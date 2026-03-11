@@ -19,7 +19,7 @@ Single deterministic runbook for Team 10 (Gateway) gate execution. Gate Protocol
 
 - SSM/WSM and Gate Protocol are canonical. Identity header and canonical message format (TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK_v1.0.0) apply to all gate-bound artifacts.
 - Team 10 uses TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0 for scope (20/30/40/60); activates **every** development team in scope with explicit mandate/prompt.
-- Fast-track operations (when declared) are governed by `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.0.0.md`; this runbook remains the canonical execution reference for GATE_3 internals.
+- Fast-track operations (when declared) are governed by `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.2.0.md`; this runbook remains the canonical execution reference for GATE_3 internals.
 - Cross-owner gate artifact contracts are mandatory references:
   - `documentation/docs-governance/05-CONTRACTS/GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.1.0.md`
   - `documentation/docs-governance/05-CONTRACTS/GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.1.0.md`
@@ -122,7 +122,7 @@ When a fast-track is formally declared, Team 10 must:
 3. Enforce track exclusivity in WSM (`FAST` active => normal flow HOLD with reason).
 
 Normative fast-track protocol:
-`documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.0.0.md`
+`documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.2.0.md`
 
 ---
 

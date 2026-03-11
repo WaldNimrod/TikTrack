@@ -6,6 +6,7 @@
 **date:** 2026-03-08  
 **status:** LOCKED  
 **canonical:** GOVERNANCE_PROCEDURES_INDEX §04-PROCEDURES  
+**changelog:** 2025-01-31 — §2.1 Content requirement (דרישת תיקון מפורטת), §2.2 Applicability (Team 60 + כל צוות מאמת).  
 
 ---
 
@@ -20,19 +21,27 @@
 | Condition | Action |
 |-----------|--------|
 | QA status = BLOCK | |
-| Owner of blockers is **clear** (e.g. Team 20, Team 30, Team 60) | **Direct:** Team 50 → Owner team (fix request / block notification) |
+| Owner of blockers is **clear** (e.g. Team 20, Team 30, Team 60) | **Direct:** Verifying team → Owner team (fix request / block notification) |
 | | **cc:** Team 10 (for orchestration visibility) |
-| Owner unclear or multi-team | Team 50 → Team 10 (for routing decision) |
+| Owner unclear or multi-team | Verifying team → Team 10 (for routing decision) |
+
+### 2.1 Content requirement (חובה — מניעת רעש)
+
+**דרישת תיקון מפורטת ומדויקת:** ההודעה לצוות האחראי חייבת לכלול **את כל המידע הקיים** כדי לאפשר תיקון אופטימלי: כלל המעבר (PASS rule), מה בוצע באימות, לוג/Evidence, סיבת הכשל (שורש), מיקום רלוונטי בקוד, דרישת תיקון ברורה (כולל אפשרויות אם רלוונטי), ואימות אחרי תיקון. **בלי זה נוצר רעש מיותר ולא יעיל.**
+
+### 2.2 Applicability
+
+**חל על:** Team 50 (QA) ו-**Team 60** (אימות runtime/אינפרה) וכל צוות שמבצע אימות ומחזיר BLOCK — שולח דרישת תיקון מפורטת ישירות לצוות האחראי עם **cc: Team 10**.
 
 ---
 
 ## 3) Message Format
 
 **Direct fix request (to Owner):**
-- **Path:** `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_[ID]_[CONTEXT]_BLOCK_FIX_REQUEST.md`
+- **Path:** `_COMMUNICATION/team_[VERIFIER_ID]/TEAM_[VERIFIER_ID]_TO_TEAM_[OWNER_ID]_[CONTEXT]_[BLOCK_FIX_REQUEST|REMEDIATION_REQUEST].md`
 - **to:** Team [20|30|60|…] (הצוות האחראי)
 - **cc:** Team 10
-- **Content:** Blockers, required actions, evidence, verification steps
+- **Content:** דרישת תיקון מפורטת — Blockers, כלל PASS, Evidence, לוגים, סיבת כשל, מיקום בקוד, דרישת תיקון מדויקת, אימות אחרי תיקון (§2.1)
 
 **QA Report (informational, for traceability):**
 - **Path:** `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_[CONTEXT]_QA_REPORT.md`

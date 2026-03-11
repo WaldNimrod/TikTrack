@@ -1,10 +1,12 @@
 # FAST_TRACK_EXECUTION_PROTOCOL_v1.0.0
 
+**status:** SUPERSEDED_HISTORICAL — not for active operational references.  
+**superseded_by:** `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.2.0.md`
+
 **project_domain:** SHARED (TIKTRACK + AGENTS_OS)  
 **id:** FAST_TRACK_EXECUTION_PROTOCOL_v1.0.0  
 **owner:** Team 190 (constitutional lock), executed via Team 10 Gateway  
 **date:** 2026-02-26  
-**status:** LOCKED_OPTIONAL (not default flow)  
 **canonical_basis:** 04_GATE_MODEL_PROTOCOL_v2.3.0, PHOENIX_MASTER_WSM_v1.0.0
 
 ---

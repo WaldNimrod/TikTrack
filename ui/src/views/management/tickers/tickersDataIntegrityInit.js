@@ -276,5 +276,13 @@ function formatTs(ts) {
   populateSelect(list);
 
   selectEl.addEventListener('change', doCheck);
+
+  const checkBtn = document.getElementById('tickerDataIntegrityCheckBtn');
+  if (checkBtn) {
+    checkBtn.addEventListener('click', () => {
+      if (selectEl.value?.trim()) doCheck();
+    });
+  }
+
   doCheck();
 })();

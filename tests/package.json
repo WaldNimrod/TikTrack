@@ -12,6 +12,7 @@
     "test:password-change": "node --experimental-modules password-change.test.js",
     "test:routing": "node --experimental-modules trading-accounts-routing.test.js",
     "test:phase2": "node phase2-runtime.test.js",
+    "test:auto-wp003-runtime": "node auto-wp003-runtime.test.js",
     "test:phase2-e2e": "node phase2-e2e-selenium.test.js",
     "test:phase2-e2e-rerun-failed": "PHASE2_E2E_ONLY_FAILED=1 node phase2-e2e-selenium.test.js",
     "test:phase1-completion-b": "node phase1-completion-b-validation.test.js",

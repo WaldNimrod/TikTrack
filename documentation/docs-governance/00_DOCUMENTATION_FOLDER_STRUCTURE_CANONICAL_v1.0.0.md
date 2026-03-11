@@ -6,47 +6,46 @@
 **date:** 2026-02-22  
 **status:** LOCKED — תיקון טופולוגי: הפרדת דומיינים
 
+**Active reference unification (2026-03-10):** הנתיב הקנוני הפעיל לממשל הוא שורש `documentation/docs-governance/` עם תיקיות ישירות: `00-INDEX/`, `01-FOUNDATIONS/`, `02-POLICIES/`, `04-PROCEDURES/`, `05-CONTRACTS/`, וכו'. אין שימוש פעיל בנתיב `PHOENIX_CANONICAL/` — ראה `00_MASTER_INDEX.md` (deprecated_alias_notice). כל ההפניות המבצעיות מפנות ל־`documentation/docs-governance/01-FOUNDATIONS/`, `04-PROCEDURES/`, `05-CONTRACTS/` וכו' ישירות.
+
 ---
 
 ## 1. עקרונות מחייבים
 
 1. **כל מה שקשור לדומיין Agents_OS** חייב לשבת **תחת תיקיית המערכת** `agents_os/` — ולא תחת תיקיות התעוד הראשיות של הממשל או של TikTrack.
 2. **כל המסמכים המשותפים לשני הדומיינים** (TikTrack + Agents_OS) חייבים לשבת **בתיקיות תעוד המשילות הראשיות** — `documentation/docs-governance/` — **לא** בתיקייה של מערכת האיגנטים.
-3. **SSM, WSM, נוהל שערים, Artifact Taxonomy, Retry, Directives, Procedures, Policies, Templates** — הם **משותפים** (Phoenix/Dev OS). מקומם הקנוני: **documentation/docs-governance/PHOENIX_CANONICAL/** (או כפי שיוגדר בסעיף 2). **אסור** שיישבו תחת `agents_os/` או תחת תיקייה בשם `AGENTS_OS_GOVERNANCE`.
+3. **SSM, WSM, נוהל שערים, Artifact Taxonomy, Retry, Directives, Procedures, Policies, Templates** — הם **משותפים** (Phoenix/Dev OS). מקומם הקנוני הפעיל: **documentation/docs-governance/** עם תיקיות ישירות (`01-FOUNDATIONS/`, `04-PROCEDURES/`, `05-CONTRACTS/` וכו'). **אין שימוש פעיל** בנתיב `PHOENIX_CANONICAL/` (היסטורי — ראה §2.1). **אסור** שיישבו תחת `agents_os/` או תחת תיקייה בשם `AGENTS_OS_GOVERNANCE`.
 
 ### 1.1 מצב (SSM / WSM) — משותף; אין קבצי מצב נפרדים לדומיין
 
 **מקור יחיד למצב:** קובץ ה־WSM וקובץ ה־SSM הם **משותפים** לשני הדומיינים (TikTrack ו־Agents_OS). **אין** קבצי מצב (SSM/WSM) נפרדים לדומיין האיגנטים.
 
-- **נתיב קנוני:** `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md`, `PHOENIX_MASTER_SSM_v1.0.0.md`.
-- **בידוד דומיינים:** בידוד מתבטא במיקום **תוכן ייחודי** — כל תוכן ייחודי ל־Agents_OS תחת `agents_os/`; השכבה המשותפת (מצב ריצה, היררכיה, שערים, נהלים) נמצאת ב־`documentation/docs-governance/PHOENIX_CANONICAL/` ומשמשת את שני הדומיינים.
+- **נתיב קנוני (פעיל):** `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md`, `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md`.
+- **בידוד דומיינים:** בידוד מתבטא במיקום **תוכן ייחודי** — כל תוכן ייחודי ל־Agents_OS תחת `agents_os/`; השכבה המשותפת (מצב ריצה, היררכיה, שערים, נהלים) נמצאת ב־`documentation/docs-governance/01-FOUNDATIONS/`, `04-PROCEDURES/`, `05-CONTRACTS/` וכו' ומשמשת את שני הדומיינים.
 - **נוהל משלים:** ראה גם `agents_os/docs-governance/AGENTS_OS_PHASE_1_CONCEPT_PACKAGE_v1.0.0/DOMAIN_ISOLATION_MODEL.md` §4 (Domain Enforcement Rule) ו־§5 להלן.
 
 ---
 
 ## 2. מבנה תיקיות תעוד — הנכון (לאחר תיקון)
 
-### 2.1 תעוד משילות ראשית (משותף לשני הדומיינים)
+### 2.1 תעוד משילות ראשית (משותף לשני הדומיינים) — טופולוגיה פעילה יחידה
 
-**שורש:** `documentation/docs-governance/`
+**שורש פעיל:** `documentation/docs-governance/` (תיקיות ישירות; אין תת־תיקיית PHOENIX_CANONICAL בנתיב הפעיל.)
 
-| תיקייה | תוכן | הערה |
-|--------|------|------|
-| `PHOENIX_CANONICAL/` | קנון משותף: SSM, WSM, Gate Model, Artifact Taxonomy, Retry, Iron Rules, Team 190 Constitution, Directives, Procedures, Protocols, Policies, Templates, Working Validation Records | **מקום יחיד** ל־SSM, WSM ונוהל השערים; לא תחת דומיין איגנטים |
-| `PHOENIX_CANONICAL/00-INDEX/` | אינדקס נהלים, Source Map | |
-| `PHOENIX_CANONICAL/01-FOUNDATIONS/` | PHOENIX_MASTER_SSM_v1.0.0.md, PHOENIX_MASTER_WSM_v1.0.0.md, 04_GATE_MODEL_PROTOCOL*, GATE_0_GATE_1_CANONICAL_DESIGN_GATES_LOCK.md, 03_ARTIFACT_TAXONOMY_REGISTRY.md, 03_IRON_RULES_AND_GOVERNANCE_CONSTITUTION.md, 07_TEAM_190_CONSTITUTION.md, 00_INDEX_CANONICAL.md | יסודות קנוניים |
-| `PHOENIX_CANONICAL/02-POLICIES/` | נהלי מדיניות (למשל ARCHITECT_POLICY_*) | |
-| `PHOENIX_CANONICAL/03-PROTOCOLS/` | 05_RETRY_PROTOCOL.md, ARCHITECT_KNOWLEDGE_PROMOTION_PROTOCOL.md | |
-| `PHOENIX_CANONICAL/04-PROCEDURES/` | ARCHITECT_GOVERNANCE_PROCEDURES_V2.md וכו' | |
-| `PHOENIX_CANONICAL/05-CONTRACTS/` | ARCHITECT_DESIGN_CONTRACTS_MANDATE.md וכו' | |
-| `PHOENIX_CANONICAL/06-TEMPLATES/` | ARCHITECT_DECISION_TEMPLATE*, ARCHITECT_VERDICT_* | |
-| `PHOENIX_CANONICAL/07-DIRECTIVES_AND_DECISIONS/` | כל ה־ARCHITECT_* mandates ו־MISSION_DIRECTIVE_* | |
-| `PHOENIX_CANONICAL/08-WORKING_VALIDATION_RECORDS/` | 08_EXEC_SUMMARY_STANDARD, 09_TECHNICAL_REPORT_STANDARD, ARCHITECT_* approval records | |
-| `00-FOUNDATIONS/` | ADR Template, Documentation Standards Index (תוכן קיים) | לא להזיז |
-| `01-POLICIES/` | (קיים) | |
-| `02-PROCEDURES/` | (קיים) | |
-| `06-CONTRACTS/` | (קיים) | |
+| תיקייה (ישירות תחת docs-governance/) | תוכן | הערה |
+|--------------------------------------|------|------|
+| `00-INDEX/` | GOVERNANCE_PROCEDURES_INDEX.md, GOVERNANCE_PROCEDURES_SOURCE_MAP.md, PORTFOLIO_INDEX.md | אינדקס נהלים, Source Map |
+| `01-FOUNDATIONS/` | PHOENIX_MASTER_SSM_v1.0.0.md, PHOENIX_MASTER_WSM_v1.0.0.md, 04_GATE_MODEL_PROTOCOL_v2.3.0.md, GATE_0_GATE_1_CANONICAL_DESIGN_GATES_LOCK.md, 03_ARTIFACT_TAXONOMY_REGISTRY.md, 03_IRON_RULES_AND_GOVERNANCE_CONSTITUTION.md, 07_TEAM_190_CONSTITUTION.md, 00_INDEX_CANONICAL.md | **מקום יחיד** ל־SSM, WSM ונוהל השערים |
+| `02-POLICIES/` | נהלי מדיניות (למשל ARCHITECT_POLICY_*) | |
+| `03-PROTOCOLS/` | 05_RETRY_PROTOCOL.md, ARCHITECT_KNOWLEDGE_PROMOTION_PROTOCOL.md | |
+| `04-PROCEDURES/` | FAST_TRACK_EXECUTION_PROTOCOL_v1.2.0.md, TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md, ARCHITECT_GOVERNANCE_PROCEDURES_V2.md וכו' | |
+| `05-CONTRACTS/` | GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.1.0.md, GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.1.0.md, ARCHITECT_DESIGN_CONTRACTS_MANDATE.md וכו' | |
+| `06-TEMPLATES/` | ARCHITECT_DECISION_TEMPLATE*, ARCHITECT_VERDICT_* | |
+| `07-DIRECTIVES_AND_DECISIONS/` | (אם קיים) | |
+| `08-WORKING_VALIDATION_RECORDS/` | (אם קיים) | |
 | `09-GOVERNANCE/` | **לא פעיל** — הועבר לארכיון; קונטקסט איגנטים: `00_MASTER_INDEX.md` §Active agent context | |
+
+**היסטורי (לא לנתיב פעיל):** בעבר שימשה תת־תיקייה `PHOENIX_CANONICAL/` — כיום כל ההפניות המבצעיות מפנות ישירות ל־`documentation/docs-governance/00-INDEX/`, `01-FOUNDATIONS/`, `04-PROCEDURES/`, `05-CONTRACTS/` וכו'.
 
 ### 2.2 תעוד דומיין Agents_OS בלבד
 
@@ -72,43 +71,38 @@
 
 ---
 
-## 3. מיפוי תיקון (מקור → יעד)
+## 3. מיפוי תיקון (היסטורי — מקור → יעד פעיל נוכחי)
 
-**מקור שגוי:** `documentation/docs-governance/AGENTS_OS_GOVERNANCE/`  
-**יעד נכון:** `documentation/docs-governance/PHOENIX_CANONICAL/`
+**מקור שגוי (היסטורי):** `documentation/docs-governance/AGENTS_OS_GOVERNANCE/`  
+**יעד פעיל נוכחי:** תיקיות ישירות תחת `documentation/docs-governance/` (למשל `00-INDEX/`, `01-FOUNDATIONS/`, `04-PROCEDURES/`, `05-CONTRACTS/`).  
+**הערה:** נתיב `PHOENIX_CANONICAL/` אינו בשימוש פעיל; אם קיימת תיקייה כזו — תוכן הקנון הפעיל נמצא כבר תחת התיקיות הישירות.
 
-- `AGENTS_OS_GOVERNANCE/00-INDEX/*` → `PHOENIX_CANONICAL/00-INDEX/`
-- `AGENTS_OS_GOVERNANCE/01-FOUNDATIONS/*` → `PHOENIX_CANONICAL/01-FOUNDATIONS/`
-- `AGENTS_OS_GOVERNANCE/02-POLICIES/*` → `PHOENIX_CANONICAL/02-POLICIES/`
-- `AGENTS_OS_GOVERNANCE/03-PROTOCOLS/*` → `PHOENIX_CANONICAL/03-PROTOCOLS/`
-- `AGENTS_OS_GOVERNANCE/04-PROCEDURES/*` → `PHOENIX_CANONICAL/04-PROCEDURES/`
-- `AGENTS_OS_GOVERNANCE/05-CONTRACTS/*` → `PHOENIX_CANONICAL/05-CONTRACTS/`
-- `AGENTS_OS_GOVERNANCE/06-TEMPLATES/*` → `PHOENIX_CANONICAL/06-TEMPLATES/`
-- `AGENTS_OS_GOVERNANCE/07-DIRECTIVES_AND_DECISIONS/*` → `PHOENIX_CANONICAL/07-DIRECTIVES_AND_DECISIONS/`
-- `AGENTS_OS_GOVERNANCE/08-WORKING_VALIDATION_RECORDS/*` → `PHOENIX_CANONICAL/08-WORKING_VALIDATION_RECORDS/`
-- `AGENTS_OS_GOVERNANCE/99-ARCHIVE/*` → `PHOENIX_CANONICAL/99-ARCHIVE/` (או 99-archive תחת docs-governance)
+- `AGENTS_OS_GOVERNANCE/00-INDEX/*` → `documentation/docs-governance/00-INDEX/`
+- `AGENTS_OS_GOVERNANCE/01-FOUNDATIONS/*` → `documentation/docs-governance/01-FOUNDATIONS/`
+- (וכן הלאה לתיקיות 02–08, 99-archive.)
 
-**חובה:** העתקה מלאה של כל הקבצים לפני מחיקת `AGENTS_OS_GOVERNANCE`. מחיקת התיקייה השגויה — **רק לאחר** אימות שההעתקה הושלמה ושאין קישורים שבורים.
+**חובה:** כל הפניה מבצעית חדשה — לנתיבים הישירים תחת `documentation/docs-governance/` בלבד.
 
 ---
 
-## 4. נתיבים קנוניים מעודכנים (לאחר תיקון)
+## 4. נתיבים קנוניים פעילים (מחייב)
 
-| מסמך | נתיב קנוני (חדש) |
-|------|-------------------|
-| PHOENIX_MASTER_SSM_v1.0.0 | `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md` |
-| PHOENIX_MASTER_WSM_v1.0.0 | `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` |
-| 04_GATE_MODEL_PROTOCOL_v2.3.0 | `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md` |
-| GATE_0_GATE_1_CANONICAL_DESIGN_GATES_LOCK | `documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/GATE_0_GATE_1_CANONICAL_DESIGN_GATES_LOCK.md` |
-| אינדקס נהלים | `documentation/docs-governance/PHOENIX_CANONICAL/00-INDEX/GOVERNANCE_PROCEDURES_INDEX.md` |
-| Source Map | `documentation/docs-governance/PHOENIX_CANONICAL/00-INDEX/GOVERNANCE_PROCEDURES_SOURCE_MAP.md` |
+| מסמך | נתיב קנוני פעיל |
+|------|------------------|
+| PHOENIX_MASTER_SSM_v1.0.0 | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md` |
+| PHOENIX_MASTER_WSM_v1.0.0 | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` |
+| 04_GATE_MODEL_PROTOCOL_v2.3.0 | `documentation/docs-governance/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md` |
+| GATE_0_GATE_1_CANONICAL_DESIGN_GATES_LOCK | `documentation/docs-governance/01-FOUNDATIONS/GATE_0_GATE_1_CANONICAL_DESIGN_GATES_LOCK.md` |
+| FAST_TRACK_EXECUTION_PROTOCOL (active) | `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.2.0.md` |
+| אינדקס נהלים | `documentation/docs-governance/00-INDEX/GOVERNANCE_PROCEDURES_INDEX.md` |
+| Source Map | `documentation/docs-governance/00-INDEX/GOVERNANCE_PROCEDURES_SOURCE_MAP.md` |
 
 ---
 
 ## 5. אימוץ מחייב
 
-- **Team 70 (ספרן ראשי):** נוהל קידום ידע, עדכון אינדקסים וקישורים — **חובה** לפי מבנה זה. כל הפניה ל־SSM/WSM/נוהל שערים — לנתיבים תחת `documentation/docs-governance/PHOENIX_CANONICAL/`.
-- **צוותים 10, 100, 170, 190:** עדכון הפניות במסמכים לפי הנתיבים בסעיף 4.
+- **Team 70 (ספרן ראשי):** נוהל קידום ידע, עדכון אינדקסים וקישורים — **חובה** לפי מבנה זה. כל הפניה ל־SSM/WSM/נוהל שערים — **לנתיבים הישירים** תחת `documentation/docs-governance/` (למשל `01-FOUNDATIONS/`, `04-PROCEDURES/`, `05-CONTRACTS/`) כמופיע בסעיף 4.
+- **צוותים 10, 100, 170, 190:** עדכון הפניות במסמכים לפי הנתיבים בסעיף 4 בלבד (ללא שימוש ב־PHOENIX_CANONICAL).
 
 ---
 

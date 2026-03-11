@@ -1,9 +1,11 @@
 # GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.0.0
 
+**status:** SUPERSEDED_HISTORICAL — not for active operational references.  
+**superseded_by:** `documentation/docs-governance/05-CONTRACTS/GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.1.0.md`
+
 **date:** 2026-03-10
 
 project_domain: SHARED
-status: LOCKED
 owner: Team 190
 scope: GATE_0, GATE_1, GATE_2
 

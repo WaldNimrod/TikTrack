@@ -9,7 +9,7 @@ import { createModal } from '../../../components/shared/PhoenixModal.js';
 import { showTickerFormModal } from './tickersForm.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 import { toHebrewStatus, normalizeToCanonicalStatus } from '../../../utils/statusAdapter.js';
-import { getPriceSourceLabel, formatPriceAsOf, getTrafficLightFromSource } from '../../../utils/priceReliabilityLabels.js';
+import { getPriceSourceLabel, formatPriceAsOf, getTrafficLightFromSource, getTrafficLightTooltip } from '../../../utils/priceReliabilityLabels.js';
 
 /** BF-002: Currency symbols per Team 20 API (COUNTRY_TO_CURRENCY, CRYPTO parsing) */
 const CURRENCY_SYMBOLS = { USD: '$', EUR: '€', ILS: '₪', GBP: '£', JPY: '¥', USDT: '₮' };
@@ -90,12 +90,20 @@ const formatChangePct = (pct) => {
   }
 
   function updateSummary(summary) {
-    const totalEl = document.getElementById('totalTickers');
-    const activeEl = document.getElementById('activeTickers');
+    const contentEl = document.querySelector('#summaryStats .info-summary__content');
     const countEl = document.getElementById('tableTickersCount');
-    if (totalEl) totalEl.textContent = summary?.total_tickers ?? 0;
-    if (activeEl) activeEl.textContent = summary?.active_tickers ?? 0;
-    if (countEl) countEl.textContent = `${tableData.total} טיקרים`;
+    const summaryEl = document.getElementById('summaryStats');
+    const hasFilter = !!(filterState.ticker_type || (filterState.is_active !== undefined && filterState.is_active !== '') || filterState.search);
+    const total = summary?.total_tickers ?? 0;
+    const active = summary?.active_tickers ?? 0;
+    const displayed = tableData.total ?? 0;
+    if (contentEl) {
+      contentEl.innerHTML = hasFilter
+        ? `<div>מוצגים: <strong id="totalTickers">${displayed}</strong> מתוך <strong id="totalTickersGlobal">${total}</strong></div><div>פעילים (global): <strong id="activeTickers">${active}</strong></div>`
+        : `<div>סה"כ טיקרים: <strong id="totalTickers">${total}</strong></div><div>טיקרים פעילים: <strong id="activeTickers">${active}</strong></div>`;
+    }
+    if (countEl) countEl.textContent = `${displayed} טיקרים`;
+    if (summaryEl) summaryEl.classList.toggle('summary--filtered', !!hasFilter);
   }
 
   function updateTable(data) {
@@ -136,8 +144,9 @@ const formatChangePct = (pct) => {
       symbolWrap.className = 'phoenix-table__symbol-with-light';
       const lightSpan = document.createElement('span');
       lightSpan.className = `traffic-light traffic-light--${trafficLight}`;
-      lightSpan.setAttribute('aria-label', getPriceSourceLabel(priceSource) || 'מקור מחיר');
-      lightSpan.title = getPriceSourceLabel(priceSource) || '';
+      const tooltip = getTrafficLightTooltip(priceSource);
+      lightSpan.setAttribute('aria-label', tooltip);
+      lightSpan.title = tooltip;
       symbolWrap.appendChild(lightSpan);
       symbolWrap.appendChild(document.createTextNode(t.symbol ?? ''));
       symbolCell.appendChild(symbolWrap);
@@ -251,7 +260,67 @@ const formatChangePct = (pct) => {
     });
 
     initActionHandlers();
+    initRowHoverHandlers();
     initAddButton();
+  }
+
+  function initRowHoverHandlers() {
+    const HOVER_DELAY_MS = 150;
+    const EXIT_DELAY_MS = 100;
+    const table = document.getElementById('tickersTable');
+    if (!table?.closest('[data-tickers-actions-hover="true"]')) return;
+    table.querySelectorAll('tbody tr.phoenix-table__row').forEach((row) => {
+      const tooltip = row.querySelector('.table-actions-tooltip');
+      const menu = row.querySelector('.table-actions-menu');
+      if (!tooltip || !menu) return;
+      let openT = null;
+      let closeT = null;
+      const show = () => {
+        if (closeT) clearTimeout(closeT);
+        closeT = null;
+        menu.style.opacity = '1';
+        menu.style.visibility = 'visible';
+        menu.style.pointerEvents = 'auto';
+      };
+      const hide = () => {
+        menu.style.opacity = '0';
+        menu.style.visibility = 'hidden';
+        menu.style.pointerEvents = 'none';
+      };
+      const scheduleOpen = () => {
+        if (closeT) { clearTimeout(closeT); closeT = null; }
+        if (openT) return;
+        openT = setTimeout(() => { openT = null; show(); }, HOVER_DELAY_MS);
+      };
+      const scheduleClose = () => {
+        if (openT) { clearTimeout(openT); openT = null; }
+        if (closeT) return;
+        closeT = setTimeout(() => {
+          closeT = null;
+          if (!row.matches(':hover') && !menu.matches(':hover')) hide();
+        }, EXIT_DELAY_MS);
+      };
+      row.addEventListener('mouseenter', scheduleOpen);
+      row.addEventListener('mouseleave', () => {
+        if (!menu.matches(':hover')) scheduleClose();
+      });
+      menu.addEventListener('mouseenter', () => { if (closeT) clearTimeout(closeT); closeT = null; show(); });
+      menu.addEventListener('mouseleave', () => {
+        if (!row.matches(':hover')) scheduleClose();
+      });
+      row.querySelectorAll('.table-action-btn').forEach((btn) => {
+        btn.addEventListener('click', () => { hide(); });
+      });
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        table.querySelectorAll('.table-actions-menu').forEach((m) => {
+          m.style.opacity = '0';
+          m.style.visibility = 'hidden';
+          m.style.pointerEvents = 'none';
+        });
+      }
+    });
   }
 
   function updatePagination() {
@@ -357,84 +426,148 @@ const formatChangePct = (pct) => {
     });
   }
 
-  async function handleDetails(tickerId) {
+  function renderDetailSkeleton() {
+    return `
+      <div class="modal-skeleton">
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row skeleton-row--short"></div>
+        <div class="skeleton-row"></div>
+      </div>
+    `;
+  }
+
+  function renderDetailContent(t, data, tickerId) {
+    const eod = (data?.eod_prices ?? {});
+    const intra = data?.intraday_prices ?? {};
+    const hist = data?.history_250d ?? {};
+    const fmt = (ts) => !ts ? '—' : new Date(ts).toLocaleString('he-IL', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+    const gapLabel = (g) => (g === 'OK' ? 'מלא' : g === 'NO_DATA' ? 'אין נתון' : g === 'INSUFFICIENT' ? 'חלקי' : g || '—');
+    const level = (g) => (g === 'OK' ? 'success' : g === 'NO_DATA' || g === 'INSUFFICIENT' ? 'warning' : 'error');
+    const eodTs = eod.latest_fetched_at ?? eod.last_update;
+    const intraTs = intra.latest_fetched_at ?? intra.last_update;
+    const histTs = hist.latest_fetched_at ?? hist.last_update;
+    const esc = (v) => (v == null || v === '' ? '—' : String(v).replace(/</g, '&lt;'));
+    const curr = t.currency ?? t.currencyCode ?? 'USD';
+    const priceVal = t.current_price ?? t.currentPrice ?? null;
+    const lastClose = t.last_close_price ?? t.lastClosePrice ?? null;
+    const statusCanon = t.status ?? (t.is_active ?? t.isActive ? 'active' : 'cancelled');
+    const statusLabel = toHebrewStatus(statusCanon) || (t.is_active ? 'פתוח' : 'מבוטל');
+    const editSection = `
+      <div class="data-integrity-detail-section">
+        <strong>שדות עריכה</strong>
+        <div class="data-integrity-detail-row"><strong>סמל</strong><span dir="ltr">${esc(t.symbol)}</span></div>
+        <div class="data-integrity-detail-row"><strong>שם חברה</strong><span>${esc(t.company_name ?? t.companyName)}</span></div>
+        <div class="data-integrity-detail-row"><strong>סוג</strong><span>${esc(t.ticker_type ?? t.tickerType)}</span></div>
+        <div class="data-integrity-detail-row"><strong>מטבע</strong><span dir="ltr">${esc(curr)}</span></div>
+        <div class="data-integrity-detail-row"><strong>בורסה</strong><span dir="ltr">${esc(t.exchange_code ?? t.exchangeCode)}</span></div>
+        <div class="data-integrity-detail-row"><strong>סטטוס</strong><span>${esc(statusLabel)}</span></div>
+        <div class="data-integrity-detail-row"><strong>מחיר נוכחי</strong><span dir="ltr">${formatCurrency(priceVal, curr)}</span></div>
+        <div class="data-integrity-detail-row"><strong>סגירה</strong><span dir="ltr">${formatCurrency(lastClose, curr)}</span></div>
+        <div class="data-integrity-detail-row"><strong>מקור</strong><span>${getPriceSourceLabel(t.price_source ?? t.priceSource)}</span></div>
+        <div class="data-integrity-detail-row"><strong>עודכן ב</strong><span dir="ltr">${t.price_as_of_utc ?? t.priceAsOfUtc ? formatPriceAsOf(t.price_as_of_utc ?? t.priceAsOfUtc) : '—'}</span></div>
+      </div>
+    `;
+    const marketSection = `
+      <tt-section-row class="data-integrity-summary-row">
+        <div class="data-integrity-card staleness-level--${level(eod.gap_status)}">
+          <div class="data-integrity-card__title">נתוני EOD</div>
+          <div class="data-integrity-card__value">${gapLabel(eod.gap_status)} — ${fmt(eodTs)}</div>
+        </div>
+        <div class="data-integrity-card staleness-level--${level(intra.gap_status)}">
+          <div class="data-integrity-card__title">נתוני Intraday</div>
+          <div class="data-integrity-card__value">${gapLabel(intra.gap_status)} — ${fmt(intraTs)}</div>
+        </div>
+        <div class="data-integrity-card staleness-level--${level(hist.gap_status)}">
+          <div class="data-integrity-card__title">היסטוריה 250d</div>
+          <div class="data-integrity-card__value">${gapLabel(hist.gap_status)} — ${fmt(histTs)}</div>
+        </div>
+      </tt-section-row>
+    `;
+    return `
+      <div class="data-integrity-panel">
+        <div class="data-integrity-detail-section" style="display:flex;justify-content:flex-end;margin-bottom:0.5rem;">
+          <button type="button" class="phoenix-modal__save-btn phoenix-btn phoenix-btn--secondary js-refresh-ticker-data" data-ticker-id="${esc(tickerId ?? '')}">↺ רענן</button>
+        </div>
+        ${editSection}
+        <div class="data-integrity-detail-section" style="margin-top:1rem;"><strong>נתוני שוק + סטטוס תקינות</strong></div>
+        ${marketSection}
+      </div>
+    `;
+  }
+
+  function handleDetails(tickerId) {
+    createModal({
+      title: 'פרטי טיקר — בקרת תקינות',
+      content: renderDetailSkeleton(),
+      entity: 'ticker',
+      showSaveButton: false,
+      cancelButtonText: 'סגור',
+      onClose: () => {}
+    });
+
+    (async function fetchAndUpdate() {
+      try {
+        await sharedServices.init();
+        const [tickerRes, integrityRes] = await Promise.all([
+          sharedServices.get(`/tickers/${tickerId}`, {}),
+          sharedServices.get(`/tickers/${tickerId}/data-integrity`, {}).catch(() => ({})),
+        ]);
+        const t = tickerRes?.data ?? tickerRes ?? {};
+        const data = integrityRes?.data ?? integrityRes ?? {};
+        const body = document.querySelector('#phoenix-modal .phoenix-modal__body');
+        if (!body) return;
+        body.innerHTML = renderDetailContent(t, data, tickerId);
+        const refreshBtn = body.querySelector('.js-refresh-ticker-data');
+        if (refreshBtn) {
+          refreshBtn.addEventListener('click', () => handleDetailRefresh(tickerId, body, refreshBtn));
+        }
+      } catch (e) {
+        maskedLog('[Tickers] Data integrity failed:', { errorCode: e?.code, status: e?.status });
+        const body = document.querySelector('#phoenix-modal .phoenix-modal__body');
+        if (body) {
+          body.innerHTML = `<p class="data-integrity-error">${String(e?.message ?? 'לא ניתן לטעון בקרת תקינות').replace(/</g, '&lt;')}</p>`;
+        }
+      }
+    })();
+  }
+
+  async function handleDetailRefresh(tickerId, bodyEl, refreshBtn) {
+    if (!refreshBtn || refreshBtn.disabled) return;
+    refreshBtn.disabled = true;
+    refreshBtn.textContent = 'מרענן...';
     try {
-      await sharedServices.init();
       const [tickerRes, integrityRes] = await Promise.all([
         sharedServices.get(`/tickers/${tickerId}`, {}),
         sharedServices.get(`/tickers/${tickerId}/data-integrity`, {}).catch(() => ({})),
       ]);
       const t = tickerRes?.data ?? tickerRes ?? {};
       const data = integrityRes?.data ?? integrityRes ?? {};
-      const eod = data?.eod_prices ?? {};
-      const intra = data?.intraday_prices ?? {};
-      const hist = data?.history_250d ?? {};
-      const fmt = (ts) => !ts ? '—' : new Date(ts).toLocaleString('he-IL', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-      const gapLabel = (g) => (g === 'OK' ? 'מלא' : g === 'NO_DATA' ? 'אין נתון' : g === 'INSUFFICIENT' ? 'חלקי' : g || '—');
-      const level = (g) => (g === 'OK' ? 'success' : g === 'NO_DATA' || g === 'INSUFFICIENT' ? 'warning' : 'error');
-      const eodTs = eod.latest_fetched_at ?? eod.last_update;
-      const intraTs = intra.latest_fetched_at ?? intra.last_update;
-      const histTs = hist.latest_fetched_at ?? hist.last_update;
-      const esc = (v) => (v == null || v === '' ? '—' : String(v).replace(/</g, '&lt;'));
-      const curr = t.currency ?? t.currencyCode ?? 'USD';
-      const priceVal = t.current_price ?? t.currentPrice ?? null;
-      const lastClose = t.last_close_price ?? t.lastClosePrice ?? null;
-      const statusCanon = t.status ?? (t.is_active ?? t.isActive ? 'active' : 'cancelled');
-      const statusLabel = toHebrewStatus(statusCanon) || (t.is_active ? 'פתוח' : 'מבוטל');
-      const editSection = `
-        <div class="data-integrity-detail-section">
-          <strong>שדות עריכה</strong>
-          <div class="data-integrity-detail-row"><strong>סמל</strong><span dir="ltr">${esc(t.symbol)}</span></div>
-          <div class="data-integrity-detail-row"><strong>שם חברה</strong><span>${esc(t.company_name ?? t.companyName)}</span></div>
-          <div class="data-integrity-detail-row"><strong>סוג</strong><span>${esc(t.ticker_type ?? t.tickerType)}</span></div>
-          <div class="data-integrity-detail-row"><strong>מטבע</strong><span dir="ltr">${esc(curr)}</span></div>
-          <div class="data-integrity-detail-row"><strong>בורסה</strong><span dir="ltr">${esc(t.exchange_code ?? t.exchangeCode)}</span></div>
-          <div class="data-integrity-detail-row"><strong>סטטוס</strong><span>${esc(statusLabel)}</span></div>
-          <div class="data-integrity-detail-row"><strong>מחיר נוכחי</strong><span dir="ltr">${formatCurrency(priceVal, curr)}</span></div>
-          <div class="data-integrity-detail-row"><strong>סגירה</strong><span dir="ltr">${formatCurrency(lastClose, curr)}</span></div>
-          <div class="data-integrity-detail-row"><strong>מקור</strong><span>${getPriceSourceLabel(t.price_source ?? t.priceSource)}</span></div>
-          <div class="data-integrity-detail-row"><strong>עודכן ב</strong><span dir="ltr">${t.price_as_of_utc ?? t.priceAsOfUtc ? formatPriceAsOf(t.price_as_of_utc ?? t.priceAsOfUtc) : '—'}</span></div>
-        </div>
-      `;
-      const marketSection = `
-        <tt-section-row class="data-integrity-summary-row">
-          <div class="data-integrity-card staleness-level--${level(eod.gap_status)}">
-            <div class="data-integrity-card__title">נתוני EOD</div>
-            <div class="data-integrity-card__value">${gapLabel(eod.gap_status)} — ${fmt(eodTs)}</div>
-          </div>
-          <div class="data-integrity-card staleness-level--${level(intra.gap_status)}">
-            <div class="data-integrity-card__title">נתוני Intraday</div>
-            <div class="data-integrity-card__value">${gapLabel(intra.gap_status)} — ${fmt(intraTs)}</div>
-          </div>
-          <div class="data-integrity-card staleness-level--${level(hist.gap_status)}">
-            <div class="data-integrity-card__title">היסטוריה 250d</div>
-            <div class="data-integrity-card__value">${gapLabel(hist.gap_status)} — ${fmt(histTs)}</div>
-          </div>
-        </tt-section-row>
-      `;
-      const html = `
-        <div class="data-integrity-panel">
-          ${editSection}
-          <div class="data-integrity-detail-section" style="margin-top:1rem;"><strong>נתוני שוק + סטטוס תקינות</strong></div>
-          ${marketSection}
-        </div>
-      `;
-      createModal({
-        title: 'פרטי טיקר — בקרת תקינות',
-        content: html,
-        entity: 'ticker',
-        showSaveButton: false,
-        cancelButtonText: 'סגור',
-        onClose: () => {}
-      });
+      const idx = tableData.data?.findIndex((x) => (x.id || x.external_ulid) === tickerId);
+      if (idx >= 0 && tableData.data) {
+        tableData.data[idx] = { ...tableData.data[idx], ...t };
+        updateTable(tableData.data);
+      }
+      bodyEl.innerHTML = renderDetailContent(t, data, tickerId);
+      const flashEl = document.createElement('div');
+      flashEl.className = 'modal-refresh-flash';
+      flashEl.style.cssText = 'margin-top:8px;padding:4px 8px;border-radius:4px;font-size:0.9rem;background:var(--apple-green,#34c759);color:#fff;';
+      flashEl.textContent = 'עודכן';
+      bodyEl.appendChild(flashEl);
+      setTimeout(() => flashEl.remove(), 2000);
+      const newRefresh = bodyEl.querySelector('.js-refresh-ticker-data');
+      if (newRefresh) newRefresh.addEventListener('click', () => handleDetailRefresh(tickerId, bodyEl, newRefresh));
     } catch (e) {
-      maskedLog('[Tickers] Data integrity failed:', { errorCode: e?.code, status: e?.status });
-      createModal({
-        title: 'שגיאה',
-        content: `<p>${String(e?.message ?? 'לא ניתן לטעון בקרת תקינות').replace(/</g, '&lt;')}</p>`,
-        showSaveButton: false,
-        cancelButtonText: 'סגור'
-      });
+      const flashEl = document.createElement('div');
+      flashEl.className = 'modal-refresh-flash';
+      flashEl.style.cssText = 'margin-top:8px;padding:4px 8px;border-radius:4px;font-size:0.9rem;background:var(--apple-red,#ff3b30);color:#fff;';
+      flashEl.textContent = 'שגיאה ברענון';
+      bodyEl.appendChild(flashEl);
+      setTimeout(() => flashEl.remove(), 2000);
+    } finally {
+      if (refreshBtn?.parentNode) {
+        refreshBtn.disabled = false;
+        refreshBtn.textContent = '↺ רענן';
+      }
     }
   }
 

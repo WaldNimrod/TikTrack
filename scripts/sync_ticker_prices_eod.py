@@ -24,6 +24,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from uuid import UUID
 
 DECIMAL_SCALE = Decimal("0.00000001")
+AUTO_WP003_05_SYMBOLS = ("ANAU.MI", "BTC-USD", "TEVA.TA", "SPY")
 
 _project = Path(__file__).parent.parent
 env_file = _project / "api" / ".env"
@@ -68,8 +69,111 @@ def _is_429(e: Exception) -> bool:
     return "429" in s or "too many" in s or "rate limit" in s
 
 
+def _fetch_market_caps_batch_auto_wp003_05() -> Dict[str, Decimal]:
+    """AUTO-WP003-05: Single Yahoo v7/quote request for all 4 symbols — reduces rate-limit risk."""
+    from api.integrations.market_data.provider_cooldown import is_in_cooldown
+
+    if is_in_cooldown("YAHOO_FINANCE"):
+        return {}
+    try:
+        import httpx
+        from api.integrations.market_data.providers.yahoo_provider import _next_user_agent
+
+        url = "https://query1.finance.yahoo.com/v7/finance/quote"
+        params = {"symbols": ",".join(AUTO_WP003_05_SYMBOLS)}
+        headers = {"User-Agent": _next_user_agent()}
+        with httpx.Client(timeout=8.0, headers=headers) as client:
+            r = client.get(url, params=params)
+            r.raise_for_status()
+        data = r.json()
+        results = (data or {}).get("quoteResponse", {}).get("result") or []
+        out: Dict[str, Decimal] = {}
+        for q in results:
+            sym = q.get("symbol")
+            raw = q.get("marketCap")
+            if sym and raw is not None:
+                mc = _quantize(float(raw))
+                if mc:
+                    out[sym] = mc
+        return out
+    except Exception:
+        return {}
+
+
+def _fetch_market_cap_for_symbol(symbol: str) -> Optional[Decimal]:
+    """AUTO-WP003-05: Fetch market_cap when Yahoo v8 path didn't run (last-known, cooldown).
+    Tries: Yahoo v7 → Alpha OVERVIEW (stocks; TEVA.TA→TEVA) → CoinGecko (BTC-USD) → yfinance."""
+    from api.integrations.market_data.providers.yahoo_provider import _fetch_market_cap_only_v7
+    from api.integrations.market_data.provider_cooldown import is_in_cooldown
+
+    if not is_in_cooldown("YAHOO_FINANCE"):
+        try:
+            from concurrent.futures import ThreadPoolExecutor
+            with ThreadPoolExecutor(max_workers=1) as ex:
+                mc = ex.submit(_fetch_market_cap_only_v7, symbol).result(timeout=8)
+            if mc is not None:
+                return mc
+        except Exception:
+            pass
+
+    # Alpha OVERVIEW for stocks (before yfinance — faster, no Yahoo dependency)
+    # TEVA.TA → TEVA (Alpha has NYSE ADR); ANAU.MI → as-is (Alpha may not have)
+    if symbol != "BTC-USD" and ALPHA_VANTAGE_API_KEY:
+        alpha_sym = "TEVA" if symbol == "TEVA.TA" else symbol
+        try:
+            import httpx
+            url = "https://www.alphavantage.co/query"
+            params = {
+                "function": "OVERVIEW",
+                "symbol": alpha_sym,
+                "apikey": ALPHA_VANTAGE_API_KEY,
+            }
+            with httpx.Client(timeout=10.0) as client:
+                r = client.get(url, params=params)
+                r.raise_for_status()
+            data = r.json()
+            mc_raw = data.get("MarketCapitalization")
+            if mc_raw is not None:
+                return _quantize(float(mc_raw))
+        except Exception:
+            pass
+
+    # CoinGecko for BTC-USD (free, no key) — works when Yahoo/yfinance 429
+    if symbol == "BTC-USD":
+        try:
+            import httpx
+            url = "https://api.coingecko.com/api/v3/coins/markets"
+            params = {"vs_currency": "usd", "ids": "bitcoin"}
+            with httpx.Client(timeout=10.0) as client:
+                r = client.get(url, params=params)
+                r.raise_for_status()
+            data = r.json()
+            if isinstance(data, list) and data:
+                mc_raw = data[0].get("market_cap")
+                if mc_raw is not None:
+                    return _quantize(float(mc_raw))
+        except Exception:
+            pass
+
+    # yfinance last resort — often 429 when Yahoo is rate limited; timeout to avoid hang
+    try:
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=1) as ex:
+            def _yf_fetch():
+                import yfinance as yf
+                return yf.Ticker(symbol).info.get("marketCap")
+            raw = ex.submit(_yf_fetch).result(timeout=12)
+        if raw is not None:
+            return _quantize(float(raw))
+    except Exception:
+        pass
+
+    return None
+
+
 async def fetch_prices_for_tickers(
-    tickers: List[Tuple[UUID, str, str, Optional[Dict[str, Any]]]]
+    tickers: List[Tuple[UUID, str, str, Optional[Dict[str, Any]]]],
+    pre_fetched_market_caps: Optional[Dict[str, Decimal]] = None,
 ) -> List[Tuple[UUID, str, Decimal, Optional[Decimal], Optional[Decimal], Optional[Decimal], Optional[Decimal], Optional[int], Optional[Decimal], datetime, str]]:
     """
     Yahoo (Primary) → Alpha (Fallback — CRYPTO only or when quota allows).
@@ -169,6 +273,13 @@ async def fetch_prices_for_tickers(
             # Both providers failed (e.g. weekend) — fallback to last-known price from DB
             last = _get_last_known_price(ticker_id, symbol)
             if last:
+                # AUTO-WP003-05: enrich market_cap for required symbols when possible
+                if symbol in AUTO_WP003_05_SYMBOLS and last[8] is None:
+                    mc = (pre_fetched_market_caps or {}).get(symbol)
+                    if mc is None:
+                        mc = await asyncio.to_thread(_fetch_market_cap_for_symbol, symbol)
+                    if mc is not None:
+                        last = last[:8] + (mc,) + last[9:]
                 results.append(last)
                 print(f"📌 {symbol}: using last-known price (providers unavailable)")
             else:
@@ -352,6 +463,71 @@ def upsert_prices(
         conn.close()
 
 
+def backfill_market_cap_auto_wp003_05(
+    pre_fetched: Optional[Dict[str, Decimal]] = None,
+    manual_overrides: Optional[Dict[str, Decimal]] = None,
+) -> int:
+    """AUTO-WP003-05: UPDATE market_cap when null for ANAU.MI, BTC-USD, TEVA.TA.
+    pre_fetched: from _prefetch_market_caps_auto_wp003_05 (avoids extra HTTP when available).
+    manual_overrides: {symbol: value} when providers fail (e.g. Yahoo 429). Use: --manual ANAU.MI=1440000000
+    Tries batch Yahoo v7 first (1 req for all 3), then per-symbol fallbacks."""
+    import psycopg2
+    from psycopg2.extras import RealDictCursor
+
+    updated = 0
+    pre_fetched = dict(pre_fetched) if pre_fetched else {}
+    manual_overrides = dict(manual_overrides) if manual_overrides else {}
+    # Single Yahoo v7 batch request — reduces rate-limit risk vs 3 separate calls
+    if not pre_fetched:
+        batch = _fetch_market_caps_batch_auto_wp003_05()
+        pre_fetched.update(batch)
+
+    conn = psycopg2.connect(DATABASE_URL)
+    try:
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute("SET lock_timeout = '15s'")  # avoid indefinite hang on table lock
+        cur.execute("""
+            WITH latest AS (
+                SELECT DISTINCT ON (t.id) t.id AS ticker_id, t.symbol, tp.id AS price_row_id, tp.price_timestamp
+                FROM market_data.tickers t
+                JOIN market_data.ticker_prices tp ON tp.ticker_id = t.id
+                WHERE t.symbol = ANY(%s) AND t.deleted_at IS NULL AND tp.market_cap IS NULL
+                ORDER BY t.id, tp.price_timestamp DESC
+            )
+            SELECT ticker_id, symbol, price_row_id, price_timestamp FROM latest
+        """, (list(AUTO_WP003_05_SYMBOLS),))
+        rows = cur.fetchall()
+        for row in rows:
+            symbol = row["symbol"]
+            mc = pre_fetched.get(symbol)
+            if mc is None:
+                mc = _fetch_market_cap_for_symbol(symbol)
+            if mc is None:
+                mc = manual_overrides.get(symbol)
+            if mc is not None:
+                savepoint = f"sp_{symbol.replace('.', '_').replace('-', '_')}"
+                try:
+                    cur.execute(f"SAVEPOINT {savepoint}")
+                    cur.execute("SET LOCAL lock_timeout = '5s'")
+                    cur.execute("""
+                        UPDATE market_data.ticker_prices
+                        SET market_cap = %s
+                        WHERE id = %s AND price_timestamp = %s
+                    """, (float(mc), row["price_row_id"], row["price_timestamp"]))
+                    updated += cur.rowcount
+                except Exception as e:
+                    try:
+                        cur.execute(f"ROLLBACK TO SAVEPOINT {savepoint}")
+                    except Exception:
+                        conn.rollback()
+                        raise
+                    print(f"⚠️ Backfill market_cap {symbol}: {e}")
+        conn.commit()
+    finally:
+        conn.close()
+    return updated
+
+
 def load_tickers() -> List[Tuple[UUID, str, str, Optional[Dict[str, Any]]]]:
     """Load tickers for EOD sync. P3-010: EOD covers ALL tickers (active + inactive).
     Per MARKET_DATA_PIPE_SPEC §2.4: 'EOD ליתר' — inactive get EOD only.
@@ -387,6 +563,31 @@ def load_tickers() -> List[Tuple[UUID, str, str, Optional[Dict[str, Any]]]]:
         conn.close()
 
 
+def _prefetch_market_caps_auto_wp003_05() -> Dict[str, Decimal]:
+    """AUTO-WP003-05: ONE batch v7/quote call for 4 symbols BEFORE any v8/chart (which triggers 429).
+    Returns {symbol: market_cap} for symbols that have it."""
+    from api.integrations.market_data.providers.yahoo_provider import _fetch_prices_batch_sync
+
+    out: Dict[str, Decimal] = {}
+    try:
+        batch = _fetch_prices_batch_sync(list(AUTO_WP003_05_SYMBOLS))
+        for sym, pr in batch.items():
+            if pr.market_cap is not None:
+                out[sym] = pr.market_cap
+    except Exception:
+        pass
+    return out
+
+
+def _prioritize_auto_wp003_05(
+    tickers: List[Tuple[UUID, str, str, Optional[Dict[str, Any]]]]
+) -> List[Tuple[UUID, str, str, Optional[Dict[str, Any]]]]:
+    """AUTO-WP003-05: Process required symbols FIRST (before any 429 can trigger cooldown)."""
+    priority = [t for t in tickers if t[1] in AUTO_WP003_05_SYMBOLS]
+    rest = [t for t in tickers if t[1] not in AUTO_WP003_05_SYMBOLS]
+    return priority + rest
+
+
 def main():
     fd = None
     if fcntl:
@@ -405,18 +606,35 @@ def main():
 
     try:
         print("🔄 EOD sync — ticker_prices (Yahoo→Alpha, Single-Flight)")
+        # AUTO-WP003-05: pre-fetch market_cap via v7/quote batch BEFORE any v8/chart (avoids 429 cascade)
+        pre_fetched_mc = _prefetch_market_caps_auto_wp003_05()
+        if pre_fetched_mc:
+            print(f"📊 [AUTO-WP003-05] Pre-fetched market_cap for {list(pre_fetched_mc.keys())}")
+
         tickers = load_tickers()
         if not tickers:
             print("⚠️ No tickers in market_data.tickers. Run: python3 scripts/seed_market_data_tickers.py")
             sys.exit(0)
+        tickers = _prioritize_auto_wp003_05(tickers)
 
-        rows = asyncio.run(fetch_prices_for_tickers(tickers))
+        rows = asyncio.run(fetch_prices_for_tickers(tickers, pre_fetched_market_caps=pre_fetched_mc))
         if not rows:
             print("⚠️ No prices fetched. Exit 0.")
             sys.exit(0)
 
+        # Patch rows: use pre-fetched market_cap for AUTO-WP003-05 symbols when missing
+        patched = []
+        for r in rows:
+            if r[1] in AUTO_WP003_05_SYMBOLS and r[8] is None and pre_fetched_mc.get(r[1]):
+                r = r[:8] + (pre_fetched_mc[r[1]],) + r[9:]
+            patched.append(r)
+        rows = patched
+
         n = upsert_prices(rows)
         print(f"✅ Upserted {n} ticker prices to market_data.ticker_prices")
+        bf = backfill_market_cap_auto_wp003_05(pre_fetched=pre_fetched_mc)
+        if bf > 0:
+            print(f"✅ Backfilled market_cap for {bf} row(s) (AUTO-WP003-05)")
     finally:
         if fd is not None and fcntl:
             fcntl.flock(fd, fcntl.LOCK_UN)

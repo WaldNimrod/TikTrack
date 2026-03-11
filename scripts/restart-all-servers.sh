@@ -15,6 +15,28 @@ PROJECT_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
 echo -e "${GREEN}🔄 Restarting All Servers${NC}"
 echo "=========================================="
 
+# 0. Ensure PostgreSQL is running, then wait for it
+echo -e "${YELLOW}[0/4] PostgreSQL...${NC}"
+if docker ps -a --format "{{.Names}}" 2>/dev/null | grep -q "tiktrack-postgres-dev"; then
+  if ! docker ps --format "{{.Names}}" 2>/dev/null | grep -q "tiktrack-postgres-dev"; then
+    echo "  Starting tiktrack-postgres-dev..."
+    docker start tiktrack-postgres-dev 2>/dev/null || true
+    sleep 3
+  fi
+fi
+echo "  Waiting for DB..."
+for i in {1..60}; do
+  if python3 "$SCRIPT_DIR/wait_for_db.py" 2>/dev/null; then
+    echo -e "${GREEN}✅ PostgreSQL ready${NC}"
+    break
+  fi
+  if [ $i -eq 60 ]; then
+    echo -e "${RED}❌ PostgreSQL not available after 60s — start Docker/DB first${NC}"
+    exit 1
+  fi
+  sleep 1
+done
+
 # 1. Stop both
 echo -e "${YELLOW}[1/4] Stopping servers...${NC}"
 bash "$SCRIPT_DIR/stop-backend.sh"  2>/dev/null || true

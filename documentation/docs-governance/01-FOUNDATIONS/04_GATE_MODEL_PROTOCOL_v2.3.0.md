@@ -221,7 +221,7 @@ Fast-track is a runtime execution overlay; it does not redefine the gate enum.
   - `track_mode=FAST` requires normal flow HOLD.
   - `track_mode=NORMAL` means fast-track is inactive or scheduled-next.
 5. FAST stages are operational only (`FAST_0..FAST_4`) and reference canonical gates, especially GATE_3 internals.
-6. Full protocol: `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.1.0.md`.
+6. Full protocol: `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.2.0.md`.
 
 ---
 
@@ -232,7 +232,7 @@ Fast-track is a runtime execution overlay; it does not redefine the gate enum.
 Operational detail and artifact contracts are referenced canonically:
 
 - **Execution runbook (GATE_3..GATE_8 operations from Team 10 gateway perspective):** `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md`
-- **Fast-track overlay (domain-aware; AGENTS_OS default):** `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.1.0.md`
+- **Fast-track overlay (domain-aware; AGENTS_OS default):** `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.2.0.md`
 - **Spec lifecycle contract (GATE_0..GATE_2):** `documentation/docs-governance/05-CONTRACTS/GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.1.0.md`
 - **Human UX approval contract (GATE_7):** `documentation/docs-governance/05-CONTRACTS/GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.1.0.md`
 

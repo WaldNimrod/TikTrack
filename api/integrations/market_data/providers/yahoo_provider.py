@@ -49,8 +49,20 @@ def _to_decimal(val) -> Optional[Decimal]:
         return None
 
 
+def _tase_agorot_to_ils(val: Optional[Decimal], symbol: str) -> Optional[Decimal]:
+    """TASE (.TA) agorot → ILS. 1 ILS = 100 agorot. Mandate B2."""
+    if val is None or not symbol or not symbol.upper().endswith(".TA"):
+        return val
+    if val <= 0:
+        return val
+    return (val / Decimal("100")).quantize(Decimal("0.00000001"))
+
+
 # US market proxy for market status (SPY = S&P 500 ETF)
 _MARKET_STATUS_SYMBOL = "SPY"
+
+# AUTO-WP003-05: market_cap NOT NULL for these symbols — v8/chart lacks marketCap; enrich from v7/quote
+_AUTO_WP003_05_SYMBOLS = frozenset(("ANAU.MI", "BTC-USD", "TEVA.TA", "SPY"))
 
 
 def _fetch_prices_batch_sync(symbols: List[str]) -> Dict[str, PriceResult]:
@@ -98,6 +110,8 @@ def _fetch_prices_batch_sync(symbols: List[str]) -> Dict[str, PriceResult]:
                     price = _to_decimal(raw_price)
                     if not price or price <= 0:
                         continue
+                    # TASE agorot → ILS (Mandate B2: 1 ILS = 100 agorot)
+                    price = _tase_agorot_to_ils(price, sym)
                     raw_time = q.get("regularMarketTime")
                     as_of = (
                         datetime.fromtimestamp(int(raw_time), tz=timezone.utc)
@@ -105,15 +119,16 @@ def _fetch_prices_batch_sync(symbols: List[str]) -> Dict[str, PriceResult]:
                         else datetime.now(timezone.utc)
                     )
                     close_raw = q.get("regularMarketPreviousClose")
+                    close_dec = _tase_agorot_to_ils(_to_decimal(close_raw), sym) if close_raw else price
                     vol_raw = q.get("regularMarketVolume")
                     vol = int(vol_raw) if vol_raw is not None and str(vol_raw) != "nan" else None
                     result[sym] = PriceResult(
                         symbol=sym,
                         price=price,
-                        open_price=_to_decimal(q.get("regularMarketOpen")),
-                        high_price=_to_decimal(q.get("regularMarketDayHigh")),
-                        low_price=_to_decimal(q.get("regularMarketDayLow")),
-                        close_price=_to_decimal(close_raw) if close_raw else price,
+                        open_price=_tase_agorot_to_ils(_to_decimal(q.get("regularMarketOpen")), sym),
+                        high_price=_tase_agorot_to_ils(_to_decimal(q.get("regularMarketDayHigh")), sym),
+                        low_price=_tase_agorot_to_ils(_to_decimal(q.get("regularMarketDayLow")), sym),
+                        close_price=close_dec if close_dec else price,
                         volume=vol,
                         market_cap=_to_decimal(q.get("marketCap")),
                         as_of=as_of,
@@ -250,6 +265,14 @@ def _fetch_last_close_via_v8_chart_inner(
             h = _to_decimal(highs[i]) if abs(i) <= len(highs) and highs[i] else None
             lw = _to_decimal(lows[i]) if abs(i) <= len(lows) and lows[i] else None
             vol = int(vols[i]) if abs(i) <= len(vols) and vols[i] is not None and str(vols[i]) != "nan" else None
+            # TASE agorot → ILS (Mandate B2)
+            price = _tase_agorot_to_ils(price, out_sym)
+            o = _tase_agorot_to_ils(o, out_sym)
+            h = _tase_agorot_to_ils(h, out_sym)
+            lw = _tase_agorot_to_ils(lw, out_sym)
+            mc = None
+            if out_sym in _AUTO_WP003_05_SYMBOLS:
+                mc = _fetch_market_cap_only_v7(symbol)
             return PriceResult(
                 symbol=out_sym,
                 price=price,
@@ -258,7 +281,7 @@ def _fetch_last_close_via_v8_chart_inner(
                 low_price=lw,
                 close_price=price,
                 volume=vol,
-                market_cap=None,
+                market_cap=mc,
                 as_of=ts,
                 provider="YAHOO_FINANCE",
             )
@@ -267,6 +290,26 @@ def _fetch_last_close_via_v8_chart_inner(
             if attempt < 2:
                 time.sleep(5)
     return None
+
+
+def _fetch_market_cap_only_v7(symbol: str) -> Optional[Decimal]:
+    """AUTO-WP003-05: Minimal v7/quote request to get marketCap. v8/chart does not return it."""
+    try:
+        import httpx
+        url = "https://query1.finance.yahoo.com/v7/finance/quote"
+        params = {"symbols": symbol}
+        headers = {"User-Agent": _next_user_agent()}
+        with httpx.Client(timeout=5.0, headers=headers) as client:
+            r = client.get(url, params=params)
+            r.raise_for_status()
+        data = r.json()
+        results = data.get("quoteResponse", {}).get("result", [])
+        if not results:
+            return None
+        raw = results[0].get("marketCap")
+        return _to_decimal(raw) if raw else None
+    except Exception:
+        return None
 
 
 def _fetch_price_via_quote_api(symbol: str) -> Optional[PriceResult]:
@@ -285,9 +328,11 @@ def _fetch_price_via_quote_api(symbol: str) -> Optional[PriceResult]:
         if not results:
             return None
         q = results[0]
+        out_sym = q.get("symbol", symbol)
         price = _to_decimal(q.get("regularMarketPrice") or q.get("regularMarketPreviousClose"))
         if not price or price <= 0:
             return None
+        price = _tase_agorot_to_ils(price, out_sym)
         ts_raw = q.get("regularMarketTime") or q.get("regularMarketOpen")
         if ts_raw:
             try:
@@ -301,11 +346,11 @@ def _fetch_price_via_quote_api(symbol: str) -> Optional[PriceResult]:
         market_cap_raw = q.get("marketCap")
         market_cap = _to_decimal(market_cap_raw) if market_cap_raw else None
         return PriceResult(
-            symbol=q.get("symbol", symbol),
+            symbol=out_sym,
             price=price,
-            open_price=_to_decimal(q.get("regularMarketOpen")),
-            high_price=_to_decimal(q.get("regularMarketDayHigh")),
-            low_price=_to_decimal(q.get("regularMarketDayLow")),
+            open_price=_tase_agorot_to_ils(_to_decimal(q.get("regularMarketOpen")), out_sym),
+            high_price=_tase_agorot_to_ils(_to_decimal(q.get("regularMarketDayHigh")), out_sym),
+            low_price=_tase_agorot_to_ils(_to_decimal(q.get("regularMarketDayLow")), out_sym),
             close_price=price,
             volume=vol,
             market_cap=market_cap,

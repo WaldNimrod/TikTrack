@@ -1,4 +1,7 @@
 ---
+**status:** SUPERSEDED_HISTORICAL — not for active operational references.
+**superseded_by:** `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_TEAM_100_G5_G6_G7_AUTOMATION_GOVERNANCE_INTELLIGENCE_REPORT_v1.0.1.md`
+
 project_domain: SHARED (TIKTRACK + AGENTS_OS)
 id: TEAM_190_TO_TEAM_00_TEAM_100_G5_G6_G7_AUTOMATION_GOVERNANCE_INTELLIGENCE_REPORT_v1.0.0
 from: Team 190 (Constitutional Architectural Validator)

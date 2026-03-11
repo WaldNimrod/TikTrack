@@ -24,6 +24,20 @@ export function getPriceSourceLabel(source) {
   return SOURCE_LABELS[source] ?? source;
 }
 
+/** T30-10: Tooltip for traffic light when price_source is null */
+const TOOLTIP_NULL = 'אין נתונים — יש לרוץ EOD sync';
+
+/** Get tooltip text for traffic light (including null case per SPEC §1 Q3.2) */
+export function getTrafficLightTooltip(source) {
+  if (!source) return TOOLTIP_NULL;
+  const labels = {
+    EOD: 'נתונים מסגירה — מעודכן',
+    EOD_STALE: 'נתוני סגירה ישנים (>48 שעות)',
+    INTRADAY_FALLBACK: 'נתונים תוך־יומיים (EOD ישן)',
+  };
+  return labels[source] ?? getPriceSourceLabel(source);
+}
+
 /**
  * Format price_as_of_utc or last_close_as_of_utc for display
  * @param {string|null} iso8601 - ISO8601 timestamp

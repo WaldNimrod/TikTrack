@@ -82,8 +82,8 @@ Reference: `_COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION_v1.0.0.md`.
 3. No gate progression without a single WSM update by the gate owner.
 4. Lifecycle closes only on `GATE_8 PASS`.
 5. Artifact contracts are mandatory:
-   - `documentation/docs-governance/05-CONTRACTS/GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.0.0.md`
-   - `documentation/docs-governance/05-CONTRACTS/GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.0.0.md`
+   - `documentation/docs-governance/05-CONTRACTS/GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.1.0.md`
+   - `documentation/docs-governance/05-CONTRACTS/GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.1.0.md`
 
 ---
 

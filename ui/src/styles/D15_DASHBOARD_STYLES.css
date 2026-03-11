@@ -2194,3 +2194,96 @@ body.brokers-fees-page tt-container tt-section {
 .data-integrity-error {
   color: var(--color-error-red, #FF3B30);
 }
+
+/* T30-1: Tickers table — hover menu precision (150ms/100ms/0px gap, row zone) */
+.phoenix-table--actions-hover .table-actions-tooltip {
+  display: block;
+}
+.phoenix-table--actions-hover .table-actions-menu {
+  top: 100%;
+  inset-inline-end: 0;
+  margin-top: 0;
+  transition-delay: 0s;
+}
+.phoenix-table--actions-hover .table-actions-tooltip:hover .table-actions-menu,
+.phoenix-table--actions-hover .table-actions-tooltip:focus-within .table-actions-menu {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.phoenix-table--actions-hover .table-actions-menu:hover {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* T30-11: Status legend after tickers table */
+.ticker-status-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-top: var(--spacing-md, 16px);
+  padding: var(--spacing-sm, 8px) 0;
+  font-size: 0.85rem;
+  color: var(--apple-text-secondary, #6b7280);
+}
+.ticker-status-legend .legend__title {
+  font-weight: 600;
+  margin-inline-end: 4px;
+}
+.ticker-status-legend .legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.ticker-status-legend .status-badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8em;
+}
+.ticker-status-legend .status--pending { background: #e0f2fe; color: #0369a1; }
+.ticker-status-legend .status--active { background: #dcfce7; color: #15803d; }
+.ticker-status-legend .status--inactive { background: #fef3c7; color: #b45309; }
+.ticker-status-legend .status--cancelled { background: #fee2e2; color: #b91c1c; }
+
+/* T30-3: Heat indicator card */
+.market-data-heat-card {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--spacing-md, 16px);
+  margin-bottom: var(--spacing-md, 16px);
+  background: var(--apple-bg-secondary, #f2f2f7);
+  border-radius: var(--apple-radius-small, 6px);
+  border: 1px solid var(--apple-border-light, #e5e5e5);
+}
+.heat-card__title { font-weight: 600; font-size: 0.9rem; }
+.heat-card__value { font-size: 1.25rem; }
+.heat-indicator--low { color: var(--apple-green, #34c759); }
+.heat-indicator--medium { color: var(--apple-orange, #ff9f0a); }
+.heat-indicator--high { color: var(--apple-red, #ff3b30); }
+.heat-card__detail { font-size: 0.85rem; color: var(--apple-text-secondary, #6b7280); }
+
+/* Settings field hint */
+.settings-row__field-hint { cursor: help; opacity: 0.7; }
+.input--error { border-color: var(--apple-red, #ff3b30) !important; }
+.field-error-message { color: var(--apple-red, #ff3b30); font-size: 0.8rem; display: block; margin-top: 2px; }
+
+/* T30-12: Modal skeleton loading */
+.modal-skeleton {
+  padding: var(--spacing-sm, 8px) 0;
+}
+.modal-skeleton .skeleton-row {
+  height: 20px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: modal-skeleton-shimmer 1.5s infinite;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+.modal-skeleton .skeleton-row--short { max-width: 60%; }
+@keyframes modal-skeleton-shimmer {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}

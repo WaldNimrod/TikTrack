@@ -63,7 +63,7 @@
 | **Known Bugs Register (canonical)** | `documentation/docs-governance/01-FOUNDATIONS/KNOWN_BUGS_REGISTER_v1.0.0.md` | רג'יסטר קנוני יחיד לבאגים מאומתים (BLOCKING/באטצ'ד) |
 | **Known Bugs Procedure (central)** | `documentation/docs-governance/04-PROCEDURES/KNOWN_BUGS_REMEDIATION_GOVERNANCE_PROCEDURE_v1.0.0.md` | נוהל קנוני: intake/routing/closure ל־known bugs |
 | **נוהל ניהול רשימות + מי מעדכן WSM ומתי + חובה סנכרון רשימות** | `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST_PROTOCOL.md` | §1.2.2: Gate Owner מעדכן WSM; Team 10 מסנכרן רשימות בכל הרמות |
-| **נוהל מסלול מקוצר (אופציונלי, לא ברירת מחדל)** | `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.0.0.md` | FAST_0..FAST_4; בלעדיות מסלול; SLA 48h; FAST_2 מפנה ל־GATE_3 canonical |
+| **נוהל מסלול מקוצר (AGENTS_OS ברירת מחדל; TIKTRACK אופציונלי)** | `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.2.0.md` | FAST_0..FAST_4; handoff חובה בפרומט גנרי מפורט (§11); §12–13 domain/validation precision |
 
 **כלל:** שינוי סטטוס Program/Work Package (כולל עדכון WSM) מחייב עדכון רשימות רמה 2 (והתאם רמה 1/3) — ראה נוהל.
 

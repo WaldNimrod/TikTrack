@@ -110,6 +110,9 @@
         <select id="tickerDataIntegritySelect" class="index-section__header-filter-select" aria-label="לבחור טיקר">
           <option value="">— לבחור טיקר —</option>
         </select>
+        <button type="button" id="tickerDataIntegrityCheckBtn" class="index-section__header-action-btn js-check-data-integrity" aria-label="בדיקת נתונים" title="בדיקת נתונים">
+          <span>✓ בדיקת נתונים</span>
+        </button>
       </div>
       <div class="index-section__header-actions">
         <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
@@ -186,8 +189,8 @@
       <tt-section-row>
         <div class="col-12">
           
-          <div class="phoenix-table-wrapper">
-            <table id="tickersTable" class="phoenix-table js-table" data-table-type="tickers" role="table" aria-label="ניהול טיקרים">
+          <div class="phoenix-table-wrapper" data-tickers-actions-hover="true">
+            <table id="tickersTable" class="phoenix-table js-table phoenix-table--actions-hover" data-table-type="tickers" role="table" aria-label="ניהול טיקרים">
               <thead class="phoenix-table__head" role="rowgroup">
                 <tr class="phoenix-table__row" role="row">
                   <th class="phoenix-table__header col-symbol js-table-sort-trigger" data-sortable="true" data-sort-key="symbol" data-sort-type="string" data-column-index="0" role="columnheader" aria-sort="none" tabindex="0">
@@ -288,6 +291,14 @@
                 </button>
               </div>
             </div>
+          </div>
+
+          <div class="ticker-status-legend" role="note" aria-label="מקרא סטטוסים">
+            <span class="legend__title">מקרא סטטוס:</span>
+            <span class="legend__item"><span class="status-badge status--pending">ממתין</span> — EOD + היסטוריה בלבד, אין Intraday</span>
+            <span class="legend__item"><span class="status-badge status--active">פתוח</span> — נתונים מלאים: Intraday + EOD + היסטוריה</span>
+            <span class="legend__item"><span class="status-badge status--inactive">סגור</span> — EOD + היסטוריה בלבד</span>
+            <span class="legend__item"><span class="status-badge status--cancelled">מבוטל</span> — לא טוען נתונים</span>
           </div>
           
         </div>

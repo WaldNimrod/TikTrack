@@ -181,6 +181,14 @@ class AlphaProvider(MarketDataProvider):
         except (TypeError, ValueError):
             return None
 
+    def _tase_agorot_to_ils(self, val: Optional[Decimal], symbol: str) -> Optional[Decimal]:
+        """TASE (.TA) agorot → ILS when price > 1000 (Mandate B2). Alpha may return agorot."""
+        if val is None or not symbol or not symbol.upper().endswith(".TA"):
+            return val
+        if val <= 1000:
+            return val
+        return (val / Decimal("100")).quantize(Decimal("0.00000001"))
+
     async def get_ticker_price_crypto(self, symbol: str, market: str = "USD") -> Optional[PriceResult]:
         """
         Crypto-specific: DIGITAL_CURRENCY_DAILY endpoint.
@@ -279,14 +287,18 @@ class AlphaProvider(MarketDataProvider):
             quote = data.get("Global Quote", {})
             price = self._to_decimal(quote.get("05. price")) if quote else None
             if price and price > 0:
+                # TASE agorot → ILS when price > 1000 (Mandate B2)
+                price = self._tase_agorot_to_ils(price, symbol)
+                open_p = self._tase_agorot_to_ils(self._to_decimal(quote.get("02. open")), symbol)
+                high_p = self._tase_agorot_to_ils(self._to_decimal(quote.get("03. high")), symbol)
+                low_p = self._tase_agorot_to_ils(self._to_decimal(quote.get("04. low")), symbol)
                 # FIX-4: Do NOT call _fetch_market_cap — that burns a second Alpha call (2/ticker).
-                # With 25/day limit, every call is precious. market_cap = None is acceptable.
                 return PriceResult(
                     symbol=symbol,
                     price=price,
-                    open_price=self._to_decimal(quote.get("02. open")),
-                    high_price=self._to_decimal(quote.get("03. high")),
-                    low_price=self._to_decimal(quote.get("04. low")),
+                    open_price=open_p,
+                    high_price=high_p,
+                    low_price=low_p,
                     close_price=price,
                     volume=int(quote.get("06. volume", 0)) if quote.get("06. volume") else None,
                     market_cap=None,  # FIX-4: skip OVERVIEW call — saves 1 Alpha call per ticker
@@ -332,6 +344,11 @@ class AlphaProvider(MarketDataProvider):
             price = self._to_decimal(close_val)
             if not price or price <= 0:
                 return None
+            # TASE agorot → ILS when price > 1000 (Mandate B2)
+            price = self._tase_agorot_to_ils(price, symbol)
+            open_p = self._tase_agorot_to_ils(self._to_decimal(v.get("1. open")), symbol)
+            high_p = self._tase_agorot_to_ils(self._to_decimal(v.get("2. high")), symbol)
+            low_p = self._tase_agorot_to_ils(self._to_decimal(v.get("3. low")), symbol)
             vol_raw = v.get("5. volume")
             vol_int = None
             if vol_raw is not None and str(vol_raw).strip():
@@ -342,9 +359,9 @@ class AlphaProvider(MarketDataProvider):
             return PriceResult(
                 symbol=symbol,
                 price=price,
-                open_price=self._to_decimal(v.get("1. open")),
-                high_price=self._to_decimal(v.get("2. high")),
-                low_price=self._to_decimal(v.get("3. low")),
+                open_price=open_p,
+                high_price=high_p,
+                low_price=low_p,
                 close_price=price,
                 volume=vol_int,
                 market_cap=None,

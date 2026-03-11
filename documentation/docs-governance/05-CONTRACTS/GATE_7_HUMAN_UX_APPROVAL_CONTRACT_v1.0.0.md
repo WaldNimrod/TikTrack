@@ -1,9 +1,11 @@
 # GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.0.0
 
+**status:** SUPERSEDED_HISTORICAL — not for active operational references.  
+**superseded_by:** `documentation/docs-governance/05-CONTRACTS/GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.1.0.md`
+
 **date:** 2026-03-10
 
 project_domain: SHARED
-status: LOCKED
 owner: Team 90
 scope: GATE_7
 

@@ -1,11 +1,11 @@
-# FAST_TRACK_EXECUTION_PROTOCOL_v1.1.0
+# FAST_TRACK_EXECUTION_PROTOCOL_v1.2.0
 
 **project_domain:** SHARED (TIKTRACK + AGENTS_OS)  
-**id:** FAST_TRACK_EXECUTION_PROTOCOL_v1.1.0  
+**id:** FAST_TRACK_EXECUTION_PROTOCOL_v1.2.0  
 **owner:** Team 190 (constitutional lock), executed via Team 10 Gateway  
-**date:** 2026-03-10  
+**date:** 2026-03-11  
 **status:** ACTIVE  
-**supersedes:** FAST_TRACK_EXECUTION_PROTOCOL_v1.0.0  
+**supersedes:** FAST_TRACK_EXECUTION_PROTOCOL_v1.1.0  
 **canonical_basis:** 04_GATE_MODEL_PROTOCOL_v2.3.0, PHOENIX_MASTER_WSM_v1.0.0, ARCHITECT_DIRECTIVE_AGENTS_OS_FAST_TRACK_DEFAULT_v1.0.0
 
 ---
@@ -188,14 +188,60 @@ Reference: `agents_os_v2/context/identity/team_51.md`
 
 ---
 
-## 11) Canonical references
+## 11) Handoff protocol (mandatory)
+
+**כל צוות במסלול המהיר:**
+1. מבצע את השלב שלו.
+2. באישור סיום — מבצע **handoff** לצוות האחראי על השלב הבא.
+3. ה-handoff = **פרומט גנרי מפורט** עם כל הקונטקסט והמידע הנדרשים לביצוע השלב הבא.
+
+**חובה:** ללא handoff מפורט, לצוות הבא אין מושג מה לבצע ומה לתעד. Handoff חייב לכלול: מטרה, רשימת פעולות, מקורות מידע, פורמטים נדרשים, מה אסור.
+
+**Authority:** `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_100_TEAM_61_FAST_TRACK_VALIDATION_DOMAIN_CLARIFICATION_v1.0.0.md` — Team 190 constitutional lock.
+
+---
+
+## 12) Validation response structure (canonical)
+
+For FAST_1 and governance validation packages, canonical response structure per Team 190:
+
+1. **`overall_verdict`** — PASS or BLOCK_FOR_FIX
+2. **`closed_findings`** — with evidence-by-path (file:line)
+3. **`domain_and_track_scope`** — explicit statement: AGENTS_OS vs TIKTRACK, FAST_TRACK vs GATE_0..GATE_8
+4. **`routing_authorization`** — who is authorized for the next step
+
+**Reference:** `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_100_TEAM_61_FAST_TRACK_VALIDATION_DOMAIN_CLARIFICATION_v1.0.0.md` § Operational Note.
+
+---
+
+## 13) Domain and track clarification (AGENTS_OS)
+
+Per Team 190 validation (locked):
+
+1. Validation scope for AGENTS_OS fast-track package = **AGENTS_OS domain**.
+2. Process lane = **FAST_TRACK default for AGENTS_OS**.
+3. AGENTS_OS fast-track package is **not** a TIKTRACK FAST_1 package and **not** a regular GATE_0..GATE_8 execution package.
+4. Validation type = **constitutional governance validation** for protocol/team/ownership alignment.
+
+**Routing and ownership (AGENTS_OS):**
+- Team 61: execution lane owner (implementation/automation)
+- Team 51: mandatory QA lane (FAST_2.5 / GATE_5-equivalent)
+- Team 170: FAST_4 closure for AGENTS_OS governance/docs lane
+- Team 70: TIKTRACK documentation lane + repository maintenance (not AGENTS_OS FAST_4 owner)
+- Teams 90 and 190: cross-domain validators
+
+---
+
+## 14) Canonical references
 
 1. `documentation/docs-governance/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md`
 2. `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md`
 3. `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md`
 4. `documentation/docs-governance/03-PROTOCOLS/ARCHITECT_KNOWLEDGE_PROMOTION_PROTOCOL.md`
 5. `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_AGENTS_OS_FAST_TRACK_DEFAULT_v1.0.0.md`
+6. `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_100_TEAM_61_FAST_TRACK_VALIDATION_DOMAIN_CLARIFICATION_v1.0.0.md`
 
 ---
 
 **log_entry | TEAM_61 | FAST_TRACK_EXECUTION_PROTOCOL | v1.1.0_AGENTS_OS_DEFAULT_ADDED | 2026-03-10**
+**log_entry | TEAM_61 | FAST_TRACK_EXECUTION_PROTOCOL | v1.2.0_HANDOFF_AND_DOMAIN_PRECISION | 2026-03-11**

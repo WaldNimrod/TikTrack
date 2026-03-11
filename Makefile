@@ -242,6 +242,19 @@ sync-ticker-prices:
 	@python3 scripts/sync_ticker_prices_eod.py
 	@echo "✅ Ticker prices EOD sync complete."
 
+## Backfill market_cap for AUTO-WP003-05 (ANAU.MI, BTC-USD, TEVA.TA) — run when Yahoo cooldown expired
+backfill-market-cap-auto-wp003-05:
+	@python3 scripts/backfill_market_cap_auto_wp003_05.py
+
+## Terminate lock holders on ticker_prices — run before backfill when UPDATE blocks
+terminate-ticker-prices-blockers:
+	@python3 scripts/terminate_ticker_prices_blockers.py
+
+## Full flow: terminate blockers → backfill — when סביבה "פנויה" but locks נשארו מתהליכים קודמים
+backfill-market-cap-after-terminate: terminate-ticker-prices-blockers
+	@sleep 2
+	@python3 scripts/backfill_market_cap_auto_wp003_05.py
+
 ## Intraday Sync — ticker_prices_intraday (Active tickers; Yahoo→Alpha)
 sync-intraday:
 	@echo "🔄 Intraday sync — ticker_prices_intraday"

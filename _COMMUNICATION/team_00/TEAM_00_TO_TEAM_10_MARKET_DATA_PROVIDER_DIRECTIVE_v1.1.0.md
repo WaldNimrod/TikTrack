@@ -4,7 +4,7 @@ id: TEAM_00_TO_TEAM_10_MARKET_DATA_PROVIDER_DIRECTIVE_v1.1.0
 from: Team 00 (Chief Architect — Nimrod)
 to: Team 10 (Gateway Orchestration)
 cc: Team 20 (Backend), Team 50 (QA), Team 90 (Validation)
-date: 2026-03-12
+date: 2026-03-11
 status: ISSUED — ACTION REQUIRED
 gate_id: GATE_7 (S002-P002-WP003)
 work_package_id: S002-P002-WP003
@@ -35,7 +35,7 @@ Legacy code review (`archive/TikTrackV1.../yahoo_finance_adapter.py`) confirmed:
 
 ## 2. Architectural Decision: Option B Approved
 
-**Chief Architect decision (2026-03-12): Option B — approve current package as minimum baseline.**
+**Chief Architect decision (2026-03-11): Option B — approve current package as minimum baseline.**
 
 - Current WP003 scope (FIX-1..4 + B1/B2/B4) is confirmed delivered and QA-passed
 - CC-04 requires only 3 minimal code fixes (G7-FIX-1, revised FIX-2, FIX-3)
@@ -169,4 +169,4 @@ PARALLEL:
 
 ---
 
-**log_entry | TEAM_00 | TEAM_00_TO_TEAM_10_MARKET_DATA_PROVIDER_DIRECTIVE_v1.1.0 | ISSUED | SUPERSEDES_v1.0.0 | G7-FIX-2_REVISED_ANAU_ON_YAHOO | OPTION_B_APPROVED | WP004_NOTICE | IRON_RULES_9_AND_10 | 2026-03-12**
+**log_entry | TEAM_00 | TEAM_00_TO_TEAM_10_MARKET_DATA_PROVIDER_DIRECTIVE_v1.1.0 | ISSUED | SUPERSEDES_v1.0.0 | G7-FIX-2_REVISED_ANAU_ON_YAHOO | OPTION_B_APPROVED | WP004_NOTICE | IRON_RULES_9_AND_10 | 2026-03-11**

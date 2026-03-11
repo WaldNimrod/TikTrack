@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-10T22:44:34.613755+00:00",
+  "generated_at_utc": "2026-03-11T20:37:57.786593+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -10,11 +10,11 @@
     "active_stage_id": "S002",
     "active_work_package_id": "S002-P002-WP003",
     "in_progress_work_package_id": "S002-P002-WP003",
-    "current_gate": "GATE_3 (REMEDIATION_IN_PROGRESS)",
+    "current_gate": "GATE_7 (HUMAN_APPROVAL_ACTIVE)",
     "active_program_id": "S002-P002",
-    "last_gate_event": "R3_SYNC_RETRY_PARTIAL \\",
-    "next_required_action": "Team 60: retry sync-ticker-prices אחרי cooldown (Yahoo ~15 דק') → Team 50 re-verify 1.2 → re-submit GATE_7.",
-    "next_responsible_team": "Team 60 (sync retry after cooldown)"
+    "last_gate_event": "AUTO_WP003_05_RE_VERIFY_PASS \\",
+    "next_required_action": "Team 90: לשחרר תרחישי GATE_7 Human לנימרוד (scenarios, coverage matrix, sign-off rule).",
+    "next_responsible_team": "Team 90 (GATE_7 owner)"
   },
   "stages": [
     {
@@ -103,7 +103,7 @@
       "domain": "TIKTRACK",
       "stage_id": "S002",
       "status": "ACTIVE",
-      "current_gate_mirror": "GATE_3 (REMEDIATION_IN_PROGRESS); active_flow=S002-P002-WP003 (Market Data Hardening) — **GATE_3 REMEDIATION**; BLOCK @ GATE_7 (R2 QA) → returned to dev flow.; active_work_package_id=S002-P002-WP003"
+      "current_gate_mirror": "GATE_7 (HUMAN_APPROVAL_ACTIVE); active_flow=S002-P002-WP003 (Market Data Hardening) — **GATE_7 HUMAN_APPROVAL_ACTIVE** post GATE_6 PASS; Nimrod browser validation is mandatory; CC-WP003-01..04 runtime evidence supports (does not replace) human decision.; active_work_package_id=S002-P002-WP003"
     },
     {
       "program_id": "S002-P003",
@@ -340,9 +340,9 @@
       "program_id": "S002-P002",
       "domain": "TIKTRACK",
       "status": "IN_PROGRESS",
-      "current_gate": "GATE_3 (REMEDIATION_IN_PROGRESS)",
+      "current_gate": "GATE_7 (HUMAN_APPROVAL_ACTIVE)",
       "is_active": true,
-      "active_marker_reason": "S002-P002-WP003 (Market Data Hardening) — **GATE_3 REMEDIATION**; BLOCK @ GATE_7 (R2 QA) → returned to dev flow."
+      "active_marker_reason": "S002-P002-WP003 (Market Data Hardening) — **GATE_7 HUMAN_APPROVAL_ACTIVE** post GATE_6 PASS; Nimrod browser validation is mandatory; CC-WP003-01..04 runtime evidence supports (does not replace) human decision."
     },
     {
       "work_package_id": "S002-P003-WP002",
@@ -444,16 +444,16 @@
           "program_name": "MCP-QA Transition (Full Pipeline Orchestrator)",
           "domain": "TIKTRACK",
           "status": "ACTIVE",
-          "current_gate_mirror": "GATE_3 (REMEDIATION_IN_PROGRESS); active_flow=S002-P002-WP003 (Market Data Hardening) — **GATE_3 REMEDIATION**; BLOCK @ GATE_7 (R2 QA) → returned to dev flow.; active_work_package_id=S002-P002-WP003",
+          "current_gate_mirror": "GATE_7 (HUMAN_APPROVAL_ACTIVE); active_flow=S002-P002-WP003 (Market Data Hardening) — **GATE_7 HUMAN_APPROVAL_ACTIVE** post GATE_6 PASS; Nimrod browser validation is mandatory; CC-WP003-01..04 runtime evidence supports (does not replace) human decision.; active_work_package_id=S002-P002-WP003",
           "work_packages": [
             {
               "work_package_id": "S002-P002-WP003",
               "program_id": "S002-P002",
               "domain": "TIKTRACK",
               "status": "IN_PROGRESS",
-              "current_gate": "GATE_3 (REMEDIATION_IN_PROGRESS)",
+              "current_gate": "GATE_7 (HUMAN_APPROVAL_ACTIVE)",
               "is_active": true,
-              "active_marker_reason": "S002-P002-WP003 (Market Data Hardening) — **GATE_3 REMEDIATION**; BLOCK @ GATE_7 (R2 QA) → returned to dev flow."
+              "active_marker_reason": "S002-P002-WP003 (Market Data Hardening) — **GATE_7 HUMAN_APPROVAL_ACTIVE** post GATE_6 PASS; Nimrod browser validation is mandatory; CC-WP003-01..04 runtime evidence supports (does not replace) human decision."
             }
           ]
         },

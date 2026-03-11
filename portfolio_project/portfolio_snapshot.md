@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-10T22:44:34.613755+00:00`
+- Generated (UTC): `2026-03-11T20:37:57.786593+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -10,8 +10,8 @@
 - active_stage_id: `S002`
 - active_program_id: `S002-P002`
 - active_work_package_id: `S002-P002-WP003`
-- current_gate: `GATE_3 (REMEDIATION_IN_PROGRESS)`
-- next_required_action: `Team 60: retry sync-ticker-prices אחרי cooldown (Yahoo ~15 דק') → Team 50 re-verify 1.2 → re-submit GATE_7.`
+- current_gate: `GATE_7 (HUMAN_APPROVAL_ACTIVE)`
+- next_required_action: `Team 90: לשחרר תרחישי GATE_7 Human לנימרוד (scenarios, coverage matrix, sign-off rule).`
 
 ## Portfolio Counts
 
@@ -40,7 +40,7 @@
         └── **WP** `S002-P001-WP002` | CLOSED | gate: GATE_8 (PASS) | domain: **AGENTS_OS**
 
     ├── **Program** `S002-P002` — MCP-QA Transition (Full Pipeline Orchestrator) | ACTIVE | domain: **TIKTRACK**
-        └── **WP** `S002-P002-WP003` | IN_PROGRESS | gate: GATE_3 (REMEDIATION_IN_PROGRESS) | domain: **TIKTRACK** (active)
+        └── **WP** `S002-P002-WP003` | IN_PROGRESS | gate: GATE_7 (HUMAN_APPROVAL_ACTIVE) | domain: **TIKTRACK** (active)
 
     ├── **Program** `S002-P003` — TikTrack Alignment (D22+D33+D34+D35) | COMPLETE | domain: **TIKTRACK**
         └── **WP** `S002-P003-WP002` | CLOSED | gate: GATE_8 (PASS) | domain: **TIKTRACK**

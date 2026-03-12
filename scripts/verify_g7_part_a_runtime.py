@@ -267,6 +267,8 @@ def main():
         prev["cc_04_yahoo_429_count"] = evidence["yahoo_429_count"]
 
     artifact = {
+        "report_date_utc": prev.get("report_date_utc"),
+        "run_id": prev.get("run_id"),
         "timestamp_utc": ts_utc,
         "backend_url": BACKEND_URL,
         "job_name": JOB_NAME,

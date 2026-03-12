@@ -9,7 +9,8 @@ import { createModal } from '../../../components/shared/PhoenixModal.js';
 import { showTickerFormModal } from './tickersForm.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 import { toHebrewStatus, normalizeToCanonicalStatus } from '../../../utils/statusAdapter.js';
-import { getPriceSourceLabel, formatPriceAsOf, getTrafficLightFromSource, getTrafficLightTooltip } from '../../../utils/priceReliabilityLabels.js';
+import { getPriceSourceLabel, getPriceSourceBadgeHTML, formatPriceAsOf, getTrafficLightFromSource, getTrafficLightTooltip } from '../../../utils/priceReliabilityLabels.js';
+import { formatDailyChange } from '../../../utils/formatChange.js';
 
 /** BF-002: Currency symbols per Team 20 API (COUNTRY_TO_CURRENCY, CRYPTO parsing) */
 const CURRENCY_SYMBOLS = { USD: '$', EUR: '€', ILS: '₪', GBP: '£', JPY: '¥', USDT: '₮' };
@@ -17,12 +18,6 @@ const formatCurrency = (amount, currency = 'USD') => {
   if (amount == null || isNaN(amount)) return '—';
   const sym = CURRENCY_SYMBOLS[currency?.toUpperCase?.()] ?? currency ?? '$';
   return `${sym}${Number(amount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
-};
-const formatChangePct = (pct) => {
-  if (pct == null || isNaN(pct)) return '—';
-  const n = Number(pct);
-  const sign = n >= 0 ? '+' : '';
-  return `${sign}${n.toFixed(2)}%`;
 };
 
 (function initTickersTable() {
@@ -164,8 +159,7 @@ const formatChangePct = (pct) => {
 
       const sourceCell = document.createElement('td');
       sourceCell.className = 'phoenix-table__cell col-source';
-      sourceCell.textContent = getPriceSourceLabel(priceSource) || '—';
-      if (priceSource === 'EOD_STALE') sourceCell.classList.add('price-source-stale');
+      sourceCell.innerHTML = getPriceSourceBadgeHTML(priceSource);
       row.appendChild(sourceCell);
 
       const lastCloseCell = document.createElement('td');
@@ -187,7 +181,7 @@ const formatChangePct = (pct) => {
       const changeSpan = document.createElement('span');
       const changeNum = changeVal != null ? Number(changeVal) : null;
       changeSpan.className = changeNum != null && changeNum >= 0 ? 'numeric-value-positive' : 'numeric-value-negative';
-      changeSpan.textContent = formatChangePct(changeVal);
+      changeSpan.textContent = formatDailyChange(changeVal, priceVal, lastClose, currency);
       changeCell.appendChild(changeSpan);
       row.appendChild(changeCell);
 
@@ -204,8 +198,11 @@ const formatChangePct = (pct) => {
       const typeCell = document.createElement('td');
       typeCell.className = 'phoenix-table__cell col-type';
       const typeBadge = document.createElement('span');
-      typeBadge.className = 'phoenix-table__status-badge badge badge--info';
-      typeBadge.textContent = t.ticker_type ?? 'STOCK';
+      const rawType = (t.ticker_type ?? t.tickerType ?? 'STOCK').toUpperCase();
+      const knownTypes = ['STOCK', 'ETF', 'OPTION', 'FUTURE', 'FOREX', 'CRYPTO', 'INDEX'];
+      const tickerType = knownTypes.includes(rawType) ? rawType : 'OTHER';
+      typeBadge.className = `ticker-type-badge ticker-type-badge--${tickerType}`;
+      typeBadge.textContent = rawType;
       typeCell.appendChild(typeBadge);
       row.appendChild(typeCell);
 
@@ -275,17 +272,52 @@ const formatChangePct = (pct) => {
       if (!tooltip || !menu) return;
       let openT = null;
       let closeT = null;
+      let menuParent = null;
       const show = () => {
         if (closeT) clearTimeout(closeT);
         closeT = null;
-        menu.style.opacity = '1';
-        menu.style.visibility = 'visible';
-        menu.style.pointerEvents = 'auto';
+        const trigger = tooltip.querySelector('.table-actions-trigger');
+        if (trigger) {
+          menuParent = menu.parentElement;
+          document.body.appendChild(menu);
+          menu.style.position = 'fixed';
+          menu.style.zIndex = '1100';
+          const r = trigger.getBoundingClientRect();
+          const isRtl = document.documentElement.dir === 'rtl';
+          const gapPx = 4;
+          /* RTL: menu opens מימין לכפתור (to the right of trigger, towards center). LTR: to the left. */
+          if (isRtl) {
+            menu.style.left = `${r.right + gapPx}px`;
+            menu.style.right = 'auto';
+          } else {
+            menu.style.right = `${window.innerWidth - r.left + gapPx}px`;
+            menu.style.left = 'auto';
+          }
+          menu.style.bottom = 'auto';
+          const gap = 4;
+          const menuLowerPx = 25;
+          const menuH = Math.max(menu.offsetHeight, 36);
+          menu.style.top = `${r.top - gap - menuH + menuLowerPx}px`;
+          menu.style.opacity = '1';
+          menu.style.visibility = 'visible';
+          menu.style.pointerEvents = 'auto';
+        }
       };
       const hide = () => {
         menu.style.opacity = '0';
         menu.style.visibility = 'hidden';
         menu.style.pointerEvents = 'none';
+        if (menuParent && menu.parentElement === document.body) {
+          menuParent.appendChild(menu);
+          menu.style.position = '';
+          menu.style.top = '';
+          menu.style.bottom = '';
+          menu.style.left = '';
+          menu.style.right = '';
+          menu.style.zIndex = '';
+          menu.style.transform = '';
+          menuParent = null;
+        }
       };
       const scheduleOpen = () => {
         if (closeT) { clearTimeout(closeT); closeT = null; }
@@ -463,7 +495,7 @@ const formatChangePct = (pct) => {
         <div class="data-integrity-detail-row"><strong>סטטוס</strong><span>${esc(statusLabel)}</span></div>
         <div class="data-integrity-detail-row"><strong>מחיר נוכחי</strong><span dir="ltr">${formatCurrency(priceVal, curr)}</span></div>
         <div class="data-integrity-detail-row"><strong>סגירה</strong><span dir="ltr">${formatCurrency(lastClose, curr)}</span></div>
-        <div class="data-integrity-detail-row"><strong>מקור</strong><span>${getPriceSourceLabel(t.price_source ?? t.priceSource)}</span></div>
+        <div class="data-integrity-detail-row"><strong>מקור</strong><span>${getPriceSourceBadgeHTML(t.price_source ?? t.priceSource)}</span></div>
         <div class="data-integrity-detail-row"><strong>עודכן ב</strong><span dir="ltr">${t.price_as_of_utc ?? t.priceAsOfUtc ? formatPriceAsOf(t.price_as_of_utc ?? t.priceAsOfUtc) : '—'}</span></div>
       </div>
     `;

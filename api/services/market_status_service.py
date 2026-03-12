@@ -136,8 +136,13 @@ async def get_market_status() -> Tuple[Optional[str], str]:
 def get_market_status_sync() -> Optional[str]:
     """
     Sync market status — for scripts (e.g. history backfill).
-    Returns REGULAR | PRE | POST | CLOSED | None. Skips Yahoo when closed.
+    Returns REGULAR | PRE | POST | CLOSED | None.
+    CC-02: When local time indicates CLOSED (weekend / outside 9:30-16:00 ET), skip Yahoo/Alpha — 0 HTTP.
     """
+    state, _ = _us_market_status_from_local_time()
+    if state == "CLOSED":
+        # CC-02: Avoid Yahoo market status call in off-hours — saves 1 HTTP (threshold ≤2)
+        return state
     try:
         state = _fetch_market_status_sync()
         if state:

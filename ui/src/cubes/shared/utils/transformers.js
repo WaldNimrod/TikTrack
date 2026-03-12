@@ -23,7 +23,7 @@ const FINANCIAL_FIELDS = ['balance', 'price', 'amount', 'total', 'value', 'quant
  * Note: commissionValue was removed (now NUMERIC(20,6) - should be converted to number)
  * Note: commissionType is ENUM (TIERED/FLAT) - should remain as string
  */
-const STRING_ONLY_FIELDS = ['description', 'notes', 'comment', 'message', 'name', 'title', 'label', 'commissionType', 'commission_type', 'type', 'parent_id', 'target_id', 'ticker_id'];
+const STRING_ONLY_FIELDS = ['description', 'notes', 'comment', 'message', 'name', 'title', 'label', 'commissionType', 'commission_type', 'type', 'parent_id', 'target_id', 'ticker_id', 'price_source', 'priceSource', 'price_as_of_utc', 'priceAsOfUtc'];
 
 /**
  * Convert value to number for financial fields

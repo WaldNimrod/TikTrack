@@ -45,15 +45,16 @@
 - **PHOENIX_PROGRAM_REGISTRY:** S003-P002 status → COMPLETE; current_gate_mirror = FAST_4 CLOSED (WP001) 2026-03-12 — Test Template Generator deployed; G3.7 in pipeline; agents_os_v2/requirements.txt canonical.
 - **PHOENIX_WORK_PACKAGE_REGISTRY:** S003-P002-WP001 row added — CLOSED, FAST_4 (PASS).
 - **TEAM_10_GATE_ACTIONS_RUNBOOK:** עדכון קנוני בלבד (תיעוד G3.7 לשרשרת pipeline) — אין מעורבות צוות 10 במסלול המהיר AGENTS_OS; האדריכלית לדומיין: Team 100.
-- **WSM agents_os_parallel_track:** Updated — S003-P002 WP001 FAST_4 CLOSED; next S003-P003 (System Settings); **Team 100** מנפיק FAST_0 scope brief per roadmap.
-- **Handoff to Team 100:** TEAM_170_TO_TEAM_100_S003_P002_WP001_FAST4_HANDOFF_v1.0.0.md (פרומט handoff קנוני לפי נוהל §11).
+- **WSM agents_os_parallel_track:** Updated — S003-P002 WP001 FAST_4 CLOSED; next AGENTS_OS: S004-P001 (Financial Precision Validator); LOD200 before FAST_0; Team 100 on hold. S003-P003 is TIKTRACK (normal gates).
+- **Handoff to Team 100:** TEAM_170_TO_TEAM_100_S003_P002_WP001_FAST4_HANDOFF_v1.1.0.md (פרומט handoff קנוני לפי נוהל §11; תיקון דומיין + הודעת G3.7 ל-Team 10).
+- **הודעת מודעות ל-Team 10:** TEAM_170_TO_TEAM_10_G37_RUNBOOK_ADDITION_NOTICE_v1.0.0.md (חובה per FAST_0 §11 item 3).
 - **Closure document:** This file.
 
 ---
 
 ## 4) What’s Next
 
-**S003-P003 (System Settings)** — Team 100 issues FAST_0 scope brief per roadmap and slot availability.
+**תוכניות AGENTS_OS ב-S003:** S003-P001 + S003-P002 הושלמו (FAST_4 CLOSED). **התוכנית הבאה בדומיין AGENTS_OS:** S004-P001 (Financial Precision Validator) — LOD200 צריך להיכתב לפני FAST_0; Team 100 בהמתנה. S003-P003 (System Settings) הוא **TIKTRACK** — תהליך גייטים רגיל (GATE_0..GATE_8); כאשר יגיע ל-GATE_3, צוות 10 ישתמש ב-G3.7 לייצר סקפולדים.
 
 ---
 

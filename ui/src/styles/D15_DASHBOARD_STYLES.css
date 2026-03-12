@@ -2198,11 +2198,10 @@ body.brokers-fees-page tt-container tt-section {
 /* T30-1: Tickers table — hover menu precision (150ms/100ms/0px gap, row zone) */
 .phoenix-table--actions-hover .table-actions-tooltip {
   display: block;
+  width: fit-content;
+  height: fit-content;
 }
 .phoenix-table--actions-hover .table-actions-menu {
-  top: 100%;
-  inset-inline-end: 0;
-  margin-top: 0;
   transition-delay: 0s;
 }
 .phoenix-table--actions-hover .table-actions-tooltip:hover .table-actions-menu,
@@ -2215,6 +2214,58 @@ body.brokers-fees-page tt-container tt-section {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+}
+
+/* Ticker type badges — סולם צבעים לפי ישויות */
+.ticker-type-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: var(--font-size-xs, 12px);
+  font-weight: var(--font-weight-medium, 500);
+  white-space: nowrap;
+}
+.ticker-type-badge--STOCK {
+  background: var(--entity-ticker-light, #c5f4ea);
+  border: 1px solid var(--entity-ticker, #17a2b8);
+  color: var(--entity-ticker-dark, #138496);
+}
+.ticker-type-badge--ETF {
+  background: var(--entity-trade_plan-light, #c3e6cb);
+  border: 1px solid var(--entity-trade_plan, #28a745);
+  color: var(--entity-trade_plan-dark, #155724);
+}
+.ticker-type-badge--CRYPTO {
+  background: var(--entity-research-light, #e2d9f3);
+  border: 1px solid var(--entity-research, #9c27b0);
+  color: var(--entity-research-dark, #7b1fa2);
+}
+.ticker-type-badge--OPTION {
+  background: var(--entity-execution-light, #bee5eb);
+  border: 1px solid var(--entity-execution, #17a2b8);
+  color: var(--entity-execution-dark, #0c5460);
+}
+.ticker-type-badge--FUTURE {
+  background: var(--entity-cash_flow-light, #ffe5d3);
+  border: 1px solid var(--entity-cash_flow, #ff9800);
+  color: var(--entity-cash_flow-dark, #e68900);
+}
+.ticker-type-badge--FOREX {
+  background: var(--entity-trading_account-light, #c3e6cb);
+  border: 1px solid var(--entity-trading_account, #28a745);
+  color: var(--entity-trading_account-dark, #155724);
+}
+.ticker-type-badge--INDEX {
+  background: var(--entity-note-light, #e2e3e5);
+  border: 1px solid var(--entity-note, #6c757d);
+  color: var(--entity-note-dark, #383d41);
+}
+/* Fallback for unknown types — same as INDEX */
+.ticker-type-badge--OTHER,
+.ticker-type-badge--default {
+  background: var(--entity-note-light, #e2e3e5);
+  border: 1px solid var(--entity-note, #6c757d);
+  color: var(--entity-note-dark, #383d41);
 }
 
 /* T30-11: Status legend after tickers table */
@@ -2237,15 +2288,6 @@ body.brokers-fees-page tt-container tt-section {
   align-items: center;
   gap: 4px;
 }
-.ticker-status-legend .status-badge {
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 0.8em;
-}
-.ticker-status-legend .status--pending { background: #e0f2fe; color: #0369a1; }
-.ticker-status-legend .status--active { background: #dcfce7; color: #15803d; }
-.ticker-status-legend .status--inactive { background: #fef3c7; color: #b45309; }
-.ticker-status-legend .status--cancelled { background: #fee2e2; color: #b91c1c; }
 
 /* T30-3: Heat indicator card */
 .market-data-heat-card {
@@ -2269,6 +2311,32 @@ body.brokers-fees-page tt-container tt-section {
 .settings-row__field-hint { cursor: help; opacity: 0.7; }
 .input--error { border-color: var(--apple-red, #ff3b30) !important; }
 .field-error-message { color: var(--apple-red, #ff3b30); font-size: 0.8rem; display: block; margin-top: 2px; }
+
+/* Price source badges (סגירה, תוך־יומי) */
+.price-source-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.price-source-badge--eod {
+  background: var(--status-active-light, rgba(34, 197, 94, 0.15));
+  border: 1px solid var(--status-active, #22c55e);
+  color: var(--status-active-dark, #15803d);
+}
+.price-source-badge--stale,
+.price-source-badge--intraday {
+  background: var(--status-inactive-light, rgba(234, 179, 8, 0.15));
+  border: 1px solid var(--status-inactive, #eab308);
+  color: var(--status-inactive-dark, #a16207);
+}
+.price-source-badge--none {
+  background: rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  color: var(--apple-text-secondary, #6b7280);
+}
 
 /* T30-12: Modal skeleton loading */
 .modal-skeleton {

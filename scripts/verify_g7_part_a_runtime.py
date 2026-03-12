@@ -115,12 +115,19 @@ def wait_for_completion(token: str, max_wait_sec: int = 120, poll_sec: float = 2
 
 
 def parse_log_for_evidence(log_path: str, from_position: Optional[int] = None) -> dict:
-    """Parse log file for Yahoo call count and 429 occurrences. Optionally from byte offset.
-    Yahoo call count: prefer GATE7_CC_YAHOO_HTTP (per mandate); else query1.finance.yahoo.com / yahoo+finance."""
+    """Parse log file for Yahoo call count and CC-04 cooldown activations.
+    Yahoo call count: prefer GATE7_CC_YAHOO_HTTP; else query1.finance.yahoo.com / yahoo+finance.
+    CC-04 (yahoo_429_count): G7-FIX-3 — count only "Yahoo 429 — cooldown" + "Yahoo systemic rate limit"
+    (NOT raw 429 log lines; per TEAM_00_TO_TEAM_20_G7_FIX_MANDATE)."""
     out = {"yahoo_call_count": 0, "yahoo_429_count": 0, "lines_with_yahoo": [], "lines_with_429": []}
     if not log_path or not Path(log_path).exists():
         return out
     try:
+        with open(log_path, "r", encoding="utf-8", errors="replace") as f:
+            if from_position is not None and from_position > 0:
+                f.seek(from_position)
+            text = f.read()
+        # Yahoo call count — line-by-line parse (reopen for lines)
         with open(log_path, "r", encoding="utf-8", errors="replace") as f:
             if from_position is not None and from_position > 0:
                 f.seek(from_position)
@@ -131,9 +138,14 @@ def parse_log_for_evidence(log_path: str, from_position: Optional[int] = None) -
                 elif "query1.finance.yahoo.com" in line or ("yahoo" in line.lower() and "finance" in line.lower()):
                     out["yahoo_call_count"] += 1
                     out["lines_with_yahoo"].append(line.strip()[:200])
-                if "429" in line and ("yahoo" in line.lower() or "quote" in line or "chart" in line):
-                    out["yahoo_429_count"] += 1
-                    out["lines_with_429"].append(line.strip()[:200])
+        # CC-04: G7-FIX-3 — cooldown activations only (not raw 429)
+        out["yahoo_429_count"] = text.count("Yahoo 429 — cooldown") + text.count("Yahoo systemic rate limit")
+        if out["yahoo_429_count"] > 0:
+            out["lines_with_429"] = [
+                ln.strip()[:200]
+                for ln in text.splitlines()
+                if "Yahoo 429 — cooldown" in ln or "Yahoo systemic rate limit" in ln
+            ]
     except Exception as e:
         out["parse_error"] = str(e)
     return out

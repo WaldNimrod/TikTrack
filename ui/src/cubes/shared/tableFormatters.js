@@ -1,4 +1,5 @@
 import { toHebrewStatus } from '../../utils/statusAdapter.js';
+import { formatDailyChange, formatDailyChangeFromAbsolute } from '../../utils/formatChange.js';
 
 /**
  * tableFormatters - פונקציות עזר לפורמט תצוגה בטבלאות
@@ -352,7 +353,9 @@ if (typeof module !== 'undefined' && module.exports) {
     formatStatusBadgeFromCanonical,
     formatOperationTypeBadge,
     formatNumericValue,
-    formatCommissionValue
+    formatCommissionValue,
+    formatDailyChange,
+    formatDailyChangeFromAbsolute
   };
 }
 
@@ -368,5 +371,7 @@ window.tableFormatters = {
   formatStatusBadgeFromCanonical,
   formatOperationTypeBadge,
   formatNumericValue,
-  formatCommissionValue
+  formatCommissionValue,
+  formatDailyChange,
+  formatDailyChangeFromAbsolute
 };

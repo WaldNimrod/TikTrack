@@ -13,17 +13,14 @@ import { showUserTickerEditModal } from './userTickerEditForm.js';
 import { createModal } from '../../../components/shared/PhoenixModal.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 import { toHebrewStatus, normalizeToCanonicalStatus } from '../../../utils/statusAdapter.js';
-import { getPriceSourceLabel, formatPriceAsOf } from '../../../utils/priceReliabilityLabels.js';
+import { getPriceSourceLabel, getPriceSourceBadgeHTML, formatPriceAsOf } from '../../../utils/priceReliabilityLabels.js';
+import { formatDailyChange } from '../../../utils/formatChange.js';
 
+const CURRENCY_SYMBOLS = { USD: '$', EUR: '€', ILS: '₪', GBP: '£', JPY: '¥', USDT: '₮' };
 const formatCurrency = (amount, currency = 'USD') => {
   if (amount == null || isNaN(amount)) return '—';
-  return `${currency === 'USD' ? '$' : ''}${Number(amount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
-};
-const formatChangePct = (pct) => {
-  if (pct == null || isNaN(pct)) return '—';
-  const n = Number(pct);
-  const sign = n >= 0 ? '+' : '';
-  return `${sign}${n.toFixed(2)}%`;
+  const sym = CURRENCY_SYMBOLS[currency?.toUpperCase?.()] ?? currency ?? '$';
+  return `${sym}${Number(amount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
 };
 
 (function initUserTickerTable() {
@@ -137,11 +134,13 @@ const formatChangePct = (pct) => {
       priceCell.className = 'phoenix-table__cell col-price phoenix-table__cell--numeric';
       priceCell.setAttribute('dir', 'ltr');
       const priceVal = t.current_price ?? t.currentPrice ?? null;
-      const priceSource = t.price_source ?? t.priceSource ?? 'EOD';
+      const priceSource = t.price_source ?? t.priceSource ?? null;
       const priceAsOf = t.price_as_of_utc ?? t.priceAsOfUtc ?? null;
+      const lastClose = t.last_close_price ?? t.lastClosePrice ?? null;
+      const curr = t.currency ?? t.currencyCode ?? 'USD';
       const priceSpan = document.createElement('span');
       priceSpan.className = 'numeric-value-positive';
-      priceSpan.textContent = formatCurrency(priceVal);
+      priceSpan.textContent = formatCurrency(priceVal, curr);
       priceSpan.setAttribute('data-price-source', priceSource || '');
       priceCell.appendChild(priceSpan);
       const asOfSpan = document.createElement('div');
@@ -152,16 +151,13 @@ const formatChangePct = (pct) => {
 
       const sourceCell = document.createElement('td');
       sourceCell.className = 'phoenix-table__cell col-source';
-      const sourceLabel = getPriceSourceLabel(priceSource);
-      sourceCell.textContent = sourceLabel;
-      if (priceSource === 'EOD_STALE') sourceCell.classList.add('price-source-stale');
+      sourceCell.innerHTML = getPriceSourceBadgeHTML(priceSource);
       row.appendChild(sourceCell);
 
       const lastCloseCell = document.createElement('td');
       lastCloseCell.className = 'phoenix-table__cell col-last-close phoenix-table__cell--numeric';
       lastCloseCell.setAttribute('dir', 'ltr');
-      const lastClose = t.last_close_price ?? t.lastClosePrice ?? null;
-      lastCloseCell.textContent = formatCurrency(lastClose);
+      lastCloseCell.textContent = formatCurrency(lastClose, curr);
       row.appendChild(lastCloseCell);
 
       const changeCell = document.createElement('td');
@@ -171,7 +167,7 @@ const formatChangePct = (pct) => {
       const changeSpan = document.createElement('span');
       const changeNum = changeVal != null ? Number(changeVal) : null;
       changeSpan.className = changeNum != null && changeNum >= 0 ? 'numeric-value-positive' : 'numeric-value-negative';
-      changeSpan.textContent = formatChangePct(changeVal);
+      changeSpan.textContent = formatDailyChange(changeVal, priceVal, lastClose, curr);
       changeCell.appendChild(changeSpan);
       row.appendChild(changeCell);
 
@@ -183,8 +179,11 @@ const formatChangePct = (pct) => {
       const typeCell = document.createElement('td');
       typeCell.className = 'phoenix-table__cell col-type';
       const typeBadge = document.createElement('span');
-      typeBadge.className = 'phoenix-table__status-badge badge badge--info';
-      typeBadge.textContent = t.ticker_type ?? t.tickerType ?? 'STOCK';
+      const rawType = (t.ticker_type ?? t.tickerType ?? 'STOCK').toUpperCase();
+      const knownTypes = ['STOCK', 'ETF', 'OPTION', 'FUTURE', 'FOREX', 'CRYPTO', 'INDEX'];
+      const tickerType = knownTypes.includes(rawType) ? rawType : 'OTHER';
+      typeBadge.className = `ticker-type-badge ticker-type-badge--${tickerType}`;
+      typeBadge.textContent = rawType;
       typeCell.appendChild(typeBadge);
       row.appendChild(typeCell);
 
@@ -364,18 +363,24 @@ const formatChangePct = (pct) => {
     const sym = ticker.symbol ?? '';
     const displayName = (ticker.display_name || ticker.displayName || '').trim() || sym;
     const name = ticker.company_name ?? ticker.companyName ?? '';
-    const price = formatCurrency(ticker.current_price ?? ticker.currentPrice);
-    const change = formatChangePct(ticker.daily_change_pct ?? ticker.dailyChangePct);
-    const sourceLabel = getPriceSourceLabel(ticker.price_source ?? ticker.priceSource ?? '');
+    const curr = ticker.currency ?? ticker.currencyCode ?? 'USD';
+    const price = formatCurrency(ticker.current_price ?? ticker.currentPrice, curr);
+    const change = formatDailyChange(
+      ticker.daily_change_pct ?? ticker.dailyChangePct,
+      ticker.current_price ?? ticker.currentPrice,
+      ticker.last_close_price ?? ticker.lastClosePrice,
+      curr
+    );
+    const sourceBadge = getPriceSourceBadgeHTML(ticker.price_source ?? ticker.priceSource ?? '');
     const asOf = formatPriceAsOf(ticker.price_as_of_utc ?? ticker.priceAsOfUtc ?? null);
-    const lastClose = formatCurrency(ticker.last_close_price ?? ticker.lastClosePrice ?? null);
+    const lastClose = formatCurrency(ticker.last_close_price ?? ticker.lastClosePrice ?? null, curr);
     const html = `
       <div class="phoenix-form">
         <div class="form-group"><strong>סמל:</strong> ${sym}</div>
         ${displayName !== sym ? `<div class="form-group"><strong>שם תצוגה:</strong> ${displayName}</div>` : ''}
         <div class="form-group"><strong>שם חברה:</strong> ${name || '—'}</div>
         <div class="form-group"><strong>מחיר:</strong> ${price}</div>
-        <div class="form-group"><strong>מקור:</strong> ${sourceLabel}</div>
+        <div class="form-group"><strong>מקור:</strong> ${sourceBadge}</div>
         <div class="form-group"><strong>עודכן ב:</strong> ${asOf}</div>
         <div class="form-group"><strong>סגירה:</strong> ${lastClose}</div>
         <div class="form-group"><strong>שינוי יומי:</strong> ${change}</div>

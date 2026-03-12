@@ -1,0 +1,144 @@
+INFO:     Started server process [37002]
+INFO:     Waiting for application startup.
+INFO:httpx:HTTP Request: GET https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY "HTTP/1.1 401 Unauthorized"
+WARNING:api.integrations.market_data.providers.yahoo_provider:Yahoo market status fetch failed: HTTP 401 — Client error '401 Unauthorized' for url 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+INFO:httpx:HTTP Request: GET https://www.alphavantage.co/query?function=MARKET_STATUS_CURRENT&apikey=Z103KQWGWCQ1USLL "HTTP/1.1 200 OK"
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:api.background.scheduler_startup:APScheduler: registered job sync_ticker_prices_intraday (interval=60m, first_run=immediate)
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:api.background.scheduler_startup:APScheduler: registered job sync_exchange_rates_eod (interval=1440m, first_run=immediate)
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:api.background.scheduler_startup:APScheduler: registered job check_alert_conditions (interval=15m, first_run=delayed +15m (run_after=sync_ticker_prices_intraday))
+INFO:apscheduler.scheduler:Added job "sync_ticker_prices_intraday" to job store "default"
+INFO:apscheduler.scheduler:Added job "sync_exchange_rates_eod" to job store "default"
+INFO:apscheduler.scheduler:Added job "check_alert_conditions" to job store "default"
+INFO:apscheduler.scheduler:Scheduler started
+INFO:api.background.scheduler_startup:APScheduler started — background jobs active
+INFO:api.main:APScheduler started — background jobs active
+INFO:     Application startup complete.
+WARNING:apscheduler.executors.default:Run time of job "sync_exchange_rates_eod (trigger: interval[1 day, 0:00:00], next run at: 2026-03-13 02:48:31 IST)" was missed by 0:00:01.713120
+WARNING:apscheduler.executors.default:Run time of job "sync_ticker_prices_intraday (trigger: interval[1:00:00], next run at: 2026-03-12 03:48:31 IST)" was missed by 0:00:01.713173
+INFO:     Uvicorn running on http://0.0.0.0:8083 (Press CTRL+C to quit)
+INFO:     127.0.0.1:59753 - "GET /health HTTP/1.1" 200 OK
+INFO:api.routers.auth:Login attempt started for: Tik***
+INFO:api.services.auth:User found: TikTrackAdmin, email: nimrod@mezoo.co, is_active: True
+INFO:api.services.auth:Verifying password for user: TikTrackAdmin
+INFO:api.services.auth:Password hash (first 50 chars): $2b$12$2ZlMcAQvc63M5UudvUzUM.gYjOXCIGrRUwHQZ0BgWqc...
+INFO:api.services.auth:Password hash length: 60
+INFO:api.services.auth:Password hash format check: True
+INFO:api.services.auth:Password verification result: True
+INFO:api.routers.auth:Login successful for user: Tik***
+INFO:     127.0.0.1:59806 - "POST /api/v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59812 - "POST /api/v1/admin/background-jobs/sync_ticker_prices_intraday/trigger HTTP/1.1" 200 OK
+INFO:apscheduler.executors.default:Running job "sync_ticker_prices_intraday (trigger: interval[1:00:00], next run at: 2026-03-12 03:48:53 IST)" (scheduled at 2026-03-12 00:48:53.148288+00:00)
+INFO:     127.0.0.1:59813 - "GET /api/v1/admin/background-jobs/sync_ticker_prices_intraday HTTP/1.1" 200 OK
+INFO:httpx:HTTP Request: GET https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY "HTTP/1.1 429 Too Many Requests"
+WARNING:api.integrations.market_data.providers.yahoo_provider:Yahoo market status fetch failed: HTTP 429 — Client error '429 Too Many Requests' for url 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429
+INFO:httpx:HTTP Request: GET https://www.alphavantage.co/query?function=MARKET_STATUS_CURRENT&apikey=Z103KQWGWCQ1USLL "HTTP/1.1 200 OK"
+INFO:api.background.scheduler_startup:APScheduler: triggered dependent job check_alert_conditions after sync_ticker_prices_intraday completed
+INFO:httpx:HTTP Request: GET https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY "HTTP/1.1 429 Too Many Requests"
+WARNING:api.integrations.market_data.providers.yahoo_provider:Yahoo market status fetch failed: HTTP 429 — Client error '429 Too Many Requests' for url 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429
+INFO:httpx:HTTP Request: GET https://www.alphavantage.co/query?function=MARKET_STATUS_CURRENT&apikey=Z103KQWGWCQ1USLL "HTTP/1.1 200 OK"
+INFO:api.background.scheduler_startup:PHASE_3 price sync cadence: mode=off_hours interval_min=60 next_run=2026-03-12T01:48:54.087296+00:00
+INFO:apscheduler.executors.default:Job "sync_ticker_prices_intraday (trigger: interval[1:00:00], next run at: 2026-03-12 01:48:54 UTC)" executed successfully
+WARNING:apscheduler.executors.default:Run time of job "check_alert_conditions (trigger: interval[0:15:00], next run at: 2026-03-12 03:03:54 IST)" was missed by 0:00:04.832591
+INFO:api.routers.auth:Login attempt started for: Tik***
+INFO:api.services.auth:User found: TikTrackAdmin, email: nimrod@mezoo.co, is_active: True
+INFO:api.services.auth:Verifying password for user: TikTrackAdmin
+INFO:api.services.auth:Password hash (first 50 chars): $2b$12$2ZlMcAQvc63M5UudvUzUM.gYjOXCIGrRUwHQZ0BgWqc...
+INFO:api.services.auth:Password hash length: 60
+INFO:api.services.auth:Password hash format check: True
+INFO:api.services.auth:Password verification result: True
+INFO:api.routers.auth:Login successful for user: Tik***
+INFO:     127.0.0.1:59843 - "POST /api/v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59858 - "POST /api/v1/admin/background-jobs/sync_ticker_prices_intraday/trigger HTTP/1.1" 200 OK
+INFO:apscheduler.executors.default:Running job "sync_ticker_prices_intraday (trigger: interval[1:00:00], next run at: 2026-03-12 03:48:59 IST)" (scheduled at 2026-03-12 00:48:59.236352+00:00)
+INFO:httpx:HTTP Request: GET https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY "HTTP/1.1 401 Unauthorized"
+WARNING:api.integrations.market_data.providers.yahoo_provider:Yahoo market status fetch failed: HTTP 401 — Client error '401 Unauthorized' for url 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+INFO:httpx:HTTP Request: GET https://www.alphavantage.co/query?function=MARKET_STATUS_CURRENT&apikey=Z103KQWGWCQ1USLL "HTTP/1.1 200 OK"
+INFO:api.background.scheduler_startup:APScheduler: triggered dependent job check_alert_conditions after sync_ticker_prices_intraday completed
+INFO:httpx:HTTP Request: GET https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY "HTTP/1.1 429 Too Many Requests"
+WARNING:api.integrations.market_data.providers.yahoo_provider:Yahoo market status fetch failed: HTTP 429 — Client error '429 Too Many Requests' for url 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429
+INFO:httpx:HTTP Request: GET https://www.alphavantage.co/query?function=MARKET_STATUS_CURRENT&apikey=Z103KQWGWCQ1USLL "HTTP/1.1 200 OK"
+INFO:api.background.scheduler_startup:PHASE_3 price sync cadence: mode=off_hours interval_min=60 next_run=2026-03-12T01:49:00.054203+00:00
+INFO:apscheduler.executors.default:Job "sync_ticker_prices_intraday (trigger: interval[1:00:00], next run at: 2026-03-12 01:49:00 UTC)" executed successfully
+WARNING:apscheduler.executors.default:Run time of job "check_alert_conditions (trigger: interval[0:15:00], next run at: 2026-03-12 03:04:00 IST)" was missed by 0:00:01.013746
+INFO:     127.0.0.1:59859 - "GET /api/v1/admin/background-jobs/sync_ticker_prices_intraday HTTP/1.1" 200 OK
+INFO:api.routers.auth:Login attempt started for: Tik***
+INFO:api.services.auth:User found: TikTrackAdmin, email: nimrod@mezoo.co, is_active: True
+INFO:api.services.auth:Verifying password for user: TikTrackAdmin
+INFO:api.services.auth:Password hash (first 50 chars): $2b$12$2ZlMcAQvc63M5UudvUzUM.gYjOXCIGrRUwHQZ0BgWqc...
+INFO:api.services.auth:Password hash length: 60
+INFO:api.services.auth:Password hash format check: True
+INFO:api.services.auth:Password verification result: True
+INFO:api.routers.auth:Login successful for user: Tik***
+INFO:     127.0.0.1:59937 - "POST /api/v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59938 - "POST /api/v1/admin/background-jobs/sync_ticker_prices_intraday/trigger HTTP/1.1" 200 OK
+INFO:apscheduler.executors.default:Running job "sync_ticker_prices_intraday (trigger: interval[1:00:00], next run at: 2026-03-12 03:49:10 IST)" (scheduled at 2026-03-12 00:49:10.795633+00:00)
+INFO:httpx:HTTP Request: GET https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY "HTTP/1.1 429 Too Many Requests"
+WARNING:api.integrations.market_data.providers.yahoo_provider:Yahoo market status fetch failed: HTTP 429 — Client error '429 Too Many Requests' for url 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429
+INFO:httpx:HTTP Request: GET https://www.alphavantage.co/query?function=MARKET_STATUS_CURRENT&apikey=Z103KQWGWCQ1USLL "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:59939 - "GET /api/v1/admin/background-jobs/sync_ticker_prices_intraday HTTP/1.1" 200 OK
+INFO:api.background.scheduler_startup:APScheduler: triggered dependent job check_alert_conditions after sync_ticker_prices_intraday completed
+INFO:httpx:HTTP Request: GET https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY "HTTP/1.1 401 Unauthorized"
+WARNING:api.integrations.market_data.providers.yahoo_provider:Yahoo market status fetch failed: HTTP 401 — Client error '401 Unauthorized' for url 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+INFO:httpx:HTTP Request: GET https://www.alphavantage.co/query?function=MARKET_STATUS_CURRENT&apikey=Z103KQWGWCQ1USLL "HTTP/1.1 200 OK"
+INFO:api.background.scheduler_startup:PHASE_3 price sync cadence: mode=off_hours interval_min=60 next_run=2026-03-12T01:49:11.755024+00:00
+INFO:apscheduler.executors.default:Job "sync_ticker_prices_intraday (trigger: interval[1:00:00], next run at: 2026-03-12 01:49:11 UTC)" executed successfully
+INFO:apscheduler.executors.default:Running job "check_alert_conditions (trigger: interval[0:15:00], next run at: 2026-03-12 03:04:11 IST)" (scheduled at 2026-03-12 00:49:11.755024+00:00)
+INFO:apscheduler.executors.default:Job "check_alert_conditions (trigger: interval[0:15:00], next run at: 2026-03-12 03:04:11 IST)" executed successfully
+INFO:     127.0.0.1:59965 - "GET /api/v1/admin/background-jobs/sync_ticker_prices_intraday HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59988 - "POST /api/v1/admin/background-jobs/sync_ticker_prices_intraday/trigger HTTP/1.1" 200 OK
+INFO:apscheduler.executors.default:Running job "sync_ticker_prices_intraday (trigger: interval[1:00:00], next run at: 2026-03-12 03:49:18 IST)" (scheduled at 2026-03-12 00:49:18.768903+00:00)
+INFO:     127.0.0.1:59989 - "GET /api/v1/admin/background-jobs/sync_ticker_prices_intraday HTTP/1.1" 200 OK
+INFO:httpx:HTTP Request: GET https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY "HTTP/1.1 429 Too Many Requests"
+WARNING:api.integrations.market_data.providers.yahoo_provider:Yahoo market status fetch failed: HTTP 429 — Client error '429 Too Many Requests' for url 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429
+INFO:httpx:HTTP Request: GET https://www.alphavantage.co/query?function=MARKET_STATUS_CURRENT&apikey=Z103KQWGWCQ1USLL "HTTP/1.1 200 OK"
+INFO:api.background.scheduler_startup:APScheduler: triggered dependent job check_alert_conditions after sync_ticker_prices_intraday completed
+INFO:httpx:HTTP Request: GET https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY "HTTP/1.1 429 Too Many Requests"
+WARNING:api.integrations.market_data.providers.yahoo_provider:Yahoo market status fetch failed: HTTP 429 — Client error '429 Too Many Requests' for url 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429
+INFO:httpx:HTTP Request: GET https://www.alphavantage.co/query?function=MARKET_STATUS_CURRENT&apikey=Z103KQWGWCQ1USLL "HTTP/1.1 200 OK"
+INFO:api.background.scheduler_startup:PHASE_3 price sync cadence: mode=off_hours interval_min=60 next_run=2026-03-12T01:49:19.601789+00:00
+INFO:apscheduler.executors.default:Job "sync_ticker_prices_intraday (trigger: interval[1:00:00], next run at: 2026-03-12 01:49:19 UTC)" executed successfully
+WARNING:apscheduler.executors.default:Run time of job "check_alert_conditions (trigger: interval[0:15:00], next run at: 2026-03-12 03:04:19 IST)" was missed by 0:00:01.000990
+INFO:     127.0.0.1:60023 - "POST /api/v1/admin/background-jobs/sync_ticker_prices_intraday/trigger HTTP/1.1" 200 OK
+INFO:apscheduler.executors.default:Running job "sync_ticker_prices_intraday (trigger: interval[1:00:00], next run at: 2026-03-12 03:49:23 IST)" (scheduled at 2026-03-12 00:49:23.795679+00:00)
+INFO:     127.0.0.1:60024 - "GET /api/v1/admin/background-jobs/sync_ticker_prices_intraday HTTP/1.1" 200 OK
+INFO:httpx:HTTP Request: GET https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY "HTTP/1.1 401 Unauthorized"
+WARNING:api.integrations.market_data.providers.yahoo_provider:Yahoo market status fetch failed: HTTP 401 — Client error '401 Unauthorized' for url 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+INFO:httpx:HTTP Request: GET https://www.alphavantage.co/query?function=MARKET_STATUS_CURRENT&apikey=Z103KQWGWCQ1USLL "HTTP/1.1 200 OK"
+INFO:api.background.scheduler_startup:APScheduler: triggered dependent job check_alert_conditions after sync_ticker_prices_intraday completed
+INFO:httpx:HTTP Request: GET https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY "HTTP/1.1 429 Too Many Requests"
+WARNING:api.integrations.market_data.providers.yahoo_provider:Yahoo market status fetch failed: HTTP 429 — Client error '429 Too Many Requests' for url 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429
+INFO:httpx:HTTP Request: GET https://www.alphavantage.co/query?function=MARKET_STATUS_CURRENT&apikey=Z103KQWGWCQ1USLL "HTTP/1.1 200 OK"
+INFO:api.background.scheduler_startup:PHASE_3 price sync cadence: mode=off_hours interval_min=60 next_run=2026-03-12T01:49:24.625137+00:00
+INFO:apscheduler.executors.default:Job "sync_ticker_prices_intraday (trigger: interval[1:00:00], next run at: 2026-03-12 01:49:24 UTC)" executed successfully
+INFO:apscheduler.executors.default:Running job "check_alert_conditions (trigger: interval[0:15:00], next run at: 2026-03-12 03:04:24 IST)" (scheduled at 2026-03-12 00:49:24.625137+00:00)
+INFO:apscheduler.executors.default:Job "check_alert_conditions (trigger: interval[0:15:00], next run at: 2026-03-12 03:04:24 IST)" executed successfully
+INFO:     127.0.0.1:60064 - "POST /api/v1/admin/background-jobs/sync_ticker_prices_intraday/trigger HTTP/1.1" 200 OK
+INFO:apscheduler.executors.default:Running job "sync_ticker_prices_intraday (trigger: interval[1:00:00], next run at: 2026-03-12 03:49:28 IST)" (scheduled at 2026-03-12 00:49:28.824208+00:00)
+INFO:     127.0.0.1:60065 - "GET /api/v1/admin/background-jobs/sync_ticker_prices_intraday HTTP/1.1" 200 OK
+INFO:httpx:HTTP Request: GET https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY "HTTP/1.1 429 Too Many Requests"
+WARNING:api.integrations.market_data.providers.yahoo_provider:Yahoo market status fetch failed: HTTP 429 — Client error '429 Too Many Requests' for url 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429
+INFO:httpx:HTTP Request: GET https://www.alphavantage.co/query?function=MARKET_STATUS_CURRENT&apikey=Z103KQWGWCQ1USLL "HTTP/1.1 200 OK"
+INFO:api.background.scheduler_startup:APScheduler: triggered dependent job check_alert_conditions after sync_ticker_prices_intraday completed
+INFO:httpx:HTTP Request: GET https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY "HTTP/1.1 401 Unauthorized"
+WARNING:api.integrations.market_data.providers.yahoo_provider:Yahoo market status fetch failed: HTTP 401 — Client error '401 Unauthorized' for url 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=SPY'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+INFO:httpx:HTTP Request: GET https://www.alphavantage.co/query?function=MARKET_STATUS_CURRENT&apikey=Z103KQWGWCQ1USLL "HTTP/1.1 200 OK"
+INFO:api.background.scheduler_startup:PHASE_3 price sync cadence: mode=off_hours interval_min=60 next_run=2026-03-12T01:49:29.718070+00:00
+INFO:apscheduler.executors.default:Job "sync_ticker_prices_intraday (trigger: interval[1:00:00], next run at: 2026-03-12 01:49:29 UTC)" executed successfully
+INFO:apscheduler.executors.default:Running job "check_alert_conditions (trigger: interval[0:15:00], next run at: 2026-03-12 03:04:29 IST)" (scheduled at 2026-03-12 00:49:29.718070+00:00)
+INFO:apscheduler.executors.default:Job "check_alert_conditions (trigger: interval[0:15:00], next run at: 2026-03-12 03:04:29 IST)" executed successfully

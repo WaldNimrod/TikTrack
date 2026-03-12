@@ -24,6 +24,27 @@ export function getPriceSourceLabel(source) {
   return SOURCE_LABELS[source] ?? source;
 }
 
+/** Badge CSS class per price_source: EOD→success, EOD_STALE/INTRADAY→warning, null→secondary */
+const SOURCE_BADGE_CLASS = {
+  EOD: 'price-source-badge price-source-badge--eod',
+  EOD_STALE: 'price-source-badge price-source-badge--stale',
+  INTRADAY_FALLBACK: 'price-source-badge price-source-badge--intraday',
+};
+
+/**
+ * Get price_source as badge HTML (סגירה/תוך־יומי) — badge with status colors
+ * @param {string|null} source - price_source from API
+ * @returns {string} HTML string for badge span
+ */
+export function getPriceSourceBadgeHTML(source) {
+  if (!source) {
+    return '<span class="price-source-badge price-source-badge--none">—</span>';
+  }
+  const label = SOURCE_LABELS[source] ?? source;
+  const cls = SOURCE_BADGE_CLASS[source] || 'price-source-badge price-source-badge--none';
+  return `<span class="${cls}" data-price-source="${String(source).replace(/"/g, '&quot;')}">${label}</span>`;
+}
+
 /** T30-10: Tooltip for traffic light when price_source is null */
 const TOOLTIP_NULL = 'אין נתונים — יש לרוץ EOD sync';
 

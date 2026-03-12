@@ -87,13 +87,13 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-12** by **Team 90** — GATE_7 Part A revalidation received (`v2.0.2`): CC-04 accepted PASS, CC-01/02 remain NOT_EVIDENCED; targeted mandate issued.
+**Gate-owner update evidence:** This block was updated **2026-03-12** by **Team 90** — GATE_7 Part A revalidation received (`v2.0.5`): CC-02/04 PASS, CC-01 remains NOT_EVIDENCED (market-open admissibility gap); targeted completion mandate issued.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P002-WP003 (Market Data Hardening) — **GATE_7 AWAITING_RUNTIME_AND_UX_CONFIRMATION** after GATE_6 PASS v2.0.0; Part A remains BLOCK on missing evidence for CC-WP003-01/02; Part B browser review may proceed in parallel; conditions_open=CC-WP003-01,CC-WP003-02,CC-WP003-05; conditions_closed=CC-WP003-03,CC-WP003-04. |
+| active_flow | S002-P002-WP003 (Market Data Hardening) — **GATE_7 AWAITING_RUNTIME_AND_UX_CONFIRMATION** after GATE_6 PASS v2.0.0; Part A remains BLOCK on CC-WP003-01 (market-open evidence only); Part B browser review may proceed in parallel; conditions_open=CC-WP003-01,CC-WP003-05; conditions_closed=CC-WP003-02,CC-WP003-03,CC-WP003-04. |
 | active_project_domain | TIKTRACK (WP003 Market Data Hardening execution track) |
 | active_work_package_id | S002-P002-WP003 |
 | in_progress_work_package_id | S002-P002-WP003 |
@@ -105,13 +105,13 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
-| agents_os_parallel_track | S003-P001 WP001 + S003-P002 WP001 FAST_4 CLOSED (2026-03-11 / 2026-03-12). Next: S003-P003 (System Settings) — Team 100 issues FAST_0 scope brief per roadmap. Governed per TEAM_00_AGENTS_OS_INDEPENDENT_ADVANCEMENT_DIRECTIVE_v1.0.0; does NOT depend on S002-P002-WP003 GATE closure. |
+| agents_os_parallel_track | S003-P001 WP001 + S003-P002 WP001 FAST_4 CLOSED (2026-03-11 / 2026-03-12). Next AGENTS_OS program: S004-P001 (Financial Precision Validator) — LOD200 must be written before FAST_0; Team 100 on hold. S003-P003 is TIKTRACK (normal GATE_0..GATE_8); G3.7 available for Team 10 at GATE_3. Governed per TEAM_00_AGENTS_OS_INDEPENDENT_ADVANCEMENT_DIRECTIVE_v1.0.0; does NOT depend on S002-P002-WP003 GATE closure. |
 | active_program_id | S002-P002 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 90 (GATE_7 gate owner); Nimrod/Team 00 (human sign-off authority); Team 10 (execution orchestrator); Team 60/50 (runtime corroboration) |
-| last_gate_event | GATE_7_PARTA_REVALIDATION_BLOCK \| 2026-03-12 \| Team 90 accepted v2.0.2 evidence: CC-04 PASS, but CC-01/02 NOT_EVIDENCED; targeted mandate v2.0.2 issued. |
-| next_required_action | Team 60/50 to provide dedicated market-open and off-hours evidence runs for CC-WP003-01/02; Team 90 to continue Part B Nimrod browser scenarios in parallel; final GATE_7 decision only after Part A + Part B PASS. |
-| next_responsible_team | Team 60/50 (Part A targeted evidence), Nimrod (Part B browser execution), Team 90 (orchestration + canonical decision) |
+| last_gate_event | GATE_7_PARTA_REVALIDATION_BLOCK \| 2026-03-12 \| Team 90 validated v2.0.5 handoff: CC-02 PASS, CC-04 PASS, CC-01 NOT_EVIDENCED (no admissible market-open window); CC-01 targeted mandate v2.0.5 issued. |
+| next_required_action | Team 60/50 to provide admissible market-open runtime evidence for CC-WP003-01 only; Team 90 to continue Part B Nimrod browser scenarios in parallel; final GATE_7 decision only after Part A + Part B PASS. |
+| next_responsible_team | Team 60/50 (CC-01 market-open evidence), Nimrod (Part B browser execution), Team 90 (orchestration + canonical decision) |
 
 ---
 
@@ -269,6 +269,8 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 PASS accepted for S002-P002-WP003 per Team 00 decision v2.0.0; GATE_7 activated with Part A runtime (CC-01/02/04) + Part B Nimrod browser review (CC-05); CC-03 closed | 2026-03-11**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 Part A BLOCK for S002-P002-WP003 (CC-WP003-04); Part A rerun mandate v2.0.1 issued; Part B browser flow remains active in parallel | 2026-03-11**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 Part A revalidation v2.0.2 accepted: CC-WP003-04 PASS, CC-WP003-01/02 NOT_EVIDENCED; targeted evidence mandate v2.0.2 issued; Part B remains active | 2026-03-12**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 Part A revalidation v2.0.3 BLOCK: CC-WP003-01/02 NOT_EVIDENCED (inadmissible run log), CC-WP003-04 contradictory across Team 60/50; targeted evidence mandate v2.0.3 issued; Part B remains active | 2026-03-12**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 Part A revalidation v2.0.5 BLOCK: CC-WP003-02/04 PASS, CC-WP003-01 NOT_EVIDENCED (market-open admissibility gap); targeted CC-01 completion mandate v2.0.5 issued; Part B remains active | 2026-03-12**
 **log_entry | TEAM_190 | TO_TEAM_170 | REGISTRY_MIRROR_SYNC_REQUIRED | run sync_registry_mirrors_from_wsm.py --write then --check for WP003 baseline standardization | 2026-03-10**
 
 GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:

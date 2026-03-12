@@ -52,6 +52,25 @@ def _cleanup_removed_symbols(cur):
         print(f"  🧹 Cleaned (deleted_at): {n} ticker(s) DDD/TSLA/MSFT")
 
 
+def _backfill_ticker_type_for_existing(cur):
+    """TEAM_10_TICKER_TYPE: Update ticker_type for existing tickers when DEFAULT_TICKERS says differently (SPY→ETF, QQQ→ETF, BTC-USD→CRYPTO)."""
+    updated = 0
+    for row in DEFAULT_TICKERS:
+        symbol = row[0]
+        expected_type = row[2] if len(row) >= 3 else "STOCK"
+        cur.execute("""
+            UPDATE market_data.tickers
+            SET ticker_type = %s, updated_at = NOW()
+            WHERE symbol = %s AND deleted_at IS NULL
+              AND (ticker_type IS NULL OR ticker_type::text != %s)
+        """, (expected_type, symbol, expected_type))
+        if cur.rowcount > 0:
+            updated += cur.rowcount
+            print(f"  🔄 Updated ticker_type: {symbol} → {expected_type}")
+    if updated > 0:
+        print(f"  ✅ ticker_type backfill: {updated} ticker(s) updated")
+
+
 def _backfill_exchange_id_for_existing(cur):
     """GATE_3 R3 (Blocker 1.3): Set exchange_id for existing tickers (e.g. TEVA.TA→TASE, ANAU.MI→MIL)."""
     updated = 0
@@ -90,6 +109,9 @@ def seed():
         conn.commit()
         # GATE_3 R3 (1.3): Backfill exchange_id for existing tickers (TEVA.TA, ANAU.MI, etc.)
         _backfill_exchange_id_for_existing(cur)
+        conn.commit()
+        # TEAM_10_TICKER_TYPE: Backfill ticker_type (SPY→ETF, QQQ→ETF, BTC-USD→CRYPTO) when existing tickers have wrong type
+        _backfill_ticker_type_for_existing(cur)
         conn.commit()
 
         inserted = 0

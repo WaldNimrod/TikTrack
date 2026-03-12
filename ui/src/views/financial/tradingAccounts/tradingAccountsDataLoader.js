@@ -27,6 +27,7 @@ import { apiToReact } from '../../../cubes/shared/utils/transformers.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 import { toCanonicalStatus, toHebrewStatus } from '../../../utils/statusAdapter.js';
 import { toFlowTypeLabel, getFlowTypeEntity } from '../../../utils/flowTypeValues.js';
+import { formatDailyChangeFromAbsolute } from '../../../utils/formatChange.js';
 
 /**
  * Validate ULID format
@@ -792,14 +793,11 @@ async function loadContainer4(filters = {}) {
       const posCanon = position.status === 'OPEN' ? 'active' : 'inactive';
       const statusBadge = `<span class="phoenix-table__status-badge phoenix-table__status-badge--${posCanon}" data-status-category="${posCanon}">${toHebrewStatus(posCanon)}</span>`;
       
-      // Format current price with daily change
-      const currentPriceHtml = window.tableFormatters?.formatCurrentPrice 
-        ? window.tableFormatters.formatCurrentPrice(
-            parseFloat(position.currentPrice || 0),
-            parseFloat(position.dailyChangePercent || 0),
-            'USD'
-          ).outerHTML
-        : `<span class="numeric-value-positive" dir="ltr">${formatCurrency(parseFloat(position.currentPrice || 0), 'USD', 2)}</span>`;
+      // Format current price with daily change: אחוז(סכום) per SSOT
+      const dailyChangePct = parseFloat(position.dailyChangePercent || 0);
+      const dailyChangeAbs = parseFloat(position.dailyChange ?? position.daily_change ?? 0);
+      const changeStr = formatDailyChangeFromAbsolute(dailyChangePct, dailyChangeAbs, 'USD');
+      const currentPriceHtml = `<div class="current-price-display"><span class="numeric-value-positive" dir="ltr">${formatCurrency(parseFloat(position.currentPrice || 0), 'USD', 2)}</span><span class="${dailyChangePct >= 0 ? 'numeric-value-positive' : 'numeric-value-negative'}" dir="ltr" style="font-size:0.85em"> ${changeStr}</span></div>`;
       
       // Format P/L
       const plHtml = window.tableFormatters?.formatPL

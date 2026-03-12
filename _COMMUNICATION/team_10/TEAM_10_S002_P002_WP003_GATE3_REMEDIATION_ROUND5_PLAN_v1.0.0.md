@@ -77,4 +77,20 @@
 
 ---
 
-**log_entry | TEAM_10 | WP003_GATE3_REMEDIATION_ROUND5_PLAN | CREATED | 2026-03-12**
+---
+
+## 6) Status (2026-03-12)
+
+| Team | Status |
+|------|--------|
+| Team 20 | ✅ DONE — G7-FIX-1/2A/2B/3; pass_04=True |
+| Team 60 | ✅ DONE — Run A/B v2.0.3; CC-01, CC-02, CC-04 evidenced |
+| Team 50 | ✅ DONE — G7-VERIFY, T-MKTDATA 5/5, Corroboration v2.0.3 → Team 90 |
+
+**החבילה:** הוגשה ל־Team 90. Team 90 v2.0.3: **BLOCK_PART_A** (CC-01/02 NOT_EVIDENCED; CC-04 סתירה 60 vs 50).
+
+**v2.0.5:** Team 20 ✓ Team 60 ✓ Team 50 ✓ — Re-QA PASS. **Handoff ל־Team 90:** `TEAM_10_TO_TEAM_90_..._HANDOFF_v2.0.5.md`. הערה: ticker_type — תיקון זריז (לא חוסם).
+
+---
+
+**log_entry | TEAM_10 | WP003_GATE3_REMEDIATION_ROUND5_PLAN | UPDATED_T50_IN_PROGRESS | 2026-03-12**

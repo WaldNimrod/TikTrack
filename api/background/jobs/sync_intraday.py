@@ -170,7 +170,8 @@ async def _fetch_prices_for_tickers(
 
         if yahoo_sym and yahoo_sym in yahoo_batch:
             pr = yahoo_batch[yahoo_sym]
-        elif not is_in_cooldown("YAHOO_FINANCE") and yahoo_sym:
+        elif not is_in_cooldown("YAHOO_FINANCE") and yahoo_sym and market_is_open:
+            # CC-02: In off-hours, skip per-ticker Yahoo — batch only (≤2 Yahoo total: 0 market status + 1 batch)
             try:
                 pr = await yahoo.get_ticker_price(yahoo_sym)
             except Exception as e:

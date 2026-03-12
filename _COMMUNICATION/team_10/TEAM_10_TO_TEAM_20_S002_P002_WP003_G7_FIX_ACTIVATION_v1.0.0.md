@@ -1,3 +1,5 @@
+
+
 # Team 10 → Team 20 | S002-P002-WP003 G7-FIX — הפעלת מנדט אדריכלי (סבב תיקון 5)
 
 **project_domain:** TIKTRACK  
@@ -6,6 +8,7 @@
 **to:** Team 20 (Backend Implementation)  
 **cc:** Team 50, Team 60, Team 90, Team 00  
 **date:** 2026-03-12  
+**historical_record:** true
 **status:** MANDATE_ACTIVE  
 **trigger:** WP003 GATE_3 Remediation Round 5 — תיקוני קוד אדריכליים לפי מנדט Team 00  
 **authority:** TEAM_00_TO_TEAM_20_S002_P002_WP003_G7_FIX_MANDATE_v1.0.0  

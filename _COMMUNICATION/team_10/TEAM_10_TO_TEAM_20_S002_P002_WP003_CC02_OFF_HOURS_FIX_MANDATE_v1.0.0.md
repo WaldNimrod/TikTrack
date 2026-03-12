@@ -1,3 +1,5 @@
+
+
 # Team 10 → Team 20 | S002-P002-WP003 CC-02 — מנדט תיקון off-hours (≤2 Yahoo)
 
 **project_domain:** TIKTRACK  
@@ -6,6 +8,7 @@
 **to:** Team 20 (Backend Implementation)  
 **cc:** Team 60, Team 50, Team 90  
 **date:** 2026-03-12  
+**historical_record:** true
 **status:** MANDATE_ACTIVE  
 **authority:** TEAM_10_S002_P002_WP003_GATE7_PARTA_PRE_SUBMISSION_ASSESSMENT_v1.0.0  
 

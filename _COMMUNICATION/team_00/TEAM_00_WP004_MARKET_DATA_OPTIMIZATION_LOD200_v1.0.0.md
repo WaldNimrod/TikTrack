@@ -1,10 +1,13 @@
+**date:** 2026-03-12
+
+**historical_record:** true
+
 ---
 project_domain: TIKTRACK
 id: TEAM_00_WP004_MARKET_DATA_OPTIMIZATION_LOD200_v1.0.0
 from: Team 00 (Chief Architect — Nimrod)
 to: Team 190 (Constitutional Architectural Validator), Team 100 (GATE_2 Authority)
 cc: Team 10 (intake orchestration), Team 20 (backend), Team 50 (QA), Team 170 (registry)
-date: 2026-03-12
 status: LOD200 DRAFT — submitted for Team 190 constitutional validation + GATE_2 approval
 authority: ARCHITECT_DECISION_MARKET_DATA_PROVIDER_ARCHITECTURE_v1.1.0
 supersedes: N/A (new work package)

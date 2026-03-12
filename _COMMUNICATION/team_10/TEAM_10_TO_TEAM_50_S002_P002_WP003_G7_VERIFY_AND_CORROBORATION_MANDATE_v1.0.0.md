@@ -1,3 +1,5 @@
+
+
 # Team 10 → Team 50 | S002-P002-WP003 G7-VERIFY + Corroboration v2.0.3 (סבב תיקון 5)
 
 **project_domain:** TIKTRACK  
@@ -6,6 +8,7 @@
 **to:** Team 50 (QA & Fidelity)  
 **cc:** Team 20, Team 60, Team 90  
 **date:** 2026-03-12  
+**historical_record:** true
 **status:** MANDATE_ACTIVE  
 **trigger:** WP003 GATE_3 Remediation Round 5 — G7-VERIFY (אחרי Team 20) + Corroboration (אחרי Team 60)  
 **authority:** TEAM_00_TO_TEAM_20_S002_P002_WP003_G7_FIX_MANDATE_v1.0.0, TEAM_90_TO_TEAM_60_TEAM_50_..._TARGETED_EVIDENCE_MANDATE_v2.0.2  

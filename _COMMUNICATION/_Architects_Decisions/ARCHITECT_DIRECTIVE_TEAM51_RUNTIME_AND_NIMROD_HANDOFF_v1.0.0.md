@@ -1,10 +1,13 @@
+**date:** 2026-03-12
+
+**historical_record:** true
+
 ---
 **project_domain:** AGENTS_OS
 **id:** ARCHITECT_DIRECTIVE_TEAM51_RUNTIME_AND_NIMROD_HANDOFF_v1.0.0
 **from:** Team 00 (Chief Architect) — Nimrod authority
 **to:** Team 51, Team 100, Team 170
 **cc:** Team 61
-**date:** 2026-03-11
 **status:** LOCKED — immediate implementation
 **authority:** Nimrod (Visionary) + Team 00 constitutional authority
 ---

@@ -1,9 +1,12 @@
+
+
 # Team 10 | הערת תיקון זריז — שדה סוג נכס (ticker_type)
 
 **project_domain:** TIKTRACK  
 **id:** TEAM_10_TICKER_TYPE_QUICK_FIX_NOTE  
 **from:** Team 10 (Execution Orchestrator)  
 **date:** 2026-03-12  
+**historical_record:** true
 **status:** OPEN — לא חוסם הגשה  
 
 ---

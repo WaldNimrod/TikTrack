@@ -1,3 +1,5 @@
+
+
 # Team 10 → Team 60 | S002-P002-WP003 CC-01, CC-02 — מנדט איסוף עדות (סבב תיקון 5)
 
 **project_domain:** TIKTRACK  
@@ -6,6 +8,7 @@
 **to:** Team 60 (Runtime/Infra)  
 **cc:** Team 50, Team 90  
 **date:** 2026-03-12  
+**historical_record:** true
 **status:** MANDATE_ACTIVE  
 **trigger:** WP003 GATE_3 Remediation Round 5 — CC-WP003-01, CC-WP003-02 NOT_EVIDENCED  
 **authority:** TEAM_90_TO_TEAM_60_TEAM_50_S002_P002_WP003_GATE7_PARTA_TARGETED_EVIDENCE_MANDATE_v2.0.2  

@@ -1,3 +1,5 @@
+
+
 # Team 90 -> Team 60, Team 50 | S002-P002-WP003 GATE_7 Part A Market-Open Window Mandate v2.0.8
 
 **project_domain:** TIKTRACK  
@@ -5,7 +7,8 @@
 **from:** Team 90 (GATE_7 owner)  
 **to:** Team 60 (Runtime/Infra), Team 50 (QA corroboration)  
 **cc:** Team 10, Team 20, Team 00, Team 100, Team 190  
-**date:** 2026-03-13  
+**date:** 2026-03-12  
+**historical_record:** true
 **status:** ACTION_REQUIRED  
 **gate_id:** GATE_7  
 **work_package_id:** S002-P002-WP003  
@@ -38,4 +41,4 @@ Forced `mode=market_open` outside this ET window is not admissible for CC-01 clo
 
 ---
 
-**log_entry | TEAM_90 | TO_TEAM_60_TEAM_50 | S002_P002_WP003_GATE7_PARTA_MARKET_OPEN_WINDOW_MANDATE_v2.0.8 | ACTION_REQUIRED | 2026-03-13**
+**log_entry | TEAM_90 | TO_TEAM_60_TEAM_50 | S002_P002_WP003_GATE7_PARTA_MARKET_OPEN_WINDOW_MANDATE_v2.0.8 | ACTION_REQUIRED | 2026-03-12**

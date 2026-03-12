@@ -1,9 +1,12 @@
+
+
 # Team 50 | S002-P002-WP003 GATE_7 Part A — נוהל Corroboration v2.0.7
 
 **project_domain:** TIKTRACK  
 **id:** TEAM_50_S002_P002_WP003_GATE7_PARTA_V2_0_7_CORROBORATION_PROCEDURE_v1.0.0  
 **from:** Team 50 (QA & Fidelity)  
 **date:** 2026-03-12  
+**historical_record:** true
 **status:** CANONICAL — חובה לפני הגשת corroboration  
 **purpose:** מונע BLOCK חוזר — v2.0.6 נפסל כי הלוג הכיל mode=off_hours  
 

@@ -1,3 +1,5 @@
+
+
 # Team 20 → Team 30 | דרישות UI לשדה ticker_type
 
 **project_domain:** TIKTRACK  
@@ -6,6 +8,7 @@
 **to:** Team 30 (UI/Frontend)  
 **ref:** TEAM_10_TICKER_TYPE_QUICK_FIX_NOTE_v1.0.0, TEAM_20_TICKER_TYPE_OWNERSHIP_ANALYSIS_v1.0.0  
 **date:** 2026-03-12  
+**historical_record:** true
 **status:** ACTION_REQUIRED  
 
 ---

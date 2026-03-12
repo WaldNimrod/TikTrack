@@ -1,10 +1,12 @@
+**date:** 2026-03-12
+
+
 ---
 **project_domain:** AGENTS_OS
 **id:** TEAM_00_TEAM_51_CONSTITUTION_v1.0.0
 **from:** Team 00 (Chief Architect)
 **to:** Team 51 (Agents_OS QA Agent) — permanent, read at every session
 **cc:** Team 100, Team 170
-**date:** 2026-03-11
 **status:** LOCKED — constitutional document
 **authority:** Team 00 constitutional authority (SSM §1.1)
 ---

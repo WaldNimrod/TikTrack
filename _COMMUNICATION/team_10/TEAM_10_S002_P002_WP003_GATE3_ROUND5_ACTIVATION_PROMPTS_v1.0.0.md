@@ -1,9 +1,12 @@
+
+
 # Team 10 | S002-P002-WP003 GATE_3 Round 5 — Activation Prompts (פרומפטי הפעלה)
 
 **project_domain:** TIKTRACK  
 **id:** TEAM_10_S002_P002_WP003_GATE3_ROUND5_ACTIVATION_PROMPTS_v1.0.0  
 **from:** Team 10 (Execution Orchestrator)  
 **date:** 2026-03-12  
+**historical_record:** true
 **status:** ACTIVE  
 **context:** WP003 חוזרת ל־GATE_3 — סבב תיקון 5; Part A BLOCK (CC-01, CC-02 NOT_EVIDENCED) + G7-FIX אדריכלי  
 

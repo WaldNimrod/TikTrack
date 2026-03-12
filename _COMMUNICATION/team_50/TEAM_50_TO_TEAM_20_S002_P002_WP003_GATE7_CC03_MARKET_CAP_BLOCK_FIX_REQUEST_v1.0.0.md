@@ -1,3 +1,5 @@
+
+
 # Team 50 → Team 20 | S002-P002-WP003 GATE_7 — דרישת תיקון CC-03 (market_cap)
 
 **project_domain:** TIKTRACK  
@@ -6,6 +8,7 @@
 **to:** Team 20 (Backend)  
 **cc:** Team 10  
 **date:** 2026-03-12  
+**historical_record:** true
 **status:** ACTION_REQUIRED  
 **blocker:** CC-WP003-03 / AUTO-WP003-05 — market_cap null  
 

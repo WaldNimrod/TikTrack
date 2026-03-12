@@ -1,3 +1,5 @@
+
+
 # Team 60 → Team 50 | S002-P002-WP003 GATE_3 Round 5 — פרומפט קנוני להפעלת Team 50 (העתק ל־Team 20)
 
 **project_domain:** TIKTRACK  
@@ -6,6 +8,7 @@
 **to:** Team 50 (QA & Fidelity)  
 **cc:** Team 10, **Team 20 (מנהל התהליך)**  
 **date:** 2026-03-12  
+**historical_record:** true
 **status:** ACTIVATION_IMMEDIATE  
 **trigger:** Team 60 השלים Run A + Run B; דוח עדות v2.0.3 הוגש. Team 50 נדרש לפעול מיד.  
 **authority:** TEAM_10_S002_P002_WP003_GATE3_REMEDIATION_ROUND5_PLAN; TEAM_90_..._TARGETED_EVIDENCE_MANDATE_v2.0.2  

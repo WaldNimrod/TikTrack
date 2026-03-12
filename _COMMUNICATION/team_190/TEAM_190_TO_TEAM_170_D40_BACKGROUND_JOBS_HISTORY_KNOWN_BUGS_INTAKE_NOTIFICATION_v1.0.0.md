@@ -1,10 +1,13 @@
+**date:** 2026-03-12
+
+**historical_record:** true
+
 ---
 project_domain: SHARED (TIKTRACK + AGENTS_OS)
 id: TEAM_190_TO_TEAM_170_D40_BACKGROUND_JOBS_HISTORY_KNOWN_BUGS_INTAKE_NOTIFICATION_v1.0.0
 from: Team 190 (Constitutional Validation Intake Authority)
 to: Team 170 (Documentation & Governance)
 cc: Team 10, Team 90
-date: 2026-03-12
 status: NOTICE
 gate_id: GOVERNANCE_PROGRAM
 scope: Known Bugs register intake sync for urgent cycle

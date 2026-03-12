@@ -1,3 +1,5 @@
+
+
 # TEAM_170 → TEAM_10 | G3.7 Runbook Addition Notice v1.0.0
 
 **project_domain:** SHARED (AGENTS_OS + TIKTRACK)  
@@ -6,6 +8,7 @@
 **to:** Team 10 (Gateway)  
 **cc:** Team 100  
 **date:** 2026-03-12  
+**historical_record:** true
 **status:** INFORMATIONAL — הודעת מודעות בלבד (per FAST_0 §11 item 3)  
 **in_context_of:** S003-P002 WP001 FAST_4 closure (AGENTS_OS); צוות 10 לא מעורב במסלול המהיר  
 **authority:** _COMMUNICATION/team_100/TEAM_100_S003_P002_WP001_FAST0_SCOPE_BRIEF_v1.0.0.md §11 item 3 — "Notifies Team 10 of G3.7 addition to their GATE_3 runbook"  

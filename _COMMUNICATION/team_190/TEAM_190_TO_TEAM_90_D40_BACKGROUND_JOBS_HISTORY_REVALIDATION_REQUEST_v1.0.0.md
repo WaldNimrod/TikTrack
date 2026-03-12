@@ -1,10 +1,13 @@
+**date:** 2026-03-12
+
+**historical_record:** true
+
 ---
 project_domain: TIKTRACK
 id: TEAM_190_TO_TEAM_90_D40_BACKGROUND_JOBS_HISTORY_REVALIDATION_REQUEST_v1.0.0
 from: Team 190 (Constitutional Architectural Validator)
 to: Team 90 (Validation & Gate Management)
 cc: Team 10, Team 50, Team 00, Team 100
-date: 2026-03-12
 status: ACTION_REQUIRED
 gate_id: GATE_7_REMEDIATION_LANE
 program_id: S002-P002

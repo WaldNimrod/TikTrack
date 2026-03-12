@@ -1,10 +1,13 @@
+**date:** 2026-03-12
+
+**historical_record:** true
+
 ---
 project_domain: TIKTRACK
 id: TEAM_190_TO_TEAM_50_D40_BACKGROUND_JOBS_HISTORY_TARGETED_QA_MANDATE_v1.0.0
 from: Team 190 (Constitutional Architectural Validator)
 to: Team 50 (QA + FAV)
 cc: Team 10, Team 30, Team 90
-date: 2026-03-12
 status: ACTION_REQUIRED
 gate_id: GATE_7_REMEDIATION_LANE
 program_id: S002-P002

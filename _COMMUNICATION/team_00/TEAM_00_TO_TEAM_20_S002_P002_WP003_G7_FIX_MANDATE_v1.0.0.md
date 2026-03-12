@@ -1,10 +1,13 @@
+**date:** 2026-03-12
+
+**historical_record:** true
+
 ---
 project_domain: TIKTRACK
 id: TEAM_00_TO_TEAM_20_S002_P002_WP003_G7_FIX_MANDATE_v1.0.0
 from: Team 00 (Chief Architect — Nimrod)
 to: Team 20 (Backend Implementation)
 cc: Team 50 (QA), Team 10 (Gateway), Team 90 (Validation)
-date: 2026-03-12
 status: MANDATE_ACTIVE — CANONICAL ACTIVATION PROMPT
 gate_id: GATE_7 (S002-P002-WP003)
 work_package_id: S002-P002-WP003

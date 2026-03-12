@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-11T23:18:33.835356+00:00`
+- Generated (UTC): `2026-03-12T22:50:02.849507+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -11,13 +11,13 @@
 - active_program_id: `S002-P002`
 - active_work_package_id: `S002-P002-WP003`
 - current_gate: `GATE_7 (AWAITING_RUNTIME_AND_UX_CONFIRMATION)`
-- next_required_action: `Team 60/50 to re-run Part A runtime evidence and close CC-WP003-04; Team 90 to continue Part B Nimrod browser scenarios in parallel; final GATE_7 decision only after both parts PASS.`
+- next_required_action: `Team 60/50 to execute (not just prepare) v2.0.9 market-open run and corroboration: completed evidence state, non-null timestamp, and admissible ET window proof for CC-01; Team 90 to continue Part B Nimrod browser scenarios in parallel; final GATE_7 decision only after Part A + Part B PASS.`
 
 ## Portfolio Counts
 
 - stages: `6`
 - programs: `28`
-- work_packages: `7`
+- work_packages: `8`
 
 ## Roadmap (hierarchical)
 
@@ -53,7 +53,8 @@
     ├── **Program** `S003-P001` — Data Model Validator | COMPLETE | domain: **AGENTS_OS**
         └── **WP** `S003-P001-WP001` | CLOSED | gate: FAST_4 (PASS) | domain: **AGENTS_OS**
 
-    ├── **Program** `S003-P002` — Test Template Generator | PLANNED | domain: **AGENTS_OS**
+    ├── **Program** `S003-P002` — Test Template Generator | COMPLETE | domain: **AGENTS_OS**
+        └── **WP** `S003-P002-WP001` | CLOSED | gate: FAST_4 (PASS) | domain: **AGENTS_OS**
 
     ├── **Program** `S003-P003` — System Settings (D39+D40+D41) | PLANNED | domain: **TIKTRACK**
 

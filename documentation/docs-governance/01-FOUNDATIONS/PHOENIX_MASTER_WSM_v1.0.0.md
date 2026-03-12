@@ -1,9 +1,10 @@
+**date:** 2026-03-12
+
 ---
 **provenance:** Governance consolidation (Team 170)
 **source_path:** _COMMUNICATION/_Architects_Decisions/PHOENIX_MASTER_WSM_v1.0.0.md
 **canonical_path:** documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md
 **promotion_date:** 2026-02-22
-**date:** 2026-03-10
 **directive_id:** TEAM_190_TO_TEAM_170_GOVERNANCE_PROCEDURES_CONSOLIDATION_DIRECTIVE_v1.0.0
 **classification:** PROMOTE_TO_CANONICAL_GOVERNANCE
 ---
@@ -17,7 +18,6 @@ owner: Team 10
 ssm_dependency: 1.0.0
 ---
 **project_domain:** TIKTRACK
-**date:** 2026-02-22
 # 🛠️ PHOENIX WORK STATE (WSM) v1.0.0
 
 מניפסט המשימות מנהל את צנרת הביצוע ומקשר בין פקודות האדריכל לתוצרי השטח. **מבנה קנוני v2.3.0** (היררכיה, מספור, GATE_2/GATE_8) per 04_GATE_MODEL_PROTOCOL_v2.3.0.
@@ -87,7 +87,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-13** by **Team 90** — GATE_7 Part A revalidation received (`v2.0.8`): all artifacts exist and CC-02/03/04 are PASS/CARRY_FORWARD_PASS, but CC-01 remains NOT_EVIDENCED because run timestamp is outside required 09:30–16:00 ET window; targeted market-open-window mandate issued.
+**Gate-owner update evidence:** This block was updated **2026-03-13** by **Team 90** — GATE_7 Part A revalidation received (`v2.0.9`): package moved to procedure/activation readiness but still not executed evidence; CC-01 remains NOT_EVIDENCED until market-open run is actually performed and corroborated.
 
 | Field | Value |
 |-------|-------|
@@ -109,8 +109,8 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | active_program_id | S002-P002 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 90 (GATE_7 gate owner); Nimrod/Team 00 (human sign-off authority); Team 10 (execution orchestrator); Team 60/50 (runtime corroboration) |
-| last_gate_event | GATE_7_PARTA_REVALIDATION_BLOCK \| 2026-03-13 \| Team 90 validated v2.0.8 set: CC-01 NOT_EVIDENCED (run timestamp `2026-03-12T12:29:30Z` outside 09:30–16:00 ET), while CC-02/03/04 remain PASS/CARRY_FORWARD_PASS; market-open-window mandate v2.0.8 issued. |
-| next_required_action | Team 60/50 to submit v2.0.9 completion set with CC-01 run executed inside 09:30–16:00 ET and corroborated by Team 50; Team 90 to continue Part B Nimrod browser scenarios in parallel; final GATE_7 decision only after Part A + Part B PASS. |
+| last_gate_event | GATE_7_PARTA_REVALIDATION_BLOCK \| 2026-03-13 \| Team 90 validated v2.0.9 set: Team 60=`PROCEDURE_READY`, Team 50=`ACTIVATION_READY`, JSON `timestamp_utc=null`; CC-01 still NOT_EVIDENCED and Part A remains blocked. |
+| next_required_action | Team 60/50 to execute (not just prepare) v2.0.9 market-open run and corroboration: completed evidence state, non-null timestamp, and admissible ET window proof for CC-01; Team 90 to continue Part B Nimrod browser scenarios in parallel; final GATE_7 decision only after Part A + Part B PASS. |
 | next_responsible_team | Team 60/50 (CC-01 admissible run + corroboration), Nimrod (Part B browser execution), Team 90 (orchestration + canonical decision) |
 
 ---
@@ -274,6 +274,7 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 Part A revalidation v2.0.6 BLOCK: CC-WP003-02/04 PASS retained, CC-WP003-01 NOT_EVIDENCED (non-market-open run timestamp and off_hours cadence); targeted CC-01 completion mandate v2.0.6 issued; Part B remains active | 2026-03-12**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 Part A revalidation v2.0.7 BLOCK: CC-WP003-01 NOT_EVIDENCED (missing shared log + pass_01 null) and Team 50 v2.0.7 corroboration missing; CC-01 completion mandate v2.0.7 issued; Part B remains active | 2026-03-12**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 Part A revalidation v2.0.8 BLOCK: CC-WP003-01 NOT_EVIDENCED (timestamp outside 09:30–16:00 ET), CC-WP003-02/03/04 PASS/CARRY_FORWARD_PASS; market-open-window mandate v2.0.8 issued; Part B remains active | 2026-03-13**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 Part A revalidation v2.0.9 BLOCK: Team 60/50 submitted procedure/activation-ready package only (no completed market-open execution evidence); CC-WP003-01 remains NOT_EVIDENCED; Part B remains active | 2026-03-13**
 **log_entry | TEAM_190 | TO_TEAM_170 | REGISTRY_MIRROR_SYNC_REQUIRED | run sync_registry_mirrors_from_wsm.py --write then --check for WP003 baseline standardization | 2026-03-10**
 
 GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:

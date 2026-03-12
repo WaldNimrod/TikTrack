@@ -144,9 +144,10 @@ function renderJobs(jobs) {
       if (row.hidden) {
         row.hidden = false;
         content.textContent = 'טוען...';
+        let items = [];
         try {
           const res = await sharedServices.get(`/admin/background-jobs/${decodeURIComponent(jobName)}/history`, { limit: 5 });
-          const items = res?.items ?? [];
+          items = res?.items ?? [];
           content.innerHTML = items.length ? `
             <table class="phoenix-table phoenix-table--compact">
               <thead><tr><th>תאריך</th><th>סטטוס</th><th>משך (ms)</th><th>רשומות</th><th>שגיאות</th></tr></thead>

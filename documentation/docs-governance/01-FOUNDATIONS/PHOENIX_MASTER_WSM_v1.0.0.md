@@ -87,31 +87,31 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-13** by **Team 90** — GATE_7 Part A revalidation received (`v2.0.9`): package moved to procedure/activation readiness but still not executed evidence; CC-01 remains NOT_EVIDENCED until market-open run is actually performed and corroborated.
+**Gate-owner update evidence:** This block was updated **2026-03-13** by **Team 90** — GATE_8 PASS validated from Team 70 closure package; `S002-P002-WP003` lifecycle is DOCUMENTATION_CLOSED.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P002-WP003 (Market Data Hardening) — **GATE_7 AWAITING_RUNTIME_AND_UX_CONFIRMATION** after GATE_6 PASS v2.0.0; Part A remains BLOCK on CC-WP003-01 (market-open evidence only); Part B browser review may proceed in parallel; conditions_open=CC-WP003-01,CC-WP003-05; conditions_closed=CC-WP003-02,CC-WP003-03,CC-WP003-04. |
-| active_project_domain | TIKTRACK (WP003 Market Data Hardening execution track) |
-| active_work_package_id | S002-P002-WP003 |
-| in_progress_work_package_id | S002-P002-WP003 |
-| last_closed_work_package_id | S002-P003-WP002 (GATE_8 PASS 2026-03-07; DOCUMENTATION_CLOSED) |
-| last_closed_program_id | S002-P002 (GATE_8 PASS 2026-03-08; DOCUMENTATION_CLOSED) |
+| active_flow | S002-P002-WP003 (Market Data Hardening) — **GATE_8 PASS / DOCUMENTATION_CLOSED** after Team 90 validation; no active work package in execution at this time. |
+| active_project_domain | TIKTRACK |
+| active_work_package_id | N/A |
+| in_progress_work_package_id | N/A |
+| last_closed_work_package_id | S002-P002-WP003 (GATE_8 PASS 2026-03-13; DOCUMENTATION_CLOSED) |
+| last_closed_program_id | S002-P002 (GATE_8 PASS 2026-03-13; DOCUMENTATION_CLOSED with WP003) |
 | last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
 | allowed_gate_range | GATE_0_TO_GATE_8 (normal execution lifecycle) |
-| current_gate | GATE_7 (AWAITING_RUNTIME_AND_UX_CONFIRMATION) |
+| current_gate | GATE_8 |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
 | agents_os_parallel_track | S003-P001 WP001 + S003-P002 WP001 FAST_4 CLOSED (2026-03-11 / 2026-03-12). Next AGENTS_OS program: S004-P001 (Financial Precision Validator) — LOD200 must be written before FAST_0; Team 100 on hold. S003-P003 is TIKTRACK (normal GATE_0..GATE_8); G3.7 available for Team 10 at GATE_3. Governed per TEAM_00_AGENTS_OS_INDEPENDENT_ADVANCEMENT_DIRECTIVE_v1.0.0; does NOT depend on S002-P002-WP003 GATE closure. |
 | active_program_id | S002-P002 |
 | active_plan_id | S002 |
-| phase_owner_team | Team 90 (GATE_7 gate owner); Nimrod/Team 00 (human sign-off authority); Team 10 (execution orchestrator); Team 60/50 (runtime corroboration) |
-| last_gate_event | GATE_7_PARTA_REVALIDATION_BLOCK \| 2026-03-13 \| Team 90 validated v2.0.9 set: Team 60=`PROCEDURE_READY`, Team 50=`ACTIVATION_READY`, JSON `timestamp_utc=null`; CC-01 still NOT_EVIDENCED and Part A remains blocked. |
-| next_required_action | Team 60/50 to execute (not just prepare) v2.0.9 market-open run and corroboration: completed evidence state, non-null timestamp, and admissible ET window proof for CC-01; Team 90 to continue Part B Nimrod browser scenarios in parallel; final GATE_7 decision only after Part A + Part B PASS. |
-| next_responsible_team | Team 60/50 (CC-01 admissible run + corroboration), Nimrod (Part B browser execution), Team 90 (orchestration + canonical decision) |
+| phase_owner_team | Team 90 (GATE_8 owner; closure validated) |
+| last_gate_event | GATE_8_PASS_DOCUMENTATION_CLOSED; 2026-03-13; Team 90 validated Team 70 GATE_8 package and issued PASS (`TEAM_90_TO_TEAM_70_S002_P002_WP003_GATE8_VALIDATION_RESPONSE_v1.0.0.md`). |
+| next_required_action | Team 90 and Team 10 to route next lifecycle activation per roadmap priorities; S002-P002-WP003 is closed with no open gate obligations. |
+| next_responsible_team | Team 90 (state governance), Team 10 (next execution intake when activated) |
 
 ---
 
@@ -275,6 +275,10 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 Part A revalidation v2.0.7 BLOCK: CC-WP003-01 NOT_EVIDENCED (missing shared log + pass_01 null) and Team 50 v2.0.7 corroboration missing; CC-01 completion mandate v2.0.7 issued; Part B remains active | 2026-03-12**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 Part A revalidation v2.0.8 BLOCK: CC-WP003-01 NOT_EVIDENCED (timestamp outside 09:30–16:00 ET), CC-WP003-02/03/04 PASS/CARRY_FORWARD_PASS; market-open-window mandate v2.0.8 issued; Part B remains active | 2026-03-13**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 Part A revalidation v2.0.9 BLOCK: Team 60/50 submitted procedure/activation-ready package only (no completed market-open execution evidence); CC-WP003-01 remains NOT_EVIDENCED; Part B remains active | 2026-03-13**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | Team 00 waiver decision adopted: WAIVER_DENIED with fast-track authorization; market-open fast-track mandate v2.1.0 issued to Team 60/50; Part B continuation notice issued to Nimrod | 2026-03-13**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 Part A PASS accepted for S002-P002-WP003 per revalidation response v2.1.0; Part B final activation issued to Nimrod; GATE_8 pending final GATE_7 PASS | 2026-03-13**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 PASS confirmed for S002-P002-WP003 (Part A + Part B); GATE_8 activated and Team 70 execution requested via canonical activation package v1.0.0 | 2026-03-13**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_8 PASS S002-P002-WP003; Team 70 closure package validated; DOCUMENTATION_CLOSED and lifecycle complete | 2026-03-13**
 **log_entry | TEAM_190 | TO_TEAM_170 | REGISTRY_MIRROR_SYNC_REQUIRED | run sync_registry_mirrors_from_wsm.py --write then --check for WP003 baseline standardization | 2026-03-10**
 
 GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:

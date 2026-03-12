@@ -87,7 +87,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-12** by **Team 90** — GATE_7 Part A revalidation received (`v2.0.5`): CC-02/04 PASS, CC-01 remains NOT_EVIDENCED (market-open admissibility gap); targeted completion mandate issued.
+**Gate-owner update evidence:** This block was updated **2026-03-12** by **Team 90** — GATE_7 Part A revalidation received (`v2.0.6`): CC-02/04 PASS retained, CC-01 remains NOT_EVIDENCED due non-market-open run window; targeted completion mandate issued.
 
 | Field | Value |
 |-------|-------|
@@ -109,9 +109,9 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | active_program_id | S002-P002 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 90 (GATE_7 gate owner); Nimrod/Team 00 (human sign-off authority); Team 10 (execution orchestrator); Team 60/50 (runtime corroboration) |
-| last_gate_event | GATE_7_PARTA_REVALIDATION_BLOCK \| 2026-03-12 \| Team 90 validated v2.0.5 handoff: CC-02 PASS, CC-04 PASS, CC-01 NOT_EVIDENCED (no admissible market-open window); CC-01 targeted mandate v2.0.5 issued. |
-| next_required_action | Team 60/50 to provide admissible market-open runtime evidence for CC-WP003-01 only; Team 90 to continue Part B Nimrod browser scenarios in parallel; final GATE_7 decision only after Part A + Part B PASS. |
-| next_responsible_team | Team 60/50 (CC-01 market-open evidence), Nimrod (Part B browser execution), Team 90 (orchestration + canonical decision) |
+| last_gate_event | GATE_7_PARTA_REVALIDATION_BLOCK \| 2026-03-12 \| Team 90 validated v2.0.6 handoff: CC-02 PASS, CC-04 PASS, CC-01 NOT_EVIDENCED (run timestamp 11:50:57Z and off_hours cadence); CC-01 targeted mandate v2.0.6 issued. |
+| next_required_action | Team 60/50 to provide admissible CC-WP003-01 runtime evidence in verified market-open window (09:30–16:00 ET); Team 90 to continue Part B Nimrod browser scenarios in parallel; final GATE_7 decision only after Part A + Part B PASS. |
+| next_responsible_team | Team 60/50 (CC-01 market-open run), Nimrod (Part B browser execution), Team 90 (orchestration + canonical decision) |
 
 ---
 

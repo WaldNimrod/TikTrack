@@ -5,7 +5,7 @@
 **version:** 1.0.0  
 **owner:** Team 170 (canonical maintenance); Team 190 is validation intake authority  
 **date:** 2026-03-03  
-**last_updated:** 2026-03-03  
+**last_updated:** 2026-03-12  
 **status:** ACTIVE  
 **purpose:** Single canonical register for validated known bugs that are accepted into a batched remediation cycle or marked as immediate blockers.
 
@@ -98,6 +98,7 @@ This cadence is an operational batching rule, not a gate override.
 | KB-2026-03-03-21 | 2026-03-03 | SHARED | CLOUD_AGENT_SCAN | MEDIUM | OPEN | Team 20 | Team 10 | KB-019: `system_settings` accessed via raw SQL without ORM model | `_COMMUNICATION/team_00/CLOUD_AGENT_QUALITY_SCAN_REPORT_2026-03-03.md#KB-019` | BATCHED | Cloud-Agent Batched Remediation Round (CA-BAT-01) |
 | KB-2026-03-03-22 | 2026-03-03 | SHARED | CLOUD_AGENT_SCAN | HIGH | OPEN | Team 20 | Team 10 | KB-020: Backend unit-test coverage gap (14/18 services untested) | `_COMMUNICATION/team_00/CLOUD_AGENT_QUALITY_SCAN_REPORT_2026-03-03.md#KB-020` | IMMEDIATE | S002-P003-WP002 Cloud-Agent Immediate Lane (CA-IMM-01) |
 | KB-2026-03-03-23 | 2026-03-03 | SHARED | CLOUD_AGENT_SCAN | MEDIUM | OPEN | Team 20 | Team 10 | KB-021: Pydantic V2 deprecation lineage (`class Config` -> `ConfigDict`) must remain tracked | `_COMMUNICATION/team_00/CLOUD_AGENT_QUALITY_SCAN_REPORT_2026-03-03.md#KB-021` | BATCHED | Cloud-Agent Batched Remediation Round (CA-BAT-01) |
+| KB-2026-03-12-24 | 2026-03-12 | TIKTRACK | S002-P002-WP003 | BLOCKING | IN_REMEDIATION | Team 30 | Team 10 | D40 Background Jobs history toggle throws runtime `ReferenceError` (`items is not defined`) due to scope leak outside `try`/`catch` | `ui/src/views/management/systemManagement/systemManagementBackgroundJobsInit.js:149` | IMMEDIATE | URGENT_BUGFIX_CYCLE_2026-03-12_D40_HISTORY_TOGGLE |
 
 ---
 
@@ -138,6 +139,18 @@ This cadence is an operational batching rule, not a gate override.
   - Canonical mapping: `KB-021` -> `KB-2026-03-03-23`
   - Scope source: `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_170_CLOUD_AGENT_KNOWN_BUGS_CANONICAL_INTAKE_REQUEST_v1.0.0.md` section 4
 
+### KB-2026-03-12-24
+
+- Scanner evidence summary:
+  - commit window since `2026-03-11T08:56:34Z`
+  - introduced in commit `4f13dce03`
+- Code evidence:
+  - declaration in `try`: `ui/src/views/management/systemManagement/systemManagementBackgroundJobsInit.js:149`
+  - out-of-scope use after `catch`: `ui/src/views/management/systemManagement/systemManagementBackgroundJobsInit.js:169`
+- Current validation state:
+  - runtime bug confirmed at code level by Team 190
+  - remediation cycle activated as IMMEDIATE (`URGENT_BUGFIX_CYCLE_2026-03-12_D40_HISTORY_TOGGLE`)
+
 ---
 
 ## Maintenance Note
@@ -159,3 +172,4 @@ Operational maintenance model:
 **log_entry | TEAM_190 | KNOWN_BUGS_REGISTER | KB_2026_03_03_01_AND_02_CLOSED_AFTER_REVALIDATION | 2026-03-03**
 **log_entry | TEAM_170 | KNOWN_BUGS_REGISTER | CLOUD_AGENT_KB_001_TO_021_CANONICAL_INTAKE_COMPLETED_EXCLUDING_CLOSED_01_02 | 2026-03-03**
 **log_entry | TEAM_170 | KNOWN_BUGS_REGISTER | KB_ROUTING_AND_STATUS_CORRECTION_APPLIED_PER_TEAM_00_DIRECTIVE | 2026-03-03**
+**log_entry | TEAM_190 | KNOWN_BUGS_REGISTER | KB_2026_03_12_24_INTAKE_AND_URGENT_CYCLE_ACTIVATED | 2026-03-12**

@@ -1,0 +1,41 @@
+INFO:     Started server process [33615]
+INFO:     Waiting for application startup.
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:api.background.scheduler_startup:APScheduler: registered job sync_ticker_prices_intraday (interval=60m, first_run=immediate)
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:api.background.scheduler_startup:APScheduler: registered job sync_exchange_rates_eod (interval=1440m, first_run=immediate)
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:api.background.scheduler_startup:APScheduler: registered job check_alert_conditions (interval=15m, first_run=delayed +15m (run_after=sync_ticker_prices_intraday))
+INFO:apscheduler.scheduler:Added job "sync_ticker_prices_intraday" to job store "default"
+INFO:apscheduler.scheduler:Added job "sync_exchange_rates_eod" to job store "default"
+INFO:apscheduler.scheduler:Added job "check_alert_conditions" to job store "default"
+INFO:apscheduler.scheduler:Scheduler started
+INFO:api.background.scheduler_startup:APScheduler started — background jobs active
+INFO:api.main:APScheduler started — background jobs active
+INFO:     Application startup complete.
+INFO:apscheduler.executors.default:Running job "sync_exchange_rates_eod (trigger: interval[1 day, 0:00:00], next run at: 2026-03-13 13:50:30 IST)" (scheduled at 2026-03-12 11:50:30.959872+00:00)
+INFO:apscheduler.executors.default:Running job "sync_ticker_prices_intraday (trigger: interval[1:00:00], next run at: 2026-03-12 14:50:30 IST)" (scheduled at 2026-03-12 11:50:30.959872+00:00)
+INFO:     Uvicorn running on http://0.0.0.0:8083 (Press CTRL+C to quit)
+INFO:api.background.scheduler_startup:APScheduler: triggered dependent job check_alert_conditions after sync_ticker_prices_intraday completed
+INFO:api.background.scheduler_startup:PHASE_3 price sync cadence: mode=off_hours interval_min=60 next_run=2026-03-12T12:50:31.168739+00:00
+INFO:apscheduler.executors.default:Job "sync_ticker_prices_intraday (trigger: interval[1:00:00], next run at: 2026-03-12 12:50:31 UTC)" executed successfully
+INFO:apscheduler.executors.default:Running job "check_alert_conditions (trigger: interval[0:15:00], next run at: 2026-03-12 14:05:31 IST)" (scheduled at 2026-03-12 11:50:31.168739+00:00)
+INFO:apscheduler.executors.default:Job "check_alert_conditions (trigger: interval[0:15:00], next run at: 2026-03-12 14:05:31 IST)" executed successfully
+INFO:     127.0.0.1:64885 - "GET /health HTTP/1.1" 200 OK
+INFO:api.routers.auth:Login attempt started for: Tik***
+INFO:api.services.auth:User found: TikTrackAdmin, email: nimrod@mezoo.co, is_active: True
+INFO:api.services.auth:Verifying password for user: TikTrackAdmin
+INFO:api.services.auth:Password hash (first 50 chars): $2b$12$2ZlMcAQvc63M5UudvUzUM.gYjOXCIGrRUwHQZ0BgWqc...
+INFO:api.services.auth:Password hash length: 60
+INFO:api.services.auth:Password hash format check: True
+INFO:api.services.auth:Password verification result: True
+INFO:api.routers.auth:Login successful for user: Tik***
+INFO:     127.0.0.1:64977 - "POST /api/v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64983 - "POST /api/v1/admin/background-jobs/sync_ticker_prices_intraday/trigger HTTP/1.1" 200 OK
+INFO:apscheduler.executors.default:Running job "sync_ticker_prices_intraday (trigger: interval[1:00:00], next run at: 2026-03-12 14:50:57 IST)" (scheduled at 2026-03-12 11:50:57.955501+00:00)
+INFO:api.background.scheduler_startup:APScheduler: triggered dependent job check_alert_conditions after sync_ticker_prices_intraday completed
+INFO:api.background.scheduler_startup:PHASE_3 price sync cadence: mode=off_hours interval_min=60 next_run=2026-03-12T12:50:58.047454+00:00
+INFO:apscheduler.executors.default:Job "sync_ticker_prices_intraday (trigger: interval[1:00:00], next run at: 2026-03-12 12:50:58 UTC)" executed successfully
+INFO:apscheduler.executors.default:Running job "check_alert_conditions (trigger: interval[0:15:00], next run at: 2026-03-12 14:05:58 IST)" (scheduled at 2026-03-12 11:50:58.047454+00:00)
+INFO:     127.0.0.1:64984 - "GET /api/v1/admin/background-jobs/sync_ticker_prices_intraday HTTP/1.1" 200 OK
+INFO:apscheduler.executors.default:Job "check_alert_conditions (trigger: interval[0:15:00], next run at: 2026-03-12 14:05:58 IST)" executed successfully

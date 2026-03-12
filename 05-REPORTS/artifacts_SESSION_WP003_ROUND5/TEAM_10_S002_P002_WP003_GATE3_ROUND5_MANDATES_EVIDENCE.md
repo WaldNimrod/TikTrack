@@ -170,4 +170,48 @@
 
 ---
 
-**log_entry | TEAM_10 | WP003_GATE3_ROUND5_MANDATES | V2_0_4_HANDOFF_TO_90 | 2026-03-12**
+## 12) Team 90 v2.0.5 — BLOCK_PART_A (2026-03-12)
+
+| פריט | ערך |
+|------|-----|
+| **פסיקה** | BLOCK_PART_A |
+| **תגובה** | `TEAM_90_TO_TEAM_10_..._REVALIDATION_RESPONSE_v2.0.5.md` |
+| **ממצא חוסם** | BF-G7PA-401 — CC-WP003-01 = NOT_EVIDENCED |
+| **בסיס** | הלוג משותף מציג off_hours בלבד; חסרה הוכחת market-open |
+| **CC-02** | PASS |
+| **CC-04** | PASS |
+| **מנדט ממוקד** | `TEAM_90_TO_TEAM_60_TEAM_50_..._CC01_MARKET_OPEN_EVIDENCE_MANDATE_v2.0.5.md` |
+| **אישור Team 10** | `TEAM_10_S002_P002_WP003_GATE7_PARTA_V2_0_5_BLOCK_ACK_AND_CC01_ROUTING_v1.0.0.md` |
+| **הפעלת Team 60** | `TEAM_10_TO_TEAM_60_..._CC01_ACTIVATION_v1.0.0.md` |
+| **הפעלת Team 50** | `TEAM_10_TO_TEAM_50_..._CC01_ACTIVATION_v1.0.0.md` |
+| **צעד הבא** | Team 60 market-open run → Team 50 corroboration → Handoff v2.0.6 ל־90 |
+
+---
+
+## 13) Team 60 CC-01 — הושלם (2026-03-12)
+
+| פריט | ערך |
+|------|-----|
+| **Run A (market_open)** | 2026-03-12T11:50:57Z UTC; cc_01=0, pass_01=true |
+| **log_path** | `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_6.log` |
+| **דוח** | `TEAM_60_TO_TEAM_90_..._RUNTIME_EVIDENCE_REPORT_v2.0.6.md` |
+| **Handoff ל־50** | `TEAM_60_TO_TEAM_50_..._V2_0_6_CC01_CANONICAL_HANDOFF_v1.0.0.md` |
+| **אישור Team 10** | `TEAM_10_TO_TEAM_60_..._CC01_COMPLETION_ACK_v1.0.0.md` |
+| **Team 50** | DONE — corroboration v2.0.6 |
+| **הערה** | חלון 11:50 UTC — אם נדרש 9:30–16:00 ET, החלטה בידי Team 90 |
+
+---
+
+## 14) Team 50 CC-01 — הושלם; Handoff v2.0.6 (2026-03-12)
+
+| פריט | ערך |
+|------|-----|
+| **Corroboration v2.0.6** | אותו log_path ו־timestamp; CC-01 PASS (תואם 60) |
+| **דוח** | `TEAM_50_TO_TEAM_90_..._QA_CORROBORATION_v2.0.6.md` |
+| **אישור Team 10** | `TEAM_10_TO_TEAM_50_..._CC01_CORROBORATION_ACK` |
+| **Handoff v2.0.6** | `TEAM_10_TO_TEAM_90_..._HANDOFF_v2.0.6.md` — מוגש ל־Team 90 |
+| **צעד הבא** | תגובת Team 90 — REVALIDATION_RESPONSE_v2.0.6 |
+
+---
+
+**log_entry | TEAM_10 | WP003_GATE3_ROUND5_MANDATES | HANDOFF_V2_0_6_TO_90 | 2026-03-12**

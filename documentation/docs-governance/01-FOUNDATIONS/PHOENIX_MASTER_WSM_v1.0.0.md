@@ -87,7 +87,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-12** by **Team 90** — GATE_7 Part A revalidation received (`v2.0.7`): CC-01 remains NOT_EVIDENCED (missing runtime log + null pass_01 in JSON) and required Team 50 corroboration artifact is missing; targeted completion mandate issued.
+**Gate-owner update evidence:** This block was updated **2026-03-13** by **Team 90** — GATE_7 Part A revalidation received (`v2.0.8`): all artifacts exist and CC-02/03/04 are PASS/CARRY_FORWARD_PASS, but CC-01 remains NOT_EVIDENCED because run timestamp is outside required 09:30–16:00 ET window; targeted market-open-window mandate issued.
 
 | Field | Value |
 |-------|-------|
@@ -109,8 +109,8 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | active_program_id | S002-P002 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 90 (GATE_7 gate owner); Nimrod/Team 00 (human sign-off authority); Team 10 (execution orchestrator); Team 60/50 (runtime corroboration) |
-| last_gate_event | GATE_7_PARTA_REVALIDATION_BLOCK \| 2026-03-12 \| Team 90 validated v2.0.7 handoff: CC-01 NOT_EVIDENCED (missing `G7_PART_A_V2_0_7.log` + JSON `pass_01=null`) and Team 50 v2.0.7 corroboration artifact missing; CC-01 completion mandate v2.0.7 issued. |
-| next_required_action | Team 60/50 to submit v2.0.8 completion set: admissible market-open CC-01 run with existing non-empty shared log, JSON pass_01 populated, and Team 50 corroboration artifact; Team 90 to continue Part B Nimrod browser scenarios in parallel; final GATE_7 decision only after Part A + Part B PASS. |
+| last_gate_event | GATE_7_PARTA_REVALIDATION_BLOCK \| 2026-03-13 \| Team 90 validated v2.0.8 set: CC-01 NOT_EVIDENCED (run timestamp `2026-03-12T12:29:30Z` outside 09:30–16:00 ET), while CC-02/03/04 remain PASS/CARRY_FORWARD_PASS; market-open-window mandate v2.0.8 issued. |
+| next_required_action | Team 60/50 to submit v2.0.9 completion set with CC-01 run executed inside 09:30–16:00 ET and corroborated by Team 50; Team 90 to continue Part B Nimrod browser scenarios in parallel; final GATE_7 decision only after Part A + Part B PASS. |
 | next_responsible_team | Team 60/50 (CC-01 admissible run + corroboration), Nimrod (Part B browser execution), Team 90 (orchestration + canonical decision) |
 
 ---
@@ -273,6 +273,7 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 Part A revalidation v2.0.5 BLOCK: CC-WP003-02/04 PASS, CC-WP003-01 NOT_EVIDENCED (market-open admissibility gap); targeted CC-01 completion mandate v2.0.5 issued; Part B remains active | 2026-03-12**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 Part A revalidation v2.0.6 BLOCK: CC-WP003-02/04 PASS retained, CC-WP003-01 NOT_EVIDENCED (non-market-open run timestamp and off_hours cadence); targeted CC-01 completion mandate v2.0.6 issued; Part B remains active | 2026-03-12**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 Part A revalidation v2.0.7 BLOCK: CC-WP003-01 NOT_EVIDENCED (missing shared log + pass_01 null) and Team 50 v2.0.7 corroboration missing; CC-01 completion mandate v2.0.7 issued; Part B remains active | 2026-03-12**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 Part A revalidation v2.0.8 BLOCK: CC-WP003-01 NOT_EVIDENCED (timestamp outside 09:30–16:00 ET), CC-WP003-02/03/04 PASS/CARRY_FORWARD_PASS; market-open-window mandate v2.0.8 issued; Part B remains active | 2026-03-13**
 **log_entry | TEAM_190 | TO_TEAM_170 | REGISTRY_MIRROR_SYNC_REQUIRED | run sync_registry_mirrors_from_wsm.py --write then --check for WP003 baseline standardization | 2026-03-10**
 
 GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:

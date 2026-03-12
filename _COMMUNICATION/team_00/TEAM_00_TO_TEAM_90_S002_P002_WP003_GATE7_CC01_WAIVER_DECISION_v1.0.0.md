@@ -4,7 +4,8 @@ id: TEAM_00_TO_TEAM_90_S002_P002_WP003_GATE7_CC01_WAIVER_DECISION_v1.0.0
 from: Team 00 (Chief Architect — Nimrod)
 to: Team 90 (GATE_7 owner)
 cc: Team 190, Team 10, Team 60, Team 50, Team 100
-date: 2026-03-13
+date: 2026-03-12
+historical_record: true
 status: DECISION_ISSUED
 gate_id: GATE_7
 work_package_id: S002-P002-WP003
@@ -39,7 +40,7 @@ The market-hours time window is therefore a substantive evidence requirement —
 
 ### 2.2 — Team 90's own position was correct
 
-Team 90 reached the correct conclusion independently in its v2.0.8 mandate (2026-03-13):
+Team 90 reached the correct conclusion independently in its v2.0.8 mandate (2026-03-12):
 
 > *"Forced `mode=market_open` outside this ET window is not admissible for CC-01 closure."*
 
@@ -90,10 +91,10 @@ If Team 60 or Team 90 wish to formalize this mechanism for future use in forced-
 
 ## §6 — Next Market-Hours Window
 
-- Next admissible window (if current time is past 16:00 ET on 2026-03-13 Friday): **Monday 2026-03-16, 09:30–16:00 ET**
+- Next admissible window (if current time is past 16:00 ET on 2026-03-12 Friday): **Monday 2026-03-16, 09:30–16:00 ET**
 - Team 60 should plan a standard single-cycle run within that window
 - No code changes required — this is evidence collection only
 
 ---
 
-**log_entry | TEAM_00 | TEAM_00_TO_TEAM_90_S002_P002_WP003_GATE7_CC01_WAIVER_DECISION_v1.0.0 | WAIVER_DENIED | FAST_TRACK_AUTHORIZED | 2026-03-13**
+**log_entry | TEAM_00 | TEAM_00_TO_TEAM_90_S002_P002_WP003_GATE7_CC01_WAIVER_DECISION_v1.0.0 | WAIVER_DENIED | FAST_TRACK_AUTHORIZED | 2026-03-12**

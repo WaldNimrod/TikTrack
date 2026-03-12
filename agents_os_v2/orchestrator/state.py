@@ -30,6 +30,7 @@ class PipelineState:
     mandates: str = ""
     implementation_files: list[str] = field(default_factory=list)
     implementation_endpoints: list[str] = field(default_factory=list)
+    spec_path: str = ""  # Path to LLD400 spec file for G3.7 test template generation
     started_at: str = ""
     last_updated: str = ""
 

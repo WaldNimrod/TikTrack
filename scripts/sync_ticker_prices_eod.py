@@ -182,7 +182,7 @@ async def fetch_prices_for_tickers(
     - Alpha non-CRYPTO: only when Yahoo is in cooldown AND remaining Alpha quota > ALPHA_FX_RESERVE
     - This ensures FX sync (sync_exchange_rates_eod.py) always has quota for its 5 pairs
     """
-    from api.integrations.market_data.providers.yahoo_provider import YahooProvider
+    from api.integrations.market_data.providers.yahoo_provider import YahooProvider, YahooSymbolRateLimitedException
     from api.integrations.market_data.providers.alpha_provider import AlphaProvider
     from api.integrations.market_data.provider_cooldown import (
         set_cooldown, is_in_cooldown, get_cooldown_status, get_alpha_remaining_today,
@@ -211,6 +211,7 @@ async def fetch_prices_for_tickers(
     results = []
     yahoo_skipped = alpha_skipped = False
     alpha_equity_blocked_logged = False  # log once when Alpha blocked for non-CRYPTO
+    yahoo_symbol_fail_count = 0  # G7-FIX-2B: per-symbol 429 → global cooldown only when ≥3
 
     # CC-WP003-04: Batch-first Yahoo (1 HTTP for all) — reduces 429 risk vs N per-ticker v8/chart calls
     yahoo_batch: Dict[str, Any] = {}
@@ -237,9 +238,8 @@ async def fetch_prices_for_tickers(
                     set_cooldown("YAHOO_FINANCE", cooldown_min)
                     print(f"⚠️ YAHOO_FINANCE batch 429 — cooldown {cooldown_min}min")
                 elif "401" in str(e) or "Unauthorized" in str(e).lower():
-                    # H3: 401 = Yahoo blocking; avoid per-ticker v8 (429). Use Alpha fallback.
-                    set_cooldown("YAHOO_FINANCE", cooldown_min)
-                    print(f"⚠️ Yahoo batch 401 — cooldown {cooldown_min}min (use Alpha fallback)")
+                    # Iron Rule #8: 401 = authorization refusal, NOT a rate limit — never triggers SOP-015
+                    print(f"⚠️ Yahoo batch 401 — skipping batch, proceeding to per-ticker (no cooldown)")
                 print(f"⚠️ Yahoo batch failed: {e}")
 
     for ticker_id, symbol, ticker_type, metadata in tickers:
@@ -312,12 +312,21 @@ async def fetch_prices_for_tickers(
                             pr.provider or "unknown",
                         ))
                         break
+                except YahooSymbolRateLimitedException as e:
+                    # G7-FIX-2B: Per-symbol rate limit — degrade this symbol only; global cooldown only at ≥3
+                    yahoo_symbol_fail_count += 1
+                    print(f"📌 {e.symbol}: Yahoo per-symbol rate limit — using last-known price")
+                    if yahoo_symbol_fail_count >= 3:
+                        set_cooldown("YAHOO_FINANCE", cooldown_min)
+                        print(f"⚠️ Yahoo systemic rate limit detected ({yahoo_symbol_fail_count} symbols) — cooldown {cooldown_min}min")
+                    pr = None
+                    break  # Fall through to last-known (handled below)
                 except Exception as e:
                     if _is_429(e):
                         set_cooldown(name, cooldown_min)
                         print(f"⚠️ {name} 429 — cooldown {cooldown_min}min")
                     print(f"⚠️ {name} {symbol}: {e}")
-        else:
+        if not any(r[0] == ticker_id and r[1] == symbol for r in results):
             # Both providers failed (e.g. weekend) — fallback to last-known price from DB
             last = _get_last_known_price(ticker_id, symbol)
             if last:

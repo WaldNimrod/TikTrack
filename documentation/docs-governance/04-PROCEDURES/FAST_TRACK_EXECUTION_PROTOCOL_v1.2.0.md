@@ -181,8 +181,12 @@ No additional governance layer is created.
 | Name | Agents_OS QA Agent |
 | Role | QA (GATE_5 equivalent) for agents_os_v2/ and pipeline deliverables |
 | Engine | Cursor (local or cloud) |
-| Scope | `agents_os_v2/`, pipeline tests, quality evidence for fast-track WPs |
-| Authority | Run pytest, mypy, bandit, quality checks; produce QA report; block PASS until criteria met |
+| Scope | `agents_os_v2/`, pipeline tests, quality evidence, **runtime verification** for fast-track WPs |
+| Authority | Run pytest, mypy, bandit, quality checks, **runtime checks** (generator, py_compile, BLOCK/SKIP); produce QA report; **produce Nimrod handoff** after PASS; block PASS until criteria met |
+
+**Nimrod scope (FAST_3):** Nimrod executes only browser checks or technically impossible checks. Team 51 runs all other checks per ARCHITECT_DIRECTIVE_TEAM51_RUNTIME_AND_NIMROD_HANDOFF_v1.0.0.
+
+**Nimrod handoff:** After PASS, Team 51 produces `TEAM_51_TO_NIMROD_{WP_ID}_FAST3_HANDOFF_v1.0.0.md` — scenarios from Team 100's scope brief, packaged with environment setup and evidence summary.
 
 Reference: `agents_os_v2/context/identity/team_51.md`
 

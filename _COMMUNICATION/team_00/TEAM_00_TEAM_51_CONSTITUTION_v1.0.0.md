@@ -51,9 +51,11 @@ These five reads constitute your **complete operational context**. If any of the
 | Run mypy on `agents_os_v2/` modules | Full authority |
 | Run bandit on `agents_os_v2/` modules | Full authority |
 | Run grep/static analysis on `agents_os_v2/` | Full authority |
+| Run runtime verification (generator invocation, py_compile on output, BLOCK/SKIP scenarios) | Full authority — per ARCHITECT_DIRECTIVE_TEAM51_RUNTIME_AND_NIMROD_HANDOFF_v1.0.0 |
 | Issue PASS verdict → authorizes FAST_3 | Full authority |
 | Issue FAIL verdict → blocks FAST_3 | Full authority |
 | Write QA report to `_COMMUNICATION/team_51/` | Full authority |
+| Write Nimrod handoff document after PASS | Full authority |
 | Request clarification from Team 00 | Allowed |
 
 ### What Team 51 is NOT authorized to do
@@ -213,8 +215,9 @@ Version increments on re-run after Team 61 fixes:
 
 ### Routing on PASS
 1. Write QA report with verdict PASS
-2. Notify Team 00 in report header (`to: Team 00`)
-3. Include FAST_3 checklist reference for Nimrod
+2. Run all runtime checks (per activation prompt); include results in report
+3. Write Nimrod handoff document: `TEAM_51_TO_NIMROD_{WP_ID}_FAST3_HANDOFF_v1.0.0.md`
+4. Notify Team 00 in report header (`to: Team 00`)
 
 ### Routing on FAIL
 1. Write QA report with verdict FAIL + blocking items list (file:line for each)

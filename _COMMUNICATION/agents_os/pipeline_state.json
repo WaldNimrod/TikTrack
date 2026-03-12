@@ -1,5 +1,5 @@
 {
-  "pipe_run_id": "25019519",
+  "pipe_run_id": "848fe4d6",
   "work_package_id": "REQUIRED",
   "stage_id": "S002",
   "spec_brief": "",
@@ -13,6 +13,7 @@
   "mandates": "",
   "implementation_files": [],
   "implementation_endpoints": [],
+  "spec_path": "",
   "started_at": "",
-  "last_updated": "2026-03-11T22:17:20.719533+00:00"
+  "last_updated": "2026-03-11T23:38:14.028739+00:00"
 }

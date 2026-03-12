@@ -40,7 +40,7 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S001-P001 | S001-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-23 |
 | S002-P001 | S002-P001-WP001 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
 | S002-P001 | S002-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
-| S002-P002 | S002-P002-WP003 | IN_PROGRESS | GATE_7 (AWAITING_RUNTIME_AND_UX_CONFIRMATION) | true | S002-P002-WP003 (Market Data Hardening) — **GATE_7 AWAITING_RUNTIME_AND_UX_CONFIRMATION** after GATE_6 PASS v2.0.0; Part A currently BLOCK (CC-WP003-04) pending rerun, Part B browser review may proceed in parallel; conditions_open=CC-WP003-01,CC-WP003-02,CC-WP003-04,CC-WP003-05; conditions_closed=CC-WP003-03. |
+| S002-P002 | S002-P002-WP003 | IN_PROGRESS | GATE_7 (AWAITING_RUNTIME_AND_UX_CONFIRMATION) | true | S002-P002-WP003 (Market Data Hardening) — **GATE_7 AWAITING_RUNTIME_AND_UX_CONFIRMATION** after GATE_6 PASS v2.0.0; Part A remains BLOCK on missing evidence for CC-WP003-01/02; Part B browser review may proceed in parallel; conditions_open=CC-WP003-01,CC-WP003-02,CC-WP003-05; conditions_closed=CC-WP003-03,CC-WP003-04. |
 | S002-P003 | S002-P003-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-03-07 |
 | S003-P001 | S003-P001-WP001 | CLOSED | FAST_4 (PASS) | false | Data Model Validator deployed; FAST_4 CLOSED 2026-03-11 (Team 170 closure) |
 

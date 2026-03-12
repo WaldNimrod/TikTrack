@@ -23,6 +23,19 @@ from ..provider_interface import (
 
 logger = logging.getLogger(__name__)
 
+
+class YahooSymbolRateLimitedException(Exception):
+    """Raised when a single symbol exhausts Yahoo v8/chart retry attempts.
+
+    Distinct from a systemic Yahoo rate limit. Per-symbol failures must NOT
+    trigger a global provider cooldown (Iron Rule #10).
+    """
+
+    def __init__(self, symbol: str):
+        self.symbol = symbol
+        super().__init__(f"Yahoo per-symbol rate limit exhausted: {symbol}")
+
+
 # User-Agent Rotation — per EXTERNAL_PROVIDER_YAHOO_FINANCE_SPEC
 _YAHOO_USER_AGENTS = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
@@ -237,12 +250,12 @@ def _fetch_last_close_via_v8_chart_inner(
                         )
                         time.sleep(wait_time)
                         continue
-                    # All retries exhausted — set cooldown (SOP-015)
-                    from ..provider_cooldown import set_cooldown
-                    from ..market_data_settings import get_provider_cooldown_minutes
-                    cooldown_min = get_provider_cooldown_minutes()
-                    set_cooldown("YAHOO_FINANCE", cooldown_min)
-                    logger.warning("Yahoo 429 — cooldown %d min (SOP-015)", cooldown_min)
+                    # All retries exhausted for this symbol — per-symbol rate limit, NOT systemic (G7-FIX-2A)
+                    logger.warning(
+                        "Yahoo v8/chart 429 exhausted for %s — per-symbol rate limit (no global cooldown)",
+                        symbol,
+                    )
+                    raise YahooSymbolRateLimitedException(symbol)
                 r.raise_for_status()
             data = r.json()
             chart = data.get("chart", {}).get("result")

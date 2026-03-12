@@ -55,12 +55,14 @@ def main():
             time.sleep(60)
         with open(log_path, "a", encoding="utf-8") as f:
             f.write("\n")
-    # Count 429
+    # G7-FIX-3: Count actual Yahoo provider-level cooldown activations (not per-symbol retry messages)
+    # "Yahoo 429 — cooldown" = SOP-015 global cooldown activation
+    # "Yahoo systemic rate limit" = G7-FIX-2 threshold reached
     text = log_path.read_text(encoding="utf-8")
-    count_429 = text.count("429")
+    count_cooldown = text.count("Yahoo 429 — cooldown") + text.count("Yahoo systemic rate limit")
     print(f"log_path={log_path}")
-    print(f"cc_wp003_04_yahoo_429_count={count_429}")
-    print(f"pass_04={count_429 == 0}")
+    print(f"cc_wp003_04_yahoo_cooldown_activations={count_cooldown}")
+    print(f"pass_04={count_cooldown == 0}")
 
 
 if __name__ == "__main__":

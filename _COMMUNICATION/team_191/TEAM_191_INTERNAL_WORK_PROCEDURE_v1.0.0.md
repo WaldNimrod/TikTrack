@@ -97,5 +97,36 @@ Every Team 191 closure note must include:
 
 ---
 
+## 8) Language Lock (Binding)
+
+1. Team 191 user-facing responses are in Hebrew by default.
+2. Technical command tokens remain in English monospace for operational precision (for example: `git status`, `DATE-LINT`, `push`).
+3. Fixed translation lock for recurring Git operations:
+   - `commit` = קומיט מקומי
+   - `push` = דחיפה ל-`origin/main`
+   - `DATE-LINT` = תקינות תאריכים בקבצי governance/communication
+   - `SYNC CHECK` = סנכרון WSM/Registries
+   - `SNAPSHOT CHECK` = תקינות snapshot artifacts
+4. Language lock applies to all Team 191 operational summaries, escalation prompts, and closure contracts unless the user explicitly requests another language.
+
+---
+
+## 9) Base Prompt Lock: `191 ?` (Binding)
+
+1. Trigger: exact prompt `191 ?` (or `191?`).
+2. Required behavior: always return the Team 191 command options menu; do not execute Git actions in this help mode.
+3. Menu content is mandatory and stable:
+   - `191 status` — show current Git/governance blocker status only.
+   - `191 commit` — create context-aware local commit message and commit all intended updates.
+   - `191 push` — run default `SAFE` push flow (guard checks + deterministic remediation + push).
+   - `191 push quick` — minimal flow (fast path; lower hygiene).
+   - `191 push safe` — default balanced flow (recommended).
+   - `191 push strict` — maximal hygiene flow (deep checks, slower).
+4. If mode is not specified, default mode is `SAFE`.
+5. Every `191 ?` response must include short pros/cons per mode to preserve consistent operator guidance.
+
+---
+
 **log_entry | TEAM_190 | TEAM_191_INTERNAL_WORK_PROCEDURE | CREATED_AND_ACTIVATED | 2026-03-11**
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | DATE_LINT_RECURRING_PATTERN_POLICY_LOCKED | 2026-03-11**
+**log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | HEBREW_LANGUAGE_LOCK_AND_191_HELP_PROMPT_LOCKED | 2026-03-11**

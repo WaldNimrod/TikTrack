@@ -31,11 +31,23 @@ Single deterministic runbook for Team 10 (Gateway) gate execution. Gate Protocol
 
 Internal sub-stage sequence: _COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION_v1.0.0.md. **G3.5 (WORK_PACKAGE_VALIDATION_WITH_TEAM_90)** is mandatory before G3.6: Team 10 submits work plan to Team 90; only after Team 90 PASS may Team 10 proceed to team activation.
 
+**AGENTS_OS sequence (includes G3.7):** G3.1 → G3.2 → G3.3 → G3.4 → G3.5 → **G3.7 (Test Template Generation)** → G3.6 → G3.8 → G3.9. For TIKTRACK-only flows, G3.7 is skipped unless explicitly activated.
+
+### 3.1 G3.7 — Test Template Generation (AGENTS_OS)
+
 | Item | Content |
 |------|---------|
-| **Entry** | Work Package defined; execution plan ready. G3.5 PASS (Team 90 work-plan validation) required before G3.6. |
-| **Team 10 mandatory actions** | (1) G3.1–G3.5: Spec intake, implementation review, clarification loop, detailed build, **submit to Team 90 for validation (G3.5)**; wait for PASS. (2) G3.6–G3.9: Issue mandate to each dev team in scope (20/30/40/60 per TEAM_DEVELOPMENT_ROLE_MAPPING); orchestrate; collect deliverables; pre-check; build GATE_3 exit package; submit to GATE_4 (QA). (3) Update WSM (current_gate, last_gate_event, next_required_action). |
-| **Required artifacts** | EXECUTION_AND_TEAM_PROMPTS (or equivalent); Team 90 G3.5 response; completion reports; GATE_3 exit package to GATE_4. |
+| **Placement** | After G3.5 (Work Package Validation); **before** G3.6 (Team Activation Mandates). |
+| **Action** | Run Test Template Generation on spec: `generate_test_templates`; outputs in `tests/api/` and `tests/ui/`. |
+| **BLOCK rule** | TT-00 BLOCK when required spec section is empty. |
+| **Source** | `agents_os_v2/orchestrator/gate_router.py` — `run_g3_7_test_template_generation()`. |
+| **Canonical dependency** | `agents_os_v2/requirements.txt` (Jinja2>=3.1.0,<4.0) — AGENTS_OS canonical. |
+
+| Item | Content |
+|------|---------|
+| **Entry** | Work Package defined; execution plan ready. G3.5 PASS (Team 90 work-plan validation) required before G3.6 (and before G3.7 when AGENTS_OS). |
+| **Team 10 mandatory actions** | (1) G3.1–G3.5: Spec intake, implementation review, clarification loop, detailed build, **submit to Team 90 for validation (G3.5)**; wait for PASS. (2) **AGENTS_OS:** Execute **G3.7 (Test Template Generation)** — run `generate_test_templates` on spec; ensure outputs in `tests/api/`, `tests/ui/`; TT-00 BLOCK if section empty. (3) G3.6–G3.9: Issue mandate to each dev team in scope (20/30/40/60 per TEAM_DEVELOPMENT_ROLE_MAPPING); orchestrate; collect deliverables; pre-check; build GATE_3 exit package; submit to GATE_4 (QA). (4) Update WSM (current_gate, last_gate_event, next_required_action). |
+| **Required artifacts** | EXECUTION_AND_TEAM_PROMPTS (or equivalent); Team 90 G3.5 response; (AGENTS_OS: G3.7 test template outputs where applicable); completion reports; GATE_3 exit package to GATE_4. |
 | **Exit** | Implementation complete; package handed to GATE_4 (QA). |
 | **WSM** | Team 10 (Gate Owner for GATE_3) updates WSM immediately upon GATE_3 closure. |
 

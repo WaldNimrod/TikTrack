@@ -115,7 +115,8 @@ def wait_for_completion(token: str, max_wait_sec: int = 120, poll_sec: float = 2
 
 
 def parse_log_for_evidence(log_path: str, from_position: Optional[int] = None) -> dict:
-    """Parse log file for Yahoo call count and 429 occurrences. Optionally from byte offset."""
+    """Parse log file for Yahoo call count and 429 occurrences. Optionally from byte offset.
+    Yahoo call count: prefer GATE7_CC_YAHOO_HTTP (per mandate); else query1.finance.yahoo.com / yahoo+finance."""
     out = {"yahoo_call_count": 0, "yahoo_429_count": 0, "lines_with_yahoo": [], "lines_with_429": []}
     if not log_path or not Path(log_path).exists():
         return out
@@ -124,7 +125,10 @@ def parse_log_for_evidence(log_path: str, from_position: Optional[int] = None) -
             if from_position is not None and from_position > 0:
                 f.seek(from_position)
             for line in f:
-                if "query1.finance.yahoo.com" in line or ("yahoo" in line.lower() and "finance" in line.lower()):
+                if "GATE7_CC_YAHOO_HTTP" in line:
+                    out["yahoo_call_count"] += 1
+                    out["lines_with_yahoo"].append(line.strip()[:200])
+                elif "query1.finance.yahoo.com" in line or ("yahoo" in line.lower() and "finance" in line.lower()):
                     out["yahoo_call_count"] += 1
                     out["lines_with_yahoo"].append(line.strip()[:200])
                 if "429" in line and ("yahoo" in line.lower() or "quote" in line or "chart" in line):

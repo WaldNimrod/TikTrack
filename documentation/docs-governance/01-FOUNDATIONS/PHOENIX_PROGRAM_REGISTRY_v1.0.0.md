@@ -43,7 +43,7 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | S002 | S002-P003 | TikTrack Alignment (D22+D33+D34+D35) | TIKTRACK | COMPLETE | GATE_8 PASS 2026-03-07; DOCUMENTATION_CLOSED; lifecycle complete (Team 90 validation report) |
 | S002 | S002-P004 | Admin Review S002 | TIKTRACK | PLANNED | — (Stage Governance Package; planning marker per integrated roadmap v1.1.0) |
 | S003 | S003-P001 | Data Model Validator | AGENTS_OS | COMPLETE | FAST_4 CLOSED (WP001) 2026-03-11 — Data Model Validator deployed; FAST_0..FAST_3 completed; Team 170 closure per TEAM_61_TO_TEAM_170_S003_P001_WP001_FAST4_HANDOFF_PROMPT_v1.0.0 |
-| S003 | S003-P002 | Test Template Generator | AGENTS_OS | PLANNED | — (placeholder; ⚡ ACCELERATED from S005; scope: generate pytest/Selenium test scaffolds from DOM contracts + API contracts; domain-agnostic — benefits all TikTrack stages from S004 onwards; highest ROI per-token) |
+| S003 | S003-P002 | Test Template Generator | AGENTS_OS | COMPLETE | FAST_4 CLOSED (WP001) 2026-03-12 — Test Template Generator deployed; G3.7 added; agents_os_v2/requirements.txt canonical |
 | S003 | S003-P003 | System Settings (D39+D40+D41) | TIKTRACK | PLANNED | — (scope updated per ROADMAP_AMENDMENT_v2 §B3; D41 user_management companion) |
 | S003 | S003-P004 | User Tickers (D33) | TIKTRACK | PLANNED | — (registered from integrated roadmap v1.1.0) |
 | S003 | S003-P005 | Watch Lists (D26) | TIKTRACK | PLANNED | — (D38 tag_management relocated to S005 per ARCHITECT_DIRECTIVE_ROADMAP_AMENDMENT_v1.0.0 §A1; registered from integrated roadmap v1.1.0) |
@@ -137,3 +137,4 @@ Source directives:
 **log_entry | TEAM_90 | PHOENIX_PROGRAM_REGISTRY | S002_P002_PRICE_RELIABILITY_PACKAGE_TEAM190_REVALIDATION_PASS_GATE7_ACTIVE | 2026-03-09**
 **log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | FA01_APPLIED_S001_P002_DOMAIN_TIKTRACK_STATUS_DEFERRED_PER_TEAM_00_DIRECTIVE | 2026-03-11**
 **log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | S003_P001_FAST4_CLOSED_WP001_COMPLETE | 2026-03-11**
+**log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | S003_P002_FAST4_CLOSED_WP001_G37_ADDED | 2026-03-12**

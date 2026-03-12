@@ -309,6 +309,8 @@ def _fetch_last_close_via_v8_chart_inner(
                 as_of=ts,
                 provider="YAHOO_FINANCE",
             )
+        except YahooSymbolRateLimitedException:
+            raise  # G7-FIX-2A: propagate per-symbol rate limit to caller
         except Exception as e:
             logger.debug("Yahoo v8/chart last-close attempt %s failed for %s: %s", attempt + 1, symbol, e)
             if attempt < 2:

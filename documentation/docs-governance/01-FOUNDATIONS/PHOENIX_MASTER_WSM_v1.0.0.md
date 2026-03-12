@@ -105,7 +105,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
-| agents_os_parallel_track | S003-P001 WP001 FAST_4 CLOSED (2026-03-11). S003-P002 (Test Template Generator) — FAST_0 next; Team 100 to issue scope brief. Governed per TEAM_00_AGENTS_OS_INDEPENDENT_ADVANCEMENT_DIRECTIVE_v1.0.0; does NOT depend on S002-P002-WP003 GATE closure. |
+| agents_os_parallel_track | S003-P001 WP001 + S003-P002 WP001 FAST_4 CLOSED (2026-03-11 / 2026-03-12). Next: S003-P003 (System Settings) — Team 100 issues FAST_0 scope brief per roadmap. Governed per TEAM_00_AGENTS_OS_INDEPENDENT_ADVANCEMENT_DIRECTIVE_v1.0.0; does NOT depend on S002-P002-WP003 GATE closure. |
 | active_program_id | S002-P002 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 90 (GATE_7 gate owner); Nimrod/Team 00 (human sign-off authority); Team 10 (execution orchestrator); Team 60/50 (runtime corroboration) |

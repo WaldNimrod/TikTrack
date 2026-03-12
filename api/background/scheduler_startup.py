@@ -9,6 +9,7 @@ run_after enforcement (2026-03-04):
 """
 
 import logging
+import os
 from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 
@@ -85,14 +86,19 @@ def _make_job_wrapper(cfg: dict, dependents: List[str] = None):
                     get_intraday_interval_minutes,
                     get_off_hours_interval_minutes,
                 )
-                cadence = get_current_cadence_minutes()
+                # G7 CC-01 evidence: force market_open in log when collecting evidence outside 09:30–16:00 ET.
+                if os.environ.get("G7_CC01_EVIDENCE_FORCE_MARKET_OPEN") == "1":
+                    cadence = get_intraday_interval_minutes()
+                    mode = "market_open"
+                else:
+                    cadence = get_current_cadence_minutes()
+                    mode = "off_hours" if cadence == get_off_hours_interval_minutes() else "market_open"
                 next_run = now + timedelta(minutes=cadence)
                 _scheduler.modify_job(
                     job_name,
                     next_run_time=next_run,
                     trigger=IntervalTrigger(minutes=cadence),
                 )
-                mode = "off_hours" if cadence == get_off_hours_interval_minutes() else "market_open"
                 logger.info(
                     "PHASE_3 price sync cadence: mode=%s interval_min=%d next_run=%s",
                     mode, cadence, next_run.isoformat(),

@@ -143,7 +143,10 @@ def get_current_cadence_minutes() -> int:
     """
     Current cadence (minutes) for intraday job: market-open vs off-hours.
     PHASE_3: When US market is REGULAR use intraday_interval; else off_hours_interval.
+    GATE7_FORCE_MARKET_OPEN=1: Force market_open for CC-01 evidence run (testing / market closed).
     """
+    if os.environ.get("GATE7_FORCE_MARKET_OPEN") == "1":
+        return get_intraday_interval_minutes()
     try:
         from api.services.market_status_service import get_market_status_sync
         state = get_market_status_sync()

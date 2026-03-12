@@ -87,7 +87,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-12** by **Team 90** — GATE_7 Part A revalidation received (`v2.0.6`): CC-02/04 PASS retained, CC-01 remains NOT_EVIDENCED due non-market-open run window; targeted completion mandate issued.
+**Gate-owner update evidence:** This block was updated **2026-03-12** by **Team 90** — GATE_7 Part A revalidation received (`v2.0.7`): CC-01 remains NOT_EVIDENCED (invalid window) and required Team 50 corroboration artifact is missing; targeted completion mandate issued.
 
 | Field | Value |
 |-------|-------|
@@ -109,9 +109,9 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | active_program_id | S002-P002 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 90 (GATE_7 gate owner); Nimrod/Team 00 (human sign-off authority); Team 10 (execution orchestrator); Team 60/50 (runtime corroboration) |
-| last_gate_event | GATE_7_PARTA_REVALIDATION_BLOCK \| 2026-03-12 \| Team 90 validated v2.0.6 handoff: CC-02 PASS, CC-04 PASS, CC-01 NOT_EVIDENCED (run timestamp 11:50:57Z and off_hours cadence); CC-01 targeted mandate v2.0.6 issued. |
-| next_required_action | Team 60/50 to provide admissible CC-WP003-01 runtime evidence in verified market-open window (09:30–16:00 ET); Team 90 to continue Part B Nimrod browser scenarios in parallel; final GATE_7 decision only after Part A + Part B PASS. |
-| next_responsible_team | Team 60/50 (CC-01 market-open run), Nimrod (Part B browser execution), Team 90 (orchestration + canonical decision) |
+| last_gate_event | GATE_7_PARTA_REVALIDATION_BLOCK \| 2026-03-12 \| Team 90 validated v2.0.7 handoff: CC-01 NOT_EVIDENCED (non-market-open timestamp + off_hours cadence) and Team 50 v2.0.7 corroboration artifact missing; CC-01 completion mandate v2.0.7 issued. |
+| next_required_action | Team 60/50 to submit v2.0.8 completion set: admissible market-open CC-01 run plus Team 50 corroboration artifact; Team 90 to continue Part B Nimrod browser scenarios in parallel; final GATE_7 decision only after Part A + Part B PASS. |
+| next_responsible_team | Team 60/50 (CC-01 admissible run + corroboration), Nimrod (Part B browser execution), Team 90 (orchestration + canonical decision) |
 
 ---
 
@@ -271,6 +271,8 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 Part A revalidation v2.0.2 accepted: CC-WP003-04 PASS, CC-WP003-01/02 NOT_EVIDENCED; targeted evidence mandate v2.0.2 issued; Part B remains active | 2026-03-12**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 Part A revalidation v2.0.3 BLOCK: CC-WP003-01/02 NOT_EVIDENCED (inadmissible run log), CC-WP003-04 contradictory across Team 60/50; targeted evidence mandate v2.0.3 issued; Part B remains active | 2026-03-12**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 Part A revalidation v2.0.5 BLOCK: CC-WP003-02/04 PASS, CC-WP003-01 NOT_EVIDENCED (market-open admissibility gap); targeted CC-01 completion mandate v2.0.5 issued; Part B remains active | 2026-03-12**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 Part A revalidation v2.0.6 BLOCK: CC-WP003-02/04 PASS retained, CC-WP003-01 NOT_EVIDENCED (non-market-open run timestamp and off_hours cadence); targeted CC-01 completion mandate v2.0.6 issued; Part B remains active | 2026-03-12**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 Part A revalidation v2.0.7 BLOCK: CC-WP003-01 NOT_EVIDENCED (invalid market-open window) and Team 50 v2.0.7 corroboration missing; CC-01 completion mandate v2.0.7 issued; Part B remains active | 2026-03-12**
 **log_entry | TEAM_190 | TO_TEAM_170 | REGISTRY_MIRROR_SYNC_REQUIRED | run sync_registry_mirrors_from_wsm.py --write then --check for WP003 baseline standardization | 2026-03-10**
 
 GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:

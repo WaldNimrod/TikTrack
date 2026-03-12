@@ -214,4 +214,32 @@
 
 ---
 
-**log_entry | TEAM_10 | WP003_GATE3_ROUND5_MANDATES | HANDOFF_V2_0_6_TO_90 | 2026-03-12**
+## 15) Team 90 v2.0.6 — BLOCK; ניתוב v2.0.7 (2026-03-12)
+
+| פריט | ערך |
+|------|-----|
+| **פסיקה** | BLOCK_PART_A |
+| **ממצא חוסם** | BF-G7PA-501 — הלוג מציג `mode=off_hours` (2026-03-12T11:50:57Z) — לא חלון market-open קביל |
+| **תנאים שאושרו** | CC-02 PASS, CC-04 PASS, CC-03 CARRY_FORWARD_PASS |
+| **מנדט** | `TEAM_90_TO_TEAM_60_TEAM_50_..._CC01_MARKET_OPEN_EVIDENCE_MANDATE_v2.0.6` |
+| **תיקון** | Pre-flight: `scripts/check_market_open_et.py` — הרצה רק ב־09:30–16:00 ET |
+| **הפעלה** | `TEAM_10_TO_TEAM_60_..._CC01_V2_0_7_ACTIVATION`, `TEAM_10_TO_TEAM_50_..._CC01_V2_0_7_ACTIVATION` |
+| **צעד הבא** | Team 60 — ריצה בחלון market-open → הלוג חייב להכיל `mode=market_open` |
+
+---
+
+## 16) v2.0.7 — היערכות הושלמה (2026-03-12)
+
+| פריט | ערך |
+|------|-----|
+| **Team 60** | `scripts/run_g7_cc01_v207_market_open.sh` — רץ רק ב־09:30–16:00 ET; grep mode=market_open |
+| **Team 50** | prereqs + generator — `team_50_verify_g7_v207_corroboration_prereqs.py`, `team_50_generate_corroboration_v207.py` |
+| **מצב** | נוהל מוכן; ממתין לריצה בשעות השוק |
+| **אישור** | `TEAM_10_S002_P002_WP003_GATE7_PARTA_V2_0_7_READINESS_ACK_v1.0.0.md` |
+| **Handoff v2.0.7** | `TEAM_10_TO_TEAM_90_..._HANDOFF_v2.0.7.md` |
+| **פרומפט קנוני** | `TEAM_10_TO_TEAM_90_..._CANONICAL_VALIDATION_PROMPT_v2.0.7.md` |
+| **צעד הבא** | ריצה בשעות השוק → corroboration → הגשת Handoff + פרומפט ל־Team 90 |
+
+---
+
+**log_entry | TEAM_10 | WP003_GATE3_ROUND5_MANDATES | HANDOFF_AND_PROMPT_READY | 2026-03-12**

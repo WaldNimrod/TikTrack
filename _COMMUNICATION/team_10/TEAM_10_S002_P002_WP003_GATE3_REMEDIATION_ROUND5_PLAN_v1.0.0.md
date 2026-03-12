@@ -89,8 +89,8 @@
 
 **החבילה:** הוגשה ל־Team 90. Team 90 v2.0.3: **BLOCK_PART_A** (CC-01/02 NOT_EVIDENCED; CC-04 סתירה 60 vs 50).
 
-**v2.0.5:** BLOCK — CC-01 NOT_EVIDENCED. **v2.0.6:** Team 60 + Team 50 הושלמו (CC-01 market-open + corroboration). **Handoff v2.0.6** ל־Team 90: `TEAM_10_TO_TEAM_90_..._HANDOFF_v2.0.6.md`.
+**v2.0.6:** Handoff → Team 90 BLOCK (הלוג mode=off_hours). **v2.0.7:** Pre-flight `check_market_open_et.py` + ריצה ב־09:30–16:00 ET. הפעלה: `TEAM_10_TO_TEAM_60_..._CC01_V2_0_7_ACTIVATION`, `TEAM_10_TO_TEAM_50_..._CC01_V2_0_7_ACTIVATION`.
 
 ---
 
-**log_entry | TEAM_10 | WP003_GATE3_REMEDIATION_ROUND5_PLAN | HANDOFF_V2_0_6 | 2026-03-12**
+**log_entry | TEAM_10 | WP003_GATE3_REMEDIATION_ROUND5_PLAN | V2_0_7_CC01_ACTIVATED | 2026-03-12**

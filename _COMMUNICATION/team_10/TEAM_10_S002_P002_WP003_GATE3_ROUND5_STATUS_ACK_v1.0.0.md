@@ -55,7 +55,7 @@ Team 90 BLOCK v2.0.3. Team 10 הפעיל Team 60 + Team 50 לפי מנדט v2.0.
 - `TEAM_10_TO_TEAM_60_..._V2_0_4_ACTIVATION_v1.0.0.md`
 - `TEAM_10_TO_TEAM_50_..._V2_0_4_ACTIVATION_v1.0.0.md`
 
-**סטטוס:** Team 60 + Team 50 הושלמו. **Handoff v2.0.6** ל־Team 90 מוגש. **צעד הבא:** תגובת Team 90 — REVALIDATION_RESPONSE_v2.0.6.
+**סטטוס:** v2.0.7 — **היערכות הושלמה**. Team 60: `run_g7_cc01_v207_market_open.sh`; Team 50: prereqs+generator. **ממתין:** ריצה בשעות השוק (09:30–16:00 ET) → corroboration → Handoff v2.0.7.
 
 ---
 

@@ -6,6 +6,7 @@
 **to:** Team 191 (Git Governance Operations)  
 **cc:** Team 30, Team 50, Team 90, Team 170, Team 190  
 **date:** 2026-03-12  
+**historical_record:** true  
 **status:** ACTIVATED — תנאים התקיימו (Team 190 PASS, Register CLOSED)  
 **gate_id:** GATE_7_REMEDIATION_LANE  
 **program_id:** S002-P002  

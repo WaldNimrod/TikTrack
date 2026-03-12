@@ -6,6 +6,7 @@
 **to:** Team 90 (Validation Authority)  
 **cc:** Team 30, Team 50, Team 190  
 **date:** 2026-03-12  
+**historical_record:** true  
 **status:** SUBMITTED — חבילה מוגשת; ממתין לפסיקת Team 90  
 **gate_id:** GATE_7_REMEDIATION_LANE  
 **program_id:** S002-P002  

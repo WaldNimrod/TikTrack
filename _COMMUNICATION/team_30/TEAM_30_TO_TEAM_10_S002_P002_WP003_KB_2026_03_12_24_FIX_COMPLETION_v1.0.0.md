@@ -6,6 +6,7 @@
 **to:** Team 10 (Execution Orchestrator)  
 **in_response_to:** TEAM_10_TO_TEAM_30_D40_BACKGROUND_JOBS_HISTORY_REFERENCEERROR_FIX_MANDATE_v1.0.0  
 **date:** 2026-03-12  
+**historical_record:** true  
 **status:** COMPLETED  
 **bug_id:** KB-2026-03-12-24  
 

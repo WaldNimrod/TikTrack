@@ -5,7 +5,8 @@
 **from:** Team 70 (Knowledge Librarian — GATE_8 executor)  
 **to:** Team 90 (GATE_8 owner)  
 **cc:** Team 10, Team 00, Team 100, Team 190  
-**date:** 2026-03-13  
+**date:** 2026-03-12  
+**historical_record:** true  
 **status:** ACTION_REQUIRED (Team 90 validation)  
 **gate_id:** GATE_8 — DOCUMENTATION_CLOSURE (AS_MADE_LOCK)  
 **work_package_id:** S002-P002-WP003 (Market Data Hardening)

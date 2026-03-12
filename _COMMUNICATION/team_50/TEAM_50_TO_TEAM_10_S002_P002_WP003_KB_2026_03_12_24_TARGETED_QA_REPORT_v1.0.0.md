@@ -6,6 +6,7 @@
 **to:** Team 10 (Execution Orchestrator)  
 **in_response_to:** TEAM_10_TO_TEAM_50_D40_BACKGROUND_JOBS_HISTORY_TARGETED_QA_MANDATE_v1.0.0  
 **date:** 2026-03-12  
+**historical_record:** true  
 **status:** SUBMITTED  
 **bug_id:** KB-2026-03-12-24  
 **trigger:** TEAM_30_TO_TEAM_10_S002_P002_WP003_KB_2026_03_12_24_FIX_COMPLETION_v1.0.0  

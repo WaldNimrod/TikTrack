@@ -4,6 +4,7 @@
 **id:** TEAM_10_KB_2026_03_12_24_URGENT_CYCLE_ACTIVATION_ACK  
 **from:** Team 10 (Execution Orchestrator)  
 **date:** 2026-03-12  
+**historical_record:** true  
 **status:** CYCLE_CLOSED — Team 190 PASS; Team 191 מופעל  
 **in_response_to:** TEAM_190_TO_TEAM_10_HANDOFF_PROMPT_KB_2026_03_12_24_v1.0.0  
 

@@ -6,6 +6,7 @@
 **to:** Team 170 (Spec & Governance Authority)  
 **cc:** Team 30, Team 50, Team 90, Team 190  
 **date:** 2026-03-12  
+**historical_record:** true  
 **status:** ISSUED_ON_PASS — מופעל רק לאחר Team 90 PASS  
 **gate_id:** GATE_7_REMEDIATION_LANE  
 **program_id:** S002-P002  

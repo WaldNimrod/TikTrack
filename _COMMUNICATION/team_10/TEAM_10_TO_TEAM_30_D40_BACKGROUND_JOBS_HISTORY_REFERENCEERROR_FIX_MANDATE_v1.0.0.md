@@ -6,6 +6,7 @@
 **to:** Team 30 (Frontend Implementation)  
 **cc:** Team 50, Team 90, Team 190  
 **date:** 2026-03-12  
+**historical_record:** true  
 **status:** ACTION_REQUIRED  
 **gate_id:** GATE_7_REMEDIATION_LANE  
 **program_id:** S002-P002  

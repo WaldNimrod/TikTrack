@@ -4,6 +4,7 @@
 **id:** TEAM_10_KB_2026_03_12_24_T30_T50_COMPLETION_ACK  
 **from:** Team 10 (Execution Orchestrator)  
 **date:** 2026-03-12  
+**historical_record:** true  
 **status:** ACK — חבילה מוכנה להגשה ל־Team 90  
 
 ---

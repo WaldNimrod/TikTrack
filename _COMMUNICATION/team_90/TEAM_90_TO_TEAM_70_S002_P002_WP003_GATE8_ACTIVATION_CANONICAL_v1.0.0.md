@@ -5,7 +5,8 @@
 **from:** Team 90 (GATE_8 owner)  
 **to:** Team 70 (Knowledge Librarian — GATE_8 executor)  
 **cc:** Team 10, Team 00, Team 100, Team 190  
-**date:** 2026-03-13  
+**date:** 2026-03-12  
+**historical_record:** true  
 **status:** ACTION_REQUIRED  
 **gate_id:** GATE_8  
 **program_id:** S002-P002  

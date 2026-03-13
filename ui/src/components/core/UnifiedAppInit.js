@@ -2,10 +2,10 @@
  * Unified App Init (UAI) - Main Controller
  * --------------------------------------------------------
  * Manages complete page lifecycle in 5 sequential stages
- * 
+ *
  * @description Central controller for page initialization lifecycle
  * @version v1.0.0
- * 
+ *
  * Lifecycle Stages:
  * 1. DOM - DOM readiness and basic setup
  * 2. Bridge - PhoenixBridge initialization
@@ -30,14 +30,16 @@ export class UnifiedAppInit {
     // ✅ REQUIRED: Use window.UAI.config (consistent with UAI namespace)
     // ❌ NO LEGACY FALLBACK - External config file is mandatory
     this.config = config || window.UAI?.config;
-    
+
     if (!this.config) {
-      throw new Error('UAI_CONFIG_MISSING: window.UAI.config is not defined. Make sure page config JS file is loaded before UAI.');
+      throw new Error(
+        'UAI_CONFIG_MISSING: window.UAI.config is not defined. Make sure page config JS file is loaded before UAI.',
+      );
     }
-    
+
     // Validate config
     this.validateConfig();
-    
+
     // Initialize stages
     this.currentStage = null;
     this.stages = {
@@ -45,9 +47,9 @@ export class UnifiedAppInit {
       Bridge: new BridgeStage(),
       Data: new DataStage(),
       Render: new RenderStage(),
-      Ready: new ReadyStage()
+      Ready: new ReadyStage(),
     };
-    
+
     // Initialize global state
     window.UAI = window.UAI || {};
     window.UAI.instance = this;
@@ -56,37 +58,43 @@ export class UnifiedAppInit {
     window.UAIState.pageType = this.config.pageType;
     window.UAIState.config = this.config;
   }
-  
+
   /**
    * Validate UAI config
    * @throws {Error} If config is invalid
    */
   validateConfig() {
     const errors = [];
-    
+
     // Required fields
     if (!this.config.pageType) {
       errors.push('pageType is required');
     }
-    
+
     if (typeof this.config.requiresAuth !== 'boolean') {
       errors.push('requiresAuth must be a boolean');
     }
-    
+
     if (typeof this.config.requiresHeader !== 'boolean') {
       errors.push('requiresHeader must be a boolean');
     }
-    
+
     // Page type validation
-    if (this.config.pageType && !/^[a-z][a-zA-Z0-9]*$/.test(this.config.pageType)) {
+    if (
+      this.config.pageType &&
+      !/^[a-z][a-zA-Z0-9]*$/.test(this.config.pageType)
+    ) {
       errors.push('pageType must match pattern: ^[a-z][a-zA-Z0-9]*$');
     }
-    
+
     // Data loader validation
-    if (this.config.dataLoader && !/^\/src\/.*\.js$/.test(this.config.dataLoader)) {
+    if (
+      this.config.dataLoader &&
+      !/^\/src\/.*\.js$/.test(this.config.dataLoader)
+    ) {
       errors.push('dataLoader must be a valid path to .js file');
     }
-    
+
     // Tables validation
     if (this.config.tables) {
       if (!Array.isArray(this.config.tables)) {
@@ -105,78 +113,80 @@ export class UnifiedAppInit {
         });
       }
     }
-    
+
     if (errors.length > 0) {
       throw new Error(`UAI_CONFIG_INVALID: ${errors.join(', ')}`);
     }
   }
-  
+
   /**
    * Initialize UAI - Execute all stages sequentially
    * @returns {Promise<void>}
    */
   async init() {
     const startTime = Date.now();
-    
+
     try {
       maskedLog('[UAI] Starting initialization...', {
         pageType: this.config.pageType,
         requiresAuth: this.config.requiresAuth,
-        requiresHeader: this.config.requiresHeader
+        requiresHeader: this.config.requiresHeader,
       });
-      
+
       // Stage 1: DOM
       this.currentStage = 'DOM';
       await this.stages.DOM.execute();
       maskedLog('[UAI] DOM stage completed');
-      
+
       // Stage 2: Bridge
       this.currentStage = 'Bridge';
       await this.stages.Bridge.execute();
       maskedLog('[UAI] Bridge stage completed');
-      
+
       // Stage 3: Data
       this.currentStage = 'Data';
       await this.stages.Data.execute();
       maskedLog('[UAI] Data stage completed');
-      
+
       // Stage 4: Render
       this.currentStage = 'Render';
       await this.stages.Render.execute();
       maskedLog('[UAI] Render stage completed');
-      
+
       // Stage 5: Ready
       this.currentStage = 'Ready';
       await this.stages.Ready.execute();
       maskedLog('[UAI] Ready stage completed');
-      
+
       const duration = Date.now() - startTime;
       maskedLog('[UAI] Initialization completed successfully', {
         duration: `${duration}ms`,
-        stages: ['DOM', 'Bridge', 'Data', 'Render', 'Ready']
+        stages: ['DOM', 'Bridge', 'Data', 'Render', 'Ready'],
       });
     } catch (error) {
       const duration = Date.now() - startTime;
       maskedLog('[UAI] Initialization failed:', {
         message: error?.message,
         stage: this.currentStage,
-        duration: `${duration}ms`
+        duration: `${duration}ms`,
       });
-      
+
       // Emit error event
-      window.dispatchEvent(new CustomEvent('uai:error', {
-        detail: {
-          error: error.message,
-          stage: this.currentStage,
-          duration,
-          timestamp: Date.now()
-        }
-      }));
-      
+      window.dispatchEvent(
+        new CustomEvent('uai:error', {
+          detail: {
+            error: error.message,
+            stage: this.currentStage,
+            duration,
+            timestamp: Date.now(),
+          },
+        }),
+      );
+
       throw error;
     }
   }
-  
+
   /**
    * Get stage by name
    * @param {string} stageName - Name of stage
@@ -185,7 +195,7 @@ export class UnifiedAppInit {
   getStage(stageName) {
     return this.stages[stageName] || null;
   }
-  
+
   /**
    * Register lifecycle hook
    * @param {string} stageName - Name of stage
@@ -209,8 +219,10 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     if (hasConfig) {
       const uai = new UnifiedAppInit();
-      uai.init().catch(error => {
-        maskedLog('[UAI] Auto-initialization failed:', { message: error?.message });
+      uai.init().catch((error) => {
+        maskedLog('[UAI] Auto-initialization failed:', {
+          message: error?.message,
+        });
       });
     }
   });
@@ -218,8 +230,10 @@ if (document.readyState === 'loading') {
   // DOM already loaded
   if (hasConfig) {
     const uai = new UnifiedAppInit();
-    uai.init().catch(error => {
-      maskedLog('[UAI] Auto-initialization failed:', { message: error?.message });
+    uai.init().catch((error) => {
+      maskedLog('[UAI] Auto-initialization failed:', {
+        message: error?.message,
+      });
     });
   }
 }

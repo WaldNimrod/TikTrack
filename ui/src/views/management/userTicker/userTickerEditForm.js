@@ -19,7 +19,11 @@ import { reactToApi } from '../../../cubes/shared/utils/transformers.js';
 export function showUserTickerEditModal(options = {}) {
   const { ticker = {}, onSuccess = null } = options;
   const tickerId = ticker.id ?? ticker.external_ulid ?? '';
-  const currentDisplayName = (ticker.display_name || ticker.displayName || '').trim();
+  const currentDisplayName = (
+    ticker.display_name ||
+    ticker.displayName ||
+    ''
+  ).trim();
   const symbol = ticker.symbol ?? '';
 
   const formHTML = `
@@ -59,11 +63,19 @@ export function showUserTickerEditModal(options = {}) {
         document.getElementById('phoenix-modal-backdrop')?.remove();
         if (typeof onSuccess === 'function') onSuccess();
       } catch (error) {
-        maskedLog('[UserTicker Edit] Error:', { status: error?.status, code: error?.code });
-        const msg = (error?.detail ?? error?.message ?? error?.message_i18n ?? 'שגיאה בעדכון שם תצוגה').trim();
+        maskedLog('[UserTicker Edit] Error:', {
+          status: error?.status,
+          code: error?.code,
+        });
+        const msg = (
+          error?.detail ??
+          error?.message ??
+          error?.message_i18n ??
+          'שגיאה בעדכון שם תצוגה'
+        ).trim();
         if (errEl) errEl.textContent = msg;
       }
     },
-    onClose: function () {}
+    onClose: function () {},
   });
 }

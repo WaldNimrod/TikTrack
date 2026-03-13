@@ -14,6 +14,7 @@ from typing import Optional
 @dataclass
 class PriceResult:
     """Per MARKET_DATA_PIPE_SPEC §4.1, PRECISION_POLICY_SSOT — Precision 20,8."""
+
     symbol: str
     price: Decimal
     open_price: Optional[Decimal] = None
@@ -29,6 +30,7 @@ class PriceResult:
 @dataclass
 class ExchangeRateResult:
     """Per FOREX_MARKET_SPEC — conversion_rate NUMERIC(20,8)."""
+
     from_currency: str
     to_currency: str
     rate: Decimal
@@ -39,6 +41,7 @@ class ExchangeRateResult:
 @dataclass
 class OHLCVRow:
     """Single day OHLCV — for 250d historical (P3-015)."""
+
     date: datetime
     open_price: Decimal
     high_price: Decimal
@@ -61,9 +64,7 @@ class MarketDataProvider(ABC):
         pass
 
     @abstractmethod
-    async def get_exchange_rate(
-        self, from_ccy: str, to_ccy: str
-    ) -> Optional[ExchangeRateResult]:
+    async def get_exchange_rate(self, from_ccy: str, to_ccy: str) -> Optional[ExchangeRateResult]:
         """Fetch FX rate. Returns None on failure."""
         pass
 

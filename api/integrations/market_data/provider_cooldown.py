@@ -120,7 +120,9 @@ def _read_alpha_cooldown_from_db() -> Optional[float]:
         conn = psycopg2.connect(url)
         try:
             cur = conn.cursor()
-            cur.execute("SELECT value FROM market_data.system_settings WHERE key = 'alpha_cooldown_until'")
+            cur.execute(
+                "SELECT value FROM market_data.system_settings WHERE key = 'alpha_cooldown_until'"
+            )
             row = cur.fetchone()
             if not row:
                 return None

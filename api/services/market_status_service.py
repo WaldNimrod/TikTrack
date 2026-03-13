@@ -42,6 +42,7 @@ def _fetch_alpha_market_status_sync() -> Optional[str]:
         return None
     try:
         import httpx
+
         url = "https://www.alphavantage.co/query"
         params = {
             "function": "MARKET_STATUS_CURRENT",
@@ -80,6 +81,7 @@ def _us_market_status_from_local_time() -> Tuple[str, str]:
     except ImportError:
         try:
             import pytz
+
             tz = pytz.timezone("America/New_York")
         except ImportError:
             return "CLOSED", "שוק סגור"

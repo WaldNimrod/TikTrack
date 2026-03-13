@@ -27,14 +27,16 @@ async def list_trade_plans_for_entity_loader(
     """
     try:
         result = await db.execute(
-            text("""
+            text(
+                """
                 SELECT tp.id, tp.plan_name, t.symbol
                 FROM user_data.trade_plans tp
                 LEFT JOIN market_data.tickers t ON t.id = tp.ticker_id
                 WHERE tp.user_id = :uid AND tp.deleted_at IS NULL
                 ORDER BY tp.created_at DESC
                 LIMIT :lim
-            """),
+            """
+            ),
             {"uid": str(user_id), "lim": limit},
         )
         rows = result.fetchall()

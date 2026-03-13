@@ -70,7 +70,11 @@ const authService = {
       const payload = reactToApi({ usernameOrEmail, password });
       debugLog('Auth', 'Login payload prepared', payload);
 
-      const raw = await sharedServices.post('/auth/login', payload, AUTH_CREDENTIALS);
+      const raw = await sharedServices.post(
+        '/auth/login',
+        payload,
+        AUTH_CREDENTIALS,
+      );
       const loginData = normalizeAuthResponse(raw);
 
       if (loginData.accessToken) {
@@ -81,7 +85,9 @@ const authService = {
         }
       }
 
-      audit.log('Auth', 'Login successful', { userId: loginData.user?.externalUlids });
+      audit.log('Auth', 'Login successful', {
+        userId: loginData.user?.externalUlids,
+      });
       return loginData;
     } catch (error) {
       audit.error('Auth', 'Login failure', error);
@@ -100,7 +106,11 @@ const authService = {
       const payload = reactToApi(userData);
       debugLog('Auth', 'Register payload prepared', payload);
 
-      const raw = await sharedServices.post('/auth/register', payload, AUTH_CREDENTIALS);
+      const raw = await sharedServices.post(
+        '/auth/register',
+        payload,
+        AUTH_CREDENTIALS,
+      );
       const registerData = normalizeAuthResponse(raw);
 
       if (registerData.accessToken) {
@@ -111,7 +121,9 @@ const authService = {
         }
       }
 
-      audit.log('Auth', 'Register successful', { userId: registerData.user?.externalUlids });
+      audit.log('Auth', 'Register successful', {
+        userId: registerData.user?.externalUlids,
+      });
       return registerData;
     } catch (error) {
       audit.error('Auth', 'Register failure', error);
@@ -124,7 +136,9 @@ const authService = {
    * Returns true ONLY when: token exists AND exp - now <= 300 AND exp > now (not expired).
    */
   isInsideRefreshWindow() {
-    const token = localStorage.getItem('access_token') || localStorage.getItem('auth_token');
+    const token =
+      localStorage.getItem('access_token') ||
+      localStorage.getItem('auth_token');
     if (!token || token.trim() === '') return false;
     try {
       const parts = token.split('.');
@@ -154,7 +168,11 @@ const authService = {
 
     try {
       await ensureInit();
-      const raw = await sharedServices.post('/auth/refresh', {}, AUTH_CREDENTIALS);
+      const raw = await sharedServices.post(
+        '/auth/refresh',
+        {},
+        AUTH_CREDENTIALS,
+      );
       const refreshData = normalizeAuthResponse(raw);
 
       if (refreshData.accessToken) {
@@ -201,11 +219,17 @@ const authService = {
       await ensureInit();
       const payload = reactToApi({
         method,
-        ...(method === 'EMAIL' ? { email: identifier } : { phoneNumber: identifier }),
+        ...(method === 'EMAIL'
+          ? { email: identifier }
+          : { phoneNumber: identifier }),
       });
       debugLog('Auth', 'Password reset payload prepared', payload);
 
-      const raw = await sharedServices.post('/auth/reset-password', payload, AUTH_CREDENTIALS);
+      const raw = await sharedServices.post(
+        '/auth/reset-password',
+        payload,
+        AUTH_CREDENTIALS,
+      );
       audit.log('Auth', 'Password reset request successful');
       return raw?.data ?? raw ?? {};
     } catch (error) {
@@ -225,7 +249,11 @@ const authService = {
       const payload = reactToApi(resetData);
       debugLog('Auth', 'Password reset verify payload prepared', payload);
 
-      const raw = await sharedServices.post('/auth/verify-reset', payload, AUTH_CREDENTIALS);
+      const raw = await sharedServices.post(
+        '/auth/verify-reset',
+        payload,
+        AUTH_CREDENTIALS,
+      );
       audit.log('Auth', 'Password reset verify successful');
       return raw?.data ?? raw;
     } catch (error) {
@@ -245,7 +273,11 @@ const authService = {
       const payload = reactToApi({ verificationCode });
       debugLog('Auth', 'Phone verification payload prepared', payload);
 
-      const raw = await sharedServices.post('/auth/verify-phone', payload, AUTH_CREDENTIALS);
+      const raw = await sharedServices.post(
+        '/auth/verify-phone',
+        payload,
+        AUTH_CREDENTIALS,
+      );
       audit.log('Auth', 'Phone verification successful');
       return normalizeAuthResponse(raw);
     } catch (error) {
@@ -264,9 +296,12 @@ const authService = {
       await ensureInit();
       const raw = await sharedServices.get('/users/me', {}, {});
       const data = raw?.data ?? raw;
-      const userData = typeof data === 'object' && data !== null ? apiToReact(data) : data;
+      const userData =
+        typeof data === 'object' && data !== null ? apiToReact(data) : data;
 
-      audit.log('Auth', 'Get current user successful', { userId: userData?.externalUlids });
+      audit.log('Auth', 'Get current user successful', {
+        userId: userData?.externalUlids,
+      });
       return userData;
     });
   },
@@ -297,7 +332,9 @@ const authService = {
    * Update User - עם retry על 401
    */
   async updateUser(userData) {
-    audit.log('Auth', 'Update user started', { userId: userData.externalUlids });
+    audit.log('Auth', 'Update user started', {
+      userId: userData.externalUlids,
+    });
 
     return requestWithRefresh(async () => {
       await ensureInit();
@@ -306,9 +343,12 @@ const authService = {
 
       const raw = await sharedServices.put('/users/me', payload, {});
       const data = raw?.data ?? raw;
-      const updatedUser = typeof data === 'object' && data !== null ? apiToReact(data) : data;
+      const updatedUser =
+        typeof data === 'object' && data !== null ? apiToReact(data) : data;
 
-      audit.log('Auth', 'Update user successful', { userId: updatedUser?.externalUlids });
+      audit.log('Auth', 'Update user successful', {
+        userId: updatedUser?.externalUlids,
+      });
       return updatedUser;
     });
   },
@@ -323,7 +363,11 @@ const authService = {
       await ensureInit();
       debugLog('Auth', 'Change password payload prepared', passwordData);
 
-      const raw = await sharedServices.put('/users/me/password', reactToApi(passwordData), {});
+      const raw = await sharedServices.put(
+        '/users/me/password',
+        reactToApi(passwordData),
+        {},
+      );
       audit.log('Auth', 'Change password successful');
       return raw?.data ?? raw;
     });
@@ -337,7 +381,7 @@ const authService = {
       await sharedServices.post(
         '/auth/reset-password',
         reactToApi({ email: userData.email, method: 'EMAIL' }),
-        AUTH_CREDENTIALS
+        AUTH_CREDENTIALS,
       );
       audit.log('Auth', 'Resend email verification successful');
       return {};
@@ -359,7 +403,7 @@ const authService = {
       await sharedServices.post(
         '/auth/reset-password',
         reactToApi({ phoneNumber, method: 'SMS' }),
-        AUTH_CREDENTIALS
+        AUTH_CREDENTIALS,
       );
       audit.log('Auth', 'Resend phone verification successful');
       return {};
@@ -383,15 +427,19 @@ const authService = {
     const usernameOrEmail = localStorage.getItem('usernameOrEmail');
     localStorage.clear();
     sessionStorage.clear();
-    if (usernameOrEmail) localStorage.setItem('usernameOrEmail', usernameOrEmail);
+    if (usernameOrEmail)
+      localStorage.setItem('usernameOrEmail', usernameOrEmail);
     window.dispatchEvent(new CustomEvent('auth:logout'));
     audit.log('Auth', '401 logout — redirecting to login');
-    if (!window.location.pathname.startsWith('/login')) window.location.href = '/login';
+    if (!window.location.pathname.startsWith('/login'))
+      window.location.href = '/login';
   },
 
   /** G7R §3E: App boot — if token expired, clear auth and redirect */
   checkTokenExpiryOnBoot() {
-    const token = localStorage.getItem('access_token') || localStorage.getItem('auth_token');
+    const token =
+      localStorage.getItem('access_token') ||
+      localStorage.getItem('auth_token');
     if (!token || token.trim() === '') return;
     try {
       const parts = token.split('.');
@@ -429,7 +477,7 @@ const authService = {
       clearInterval(this._refreshIntervalId);
       this._refreshIntervalId = null;
     }
-  }
+  },
 };
 
 export default authService;

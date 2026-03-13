@@ -2,11 +2,11 @@
  * PhoenixTableSortManager - Class לניהול סידור טבלאות
  * -----------------------------------------------------
  * Class לניהול מצב סידור טבלאות עם תמיכה ב-Multi-sort (Primary + Secondary).
- * 
+ *
  * @description Class לניהול סידור טבלאות עם מחזור סידור (ASC → DESC → NONE) ו-Multi-sort (Shift + click)
  * @standard JS Standards Protocol ✅ | Clean Slate Rule ✅ | Accessibility ✅
  * @legacyReference Legacy.tables.sorting
- * 
+ *
  * @example
  * const sortManager = new PhoenixTableSortManager(tableElement);
  * // מחזור סידור: ASC → DESC → NONE
@@ -21,14 +21,14 @@ class PhoenixTableSortManager {
     this.table = tableElement;
     this.sortState = {
       primary: { key: null, direction: null },
-      secondary: { key: null, direction: null }
+      secondary: { key: null, direction: null },
     };
     this.init();
   }
 
   /**
    * init - אתחול המנהל
-   * 
+   *
    * @description חיבור event listeners לכל כותרות העמודות הניתנות לסידור
    */
   init() {
@@ -38,9 +38,11 @@ class PhoenixTableSortManager {
     }
 
     // חיבור event listeners לכל כותרות העמודות הניתנות לסידור
-    const headers = this.table.querySelectorAll('[data-sortable="true"], .js-table-sort-trigger');
-    
-    headers.forEach(header => {
+    const headers = this.table.querySelectorAll(
+      '[data-sortable="true"], .js-table-sort-trigger',
+    );
+
+    headers.forEach((header) => {
       // Event listener ללחיצה רגילה (רמת סידור ראשונה)
       header.addEventListener('click', (e) => {
         if (e.shiftKey) {
@@ -65,12 +67,14 @@ class PhoenixTableSortManager {
       });
     });
 
-    maskedLog(`[PhoenixTableSortManager] Initialized for table: ${this.table.id || 'unnamed'}`);
+    maskedLog(
+      `[PhoenixTableSortManager] Initialized for table: ${this.table.id || 'unnamed'}`,
+    );
   }
 
   /**
    * handleSort - טיפול בלחיצה על כותרת עמודה לסידור
-   * 
+   *
    * @description מחזור סידור: ASC → DESC → NONE (או רמת סידור שניה עם Shift)
    * @param {HTMLElement} header - אלמנט כותרת העמודה
    * @param {boolean} isSecondary - האם זו רמת סידור שניה (Shift + click)
@@ -90,7 +94,9 @@ class PhoenixTableSortManager {
       return;
     }
 
-    const currentState = isSecondary ? this.sortState.secondary : this.sortState.primary;
+    const currentState = isSecondary
+      ? this.sortState.secondary
+      : this.sortState.primary;
 
     // מחזור סידור: ASC → DESC → NONE
     if (currentState.key === sortKey) {
@@ -139,30 +145,40 @@ class PhoenixTableSortManager {
       sortDirection: dir,
       sortDir: dir.toLowerCase(),
       sortType,
-      sortState: this.getSortState()
+      sortState: this.getSortState(),
     };
-    this.table.dispatchEvent(new CustomEvent('phoenix-table-sorted', { detail, bubbles: true }));
+    this.table.dispatchEvent(
+      new CustomEvent('phoenix-table-sorted', { detail, bubbles: true }),
+    );
 
     maskedLog('[PhoenixTableSortManager] Sort changed', {
       key: sortKey,
-      direction: isSecondary ? this.sortState.secondary.direction : this.sortState.primary.direction,
+      direction: isSecondary
+        ? this.sortState.secondary.direction
+        : this.sortState.primary.direction,
       isSecondary,
-      sortState: this.sortState
+      sortState: this.sortState,
     });
   }
 
   /**
    * updateUI - עדכון UI (אייקונים, מצבים)
-   * 
+   *
    * @description עדכון כל כותרות העמודות עם מצב הסידור הנוכחי
    */
   updateUI() {
-    const headers = this.table.querySelectorAll('[data-sortable="true"], .js-table-sort-trigger');
+    const headers = this.table.querySelectorAll(
+      '[data-sortable="true"], .js-table-sort-trigger',
+    );
 
-    headers.forEach(header => {
+    headers.forEach((header) => {
       const sortKey = header.dataset.sortKey;
-      const sortIcon = header.querySelector('.js-sort-icon, .phoenix-table__sort-icon');
-      const sortIndicator = header.querySelector('.js-sort-indicator, .phoenix-table__sort-indicator');
+      const sortIcon = header.querySelector(
+        '.js-sort-icon, .phoenix-table__sort-icon',
+      );
+      const sortIndicator = header.querySelector(
+        '.js-sort-indicator, .phoenix-table__sort-indicator',
+      );
 
       // בדיקה אם זו רמת סידור ראשונה או שניה
       let sortDirection = null;
@@ -199,7 +215,7 @@ class PhoenixTableSortManager {
 
   /**
    * applySort - ביצוע סידור על שורות הטבלה
-   * 
+   *
    * @description סידור שורות הטבלה לפי מצב הסידור הנוכחי
    * @param {string} sortType - סוג הנתונים (string, numeric, date, boolean)
    */
@@ -217,7 +233,7 @@ class PhoenixTableSortManager {
       // שחזור סדר מקורי (אם נשמר)
       if (this.originalRowOrder) {
         const fragment = document.createDocumentFragment();
-        this.originalRowOrder.forEach(row => {
+        this.originalRowOrder.forEach((row) => {
           fragment.appendChild(row);
         });
         tbody.appendChild(fragment);
@@ -227,7 +243,7 @@ class PhoenixTableSortManager {
 
     // שמירת סדר מקורי (רק בפעם הראשונה)
     if (!this.originalRowOrder) {
-      this.originalRowOrder = rows.map(row => row.cloneNode(true));
+      this.originalRowOrder = rows.map((row) => row.cloneNode(true));
     }
 
     // סידור שורות
@@ -236,7 +252,13 @@ class PhoenixTableSortManager {
 
       // סידור ראשוני
       if (this.sortState.primary.key) {
-        comparison = this.compareRows(a, b, this.sortState.primary.key, this.sortState.primary.direction, sortType);
+        comparison = this.compareRows(
+          a,
+          b,
+          this.sortState.primary.key,
+          this.sortState.primary.direction,
+          sortType,
+        );
         if (comparison !== 0) {
           return comparison;
         }
@@ -244,7 +266,13 @@ class PhoenixTableSortManager {
 
       // סידור משני (אם יש)
       if (this.sortState.secondary.key && comparison === 0) {
-        comparison = this.compareRows(a, b, this.sortState.secondary.key, this.sortState.secondary.direction, sortType);
+        comparison = this.compareRows(
+          a,
+          b,
+          this.sortState.secondary.key,
+          this.sortState.secondary.direction,
+          sortType,
+        );
       }
 
       return comparison;
@@ -252,7 +280,7 @@ class PhoenixTableSortManager {
 
     // עדכון DOM
     const fragment = document.createDocumentFragment();
-    rows.forEach(row => {
+    rows.forEach((row) => {
       fragment.appendChild(row);
     });
     tbody.appendChild(fragment);
@@ -260,7 +288,7 @@ class PhoenixTableSortManager {
 
   /**
    * compareRows - השוואה בין שתי שורות
-   * 
+   *
    * @description השוואה בין שתי שורות לפי מפתח סידור
    * @param {HTMLElement} rowA - שורה ראשונה
    * @param {HTMLElement} rowB - שורה שניה
@@ -291,7 +319,11 @@ class PhoenixTableSortManager {
       comparison = (valueA ? 1 : 0) - (valueB ? 1 : 0);
     } else {
       // string
-      comparison = String(valueA || '').localeCompare(String(valueB || ''), 'he', { numeric: true });
+      comparison = String(valueA || '').localeCompare(
+        String(valueB || ''),
+        'he',
+        { numeric: true },
+      );
     }
 
     // היפוך כיוון אם DESC
@@ -304,7 +336,7 @@ class PhoenixTableSortManager {
 
   /**
    * extractValue - חילוץ ערך מתא
-   * 
+   *
    * @description חילוץ ערך מתא לפי סוג הנתונים
    * @param {HTMLElement} cell - אלמנט התא
    * @param {string} sortType - סוג הנתונים
@@ -328,7 +360,12 @@ class PhoenixTableSortManager {
       return new Date(text);
     } else if (sortType === 'boolean') {
       // בדיקה אם התא מכיל ערך "פעיל" (פעיל/לא פעיל) או SSOT "פתוח" (active) או "כן"
-      return text.includes('פעיל') || text.includes('פתוח') || text.includes('כן') || text.includes('true');
+      return (
+        text.includes('פעיל') ||
+        text.includes('פתוח') ||
+        text.includes('כן') ||
+        text.includes('true')
+      );
     }
 
     // string - החזרת הטקסט כפי שהוא
@@ -337,13 +374,13 @@ class PhoenixTableSortManager {
 
   /**
    * clearSort - איפוס כל הסידור
-   * 
+   *
    * @description איפוס כל מצב הסידור למצב התחלתי
    */
   clearSort() {
     this.sortState = {
       primary: { key: null, direction: null },
-      secondary: { key: null, direction: null }
+      secondary: { key: null, direction: null },
     };
     this.updateUI();
     this.applySort();
@@ -352,7 +389,7 @@ class PhoenixTableSortManager {
 
   /**
    * getSortState - קבלת מצב הסידור הנוכחי
-   * 
+   *
    * @description קבלת מצב הסידור הנוכחי (read-only)
    * @returns {Object} מצב הסידור הנוכחי
    */

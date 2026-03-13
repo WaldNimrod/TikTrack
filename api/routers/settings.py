@@ -119,7 +119,8 @@ async def patch_market_data_settings(
             value_str = "true" if val is True else "false" if val is False else str(val)
             value_type = "boolean" if isinstance(val, bool) else "integer"
             await db.execute(
-                text("""
+                text(
+                    """
                     INSERT INTO market_data.system_settings (key, value, value_type, updated_by, updated_at)
                     VALUES (:key, :value, :value_type, :updated_by, NOW())
                     ON CONFLICT (key) DO UPDATE SET
@@ -127,7 +128,8 @@ async def patch_market_data_settings(
                         value_type = EXCLUDED.value_type,
                         updated_by = EXCLUDED.updated_by,
                         updated_at = NOW()
-                """),
+                """
+                ),
                 {
                     "key": key,
                     "value": value_str,
@@ -146,9 +148,15 @@ async def patch_market_data_settings(
             ) from e
         # Log and return 500 for other errors (FK, permissions, etc.)
         import logging
+
         logging.getLogger(__name__).exception("PATCH /settings/market-data failed: %s", e)
         from ..core.config import settings
-        detail = f"Failed to persist settings: {str(e)[:200]}" if getattr(settings, "debug", False) else "Failed to persist settings"
+
+        detail = (
+            f"Failed to persist settings: {str(e)[:200]}"
+            if getattr(settings, "debug", False)
+            else "Failed to persist settings"
+        )
         raise HTTPException(status_code=500, detail=detail) from e
 
     settings = get_all_settings()

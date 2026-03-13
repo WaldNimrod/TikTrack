@@ -21,10 +21,11 @@ from .base import Base
 class UserTicker(Base):
     """
     User Tickers model - maps to user_data.user_tickers table.
-    
+
     Junction: user ↔ ticker for "הטיקרים שלי" (My Tickers).
     Soft delete via deleted_at.
     """
+
     __tablename__ = "user_tickers"
     __table_args__ = ({"schema": "user_data"},)
 

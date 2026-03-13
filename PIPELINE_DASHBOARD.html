@@ -362,6 +362,17 @@
     .prog-msg { font-size: 11px; margin-top: 6px; }
     .prog-done-banner { background: rgba(63,185,80,0.12); border: 1px solid var(--success); border-radius: 6px; padding: 10px 14px; margin-top: 10px; display: flex; align-items: center; justify-content: space-between; }
     .prog-next-banner { background: rgba(210,153,34,0.1); border: 1px solid var(--warning); border-radius: 6px; padding: 10px 14px; margin-top: 10px; font-size: 12px; }
+
+    /* ── Sidebar Quick Commands ──────────────── */
+    .sidebar-cmd-list { display: flex; flex-direction: column; }
+    .sidebar-cmd-row { display: flex; align-items: center; gap: 5px; padding: 4px 0; border-bottom: 1px solid var(--border); }
+    .sidebar-cmd-row:last-child { border-bottom: none; }
+    .sidebar-cmd-text { font-family: var(--mono); font-size: 9.5px; flex: 1; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    .sidebar-cmd-btn { font-size: 10px !important; padding: 2px 6px !important; flex-shrink: 0; border-radius: 4px; }
+
+    /* ── Roadmap link card ────────────────────── */
+    .roadmap-link-card { display: flex; align-items: center; justify-content: center; background: var(--surface); border: 1px dashed var(--border); border-radius: 8px; padding: 10px; margin-bottom: 12px; text-decoration: none; color: var(--text-muted); font-size: 13px; transition: all 0.15s; }
+    .roadmap-link-card:hover { border-color: var(--accent); color: var(--accent); }
   </style>
 </head>
 <body>
@@ -446,7 +457,29 @@ python3 -m http.server 8090
 ./pipeline_run.sh revise "BLOCKER-1: ... BLOCKER-2: ..."
 # → paste revised G3_PLAN prompt into Cursor → Team 10 fixes → ./pipeline_run.sh pass</pre>
 
-    <h3>📁 Key Documentation</h3>
+    <h3>❓ FAQ</h3>
+    <h4>שאלה: הרצתי Team 20. מה הטריגר הבא?</h4>
+    <p>אין CLI trigger אחרי Team 20. בדוק שהקובץ <code>_COMMUNICATION/team_20/TEAM_20_S001_P002_WP001_ALERTS_WIDGET_API_VERIFICATION_v1.0.0.md</code> קיים (ראה "Expected Files" → 🟢). אם 🟢 — פתח Cursor חדש, הדבק מנדט Team 30.</p>
+    <h4>שאלה: מתי אני לוחץ ./pipeline_run.sh pass?</h4>
+    <p>רק כאשר <strong>כל ה-sub-steps של הgate הנוכחי הושלמו</strong>. עבור CURSOR_IMPLEMENTATION: Team 20 🟢 + Team 30 🟢 + git commit קיים.</p>
+    <h4>שאלה: שכחתי איפה אני בפייפליין?</h4>
+    <p>לחץ ↺ Refresh — ה-"Current Gate" בסיידבר מראה בדיוק איפה אתה. ה-accordion "Current Gate Prompt" מראה מה צריך לעשות עכשיו. לחלופין: לחץ <strong>🔍 בדוק התקדמות</strong> (או מקש <code>p</code>) לאבחון מלא.</p>
+    <h4>שאלה: Team 90 פסל את תוכנית העבודה (G3_5 FAIL). מה עושים?</h4>
+    <p>לחץ <strong>🔍 בדוק התקדמות</strong> — הדשבורד יזהה אוטומטית מצב REVISION ויציג את הצעדים. בקצרה:</p>
+    <pre>./pipeline_run.sh fail "BLOCKER-1: ... BLOCKER-2: ..."
+./pipeline_run.sh revise "BLOCKER-1: ... BLOCKER-2: ..."
+# → paste ▼▼▼ block into Cursor → Team 10 fixes → ./pipeline_run.sh pass</pre>
+    <h4>שאלה: Team 90 פסל ב-GATE_5 (dev validation). מה עושים?</h4>
+    <p>לחץ <strong>🔍 בדוק התקדמות</strong>. הבעיה היא בקוד: <code>./pipeline_run.sh fail "FINDING-1: ..."</code> → שלח findings ל-Team 10 לתיקון קוד → CURSOR_IMPLEMENTATION מחדש → GATE_4 → GATE_5.</p>
+    <h4>שאלה: ה-auto-refresh לא מזהה שינוי מצב?</h4>
+    <p>ה-dashboard קורא את pipeline_state.json — אם הסוכן עדיין לא סיים לכתוב את הoutput ולא רצת <code>./pipeline_run.sh pass/fail</code>, המצב לא ישתנה. לחץ <strong>🔍 בדוק התקדמות</strong> לבדיקה ידנית + הנחיות.</p>
+    <h4>שאלה: קיבלתי BLOCK מ-Team 190?</h4>
+    <p>קרא את ה-BLOCK findings בקובץ שנוצר בתיקיית Team 190. תקן את הspec או העבר ל-Team 00 להחלטה אדריכלית. אל תמשיך הלאה ב-pipeline.</p>
+
+    <h3>📚 Additional Tools</h3>
+    <p><strong>🗺️ Roadmap &amp; Gate History page:</strong></p>
+    <div><a class="doc-link" href="PIPELINE_ROADMAP.html" target="_blank">PIPELINE_ROADMAP.html</a> — Full pipeline sequence, portfolio roadmap tree, gate history, canonical task files</div>
+    <p style="margin-top:8px"><strong>🔍 Progress Check</strong> (button in header or press <code>p</code>): Scans all 14 gates + current artifacts → shows full pipeline overview, current gate guidance with PASS/FAIL paths, FAIL cycle detection.</p>
     <div>
       <a class="doc-link" href="PIPELINE_HOWTO.md" target="_blank">PIPELINE_HOWTO.md</a>
       <a class="doc-link" href="_COMMUNICATION/team_00/TEAM_00_S001_P002_WP001_EXPERIMENT_EXECUTION_GUIDE_v1.0.0.md" target="_blank">Experiment Execution Guide</a>
@@ -455,16 +488,6 @@ python3 -m http.server 8090
       <a class="doc-link" href="agents_os_v2/orchestrator/pipeline.py" target="_blank">pipeline.py (CLI source)</a>
       <a class="doc-link" href="pipeline_run.sh" target="_blank">pipeline_run.sh</a>
     </div>
-
-    <h3>❓ FAQ</h3>
-    <h4>שאלה: הרצתי Team 20. מה הטריגר הבא?</h4>
-    <p>אין CLI trigger אחרי Team 20. בדוק שהקובץ <code>_COMMUNICATION/team_20/TEAM_20_S001_P002_WP001_ALERTS_WIDGET_API_VERIFICATION_v1.0.0.md</code> קיים (ראה "Expected Files" → 🟢). אם 🟢 — פתח Cursor חדש, הדבק מנדט Team 30.</p>
-    <h4>שאלה: מתי אני לוחץ ./pipeline_run.sh pass?</h4>
-    <p>רק כאשר <strong>כל ה-sub-steps של הgate הנוכחי הושלמו</strong>. עבור CURSOR_IMPLEMENTATION: Team 20 🟢 + Team 30 🟢 + git commit קיים.</p>
-    <h4>שאלה: שכחתי איפה אני בפייפליין?</h4>
-    <p>לחץ ↺ Refresh — ה-"Current Gate" בסיידבר מראה בדיוק איפה אתה. הaccordion "Current Gate Prompt" מראה מה צריך לעשות עכשיו.</p>
-    <h4>שאלה: קיבלתי BLOCK מ-Team 190?</h4>
-    <p>קרא את ה-BLOCK findings בקובץ שנוצר בתיקיית Team 190. תקן את הspec או העבר ל-Team 00 להחלטה אדריכלית. אל תמשיך הלאה ב-pipeline.</p>
   </div>
 </div>
 
@@ -495,6 +518,13 @@ python3 -m http.server 8090
       <ul class="gate-list" id="gate-list">
         <li class="gate-item"><span class="gate-dot dot-pending"></span><span class="gate-name loading">Loading…</span></li>
       </ul>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Quick Commands</div>
+      <div class="sidebar-cmd-list" id="sidebar-cmd-list">
+        <div class="sidebar-cmd-row"><span class="sidebar-cmd-text loading">Loading…</span></div>
+      </div>
     </div>
   </aside>
 
@@ -532,21 +562,6 @@ python3 -m http.server 8090
       </div>
     </div>
 
-    <!-- Accordion: Quick Commands -->
-    <div class="accordion open" id="acc-commands">
-      <div class="accordion-header" onclick="toggleAccordion('acc-commands')">
-        <span>⌨️</span>
-        <span class="accordion-title">Quick Commands</span>
-        <span class="accordion-badge">terminal</span>
-        <span class="accordion-chevron">▶</span>
-      </div>
-      <div class="accordion-body">
-        <div class="cmd-list" id="cmd-list">
-          <!-- populated by JS -->
-        </div>
-      </div>
-    </div>
-
     <!-- Accordion: Team Mandates -->
     <div class="accordion" id="acc-mandates">
       <div class="accordion-header" onclick="toggleAccordion('acc-mandates')">
@@ -577,31 +592,10 @@ python3 -m http.server 8090
       </div>
     </div>
 
-    <!-- Accordion: Roadmap Map -->
-    <div class="accordion" id="acc-roadmap">
-      <div class="accordion-header" onclick="toggleAccordion('acc-roadmap'); if(document.getElementById('acc-roadmap').classList.contains('open') && !roadmapLoaded) loadRoadmap()">
-        <span>🗺️</span>
-        <span class="accordion-title">Roadmap Map</span>
-        <span class="accordion-badge" id="roadmap-badge">—</span>
-        <span class="accordion-chevron">▶</span>
-      </div>
-      <div class="accordion-body">
-        <div id="roadmap-content"><span class="loading">Click to load…</span></div>
-      </div>
-    </div>
-
-    <!-- Accordion: Gate History -->
-    <div class="accordion" id="acc-history">
-      <div class="accordion-header" onclick="toggleAccordion('acc-history')">
-        <span>📜</span>
-        <span class="accordion-title">Gate History</span>
-        <span class="accordion-badge" id="history-badge">—</span>
-        <span class="accordion-chevron">▶</span>
-      </div>
-      <div class="accordion-body">
-        <ul class="history-list" id="history-list"><li class="loading">Loading…</li></ul>
-      </div>
-    </div>
+    <!-- Roadmap & Gate History link (separate page) -->
+    <a href="PIPELINE_ROADMAP.html" class="roadmap-link-card">
+      🗺️ Roadmap &amp; Gate History → Full pipeline sequence, program tree, canonical files
+    </a>
 
   </main>
 </div>
@@ -778,22 +772,23 @@ async function loadPipelineState() {
   }
 }
 
-// ── Build quick commands ──────────────────────────────────────────────────
+// ── Build quick commands (sidebar) ───────────────────────────────────────
 function buildCommands(currentGate) {
   const cmds = [
-    {text:"./pipeline_run.sh",            desc:"Generate + show current gate prompt"},
-    {text:"./pipeline_run.sh pass",       desc:"Advance current gate → PASS"},
-    {text:"./pipeline_run.sh fail \"reason\"", desc:"Advance current gate → FAIL"},
-    {text:"./pipeline_run.sh approve",    desc:"Approve human-authority gate"},
-    {text:"./pipeline_run.sh status",     desc:"Show pipeline state"},
-    {text:`./pipeline_run.sh gate ${currentGate||"GATE_X"}`, desc:"Regenerate current gate prompt"},
-    {text:"python3 -m agents_os_v2.orchestrator.pipeline --status", desc:"Full CLI status"},
+    {text:"./pipeline_run.sh",                     desc:"Generate current gate prompt"},
+    {text:"./pipeline_run.sh pass",                desc:"Advance → PASS"},
+    {text:"./pipeline_run.sh fail \"reason\"",     desc:"Advance → FAIL"},
+    {text:"./pipeline_run.sh approve",             desc:"Approve human gate"},
+    {text:"./pipeline_run.sh status",              desc:"Show pipeline state"},
+    {text:`./pipeline_run.sh gate ${currentGate||"GATE_X"}`, desc:"Regenerate prompt"},
+    {text:"./pipeline_run.sh revise \"BLOCKER-1: ...\"", desc:"G3_5 FAIL revision"},
   ];
-  document.getElementById("cmd-list").innerHTML = cmds.map((c,i) =>
-    `<div class="cmd-row">
-      <span class="cmd-text">${escHtml(c.text)}</span>
-      <span class="cmd-desc">${c.desc}</span>
-      <button class="btn cmd-copy" onclick="copyCmd(${JSON.stringify(c.text)}, this)">Copy</button>
+  const el = document.getElementById("sidebar-cmd-list");
+  if (!el) return;
+  el.innerHTML = cmds.map(c =>
+    `<div class="sidebar-cmd-row" title="${escHtml(c.desc)}">
+      <span class="sidebar-cmd-text">${escHtml(c.text)}</span>
+      <button class="btn sidebar-cmd-btn" onclick="copyCmd(${JSON.stringify(c.text)}, this)">⎘</button>
     </div>`
   ).join("");
 }
@@ -873,57 +868,124 @@ function showMandate(key) {
   document.getElementById("mandate-content").textContent = mandateSections[key] || "(empty)";
 }
 
-// ── Canonical files (Roadmap Map) ─────────────────────────────────────────
-const CANONICAL_FILES = [
-  {label:"Known Bugs Register",        path:"documentation/docs-governance/01-FOUNDATIONS/KNOWN_BUGS_REGISTER_v1.0.0.md"},
-  {label:"Bugs Remediation Procedure", path:"documentation/docs-governance/04-PROCEDURES/KNOWN_BUGS_REMEDIATION_GOVERNANCE_PROCEDURE_v1.0.0.md"},
-  {label:"Master Task List (Team 10)", path:"_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md"},
-  {label:"Level-2 Carryover List",     path:"_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md"},
-  {label:"Level-2 Registry",           path:"_COMMUNICATION/team_10/TEAM_10_LEVEL2_LISTS_REGISTRY.md"},
-  {label:"WSM — Live Operational State", path:"documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md"},
-  {label:"Portfolio Roadmap",          path:"documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md"},
-  {label:"Program Registry",           path:"documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md"},
-  {label:"SSM (Governance Constitution)", path:"documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md"},
-];
-
-// ── Gate sub-step definitions (for Progress Check) ─────────────────────────
-const GATE_SUBSTEPS = {
-  'CURSOR_IMPLEMENTATION': [
-    {
-      label:'Step A — Team 20 (API Verify)',
-      files:['_COMMUNICATION/team_20/TEAM_20_S001_P002_WP001_ALERTS_WIDGET_API_VERIFICATION_v1.0.0.md'],
-      doneMsg:'✅ API verification complete — proceed to Step B (Team 30)',
-      pendingMsg:'⏳ Pending — open Cursor Composer, paste Team 20 mandate from implementation_mandates.md',
-    },
-    {
-      label:'Step B — Team 30 (Widget Implementation)',
-      requiresPrev:true,
-      files:['ui/src/components/AlertsSummaryWidget.jsx','ui/src/components/HomePage.jsx'],
-      doneMsg:'✅ Widget files created — run git commit then ./pipeline_run.sh pass',
-      pendingMsg:'⏳ Pending — open new Cursor Composer, paste Team 30 mandate from implementation_mandates.md',
-    },
-  ],
-  'GATE_4': [
-    {
-      label:'Team 50 — QA Report',
-      files:['_COMMUNICATION/team_50/TEAM_50_S001_P002_WP001_QA_REPORT_v1.0.0.md'],
-      doneMsg:'✅ QA report exists — run ./pipeline_run.sh pass',
-      pendingMsg:'⏳ Pending — open Cursor Composer, paste Team 50 mandate',
-    },
-  ],
-};
-
-// ── Generic gate advice ────────────────────────────────────────────────────
-const GATE_ADVICE = {
-  'G3_PLAN':  'Team 10 produces work plan. Store artifact: ./pipeline_run.sh store G3_PLAN &lt;file&gt; → ./pipeline_run.sh pass',
-  'G3_5':     'Team 90 reviews plan. PASS: ./pipeline_run.sh pass | FAIL: ./pipeline_run.sh revise "BLOCKER-1: ..."',
-  'G3_6_MANDATES': 'Auto-gate: mandates generated. Run ./pipeline_run.sh pass to advance.',
-  'GATE_5':   'Team 90 dev validation. PASS: ./pipeline_run.sh pass',
-  'GATE_6':   'Team 100 reality vs intent. PASS: ./pipeline_run.sh pass → ./pipeline_run.sh approve',
-  'GATE_7':   'Nimrod browser review at http://localhost:8080 → ./pipeline_run.sh approve',
-  'GATE_8':   'Team 90 + 70 docs closure. PASS: ./pipeline_run.sh pass',
-  'WAITING_GATE2_APPROVAL': 'Run: ./pipeline_run.sh approve',
-  'WAITING_GATE6_APPROVAL': 'Run: ./pipeline_run.sh approve',
+// ── Comprehensive gate definitions — all 14 gates ─────────────────────────
+const ALL_GATE_DEFS = {
+  'GATE_0': {
+    owner:'team_190', engine:'codex',
+    desc:'Team 190 validates scope: domain isolation, no active program conflicts, feasibility',
+    advice:'./pipeline_run.sh → paste prompt to Codex → Team 190 validates → PASS: ./pipeline_run.sh pass',
+    failAdvice:'./pipeline_run.sh fail "reason" → fix spec definition → re-run GATE_0',
+  },
+  'GATE_1': {
+    owner:'team_170+190', engine:'codex',
+    desc:'Team 170 produces LLD400 spec → Team 190 validates structure and completeness',
+    advice:'./pipeline_run.sh → paste to Codex → Team 170 writes spec + Team 190 validates → ./pipeline_run.sh pass',
+    failAdvice:'./pipeline_run.sh fail "reason" → Team 170 revises spec → re-run GATE_1',
+  },
+  'GATE_2': {
+    owner:'team_100', engine:'codex+human',
+    desc:'Team 100 reviews spec, recommends approval → Nimrod decides',
+    advice:'./pipeline_run.sh → paste to Codex → Team 100 outputs recommendation → ./pipeline_run.sh pass → ./pipeline_run.sh approve',
+    failAdvice:'If Team 100 flags blockers: route to Team 00 before approving',
+  },
+  'WAITING_GATE2_APPROVAL': {
+    owner:'team_00', engine:'human',
+    desc:'Nimrod final approval for GATE_2 — "do we approve building this?"',
+    advice:'Review Team 100 recommendation → ./pipeline_run.sh approve',
+    failAdvice:'If rejected: ./pipeline_run.sh fail "reason" → route back to spec revision',
+  },
+  'G3_PLAN': {
+    owner:'team_10', engine:'cursor',
+    desc:'Team 10 produces implementation work plan in Cursor Composer',
+    advice:'./pipeline_run.sh → paste to Cursor → Team 10 writes work plan → ./pipeline_run.sh store G3_PLAN <file> → ./pipeline_run.sh pass',
+    failAdvice:'G3_5 rejected this plan. Run: ./pipeline_run.sh revise "BLOCKER-1: ..." → paste revised prompt into Cursor → Team 10 fixes → ./pipeline_run.sh pass',
+    revisionGate:'G3_5',
+  },
+  'G3_5': {
+    owner:'team_90', engine:'codex',
+    desc:'Team 90 validates work plan: completeness, API contracts, test criteria, no spec gaps',
+    advice:'./pipeline_run.sh → paste to Codex → Team 90 reviews → Team 90 produces verdict',
+    failAdvice:'./pipeline_run.sh fail "BLOCKER-1: ..." → ./pipeline_run.sh revise "BLOCKER-1: ..." → paste revised G3_PLAN prompt into Cursor → Team 10 fixes → ./pipeline_run.sh pass',
+    twoPaths:true,
+    passCmd:'./pipeline_run.sh pass',
+    failCmd:'./pipeline_run.sh fail "BLOCKER-1: ..."',
+    reviseCmd:'./pipeline_run.sh revise "BLOCKER-1: ..."',
+  },
+  'G3_6_MANDATES': {
+    owner:'orchestrator', engine:'auto',
+    desc:'Auto-generates per-team mandates deterministically from work plan',
+    advice:'Mandates are auto-generated → ./pipeline_run.sh pass to advance',
+    failAdvice:'Should not fail. Check pipeline.py error output for issues.',
+    files:['_COMMUNICATION/agents_os/prompts/implementation_mandates.md'],
+  },
+  'CURSOR_IMPLEMENTATION': {
+    owner:'teams_20+30', engine:'cursor',
+    desc:'Teams 20+30 implement in Cursor Composer — 2 sequential sub-steps',
+    advice:'Step A: Team 20 API verify → Step B: Team 30 widget → git commit → ./pipeline_run.sh pass',
+    failAdvice:'./pipeline_run.sh fail "reason" → identify which sub-step failed → fix → re-run',
+    substeps:[
+      {
+        label:'Step A — Team 20 (API Verify)',
+        files:['_COMMUNICATION/team_20/TEAM_20_S001_P002_WP001_ALERTS_WIDGET_API_VERIFICATION_v1.0.0.md'],
+        doneMsg:'✅ API verification done — proceed to Step B (Team 30)',
+        pendingMsg:'⏳ Open Cursor Composer → paste Team 20 mandate from implementation_mandates.md',
+      },
+      {
+        label:'Step B — Team 30 (Widget Implementation)',
+        requiresPrev:true,
+        files:['ui/src/components/AlertsSummaryWidget.jsx','ui/src/components/HomePage.jsx'],
+        doneMsg:'✅ Widget files created — run git commit then ./pipeline_run.sh pass',
+        pendingMsg:'⏳ Open new Cursor Composer → paste Team 30 mandate from implementation_mandates.md',
+      },
+    ],
+  },
+  'GATE_4': {
+    owner:'team_50', engine:'cursor+mcp',
+    desc:'Team 50 QA: browser automation tests, 10-point checklist, binary PASS/FAIL',
+    advice:'./pipeline_run.sh → paste to Cursor → Team 50 runs tests → review report → ./pipeline_run.sh pass OR fail',
+    failAdvice:'./pipeline_run.sh fail "failed items" → route to Team 10 for code fixes → re-run CURSOR_IMPLEMENTATION → GATE_4',
+    substeps:[
+      {
+        label:'Team 50 — QA Report',
+        files:['_COMMUNICATION/team_50/TEAM_50_S001_P002_WP001_QA_REPORT_v1.0.0.md'],
+        doneMsg:'✅ QA report exists — review findings then: PASS → ./pipeline_run.sh pass | FAIL → ./pipeline_run.sh fail "items"',
+        pendingMsg:'⏳ Open Cursor Composer → paste Team 50 mandate from implementation_mandates.md',
+      },
+    ],
+  },
+  'GATE_5': {
+    owner:'team_90', engine:'codex',
+    desc:'Team 90 dev validation: code compliance vs spec, no regressions, no spec gaps',
+    advice:'./pipeline_run.sh → paste to Codex → Team 90 reviews code → Team 90 produces verdict',
+    failAdvice:'./pipeline_run.sh fail "FINDING-1: ..." → route to Team 10 for code fixes → re-run CURSOR_IMPLEMENTATION → GATE_4 → GATE_5',
+    twoPaths:true,
+    passCmd:'./pipeline_run.sh pass',
+    failCmd:'./pipeline_run.sh fail "FINDING-1: ..."',
+  },
+  'GATE_6': {
+    owner:'team_100', engine:'codex+human',
+    desc:'Team 100 reality vs intent: does what was built match what was approved?',
+    advice:'./pipeline_run.sh → paste to Codex → Team 100 reviews → ./pipeline_run.sh pass → ./pipeline_run.sh approve',
+    failAdvice:'Major gap: route to Team 00 for architectural decision. Minor: approve with conditions.',
+  },
+  'WAITING_GATE6_APPROVAL': {
+    owner:'team_00', engine:'human',
+    desc:'Nimrod approves GATE_6 — "does the built product match what we approved?"',
+    advice:'Review GATE_6 findings → ./pipeline_run.sh approve',
+    failAdvice:'If rejected: ./pipeline_run.sh fail "reason" → route to Team 00',
+  },
+  'GATE_7': {
+    owner:'team_00', engine:'human',
+    desc:'Nimrod browser UX sign-off — live review at http://localhost:8080',
+    advice:'Open http://localhost:8080 → review feature UX → ./pipeline_run.sh approve',
+    failAdvice:'Issues found: document findings → route to Team 10 for fixes → re-run from GATE_4',
+  },
+  'GATE_8': {
+    owner:'team_90+70', engine:'codex',
+    desc:'Team 90+70 docs closure: AS_MADE_REPORT, registry update, WSM update',
+    advice:'./pipeline_run.sh → paste to Codex → Team 90+70 produce docs → ./pipeline_run.sh pass → program CLOSED',
+    failAdvice:'Docs incomplete: Team 70 revises → re-run GATE_8',
+  },
 };
 
 // ── Progress Check ─────────────────────────────────────────────────────────
@@ -932,32 +994,76 @@ async function runProgressCheck() {
   const content = document.getElementById("progress-content");
   content.innerHTML = '<span class="loading">Scanning pipeline state and artifacts…</span>';
 
-  // Fresh state fetch
   let state = null;
   try {
     const r = await fetch('_COMMUNICATION/agents_os/pipeline_state.json?t=' + Date.now());
     state = await r.json();
   } catch(e) {
-    content.innerHTML = '<div class="alert-box">❌ Cannot read pipeline_state.json — is the server running? (python3 -m http.server 8090)</div>';
+    content.innerHTML = '<div class="alert-box">❌ Cannot read pipeline_state.json — is the HTTP server running?<br><code>python3 -m http.server 8090</code></div>';
     return;
   }
 
-  const gate = state.current_gate;
-  const cfg  = GATE_CONFIG[gate] || {};
+  const gate      = state.current_gate;
   const completed = state.gates_completed || [];
   const failed    = state.gates_failed    || [];
+  const cfg       = GATE_CONFIG[gate] || {};
+  const def       = ALL_GATE_DEFS[gate] || {};
 
-  let html = `<div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin-bottom:14px">
-    <div class="info-row"><span class="info-key">Current gate:</span><span class="info-val" style="font-family:var(--mono)">${escHtml(gate)}</span></div>
-    <div class="info-row"><span class="info-key">Work Package:</span><span class="info-val" style="font-family:var(--mono)">${escHtml(state.work_package_id||'—')}</span></div>
-    <div class="info-row"><span class="info-key">Owner:</span><span class="info-val">${escHtml(cfg.owner||'—')}</span></div>
-    <div class="info-row"><span class="info-key">Engine:</span><span class="info-val">${escHtml(cfg.engine||'—')}</span></div>
-    <div class="info-row"><span class="info-key">Completed gates:</span><span class="info-val" style="color:var(--success)">${completed.length}</span></div>
-    ${failed.length ? `<div class="info-row"><span class="info-key">Had FAIL cycles:</span><span class="info-val" style="color:var(--warning)">${failed.join(', ')}</span></div>` : ''}
+  // ── Full Pipeline Overview ──────────────────────────────────────────────
+  let html = `<div style="margin-bottom:16px">
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px">Full Pipeline Overview — All Gates</div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr>
+        <th style="text-align:left;padding:3px 6px;color:var(--text-muted);border-bottom:1px solid var(--border);font-size:10px;text-transform:uppercase">Gate</th>
+        <th style="text-align:left;padding:3px 6px;color:var(--text-muted);border-bottom:1px solid var(--border);font-size:10px;text-transform:uppercase">Owner</th>
+        <th style="text-align:left;padding:3px 6px;color:var(--text-muted);border-bottom:1px solid var(--border);font-size:10px;text-transform:uppercase">Status</th>
+      </tr></thead><tbody>`;
+  GATE_SEQUENCE.forEach(g => {
+    const s    = gateStatus(g, state);
+    const gcfg = GATE_CONFIG[g] || {};
+    const isCur = g === gate;
+    const icon  = s==='pass'?'✓':s==='fail'?'✗':s==='current'?'▶':s==='human'?'⏸':'○';
+    const color = s==='pass'?'var(--success)':s==='fail'?'var(--danger)':s==='current'?'var(--accent)':s==='human'?'var(--warning)':'var(--border)';
+    html += `<tr style="${isCur?'background:rgba(31,111,235,0.08);':''}">
+      <td style="padding:3px 6px;font-family:var(--mono);font-size:10px;color:${color}">${icon} ${escHtml(g)}</td>
+      <td style="padding:3px 6px;color:var(--text-muted);font-size:10px">${escHtml(gcfg.owner||'—')}</td>
+      <td style="padding:3px 6px"><span class="status-pill ${statusPillClass(s)}" style="font-size:10px">${statusLabel(s)}</span></td>
+    </tr>`;
+  });
+  html += `</tbody></table></div>`;
+
+  // ── Current Gate Summary ────────────────────────────────────────────────
+  html += `<div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin-bottom:12px">
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px">Current Gate Analysis</div>
+    <div class="info-row"><span class="info-key">Gate:</span><span class="info-val" style="font-family:var(--mono)">${escHtml(gate)}</span></div>
+    <div class="info-row"><span class="info-key">WP:</span><span class="info-val" style="font-family:var(--mono)">${escHtml(state.work_package_id||'—')}</span></div>
+    <div class="info-row"><span class="info-key">Owner:</span><span class="info-val">${escHtml(def.owner||cfg.owner||'—')}</span></div>
+    <div class="info-row"><span class="info-key">Engine:</span><span class="info-val">${escHtml(def.engine||cfg.engine||'—')}</span></div>
+    <div class="info-row" style="align-items:flex-start"><span class="info-key">Scope:</span><span style="font-size:11px;color:var(--text);text-align:right;max-width:65%">${escHtml(def.desc||cfg.desc||'—')}</span></div>
+    ${failed.length ? `<div class="info-row"><span class="info-key">FAIL cycles:</span><span style="color:var(--warning);font-size:11px;font-family:var(--mono)">${failed.map(g=>escHtml(g)).join(', ')}</span></div>` : ''}
   </div>`;
 
-  const substeps = GATE_SUBSTEPS[gate];
+  // ── G3_PLAN revision mode detection ────────────────────────────────────
+  if (gate === 'G3_PLAN' && failed.includes('G3_5')) {
+    html += `<div style="background:rgba(210,153,34,0.1);border:1px solid var(--warning);border-radius:6px;padding:10px 14px;margin-bottom:12px">
+      <div style="font-weight:600;color:var(--warning);margin-bottom:6px">⚠️ REVISION MODE — G3_5 failed the previous work plan</div>
+      <div style="font-size:12px;margin-bottom:8px">Team 90 rejected the work plan. You need to run the revision command with the specific blockers:</div>
+      <div style="font-family:var(--mono);font-size:11px;background:#010409;padding:8px;border-radius:4px;margin-bottom:6px">./pipeline_run.sh revise "BLOCKER-1: ... BLOCKER-2: ..."</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Then: paste ▼▼▼ block into Cursor → Team 10 fixes work plan → ./pipeline_run.sh pass</div>
+      <button class="btn" onclick="navigator.clipboard.writeText('./pipeline_run.sh revise &quot;BLOCKER-1: ...&quot;').then(()=>{this.textContent='✓ Copied!';setTimeout(()=>this.textContent='📋 Copy revise cmd',1500)})">📋 Copy revise cmd</button>
+    </div>`;
+  }
 
+  // ── GATE_5 FAIL routing guidance ────────────────────────────────────────
+  if (gate === 'CURSOR_IMPLEMENTATION' && failed.includes('GATE_5')) {
+    html += `<div style="background:rgba(248,81,73,0.08);border:1px solid var(--danger);border-radius:6px;padding:10px 14px;margin-bottom:12px">
+      <div style="font-weight:600;color:var(--danger);margin-bottom:4px">🔄 Re-implementation — GATE_5 rejected code previously</div>
+      <div style="font-size:12px">Team 90 found code issues. Fix code → commit → ./pipeline_run.sh pass to re-run GATE_4 → GATE_5.</div>
+    </div>`;
+  }
+
+  // ── Sub-step analysis (gates with substeps defined) ─────────────────────
+  const substeps = def.substeps;
   if (substeps) {
     html += `<div style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px">Sub-step Analysis</div>`;
     let prevDone = true;
@@ -965,27 +1071,24 @@ async function runProgressCheck() {
     let firstPendingMsg = '';
 
     for (const step of substeps) {
-      const blocked = step.requiresPrev && !prevDone;
+      const blocked    = step.requiresPrev && !prevDone;
       const fileChecks = await Promise.all(step.files.map(async f => ({path:f, exists:await fileExists(f)})));
-      const stepDone = !blocked && fileChecks.every(f => f.exists);
-
+      const stepDone   = !blocked && fileChecks.every(f => f.exists);
       const borderColor = stepDone ? 'var(--success)' : blocked ? 'var(--border)' : 'var(--warning)';
-      const icon = stepDone ? '✅' : blocked ? '⏸️' : '⏳';
+      const icon        = stepDone ? '✅' : blocked ? '⏸️' : '⏳';
 
       html += `<div class="prog-substep" style="border-left:3px solid ${borderColor}">
-        <div class="prog-substep-title" style="color:${borderColor}">${icon} ${escHtml(step.label)}</div>`;
-
+        <div style="color:${borderColor};font-weight:500;margin-bottom:4px">${icon} ${escHtml(step.label)}</div>`;
       fileChecks.forEach(f => {
         html += `<div class="prog-file-item" style="color:${f.exists?'var(--success)':'var(--danger)'}">
           ${f.exists?'🟢':'🔴'} ${escHtml(f.path)}</div>`;
       });
-
       if (blocked) {
         html += `<div class="prog-msg" style="color:var(--text-muted)">⏸️ Blocked — complete previous step first</div>`;
       } else if (stepDone) {
-        html += `<div class="prog-msg" style="color:var(--success)">${step.doneMsg}</div>`;
+        html += `<div class="prog-msg" style="color:var(--success)">${escHtml(step.doneMsg)}</div>`;
       } else {
-        html += `<div class="prog-msg" style="color:var(--warning)">${step.pendingMsg}</div>`;
+        html += `<div class="prog-msg" style="color:var(--warning)">${escHtml(step.pendingMsg)}</div>`;
         if (!firstPendingMsg) firstPendingMsg = step.pendingMsg;
         allDone = false;
       }
@@ -1001,34 +1104,82 @@ async function runProgressCheck() {
       </div>
       <div style="margin-top:6px;font-family:var(--mono);font-size:12px;color:var(--text-muted)">./pipeline_run.sh pass</div>`;
     } else if (firstPendingMsg) {
-      html += `<div class="prog-next-banner"><strong>⏭️ Next action:</strong> ${firstPendingMsg}</div>`;
+      html += `<div class="prog-next-banner"><strong>⏭️ Next action:</strong> ${escHtml(firstPendingMsg)}</div>`;
     }
 
   } else {
-    // Generic gate: show all expected files + advice
-    html += `<div style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px">Expected Output Files</div>`;
-    const results = await Promise.all(EXPECTED_FILES.map(async f => ({...f, exists:await fileExists(f.path)})));
-    const allFound = results.every(r => r.exists);
+    // ── Standard gate guidance ───────────────────────────────────────────
+    html += `<div style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px">Gate Guidance</div>`;
 
-    results.forEach(r => {
-      html += `<div class="prog-file-item" style="color:${r.exists?'var(--success)':'var(--danger)'}">
-        ${r.exists?'🟢':'🔴'} <strong>${escHtml(r.label)}</strong> — <span style="color:var(--text-muted)">${escHtml(r.path)}</span></div>`;
-    });
-
-    const advice = GATE_ADVICE[gate];
-    if (advice) {
-      html += `<div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-top:10px;font-size:12px">
-        <strong>ℹ️ Gate advice:</strong> ${advice}</div>`;
+    if (def.twoPaths) {
+      // Two-path gates (G3_5, GATE_5) — show PASS and FAIL explicitly
+      if (def.advice) {
+        html += `<div style="font-size:12px;margin-bottom:10px">${escHtml(def.advice)}</div>`;
+      }
+      html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <div style="background:rgba(63,185,80,0.08);border:1px solid var(--success);border-radius:6px;padding:8px">
+          <div style="color:var(--success);font-weight:600;font-size:12px;margin-bottom:6px">✅ If Team 90 PASS</div>
+          <div style="font-family:var(--mono);font-size:11px;background:#010409;padding:5px 8px;border-radius:4px;margin-bottom:6px">${escHtml(def.passCmd||'./pipeline_run.sh pass')}</div>
+          <button class="btn" style="font-size:10px" onclick="navigator.clipboard.writeText(${JSON.stringify(def.passCmd||'./pipeline_run.sh pass')}).then(()=>{this.textContent='✓ Copied!';setTimeout(()=>this.textContent='📋 Copy',1500)})">📋 Copy</button>
+        </div>
+        <div style="background:rgba(248,81,73,0.08);border:1px solid var(--danger);border-radius:6px;padding:8px">
+          <div style="color:var(--danger);font-weight:600;font-size:12px;margin-bottom:6px">❌ If Team 90 FAIL</div>
+          <div style="font-family:var(--mono);font-size:11px;background:#010409;padding:5px 8px;border-radius:4px;margin-bottom:6px">${escHtml(def.failCmd||'./pipeline_run.sh fail "reason"')}</div>
+          <button class="btn" style="font-size:10px" onclick="navigator.clipboard.writeText(${JSON.stringify(def.failCmd||'./pipeline_run.sh fail "reason"')}).then(()=>{this.textContent='✓ Copied!';setTimeout(()=>this.textContent='📋 Copy',1500)})">📋 Copy</button>
+        </div>
+      </div>`;
+      if (def.reviseCmd) {
+        html += `<div style="background:rgba(210,153,34,0.08);border:1px solid var(--warning);border-radius:6px;padding:8px;margin-bottom:8px">
+          <div style="color:var(--warning);font-weight:600;font-size:12px;margin-bottom:4px">↩️ After FAIL — generate revision prompt</div>
+          <div style="font-family:var(--mono);font-size:11px;background:#010409;padding:5px 8px;border-radius:4px;margin-bottom:6px">${escHtml(def.reviseCmd)}</div>
+          <div style="font-size:11px;color:var(--text-muted)">${escHtml(def.failAdvice||'')}</div>
+        </div>`;
+      } else if (def.failAdvice) {
+        html += `<div style="font-size:11px;color:var(--text-muted);margin-top:4px">${escHtml(def.failAdvice)}</div>`;
+      }
+    } else {
+      // Standard linear gate
+      if (def.advice) {
+        html += `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin-bottom:8px">
+          <div style="font-size:11px;font-weight:600;margin-bottom:4px">ℹ️ Next action:</div>
+          <div style="font-size:12px">${escHtml(def.advice)}</div>
+        </div>`;
+      }
+      if (def.failAdvice) {
+        html += `<div style="background:rgba(248,81,73,0.05);border:1px solid var(--border);border-radius:6px;padding:8px 12px;margin-bottom:8px">
+          <div style="font-size:11px;font-weight:600;color:var(--warning);margin-bottom:3px">⚠️ If FAIL:</div>
+          <div style="font-size:11px">${escHtml(def.failAdvice)}</div>
+        </div>`;
+      }
     }
-    if (allFound) {
-      html += `<div class="tip-box" style="margin-top:10px">✅ All expected artifacts found — gate appears complete.</div>`;
+
+    // Gate-specific expected files
+    if (def.files && def.files.length > 0) {
+      const fileChecks = await Promise.all(def.files.map(async f => ({path:f, exists:await fileExists(f)})));
+      html += `<div style="margin-top:8px">`;
+      fileChecks.forEach(f => {
+        html += `<div class="prog-file-item" style="color:${f.exists?'var(--success)':'var(--danger)'}">
+          ${f.exists?'🟢':'🔴'} ${escHtml(f.path)}</div>`;
+      });
+      html += `</div>`;
+    }
+
+    // Human gate: highlight approve command
+    if (cfg.engine && cfg.engine.includes('human')) {
+      html += `<div class="tip-box" style="margin-top:10px;display:flex;align-items:center;justify-content:space-between">
+        <span><strong>⏸ Human gate</strong> — after review:</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <code>./pipeline_run.sh approve</code>
+          <button class="btn" onclick="navigator.clipboard.writeText('./pipeline_run.sh approve').then(()=>{this.textContent='✓ Copied!';setTimeout(()=>this.textContent='📋 Copy',1500)})">📋 Copy</button>
+        </div>
+      </div>`;
     }
   }
 
-  // Completed gates summary at bottom
+  // ── Completed gate chain ─────────────────────────────────────────────────
   if (completed.length > 0) {
     html += `<div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;color:var(--text-muted)">
-      Completed: ${completed.map(g=>`<span style="color:var(--success)">${escHtml(g)}</span>`).join(' → ')}
+      ✓ Completed: ${completed.map(g=>`<span style="color:var(--success);font-family:var(--mono)">${escHtml(g)}</span>`).join(' → ')}
     </div>`;
   }
 
@@ -1037,172 +1188,6 @@ async function runProgressCheck() {
 
 function closeProgress() {
   document.getElementById("progress-modal").classList.remove("open");
-}
-
-// ── Roadmap Map ────────────────────────────────────────────────────────────
-let roadmapLoaded = false;
-
-function extractTable(mdText, firstColName) {
-  const rows = [];
-  let headers = null;
-  let pastSep  = false;
-  let hasData  = false;
-  for (const rawLine of mdText.split('\n')) {
-    const line = rawLine.trim();
-    if (!line) {
-      if (hasData) break; // blank line after data = table ended
-      continue;
-    }
-    if (!line.startsWith('|')) {
-      if (hasData) break;
-      headers = null; pastSep = false;
-      continue;
-    }
-    const cols = line.split('|').slice(1, -1).map(c => c.trim());
-    if (!cols.length) continue;
-    if (cols.every(c => /^[-: ]*$/.test(c))) { pastSep = true; continue; }
-    if (!headers) {
-      if (cols.includes(firstColName)) { headers = cols; }
-      continue;
-    }
-    if (!pastSep) continue;
-    hasData = true;
-    const row = {};
-    headers.forEach((h, i) => { row[h] = cols[i] !== undefined ? cols[i] : ''; });
-    rows.push(row);
-  }
-  return rows;
-}
-
-function rmStatusClass(status) {
-  const s = (status || '').toUpperCase();
-  if (s.includes('ACTIVE'))    return 'rm-s-active';
-  if (s.includes('COMPLET') || s.includes('CLOSED') || s.includes('PASS')) return 'rm-s-complete';
-  if (s.includes('DEFER'))     return 'rm-s-deferred';
-  if (s.includes('HOLD') || s.includes('FROZEN')) return 'rm-s-hold';
-  return 'rm-s-planned';
-}
-
-function rmStatusLabel(status) {
-  const s = (status || '').toUpperCase();
-  if (s.includes('ACTIVE'))    return 'ACTIVE';
-  if (s.includes('COMPLET'))   return 'COMPLETE';
-  if (s.includes('CLOSED'))    return 'CLOSED';
-  if (s.includes('DEFER'))     return 'DEFERRED';
-  if (s.includes('HOLD'))      return 'HOLD';
-  if (s.includes('FROZEN'))    return 'FROZEN';
-  if (s.includes('PLANNED'))   return 'PLANNED';
-  return (status || '?').slice(0, 12);
-}
-
-async function loadRoadmap() {
-  const el = document.getElementById("roadmap-content");
-  if (!el) return;
-  el.innerHTML = '<span class="loading">Loading roadmap files…</span>';
-
-  let roadmapText = '', registryText = '';
-  try {
-    const [r1, r2] = await Promise.all([
-      fetch('documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md?t=' + Date.now()),
-      fetch('documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md?t=' + Date.now()),
-    ]);
-    if (!r1.ok || !r2.ok) throw new Error('fetch failed');
-    [roadmapText, registryText] = await Promise.all([r1.text(), r2.text()]);
-  } catch(e) {
-    el.innerHTML = '<div class="alert-box">❌ Could not load roadmap files. Is the HTTP server running? (python3 -m http.server 8090)</div>';
-    return;
-  }
-
-  const stages   = extractTable(roadmapText,   'stage_id');
-  const programs = extractTable(registryText,  'program_id');
-
-  // ── Validation ──────────────────────────────────────────────────────────
-  const errors = [];
-  const stageIds = stages.map(s => s['stage_id']).filter(Boolean);
-  const progIds  = programs.map(p => p['program_id']).filter(Boolean);
-
-  const dupStages = stageIds.filter((id, i) => stageIds.indexOf(id) !== i);
-  if (dupStages.length) errors.push(`Duplicate stage IDs: ${dupStages.join(', ')}`);
-
-  const dupProgs = progIds.filter((id, i) => progIds.indexOf(id) !== i);
-  if (dupProgs.length) errors.push(`Duplicate program IDs: ${dupProgs.join(', ')}`);
-
-  const orphans = programs.filter(p => p['stage_id'] && !stageIds.includes(p['stage_id']));
-  if (orphans.length) errors.push(`Programs with invalid stage_id: ${orphans.map(p=>p['program_id']).join(', ')}`);
-
-  const noStage = programs.filter(p => !p['stage_id']);
-  if (noStage.length) errors.push(`Programs missing stage_id: ${noStage.map(p=>p['program_id']).join(', ')}`);
-
-  let html = '<div class="rm-validation">';
-  if (!errors.length) {
-    html += `<div class="rm-val-ok">✅ Hierarchy valid — ${stages.length} stages · ${programs.length} programs · no duplicates or orphans</div>`;
-  } else {
-    errors.forEach(e => { html += `<div class="rm-val-err">❌ ${escHtml(e)}</div>`; });
-  }
-  html += '</div>';
-
-  // Active program detection (from global pipelineState)
-  const activeWp  = pipelineState ? (pipelineState.work_package_id || '') : '';
-  const activeProg = activeWp ? activeWp.replace(/-WP\d+.*$/, '') : '';
-
-  // ── Tree ────────────────────────────────────────────────────────────────
-  for (const stage of stages) {
-    const sid  = stage['stage_id'];
-    if (!sid) continue;
-    const stageProgs = programs.filter(p => p['stage_id'] === sid);
-    const isActiveStage = stageProgs.some(p => p['program_id'] === activeProg);
-    const ssc  = rmStatusClass(stage['status']);
-    const ssl  = rmStatusLabel(stage['status']);
-
-    html += `<div class="rm-stage${isActiveStage ? ' rm-stage-active-border rm-open' : ''}">
-      <div class="rm-stage-header" onclick="this.parentElement.classList.toggle('rm-open')">
-        <span class="rm-stage-id">${escHtml(sid)}</span>
-        <span class="rm-stage-name">${escHtml((stage['stage_name']||'').replace(/\*/g,''))}</span>
-        <span class="rm-status ${ssc}">${ssl}</span>
-        <span style="font-size:10px;color:var(--text-muted)">${stageProgs.length}p</span>
-        <span class="rm-chevron">▶</span>
-      </div>
-      <div class="rm-programs">`;
-
-    if (!stageProgs.length) {
-      html += `<div style="font-size:11px;color:var(--text-muted);font-style:italic">No programs registered</div>`;
-    } else {
-      for (const prog of stageProgs) {
-        const pid = prog['program_id'];
-        const isActive = pid === activeProg;
-        const domain = (prog['domain'] || '').replace(/[^A-Z_]/g, '');
-        const domClass = domain.includes('AGENTS') ? 'domain-agentsos' : 'domain-tiktrack';
-        const psc  = rmStatusClass(prog['status']);
-        const psl  = rmStatusLabel(prog['status']);
-        html += `<div class="rm-program${isActive ? ' rm-program-active' : ''}">
-          <span style="font-size:9px;color:${isActive?'var(--accent)':'transparent'};min-width:10px">▶</span>
-          <span class="rm-prog-id">${escHtml(pid)}</span>
-          <span class="rm-prog-name">${escHtml((prog['program_name']||'').replace(/\*/g,''))}</span>
-          <span class="rm-prog-domain ${domClass}">${escHtml(domain.replace('_',''))}</span>
-          <span class="rm-status ${psc}">${psl}</span>
-        </div>`;
-      }
-    }
-    html += `</div></div>`;
-  }
-
-  // ── Canonical Task Files ─────────────────────────────────────────────────
-  const fileStatuses = await Promise.all(CANONICAL_FILES.map(async f => ({...f, exists:await fileExists(f.path)})));
-  html += `<div class="rm-canonical">
-    <h4>📋 Canonical Task Files</h4>`;
-  fileStatuses.forEach(f => {
-    html += `<div class="rm-file-row">
-      <span>${f.exists?'🟢':'🔴'}</span>
-      <a href="${f.path}" target="_blank">${escHtml(f.label)}</a>
-      <span class="rm-file-path">${escHtml(f.path)}</span>
-    </div>`;
-  });
-  html += `</div>`;
-
-  document.getElementById("roadmap-badge").textContent =
-    `${stages.length}S / ${programs.length}P${errors.length ? ' ⚠️' : ' ✅'}`;
-  el.innerHTML = html;
-  roadmapLoaded = true;
 }
 
 // ── Check expected files ──────────────────────────────────────────────────
@@ -1235,8 +1220,6 @@ async function loadAll() {
   const state = await loadPipelineState();
   if (state) await loadPrompt(state.current_gate);
   await Promise.all([loadMandates(), checkExpectedFiles()]);
-  // Reload roadmap if already opened (keeps it fresh on refresh)
-  if (roadmapLoaded) loadRoadmap();
 }
 
 // ── Auto-refresh ──────────────────────────────────────────────────────────

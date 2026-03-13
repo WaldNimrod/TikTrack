@@ -8,12 +8,16 @@
  * - בורסה/סיומת (מניות אירופאיות, TASE)
  */
 
-import { createModal, closeModal } from '../../../components/shared/PhoenixModal.js';
+import {
+  createModal,
+  closeModal,
+} from '../../../components/shared/PhoenixModal.js';
 import sharedServices from '../../../components/core/sharedServices.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 import { reactToApi } from '../../../cubes/shared/utils/transformers.js';
 
-const PROVIDER_ERROR_MSG = 'אין נתונים זמינים מהספק עבור טיקר זה. לא ניתן ליצור טיקר.';
+const PROVIDER_ERROR_MSG =
+  'אין נתונים זמינים מהספק עבור טיקר זה. לא ניתן ליצור טיקר.';
 const GENERIC_ERROR_MSG = 'שגיאה בהוספת הטיקר. נסה שוב.';
 
 /** Exchange suffixes (Yahoo format) — SSOT: WP_20_09, TEAM_10 corrective */
@@ -39,9 +43,9 @@ function createAddFormHTML(availableTickers, userTickerIds) {
     })
     .join('');
 
-  const exchangeOptionsHtml = EXCHANGE_OPTIONS
-    .map((o) => `<option value="${o.value}">${o.label}</option>`)
-    .join('');
+  const exchangeOptionsHtml = EXCHANGE_OPTIONS.map(
+    (o) => `<option value="${o.value}">${o.label}</option>`,
+  ).join('');
 
   return `
     <form id="userTickerAddForm" class="phoenix-form phoenix-form--two-col">
@@ -129,7 +133,9 @@ export function showUserTickerAddModal(options = {}) {
       const form = document.getElementById('userTickerAddForm');
       if (!form) return;
 
-      const existingSelect = document.getElementById('userTickerExistingSelect');
+      const existingSelect = document.getElementById(
+        'userTickerExistingSelect',
+      );
       const newSymbolInput = document.getElementById('userTickerNewSymbol');
       const assetTypeSelect = document.getElementById('userTickerAssetType');
       const marketSelect = document.getElementById('userTickerMarket');
@@ -154,12 +160,15 @@ export function showUserTickerAddModal(options = {}) {
       }
 
       if (!existingId && !newSymbol) {
-        if (symbolErr) symbolErr.textContent = 'לבחור טיקר קיים או להזין סמל לטיקר חדש';
+        if (symbolErr)
+          symbolErr.textContent = 'לבחור טיקר קיים או להזין סמל לטיקר חדש';
         return;
       }
 
       if (existingId && newSymbol) {
-        if (symbolErr) symbolErr.textContent = 'לבחור אפשרות אחת בלבד — טיקר קיים או טיקר חדש';
+        if (symbolErr)
+          symbolErr.textContent =
+            'לבחור אפשרות אחת בלבד — טיקר קיים או טיקר חדש';
         return;
       }
 
@@ -179,20 +188,46 @@ export function showUserTickerAddModal(options = {}) {
       try {
         await sharedServices.init();
         const apiPayload = reactToApi(payload);
-        await sharedServices.post('/me/tickers', apiPayload, { useQueryParams: true });
+        await sharedServices.post('/me/tickers', apiPayload, {
+          useQueryParams: true,
+        });
         closeModal();
         if (typeof onSuccess === 'function') onSuccess();
       } catch (error) {
-        maskedLog('[UserTicker Add] Error:', { status: error?.status, code: error?.code, detail: error?.detail });
+        maskedLog('[UserTicker Add] Error:', {
+          status: error?.status,
+          code: error?.code,
+          detail: error?.detail,
+        });
         const status = error?.status;
-        const detail = String(error?.detail ?? error?.message ?? error?.message_i18n ?? error?.details ?? '').toLowerCase();
-        const isProviderFailure = status >= 400 && status < 500 &&
-          (detail.includes('provider') || detail.includes('ספק') ||
-           detail.includes('data') || detail.includes('אין נתונים') ||
-           detail.includes('no data') || detail.includes('failed') ||
-           detail.includes('fetch') || detail.includes('unavailable') || detail.includes('לא זמין'));
-        const apiMsg = (error?.message ?? error?.message_i18n ?? error?.detail ?? '').trim();
-        const msg = isProviderFailure ? PROVIDER_ERROR_MSG : (apiMsg || GENERIC_ERROR_MSG);
+        const detail = String(
+          error?.detail ??
+            error?.message ??
+            error?.message_i18n ??
+            error?.details ??
+            '',
+        ).toLowerCase();
+        const isProviderFailure =
+          status >= 400 &&
+          status < 500 &&
+          (detail.includes('provider') ||
+            detail.includes('ספק') ||
+            detail.includes('data') ||
+            detail.includes('אין נתונים') ||
+            detail.includes('no data') ||
+            detail.includes('failed') ||
+            detail.includes('fetch') ||
+            detail.includes('unavailable') ||
+            detail.includes('לא זמין'));
+        const apiMsg = (
+          error?.message ??
+          error?.message_i18n ??
+          error?.detail ??
+          ''
+        ).trim();
+        const msg = isProviderFailure
+          ? PROVIDER_ERROR_MSG
+          : apiMsg || GENERIC_ERROR_MSG;
 
         if (errBlock && errText) {
           errText.textContent = msg;
@@ -204,7 +239,7 @@ export function showUserTickerAddModal(options = {}) {
             title: 'שגיאה',
             content: `<p>${msg.replace(/</g, '&lt;')}</p>`,
             showSaveButton: false,
-            cancelButtonText: 'ביטול'
+            cancelButtonText: 'ביטול',
           });
         }
       }
@@ -221,7 +256,8 @@ export function showUserTickerAddModal(options = {}) {
       const isCrypto = assetTypeEl.value === 'CRYPTO';
       marketGroupEl.style.display = isCrypto ? 'block' : 'none';
       // Show exchange for STOCK/ETF when adding new; hide for CRYPTO (market handles it)
-      if (exchangeRowEl) exchangeRowEl.style.display = isCrypto ? 'none' : 'block';
+      if (exchangeRowEl)
+        exchangeRowEl.style.display = isCrypto ? 'none' : 'block';
     };
     assetTypeEl.addEventListener('change', toggle);
     toggle(); // initial

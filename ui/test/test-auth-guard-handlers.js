@@ -18,8 +18,8 @@ if (document.readyState === 'loading') {
 
 function initTestHandlers() {
   logOutput = document.getElementById('logOutput');
-  
-  console.log = function(...args) {
+
+  console.log = function (...args) {
     originalLog.apply(console, args);
     if (args[0] && args[0].includes && args[0].includes('Auth Guard')) {
       if (logOutput) {
@@ -28,7 +28,7 @@ function initTestHandlers() {
       }
     }
   };
-  
+
   // Initial log
   log('Test page loaded. Auth Guard should be initialized.');
   if (window.AuthGuard) {
@@ -69,7 +69,9 @@ function removeToken() {
 }
 
 function checkToken() {
-  const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+  const token =
+    localStorage.getItem('access_token') ||
+    sessionStorage.getItem('access_token');
   log('Token exists: ' + !!token);
   if (token) {
     log('Token length: ' + token.length);
@@ -97,7 +99,9 @@ function testCheck() {
 
 function testLogWithTimestamp() {
   if (window.AuthGuard && window.AuthGuard.logWithTimestamp) {
-    const result = window.AuthGuard.logWithTimestamp('Test log message', { test: 'data' });
+    const result = window.AuthGuard.logWithTimestamp('Test log message', {
+      test: 'data',
+    });
     log('logWithTimestamp() returned: ' + JSON.stringify(result));
   } else {
     log('ERROR: AuthGuard.logWithTimestamp not available');
@@ -146,7 +150,7 @@ window.clearLogs = clearLogs;
 // Attach event listeners to buttons (Policy Compliance - No inline onclick)
 function attachEventListeners() {
   const buttons = document.querySelectorAll('.test-button[data-action]');
-  buttons.forEach(button => {
+  buttons.forEach((button) => {
     const action = button.getAttribute('data-action');
     if (window[action]) {
       button.addEventListener('click', window[action]);

@@ -23,7 +23,7 @@ from ..schemas.trading_accounts import (
     TradingAccountSummaryResponse,
     TradingAccountResponse,
     TradingAccountCreateRequest,
-    TradingAccountUpdateRequest
+    TradingAccountUpdateRequest,
 )
 
 logger = logging.getLogger(__name__)
@@ -46,20 +46,23 @@ def _canonical_status_to_is_active(status_val: Optional[str]) -> Optional[bool]:
 
 @router.get("", response_model=TradingAccountListResponse)
 async def get_trading_accounts(
-    status: Optional[str] = Query(None, description="Filter by canonical status: active|inactive|pending|cancelled (TT2_SYSTEM_STATUS_VALUES_SSOT)"),
+    status: Optional[str] = Query(
+        None,
+        description="Filter by canonical status: active|inactive|pending|cancelled (TT2_SYSTEM_STATUS_VALUES_SSOT)",
+    ),
     search: Optional[str] = Query(None, description="Search by account_name"),
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Get trading accounts for current user.
-    
+
     Returns list of trading accounts with calculated fields:
     - positions_count: Number of open positions
     - total_pl: Total unrealized P/L
     - account_value: Total account value (cash + holdings)
     - holdings_value: Total holdings value
-    
+
     Query Parameters:
     - status: Filter by is_active (true/false)
     - search: Search by account_name (partial match)
@@ -68,34 +71,31 @@ async def get_trading_accounts(
         status_bool = _canonical_status_to_is_active(status)
         service = get_trading_account_service()
         accounts = await service.get_trading_accounts(
-            user_id=current_user.id,
-            db=db,
-            status=status_bool,
-            search=search
+            user_id=current_user.id, db=db, status=status_bool, search=search
         )
-        
-        return TradingAccountListResponse(
-            data=accounts,
-            total=len(accounts)
-        )
+
+        return TradingAccountListResponse(data=accounts, total=len(accounts))
     except Exception as e:
         logger.error(f"Error fetching trading accounts: {str(e)}", exc_info=True)
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e) if settings.debug else "Failed to fetch trading accounts",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )
 
 
 @router.get("/summary", response_model=TradingAccountSummaryResponse)
 async def get_trading_accounts_summary(
-    status: Optional[str] = Query(None, description="Filter by canonical status: active|inactive|pending|cancelled (TT2_SYSTEM_STATUS_VALUES_SSOT)"),
+    status: Optional[str] = Query(
+        None,
+        description="Filter by canonical status: active|inactive|pending|cancelled (TT2_SYSTEM_STATUS_VALUES_SSOT)",
+    ),
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Get trading accounts summary statistics.
-    
+
     Returns summary statistics:
     - total_accounts: Total number of trading accounts
     - active_accounts: Number of active trading accounts
@@ -104,7 +104,7 @@ async def get_trading_accounts_summary(
     - total_holdings_value: Total holdings value across all accounts
     - total_unrealized_pl: Total unrealized P/L across all accounts
     - total_positions: Total number of open positions across all accounts
-    
+
     Query Parameters:
     - status: Filter by is_active (true/false) (optional)
     """
@@ -112,9 +112,7 @@ async def get_trading_accounts_summary(
         status_bool = _canonical_status_to_is_active(status)
         service = get_trading_account_service()
         summary = await service.get_trading_accounts_summary(
-            user_id=current_user.id,
-            db=db,
-            status=status_bool
+            user_id=current_user.id, db=db, status=status_bool
         )
         return summary
     except Exception as e:
@@ -122,7 +120,7 @@ async def get_trading_accounts_summary(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to fetch trading accounts summary",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )
 
 
@@ -130,7 +128,7 @@ async def get_trading_accounts_summary(
 async def get_trading_account_api_import_eligible(
     id: str = Path(..., description="Trading account ULID"),
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     ADR-018: Check if trading account is eligible for API setup or import.
@@ -140,17 +138,15 @@ async def get_trading_account_api_import_eligible(
     try:
         service = get_trading_account_service()
         account = await service.get_trading_account_by_id(
-            user_id=current_user.id,
-            trading_account_id=id,
-            db=db
+            user_id=current_user.id, trading_account_id=id, db=db
         )
-        broker = getattr(account, 'broker', None)
+        broker = getattr(account, "broker", None)
         eligible = is_broker_supported(broker)
         if not eligible:
             raise HTTPExceptionWithCode(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="API and import are not supported for this broker. Contact us to add support.",
-                error_code=ErrorCodes.BROKER_NOT_SUPPORTED_FOR_API_IMPORT
+                error_code=ErrorCodes.BROKER_NOT_SUPPORTED_FOR_API_IMPORT,
             )
         return {"eligible": True, "account_id": id}
     except HTTPExceptionWithCode:
@@ -160,7 +156,7 @@ async def get_trading_account_api_import_eligible(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to check eligibility",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )
 
 
@@ -168,23 +164,21 @@ async def get_trading_account_api_import_eligible(
 async def get_trading_account(
     id: str = Path(..., description="Trading account ULID"),
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Get single trading account by ID.
-    
+
     Args:
         id: Trading account ULID
-        
+
     Returns:
         TradingAccountResponse
     """
     try:
         service = get_trading_account_service()
         account = await service.get_trading_account_by_id(
-            user_id=current_user.id,
-            trading_account_id=id,
-            db=db
+            user_id=current_user.id, trading_account_id=id, db=db
         )
         return account
     except HTTPExceptionWithCode:
@@ -194,7 +188,7 @@ async def get_trading_account(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to fetch trading account",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )
 
 
@@ -202,14 +196,14 @@ async def get_trading_account(
 async def create_trading_account(
     request: TradingAccountCreateRequest,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Create new trading account.
-    
+
     Args:
         request: TradingAccountCreateRequest with account details
-        
+
     Returns:
         TradingAccountResponse
     """
@@ -225,7 +219,7 @@ async def create_trading_account(
             account_number=request.account_number,
             is_active=request.is_active,
             external_account_id=request.external_account_id,
-            account_metadata=request.account_metadata
+            account_metadata=request.account_metadata,
         )
         return account
     except HTTPExceptionWithCode:
@@ -235,7 +229,7 @@ async def create_trading_account(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to create trading account",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )
 
 
@@ -244,15 +238,15 @@ async def update_trading_account(
     id: str = Path(..., description="Trading account ULID"),
     request: TradingAccountUpdateRequest = ...,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Update existing trading account.
-    
+
     Args:
         id: Trading account ULID
         request: TradingAccountUpdateRequest with fields to update
-        
+
     Returns:
         TradingAccountResponse
     """
@@ -269,7 +263,7 @@ async def update_trading_account(
             currency=request.currency,
             is_active=request.is_active,
             external_account_id=request.external_account_id,
-            account_metadata=request.account_metadata
+            account_metadata=request.account_metadata,
         )
         return account
     except HTTPExceptionWithCode:
@@ -279,7 +273,7 @@ async def update_trading_account(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to update trading account",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )
 
 
@@ -287,24 +281,20 @@ async def update_trading_account(
 async def delete_trading_account(
     id: str = Path(..., description="Trading account ULID"),
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Delete trading account (soft delete).
-    
+
     Args:
         id: Trading account ULID
-        
+
     Returns:
         204 No Content
     """
     try:
         service = get_trading_account_service()
-        await service.delete_trading_account(
-            user_id=current_user.id,
-            trading_account_id=id,
-            db=db
-        )
+        await service.delete_trading_account(user_id=current_user.id, trading_account_id=id, db=db)
         return None
     except HTTPExceptionWithCode:
         raise
@@ -313,5 +303,5 @@ async def delete_trading_account(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to delete trading account",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )

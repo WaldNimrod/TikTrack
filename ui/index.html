@@ -1,15 +1,18 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="he" dir="rtl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="TikTrack Phoenix - Trading Platform Management System" />
-  <title>TikTrack Phoenix</title>
-  
-  <!-- Favicon - Gate B Fix: Prevent 404 SEVERE errors -->
-  <link rel="icon" type="image/x-icon" href="/images/icons/favicon.ico">
-  
-  <!-- 
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="TikTrack Phoenix - Trading Platform Management System"
+    />
+    <title>TikTrack Phoenix</title>
+
+    <!-- Favicon - Gate B Fix: Prevent 404 SEVERE errors -->
+    <link rel="icon" type="image/x-icon" href="/images/icons/favicon.ico" />
+
+    <!-- 
     CSS Loading Order (CRITICAL - DO NOT CHANGE):
     1. Pico CSS (CDN) - Framework base styles
     2. phoenix-base.css - Global defaults & DNA variables
@@ -17,26 +20,32 @@
     4. phoenix-header.css - Header component (if used)
     5. Page-specific CSS - Loaded in main.jsx per route
   -->
-  
-  <!-- 1. Pico CSS FIRST (Framework) -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
-  
-  <!-- 2-6: Remaining CSS loaded via main.jsx imports (React SPA) -->
-  
-  <!-- Header Loader - Loads unified-header.html dynamically for all pages (React and HTML) -->
-  <!-- IMPORTANT: phoenixFilterBridge (module) imports statusAdapter; load before headerLoader -->
-  <script type="module" src="/src/components/core/phoenixFilterBridge.js"></script>
-  <script src="/src/components/core/headerLoader.js"></script>
-</head>
-<body>
-  <!-- POL-015 v1.1: Unified Shell - page-wrapper > page-container > main (no Auth exceptions) -->
-  <div class="page-wrapper">
-    <div class="page-container">
-      <main>
-        <div id="root"></div>
-      </main>
+
+    <!-- 1. Pico CSS FIRST (Framework) -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css"
+    />
+
+    <!-- 2-6: Remaining CSS loaded via main.jsx imports (React SPA) -->
+
+    <!-- Header Loader - Loads unified-header.html dynamically for all pages (React and HTML) -->
+    <!-- IMPORTANT: phoenixFilterBridge (module) imports statusAdapter; load before headerLoader -->
+    <script
+      type="module"
+      src="/src/components/core/phoenixFilterBridge.js"
+    ></script>
+    <script src="/src/components/core/headerLoader.js"></script>
+  </head>
+  <body>
+    <!-- POL-015 v1.1: Unified Shell - page-wrapper > page-container > main (no Auth exceptions) -->
+    <div class="page-wrapper">
+      <div class="page-container">
+        <main>
+          <div id="root"></div>
+        </main>
+      </div>
     </div>
-  </div>
-  <script type="module" src="/src/main.jsx"></script>
-</body>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>

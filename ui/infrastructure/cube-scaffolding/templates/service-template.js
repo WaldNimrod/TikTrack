@@ -2,7 +2,7 @@
  * [Service Name] - [Description]
  * -----------------------------------------------
  * שירות ל-[תיאור]
- * 
+ *
  * @description [תיאור מפורט]
  * @legacyReference [אם רלוונטי]
  */
@@ -13,7 +13,8 @@ import { audit } from '../../../utils/audit.js';
 import { debugLog, debugError } from '../../../utils/debug.js';
 
 // API Base URL
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082/api/v1';
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082/api/v1';
 
 // Create axios instance
 const apiClient = axios.create({
@@ -35,7 +36,7 @@ apiClient.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // Response interceptor - Handle errors and token refresh
@@ -48,18 +49,18 @@ apiClient.interceptors.response.use(
       audit.error('Auth', 'Unauthorized request', error);
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 /**
  * Service Name
- * 
+ *
  * @description Service for [feature]
  */
 const serviceName = {
   /**
    * Get data
-   * 
+   *
    * @description Fetch data from API
    * @returns {Promise<Object>} Transformed data
    */
@@ -78,7 +79,7 @@ const serviceName = {
 
   /**
    * Create data
-   * 
+   *
    * @description Create new data
    * @param {Object} data - Data to create (camelCase)
    * @returns {Promise<Object>} Created data

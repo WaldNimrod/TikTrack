@@ -112,7 +112,9 @@ async def get_ticker_data_integrity(
 )
 async def post_ticker_history_backfill(
     ticker_id: str = Path(..., description="Ticker ULID"),
-    mode: Optional[str] = Query("gap_fill", description="gap_fill (default) | force_reload (Admin only)"),
+    mode: Optional[str] = Query(
+        "gap_fill", description="gap_fill (default) | force_reload (Admin only)"
+    ),
     current_user: User = Depends(require_admin_role),
 ):
     """

@@ -2,10 +2,10 @@
  * Shared Services - PDSC Client
  * --------------------------------------------------------
  * Unified API client for Phoenix Data Service Core (PDSC)
- * 
+ *
  * @description PDSC Client providing unified fetching, transformers, and error handling
  * @version v1.0.0
- * 
+ *
  * Responsibilities:
  * - Fetching (API Calls) with routes.json SSOT
  * - Transformers (camelCase ↔ snake_case) via transformers.js v1.2
@@ -13,7 +13,10 @@
  * - Authorization headers management (JWT tokens)
  */
 
-import { reactToApi, apiToReact } from '../../cubes/shared/utils/transformers.js';
+import {
+  reactToApi,
+  apiToReact,
+} from '../../cubes/shared/utils/transformers.js';
 
 // Import masked log utility for security compliance
 import { maskedLog } from '../../utils/maskedLog.js';
@@ -30,7 +33,7 @@ class SharedServices {
     /** G7R §3E: 401 handler — set by app init for immediate logout */
     this.on401 = null;
   }
-  
+
   /**
    * Get routes config (SSOT)
    * Gate B Fix: Expose routesConfig for E2E tests
@@ -39,7 +42,7 @@ class SharedServices {
   get routesConfig() {
     return this._routesConfig;
   }
-  
+
   /**
    * Set routes config and expose globally
    * Gate B Fix: Expose routesConfig on window for E2E tests
@@ -51,7 +54,7 @@ class SharedServices {
       window.routesConfig = value;
     }
   }
-  
+
   /**
    * Initialize Shared Services
    * Loads routes.json (SSOT) and prepares API base URL
@@ -64,15 +67,18 @@ class SharedServices {
       if (!response.ok) {
         throw new Error('Failed to load routes.json (SSOT)');
       }
-      
+
       this.routesConfig = await response.json(); // Uses setter which exposes to window
-      
+
       // ADR-016: No hardcoded version — version read from routes.json (SSOT) only
       // Verify routes.json has version field (sanity check; no expected value)
-      if (this.routesConfig.version == null || this.routesConfig.version === '') {
+      if (
+        this.routesConfig.version == null ||
+        this.routesConfig.version === ''
+      ) {
         maskedLog('[Shared Services] routes.json missing version field', {});
       }
-      
+
       // Extract API base URL from routes.json (SSOT)
       if (this.routesConfig.api && this.routesConfig.api.base_url) {
         this.apiBaseUrl = this.routesConfig.api.base_url;
@@ -81,34 +87,38 @@ class SharedServices {
       } else {
         // Fallback
         this.apiBaseUrl = '/api/v1';
-        maskedLog('[Shared Services] Using fallback API base URL. Consider adding api.base_url to routes.json', {});
+        maskedLog(
+          '[Shared Services] Using fallback API base URL. Consider adding api.base_url to routes.json',
+          {},
+        );
       }
-      
+
       // Extract backend port
       this.backendPort = this.routesConfig.backend || 8082;
-      
+
       // Gate A Fix: Check access_token first (primary token name), then auth_token
-      this.token = localStorage.getItem('access_token') || 
-                    localStorage.getItem('auth_token') ||
-                    sessionStorage.getItem('access_token') ||
-                    sessionStorage.getItem('auth_token');
-      
+      this.token =
+        localStorage.getItem('access_token') ||
+        localStorage.getItem('auth_token') ||
+        sessionStorage.getItem('access_token') ||
+        sessionStorage.getItem('auth_token');
+
       // Use masked log for security compliance (prevents token leakage)
       maskedLog('[Shared Services] Initialized:', {
         apiBaseUrl: this.apiBaseUrl,
         backendPort: this.backendPort,
-        version: this.routesConfig.version
+        version: this.routesConfig.version,
       });
     } catch (error) {
       // Gate B Fix: Handle errors gracefully - don't log full error object
       // Use masked log for security compliance (prevents token leakage)
-      maskedLog('[Shared Services] Initialization failed:', { 
-        errorMessage: error.message
+      maskedLog('[Shared Services] Initialization failed:', {
+        errorMessage: error.message,
       });
       throw error;
     }
   }
-  
+
   /**
    * Get routes config (SSOT)
    * Gate B Fix: Expose routesConfig for E2E tests
@@ -117,7 +127,7 @@ class SharedServices {
   getRoutesConfig() {
     return this.routesConfig;
   }
-  
+
   /**
    * Get API base URL
    * @returns {string} API base URL
@@ -128,7 +138,7 @@ class SharedServices {
     }
     return this.apiBaseUrl;
   }
-  
+
   /**
    * Set authorization token
    * @param {string} token - JWT token
@@ -136,7 +146,7 @@ class SharedServices {
   setToken(token) {
     this.token = token;
   }
-  
+
   /**
    * Get authorization token
    * Gate A Fix: Check access_token first (primary token name)
@@ -144,13 +154,14 @@ class SharedServices {
    */
   getToken() {
     // Gate A Fix: Update token from storage (check access_token first)
-    this.token = localStorage.getItem('access_token') || 
-                  localStorage.getItem('auth_token') ||
-                  sessionStorage.getItem('access_token') ||
-                  sessionStorage.getItem('auth_token');
+    this.token =
+      localStorage.getItem('access_token') ||
+      localStorage.getItem('auth_token') ||
+      sessionStorage.getItem('access_token') ||
+      sessionStorage.getItem('auth_token');
     return this.token;
   }
-  
+
   /**
    * Build full API URL
    * Gate B Fix: Handle dateRange object - split into date_from and date_to
@@ -161,11 +172,15 @@ class SharedServices {
   buildUrl(endpoint, queryParams = {}) {
     const baseUrl = this.getApiBaseUrl();
     let url = `${baseUrl}${endpoint}`;
-    
+
     // Gate B Fix: Normalize dateRange object before transformation
     // dateRange should be split into dateFrom and dateTo, not sent as object
     const normalizedParams = { ...queryParams };
-    if (normalizedParams.dateRange && typeof normalizedParams.dateRange === 'object' && !Array.isArray(normalizedParams.dateRange)) {
+    if (
+      normalizedParams.dateRange &&
+      typeof normalizedParams.dateRange === 'object' &&
+      !Array.isArray(normalizedParams.dateRange)
+    ) {
       // Extract dateFrom and dateTo from dateRange object
       if (normalizedParams.dateRange.from) {
         normalizedParams.dateFrom = normalizedParams.dateRange.from;
@@ -176,10 +191,10 @@ class SharedServices {
       // Remove dateRange object - don't send it as query param
       delete normalizedParams.dateRange;
     }
-    
+
     // Transform query params to snake_case
     const apiQueryParams = reactToApi(normalizedParams);
-    
+
     // Build query string - filter out objects, arrays, and empty strings
     const queryString = new URLSearchParams(
       Object.entries(apiQueryParams)
@@ -195,7 +210,10 @@ class SharedServices {
           // Gate B Fix: Filter out objects and arrays - they should be normalized before this point
           if (typeof value === 'object' && !Array.isArray(value)) {
             // This shouldn't happen if normalization worked, but log warning
-            maskedLog('[Shared Services] Warning: Object value in query params (should be normalized):', { key: _ });
+            maskedLog(
+              '[Shared Services] Warning: Object value in query params (should be normalized):',
+              { key: _ },
+            );
             return false;
           }
           return true;
@@ -212,16 +230,16 @@ class SharedServices {
           }
           acc[key] = stringValue;
           return acc;
-        }, {})
+        }, {}),
     ).toString();
-    
+
     if (queryString) {
       url += `?${queryString}`;
     }
-    
+
     return url;
   }
-  
+
   /**
    * Build request headers
    * Gate A Fix: Update token before building headers
@@ -231,20 +249,20 @@ class SharedServices {
   buildHeaders(additionalHeaders = {}) {
     const headers = {
       'Content-Type': 'application/json',
-      ...additionalHeaders
+      ...additionalHeaders,
     };
-    
+
     // Gate A Fix: Update token from storage before building headers
     const token = this.getToken();
-    
+
     // Add authorization header if token exists
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
-    
+
     return headers;
   }
-  
+
   /**
    * Handle API response
    * @param {Response} response - Fetch response
@@ -252,42 +270,44 @@ class SharedServices {
    */
   async handleResponse(response) {
     const data = await response.json();
-    
+
     // Check if response is an error according to PDSC Error Schema
     if (data.success === false) {
       const error = data.error || {};
-      
+
       // Handle specific error codes
       if (error.code === 'AUTH_TOKEN_EXPIRED') {
         // Token expired - clear token and redirect to login
         this.setToken(null);
         localStorage.removeItem('auth_token');
         sessionStorage.removeItem('auth_token');
-        
+
         // Emit event for auth guard to handle
-        window.dispatchEvent(new CustomEvent('auth:token-expired', {
-          detail: { error }
-        }));
+        window.dispatchEvent(
+          new CustomEvent('auth:token-expired', {
+            detail: { error },
+          }),
+        );
       }
-      
+
       // Throw error with PDSC Error Schema structure
       const errorObj = new Error(error.message || 'API request failed');
       errorObj.code = error.code;
       errorObj.message_i18n = error.message_i18n || error.message;
       errorObj.details = error.details || {};
       errorObj.response = data;
-      
+
       throw errorObj;
     }
-    
+
     // Transform response data (snake_case → camelCase)
     if (data.data) {
       data.data = apiToReact(data.data);
     }
-    
+
     return data;
   }
-  
+
   /**
    * GET request
    * @param {string} endpoint - API endpoint
@@ -307,12 +327,25 @@ class SharedServices {
 
     // Gate A: NEVER block auth endpoints - required for login, register, token refresh
     const authPrefixes = ['auth', 'users/me', 'users/profile'];
-    if (authPrefixes.some(p => normalized === p || normalized.startsWith(p + '/'))) {
+    if (
+      authPrefixes.some(
+        (p) => normalized === p || normalized.startsWith(p + '/'),
+      )
+    ) {
       return false;
     }
 
-    const protectedPrefixes = ['trading_accounts', 'cash_flows', 'positions', 'brokers_fees', 'reference', 'settings'];
-    return protectedPrefixes.some(p => normalized === p || normalized.startsWith(p + '/'));
+    const protectedPrefixes = [
+      'trading_accounts',
+      'cash_flows',
+      'positions',
+      'brokers_fees',
+      'reference',
+      'settings',
+    ];
+    return protectedPrefixes.some(
+      (p) => normalized === p || normalized.startsWith(p + '/'),
+    );
   }
 
   async get(endpoint, queryParams = {}, options = {}) {
@@ -321,7 +354,9 @@ class SharedServices {
       if (this._isProtectedEndpoint(endpoint)) {
         const token = this.getToken();
         if (!token || String(token).trim() === '') {
-          const err = new Error('Authentication required for protected endpoint');
+          const err = new Error(
+            'Authentication required for protected endpoint',
+          );
           err.code = 'HTTP_401';
           err.status = 401;
           throw err;
@@ -330,27 +365,27 @@ class SharedServices {
 
       const url = this.buildUrl(endpoint, queryParams);
       const headers = this.buildHeaders(options.headers);
-      
+
       // Gate B Fix: Wrap fetch in try-catch to prevent SEVERE console errors
       let response;
       try {
         response = await fetch(url, {
           method: 'GET',
           headers,
-          ...options
+          ...options,
         });
       } catch (fetchError) {
         // Network error or fetch failed - don't throw SEVERE
-        maskedLog('[Shared Services] Fetch failed (network error):', { 
+        maskedLog('[Shared Services] Fetch failed (network error):', {
           endpoint,
-          errorMessage: fetchError.message
+          errorMessage: fetchError.message,
         });
         const networkError = new Error(`Network error: ${fetchError.message}`);
         networkError.code = 'NETWORK_ERROR';
         networkError.status = 0;
         throw networkError;
       }
-      
+
       if (!response.ok) {
         // Gate B Fix: Handle 400/404/500 gracefully without throwing SEVERE errors
         // Return error object instead of throwing to prevent SEVERE console errors
@@ -358,15 +393,18 @@ class SharedServices {
           code: `HTTP_${response.status}`,
           message: `HTTP ${response.status}: ${response.statusText}`,
           status: response.status,
-          statusText: response.statusText
+          statusText: response.statusText,
         };
-        
+
         // Try to parse error response body if available
         try {
           const errorBody = await response.json();
           if (errorBody.error) {
             errorData.code = errorBody.error.code || errorData.code;
-            errorData.message = errorBody.error.message_i18n || errorBody.error.message || errorData.message;
+            errorData.message =
+              errorBody.error.message_i18n ||
+              errorBody.error.message ||
+              errorData.message;
             errorData.details = errorBody.error.details || {};
           } else if (errorBody.detail) {
             errorData.message = errorBody.detail;
@@ -374,39 +412,44 @@ class SharedServices {
         } catch (e) {
           // Ignore JSON parse errors
         }
-        
+
         // Use masked log for security compliance (prevents token leakage)
-        maskedLog('[Shared Services] GET request failed:', { 
+        maskedLog('[Shared Services] GET request failed:', {
           endpoint,
           status: response.status,
-          code: errorData.code
+          code: errorData.code,
         });
-        
+
         // G7R §3E: 401 = immediate logout, no refresh
-        if (response.status === 401 && typeof this.on401 === 'function') this.on401();
-        
+        if (response.status === 401 && typeof this.on401 === 'function')
+          this.on401();
+
         const errorObj = new Error(errorData.message);
         errorObj.code = errorData.code;
         errorObj.status = errorData.status;
         errorObj.details = errorData.details || {};
         throw errorObj;
       }
-      
+
       return await this.handleResponse(response);
     } catch (error) {
       // G7R §3E: 401 from pre-throw (e.g. guest access)
-      if ((error.status === 401 || error.code === 'HTTP_401') && typeof this.on401 === 'function') this.on401();
+      if (
+        (error.status === 401 || error.code === 'HTTP_401') &&
+        typeof this.on401 === 'function'
+      )
+        this.on401();
       // Use masked log for security compliance (prevents token leakage)
       // Gate B Fix: Don't log full error object to prevent SEVERE console errors
-      maskedLog('[Shared Services] GET request failed:', { 
+      maskedLog('[Shared Services] GET request failed:', {
         endpoint,
         errorCode: error.code || 'UNKNOWN',
-        errorMessage: error.message
+        errorMessage: error.message,
       });
       throw error;
     }
   }
-  
+
   /**
    * POST request
    * @param {string} endpoint - API endpoint
@@ -420,7 +463,9 @@ class SharedServices {
       if (this._isProtectedEndpoint(endpoint)) {
         const token = this.getToken();
         if (!token || String(token).trim() === '') {
-          const err = new Error('Authentication required for protected endpoint');
+          const err = new Error(
+            'Authentication required for protected endpoint',
+          );
           err.code = 'HTTP_401';
           err.status = 401;
           throw err;
@@ -428,13 +473,15 @@ class SharedServices {
       }
 
       const useQueryParams = options.useQueryParams === true;
-      const url = useQueryParams ? this.buildUrl(endpoint, body) : this.buildUrl(endpoint);
+      const url = useQueryParams
+        ? this.buildUrl(endpoint, body)
+        : this.buildUrl(endpoint);
       const headers = this.buildHeaders(options.headers);
 
       // Transform body (camelCase → snake_case); when useQueryParams, body is already in URL
       // skipTransform: send body as-is (e.g. notes parent_id must stay string, avoid any conversion)
-      const apiBody = (options.skipTransform === true) ? body : reactToApi(body);
-      
+      const apiBody = options.skipTransform === true ? body : reactToApi(body);
+
       // Gate B Fix: Wrap fetch in try-catch to prevent SEVERE console errors
       let response;
       try {
@@ -442,34 +489,37 @@ class SharedServices {
           method: 'POST',
           headers,
           body: useQueryParams ? undefined : JSON.stringify(apiBody),
-          ...options
+          ...options,
         });
       } catch (fetchError) {
         // Network error or fetch failed - don't throw SEVERE
-        maskedLog('[Shared Services] Fetch failed (network error):', { 
+        maskedLog('[Shared Services] Fetch failed (network error):', {
           endpoint,
-          errorMessage: fetchError.message
+          errorMessage: fetchError.message,
         });
         const networkError = new Error(`Network error: ${fetchError.message}`);
         networkError.code = 'NETWORK_ERROR';
         networkError.status = 0;
         throw networkError;
       }
-      
+
       if (!response.ok) {
         // Gate B Fix: Handle errors gracefully without throwing SEVERE errors
         const errorData = {
           code: `HTTP_${response.status}`,
           message: `HTTP ${response.status}: ${response.statusText}`,
           status: response.status,
-          statusText: response.statusText
+          statusText: response.statusText,
         };
-        
+
         try {
           const errorBody = await response.json();
           if (errorBody.error) {
             errorData.code = errorBody.error.code || errorData.code;
-            errorData.message = errorBody.error.message_i18n || errorBody.error.message || errorData.message;
+            errorData.message =
+              errorBody.error.message_i18n ||
+              errorBody.error.message ||
+              errorData.message;
             errorData.details = errorBody.error.details || {};
           } else if (errorBody.detail) {
             errorData.message = errorBody.detail;
@@ -477,28 +527,33 @@ class SharedServices {
         } catch (e) {
           // Ignore JSON parse errors
         }
-        
-        maskedLog('[Shared Services] POST request failed:', { 
+
+        maskedLog('[Shared Services] POST request failed:', {
           endpoint,
           status: response.status,
-          code: errorData.code
+          code: errorData.code,
         });
-        if (response.status === 401 && typeof this.on401 === 'function') this.on401();
+        if (response.status === 401 && typeof this.on401 === 'function')
+          this.on401();
         const errorObj = new Error(errorData.message);
         errorObj.code = errorData.code;
         errorObj.status = errorData.status;
         errorObj.details = errorData.details || {};
         throw errorObj;
       }
-      
+
       return await this.handleResponse(response);
     } catch (error) {
-      if ((error.status === 401 || error.code === 'HTTP_401') && typeof this.on401 === 'function') this.on401();
+      if (
+        (error.status === 401 || error.code === 'HTTP_401') &&
+        typeof this.on401 === 'function'
+      )
+        this.on401();
       // Use masked log for security compliance (prevents token leakage)
-      maskedLog('[Shared Services] POST request failed:', { 
+      maskedLog('[Shared Services] POST request failed:', {
         endpoint,
         errorCode: error.code || 'UNKNOWN',
-        errorMessage: error.message
+        errorMessage: error.message,
       });
       throw error;
     }
@@ -515,7 +570,9 @@ class SharedServices {
       if (this._isProtectedEndpoint(endpoint)) {
         const token = this.getToken();
         if (!token || String(token).trim() === '') {
-          const err = new Error('Authentication required for protected endpoint');
+          const err = new Error(
+            'Authentication required for protected endpoint',
+          );
           err.code = 'HTTP_401';
           err.status = 401;
           throw err;
@@ -526,18 +583,26 @@ class SharedServices {
       const response = await fetch(url, {
         method: 'POST',
         headers,
-        body: formData
+        body: formData,
       });
       if (!response.ok) {
-        const errorData = { code: `HTTP_${response.status}`, message: response.statusText, status: response.status };
+        const errorData = {
+          code: `HTTP_${response.status}`,
+          message: response.statusText,
+          status: response.status,
+        };
         try {
           const errorBody = await response.json();
           if (errorBody.error) {
             errorData.code = errorBody.error.code || errorData.code;
-            errorData.message = errorBody.error.message_i18n || errorBody.error.message || errorData.message;
+            errorData.message =
+              errorBody.error.message_i18n ||
+              errorBody.error.message ||
+              errorData.message;
           }
         } catch (_) {}
-        if (response.status === 401 && typeof this.on401 === 'function') this.on401();
+        if (response.status === 401 && typeof this.on401 === 'function')
+          this.on401();
         const errorObj = new Error(errorData.message);
         errorObj.code = errorData.code;
         errorObj.status = errorData.status;
@@ -545,11 +610,14 @@ class SharedServices {
       }
       return await this.handleResponse(response);
     } catch (error) {
-      maskedLog('[Shared Services] POST FormData failed:', { endpoint, errorCode: error.code });
+      maskedLog('[Shared Services] POST FormData failed:', {
+        endpoint,
+        errorCode: error.code,
+      });
       throw error;
     }
   }
-  
+
   /**
    * PUT request
    * @param {string} endpoint - API endpoint
@@ -563,7 +631,9 @@ class SharedServices {
       if (this._isProtectedEndpoint(endpoint)) {
         const token = this.getToken();
         if (!token || String(token).trim() === '') {
-          const err = new Error('Authentication required for protected endpoint');
+          const err = new Error(
+            'Authentication required for protected endpoint',
+          );
           err.code = 'HTTP_401';
           err.status = 401;
           throw err;
@@ -572,10 +642,10 @@ class SharedServices {
 
       const url = this.buildUrl(endpoint);
       const headers = this.buildHeaders(options.headers);
-      
+
       // Transform request body (camelCase → snake_case)
       const apiBody = reactToApi(body);
-      
+
       // Gate B Fix: Wrap fetch in try-catch to prevent SEVERE console errors
       let response;
       try {
@@ -583,67 +653,73 @@ class SharedServices {
           method: 'PUT',
           headers,
           body: JSON.stringify(apiBody),
-          ...options
+          ...options,
         });
       } catch (fetchError) {
         // Network error or fetch failed - don't throw SEVERE
-        maskedLog('[Shared Services] Fetch failed (network error):', { 
+        maskedLog('[Shared Services] Fetch failed (network error):', {
           endpoint,
-          errorMessage: fetchError.message
+          errorMessage: fetchError.message,
         });
         const networkError = new Error(`Network error: ${fetchError.message}`);
         networkError.code = 'NETWORK_ERROR';
         networkError.status = 0;
         throw networkError;
       }
-      
+
       if (!response.ok) {
         // Gate B Fix: Handle errors gracefully without throwing SEVERE errors
         const errorData = {
           code: `HTTP_${response.status}`,
           message: `HTTP ${response.status}: ${response.statusText}`,
           status: response.status,
-          statusText: response.statusText
+          statusText: response.statusText,
         };
-        
+
         try {
           const errorBody = await response.json();
           if (errorBody.error) {
             errorData.code = errorBody.error.code || errorData.code;
-            errorData.message = errorBody.error.message_i18n || errorBody.error.message || errorData.message;
+            errorData.message =
+              errorBody.error.message_i18n ||
+              errorBody.error.message ||
+              errorData.message;
             errorData.details = errorBody.error.details || {};
           } else if (errorBody.detail) {
-            errorData.message = typeof errorBody.detail === 'string' ? errorBody.detail : (errorBody.detail.msg || JSON.stringify(errorBody.detail));
+            errorData.message =
+              typeof errorBody.detail === 'string'
+                ? errorBody.detail
+                : errorBody.detail.msg || JSON.stringify(errorBody.detail);
           }
         } catch (e) {
           // Ignore JSON parse errors
         }
-        
-        maskedLog('[Shared Services] PUT request failed:', { 
+
+        maskedLog('[Shared Services] PUT request failed:', {
           endpoint,
           status: response.status,
-          code: errorData.code
+          code: errorData.code,
         });
-        
+
         const errorObj = new Error(errorData.message);
         errorObj.code = errorData.code;
         errorObj.status = errorData.status;
         errorObj.details = errorData.details || {};
         throw errorObj;
       }
-      
+
       return await this.handleResponse(response);
     } catch (error) {
       // Use masked log for security compliance (prevents token leakage)
-      maskedLog('[Shared Services] PUT request failed:', { 
+      maskedLog('[Shared Services] PUT request failed:', {
         endpoint,
         errorCode: error.code || 'UNKNOWN',
-        errorMessage: error.message
+        errorMessage: error.message,
       });
       throw error;
     }
   }
-  
+
   /**
    * PATCH request (partial update)
    * @param {string} endpoint - API endpoint
@@ -656,7 +732,9 @@ class SharedServices {
       if (this._isProtectedEndpoint(endpoint)) {
         const token = this.getToken();
         if (!token || String(token).trim() === '') {
-          const err = new Error('Authentication required for protected endpoint');
+          const err = new Error(
+            'Authentication required for protected endpoint',
+          );
           err.code = 'HTTP_401';
           err.status = 401;
           throw err;
@@ -664,41 +742,59 @@ class SharedServices {
       }
       const url = this.buildUrl(endpoint);
       const headers = this.buildHeaders(options.headers);
-      const apiBody = (options.skipTransform === true) ? body : reactToApi(body);
+      const apiBody = options.skipTransform === true ? body : reactToApi(body);
       let response;
       try {
         response = await fetch(url, {
           method: 'PATCH',
           headers,
           body: JSON.stringify(apiBody),
-          ...options
+          ...options,
         });
       } catch (fetchError) {
-        maskedLog('[Shared Services] PATCH fetch failed:', { endpoint, errorMessage: fetchError.message });
+        maskedLog('[Shared Services] PATCH fetch failed:', {
+          endpoint,
+          errorMessage: fetchError.message,
+        });
         const networkError = new Error(`Network error: ${fetchError.message}`);
         networkError.code = 'NETWORK_ERROR';
         networkError.status = 0;
         throw networkError;
       }
       if (!response.ok) {
-        const errorData = { code: `HTTP_${response.status}`, message: `HTTP ${response.status}: ${response.statusText}`, status: response.status, statusText: response.statusText };
+        const errorData = {
+          code: `HTTP_${response.status}`,
+          message: `HTTP ${response.status}: ${response.statusText}`,
+          status: response.status,
+          statusText: response.statusText,
+        };
         try {
           const errorBody = await response.json();
           if (errorBody.error) {
             errorData.code = errorBody.error.code || errorData.code;
-            errorData.message = errorBody.error.message_i18n || errorBody.error.message || errorData.message;
+            errorData.message =
+              errorBody.error.message_i18n ||
+              errorBody.error.message ||
+              errorData.message;
             errorData.details = errorBody.error.details || {};
           } else if (errorBody.detail) {
             errorData.detail = errorBody.detail;
-            if (typeof errorBody.detail === 'object' && errorBody.detail.validation_errors) {
+            if (
+              typeof errorBody.detail === 'object' &&
+              errorBody.detail.validation_errors
+            ) {
               errorData.validation_errors = errorBody.detail.validation_errors;
             } else if (typeof errorBody.detail === 'string') {
               errorData.message = errorBody.detail;
             }
           }
         } catch (e) {}
-        maskedLog('[Shared Services] PATCH failed:', { endpoint, status: response.status });
-        if (response.status === 401 && typeof this.on401 === 'function') this.on401();
+        maskedLog('[Shared Services] PATCH failed:', {
+          endpoint,
+          status: response.status,
+        });
+        if (response.status === 401 && typeof this.on401 === 'function')
+          this.on401();
         const errorObj = new Error(errorData.message);
         errorObj.code = errorData.code;
         errorObj.status = errorData.status;
@@ -709,8 +805,16 @@ class SharedServices {
       }
       return await this.handleResponse(response);
     } catch (error) {
-      if ((error.status === 401 || error.code === 'HTTP_401') && typeof this.on401 === 'function') this.on401();
-      maskedLog('[Shared Services] PATCH failed:', { endpoint, errorCode: error.code, errorMessage: error.message });
+      if (
+        (error.status === 401 || error.code === 'HTTP_401') &&
+        typeof this.on401 === 'function'
+      )
+        this.on401();
+      maskedLog('[Shared Services] PATCH failed:', {
+        endpoint,
+        errorCode: error.code,
+        errorMessage: error.message,
+      });
       throw error;
     }
   }
@@ -727,7 +831,9 @@ class SharedServices {
       if (this._isProtectedEndpoint(endpoint)) {
         const token = this.getToken();
         if (!token || String(token).trim() === '') {
-          const err = new Error('Authentication required for protected endpoint');
+          const err = new Error(
+            'Authentication required for protected endpoint',
+          );
           err.code = 'HTTP_401';
           err.status = 401;
           throw err;
@@ -736,70 +842,81 @@ class SharedServices {
 
       const url = this.buildUrl(endpoint);
       const headers = this.buildHeaders(options.headers);
-      
+
       // Gate B Fix: Wrap fetch in try-catch to prevent SEVERE console errors
       let response;
       try {
         response = await fetch(url, {
           method: 'DELETE',
           headers,
-          ...options
+          ...options,
         });
       } catch (fetchError) {
         // Network error or fetch failed - don't throw SEVERE
-        maskedLog('[Shared Services] Fetch failed (network error):', { 
+        maskedLog('[Shared Services] Fetch failed (network error):', {
           endpoint,
-          errorMessage: fetchError.message
+          errorMessage: fetchError.message,
         });
         const networkError = new Error(`Network error: ${fetchError.message}`);
         networkError.code = 'NETWORK_ERROR';
         networkError.status = 0;
         throw networkError;
       }
-      
+
       if (!response.ok) {
         // Gate B Fix: Handle errors gracefully without throwing SEVERE errors
         const errorData = {
           code: `HTTP_${response.status}`,
           message: `HTTP ${response.status}: ${response.statusText}`,
           status: response.status,
-          statusText: response.statusText
+          statusText: response.statusText,
         };
-        
+
         try {
           const errorBody = await response.json();
           if (errorBody.error) {
             errorData.code = errorBody.error.code || errorData.code;
-            errorData.message = errorBody.error.message_i18n || errorBody.error.message || errorData.message;
+            errorData.message =
+              errorBody.error.message_i18n ||
+              errorBody.error.message ||
+              errorData.message;
             errorData.details = errorBody.error.details || {};
           } else if (errorBody.detail) {
-            errorData.message = typeof errorBody.detail === 'string' ? errorBody.detail : (errorBody.detail.msg || JSON.stringify(errorBody.detail));
+            errorData.message =
+              typeof errorBody.detail === 'string'
+                ? errorBody.detail
+                : errorBody.detail.msg || JSON.stringify(errorBody.detail);
           }
         } catch (e) {
           // Ignore JSON parse errors
         }
-        
-        maskedLog('[Shared Services] DELETE request failed:', { 
+
+        maskedLog('[Shared Services] DELETE request failed:', {
           endpoint,
           status: response.status,
-          code: errorData.code
+          code: errorData.code,
         });
-        if (response.status === 401 && typeof this.on401 === 'function') this.on401();
+        if (response.status === 401 && typeof this.on401 === 'function')
+          this.on401();
         const errorObj = new Error(errorData.message);
         errorObj.code = errorData.code;
         errorObj.status = errorData.status;
         errorObj.details = errorData.details || {};
         throw errorObj;
       }
-      
+
       if (response.status === 204) return {};
       return await this.handleResponse(response);
     } catch (error) {
-      if ((error.status === 401 || error.code === 'HTTP_401') && typeof this.on401 === 'function') this.on401();
-      maskedLog('[Shared Services] DELETE request failed:', { 
+      if (
+        (error.status === 401 || error.code === 'HTTP_401') &&
+        typeof this.on401 === 'function'
+      )
+        this.on401();
+      maskedLog('[Shared Services] DELETE request failed:', {
         endpoint,
         errorCode: error.code || 'UNKNOWN',
-        errorMessage: error.message
+        errorMessage: error.message,
       });
       throw error;
     }
@@ -815,11 +932,11 @@ if (typeof window !== 'undefined') {
 }
 
 // Auto-initialize when module loads
-sharedServices.init().catch(error => {
+sharedServices.init().catch((error) => {
   // Gate B Fix: Handle errors gracefully - don't log full error object
   // Use masked log for security compliance (prevents token leakage)
-  maskedLog('[Shared Services] Auto-initialization failed:', { 
-    errorMessage: error.message
+  maskedLog('[Shared Services] Auto-initialization failed:', {
+    errorMessage: error.message,
   });
 });
 

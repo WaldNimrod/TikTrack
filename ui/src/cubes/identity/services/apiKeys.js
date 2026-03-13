@@ -2,7 +2,7 @@
  * API Keys Service - ניהול מפתחות API
  * -------------------------------------
  * שירות לניהול מפתחות API של המשתמש
- * 
+ *
  * @description מנהל CRUD operations למפתחות API (D24)
  * @legacyReference Legacy.apiKeys.*
  */
@@ -36,7 +36,7 @@ apiClient.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 /**
@@ -45,12 +45,12 @@ apiClient.interceptors.request.use(
 const apiKeysService = {
   /**
    * List API Keys - רשימת מפתחות API
-   * 
+   *
    * @description מביא את כל מפתחות ה-API של המשתמש המחובר
    * @legacyReference Legacy.apiKeys.list()
-   * 
+   *
    * @returns {Promise<Array>} - מערך של UserApiKeyResponse (camelCase)
-   * 
+   *
    * @throws {Error} - אם המשתמש לא מחובר (401)
    */
   async list() {
@@ -62,8 +62,10 @@ const apiKeysService = {
       // Transform response to React format (camelCase)
       const apiKeys = apiToReact(response.data);
 
-      audit.log('APIKeys', 'List API keys successful', { count: apiKeys.length });
-      
+      audit.log('APIKeys', 'List API keys successful', {
+        count: apiKeys.length,
+      });
+
       return apiKeys;
     } catch (error) {
       audit.error('APIKeys', 'List API keys failure', error);
@@ -73,10 +75,10 @@ const apiKeysService = {
 
   /**
    * Create API Key - יצירת מפתח API חדש
-   * 
+   *
    * @description יוצר מפתח API חדש עבור provider מסוים
    * @legacyReference Legacy.apiKeys.create(keyData)
-   * 
+   *
    * @param {Object} keyData - נתוני המפתח (camelCase)
    * @param {string} keyData.provider - Provider (IBKR, POLYGON, etc.)
    * @param {string} keyData.apiKey - מפתח API
@@ -84,11 +86,13 @@ const apiKeysService = {
    * @param {string} [keyData.providerLabel] - תווית מותאמת אישית
    * @param {Object} [keyData.additionalConfig] - הגדרות נוספות
    * @returns {Promise<Object>} - UserApiKeyResponse (camelCase)
-   * 
+   *
    * @throws {Error} - אם היצירה נכשלה (400, 401, 500)
    */
   async create(keyData) {
-    audit.log('APIKeys', 'Create API key started', { provider: keyData.provider });
+    audit.log('APIKeys', 'Create API key started', {
+      provider: keyData.provider,
+    });
 
     try {
       // Transform to API format (snake_case)
@@ -101,8 +105,10 @@ const apiKeysService = {
       // Transform response to React format (camelCase)
       const apiKey = apiToReact(response.data);
 
-      audit.log('APIKeys', 'Create API key successful', { keyId: apiKey.externalUlids });
-      
+      audit.log('APIKeys', 'Create API key successful', {
+        keyId: apiKey.externalUlids,
+      });
+
       return apiKey;
     } catch (error) {
       audit.error('APIKeys', 'Create API key failure', error);
@@ -112,10 +118,10 @@ const apiKeysService = {
 
   /**
    * Update API Key - עדכון מפתח API
-   * 
+   *
    * @description מעדכן מפתח API קיים
    * @legacyReference Legacy.apiKeys.update(keyId, keyData)
-   * 
+   *
    * @param {string} keyId - ULID של המפתח
    * @param {Object} updateData - נתוני עדכון (camelCase)
    * @param {string} [updateData.providerLabel] - תווית חדשה
@@ -123,7 +129,7 @@ const apiKeysService = {
    * @param {string} [updateData.apiKey] - מפתח חדש (אם משתנה)
    * @param {string} [updateData.apiSecret] - סוד חדש (אם משתנה)
    * @returns {Promise<Object>} - UserApiKeyResponse מעודכן (camelCase)
-   * 
+   *
    * @throws {Error} - אם העדכון נכשל (400, 401, 404, 500)
    */
   async update(keyId, updateData) {
@@ -141,7 +147,7 @@ const apiKeysService = {
       const apiKey = apiToReact(response.data);
 
       audit.log('APIKeys', 'Update API key successful', { keyId });
-      
+
       return apiKey;
     } catch (error) {
       audit.error('APIKeys', 'Update API key failure', error);
@@ -151,13 +157,13 @@ const apiKeysService = {
 
   /**
    * Delete API Key - מחיקת מפתח API
-   * 
+   *
    * @description מוחק מפתח API (soft delete)
    * @legacyReference Legacy.apiKeys.delete(keyId)
-   * 
+   *
    * @param {string} keyId - ULID של המפתח
    * @returns {Promise<void>}
-   * 
+   *
    * @throws {Error} - אם המחיקה נכשלה (401, 404, 500)
    */
   async delete(keyId) {
@@ -175,13 +181,13 @@ const apiKeysService = {
 
   /**
    * Verify API Key - אימות מפתח API
-   * 
+   *
    * @description מאמת מפתח API מול ה-provider
    * @legacyReference Legacy.apiKeys.verify(keyId)
-   * 
+   *
    * @param {string} keyId - ULID של המפתח
    * @returns {Promise<Object>} - תוצאת האימות
-   * 
+   *
    * @throws {Error} - אם האימות נכשל (401, 404, 500)
    */
   async verify(keyId) {
@@ -193,11 +199,11 @@ const apiKeysService = {
       // Transform response to React format (camelCase)
       const result = apiToReact(response.data);
 
-      audit.log('APIKeys', 'Verify API key successful', { 
-        keyId, 
-        isVerified: result.isVerified 
+      audit.log('APIKeys', 'Verify API key successful', {
+        keyId,
+        isVerified: result.isVerified,
       });
-      
+
       return result;
     } catch (error) {
       audit.error('APIKeys', 'Verify API key failure', error);

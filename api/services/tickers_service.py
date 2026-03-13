@@ -32,14 +32,35 @@ EOD_STALE_HOURS = 48
 
 # BF-002 / R2: COUNTRY_TO_CURRENCY — supports alpha-2 (IL, IT) and alpha-3 (USA, ISR, ITA, GBR) per p3_021
 COUNTRY_TO_CURRENCY = {
-    "US": "USD", "USA": "USD", "IL": "ILS", "IS": "ILS", "ISR": "ILS",
-    "IT": "EUR", "ITA": "EUR", "DE": "EUR", "FR": "EUR", "GB": "GBP", "GBR": "GBP",
-    "CH": "CHF", "JP": "JPY", "CN": "CNY", "HK": "HKD", "AU": "AUD", "CA": "CAD",
-    "NL": "EUR", "ES": "EUR", "SE": "SEK", "SG": "SGD", "IN": "INR", "KR": "KRW",
+    "US": "USD",
+    "USA": "USD",
+    "IL": "ILS",
+    "IS": "ILS",
+    "ISR": "ILS",
+    "IT": "EUR",
+    "ITA": "EUR",
+    "DE": "EUR",
+    "FR": "EUR",
+    "GB": "GBP",
+    "GBR": "GBP",
+    "CH": "CHF",
+    "JP": "JPY",
+    "CN": "CNY",
+    "HK": "HKD",
+    "AU": "AUD",
+    "CA": "CAD",
+    "NL": "EUR",
+    "ES": "EUR",
+    "SE": "SEK",
+    "SG": "SGD",
+    "IN": "INR",
+    "KR": "KRW",
 }
 
 
-def _derive_currency(ticker: Ticker, country: Optional[str], ticker_type: Optional[str] = None) -> str:
+def _derive_currency(
+    ticker: Ticker, country: Optional[str], ticker_type: Optional[str] = None
+) -> str:
     """BF-002/R2: Derive currency from exchange country (alpha-2/3) or symbol (CRYPTO: BTC-USD→USD)."""
     if country:
         c3 = (country or "").upper()[:3]
@@ -100,7 +121,8 @@ async def _get_price_with_fallback(
         return None
 
     # 1. EOD per ticker — BF-001: window function fetches top-2 rows; rank=2 = previous session close
-    eod_stmt = text("""
+    eod_stmt = text(
+        """
         WITH ranked AS (
             SELECT ticker_id, price, open_price, close_price, price_timestamp,
                    ROW_NUMBER() OVER (PARTITION BY ticker_id ORDER BY price_timestamp DESC) AS rn
@@ -110,7 +132,8 @@ async def _get_price_with_fallback(
         SELECT ticker_id, price, open_price, close_price, price_timestamp, rn
         FROM ranked WHERE rn <= 2
         ORDER BY ticker_id, rn
-    """)
+    """
+    )
     eod_result = await db.execute(eod_stmt, {"ticker_ids": list(ticker_ids)})
     eod_rows = eod_result.all()
 
@@ -142,21 +165,27 @@ async def _get_price_with_fallback(
         price_val = (r1["price"] or Decimal("0")) if r1["price"] is not None else Decimal("0")
         close_p = r1.get("close_price")
         ts = r1.get("price_timestamp")
-        ts_utc = ts.replace(tzinfo=timezone.utc) if ts and getattr(ts, "tzinfo", None) is None else ts
+        ts_utc = (
+            ts.replace(tzinfo=timezone.utc) if ts and getattr(ts, "tzinfo", None) is None else ts
+        )
         is_stale = ts_utc is not None and ts_utc.timestamp() < stale_cutoff
 
         # BF-001: last_close = previous session close (rank=2); else current close (single-session ticker)
         if r2 and (r2.get("close_price") is not None or r2.get("price") is not None):
             last_close = r2.get("close_price") or r2.get("price")
             last_close_ts = r2.get("price_timestamp")
-            last_close_ts_utc = last_close_ts.replace(tzinfo=timezone.utc) if last_close_ts and getattr(last_close_ts, "tzinfo", None) is None else last_close_ts
+            last_close_ts_utc = (
+                last_close_ts.replace(tzinfo=timezone.utc)
+                if last_close_ts and getattr(last_close_ts, "tzinfo", None) is None
+                else last_close_ts
+            )
         else:
             last_close = close_p or price_val
             last_close_ts_utc = ts_utc
 
         daily_pct = None
         if last_close and last_close > 0 and price_val:
-            daily_pct = ((price_val - last_close) / last_close * 100)
+            daily_pct = (price_val - last_close) / last_close * 100
 
         out[tid] = {
             "current_price": price_val,
@@ -180,12 +209,15 @@ async def _get_price_with_fallback(
         ids_to_try = [t for t in stale_for_intraday + missing_eod if t in active_set]
 
     if ids_to_try:
-        latest_intra = select(
-            TickerPriceIntraday.ticker_id,
-            func.max(TickerPriceIntraday.price_timestamp).label("max_ts"),
-        ).where(TickerPriceIntraday.ticker_id.in_(ids_to_try)).group_by(
-            TickerPriceIntraday.ticker_id
-        ).subquery()
+        latest_intra = (
+            select(
+                TickerPriceIntraday.ticker_id,
+                func.max(TickerPriceIntraday.price_timestamp).label("max_ts"),
+            )
+            .where(TickerPriceIntraday.ticker_id.in_(ids_to_try))
+            .group_by(TickerPriceIntraday.ticker_id)
+            .subquery()
+        )
         intra_stmt = select(
             TickerPriceIntraday.ticker_id,
             TickerPriceIntraday.price,
@@ -278,7 +310,9 @@ class TickersService:
         is_active: Optional[bool] = None,
     ) -> List[TickerResponse]:
         stmt = (
-            select(Ticker, Exchange.country, Exchange.exchange_code, Exchange.id.label("exchange_id"))
+            select(
+                Ticker, Exchange.country, Exchange.exchange_code, Exchange.id.label("exchange_id")
+            )
             .where(Ticker.deleted_at.is_(None))
             .outerjoin(Exchange, Ticker.exchange_id == Exchange.id)
         )
@@ -290,9 +324,7 @@ class TickersService:
                 )
             )
         if ticker_type:
-            stmt = stmt.where(
-                func.upper(cast(Ticker.ticker_type, String)) == ticker_type.upper()
-            )
+            stmt = stmt.where(func.upper(cast(Ticker.ticker_type, String)) == ticker_type.upper())
         if is_active is not None:
             stmt = stmt.where(Ticker.is_active == is_active)
         stmt = stmt.order_by(Ticker.symbol.asc())
@@ -315,16 +347,20 @@ class TickersService:
                 price_map.get(t.id),
                 price_source=price_map.get(t.id, {}).get("price_source"),
                 price_as_of_utc=price_map.get(t.id, {}).get("price_as_of_utc"),
-                currency=_derive_currency(t, country_per_ticker.get(t.id), str(t.ticker_type) if t.ticker_type else None),
-                exchange_id=uuid_to_ulid(exchange_id_per_ticker[t.id]) if exchange_id_per_ticker.get(t.id) else None,
+                currency=_derive_currency(
+                    t, country_per_ticker.get(t.id), str(t.ticker_type) if t.ticker_type else None
+                ),
+                exchange_id=(
+                    uuid_to_ulid(exchange_id_per_ticker[t.id])
+                    if exchange_id_per_ticker.get(t.id)
+                    else None
+                ),
                 exchange_code=exchange_code_per_ticker.get(t.id),
             )
             for t in tickers
         ]
 
-    async def get_ticker_by_id(
-        self, db: AsyncSession, ticker_id: str
-    ) -> Optional[TickerResponse]:
+    async def get_ticker_by_id(self, db: AsyncSession, ticker_id: str) -> Optional[TickerResponse]:
         try:
             ticker_uuid = ulid_to_uuid(ticker_id)
         except Exception:
@@ -355,7 +391,9 @@ class TickersService:
             pd,
             price_source=pd.get("price_source"),
             price_as_of_utc=pd.get("price_as_of_utc"),
-            currency=_derive_currency(ticker, country, str(ticker.ticker_type) if ticker.ticker_type else None),
+            currency=_derive_currency(
+                ticker, country, str(ticker.ticker_type) if ticker.ticker_type else None
+            ),
             exchange_id=uuid_to_ulid(ex_id) if ex_id else None,
             exchange_code=ex_code,
         )
@@ -370,6 +408,7 @@ class TickersService:
         exchange_id: Optional[str] = None,
     ) -> TickerResponse:
         from .canonical_ticker_service import create_system_ticker
+
         exchange_uuid: Optional[uuid.UUID] = None
         if exchange_id:
             try:
@@ -397,7 +436,13 @@ class TickersService:
         await db.refresh(ticker)
         country = ex_code = ex_id = None
         if ticker.exchange_id:
-            ex = (await db.execute(select(Exchange.country, Exchange.exchange_code, Exchange.id).where(Exchange.id == ticker.exchange_id))).first()
+            ex = (
+                await db.execute(
+                    select(Exchange.country, Exchange.exchange_code, Exchange.id).where(
+                        Exchange.id == ticker.exchange_id
+                    )
+                )
+            ).first()
             if ex:
                 country, ex_code, ex_id = ex[0], ex[1], ex[2]
         return _ticker_to_response(
@@ -426,9 +471,7 @@ class TickersService:
                 detail="Invalid ticker ID format",
                 error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
             )
-        stmt = select(Ticker).where(
-            and_(Ticker.id == ticker_uuid, Ticker.deleted_at.is_(None))
-        )
+        stmt = select(Ticker).where(and_(Ticker.id == ticker_uuid, Ticker.deleted_at.is_(None)))
         result = await db.execute(stmt)
         ticker = result.scalar_one_or_none()
         if not ticker:
@@ -451,13 +494,20 @@ class TickersService:
                     error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
                 )
         symbol_changed = new_sym is not None and new_sym != (ticker.symbol or "").strip().upper()
-        ticker_type_changed = new_ticker_type is not None and new_ticker_type != (ticker.ticker_type or "").upper()
+        ticker_type_changed = (
+            new_ticker_type is not None and new_ticker_type != (ticker.ticker_type or "").upper()
+        )
         exchange_changed = exchange_uuid is not None and exchange_uuid != ticker.exchange_id
         if symbol_changed or ticker_type_changed or exchange_changed:
             from .canonical_ticker_service import validate_ticker_with_providers
+
             sym_to_validate = new_sym if new_sym else (ticker.symbol or "").strip().upper()
-            type_to_validate = new_ticker_type if new_ticker_type else (ticker.ticker_type or "STOCK").upper()
-            await validate_ticker_with_providers(sym_to_validate, ticker_type=type_to_validate, market=None)
+            type_to_validate = (
+                new_ticker_type if new_ticker_type else (ticker.ticker_type or "STOCK").upper()
+            )
+            await validate_ticker_with_providers(
+                sym_to_validate, ticker_type=type_to_validate, market=None
+            )
 
         # BF-G7-009: Duplicate symbol check (API-level, DB enforces via uix_tickers_symbol_exchange_active)
         exchange_for_dup = exchange_uuid if exchange_uuid is not None else ticker.exchange_id
@@ -466,7 +516,11 @@ class TickersService:
             dup_stmt = select(Ticker).where(
                 and_(
                     Ticker.symbol == new_sym,
-                    (Ticker.exchange_id == exchange_for_dup) if exchange_for_dup is not None else Ticker.exchange_id.is_(None),
+                    (
+                        (Ticker.exchange_id == exchange_for_dup)
+                        if exchange_for_dup is not None
+                        else Ticker.exchange_id.is_(None)
+                    ),
                     Ticker.deleted_at.is_(None),
                     Ticker.id != ticker_uuid,
                 )
@@ -491,6 +545,7 @@ class TickersService:
         if is_active is not None:
             if is_active is True and (ticker.is_active is False or ticker.is_active is None):
                 from .canonical_ticker_service import validate_ticker_with_providers
+
                 await validate_ticker_with_providers(
                     ticker.symbol,
                     ticker_type=ticker.ticker_type or "STOCK",
@@ -512,7 +567,13 @@ class TickersService:
             raise
         country = ex_code = ex_id = None
         if ticker.exchange_id:
-            ex = (await db.execute(select(Exchange.country, Exchange.exchange_code, Exchange.id).where(Exchange.id == ticker.exchange_id))).first()
+            ex = (
+                await db.execute(
+                    select(Exchange.country, Exchange.exchange_code, Exchange.id).where(
+                        Exchange.id == ticker.exchange_id
+                    )
+                )
+            ).first()
             if ex:
                 country, ex_code, ex_id = ex[0], ex[1], ex[2]
         return _ticker_to_response(
@@ -536,9 +597,7 @@ class TickersService:
                 detail="Invalid ticker ID format",
                 error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
             )
-        stmt = select(Ticker).where(
-            and_(Ticker.id == ticker_uuid, Ticker.deleted_at.is_(None))
-        )
+        stmt = select(Ticker).where(and_(Ticker.id == ticker_uuid, Ticker.deleted_at.is_(None)))
         result = await db.execute(stmt)
         ticker = result.scalar_one_or_none()
         if not ticker:
@@ -566,6 +625,7 @@ class TickersService:
 
     async def get_summary(self, db: AsyncSession) -> dict:
         from ..schemas.tickers import TickerSummaryResponse
+
         total_stmt = select(func.count(Ticker.id)).where(Ticker.deleted_at.is_(None))
         active_stmt = select(func.count(Ticker.id)).where(
             and_(Ticker.deleted_at.is_(None), Ticker.is_active == True)
@@ -588,9 +648,7 @@ class TickersService:
                 detail="Invalid ticker ID format",
                 error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
             )
-        stmt = select(Ticker).where(
-            and_(Ticker.id == ticker_uuid, Ticker.deleted_at.is_(None))
-        )
+        stmt = select(Ticker).where(and_(Ticker.id == ticker_uuid, Ticker.deleted_at.is_(None)))
         result = await db.execute(stmt)
         ticker = result.scalar_one_or_none()
         if not ticker:

@@ -3,7 +3,7 @@
 /**
  * Visual Diff Tool - כלי להשוואה ויזואלית מפורטת
  * -------------------------------------------------
- * 
+ *
  * @description יוצר דוח HTML מפורט עם הבדלים מסומנים בצבעים
  * @usage node scripts/visual-diff.js <blueprint.html> <react-component.jsx> [output.html]
  */
@@ -177,10 +177,14 @@ function generateVisualDiffHTML(report, blueprintContent, reactContent) {
   <div class="comparison">
     <div class="side">
       <h2>🔍 Differences by Type</h2>
-      ${report.differences.map((diff, idx) => {
-        const typeClass = diff.type.includes('missing') ? 'missing' : 
-                         diff.type.includes('extra') ? 'extra' : 'mismatch';
-        return `
+      ${report.differences
+        .map((diff, idx) => {
+          const typeClass = diff.type.includes('missing')
+            ? 'missing'
+            : diff.type.includes('extra')
+              ? 'extra'
+              : 'mismatch';
+          return `
         <div class="diff-item ${typeClass}">
           <div><strong>#${idx + 1}</strong> [${diff.type.toUpperCase()}]</div>
           <div class="tag">&lt;${diff.blueprint?.tag || diff.react?.tag || 'unknown'}&gt;</div>
@@ -192,7 +196,8 @@ function generateVisualDiffHTML(report, blueprintContent, reactContent) {
           </div>
           <div style="margin-top: 5px; font-size: 11px; color: #858585;">${diff.message}</div>
         </div>`;
-      }).join('')}
+        })
+        .join('')}
     </div>
 
     <div class="side">
@@ -200,19 +205,19 @@ function generateVisualDiffHTML(report, blueprintContent, reactContent) {
       
       <div class="classes-list">
         <h3 style="color: #f48771; margin-top: 15px;">❌ Missing in React (${report.classes.missing.length})</h3>
-        ${report.classes.missing.map(cls => 
-          `<span class="class-item missing">${cls}</span>`
-        ).join('')}
+        ${report.classes.missing
+          .map((cls) => `<span class="class-item missing">${cls}</span>`)
+          .join('')}
         
         <h3 style="color: #89d185; margin-top: 15px;">⚠️ Extra in React (${report.classes.extra.length})</h3>
-        ${report.classes.extra.map(cls => 
-          `<span class="class-item extra">${cls}</span>`
-        ).join('')}
+        ${report.classes.extra
+          .map((cls) => `<span class="class-item extra">${cls}</span>`)
+          .join('')}
         
         <h3 style="color: #4ec9b0; margin-top: 15px;">✅ Common Classes (${report.classes.common.length})</h3>
-        ${report.classes.common.map(cls => 
-          `<span class="class-item common">${cls}</span>`
-        ).join('')}
+        ${report.classes.common
+          .map((cls) => `<span class="class-item common">${cls}</span>`)
+          .join('')}
       </div>
     </div>
   </div>
@@ -230,43 +235,48 @@ function generateVisualDiffHTML(report, blueprintContent, reactContent) {
  */
 async function main() {
   const args = process.argv.slice(2);
-  
+
   if (args.length < 2) {
-    console.error('Usage: node scripts/visual-diff.js <blueprint.html> <react-component.jsx> [output.html]');
+    console.error(
+      'Usage: node scripts/visual-diff.js <blueprint.html> <react-component.jsx> [output.html]',
+    );
     process.exit(1);
   }
-  
+
   const blueprintPath = path.resolve(args[0]);
   const reactPath = path.resolve(args[1]);
-  const outputPath = args[2] ? path.resolve(args[2]) : 
-                     path.join(path.dirname(reactPath), 'visual-diff-report.html');
-  
+  const outputPath = args[2]
+    ? path.resolve(args[2])
+    : path.join(path.dirname(reactPath), 'visual-diff-report.html');
+
   // Check files exist
   if (!fs.existsSync(blueprintPath)) {
     console.error(`❌ Error: Blueprint file not found: ${blueprintPath}`);
     process.exit(1);
   }
-  
+
   if (!fs.existsSync(reactPath)) {
     console.error(`❌ Error: React file not found: ${reactPath}`);
     process.exit(1);
   }
-  
+
   // Read files
   const blueprintContent = fs.readFileSync(blueprintPath, 'utf-8');
   const reactContent = fs.readFileSync(reactPath, 'utf-8');
-  
+
   // Import and use blueprint-diff
   const { compareBlueprint } = await import('./blueprint-diff.js');
-  
+
   // Generate report (we'll need to modify blueprint-diff to return the report)
   // For now, let's create a simple version
   console.log('🔍 Generating visual diff report...');
-  
+
   // This is a simplified version - in production, you'd call compareBlueprint
   // and use its return value
   console.log(`\n✅ Visual diff report will be saved to: ${outputPath}`);
-  console.log('   (Note: This requires the full blueprint-diff implementation)');
+  console.log(
+    '   (Note: This requires the full blueprint-diff implementation)',
+  );
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

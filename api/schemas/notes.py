@@ -13,10 +13,17 @@ VALID_PARENT_TYPES = frozenset(("trade", "trade_plan", "ticker", "account", "dat
 
 
 class NoteCreate(BaseModel):
-    parent_type: str = Field(default="ticker", description="trade|trade_plan|ticker|account|datetime")
+    parent_type: str = Field(
+        default="ticker", description="trade|trade_plan|ticker|account|datetime"
+    )
     parent_id: Optional[str] = None
     parent_datetime: Optional[datetime] = None
-    title: str = Field(..., min_length=1, max_length=200, description="Required per G5R2 error-contract parity (BF-G5R-002)")
+    title: str = Field(
+        ...,
+        min_length=1,
+        max_length=200,
+        description="Required per G5R2 error-contract parity (BF-G5R-002)",
+    )
     content: str = Field(..., description="Rich Text HTML — sanitized server-side")
     category: str = Field(default="GENERAL")
     is_pinned: bool = False
@@ -36,7 +43,9 @@ class NoteCreate(BaseModel):
         if v is None or v == "":
             return None
         if str(v).lower() == "general":
-            raise ValueError("parent_type 'general' is not allowed. Use ticker, trade, trade_plan, account, or datetime.")
+            raise ValueError(
+                "parent_type 'general' is not allowed. Use ticker, trade, trade_plan, account, or datetime."
+            )
         if v not in VALID_PARENT_TYPES:
             raise ValueError(f"parent_type must be one of {sorted(VALID_PARENT_TYPES)}, got '{v}'")
         return v
@@ -56,6 +65,7 @@ class NoteCreate(BaseModel):
 
 class NoteUpdate(BaseModel):
     """BF-G7-018: Supports linked_entity change via parent_type, parent_id, parent_datetime."""
+
     parent_type: Optional[str] = Field(None, description="trade|trade_plan|ticker|account|datetime")
     parent_id: Optional[str] = None
     parent_datetime: Optional[datetime] = None
@@ -116,6 +126,7 @@ class NoteResponse(BaseModel):
 
 class NotesSummaryResponse(BaseModel):
     """TEAM_30 request — סקשן סיכום עמוד הערות"""
+
     total_notes: int
     recent_notes: int  # 10 ימים אחרונים
     total_attachments: int

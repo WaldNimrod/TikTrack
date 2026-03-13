@@ -101,6 +101,7 @@ async def delete_note(
 
 # --- Attachments ---
 
+
 @router.get("/{note_id}/attachments", response_model=list)
 async def list_attachments(
     note_id: uuid.UUID,

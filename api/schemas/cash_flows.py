@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field
 
 class CashFlowResponse(BaseModel):
     """Cash Flow response schema."""
+
     external_ulid: str = Field(..., description="External ULID identifier")
     transaction_date: date_type = Field(..., description="Transaction date")
     flow_type: str = Field(..., description="Flow type (DEPOSIT, WITHDRAWAL, etc.)")
@@ -25,7 +26,7 @@ class CashFlowResponse(BaseModel):
     currency: str = Field(..., description="Currency")
     status: Optional[str] = Field(None, description="Status (VERIFIED, PENDING, from metadata)")
     description: Optional[str] = Field(None, description="Transaction description")
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -38,38 +39,45 @@ class CashFlowResponse(BaseModel):
                 "amount": 5000.00,
                 "currency": "USD",
                 "status": "VERIFIED",
-                "description": "הפקדה מהבנק"
+                "description": "הפקדה מהבנק",
             }
         }
 
 
 class CashFlowSummaryResponse(BaseModel):
     """Cash Flow summary schema."""
+
     total_deposits: Decimal = Field(..., description="Total deposits")
     total_withdrawals: Decimal = Field(..., description="Total withdrawals")
     net_flow: Decimal = Field(..., description="Net cash flow")
-    
+
     class Config:
         json_schema_extra = {
             "example": {
                 "total_deposits": 5000.00,
                 "total_withdrawals": 1200.00,
-                "net_flow": 3800.00
+                "net_flow": 3800.00,
             }
         }
 
 
 class CashFlowCreateRequest(BaseModel):
     """Cash Flow create request schema."""
+
     trading_account_id: str = Field(..., description="Trading account ULID")
-    flow_type: str = Field(..., description="Flow type (DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, OTHER, CURRENCY_CONVERSION)")
+    flow_type: str = Field(
+        ...,
+        description="Flow type (DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, OTHER, CURRENCY_CONVERSION)",
+    )
     amount: Decimal = Field(..., description="Transaction amount")
     currency: str = Field(default="USD", description="Currency code (ISO 3-letter)", max_length=3)
     transaction_date: date_type = Field(..., description="Transaction date")
     description: Optional[str] = Field(None, description="Transaction description")
-    external_reference: Optional[str] = Field(None, description="External system reference", max_length=100)
+    external_reference: Optional[str] = Field(
+        None, description="External system reference", max_length=100
+    )
     metadata: Optional[dict] = Field(default_factory=dict, description="Additional metadata")
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -80,39 +88,41 @@ class CashFlowCreateRequest(BaseModel):
                 "transaction_date": "2026-01-20",
                 "description": "הפקדה מהבנק",
                 "external_reference": "BANK_TXN_12345",
-                "metadata": {
-                    "subtype": "BANK_TRANSFER",
-                    "status": "VERIFIED"
-                }
+                "metadata": {"subtype": "BANK_TRANSFER", "status": "VERIFIED"},
             }
         }
 
 
 class CashFlowUpdateRequest(BaseModel):
     """Cash Flow update request schema."""
+
     trading_account_id: Optional[str] = Field(None, description="Trading account ULID")
-    flow_type: Optional[str] = Field(None, description="Flow type (DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, OTHER, CURRENCY_CONVERSION)")
+    flow_type: Optional[str] = Field(
+        None,
+        description="Flow type (DEPOSIT, WITHDRAWAL, DIVIDEND, INTEREST, FEE, OTHER, CURRENCY_CONVERSION)",
+    )
     amount: Optional[Decimal] = Field(None, description="Transaction amount")
     currency: Optional[str] = Field(None, description="Currency code (ISO 3-letter)", max_length=3)
     transaction_date: Optional[date_type] = Field(None, description="Transaction date")
     description: Optional[str] = Field(None, description="Transaction description")
-    external_reference: Optional[str] = Field(None, description="External system reference", max_length=100)
+    external_reference: Optional[str] = Field(
+        None, description="External system reference", max_length=100
+    )
     metadata: Optional[dict] = Field(None, description="Additional metadata")
-    
+
     class Config:
         json_schema_extra = {
             "example": {
                 "amount": 5500.00,
                 "description": "הפקדה מעודכנת מהבנק",
-                "metadata": {
-                    "status": "VERIFIED"
-                }
+                "metadata": {"status": "VERIFIED"},
             }
         }
 
 
 class CurrencyConversionResponse(BaseModel):
     """Currency Conversion response schema."""
+
     id: str = Field(..., description="External ULID identifier")
     date: date_type = Field(..., description="Transaction date")
     account: str = Field(..., description="Trading account name")
@@ -121,7 +131,7 @@ class CurrencyConversionResponse(BaseModel):
     to_currency: str = Field(..., description="Target currency code")
     to_amount: Decimal = Field(..., description="Converted amount")
     rate: Decimal = Field(..., description="Exchange rate")
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -132,16 +142,17 @@ class CurrencyConversionResponse(BaseModel):
                 "from_amount": 1000.00,
                 "to_currency": "EUR",
                 "to_amount": 920.00,
-                "rate": 0.92
+                "rate": 0.92,
             }
         }
 
 
 class CurrencyConversionListResponse(BaseModel):
     """Currency Conversions list response schema."""
+
     data: List[CurrencyConversionResponse] = Field(..., description="List of currency conversions")
     total: int = Field(..., description="Total count")
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -154,20 +165,21 @@ class CurrencyConversionListResponse(BaseModel):
                         "from_amount": 1000.00,
                         "to_currency": "EUR",
                         "to_amount": 920.00,
-                        "rate": 0.92
+                        "rate": 0.92,
                     }
                 ],
-                "total": 1
+                "total": 1,
             }
         }
 
 
 class CashFlowListResponse(BaseModel):
     """Cash Flows list response schema."""
+
     data: List[CashFlowResponse] = Field(..., description="List of cash flows")
     total: int = Field(..., description="Total count")
     summary: CashFlowSummaryResponse = Field(..., description="Summary statistics")
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -182,14 +194,14 @@ class CashFlowListResponse(BaseModel):
                         "amount": 5000.00,
                         "currency": "USD",
                         "status": "VERIFIED",
-                        "description": "הפקדה מהבנק"
+                        "description": "הפקדה מהבנק",
                     }
                 ],
                 "total": 1,
                 "summary": {
                     "total_deposits": 5000.00,
                     "total_withdrawals": 1200.00,
-                    "net_flow": 3800.00
-                }
+                    "net_flow": 3800.00,
+                },
             }
         }

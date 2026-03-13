@@ -41,6 +41,7 @@ IMMEDIATE_RETRY_MIN_ROWS = 50  # Retry if we get at least this many (worth retry
 def _load_backfill_module():
     """Load backfill script module (avoids scripts/ as package)."""
     import importlib.util
+
     spec = importlib.util.spec_from_file_location(
         "backfill_script",
         str(_script_path),
@@ -190,9 +191,12 @@ async def run_history_backfill(
             logger.info("Smart History: %s got %d rows — immediate retry", symbol, len(hist))
             hist2, provider2 = await asyncio.wait_for(
                 mod.fetch_history_for_ticker(
-                    ticker_uuid, symbol,
-                    ticker_type=ticker_type, metadata=metadata,
-                    date_from=None, date_to=None,
+                    ticker_uuid,
+                    symbol,
+                    ticker_type=ticker_type,
+                    metadata=metadata,
+                    date_from=None,
+                    date_to=None,
                 ),
                 timeout=BACKFILL_TIMEOUT - 10,
             )
@@ -212,7 +216,9 @@ async def run_history_backfill(
         if final_count < MIN_HISTORY_DAYS:
             logger.info(
                 "Smart History: %s has %d/%d rows — nightly batch will retry",
-                symbol, final_count, MIN_HISTORY_DAYS,
+                symbol,
+                final_count,
+                MIN_HISTORY_DAYS,
             )
 
         status = "completed" if inserted > 0 else "no_op"

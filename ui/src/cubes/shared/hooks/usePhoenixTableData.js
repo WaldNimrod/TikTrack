@@ -2,7 +2,7 @@
  * usePhoenixTableData - React Hook לטעינת נתוני טבלה מ-Backend API
  * ----------------------------------------------------------------
  * Hook לטעינת נתוני טבלה מ-Backend API עם Transformation Layer, Loading states, ו-Error handling.
- * 
+ *
  * @description Hook לטעינת נתוני טבלה מ-Backend API עם תמיכה ב-Transformation Layer
  * @standard JS Standards Protocol ✅ | Transformation Layer ✅ | Audit Trail System ✅ | Debug Mode ✅
  * @legacyReference Legacy.tables.dataFetching
@@ -16,18 +16,18 @@ import { handleApiError } from '../../../utils/errorHandler';
 
 /**
  * usePhoenixTableData Hook
- * 
+ *
  * @description Hook לטעינת נתוני טבלה מ-Backend API
  * @param {Function} fetchFunction - פונקציה לטעינת נתונים (חייבת להחזיר Promise)
  * @param {Array} dependencies - תלויות ל-useEffect (למשל: [filters, sortState])
  * @returns {Object} { data, loading, error, refetch }
- * 
+ *
  * @example
  * const { data, loading, error, refetch } = usePhoenixTableData(
  *   () => tradingAccountsService.list(),
  *   [filters, sortState]
  * );
- * 
+ *
  * // הנתונים כבר מומרים ל-camelCase (מ-snake_case)
  * console.log(data); // [{ displayNames: 'חשבון 1', availableAmounts: 1000 }, ...]
  */
@@ -39,7 +39,7 @@ export const usePhoenixTableData = (fetchFunction, dependencies = []) => {
 
   /**
    * fetchData - טעינת נתונים מ-Backend API
-   * 
+   *
    * @description טעינת נתונים מ-Backend API עם Transformation Layer ו-Error handling
    * @private
    */
@@ -56,7 +56,7 @@ export const usePhoenixTableData = (fetchFunction, dependencies = []) => {
       if (DEBUG_MODE) {
         audit.log('Tables', 'Data fetch started', {
           fetchFunction: fetchFunction.name,
-          dependencies
+          dependencies,
         });
       }
 
@@ -72,8 +72,12 @@ export const usePhoenixTableData = (fetchFunction, dependencies = []) => {
       if (DEBUG_MODE) {
         audit.log('Tables', 'Data fetch succeeded', {
           fetchFunction: fetchFunction.name,
-          dataCount: Array.isArray(transformedData) ? transformedData.length : 1,
-          sampleData: Array.isArray(transformedData) ? transformedData[0] : transformedData
+          dataCount: Array.isArray(transformedData)
+            ? transformedData.length
+            : 1,
+          sampleData: Array.isArray(transformedData)
+            ? transformedData[0]
+            : transformedData,
         });
       }
     } catch (err) {
@@ -93,12 +97,12 @@ export const usePhoenixTableData = (fetchFunction, dependencies = []) => {
 
   /**
    * refetch - טעינה מחדש של הנתונים
-   * 
+   *
    * @description טעינה מחדש של הנתונים (לשימוש ידני)
-   * 
+   *
    * @example
    * const { refetch } = usePhoenixTableData(...);
-   * 
+   *
    * // טעינה מחדש לאחר עדכון
    * await updateAccount();
    * refetch();
@@ -116,7 +120,7 @@ export const usePhoenixTableData = (fetchFunction, dependencies = []) => {
     data,
     loading,
     error,
-    refetch
+    refetch,
   };
 };
 

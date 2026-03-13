@@ -13,7 +13,9 @@ _LEGACY_YAHOO = "yahoo"
 _LEGACY_ALPHA = "alpha"
 
 
-def infer_provider_mapping(symbol: str, ticker_type: str, market: Optional[str] = None) -> Dict[str, Any]:
+def infer_provider_mapping(
+    symbol: str, ticker_type: str, market: Optional[str] = None
+) -> Dict[str, Any]:
     """
     Build provider_mapping_data per WP_20_09 (locked format).
     CRYPTO: Yahoo BTC-USD; Alpha symbol=BTC, market=USD.

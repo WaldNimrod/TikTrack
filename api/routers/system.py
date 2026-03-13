@@ -24,7 +24,7 @@ async def get_market_status_endpoint(
 ):
     """
     Get US market status (open/closed, pre/post, overnight).
-    
+
     Source: Yahoo Finance v7/quote (SPY). Used by staleness clock + market status color key.
     """
     try:
@@ -38,5 +38,5 @@ async def get_market_status_endpoint(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e) if settings.debug else "Failed to fetch market status",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )

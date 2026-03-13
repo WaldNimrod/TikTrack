@@ -3,53 +3,59 @@
  * Sync-Time: 2026-02-01 20:00:00 IST
  * Team: Team 31 (Shared Components)
  * Status: ✅ MODULAR FOOTER LOADER
- * 
+ *
  * Purpose:
  * Dynamically loads footer.html into all pages.
  * All pages now use unified structure: .page-wrapper > .page-container > main
  * Footer is injected inside .page-wrapper, after .page-container (same for all pages)
- * 
+ *
  * Usage:
  * Add <script src="./footerLoader.js"></script> before closing </body> tag in all pages.
  */
 
 (function loadFooter() {
   'use strict';
-  
+
   // Wait for DOM to be ready
   function initFooter() {
     // Check if footer already exists (prevent duplicate)
     if (document.querySelector('footer.page-footer')) {
-      window.maskedLog?.('Phoenix Footer Loader: Footer already exists. Skipping load.', {});
+      window.maskedLog?.(
+        'Phoenix Footer Loader: Footer already exists. Skipping load.',
+        {},
+      );
       return;
     }
-    
+
     // Use absolute path - Vite serves files from /src/ automatically
     const footerPath = '/src/views/shared/footer.html';
-    
+
     // Load footer.html
     fetch(footerPath)
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.text();
       })
-      .then(html => {
+      .then((html) => {
         // Create temporary container to parse HTML
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = html.trim();
-        
+
         // Find the footer element
         const footer = tempDiv.querySelector('footer.page-footer');
         if (!footer) {
-          window.maskedLog?.('Phoenix Footer Loader: footer element not found in footer.html', {});
+          window.maskedLog?.(
+            'Phoenix Footer Loader: footer element not found in footer.html',
+            {},
+          );
           return;
         }
-        
+
         // All pages now use unified structure: .page-wrapper > .page-container > main
         const pageWrapper = document.querySelector('.page-wrapper');
-        
+
         if (pageWrapper) {
           // Insert footer inside .page-wrapper, after .page-container (unified for all pages)
           const pageContainer = pageWrapper.querySelector('.page-container');
@@ -62,15 +68,21 @@
           }
         } else {
           // Fallback: Append to body if .page-wrapper not found (should not happen)
-          window.maskedLog?.('Phoenix Footer Loader: .page-wrapper not found. Appending footer to body.', {});
+          window.maskedLog?.(
+            'Phoenix Footer Loader: .page-wrapper not found. Appending footer to body.',
+            {},
+          );
           document.body.appendChild(footer);
         }
       })
-      .catch(error => {
-        window.maskedLog?.('Phoenix Footer Loader: Failed to load footer.html', { message: error?.message });
+      .catch((error) => {
+        window.maskedLog?.(
+          'Phoenix Footer Loader: Failed to load footer.html',
+          { message: error?.message },
+        );
       });
   }
-  
+
   // Run when DOM is ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initFooter);

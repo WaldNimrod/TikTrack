@@ -10,7 +10,12 @@ from .trading_accounts import TradingAccount
 from .cash_flows import CashFlow
 from .trades import Trade
 from .trade_plans import TradePlan
-from .market_reference import Exchange, Sector, Industry, MarketCapGroup  # before Ticker — FK metadata
+from .market_reference import (
+    Exchange,
+    Sector,
+    Industry,
+    MarketCapGroup,
+)  # before Ticker — FK metadata
 from .tickers import Ticker
 from .user_tickers import UserTicker
 from .ticker_prices import TickerPrice

@@ -18,7 +18,11 @@ function createPhoenixRTMark(styleName) {
       return [{ tag: `span.${className}` }];
     },
     renderHTML({ HTMLAttributes }) {
-      return ['span', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
+      return [
+        'span',
+        mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+        0,
+      ];
     },
   });
 }

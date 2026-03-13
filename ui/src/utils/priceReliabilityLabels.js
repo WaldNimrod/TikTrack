@@ -11,7 +11,7 @@
 const SOURCE_LABELS = {
   EOD: 'סגירה',
   EOD_STALE: 'סגירה (ישן)',
-  INTRADAY_FALLBACK: 'תוך־יומי'
+  INTRADAY_FALLBACK: 'תוך־יומי',
 };
 
 /**
@@ -41,7 +41,8 @@ export function getPriceSourceBadgeHTML(source) {
     return '<span class="price-source-badge price-source-badge--none">—</span>';
   }
   const label = SOURCE_LABELS[source] ?? source;
-  const cls = SOURCE_BADGE_CLASS[source] || 'price-source-badge price-source-badge--none';
+  const cls =
+    SOURCE_BADGE_CLASS[source] || 'price-source-badge price-source-badge--none';
   return `<span class="${cls}" data-price-source="${String(source).replace(/"/g, '&quot;')}">${label}</span>`;
 }
 
@@ -74,7 +75,7 @@ export function formatPriceAsOf(iso8601) {
       month: '2-digit',
       year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   } catch {
     return '—';

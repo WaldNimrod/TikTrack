@@ -92,7 +92,11 @@ body.auth-layout-root tt-container,
   max-width: 480px;
   width: 100%;
   margin-inline: auto;
-  padding-inline: clamp(16px, 2vw, 24px); /* CRITICAL: Fluid padding - responsive automatically */
+  padding-inline: clamp(
+    16px,
+    2vw,
+    24px
+  ); /* CRITICAL: Fluid padding - responsive automatically */
 }
 
 /* Auth-specific: Narrow section for auth forms - White card background */
@@ -109,7 +113,10 @@ body.auth-layout-root tt-section,
   background: var(--apple-bg-elevated, #ffffff) !important;
   border: 1px solid var(--apple-border-light, #e5e5e5) !important;
   border-radius: 12px;
-  box-shadow: var(--apple-shadow-medium, 0 4px 12px rgba(0, 0, 0, 0.15)) !important;
+  box-shadow: var(
+    --apple-shadow-medium,
+    0 4px 12px rgba(0, 0, 0, 0.15)
+  ) !important;
   padding: var(--spacing-xl, 32px);
   box-sizing: border-box;
 }
@@ -131,21 +138,29 @@ body.system-body {
 }
 
 /* Context Classes */
-.context-home { --context-primary: var(--color-brand); }
-.context-settings { --context-primary: #475569; }
-.context-data { --context-primary: #1a4d80; }
-.context-accounting { --context-primary: #1a4d80; }
-
-/* Context declaration in main */
-main[data-context="settings"] {
+.context-home {
+  --context-primary: var(--color-brand);
+}
+.context-settings {
   --context-primary: #475569;
 }
-
-main[data-context="data"] {
+.context-data {
+  --context-primary: #1a4d80;
+}
+.context-accounting {
   --context-primary: #1a4d80;
 }
 
-main[data-context="home"] {
+/* Context declaration in main */
+main[data-context='settings'] {
+  --context-primary: #475569;
+}
+
+main[data-context='data'] {
+  --context-primary: #1a4d80;
+}
+
+main[data-context='home'] {
   --context-primary: var(--color-brand);
 }
 
@@ -159,21 +174,31 @@ main[data-context="home"] {
 /* These override base styles with higher specificity (no !important needed) */
 /* Auth pages use larger padding and font size than system defaults - Exact match to legacy */
 /* Higher specificity to override phoenix-base.css input:not() selector */
-body.auth-layout-root form .form-group input:not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]):not([type=file]):not([type=hidden]),
+body.auth-layout-root
+  form
+  .form-group
+  input:not([type='checkbox']):not([type='radio']):not([type='submit']):not(
+    [type='button']
+  ):not([type='file']):not([type='hidden']),
 body.auth-layout-root form .form-control,
-body.auth-layout-root form input[type="text"],
-body.auth-layout-root form input[type="password"],
-body.auth-layout-root form input[type="email"],
-body.auth-layout-root form input[type="tel"],
-.auth-layout-root form .form-group input:not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]):not([type=file]):not([type=hidden]),
+body.auth-layout-root form input[type='text'],
+body.auth-layout-root form input[type='password'],
+body.auth-layout-root form input[type='email'],
+body.auth-layout-root form input[type='tel'],
+.auth-layout-root
+  form
+  .form-group
+  input:not([type='checkbox']):not([type='radio']):not([type='submit']):not(
+    [type='button']
+  ):not([type='file']):not([type='hidden']),
 .auth-layout-root form .form-control,
-.auth-layout-root form input[type="text"],
-.auth-layout-root form input[type="password"],
-.auth-layout-root form input[type="email"],
-.auth-layout-root form input[type="tel"] {
+.auth-layout-root form input[type='text'],
+.auth-layout-root form input[type='password'],
+.auth-layout-root form input[type='email'],
+.auth-layout-root form input[type='tel'] {
   width: 100%;
   padding: 0.75rem 1rem !important; /* Larger padding for auth pages - half of double, !important needed to override base */
-  border: 1px solid var(--border-color, #C6C6C8);
+  border: 1px solid var(--border-color, #c6c6c8);
   border-radius: 8px;
   font-size: 1rem;
   direction: rtl;
@@ -182,13 +207,13 @@ body.auth-layout-root form input[type="tel"],
 }
 
 body.auth-layout-root form .form-control:focus,
-body.auth-layout-root form input[type="text"]:focus,
-body.auth-layout-root form input[type="password"]:focus,
-body.auth-layout-root form input[type="email"]:focus,
+body.auth-layout-root form input[type='text']:focus,
+body.auth-layout-root form input[type='password']:focus,
+body.auth-layout-root form input[type='email']:focus,
 .auth-layout-root form .form-control:focus,
-.auth-layout-root form input[type="text"]:focus,
-.auth-layout-root form input[type="password"]:focus,
-.auth-layout-root form input[type="email"]:focus {
+.auth-layout-root form input[type='text']:focus,
+.auth-layout-root form input[type='password']:focus,
+.auth-layout-root form input[type='email']:focus {
   outline: none;
   border-color: #26baac;
   box-shadow: 0 0 0 3px rgba(38, 186, 172, 0.1);
@@ -216,23 +241,23 @@ body.auth-layout-root form .form-group:first-child,
   margin-block-start: 0; /* No top margin for first form group */
 }
 
-.auth-logo { 
-  margin-block-end: var(--spacing-sm); 
+.auth-logo {
+  margin-block-end: var(--spacing-sm);
 }
 
-.auth-logo img { 
-  height: 37.5px; 
-  width: auto; 
+.auth-logo img {
+  height: 37.5px;
+  width: auto;
 }
 
-.auth-title { 
+.auth-title {
   font-size: 1.25rem;
-  font-weight: 800; 
+  font-weight: 800;
   margin: var(--spacing-md, 16px) 0 0 0; /* Spacing after subtitle */
   color: var(--header-dropdown-item-hover, #ff9e04); /* Secondary color */
 }
 
-.auth-subtitle { 
+.auth-subtitle {
   font-size: 0.75rem;
   color: var(--header-brand, #26baac); /* Primary color */
   margin-block-end: 0; /* No bottom margin - spacing handled by title */
@@ -246,7 +271,7 @@ button.btn-auth-primary {
   background-color: var(--apple-bg-primary, #ffffff);
   color: var(--color-primary, #26baac);
   border: 1px solid currentColor; /* Border same color as text */
-  
+
   /* Special sizing for auth pages */
   width: 100%;
   /* Padding: Half of current (was: var(--spacing-md, 16px)) */
@@ -290,7 +315,7 @@ button.btn-auth-primary:focus {
   direction: rtl;
 }
 
-.remember-me input[type="checkbox"] {
+.remember-me input[type='checkbox'] {
   /* Inherits base checkbox styles from phoenix-base.css */
   /* Additional specific styles if needed */
   width: 18px;
@@ -302,37 +327,37 @@ button.btn-auth-primary:focus {
   color: var(--text-secondary, #666);
 }
 
-.auth-footer-zone { 
-  margin-block-start: var(--spacing-lg); 
+.auth-footer-zone {
+  margin-block-start: var(--spacing-lg);
   font-size: 0.75rem;
-  color: var(--color-text-muted); 
+  color: var(--color-text-muted);
 }
 
-.auth-link { 
-  color: var(--color-brand); 
-  text-decoration: none; 
-  font-weight: 600; 
+.auth-link {
+  color: var(--color-brand);
+  text-decoration: none;
+  font-weight: 600;
 }
 
-.auth-link-bold { 
-  color: var(--color-brand); 
-  text-decoration: none; 
-  font-weight: 800; 
-  margin-inline-end: 3px; 
+.auth-link-bold {
+  color: var(--color-brand);
+  text-decoration: none;
+  font-weight: 800;
+  margin-inline-end: 3px;
 }
 
-.auth-link:hover { 
-  text-decoration: underline; 
+.auth-link:hover {
+  text-decoration: underline;
 }
 
 /* Logo Utilities */
-.logo-sm { 
-  margin-block-end: var(--spacing-sm); 
+.logo-sm {
+  margin-block-end: var(--spacing-sm);
 }
 
-.logo-sm img { 
-  height: 37.5px; 
-  width: auto; 
+.logo-sm img {
+  height: 37.5px;
+  width: auto;
 }
 
 /* Error Message Styles - Ensure errors are visible and persistent */

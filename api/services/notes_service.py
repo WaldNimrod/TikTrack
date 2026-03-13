@@ -78,13 +78,21 @@ def _note_to_response(
     attachment_count: Optional[int] = None,
 ) -> dict:
     """G7R Batch3: linked_entity_display (BF-G7-012); attachment_count (BF-G7-023)."""
-    if note.parent_type == "datetime" and getattr(note, "parent_datetime", None) and not linked_entity_display:
+    if (
+        note.parent_type == "datetime"
+        and getattr(note, "parent_datetime", None)
+        and not linked_entity_display
+    ):
         dt_val = note.parent_datetime
-        linked_entity_display = dt_val.strftime("%Y-%m-%d %H:%M UTC") if hasattr(dt_val, "strftime") else str(dt_val)
+        linked_entity_display = (
+            dt_val.strftime("%Y-%m-%d %H:%M UTC") if hasattr(dt_val, "strftime") else str(dt_val)
+        )
     tags_val = note.tags
     if tags_val is not None and not isinstance(tags_val, list):
         tags_val = list(tags_val) if tags_val else None
-    count = attachment_count if attachment_count is not None else len(getattr(note, "attachments", []))
+    count = (
+        attachment_count if attachment_count is not None else len(getattr(note, "attachments", []))
+    )
     return {
         "id": str(note.id),
         "user_id": str(note.user_id),
@@ -154,7 +162,9 @@ class NotesService:
         return [
             _note_to_response(
                 n,
-                linked_entity_display=display_map.get((n.parent_type, n.parent_id)) if n.parent_id else None,
+                linked_entity_display=(
+                    display_map.get((n.parent_type, n.parent_id)) if n.parent_id else None
+                ),
                 attachment_count=count_map.get(n.id, 0),
             )
             for n in notes
@@ -207,19 +217,27 @@ class NotesService:
         parent_type_val = (data.get("parent_type") or "ticker").lower()
         if parent_type_val == "general":
             from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
-            raise HTTPExceptionWithCode(status_code=422, detail="parent_type 'general' is not allowed", error_code=ErrorCodes.VALIDATION_INVALID_FORMAT)
+
+            raise HTTPExceptionWithCode(
+                status_code=422,
+                detail="parent_type 'general' is not allowed",
+                error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+            )
         if parent_type_val not in ("trade", "trade_plan", "ticker", "account", "datetime"):
             parent_type_val = "ticker"
 
         parent_datetime_val = data.get("parent_datetime")
         if parent_datetime_val and isinstance(parent_datetime_val, str):
             try:
-                parent_datetime_val = datetime.fromisoformat(parent_datetime_val.replace("Z", "+00:00"))
+                parent_datetime_val = datetime.fromisoformat(
+                    parent_datetime_val.replace("Z", "+00:00")
+                )
             except (ValueError, TypeError):
                 parent_datetime_val = None
 
         if parent_type_val == "datetime" and not parent_datetime_val:
             from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+
             raise HTTPExceptionWithCode(
                 status_code=422,
                 detail="parent_datetime required when parent_type=datetime",
@@ -227,6 +245,7 @@ class NotesService:
             )
         if parent_type_val != "datetime" and data.get("parent_datetime"):
             from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
+
             raise HTTPExceptionWithCode(
                 status_code=422,
                 detail="parent_datetime not allowed when parent_type is entity",
@@ -235,7 +254,12 @@ class NotesService:
         # BF-G7-017: entity types require parent_id
         if parent_type_val in ("ticker", "trade", "trade_plan", "account") and not parent_id:
             from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
-            raise HTTPExceptionWithCode(status_code=422, detail=f"parent_id required when parent_type is {parent_type_val}", error_code=ErrorCodes.VALIDATION_INVALID_FORMAT)
+
+            raise HTTPExceptionWithCode(
+                status_code=422,
+                detail=f"parent_id required when parent_type is {parent_type_val}",
+                error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+            )
 
         cat_val = (data.get("category") or "GENERAL").upper()
         if cat_val not in ("TRADE", "PSYCHOLOGY", "ANALYSIS", "GENERAL"):
@@ -294,12 +318,19 @@ class NotesService:
                 parent_datetime_val = data.get("parent_datetime")
                 if parent_datetime_val and isinstance(parent_datetime_val, str):
                     try:
-                        parent_datetime_val = datetime.fromisoformat(parent_datetime_val.replace("Z", "+00:00"))
+                        parent_datetime_val = datetime.fromisoformat(
+                            parent_datetime_val.replace("Z", "+00:00")
+                        )
                     except (ValueError, TypeError):
                         parent_datetime_val = None
                 if not parent_datetime_val:
                     from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
-                    raise HTTPExceptionWithCode(status_code=422, detail="parent_datetime required when parent_type=datetime", error_code=ErrorCodes.VALIDATION_INVALID_FORMAT)
+
+                    raise HTTPExceptionWithCode(
+                        status_code=422,
+                        detail="parent_datetime required when parent_type=datetime",
+                        error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+                    )
                 note.parent_type = parent_type_val
                 note.parent_id = None
                 note.parent_datetime = parent_datetime_val
@@ -316,7 +347,12 @@ class NotesService:
                                 pass
                 if not parent_id_val:
                     from ..utils.exceptions import HTTPExceptionWithCode, ErrorCodes
-                    raise HTTPExceptionWithCode(status_code=422, detail=f"parent_id required when parent_type is {parent_type_val}", error_code=ErrorCodes.VALIDATION_INVALID_FORMAT)
+
+                    raise HTTPExceptionWithCode(
+                        status_code=422,
+                        detail=f"parent_id required when parent_type is {parent_type_val}",
+                        error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
+                    )
                 note.parent_type = parent_type_val
                 note.parent_id = parent_id_val
                 note.parent_datetime = None
@@ -360,6 +396,7 @@ class NotesService:
         if not note:
             return False
         from datetime import datetime, timezone
+
         note.deleted_at = datetime.now(timezone.utc)
         note.updated_by = user_id
         await db.flush()
@@ -380,20 +417,24 @@ class NotesService:
         total_stmt = select(func.count()).select_from(Note).where(base)
         total = (await db.execute(total_stmt)).scalar() or 0
 
-        pinned_stmt = select(func.count()).select_from(Note).where(
-            and_(base, Note.is_pinned.is_(True))
+        pinned_stmt = (
+            select(func.count()).select_from(Note).where(and_(base, Note.is_pinned.is_(True)))
         )
         pinned = (await db.execute(pinned_stmt)).scalar() or 0
 
         cutoff = datetime.now(timezone.utc) - timedelta(days=10)
-        recent_stmt = select(func.count()).select_from(Note).where(
-            and_(base, Note.created_at >= cutoff)
+        recent_stmt = (
+            select(func.count()).select_from(Note).where(and_(base, Note.created_at >= cutoff))
         )
         recent = (await db.execute(recent_stmt)).scalar() or 0
 
         # notes_with_tags: tags IS NOT NULL AND cardinality > 0 (PostgreSQL)
-        tags_stmt = select(func.count()).select_from(Note).where(
-            and_(base, Note.tags.isnot(None), func.coalesce(func.cardinality(Note.tags), 0) > 0)
+        tags_stmt = (
+            select(func.count())
+            .select_from(Note)
+            .where(
+                and_(base, Note.tags.isnot(None), func.coalesce(func.cardinality(Note.tags), 0) > 0)
+            )
         )
         notes_with_tags = (await db.execute(tags_stmt)).scalar() or 0
 

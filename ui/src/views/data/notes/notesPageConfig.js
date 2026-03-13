@@ -13,5 +13,5 @@ window.UAI.config = {
   components: ['table', 'summary', 'pagination', 'actions'],
   tables: [{ id: 'notesTable', type: 'notes', pageSize: 25 }],
   summary: { enabled: true, toggleEnabled: true },
-  metadata: { title: 'הערות', description: 'עמוד הערות', version: '1.0.0' }
+  metadata: { title: 'הערות', description: 'עמוד הערות', version: '1.0.0' },
 };

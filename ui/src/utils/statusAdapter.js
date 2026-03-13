@@ -8,15 +8,16 @@
 
 import { STATUS_VALUES } from './statusValues.js';
 
-const valueToLabel = new Map(STATUS_VALUES.map(s => [s.value, s.label]));
-const labelToValue = new Map(STATUS_VALUES.map(s => [s.label, s.value]));
+const valueToLabel = new Map(STATUS_VALUES.map((s) => [s.value, s.label]));
+const labelToValue = new Map(STATUS_VALUES.map((s) => [s.label, s.value]));
 
 /**
  * @param {string} label - עברית (פתוח / סגור / ממתין / מבוטל)
  * @returns {string|null} ערך קנוני (active|inactive|pending|cancelled) או null אם לא נמצא
  */
 export function toCanonicalStatus(label) {
-  if (label == null || label === '' || label === 'הכול' || label === 'כל סטטוס') return null;
+  if (label == null || label === '' || label === 'הכול' || label === 'כל סטטוס')
+    return null;
   return labelToValue.get(label) ?? null;
 }
 
@@ -26,7 +27,8 @@ export function toCanonicalStatus(label) {
  * @returns {string|null}
  */
 export function normalizeToCanonicalStatus(value) {
-  if (value == null || value === '' || value === 'הכול' || value === 'כל סטטוס') return null;
+  if (value == null || value === '' || value === 'הכול' || value === 'כל סטטוס')
+    return null;
   if (valueToLabel.has(value)) return value; // already canonical
   return labelToValue.get(value) ?? null;
 }
@@ -51,5 +53,10 @@ export { STATUS_VALUES } from './statusValues.js';
 
 /* Expose to window for Vanilla JS (phoenixFilterBridge, etc.) */
 if (typeof window !== 'undefined') {
-  window.statusAdapter = { toCanonicalStatus, toHebrewStatus, getStatusOptions, normalizeToCanonicalStatus };
+  window.statusAdapter = {
+    toCanonicalStatus,
+    toHebrewStatus,
+    getStatusOptions,
+    normalizeToCanonicalStatus,
+  };
 }

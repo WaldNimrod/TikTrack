@@ -8,5 +8,9 @@ window.UAI.config = {
   requiresAuth: true,
   requiresHeader: true,
   components: [],
-  metadata: { title: 'אנליזת AI', description: 'עמוד אנליזת AI', version: '1.0.0' },
+  metadata: {
+    title: 'אנליזת AI',
+    description: 'עמוד אנליזת AI',
+    version: '1.0.0',
+  },
 };

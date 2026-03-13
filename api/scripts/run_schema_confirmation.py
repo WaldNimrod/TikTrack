@@ -32,49 +32,70 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 
 QUERIES = [
-    ("tickers (market_data)", """
+    (
+        "tickers (market_data)",
+        """
         SELECT column_name, data_type, character_maximum_length, numeric_precision, numeric_scale
         FROM information_schema.columns
         WHERE table_schema='market_data' AND table_name='tickers'
         ORDER BY ordinal_position;
-    """),
-    ("user_api_keys", """
+    """,
+    ),
+    (
+        "user_api_keys",
+        """
         SELECT column_name, data_type, character_maximum_length, numeric_precision, numeric_scale
         FROM information_schema.columns
         WHERE table_schema='user_data' AND table_name='user_api_keys'
         ORDER BY ordinal_position;
-    """),
-    ("user_refresh_tokens", """
+    """,
+    ),
+    (
+        "user_refresh_tokens",
+        """
         SELECT column_name, data_type, character_maximum_length, numeric_precision, numeric_scale
         FROM information_schema.columns
         WHERE table_schema='user_data' AND table_name='user_refresh_tokens'
         ORDER BY ordinal_position;
-    """),
-    ("revoked_tokens", """
+    """,
+    ),
+    (
+        "revoked_tokens",
+        """
         SELECT column_name, data_type
         FROM information_schema.columns
         WHERE table_schema='user_data' AND table_name='revoked_tokens'
         ORDER BY ordinal_position;
-    """),
-    ("trading_account_fees", """
+    """,
+    ),
+    (
+        "trading_account_fees",
+        """
         SELECT column_name, data_type
         FROM information_schema.columns
         WHERE table_schema='user_data' AND table_name='trading_account_fees'
         ORDER BY ordinal_position;
-    """),
-    ("exchange_rates", """
+    """,
+    ),
+    (
+        "exchange_rates",
+        """
         SELECT column_name, data_type, numeric_precision, numeric_scale
         FROM information_schema.columns
         WHERE table_schema='market_data' AND table_name='exchange_rates'
         ORDER BY ordinal_position;
-    """),
-    ("ticker_prices (price, market_cap)", """
+    """,
+    ),
+    (
+        "ticker_prices (price, market_cap)",
+        """
         SELECT column_name, data_type, numeric_precision, numeric_scale
         FROM information_schema.columns
         WHERE table_schema='market_data' AND table_name='ticker_prices'
         AND column_name IN ('price', 'market_cap')
         ORDER BY ordinal_position;
-    """),
+    """,
+    ),
 ]
 
 

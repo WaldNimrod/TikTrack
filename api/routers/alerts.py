@@ -41,7 +41,9 @@ async def list_alerts(
     ),
     ticker_id: Optional[str] = Query(None, description="Filter by ticker (ULID)"),
     is_active: Optional[bool] = Query(None, description="Filter by active status"),
-    trigger_status: Optional[str] = Query(None, description="untriggered|triggered_unread|triggered_read|rearmed"),
+    trigger_status: Optional[str] = Query(
+        None, description="untriggered|triggered_unread|triggered_read|rearmed"
+    ),
     page: int = Query(1, ge=1),
     per_page: int = Query(25, ge=1, le=100),
     sort: str = Query("created_at", description="created_at|target_type|is_active|..."),
@@ -122,9 +124,7 @@ async def update_alert(
 ):
     service = get_alerts_service()
     data = body.model_dump(exclude_unset=True)
-    alert = await service.update_alert(
-        db=db, alert_id=alert_id, user_id=current_user.id, data=data
-    )
+    alert = await service.update_alert(db=db, alert_id=alert_id, user_id=current_user.id, data=data)
     if not alert:
         raise HTTPException(status_code=404, detail="Alert not found")
     return alert
@@ -137,8 +137,6 @@ async def delete_alert(
     db: AsyncSession = Depends(get_db),
 ):
     service = get_alerts_service()
-    ok = await service.delete_alert(
-        db=db, alert_id=alert_id, user_id=current_user.id
-    )
+    ok = await service.delete_alert(db=db, alert_id=alert_id, user_id=current_user.id)
     if not ok:
         raise HTTPException(status_code=404, detail="Alert not found")

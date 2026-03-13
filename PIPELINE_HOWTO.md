@@ -139,8 +139,48 @@ cat _COMMUNICATION/agents_os/prompts/G3_PLAN_prompt.md
 
 ---
 
+---
+
+## 🔍 Progress Check (Dashboard Diagnostic)
+
+Press **🔍 בדוק התקדמות** in the dashboard header (or press `p`) to run a full diagnostic.
+
+The progress check shows:
+1. **Full Pipeline Overview** — all 14 gates with current status (active/pass/fail/pending)
+2. **Current Gate Analysis** — owner, engine, scope description, FAIL cycle history
+3. **Sub-step analysis** — for multi-step gates (CURSOR_IMPLEMENTATION, GATE_4): file-level status
+4. **PASS / FAIL guidance** — for all gates, including explicit two-path display for validation gates (G3_5, GATE_5)
+5. **FAIL cycle detection** — automatically detects revision mode (e.g. G3_5 FAIL → G3_PLAN revision) and shows the correct command
+
+Use this whenever you're unsure what to do next, or when the auto-refresh doesn't reflect what you expect.
+
+---
+
+## 🗺️ Roadmap & Gate History Page
+
+Open `PIPELINE_ROADMAP.html` (link at bottom of main dashboard) for:
+
+- **Portfolio roadmap tree** — stages → programs, with active program highlighted and hierarchy validation
+- **Full gate sequence table** — all 14 gates with status pills
+- **Gate history** — ordered pass/fail history
+
+---
+
+## Handling FAIL — GATE_5 Dev Validation (Team 90)
+
+When GATE_5 returns FAIL (Team 90 finds code compliance issues):
+
+```bash
+./pipeline_run.sh fail "FINDING-1: ... FINDING-2: ..."
+```
+
+Then route findings to Team 10 for code fixes → re-run CURSOR_IMPLEMENTATION → GATE_4 → GATE_5.
+
+---
+
 ## Deeper Documentation
 
 - Full experiment execution guide: `_COMMUNICATION/team_00/TEAM_00_S001_P002_WP001_EXPERIMENT_EXECUTION_GUIDE_v1.0.0.md`
 - Pipeline CLI source: `agents_os_v2/orchestrator/pipeline.py`
 - Pipeline state: `_COMMUNICATION/agents_os/pipeline_state.json`
+- Roadmap & Gate History: `PIPELINE_ROADMAP.html` (serve with `python3 -m http.server 8090`)

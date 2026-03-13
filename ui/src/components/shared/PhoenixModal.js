@@ -2,7 +2,7 @@
  * Phoenix Modal Component - Reusable Modal/Dialog Component
  * --------------------------------------------------------
  * Generic modal component for forms, dialogs, and overlays
- * 
+ *
  * @description Provides a reusable modal system with backdrop, close button, and form support
  * @version v1.0.0
  */
@@ -30,7 +30,7 @@ export function createModal(options = {}) {
     saveButtonText = 'שמירה',
     cancelButtonText = 'ביטול',
     entity = null,
-    confirmMode = false
+    confirmMode = false,
   } = options;
 
   // Remove existing modal if any
@@ -43,7 +43,7 @@ export function createModal(options = {}) {
   const backdrop = document.createElement('div');
   backdrop.className = 'phoenix-modal-backdrop';
   backdrop.id = 'phoenix-modal-backdrop';
-  
+
   // Create modal container
   const modal = document.createElement('div');
   modal.className = 'phoenix-modal';
@@ -59,12 +59,12 @@ export function createModal(options = {}) {
   // Create modal header
   const header = document.createElement('div');
   header.className = 'phoenix-modal__header';
-  
+
   const titleElement = document.createElement('h2');
   titleElement.className = 'phoenix-modal__title';
   titleElement.id = 'phoenix-modal-title';
   titleElement.textContent = title;
-  
+
   const closeButton = document.createElement('button');
   closeButton.className = 'phoenix-modal__close';
   closeButton.setAttribute('aria-label', 'סגור');
@@ -73,14 +73,14 @@ export function createModal(options = {}) {
       <path d="M18 6L6 18M6 6l12 12"></path>
     </svg>
   `;
-  
+
   header.appendChild(titleElement);
   header.appendChild(closeButton);
 
   // Create modal body
   const body = document.createElement('div');
   body.className = 'phoenix-modal__body';
-  
+
   // Insert content
   if (typeof content === 'string') {
     body.innerHTML = content;
@@ -93,20 +93,23 @@ export function createModal(options = {}) {
   footer.className = 'phoenix-modal__footer';
 
   const cancelButton = document.createElement('button');
-  cancelButton.className = 'phoenix-modal__cancel-btn phoenix-btn phoenix-btn--secondary';
+  cancelButton.className =
+    'phoenix-modal__cancel-btn phoenix-btn phoenix-btn--secondary';
   cancelButton.type = 'button';
   cancelButton.textContent = cancelButtonText;
   footer.appendChild(cancelButton);
 
   if (showSaveButton && onSave) {
     const saveButton = document.createElement('button');
-    saveButton.className = 'phoenix-modal__save-btn phoenix-btn phoenix-btn--primary' + (confirmMode ? ' phoenix-modal__confirm-btn' : '');
+    saveButton.className =
+      'phoenix-modal__save-btn phoenix-btn phoenix-btn--primary' +
+      (confirmMode ? ' phoenix-modal__confirm-btn' : '');
     if (confirmMode) saveButton.setAttribute('data-action', 'confirm-delete');
     saveButton.type = 'button';
     saveButton.textContent = saveButtonText;
     footer.appendChild(saveButton);
 
-    saveButton.addEventListener('click', function(e) {
+    saveButton.addEventListener('click', function (e) {
       e.preventDefault();
       onSave();
     });
@@ -116,7 +119,7 @@ export function createModal(options = {}) {
   modal.appendChild(header);
   modal.appendChild(body);
   modal.appendChild(footer);
-  
+
   backdrop.appendChild(modal);
   document.body.appendChild(backdrop);
 
@@ -130,15 +133,15 @@ export function createModal(options = {}) {
 
   closeButton.addEventListener('click', closeModalInternal);
   cancelButton.addEventListener('click', closeModalInternal);
-  
-  backdrop.addEventListener('click', function(e) {
+
+  backdrop.addEventListener('click', function (e) {
     if (e.target === backdrop) {
       closeModalInternal();
     }
   });
 
   // ESC key handler
-  const escHandler = function(e) {
+  const escHandler = function (e) {
     if (e.key === 'Escape') {
       closeModalInternal();
       document.removeEventListener('keydown', escHandler);

@@ -2,7 +2,7 @@
  * ComponentName - [Description]
  * --------------------------------------------
  * [תיאור הרכיב]
- * 
+ *
  * @description [תיאור מפורט]
  * @legacyReference [אם רלוונטי]
  */
@@ -14,9 +14,9 @@ import { debugLog } from '../../../utils/debug.js';
 
 /**
  * ComponentName Component
- * 
+ *
  * @description [תיאור הרכיב]
- * 
+ *
  * @param {Object} props - Component props
  * @param {string} [props.propName] - Prop description
  */
@@ -28,7 +28,7 @@ const ComponentName = ({ propName }) => {
   useEffect(() => {
     /**
      * Load data
-     * 
+     *
      * @description Fetch data on component mount
      */
     const loadData = async () => {
@@ -72,11 +72,7 @@ const ComponentName = ({ propName }) => {
     <div className="component-name" dir="rtl">
       {/* Component JSX */}
       <h2>Component Name</h2>
-      {data && (
-        <div>
-          {/* Render data */}
-        </div>
-      )}
+      {data && <div>{/* Render data */}</div>}
     </div>
   );
 };

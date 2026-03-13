@@ -20,7 +20,7 @@ const TARGET_TYPES = [
   { value: 'account', label: 'חשבון מסחר' },
   { value: 'trade', label: 'טרייד' },
   { value: 'trade_plan', label: 'תוכנית' },
-  { value: 'datetime', label: 'תאריך/שעה' }
+  { value: 'datetime', label: 'תאריך/שעה' },
 ];
 
 const ALERT_TYPES = ['PRICE', 'VOLUME', 'TECHNICAL', 'NEWS', 'CUSTOM'];
@@ -33,7 +33,7 @@ const CONDITION_FIELDS = [
   { value: 'low_price', label: 'מחיר נמוך' },
   { value: 'close_price', label: 'מחיר סגירה' },
   { value: 'volume', label: 'נפח' },
-  { value: 'market_cap', label: 'שווי שוק' }
+  { value: 'market_cap', label: 'שווי שוק' },
 ];
 
 /** Phase C: 7 operators including crosses_above, crosses_below — backend CONDITION_OPERATORS */
@@ -44,39 +44,69 @@ const CONDITION_OPERATORS = [
   { value: '<=', label: '<=' },
   { value: '=', label: '=' },
   { value: 'crosses_above', label: 'חוצה כלפי מעלה' },
-  { value: 'crosses_below', label: 'חוצה כלפי מטה' }
+  { value: 'crosses_below', label: 'חוצה כלפי מטה' },
 ];
 
 function createAlertFormHTML(data = null) {
   const alertId = data && (data.id || data.external_ulid);
   const isEdit = !!alertId;
   const title = (data && data.title != null ? data.title : '') || '';
-  const targetType = (data && data.target_type != null ? data.target_type : (data && data.targetType)) || 'ticker';
-  const alertType = (data && data.alert_type != null ? data.alert_type : (data && data.alertType)) || 'PRICE';
-  const conditionField = (data && data.condition_field != null ? data.condition_field : (data && data.conditionField)) || '';
-  const conditionOperator = (data && data.condition_operator != null ? data.condition_operator : (data && data.conditionOperator)) || '';
-  const conditionValue = (data && data.condition_value != null ? data.condition_value : (data && data.conditionValue)) ?? '';
-  const isActive = (data && (data.is_active != null ? data.is_active : data.isActive)) !== false;
+  const targetType =
+    (data && data.target_type != null
+      ? data.target_type
+      : data && data.targetType) || 'ticker';
+  const alertType =
+    (data && data.alert_type != null
+      ? data.alert_type
+      : data && data.alertType) || 'PRICE';
+  const conditionField =
+    (data && data.condition_field != null
+      ? data.condition_field
+      : data && data.conditionField) || '';
+  const conditionOperator =
+    (data && data.condition_operator != null
+      ? data.condition_operator
+      : data && data.conditionOperator) || '';
+  const conditionValue =
+    (data && data.condition_value != null
+      ? data.condition_value
+      : data && data.conditionValue) ?? '';
+  const isActive =
+    (data && (data.is_active != null ? data.is_active : data.isActive)) !==
+    false;
   const message = (data && data.message != null ? data.message : '') || '';
 
-  const targetOpts = TARGET_TYPES.map(t =>
-    `<option value="${t.value}" ${targetType === t.value ? 'selected' : ''}>${t.label}</option>`
+  const targetOpts = TARGET_TYPES.map(
+    (t) =>
+      `<option value="${t.value}" ${targetType === t.value ? 'selected' : ''}>${t.label}</option>`,
   ).join('');
-  const alertTypeOpts = ALERT_TYPES.map(t =>
-    `<option value="${t}" ${alertType === t ? 'selected' : ''}>${t}</option>`
+  const alertTypeOpts = ALERT_TYPES.map(
+    (t) =>
+      `<option value="${t}" ${alertType === t ? 'selected' : ''}>${t}</option>`,
   ).join('');
   // B-02: In edit mode, target_type and alert_type are non-editable (API does not persist them)
-  const targetLabel = (TARGET_TYPES.find(t => t.value === targetType) || { label: targetType }).label;
-  const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  const targetLabel = (
+    TARGET_TYPES.find((t) => t.value === targetType) || { label: targetType }
+  ).label;
+  const esc = (s) =>
+    String(s ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/"/g, '&quot;');
   /** BF-G7-013: Condition required per backend AlertCreate */
-  const fieldOpts = CONDITION_FIELDS.map(f =>
-    `<option value="${f.value}" ${conditionField === f.value ? 'selected' : ''}>${f.label}</option>`
+  const fieldOpts = CONDITION_FIELDS.map(
+    (f) =>
+      `<option value="${f.value}" ${conditionField === f.value ? 'selected' : ''}>${f.label}</option>`,
   ).join('');
-  const operatorOpts = CONDITION_OPERATORS.map(o =>
-    `<option value="${o.value}" ${conditionOperator === o.value ? 'selected' : ''}>${o.label}</option>`
+  const operatorOpts = CONDITION_OPERATORS.map(
+    (o) =>
+      `<option value="${o.value}" ${conditionOperator === o.value ? 'selected' : ''}>${o.label}</option>`,
   ).join('');
 
-  const condValStr = conditionValue === '' || conditionValue == null ? '' : String(conditionValue);
+  const condValStr =
+    conditionValue === '' || conditionValue == null
+      ? ''
+      : String(conditionValue);
 
   return `
     <form id="alertForm" class="phoenix-form">
@@ -103,9 +133,10 @@ function createAlertFormHTML(data = null) {
       </div>
       <div class="form-group">
         <label for="alertAlertType">סוג התראה</label>
-        ${isEdit
-          ? `<span id="alertAlertType" class="form-readonly-value" aria-readonly="true">${esc(alertType)}</span>`
-          : `<select id="alertAlertType" name="alert_type">${alertTypeOpts}</select>`
+        ${
+          isEdit
+            ? `<span id="alertAlertType" class="form-readonly-value" aria-readonly="true">${esc(alertType)}</span>`
+            : `<select id="alertAlertType" name="alert_type">${alertTypeOpts}</select>`
         }
       </div>
       <div class="form-group form-group--condition-builder">
@@ -121,14 +152,18 @@ function createAlertFormHTML(data = null) {
         ${getPhoenixRichTextToolbarHTML('alert-message-toolbar')}
         <div id="alertMessageEditor" class="phoenix-rt-editor-wrapper"></div>
       </div>
-      ${isEdit ? `
+      ${
+        isEdit
+          ? `
       <div class="form-group">
         <label>
           <input type="checkbox" name="is_active" ${isActive ? 'checked' : ''} />
           פעיל
         </label>
       </div>
-      ` : ''}
+      `
+          : ''
+      }
     </form>
   `;
 }
@@ -153,32 +188,69 @@ export function openAlertsForm(alert, onSuccess) {
     saveButtonText: 'שמור',
     cancelButtonText: 'ביטול',
     onClose: function () {
-      if (alertRichTextInstance) { alertRichTextInstance.destroy(); alertRichTextInstance = null; }
+      if (alertRichTextInstance) {
+        alertRichTextInstance.destroy();
+        alertRichTextInstance = null;
+      }
     },
     onSave: async function () {
       const form = document.getElementById('alertForm');
       if (!form) return;
-      const titleVal = (form.querySelector('[name="title"]') || form.querySelector('#alertTitle'))?.value?.trim();
+      const titleVal = (
+        form.querySelector('[name="title"]') ||
+        form.querySelector('#alertTitle')
+      )?.value?.trim();
       const summaryEl = document.getElementById('alertFormValidationSummary');
-      const clearSummary = () => { if (summaryEl) { summaryEl.textContent = ''; summaryEl.hidden = true; } };
-      const showSummary = (msg) => { if (summaryEl) { summaryEl.textContent = msg; summaryEl.hidden = false; } };
+      const clearSummary = () => {
+        if (summaryEl) {
+          summaryEl.textContent = '';
+          summaryEl.hidden = true;
+        }
+      };
+      const showSummary = (msg) => {
+        if (summaryEl) {
+          summaryEl.textContent = msg;
+          summaryEl.hidden = false;
+        }
+      };
       if (!titleVal) {
         showSummary('יש להזין כותרת');
         return;
       }
       clearSummary();
-      const targetTypeVal = form.querySelector('[name="target_type"]')?.value || 'ticker';
-      const targetIdVal = (form.querySelector('[name="target_id"]') || form.querySelector('#alertTargetId'))?.value?.trim() || null;
-      const targetDtVal = form.querySelector('[name="target_datetime"]')?.value || null;
-      const alertTypeVal = form.querySelector('[name="alert_type"]')?.value || 'PRICE';
-      let messageVal = (alertRichTextInstance && alertRichTextInstance.getHTML) ? alertRichTextInstance.getHTML() : (form.querySelector('[name="message"]') || form.querySelector('#alertMessage'))?.value?.trim() || null;
+      const targetTypeVal =
+        form.querySelector('[name="target_type"]')?.value || 'ticker';
+      const targetIdVal =
+        (
+          form.querySelector('[name="target_id"]') ||
+          form.querySelector('#alertTargetId')
+        )?.value?.trim() || null;
+      const targetDtVal =
+        form.querySelector('[name="target_datetime"]')?.value || null;
+      const alertTypeVal =
+        form.querySelector('[name="alert_type"]')?.value || 'PRICE';
+      let messageVal =
+        alertRichTextInstance && alertRichTextInstance.getHTML
+          ? alertRichTextInstance.getHTML()
+          : (
+              form.querySelector('[name="message"]') ||
+              form.querySelector('#alertMessage')
+            )?.value?.trim() || null;
       if (messageVal === '<p></p>' || messageVal === '') messageVal = null;
-      const isActiveVal = form.querySelector('[name="is_active"]')?.checked ?? true;
-      const condField = form.querySelector('[name="condition_field"]')?.value?.trim() || null;
-      const condOp = form.querySelector('[name="condition_operator"]')?.value?.trim() || null;
+      const isActiveVal =
+        form.querySelector('[name="is_active"]')?.checked ?? true;
+      const condField =
+        form.querySelector('[name="condition_field"]')?.value?.trim() || null;
+      const condOp =
+        form.querySelector('[name="condition_operator"]')?.value?.trim() ||
+        null;
       const condValRaw = form.querySelector('[name="condition_value"]')?.value;
-      const condVal = condValRaw !== '' && condValRaw != null && !Number.isNaN(parseFloat(condValRaw))
-        ? parseFloat(condValRaw) : null;
+      const condVal =
+        condValRaw !== '' &&
+        condValRaw != null &&
+        !Number.isNaN(parseFloat(condValRaw))
+          ? parseFloat(condValRaw)
+          : null;
 
       // BF-G7-013: Condition required — all three must be set
       if (!condField || !condOp || condVal == null || condVal === '') {
@@ -188,7 +260,8 @@ export function openAlertsForm(alert, onSuccess) {
 
       // BF-G7-017: Linked entity required when target_type is entity (not datetime)
       if (targetTypeVal !== 'datetime') {
-        const entityId = targetIdVal || form.querySelector('#alertTargetId')?.value?.trim();
+        const entityId =
+          targetIdVal || form.querySelector('#alertTargetId')?.value?.trim();
         if (!entityId) {
           showSummary('יש לבחור ישות מקושרת.');
           return;
@@ -203,7 +276,11 @@ export function openAlertsForm(alert, onSuccess) {
       try {
         await sharedServices.init();
         if (isEdit) {
-          const payload = { title: titleVal, message: messageVal, is_active: isActiveVal };
+          const payload = {
+            title: titleVal,
+            message: messageVal,
+            is_active: isActiveVal,
+          };
           if (condField) payload.condition_field = condField;
           if (condOp) payload.condition_operator = condOp;
           if (condVal != null) payload.condition_value = condVal;
@@ -212,41 +289,51 @@ export function openAlertsForm(alert, onSuccess) {
             else payload.target_id = targetIdVal;
             payload.target_type = targetTypeVal;
           }
-          if (targetTypeVal === 'datetime' && targetDtVal) payload.target_datetime = targetDtVal;
-          await sharedServices.patch(`/alerts/${alertId}`, payload, { skipTransform: true });
+          if (targetTypeVal === 'datetime' && targetDtVal)
+            payload.target_datetime = targetDtVal;
+          await sharedServices.patch(`/alerts/${alertId}`, payload, {
+            skipTransform: true,
+          });
         } else {
           const payload = {
             target_type: targetTypeVal,
             alert_type: alertTypeVal,
             title: titleVal,
             message: messageVal,
-            is_active: true
+            is_active: true,
           };
-          if (targetTypeVal === 'datetime' && targetDtVal) payload.target_datetime = targetDtVal;
-          else if (targetTypeVal === 'ticker' && targetIdVal) payload.ticker_id = String(targetIdVal).trim();
+          if (targetTypeVal === 'datetime' && targetDtVal)
+            payload.target_datetime = targetDtVal;
+          else if (targetTypeVal === 'ticker' && targetIdVal)
+            payload.ticker_id = String(targetIdVal).trim();
           else if (targetIdVal) payload.target_id = String(targetIdVal).trim();
           if (condField) payload.condition_field = condField;
           if (condOp) payload.condition_operator = condOp;
           if (condVal != null) payload.condition_value = condVal;
-          await sharedServices.post('/alerts', payload, { skipTransform: true });
+          await sharedServices.post('/alerts', payload, {
+            skipTransform: true,
+          });
         }
         document.getElementById('phoenix-modal-backdrop')?.remove();
         if (typeof onSuccess === 'function') onSuccess();
       } catch (e) {
-        maskedLog('[Alerts] Save error:', { status: e?.status, message: e?.message });
+        maskedLog('[Alerts] Save error:', {
+          status: e?.status,
+          message: e?.message,
+        });
         const msg = String(e?.message ?? e?.detail ?? 'שגיאה בשמירה').trim();
         showSummary(msg.replace(/</g, '&lt;').replace(/>/g, '&gt;'));
       }
-    }
+    },
   });
 
   setTimeout(async () => {
     const editorContainer = document.getElementById('alertMessageEditor');
     if (editorContainer) {
       alertRichTextInstance = createPhoenixRichTextEditor(editorContainer, {
-        content: (alert && alert.message) ? String(alert.message) : '',
+        content: alert && alert.message ? String(alert.message) : '',
         placeholder: 'טקסט להודעה',
-        toolbarId: 'alert-message-toolbar'
+        toolbarId: 'alert-message-toolbar',
       });
     }
 
@@ -254,7 +341,16 @@ export function openAlertsForm(alert, onSuccess) {
     const idSelect = document.getElementById('alertTargetId');
     const entityWrap = document.getElementById('alertEntityWrap');
     const datetimeWrap = document.getElementById('alertDatetimeWrap');
-    const initialTargetId = (alert && (alert.target_id ?? alert.targetId ?? alert.ticker_id ?? alert.tickerId)) ? String(alert.target_id ?? alert.targetId ?? alert.ticker_id ?? alert.tickerId) : '';
+    const initialTargetId =
+      alert &&
+      (alert.target_id ?? alert.targetId ?? alert.ticker_id ?? alert.tickerId)
+        ? String(
+            alert.target_id ??
+              alert.targetId ??
+              alert.ticker_id ??
+              alert.tickerId,
+          )
+        : '';
 
     function toggleTargetInputs() {
       const t = typeSelect?.value || 'ticker';
@@ -268,9 +364,15 @@ export function openAlertsForm(alert, onSuccess) {
       if (t === 'datetime') return;
       const opts = await loadOptionsForParentType(t);
       const currentVal = idSelect.value || initialTargetId;
-      idSelect.innerHTML = '<option value="">—בחר—</option>' +
-        opts.map(o => `<option value="${String(o.value).replace(/"/g, '&quot;')}" ${String(o.value) === currentVal ? 'selected' : ''}>${String(o.label || o.value).replace(/</g, '&lt;')}</option>`).join('');
-      if (currentVal && !opts.some(o => String(o.value) === currentVal)) {
+      idSelect.innerHTML =
+        '<option value="">—בחר—</option>' +
+        opts
+          .map(
+            (o) =>
+              `<option value="${String(o.value).replace(/"/g, '&quot;')}" ${String(o.value) === currentVal ? 'selected' : ''}>${String(o.label || o.value).replace(/</g, '&lt;')}</option>`,
+          )
+          .join('');
+      if (currentVal && !opts.some((o) => String(o.value) === currentVal)) {
         const opt = document.createElement('option');
         opt.value = currentVal;
         opt.textContent = `${currentVal.slice(0, 8)}… (נוכחי)`;

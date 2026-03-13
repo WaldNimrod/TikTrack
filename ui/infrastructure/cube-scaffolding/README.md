@@ -1,4 +1,5 @@
 # Cube Scaffolding - תבנית ליצירת קוביות חדשות
+
 **project_domain:** TIKTRACK
 
 **Team 60 (DevOps & Platform)**  
@@ -29,16 +30,19 @@ cubes/
 ## 🚨 חוקי ברזל
 
 ### **1. בידוד מוחלט בין קוביות**
+
 - ✅ כל קוביה היא אי עצמאי
 - ❌ **אין imports בין קוביות** (חוץ מ-`cubes/shared`)
 - ✅ כל קוביה מתקשר רק דרך `cubes/shared`
 
 ### **2. שימוש ב-Shared בלבד**
+
 - ✅ שימוש ב-`cubes/shared/utils/transformers.js` להמרת נתונים
 - ✅ שימוש ב-`cubes/shared/components/` לרכיבים משותפים
 - ✅ שימוש ב-`cubes/shared/hooks/` ל-hooks משותפים
 
 ### **3. מבנה סטנדרטי**
+
 - ✅ `components/` - רכיבי React
 - ✅ `services/` - שירותי API ותקשורת עם Backend
 - ✅ `hooks/` - Custom React hooks
@@ -52,7 +56,7 @@ cubes/
  * [Service Name] - [Description]
  * -----------------------------------------------
  * שירות ל-[תיאור]
- * 
+ *
  * @description [תיאור מפורט]
  * @legacyReference [אם רלוונטי]
  */
@@ -63,7 +67,8 @@ import { audit } from '../../../utils/audit.js';
 import { debugLog, debugError } from '../../../utils/debug.js';
 
 // API Base URL
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082/api/v1';
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082/api/v1';
 
 // Create axios instance
 const apiClient = axios.create({
@@ -85,7 +90,7 @@ apiClient.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // Response interceptor - Handle errors
@@ -97,7 +102,7 @@ apiClient.interceptors.response.use(
       // Token refresh logic if needed
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 // Service functions
@@ -117,7 +122,7 @@ export default serviceName;
  * ComponentName - [Description]
  * --------------------------------------------
  * [תיאור הרכיב]
- * 
+ *
  * @description [תיאור מפורט]
  * @legacyReference [אם רלוונטי]
  */
@@ -129,7 +134,7 @@ import { debugLog } from '../../../utils/debug.js';
 
 /**
  * ComponentName Component
- * 
+ *
  * @description [תיאור הרכיב]
  */
 const ComponentName = () => {
@@ -140,11 +145,7 @@ const ComponentName = () => {
     // Component logic
   }, []);
 
-  return (
-    <div className="component-name">
-      {/* Component JSX */}
-    </div>
-  );
+  return <div className="component-name">{/* Component JSX */}</div>;
 };
 
 export default ComponentName;
@@ -159,7 +160,7 @@ export default ComponentName;
  * useFeatureHook - [Description]
  * --------------------------------------------
  * Custom hook for [feature]
- * 
+ *
  * @description [תיאור ה-hook]
  */
 
@@ -169,7 +170,7 @@ import { audit } from '../../../utils/audit.js';
 
 /**
  * useFeatureHook Hook
- * 
+ *
  * @description [תיאור ה-hook]
  * @returns {Object} Hook state and methods
  */
@@ -200,6 +201,7 @@ export default useFeatureHook;
 ### **יצירת קוביה חדשה:**
 
 1. **צור תיקיית קוביה:**
+
    ```bash
    mkdir -p ui/src/cubes/[cube-name]/{components,services,hooks}
    ```

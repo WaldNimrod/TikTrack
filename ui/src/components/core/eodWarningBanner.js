@@ -21,7 +21,10 @@
       banner.className = 'eod-warning-banner eod-warning-banner--hidden';
       banner.setAttribute('role', 'alert');
       banner.setAttribute('aria-live', 'polite');
-      banner.innerHTML = '<span class="eod-warning-banner__icon" aria-hidden="true">⚠️</span><span class="eod-warning-banner__text">' + WARNING_TEXT + '</span>';
+      banner.innerHTML =
+        '<span class="eod-warning-banner__icon" aria-hidden="true">⚠️</span><span class="eod-warning-banner__text">' +
+        WARNING_TEXT +
+        '</span>';
       const main = document.querySelector('main');
       if (main && main.firstChild) {
         main.insertBefore(banner, main.firstChild);

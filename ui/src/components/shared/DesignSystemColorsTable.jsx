@@ -12,40 +12,157 @@ const COLOR_CATEGORIES = [
   {
     title: '1. Brand Colors (6 משתנים)',
     rows: [
-      { label: 'Primary', vars: ['--color-primary-light', '--color-primary', '--color-primary-dark'] },
-      { label: 'Secondary', vars: ['--color-secondary-light', '--color-secondary', '--color-secondary-dark'] },
+      {
+        label: 'Primary',
+        vars: [
+          '--color-primary-light',
+          '--color-primary',
+          '--color-primary-dark',
+        ],
+      },
+      {
+        label: 'Secondary',
+        vars: [
+          '--color-secondary-light',
+          '--color-secondary',
+          '--color-secondary-dark',
+        ],
+      },
     ],
   },
   {
     title: '2. Entity Colors (27 משתנים)',
     rows: [
-      { label: 'trade', vars: ['--entity-trade-light', '--entity-trade', '--entity-trade-dark'] },
-      { label: 'trade_plan', vars: ['--entity-trade_plan-light', '--entity-trade_plan', '--entity-trade_plan-dark'] },
-      { label: 'execution', vars: ['--entity-execution-light', '--entity-execution', '--entity-execution-dark'] },
-      { label: 'trading_account', vars: ['--entity-trading_account-light', '--entity-trading_account', '--entity-trading_account-dark'] },
-      { label: 'cash_flow', vars: ['--entity-cash_flow-light', '--entity-cash_flow', '--entity-cash_flow-dark'] },
-      { label: 'ticker', vars: ['--entity-ticker-light', '--entity-ticker', '--entity-ticker-dark'] },
-      { label: 'alert', vars: ['--entity-alert-light', '--entity-alert', '--entity-alert-dark'] },
-      { label: 'note', vars: ['--entity-note-light', '--entity-note', '--entity-note-dark'] },
-      { label: 'research', vars: ['--entity-research-light', '--entity-research', '--entity-research-dark'] },
+      {
+        label: 'trade',
+        vars: ['--entity-trade-light', '--entity-trade', '--entity-trade-dark'],
+      },
+      {
+        label: 'trade_plan',
+        vars: [
+          '--entity-trade_plan-light',
+          '--entity-trade_plan',
+          '--entity-trade_plan-dark',
+        ],
+      },
+      {
+        label: 'execution',
+        vars: [
+          '--entity-execution-light',
+          '--entity-execution',
+          '--entity-execution-dark',
+        ],
+      },
+      {
+        label: 'trading_account',
+        vars: [
+          '--entity-trading_account-light',
+          '--entity-trading_account',
+          '--entity-trading_account-dark',
+        ],
+      },
+      {
+        label: 'cash_flow',
+        vars: [
+          '--entity-cash_flow-light',
+          '--entity-cash_flow',
+          '--entity-cash_flow-dark',
+        ],
+      },
+      {
+        label: 'ticker',
+        vars: [
+          '--entity-ticker-light',
+          '--entity-ticker',
+          '--entity-ticker-dark',
+        ],
+      },
+      {
+        label: 'alert',
+        vars: ['--entity-alert-light', '--entity-alert', '--entity-alert-dark'],
+      },
+      {
+        label: 'note',
+        vars: ['--entity-note-light', '--entity-note', '--entity-note-dark'],
+      },
+      {
+        label: 'research',
+        vars: [
+          '--entity-research-light',
+          '--entity-research',
+          '--entity-research-dark',
+        ],
+      },
     ],
   },
   {
     title: '3. Message & Status (12 משתנים)',
     rows: [
-      { label: 'info', vars: ['--message-info-light', '--message-info', '--message-info-dark'] },
-      { label: 'warning', vars: ['--message-warning-light', '--message-warning', '--message-warning-dark'] },
-      { label: 'error', vars: ['--message-error-light', '--message-error', '--message-error-dark'] },
-      { label: 'success', vars: ['--message-success-light', '--message-success', '--message-success-dark'] },
+      {
+        label: 'info',
+        vars: ['--message-info-light', '--message-info', '--message-info-dark'],
+      },
+      {
+        label: 'warning',
+        vars: [
+          '--message-warning-light',
+          '--message-warning',
+          '--message-warning-dark',
+        ],
+      },
+      {
+        label: 'error',
+        vars: [
+          '--message-error-light',
+          '--message-error',
+          '--message-error-dark',
+        ],
+      },
+      {
+        label: 'success',
+        vars: [
+          '--message-success-light',
+          '--message-success',
+          '--message-success-dark',
+        ],
+      },
     ],
   },
   {
     title: '3.1 סטטוסים קבועים — System Status (12 משתנים)',
     rows: [
-      { label: 'pending (ממתין)', vars: ['--status-pending-light', '--status-pending', '--status-pending-dark'] },
-      { label: 'active (פתוח)', vars: ['--status-active-light', '--status-active', '--status-active-dark'] },
-      { label: 'inactive (סגור)', vars: ['--status-inactive-light', '--status-inactive', '--status-inactive-dark'] },
-      { label: 'cancelled (מבוטל)', vars: ['--status-cancelled-light', '--status-cancelled', '--status-cancelled-dark'] },
+      {
+        label: 'pending (ממתין)',
+        vars: [
+          '--status-pending-light',
+          '--status-pending',
+          '--status-pending-dark',
+        ],
+      },
+      {
+        label: 'active (פתוח)',
+        vars: [
+          '--status-active-light',
+          '--status-active',
+          '--status-active-dark',
+        ],
+      },
+      {
+        label: 'inactive (סגור)',
+        vars: [
+          '--status-inactive-light',
+          '--status-inactive',
+          '--status-inactive-dark',
+        ],
+      },
+      {
+        label: 'cancelled (מבוטל)',
+        vars: [
+          '--status-cancelled-light',
+          '--status-cancelled',
+          '--status-cancelled-dark',
+        ],
+      },
     ],
   },
   {
@@ -59,15 +176,35 @@ const COLOR_CATEGORIES = [
   {
     title: '5. Numeric Values (9 משתנים)',
     rows: [
-      { label: 'positive', vars: ['--numeric-positive-light', '--numeric-positive', '--numeric-positive-dark'] },
-      { label: 'negative', vars: ['--numeric-negative-light', '--numeric-negative', '--numeric-negative-dark'] },
-      { label: 'zero', vars: ['--numeric-zero-light', '--numeric-zero', '--numeric-zero-dark'] },
+      {
+        label: 'positive',
+        vars: [
+          '--numeric-positive-light',
+          '--numeric-positive',
+          '--numeric-positive-dark',
+        ],
+      },
+      {
+        label: 'negative',
+        vars: [
+          '--numeric-negative-light',
+          '--numeric-negative',
+          '--numeric-negative-dark',
+        ],
+      },
+      {
+        label: 'zero',
+        vars: ['--numeric-zero-light', '--numeric-zero', '--numeric-zero-dark'],
+      },
     ],
   },
   {
     title: '6. Base & Border (6 משתנים)',
     rows: [
-      { label: 'background', vars: ['--color-background', '--color-background-secondary'] },
+      {
+        label: 'background',
+        vars: ['--color-background', '--color-background-secondary'],
+      },
       { label: 'text', vars: ['--color-text', '--color-text-secondary'] },
       { label: 'border', vars: ['--color-border', '--color-border-light'] },
     ],
@@ -100,7 +237,8 @@ const DesignSystemColorsTable = () => (
   <div className="design-system-section">
     <h2 className="design-system-section__title">משתני צבע DNA</h2>
     <p className="design-system-section__description">
-      משתני הצבע מ־<code>phoenix-base.css</code> (כולל סטטוסים קבועים). הצבעים מקושרים למשתנים — ללא inline.
+      משתני הצבע מ־<code>phoenix-base.css</code> (כולל סטטוסים קבועים). הצבעים
+      מקושרים למשתנים — ללא inline.
     </p>
     <div className="phoenix-table-wrapper">
       <table className="phoenix-table">

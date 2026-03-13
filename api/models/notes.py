@@ -22,6 +22,7 @@ class Note(Base):
     Note model - maps to user_data.notes table.
     D35: Rich Text content (sanitized server-side); polymorphic parent.
     """
+
     __tablename__ = "notes"
     __table_args__ = (
         CheckConstraint(
@@ -113,6 +114,7 @@ class NoteAttachment(Base):
     NoteAttachment model - maps to user_data.note_attachments table.
     D35: Max 3 per note, 2.5MB per file (BF-G7-025), MIME magic-bytes validated.
     """
+
     __tablename__ = "note_attachments"
     __table_args__ = {"schema": "user_data"}
 

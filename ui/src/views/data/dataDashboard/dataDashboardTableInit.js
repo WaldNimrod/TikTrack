@@ -13,7 +13,11 @@ import { maskedLog } from '../../../utils/maskedLog.js';
   let exchangeRates = [];
   let staleness = 'ok';
 
-  const STALENESS_LABELS = { ok: 'מעודכן', warning: 'אזהרה (>15 דק)', na: 'לא מעודכן' };
+  const STALENESS_LABELS = {
+    ok: 'מעודכן',
+    warning: 'אזהרה (>15 דק)',
+    na: 'לא מעודכן',
+  };
 
   function formatDateTime(isoStr) {
     if (!isoStr) return '—';
@@ -33,13 +37,20 @@ import { maskedLog } from '../../../utils/maskedLog.js';
 
   function formatRate(rate) {
     if (rate == null || isNaN(rate)) return '—';
-    return Number(rate).toLocaleString('he-IL', { minimumFractionDigits: 2, maximumFractionDigits: 8 });
+    return Number(rate).toLocaleString('he-IL', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 8,
+    });
   }
 
   function isAuthenticated() {
     try {
-      return !!(localStorage.getItem('access_token') || localStorage.getItem('authToken') ||
-        sessionStorage.getItem('access_token') || sessionStorage.getItem('authToken'));
+      return !!(
+        localStorage.getItem('access_token') ||
+        localStorage.getItem('authToken') ||
+        sessionStorage.getItem('access_token') ||
+        sessionStorage.getItem('authToken')
+      );
     } catch (_) {
       return false;
     }
@@ -54,7 +65,9 @@ import { maskedLog } from '../../../utils/maskedLog.js';
       staleness = res?.staleness ?? 'ok';
       return { data: exchangeRates, staleness };
     } catch (e) {
-      maskedLog('[Data Dashboard] Error fetching exchange rates:', { errorCode: e?.code });
+      maskedLog('[Data Dashboard] Error fetching exchange rates:', {
+        errorCode: e?.code,
+      });
       exchangeRates = [];
       staleness = 'na';
       return { data: [], staleness };
@@ -66,7 +79,8 @@ import { maskedLog } from '../../../utils/maskedLog.js';
     const stalenessEl = document.getElementById('ratesStaleness');
     const countEl = document.getElementById('exchangeRatesCount');
     if (totalEl) totalEl.textContent = data?.length ?? 0;
-    if (stalenessEl) stalenessEl.textContent = STALENESS_LABELS[stalenessVal] ?? stalenessVal;
+    if (stalenessEl)
+      stalenessEl.textContent = STALENESS_LABELS[stalenessVal] ?? stalenessVal;
     if (countEl) countEl.textContent = `${data?.length ?? 0} שערים`;
   }
 
@@ -78,7 +92,8 @@ import { maskedLog } from '../../../utils/maskedLog.js';
     if (!data || data.length === 0) {
       const row = document.createElement('tr');
       row.className = 'phoenix-table__row';
-      row.innerHTML = '<td colspan="3" class="phoenix-table__cell phoenix-table__cell--empty">אין נתונים להצגה</td>';
+      row.innerHTML =
+        '<td colspan="3" class="phoenix-table__cell phoenix-table__cell--empty">אין נתונים להצגה</td>';
       tbody.appendChild(row);
       return;
     }
@@ -99,7 +114,8 @@ import { maskedLog } from '../../../utils/maskedLog.js';
       tr.appendChild(pairCell);
 
       const rateCell = document.createElement('td');
-      rateCell.className = 'phoenix-table__cell col-rate phoenix-table__cell--numeric';
+      rateCell.className =
+        'phoenix-table__cell col-rate phoenix-table__cell--numeric';
       rateCell.setAttribute('dir', 'ltr');
       rateCell.textContent = formatRate(rate);
       tr.appendChild(rateCell);
@@ -138,7 +154,8 @@ import { maskedLog } from '../../../utils/maskedLog.js';
     if (!selectedPair) {
       const row = document.createElement('tr');
       row.className = 'phoenix-table__row';
-      row.innerHTML = '<td colspan="2" class="phoenix-table__cell phoenix-table__cell--empty">לבחור זוג מטבעות למעלה</td>';
+      row.innerHTML =
+        '<td colspan="2" class="phoenix-table__cell phoenix-table__cell--empty">לבחור זוג מטבעות למעלה</td>';
       tbody.appendChild(row);
       return;
     }
@@ -147,13 +164,14 @@ import { maskedLog } from '../../../utils/maskedLog.js';
     const rate = exchangeRates.find(
       (r) =>
         (r.from_currency ?? r.fromCurrency) === from &&
-        (r.to_currency ?? r.toCurrency) === to
+        (r.to_currency ?? r.toCurrency) === to,
     );
 
     if (!rate) {
       const row = document.createElement('tr');
       row.className = 'phoenix-table__row';
-      row.innerHTML = '<td colspan="2" class="phoenix-table__cell phoenix-table__cell--empty">אין נתונים לשער זה</td>';
+      row.innerHTML =
+        '<td colspan="2" class="phoenix-table__cell phoenix-table__cell--empty">אין נתונים לשער זה</td>';
       tbody.appendChild(row);
       return;
     }
@@ -167,7 +185,8 @@ import { maskedLog } from '../../../utils/maskedLog.js';
     timeCell.className = 'phoenix-table__cell col-datetime';
     timeCell.textContent = formatDateTime(syncTime);
     const rateCell = document.createElement('td');
-    rateCell.className = 'phoenix-table__cell col-rate phoenix-table__cell--numeric';
+    rateCell.className =
+      'phoenix-table__cell col-rate phoenix-table__cell--numeric';
     rateCell.setAttribute('dir', 'ltr');
     rateCell.textContent = formatRate(convRate);
     tr.appendChild(timeCell);

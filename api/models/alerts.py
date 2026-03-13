@@ -25,6 +25,7 @@ class Alert(Base):
     D34: Price alerts and notifications (polymorphic).
     G7R Stream1: target_type general removed; datetime added; target_datetime added.
     """
+
     __tablename__ = "alerts"
     __table_args__ = (
         CheckConstraint(

@@ -5,7 +5,7 @@
  * Triggered-unread count badge + list of N=5 most recent.
  * Fully hidden when 0 unread.
  * collapsible-container Iron Rule. maskedLog mandatory.
- * 
+ *
  * @reference TEAM_20_S001_P002_WP001_ALERTS_WIDGET_API_VERIFICATION
  * @reference implementation_mandates.md §7.2 (field/empty/error contracts)
  */
@@ -29,7 +29,11 @@ function formatRelativeTime(iso) {
     if (diffH < 24) return diffH === 1 ? 'לפני שעה' : `לפני ${diffH} שעות`;
     if (diffD < 2) return 'אתמול';
     if (diffD < 7) return `לפני ${diffD} ימים`;
-    return d.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    return d.toLocaleDateString('he-IL', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
   } catch {
     return '—';
   }
@@ -45,7 +49,9 @@ async function fetchTriggeredUnread() {
       sort: 'triggered_at',
       order: 'desc',
     });
-    const data = Array.isArray(res) ? res : (res?.data ?? res?.alerts ?? []) || [];
+    const data = Array.isArray(res)
+      ? res
+      : (res?.data ?? res?.alerts ?? []) || [];
     const total = Math.max(data.length, res?.total ?? 0);
     return { data, total };
   } catch (e) {
@@ -74,10 +80,16 @@ const AlertsSummaryWidget = ({ onData }) => {
       const result = await fetchTriggeredUnread();
       if (cancelled) return;
       setPayload(result);
-      onData?.(result ? { total: result.total, data: result.data } : { total: 0, data: [] });
+      onData?.(
+        result
+          ? { total: result.total, data: result.data }
+          : { total: 0, data: [] },
+      );
       setIsLoading(false);
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [onData]);
 
   if (isLoading) return null;
@@ -97,7 +109,9 @@ const AlertsSummaryWidget = ({ onData }) => {
             aria-label="פתח עמוד ההתראות"
             onClick={() => setAlertsOpen((o) => !o)}
           >
-            <span className="active-alerts__title-icon" aria-hidden="true">🔔</span>
+            <span className="active-alerts__title-icon" aria-hidden="true">
+              🔔
+            </span>
             <span className="active-alerts__title-text">התראות פעילות</span>
           </button>
           <a
@@ -117,7 +131,14 @@ const AlertsSummaryWidget = ({ onData }) => {
             aria-expanded={alertsOpen}
             onClick={() => setAlertsOpen((o) => !o)}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <path d="M6 9l6 6l6 -6"></path>
             </svg>
           </button>
@@ -131,7 +152,9 @@ const AlertsSummaryWidget = ({ onData }) => {
               const symbol = a.ticker_symbol ?? a.target_display_name ?? '—';
               const condition = a.condition_summary ?? a.title ?? '—';
               const time = formatRelativeTime(a.triggered_at ?? a.triggeredAt);
-              const itemUrl = a.id ? `${d34Url}?id=${encodeURIComponent(a.id)}` : d34Url;
+              const itemUrl = a.id
+                ? `${d34Url}?id=${encodeURIComponent(a.id)}`
+                : d34Url;
 
               return (
                 <a
@@ -142,7 +165,9 @@ const AlertsSummaryWidget = ({ onData }) => {
                 >
                   <span className="active-alerts__card-symbol">{symbol}</span>
                   <span className="active-alerts__card-sep"> · </span>
-                  <span className="active-alerts__card-condition">{condition}</span>
+                  <span className="active-alerts__card-condition">
+                    {condition}
+                  </span>
                   <span className="active-alerts__card-sep"> · </span>
                   <time className="active-alerts__card-time">{time}</time>
                 </a>

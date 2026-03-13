@@ -17,7 +17,13 @@ function formatDate(iso) {
   if (!iso) return '—';
   try {
     const d = new Date(iso);
-    return d.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    return d.toLocaleDateString('he-IL', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   } catch {
     return iso;
   }
@@ -25,8 +31,18 @@ function formatDate(iso) {
 
 function statusBadge(s) {
   if (!s) return '<span class="badge badge--secondary">טרם רץ</span>';
-  const map = { COMPLETED: 'badge--success', FAILED: 'badge--error', RUNNING: 'badge--info', PENDING: 'badge--secondary' };
-  const label = { COMPLETED: 'הסתיים', FAILED: 'נכשל', RUNNING: 'פועל', PENDING: 'ממתין' };
+  const map = {
+    COMPLETED: 'badge--success',
+    FAILED: 'badge--error',
+    RUNNING: 'badge--info',
+    PENDING: 'badge--secondary',
+  };
+  const label = {
+    COMPLETED: 'הסתיים',
+    FAILED: 'נכשל',
+    RUNNING: 'פועל',
+    PENDING: 'ממתין',
+  };
   const c = map[s] || 'badge--secondary';
   return `<span class="badge ${c}">${label[s] || s}</span>`;
 }
@@ -37,14 +53,18 @@ async function fetchBackgroundJobs() {
     const res = await sharedServices.get('/admin/background-jobs');
     const jobs = res?.jobs ?? [];
     const list = Array.isArray(jobs) ? jobs : [];
-    const withHistory = await Promise.all(list.map(async (j) => {
-      try {
-        const d = await sharedServices.get(`/admin/background-jobs/${encodeURIComponent(j.job_name ?? j.jobName)}`);
-        return { ...j, historyCount: (d?.history ?? []).length };
-      } catch {
-        return { ...j, historyCount: 0 };
-      }
-    }));
+    const withHistory = await Promise.all(
+      list.map(async (j) => {
+        try {
+          const d = await sharedServices.get(
+            `/admin/background-jobs/${encodeURIComponent(j.job_name ?? j.jobName)}`,
+          );
+          return { ...j, historyCount: (d?.history ?? []).length };
+        } catch {
+          return { ...j, historyCount: 0 };
+        }
+      }),
+    );
     return withHistory;
   } catch (e) {
     maskedLog('[BackgroundJobs] Fetch error:', { status: e?.status });
@@ -55,17 +75,24 @@ async function fetchBackgroundJobs() {
 async function triggerJob(jobName) {
   try {
     await sharedServices.init();
-    await sharedServices.post(`/admin/background-jobs/${encodeURIComponent(jobName)}/trigger`);
+    await sharedServices.post(
+      `/admin/background-jobs/${encodeURIComponent(jobName)}/trigger`,
+    );
     renderJobs(await fetchBackgroundJobs());
   } catch (e) {
-    maskedLog('[BackgroundJobs] Trigger error:', { jobName, status: e?.status });
+    maskedLog('[BackgroundJobs] Trigger error:', {
+      jobName,
+      status: e?.status,
+    });
   }
 }
 
 async function toggleJob(jobName) {
   try {
     await sharedServices.init();
-    await sharedServices.post(`/admin/background-jobs/${encodeURIComponent(jobName)}/toggle`);
+    await sharedServices.post(
+      `/admin/background-jobs/${encodeURIComponent(jobName)}/toggle`,
+    );
     renderJobs(await fetchBackgroundJobs());
   } catch (e) {
     maskedLog('[BackgroundJobs] Toggle error:', { jobName, status: e?.status });
@@ -92,14 +119,16 @@ function renderJobs(jobs) {
         </tr>
       </thead>
       <tbody>
-        ${jobs.map((j) => {
-          const name = j.job_name ?? j.jobName ?? '—';
-          const desc = JOB_HEBREW[name] || (j.description ?? '');
-          const lastRun = formatDate(j.last_run_at ?? j.lastRunAt);
-          const enabled = (j.enabled != null ? j.enabled : j.is_scheduled) !== false;
-          const scheduled = j.is_scheduled !== false;
-          const N = j.historyCount ?? 0;
-          return `
+        ${jobs
+          .map((j) => {
+            const name = j.job_name ?? j.jobName ?? '—';
+            const desc = JOB_HEBREW[name] || (j.description ?? '');
+            const lastRun = formatDate(j.last_run_at ?? j.lastRunAt);
+            const enabled =
+              (j.enabled != null ? j.enabled : j.is_scheduled) !== false;
+            const scheduled = j.is_scheduled !== false;
+            const N = j.historyCount ?? 0;
+            return `
       <tr data-job-name="${encodeURIComponent(name)}">
         <td>${name} — ${desc}</td>
         <td>${lastRun}</td>
@@ -115,7 +144,8 @@ function renderJobs(jobs) {
           <div class="job-history-content"></div>
         </td>
       </tr>`;
-        }).join('')}
+          })
+          .join('')}
       </tbody>
     </table>
   `;
@@ -146,13 +176,19 @@ function renderJobs(jobs) {
         content.textContent = 'טוען...';
         let items = [];
         try {
-          const res = await sharedServices.get(`/admin/background-jobs/${decodeURIComponent(jobName)}/history`, { limit: 5 });
+          const res = await sharedServices.get(
+            `/admin/background-jobs/${decodeURIComponent(jobName)}/history`,
+            { limit: 5 },
+          );
           items = res?.items ?? [];
-          content.innerHTML = items.length ? `
+          content.innerHTML = items.length
+            ? `
             <table class="phoenix-table phoenix-table--compact">
               <thead><tr><th>תאריך</th><th>סטטוס</th><th>משך (ms)</th><th>רשומות</th><th>שגיאות</th></tr></thead>
               <tbody>
-                ${items.map((r) => `
+                ${items
+                  .map(
+                    (r) => `
                   <tr>
                     <td>${formatDate(r.started_at)}</td>
                     <td>${statusBadge(r.status)}</td>
@@ -160,12 +196,16 @@ function renderJobs(jobs) {
                     <td>${r.records_processed ?? '—'}</td>
                     <td>${r.error_count ?? 0}</td>
                   </tr>
-                `).join('')}
+                `,
+                  )
+                  .join('')}
               </tbody>
             </table>
-          ` : '<p class="settings-note">אין ריצות ב-24 השעות האחרונות</p>';
+          `
+            : '<p class="settings-note">אין ריצות ב-24 השעות האחרונות</p>';
         } catch {
-          content.innerHTML = '<p class="settings-error">לא ניתן לטעון היסטוריה</p>';
+          content.innerHTML =
+            '<p class="settings-error">לא ניתן לטעון היסטוריה</p>';
         }
         btn.dataset.historyCount = String(items.length);
         btn.textContent = '▲ הסתר היסטוריה';

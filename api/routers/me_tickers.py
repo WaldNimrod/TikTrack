@@ -53,7 +53,9 @@ async def add_my_ticker(
     symbol: Optional[str] = Query(None, description="Symbol for new ticker (e.g. ANAU.MI)"),
     company_name: Optional[str] = Query(None),
     ticker_type: str = Query("STOCK", description="Ticker type (STOCK, ETF, CRYPTO)"),
-    exchange_id: Optional[str] = Query(None, description="Exchange ULID — from GET /reference/exchanges (R2 1.7)"),
+    exchange_id: Optional[str] = Query(
+        None, description="Exchange ULID — from GET /reference/exchanges (R2 1.7)"
+    ),
     market: Optional[str] = Query(None, description="Market/currency for CRYPTO (e.g. USD, EUR)"),
     current_user: User = Depends(get_current_user),
     db=Depends(get_db),
@@ -96,9 +98,25 @@ async def add_my_ticker(
         # When adding by symbol (create-new), failures are almost always provider/validation.
         err_lower = str(e).lower()
         _provider_keywords = (
-            "provider", "could not fetch", "invalid literal", "timeout", "connection",
-            "rate limit", "api key", "api_key", "symbol", "fetch", "yahoo", "alpha",
-            "httpx", "yfinance", "no data", "empty", "404", "429", "503"
+            "provider",
+            "could not fetch",
+            "invalid literal",
+            "timeout",
+            "connection",
+            "rate limit",
+            "api key",
+            "api_key",
+            "symbol",
+            "fetch",
+            "yahoo",
+            "alpha",
+            "httpx",
+            "yfinance",
+            "no data",
+            "empty",
+            "404",
+            "429",
+            "503",
         )
         if any(k in err_lower for k in _provider_keywords):
             logger.warning("Add ticker provider/validation failure (422): %s", e)
@@ -126,6 +144,7 @@ async def add_my_ticker(
 
 class PatchMyTickerRequest(BaseModel):
     """Request for PATCH /me/tickers/{ticker_id} — update display_name."""
+
     display_name: Optional[str] = Field(None, max_length=100)
 
 

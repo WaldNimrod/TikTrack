@@ -38,32 +38,38 @@ async def run_job(
     try:
         # Clear orphaned 'running' rows (from reload/kill) so they don't block new runs
         await db.execute(
-            text("""
+            text(
+                """
                 UPDATE admin_data.job_run_log
                 SET status = 'timeout', completed_at = NOW()
                 WHERE job_name = :job_name AND status = 'running'
                   AND started_at < NOW() - make_interval(mins => :mins)
-            """),
+            """
+            ),
             {"job_name": job_name, "mins": STALE_RUNNING_MINUTES},
         )
         await db.commit()
 
         stale_check = await db.execute(
-            text("""
+            text(
+                """
                 SELECT id FROM admin_data.job_run_log
                 WHERE job_name = :job_name AND status = 'running'
                   AND started_at > NOW() - INTERVAL '30 minutes'
                 LIMIT 1
-            """),
+            """
+            ),
             {"job_name": job_name},
         )
         if stale_check.scalar() is not None:
             await db.execute(
-                text("""
+                text(
+                    """
                     INSERT INTO admin_data.job_run_log
                     (id, job_name, started_at, completed_at, status, runtime_class, exit_code)
                     VALUES (:id, :job_name, :started, NOW(), 'skipped_concurrent', :runtime_class, 0)
-                """),
+                """
+                ),
                 {
                     "id": run_id,
                     "job_name": job_name,
@@ -76,11 +82,13 @@ async def run_job(
             return result
 
         await db.execute(
-            text("""
+            text(
+                """
                 INSERT INTO admin_data.job_run_log
                 (id, job_name, started_at, status, runtime_class, records_processed)
                 VALUES (:id, :job_name, :started, 'running', :runtime_class, 0)
-            """),
+            """
+            ),
             {
                 "id": run_id,
                 "job_name": job_name,
@@ -100,13 +108,15 @@ async def run_job(
         exit_code = 0 if error_count == 0 else 1
 
         await db.execute(
-            text("""
+            text(
+                """
                 UPDATE admin_data.job_run_log
                 SET completed_at = :completed, status = :status, exit_code = :exit_code,
                     duration_ms = :duration_ms, records_processed = :records_processed,
                     records_updated = :records_updated, error_count = :error_count
                 WHERE id = :id
-            """),
+            """
+            ),
             {
                 "id": run_id,
                 "completed": completed_at,
@@ -126,12 +136,14 @@ async def run_job(
         duration_ms = int((completed_at - started_at).total_seconds() * 1000)
         try:
             await db.execute(
-                text("""
+                text(
+                    """
                     UPDATE admin_data.job_run_log
                     SET completed_at = :completed, status = 'failed', exit_code = 1,
                         duration_ms = :duration_ms, error_class = :err_cls
                     WHERE id = :id
-                """),
+                """
+                ),
                 {
                     "id": run_id,
                     "completed": completed_at,

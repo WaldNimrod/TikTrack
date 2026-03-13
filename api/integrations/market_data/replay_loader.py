@@ -8,7 +8,9 @@ import json
 from pathlib import Path
 from typing import Any, Optional
 
-_DEFAULT_FIXTURES_DIR = Path(__file__).resolve().parent.parent.parent.parent / "tests" / "fixtures" / "market_data"
+_DEFAULT_FIXTURES_DIR = (
+    Path(__file__).resolve().parent.parent.parent.parent / "tests" / "fixtures" / "market_data"
+)
 
 
 def _load_json(path: Path) -> Optional[dict]:

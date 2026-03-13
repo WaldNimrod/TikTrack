@@ -44,11 +44,16 @@ const PhoenixTablePagination = {
   extractTableData(response) {
     const arr = Array.isArray(response)
       ? response
-      : (response?.data ?? response?.notes ?? response?.results ?? response?.items ?? []) || [];
+      : (response?.data ??
+          response?.notes ??
+          response?.results ??
+          response?.items ??
+          []) ||
+        [];
     const reported = response?.total ?? response?.total_count ?? null;
     const total = Math.max(arr.length, reported ?? 0);
     return { data: arr, total };
-  }
+  },
 };
 
 if (typeof window !== 'undefined') {

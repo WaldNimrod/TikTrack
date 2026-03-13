@@ -31,7 +31,10 @@
 body.index-page,
 body.dashboard-page,
 body.profile-page {
-  background: var(--apple-bg-secondary, #f2f2f7); /* Light gray background - NOT white */
+  background: var(
+    --apple-bg-secondary,
+    #f2f2f7
+  ); /* Light gray background - NOT white */
   color: var(--apple-text-primary, #1d1d1f);
 }
 
@@ -73,12 +76,12 @@ body.profile-page {
 
 .card-header {
   padding: var(--spacing-md, 16px) var(--spacing-lg, 24px);
-  background: var(--apple-bg-secondary, #F2F2F7);
+  background: var(--apple-bg-secondary, #f2f2f7);
   border-block-end: 1px solid var(--apple-border-light, #e5e5e5);
 }
 
 .card-header.bg-light {
-  background: var(--apple-bg-secondary, #F2F2F7);
+  background: var(--apple-bg-secondary, #f2f2f7);
 }
 
 .card-header h6 {
@@ -126,7 +129,7 @@ body.profile-page {
 }
 
 .form-control[readonly] {
-  background: var(--apple-bg-secondary, #F2F2F7);
+  background: var(--apple-bg-secondary, #f2f2f7);
   cursor: not-allowed;
 }
 
@@ -199,14 +202,14 @@ body.profile-page {
 .btn-success {
   /* Base: White background, colored text, border same color as text */
   background-color: var(--apple-bg-primary, #ffffff);
-  color: var(--apple-green, #34C759);
+  color: var(--apple-green, #34c759);
   border: 1px solid currentColor; /* Border same color as text */
   margin-block-end: 0; /* Always 0 margin below */
 }
 
 .btn-success:hover {
   /* Hover: Invert colors - colored background, white text, add shadow, border unchanged */
-  background-color: var(--apple-green, #34C759);
+  background-color: var(--apple-green, #34c759);
   color: var(--apple-bg-primary, #ffffff);
   box-shadow: var(--apple-shadow-light, 0 2px 8px rgba(0, 0, 0, 0.1));
   /* border-color unchanged (inherited from base - currentColor follows text color) */
@@ -223,14 +226,14 @@ body.profile-page {
 .btn-warning {
   /* Base: White background, colored text, border same color as text */
   background-color: var(--apple-bg-primary, #ffffff);
-  color: var(--apple-orange, #FF9500);
+  color: var(--apple-orange, #ff9500);
   border: 1px solid currentColor; /* Border same color as text */
   margin-block-end: 0; /* Always 0 margin below */
 }
 
 .btn-warning:hover {
   /* Hover: Invert colors - colored background, white text, add shadow, border unchanged */
-  background-color: var(--apple-orange, #FF9500);
+  background-color: var(--apple-orange, #ff9500);
   color: var(--apple-bg-primary, #ffffff);
   box-shadow: var(--apple-shadow-light, 0 2px 8px rgba(0, 0, 0, 0.1));
   /* border-color unchanged (inherited from base - currentColor follows text color) */
@@ -439,96 +442,124 @@ body.profile-page {
 
 /* Widget-specific entity colors - using alt attribute selectors */
 /* Ticker Chart Widget - Ticker color */
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="גרף טיקר"]) .widget-placeholder__header-title-row {
+.widget-placeholder:has(.widget-placeholder__title-icon[alt='גרף טיקר'])
+  .widget-placeholder__header-title-row {
   border-inline-start: 3px solid var(--entity-ticker-color);
 }
 
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="גרף טיקר"]) .widget-placeholder__title-icon {
+.widget-placeholder:has(.widget-placeholder__title-icon[alt='גרף טיקר'])
+  .widget-placeholder__title-icon {
   color: var(--entity-ticker-color);
 }
 
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="גרף טיקר"]) .widget-placeholder__header {
+.widget-placeholder:has(.widget-placeholder__title-icon[alt='גרף טיקר'])
+  .widget-placeholder__header {
   border-inline-start: none;
 }
 
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="גרף טיקר"]) .widget-placeholder__body {
+.widget-placeholder:has(.widget-placeholder__title-icon[alt='גרף טיקר'])
+  .widget-placeholder__body {
   border-inline-start: none;
 }
 
 /* Ticker List Widget - Ticker color */
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="רשימת טיקרים"]) .widget-placeholder__header {
+.widget-placeholder:has(.widget-placeholder__title-icon[alt='רשימת טיקרים'])
+  .widget-placeholder__header {
   border-inline-start: 3px solid var(--entity-ticker-color);
 }
 
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="רשימת טיקרים"]) .widget-placeholder__title-icon {
+.widget-placeholder:has(.widget-placeholder__title-icon[alt='רשימת טיקרים'])
+  .widget-placeholder__title-icon {
   color: var(--entity-ticker-color);
 }
 
 /* Tag Widget - Research color */
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="תגיות"]) .widget-placeholder__header-title-row {
+.widget-placeholder:has(.widget-placeholder__title-icon[alt='תגיות'])
+  .widget-placeholder__header-title-row {
   border-inline-start: 3px solid var(--entity-research-color);
 }
 
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="תגיות"]) .widget-placeholder__title-icon {
+.widget-placeholder:has(.widget-placeholder__title-icon[alt='תגיות'])
+  .widget-placeholder__title-icon {
   color: var(--entity-research-color);
 }
 
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="תגיות"]) .widget-placeholder__header {
+.widget-placeholder:has(.widget-placeholder__title-icon[alt='תגיות'])
+  .widget-placeholder__header {
   border-inline-start: none;
 }
 
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="תגיות"]) .widget-placeholder__body {
+.widget-placeholder:has(.widget-placeholder__title-icon[alt='תגיות'])
+  .widget-placeholder__body {
   border-inline-start: none;
 }
 
 /* Recent Trades Widget - Trade color */
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="טריידים אחרונים"]) .widget-placeholder__title-icon {
+.widget-placeholder:has(.widget-placeholder__title-icon[alt='טריידים אחרונים'])
+  .widget-placeholder__title-icon {
   color: var(--entity-trades-color);
 }
 
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="טריידים אחרונים"]):has(.widget-placeholder__tabs) .widget-placeholder__header-title-row {
+.widget-placeholder:has(
+    .widget-placeholder__title-icon[alt='טריידים אחרונים']
+  ):has(.widget-placeholder__tabs)
+  .widget-placeholder__header-title-row {
   border-inline-start: 3px solid var(--entity-trades-color);
 }
 
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="טריידים אחרונים"]) .widget-placeholder__header {
+.widget-placeholder:has(.widget-placeholder__title-icon[alt='טריידים אחרונים'])
+  .widget-placeholder__header {
   border-inline-start: none;
 }
 
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="טריידים אחרונים"]) .widget-placeholder__body {
+.widget-placeholder:has(.widget-placeholder__title-icon[alt='טריידים אחרונים'])
+  .widget-placeholder__body {
   border-inline-start: none;
 }
 
 /* Pending Actions Widget - Execution color */
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="פעולות ממתינות"]) .widget-placeholder__title-icon {
+.widget-placeholder:has(.widget-placeholder__title-icon[alt='פעולות ממתינות'])
+  .widget-placeholder__title-icon {
   color: var(--entity-execution-color);
 }
 
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="פעולות ממתינות"]):has(.widget-placeholder__tabs) .widget-placeholder__header-title-row {
+.widget-placeholder:has(
+    .widget-placeholder__title-icon[alt='פעולות ממתינות']
+  ):has(.widget-placeholder__tabs)
+  .widget-placeholder__header-title-row {
   border-inline-start: 3px solid var(--entity-execution-color);
 }
 
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="פעולות ממתינות"]) .widget-placeholder__header {
+.widget-placeholder:has(.widget-placeholder__title-icon[alt='פעולות ממתינות'])
+  .widget-placeholder__header {
   border-inline-start: none;
 }
 
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="פעולות ממתינות"]) .widget-placeholder__body {
+.widget-placeholder:has(.widget-placeholder__title-icon[alt='פעולות ממתינות'])
+  .widget-placeholder__body {
   border-inline-start: none;
 }
 
 /* Ticker List Widget - Ticker color (Type 2 with tabs) */
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="רשימת טיקרים"]) .widget-placeholder__title-icon {
+.widget-placeholder:has(.widget-placeholder__title-icon[alt='רשימת טיקרים'])
+  .widget-placeholder__title-icon {
   color: var(--entity-ticker-color);
 }
 
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="רשימת טיקרים"]):has(.widget-placeholder__tabs) .widget-placeholder__header-title-row {
+.widget-placeholder:has(
+    .widget-placeholder__title-icon[alt='רשימת טיקרים']
+  ):has(.widget-placeholder__tabs)
+  .widget-placeholder__header-title-row {
   border-inline-start: 3px solid var(--entity-ticker-color);
 }
 
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="רשימת טיקרים"]) .widget-placeholder__header {
+.widget-placeholder:has(.widget-placeholder__title-icon[alt='רשימת טיקרים'])
+  .widget-placeholder__header {
   border-inline-start: none;
 }
 
-.widget-placeholder:has(.widget-placeholder__title-icon[alt="רשימת טיקרים"]) .widget-placeholder__body {
+.widget-placeholder:has(.widget-placeholder__title-icon[alt='רשימת טיקרים'])
+  .widget-placeholder__body {
   border-inline-start: none;
 }
 
@@ -744,8 +775,8 @@ tt-section .dashboard-section__body .info-summary {
   color: var(--apple-text-secondary, #86868b);
 }
 
-.status-badge[data-status-category="open"],
-.status-badge[data-status-category="active"] {
+.status-badge[data-status-category='open'],
+.status-badge[data-status-category='active'] {
   background: var(--apple-green, #34c759);
   color: white;
 }
@@ -1131,7 +1162,8 @@ tt-section .dashboard-section__body .info-summary .info-summary__row--first {
   padding: 0;
 }
 
-.widget-placeholder__header:has(.widget-placeholder__tabs) .widget-placeholder__header-title-row {
+.widget-placeholder__header:has(.widget-placeholder__tabs)
+  .widget-placeholder__header-title-row {
   border-bottom: 1px solid var(--apple-border-light, #e5e5e5);
 }
 
@@ -1503,7 +1535,6 @@ tt-section-row {
   margin-block-end: var(--spacing-md, 16px);
 }
 
-
 tt-section-row:last-child {
   margin-block-end: 0;
 }
@@ -1625,10 +1656,16 @@ tt-section-row:last-child {
 
 .index-section__header-actions .portfolio-header-filters,
 .dashboard-section__header-actions .portfolio-header-filters,
-tt-section[data-section="portfolio"] .index-section__header-actions .portfolio-header-filters,
-tt-section[data-section="portfolio"] .dashboard-section__header-actions .portfolio-header-filters,
+tt-section[data-section='portfolio']
+  .index-section__header-actions
+  .portfolio-header-filters,
+tt-section[data-section='portfolio']
+  .dashboard-section__header-actions
+  .portfolio-header-filters,
 .index-section__header .index-section__header-actions .portfolio-header-filters,
-.dashboard-section__header .dashboard-section__header-actions .portfolio-header-filters {
+.dashboard-section__header
+  .dashboard-section__header-actions
+  .portfolio-header-filters {
   flex-wrap: nowrap;
 }
 
@@ -1692,16 +1729,29 @@ tt-section[data-section="portfolio"] .dashboard-section__header-actions .portfol
   margin-top: 0;
 }
 
-.index-section__header-actions .portfolio-header-filters .portfolio-side-filter-btn.align-push-down,
-.index-section__header-actions .portfolio-header-filters .portfolio-filter-select.align-push-down,
-.index-section__header-actions .portfolio-header-filters .portfolio-checkboxes-container.align-push-down,
-.dashboard-section__header-actions .portfolio-header-filters .portfolio-side-filter-btn.align-push-down,
-.dashboard-section__header-actions .portfolio-header-filters .portfolio-filter-select.align-push-down,
-.dashboard-section__header-actions .portfolio-header-filters .portfolio-checkboxes-container.align-push-down {
+.index-section__header-actions
+  .portfolio-header-filters
+  .portfolio-side-filter-btn.align-push-down,
+.index-section__header-actions
+  .portfolio-header-filters
+  .portfolio-filter-select.align-push-down,
+.index-section__header-actions
+  .portfolio-header-filters
+  .portfolio-checkboxes-container.align-push-down,
+.dashboard-section__header-actions
+  .portfolio-header-filters
+  .portfolio-side-filter-btn.align-push-down,
+.dashboard-section__header-actions
+  .portfolio-header-filters
+  .portfolio-filter-select.align-push-down,
+.dashboard-section__header-actions
+  .portfolio-header-filters
+  .portfolio-checkboxes-container.align-push-down {
   padding-top: var(--spacing-xs, 4px);
 }
 
-.widget-placeholder__header-title-row .widget-placeholder__refresh-btn.align-push-down {
+.widget-placeholder__header-title-row
+  .widget-placeholder__refresh-btn.align-push-down {
   padding-top: var(--spacing-xs, 4px);
   margin-top: 0;
 }
@@ -1721,8 +1771,12 @@ tt-section[data-section="portfolio"] .dashboard-section__header-actions .portfol
   color: white;
 }
 
-.index-section__header-actions .portfolio-header-filters .portfolio-checkboxes-container,
-.dashboard-section__header-actions .portfolio-header-filters .portfolio-checkboxes-container {
+.index-section__header-actions
+  .portfolio-header-filters
+  .portfolio-checkboxes-container,
+.dashboard-section__header-actions
+  .portfolio-header-filters
+  .portfolio-checkboxes-container {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -1773,16 +1827,19 @@ tt-section[data-section="portfolio"] .dashboard-section__header-actions .portfol
 .btn-logout {
   /* Base: White background, colored text, border same color as text */
   background-color: var(--apple-bg-primary, #ffffff) !important;
-  color: var(--color-error-red, #FF3B30) !important;
+  color: var(--color-error-red, #ff3b30) !important;
   border: 1px solid currentColor !important; /* Border same color as text */
   margin-block-end: 0 !important; /* Always 0 margin below */
 }
 
 .btn-logout:hover {
   /* Hover: Invert colors - red background, white text, add shadow, border unchanged */
-  background-color: var(--color-error-red, #FF3B30) !important;
+  background-color: var(--color-error-red, #ff3b30) !important;
   color: var(--apple-bg-primary, #ffffff) !important;
-  box-shadow: var(--apple-shadow-light, 0 2px 8px rgba(0, 0, 0, 0.1)) !important;
+  box-shadow: var(
+    --apple-shadow-light,
+    0 2px 8px rgba(0, 0, 0, 0.1)
+  ) !important;
   /* border-color unchanged (inherited from base - currentColor follows text color) */
 }
 
@@ -1844,7 +1901,7 @@ body.system-management-page {
 }
 
 .settings-error {
-  color: var(--color-error-red, #FF3B30);
+  color: var(--color-error-red, #ff3b30);
   font-size: 0.9rem;
 }
 
@@ -1857,7 +1914,7 @@ body.system-management-page {
   flex-shrink: 0;
 }
 
-.settings-row__input-wrap input[type="number"] {
+.settings-row__input-wrap input[type='number'] {
   width: 6ch;
   text-align: left;
   direction: ltr;
@@ -1882,24 +1939,29 @@ body.system-management-page {
    ============================================ */
 
 /* בחר טיקר בכותרת — יישור לסוף השורה לפני כפתור הסגירה */
-tt-section[data-section="data-integrity"] .index-section__header-meta--align-end {
+tt-section[data-section='data-integrity']
+  .index-section__header-meta--align-end {
   justify-content: flex-end;
 }
 
 /* פילטר חשבון מסחר בכותרת — יישור לסוף השורה כמו כפתור הוספה */
-tt-section[data-section="brokers-management"] .index-section__header-meta--align-end {
+tt-section[data-section='brokers-management']
+  .index-section__header-meta--align-end {
   justify-content: flex-end;
 }
 
 /* פילטר סוג תנועה בכותרת קונטיינר תזרימי מזומנים — מיושר לסוף השורה ליד כפתור הסגירה */
-tt-section[data-section="cash-flows-management"] .phoenix-table-filter-group--header {
+tt-section[data-section='cash-flows-management']
+  .phoenix-table-filter-group--header {
   display: flex;
   align-items: center;
   gap: var(--spacing-xs, 4px);
   margin: 0;
   flex-shrink: 0;
 }
-tt-section[data-section="cash-flows-management"] .phoenix-table-filter-group--header .phoenix-table-filter-select {
+tt-section[data-section='cash-flows-management']
+  .phoenix-table-filter-group--header
+  .phoenix-table-filter-select {
   height: 32px;
   padding: 0 var(--spacing-sm, 8px);
   font-size: 0.875rem;
@@ -2129,10 +2191,9 @@ body.brokers-fees-page tt-container tt-section {
   color: var(--apple-text-primary, #0f172a);
 }
 
-.data-integrity-detail-row span[dir="ltr"] {
+.data-integrity-detail-row span[dir='ltr'] {
   text-align: left;
 }
-
 
 .data-integrity-empty,
 .data-integrity-loading {
@@ -2176,7 +2237,7 @@ body.brokers-fees-page tt-container tt-section {
   padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
   margin: var(--spacing-sm, 8px) 0;
   background: rgba(0, 122, 255, 0.06);
-  border: 1px solid var(--apple-blue, #007AFF);
+  border: 1px solid var(--apple-blue, #007aff);
   border-radius: var(--apple-radius-small, 6px);
   color: var(--apple-text-primary, #0f172a);
   font-weight: 500;
@@ -2186,7 +2247,7 @@ body.brokers-fees-page tt-container tt-section {
 .data-integrity-force-reload-btn {
   margin-right: var(--spacing-md, 16px);
   padding: var(--spacing-xs, 4px) var(--spacing-md, 16px);
-  background: var(--apple-blue, #007AFF);
+  background: var(--apple-blue, #007aff);
   color: #fff;
   border: none;
   border-radius: var(--apple-radius-small, 6px);
@@ -2221,7 +2282,7 @@ body.brokers-fees-page tt-container tt-section {
 }
 
 .data-integrity-error {
-  color: var(--color-error-red, #FF3B30);
+  color: var(--color-error-red, #ff3b30);
 }
 
 /* T30-1: Tickers table — hover menu precision (150ms/100ms/0px gap, row zone) */
@@ -2234,7 +2295,9 @@ body.brokers-fees-page tt-container tt-section {
   transition-delay: 0s;
 }
 .phoenix-table--actions-hover .table-actions-tooltip:hover .table-actions-menu,
-.phoenix-table--actions-hover .table-actions-tooltip:focus-within .table-actions-menu {
+.phoenix-table--actions-hover
+  .table-actions-tooltip:focus-within
+  .table-actions-menu {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -2329,17 +2392,41 @@ body.brokers-fees-page tt-container tt-section {
   border-radius: var(--apple-radius-small, 6px);
   border: 1px solid var(--apple-border-light, #e5e5e5);
 }
-.heat-card__title { font-weight: 600; font-size: 0.9rem; }
-.heat-card__value { font-size: 1.25rem; }
-.heat-indicator--low { color: var(--apple-green, #34c759); }
-.heat-indicator--medium { color: var(--apple-orange, #ff9f0a); }
-.heat-indicator--high { color: var(--apple-red, #ff3b30); }
-.heat-card__detail { font-size: 0.85rem; color: var(--apple-text-secondary, #6b7280); }
+.heat-card__title {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.heat-card__value {
+  font-size: 1.25rem;
+}
+.heat-indicator--low {
+  color: var(--apple-green, #34c759);
+}
+.heat-indicator--medium {
+  color: var(--apple-orange, #ff9f0a);
+}
+.heat-indicator--high {
+  color: var(--apple-red, #ff3b30);
+}
+.heat-card__detail {
+  font-size: 0.85rem;
+  color: var(--apple-text-secondary, #6b7280);
+}
 
 /* Settings field hint */
-.settings-row__field-hint { cursor: help; opacity: 0.7; }
-.input--error { border-color: var(--apple-red, #ff3b30) !important; }
-.field-error-message { color: var(--apple-red, #ff3b30); font-size: 0.8rem; display: block; margin-top: 2px; }
+.settings-row__field-hint {
+  cursor: help;
+  opacity: 0.7;
+}
+.input--error {
+  border-color: var(--apple-red, #ff3b30) !important;
+}
+.field-error-message {
+  color: var(--apple-red, #ff3b30);
+  font-size: 0.8rem;
+  display: block;
+  margin-top: 2px;
+}
 
 /* Price source badges (סגירה, תוך־יומי) */
 .price-source-badge {
@@ -2379,8 +2466,14 @@ body.brokers-fees-page tt-container tt-section {
   border-radius: 4px;
   margin-bottom: 8px;
 }
-.modal-skeleton .skeleton-row--short { max-width: 60%; }
+.modal-skeleton .skeleton-row--short {
+  max-width: 60%;
+}
 @keyframes modal-skeleton-shimmer {
-  0% { background-position: 200% center; }
-  100% { background-position: -200% center; }
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
 }

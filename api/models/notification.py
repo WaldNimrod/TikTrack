@@ -19,6 +19,7 @@ from .base import Base
 
 class Notification(Base):
     """Notification model - maps to user_data.notifications table."""
+
     __tablename__ = "notifications"
     __table_args__ = ({"schema": "user_data"},)
 

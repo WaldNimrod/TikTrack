@@ -2,7 +2,7 @@
  * usePhoenixTableSort - React Hook לניהול סידור טבלאות
  * -----------------------------------------------------
  * Hook לניהול מצב סידור טבלאות עם תמיכה ב-Multi-sort (Primary + Secondary).
- * 
+ *
  * @description Hook לניהול סידור טבלאות עם מחזור סידור (ASC → DESC → NONE) ו-Multi-sort (Shift + click)
  * @standard JS Standards Protocol ✅ | Audit Trail System ✅ | Debug Mode ✅
  * @legacyReference Legacy.tables.sorting
@@ -21,25 +21,25 @@ import { DEBUG_MODE } from '../../../utils/debug';
 
 /**
  * usePhoenixTableSort Hook
- * 
+ *
  * @description Hook לניהול מצב סידור טבלאות
  * @returns {Object} { sortState, handleSort, clearSort, getSortState }
- * 
+ *
  * @example
  * const { sortState, handleSort, clearSort } = usePhoenixTableSort();
- * 
+ *
  * // לחיצה ראשונה: ASC
  * handleSort('displayNames');
  * // sortState.primary = { key: 'displayNames', direction: 'ASC' }
- * 
+ *
  * // לחיצה שניה: DESC
  * handleSort('displayNames');
  * // sortState.primary = { key: 'displayNames', direction: 'DESC' }
- * 
+ *
  * // לחיצה שלישית: NONE (איפוס)
  * handleSort('displayNames');
  * // sortState.primary = { key: null, direction: null }
- * 
+ *
  * // Multi-sort (Shift + click): רמת סידור שניה
  * handleSort('brokerNames', true);
  * // sortState.secondary = { key: 'brokerNames', direction: 'ASC' }
@@ -48,26 +48,28 @@ export const usePhoenixTableSort = () => {
   // State management: מצב סידור (Primary + Secondary)
   const [sortState, setSortState] = useState({
     primary: { key: null, direction: null },
-    secondary: { key: null, direction: null }
+    secondary: { key: null, direction: null },
   });
 
   /**
    * handleSort - טיפול בלחיצה על כותרת עמודה לסידור
-   * 
+   *
    * @description מחזור סידור: ASC → DESC → NONE (או רמת סידור שניה עם Shift)
    * @param {string} key - מפתח השדה לסידור (למשל: 'displayNames', 'availableAmounts')
    * @param {boolean} isSecondary - האם זו רמת סידור שניה (Shift + click)
-   * 
+   *
    * @example
    * // לחיצה רגילה: רמת סידור ראשונה
    * handleSort('displayNames');
-   * 
+   *
    * // Shift + click: רמת סידור שניה
    * handleSort('brokerNames', true);
    */
   const handleSort = useCallback((key, isSecondary = false) => {
     setSortState((prevState) => {
-      const currentState = isSecondary ? prevState.secondary : prevState.primary;
+      const currentState = isSecondary
+        ? prevState.secondary
+        : prevState.primary;
       const newState = { ...prevState };
 
       // מחזור סידור: ASC → DESC → NONE
@@ -107,9 +109,11 @@ export const usePhoenixTableSort = () => {
       if (DEBUG_MODE) {
         audit.log('Tables', 'Sort changed', {
           key,
-          direction: isSecondary ? newState.secondary.direction : newState.primary.direction,
+          direction: isSecondary
+            ? newState.secondary.direction
+            : newState.primary.direction,
           isSecondary,
-          sortState: newState
+          sortState: newState,
         });
       }
 
@@ -119,9 +123,9 @@ export const usePhoenixTableSort = () => {
 
   /**
    * clearSort - איפוס כל הסידור
-   * 
+   *
    * @description איפוס כל מצב הסידור למצב התחלתי
-   * 
+   *
    * @example
    * clearSort();
    * // sortState.primary = { key: null, direction: null }
@@ -130,7 +134,7 @@ export const usePhoenixTableSort = () => {
   const clearSort = useCallback(() => {
     const initialSortState = {
       primary: { key: null, direction: null },
-      secondary: { key: null, direction: null }
+      secondary: { key: null, direction: null },
     };
 
     setSortState(initialSortState);
@@ -139,17 +143,17 @@ export const usePhoenixTableSort = () => {
     if (DEBUG_MODE) {
       audit.log('Tables', 'Sort cleared', {
         previousSortState: sortState,
-        newSortState: initialSortState
+        newSortState: initialSortState,
       });
     }
   }, [sortState]);
 
   /**
    * getSortState - קבלת מצב הסידור הנוכחי
-   * 
+   *
    * @description קבלת מצב הסידור הנוכחי (read-only)
    * @returns {SortState} מצב הסידור הנוכחי
-   * 
+   *
    * @example
    * const currentSortState = getSortState();
    * console.log(currentSortState.primary.key); // 'displayNames' או null
@@ -162,7 +166,7 @@ export const usePhoenixTableSort = () => {
     sortState,
     handleSort,
     clearSort,
-    getSortState
+    getSortState,
   };
 };
 

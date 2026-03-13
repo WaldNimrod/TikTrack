@@ -13,5 +13,5 @@ window.UAI.config = {
   components: ['table', 'summary', 'pagination', 'actions'],
   tables: [{ id: 'alertsTable', type: 'alerts', pageSize: 25 }],
   summary: { enabled: true, toggleEnabled: true },
-  metadata: { title: 'התראות', description: 'עמוד התראות', version: '1.0.0' }
+  metadata: { title: 'התראות', description: 'עמוד התראות', version: '1.0.0' },
 };

@@ -110,13 +110,17 @@ async def get_exchange_rate_cache_first(
 
     if skip_fetch:
         return (
-            ExchangeRateResult(
-                from_currency=from_ccy,
-                to_currency=to_ccy,
-                rate=row.conversion_rate if row else Decimal("0"),
-                as_of=row.last_sync_time if row else None,
-                provider="cache",
-            ) if row else None,
+            (
+                ExchangeRateResult(
+                    from_currency=from_ccy,
+                    to_currency=to_ccy,
+                    rate=row.conversion_rate if row else Decimal("0"),
+                    as_of=row.last_sync_time if row else None,
+                    provider="cache",
+                )
+                if row
+                else None
+            ),
             "na" if not row else _compute_staleness(row.last_sync_time),
         )
 
@@ -129,8 +133,13 @@ async def get_exchange_rate_cache_first(
             if rate:
                 return rate, "ok"
         except Exception as e:
-            logger.warning("Provider %s failed for FX %s/%s: %s",
-                           provider.__class__.__name__, from_ccy, to_ccy, e)
+            logger.warning(
+                "Provider %s failed for FX %s/%s: %s",
+                provider.__class__.__name__,
+                from_ccy,
+                to_ccy,
+                e,
+            )
 
     # Both failed — return stale if any
     if row:
@@ -188,18 +197,22 @@ async def get_ticker_price_cache_first(
 
     if skip_fetch:
         return (
-            PriceResult(
-                symbol=symbol,
-                price=row.price if row else Decimal("0"),
-                open_price=row.open_price,
-                high_price=row.high_price,
-                low_price=row.low_price,
-                close_price=row.close_price,
-                volume=row.volume,
-                market_cap=getattr(row, "market_cap", None) if row else None,
-                as_of=row.price_timestamp if row else None,
-                provider="cache",
-            ) if row else None,
+            (
+                PriceResult(
+                    symbol=symbol,
+                    price=row.price if row else Decimal("0"),
+                    open_price=row.open_price,
+                    high_price=row.high_price,
+                    low_price=row.low_price,
+                    close_price=row.close_price,
+                    volume=row.volume,
+                    market_cap=getattr(row, "market_cap", None) if row else None,
+                    as_of=row.price_timestamp if row else None,
+                    provider="cache",
+                )
+                if row
+                else None
+            ),
             "na" if not row else _compute_staleness(row.price_timestamp),
         )
 
@@ -213,8 +226,7 @@ async def get_ticker_price_cache_first(
                 await _persist_price_to_db(db, ticker_id, price)
                 return price, "ok"
         except Exception as e:
-            logger.warning("Provider %s failed for %s: %s",
-                          provider.__class__.__name__, symbol, e)
+            logger.warning("Provider %s failed for %s: %s", provider.__class__.__name__, symbol, e)
 
     if row:
         return (
@@ -277,8 +289,9 @@ async def get_ticker_history_cache_first(
             if hist:
                 return hist
         except Exception as e:
-            logger.warning("Provider %s history failed for %s: %s",
-                           provider.__class__.__name__, symbol, e)
+            logger.warning(
+                "Provider %s history failed for %s: %s", provider.__class__.__name__, symbol, e
+            )
     return []
 
 
@@ -294,7 +307,12 @@ async def get_ticker_indicators_cache_first(
 ) -> dict:
     """P3-014 — ATR(14), MA(20/50/150/200), CCI(20). Compute-on-read from 250d OHLC."""
     rows = await get_ticker_history_cache_first(
-        db, symbol, ticker_id, trading_days,
-        skip_fetch=skip_fetch, mode=mode, fixtures_dir=fixtures_dir
+        db,
+        symbol,
+        ticker_id,
+        trading_days,
+        skip_fetch=skip_fetch,
+        mode=mode,
+        fixtures_dir=fixtures_dir,
     )
     return compute_indicators(rows)

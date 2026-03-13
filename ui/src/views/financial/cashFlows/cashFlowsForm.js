@@ -5,7 +5,10 @@
  * SOP-012: Rich-Text (TipTap) for description field
  */
 
-import { createModal, closeModal } from '../../../components/shared/PhoenixModal.js';
+import {
+  createModal,
+  closeModal,
+} from '../../../components/shared/PhoenixModal.js';
 import sharedServices from '../../../components/core/sharedServices.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 import { getFlowTypeOptions } from '../../../utils/flowTypeValues.js';
@@ -22,13 +25,14 @@ async function getTradingAccounts() {
     if (window.PhoenixBridge?.state?.tradingAccounts) {
       return window.PhoenixBridge.state.tradingAccounts;
     }
-    
+
     // Try to get from TradingAccountsDataLoader if available
     if (window.TradingAccountsDataLoader?.fetchTradingAccounts) {
-      const accountsData = await window.TradingAccountsDataLoader.fetchTradingAccounts();
+      const accountsData =
+        await window.TradingAccountsDataLoader.fetchTradingAccounts();
       return accountsData.data || [];
     }
-    
+
     // Fallback: fetch directly from API
     await sharedServices.init();
     const response = await sharedServices.get('/trading_accounts', {});
@@ -37,7 +41,7 @@ async function getTradingAccounts() {
     // Use masked log for security compliance
     maskedLog('[Cash Flows Form] Error fetching trading accounts:', {
       errorCode: error.code,
-      status: error.status
+      status: error.status,
     });
     // Return empty array - user can still type ULID manually
     return [];
@@ -52,25 +56,36 @@ async function getTradingAccounts() {
  */
 function createCashFlowFormHTML(data = null, tradingAccounts = []) {
   const isEdit = data !== null;
-  const tradingAccountId = data?.tradingAccountId || data?.trading_account_id || '';
-  const transactionDate = data?.transactionDate || data?.transaction_date || new Date().toISOString().split('T')[0];
+  const tradingAccountId =
+    data?.tradingAccountId || data?.trading_account_id || '';
+  const transactionDate =
+    data?.transactionDate ||
+    data?.transaction_date ||
+    new Date().toISOString().split('T')[0];
   const flowType = data?.flowType || data?.flow_type || 'DEPOSIT';
   const flowTypeOptions = getFlowTypeOptions();
   const amount = data?.amount || 0;
   const currency = data?.currency || 'USD';
   const description = data?.description || '';
-  const externalReference = data?.externalReference || data?.external_reference || '';
+  const externalReference =
+    data?.externalReference || data?.external_reference || '';
 
   // Get current filter if available
-  const currentFilterAccount = window.PhoenixBridge?.state?.filters?.tradingAccount || '';
+  const currentFilterAccount =
+    window.PhoenixBridge?.state?.filters?.tradingAccount || '';
   const defaultAccountId = tradingAccountId || currentFilterAccount || '';
 
   // Build trading accounts dropdown (D16 style: -- לבחור --)
   let accountsOptions = '<option value="">-- לבחור חשבון מסחר --</option>';
   if (tradingAccounts.length > 0) {
-    tradingAccounts.forEach(account => {
-      const accountId = account.externalUlid || account.id || account.external_ulid;
-      const accountName = account.displayName || account.name || account.display_name || accountId;
+    tradingAccounts.forEach((account) => {
+      const accountId =
+        account.externalUlid || account.id || account.external_ulid;
+      const accountName =
+        account.displayName ||
+        account.name ||
+        account.display_name ||
+        accountId;
       const selected = accountId === defaultAccountId ? 'selected' : '';
       accountsOptions += `<option value="${accountId}" ${selected}>${accountName}</option>`;
     });
@@ -101,7 +116,7 @@ function createCashFlowFormHTML(data = null, tradingAccounts = []) {
         <div class="form-group">
           <label for="flowType">סוג תנועה <span class="form-label-asterisk">*</span></label>
           <select id="flowType" name="flowType" required>
-            ${flowTypeOptions.map(opt => `<option value="${opt.value}" ${flowType === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('\n            ')}
+            ${flowTypeOptions.map((opt) => `<option value="${opt.value}" ${flowType === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('\n            ')}
           </select>
           <span class="form-error" id="flowTypeError"></span>
         </div>
@@ -162,9 +177,9 @@ function createCashFlowFormHTML(data = null, tradingAccounts = []) {
 export async function showCashFlowFormModal(data, onSave) {
   const isEdit = data !== null;
   const title = isEdit ? 'עריכת תזרים' : 'הוספת תזרים חדש';
-  
+
   // Get trading accounts for dropdown
-  getTradingAccounts().then(tradingAccounts => {
+  getTradingAccounts().then((tradingAccounts) => {
     const formHTML = createCashFlowFormHTML(data, tradingAccounts);
     let richTextInstance = null;
 
@@ -174,7 +189,7 @@ export async function showCashFlowFormModal(data, onSave) {
       entity: 'cash_flow',
       showSaveButton: true,
       saveButtonText: 'שמירה',
-      onSave: async function() {
+      onSave: async function () {
         const form = document.getElementById('cashFlowForm');
         if (!form) return;
 
@@ -184,22 +199,30 @@ export async function showCashFlowFormModal(data, onSave) {
           return;
         }
 
-        const descriptionHtml = richTextInstance ? richTextInstance.getHTML() : '';
+        const descriptionHtml = richTextInstance
+          ? richTextInstance.getHTML()
+          : '';
         const descPlain = descriptionHtml.replace(/<[^>]+>/g, '').trim();
 
         // Collect form data
         const formData = {
-          tradingAccountId: document.getElementById('tradingAccountId').value.trim(),
+          tradingAccountId: document
+            .getElementById('tradingAccountId')
+            .value.trim(),
           transactionDate: document.getElementById('transactionDate').value,
           flowType: document.getElementById('flowType').value,
           amount: parseFloat(document.getElementById('amount').value) || 0,
           currency: document.getElementById('currency').value,
           description: descPlain ? descriptionHtml : null,
-          externalReference: document.getElementById('externalReference').value.trim()
+          externalReference: document
+            .getElementById('externalReference')
+            .value.trim(),
         };
 
         // Clear previous errors
-        form.querySelectorAll('.form-error').forEach(el => { el.textContent = ''; });
+        form.querySelectorAll('.form-error').forEach((el) => {
+          el.textContent = '';
+        });
 
         // Validate required fields
         if (!formData.tradingAccountId) {
@@ -207,13 +230,13 @@ export async function showCashFlowFormModal(data, onSave) {
           if (el) el.textContent = 'חשבון מסחר הוא שדה חובה';
           return;
         }
-        
+
         if (!formData.transactionDate) {
           const el = document.getElementById('transactionDateError');
           if (el) el.textContent = 'תאריך תנועה הוא שדה חובה';
           return;
         }
-        
+
         if (formData.amount <= 0) {
           const el = document.getElementById('amountError');
           if (el) el.textContent = 'סכום חייב להיות גדול מ-0';
@@ -233,7 +256,10 @@ export async function showCashFlowFormModal(data, onSave) {
             }
             closeModal();
           } catch (error) {
-            maskedLog('[Cash Flows Form] Error saving:', { errorCode: error?.code, status: error?.status });
+            maskedLog('[Cash Flows Form] Error saving:', {
+              errorCode: error?.code,
+              status: error?.status,
+            });
           }
         } else {
           if (richTextInstance) {
@@ -243,12 +269,12 @@ export async function showCashFlowFormModal(data, onSave) {
           closeModal();
         }
       },
-      onClose: function() {
+      onClose: function () {
         if (richTextInstance) {
           richTextInstance.destroy();
           richTextInstance = null;
         }
-      }
+      },
     });
 
     // Init TipTap after modal is in DOM
@@ -259,7 +285,7 @@ export async function showCashFlowFormModal(data, onSave) {
         richTextInstance = createPhoenixRichTextEditor(container, {
           content: initialContent,
           placeholder: 'תיאור התנועה (אופציונלי)',
-          toolbarId: 'description-editor-toolbar'
+          toolbarId: 'description-editor-toolbar',
         });
       }
     }, 100);

@@ -2,7 +2,7 @@
  * AppRouter - React Router Configuration
  * --------------------------------------
  * Main router configuration for TikTrack Phoenix Frontend
- * 
+ *
  * @description Defines all routes and navigation structure
  * @infrastructure Team 60 - Router setup
  */
@@ -23,7 +23,7 @@ import DesignSystemDashboard from '../components/admin/DesignSystemDashboard.jsx
 
 /**
  * AppRouter Component
- * 
+ *
  * @description Main router component that defines all application routes
  */
 const AppRouter = () => {
@@ -34,14 +34,11 @@ const AppRouter = () => {
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/reset-password" element={<PasswordResetFlow />} />
-        
+
         {/* Type B (Shared): Home - accessible to both guests and authenticated users */}
         {/* No ProtectedRoute - Home is Type B (Shared) per ADR-013 */}
-        <Route
-          path="/"
-          element={<HomePage />}
-        />
-        
+        <Route path="/" element={<HomePage />} />
+
         {/* Type C (Auth-only): Profile - requires authentication */}
         <Route
           path="/profile"
@@ -51,7 +48,7 @@ const AppRouter = () => {
             </ProtectedRoute>
           }
         />
-        
+
         {/* Type D (Admin-only): Design System Dashboard - requires ADMIN or SUPERADMIN role */}
         <Route
           path="/admin/design-system"
@@ -61,7 +58,7 @@ const AppRouter = () => {
             </ProtectedRoute>
           }
         />
-        
+
         {/* Default redirect - redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

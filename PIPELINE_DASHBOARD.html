@@ -321,6 +321,11 @@
     .alert-box { background: rgba(248,81,73,0.1); border: 1px solid var(--danger); border-radius: 6px; padding: 10px 14px; margin: 10px 0; font-size: 12px; }
     .tip-box   { background: rgba(63,185,80,0.1); border: 1px solid var(--success); border-radius: 6px; padding: 10px 14px; margin: 10px 0; font-size: 12px; }
 
+    /* ── Language sections (Help modal EN/HE) ─── */
+    .lang-he { direction: rtl; text-align: right; font-family: system-ui, -apple-system, sans-serif; }
+    .lang-he code, .lang-he pre { direction: ltr; text-align: left; unicode-bidi: embed; }
+    #lang-toggle-btn { font-size: 11px; padding: 3px 8px; position: absolute; top: 16px; right: 55px; }
+
     /* ── Roadmap Map ─────────────────────────── */
     .rm-stage { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; overflow: hidden; }
     .rm-stage-active-border { border-color: var(--current) !important; }
@@ -373,6 +378,71 @@
     /* ── Roadmap link card ────────────────────── */
     .roadmap-link-card { display: flex; align-items: center; justify-content: center; background: var(--surface); border: 1px dashed var(--border); border-radius: 8px; padding: 10px; margin-bottom: 12px; text-decoration: none; color: var(--text-muted); font-size: 13px; transition: all 0.15s; }
     .roadmap-link-card:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Terminal hint badge ──────────────────────── */
+    .terminal-hint {
+      display: inline-flex; align-items: center; gap: 3px;
+      background: rgba(88,166,255,0.08); border: 1px solid rgba(88,166,255,0.25);
+      border-radius: 4px; padding: 2px 6px;
+      font-size: 10px; color: var(--accent); font-weight: 600; white-space: nowrap;
+    }
+
+    /* ── Sidebar cmd: icon + label layout ────────── */
+    .sidebar-cmd-icon  { font-size: 13px; flex-shrink: 0; line-height: 1; }
+    .sidebar-cmd-label { flex: 1; font-size: 11px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* ── Quick Action Bar ─────────────────────────── */
+    #quick-action-bar { margin-bottom: 14px; }
+    .quick-action-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+    .qa-btn {
+      flex: 1; min-width: 130px; padding: 10px 14px; border-radius: 8px;
+      border: 2px solid var(--border); background: var(--surface);
+      color: var(--text); font-size: 12px; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all 0.15s;
+    }
+    .qa-btn:hover { border-color: var(--accent); }
+    .qa-btn:disabled { opacity: 0.4; cursor: default; }
+    .qa-btn-pass    { border-color: var(--success); color: var(--success); }
+    .qa-btn-pass:hover    { background: rgba(63,185,80,0.1); }
+    .qa-btn-fail    { border-color: var(--danger);  color: var(--danger);  }
+    .qa-btn-fail:hover    { background: rgba(248,81,73,0.08); }
+    .qa-btn-approve { border-color: var(--warning); color: var(--warning); }
+    .qa-btn-approve:hover { background: rgba(210,153,34,0.1); }
+
+    /* ── Findings Builder ─────────────────────────── */
+    .findings-builder {
+      padding: 12px 14px; background: var(--surface2);
+      border: 2px solid var(--accent); border-radius: 8px; margin-top: 8px;
+    }
+    .findings-builder-title {
+      font-size: 11px; font-weight: 700; color: var(--accent);
+      margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .findings-status { font-size: 10px; font-weight: 400; }
+    .findings-textarea {
+      width: 100%; min-height: 70px; font-family: var(--mono); font-size: 11px;
+      border: 1px solid var(--border); border-radius: 4px;
+      padding: 7px 8px; background: #010409; color: #e6edf3; resize: vertical;
+    }
+    .findings-filepath {
+      width: 100%; font-family: var(--mono); font-size: 11px;
+      border: 1px solid var(--border); border-radius: 4px;
+      padding: 5px 8px; background: #010409; color: #e6edf3; margin-top: 6px;
+    }
+    .findings-cmd-row  { display: flex; align-items: stretch; gap: 8px; margin-top: 8px; }
+    .findings-cmd-text {
+      flex: 1; font-family: var(--mono); font-size: 10px;
+      background: #010409; padding: 7px 10px; border-radius: 4px;
+      word-break: break-all; color: #e6edf3; border: 1px solid var(--border);
+      white-space: pre-wrap;
+    }
+    .findings-copy-btn {
+      flex-shrink: 0; background: var(--accent); border: 1px solid var(--accent);
+      color: #fff; padding: 6px 14px; border-radius: 6px;
+      cursor: pointer; font-size: 11px; font-weight: 700;
+    }
+    .findings-copy-btn:hover { background: #388bfd; }
   </style>
 </head>
 <body>
@@ -389,6 +459,7 @@
     </label>
     <button class="btn btn-primary" onclick="loadAll()">↺ Refresh</button>
     <button class="btn" onclick="runProgressCheck()" title="סרוק ארטיפקטים ודיאגנוז מצב נוכחי">🔍 בדוק התקדמות</button>
+    <button class="btn" onclick="window.open('PIPELINE_ROADMAP.html','_blank')" title="Full roadmap, program tree, gate history">🗺️ Roadmap</button>
     <button class="help-btn" onclick="toggleHelp()" title="Help & Documentation">?</button>
   </div>
 </header>
@@ -397,9 +468,13 @@
 <div class="modal-overlay" id="help-modal" onclick="closeHelpOutside(event)">
   <div class="modal-box">
     <button class="modal-close" onclick="toggleHelp()">✕</button>
-    <h2>⚡ Agents OS — Pipeline System Guide</h2>
+    <button id="lang-toggle-btn" class="btn" onclick="toggleLang()" title="Toggle language / החלף שפה">🌐 EN</button>
+    <h2 class="lang-en">⚡ Agents OS — Pipeline System Guide</h2>
+    <h2 class="lang-he" dir="rtl" style="display:none">⚡ Agents OS — מדריך מערכת ה־Pipeline</h2>
 
-    <h3>🚀 Quick Start (30 seconds)</h3>
+    <h3 class="lang-en">🚀 Quick Start (30 seconds)</h3>
+    <h3 class="lang-he" dir="rtl" style="display:none">🚀 התחלה מהירה (30 שניות)</h3>
+    <div class="lang-en">
     <pre># 1. Start the dashboard server (from repo root):
 python3 -m http.server 8090
 # → Open: http://localhost:8090/PIPELINE_DASHBOARD.html
@@ -409,8 +484,22 @@ python3 -m http.server 8090
 # → paste ▼▼▼ block into the AI tool shown (Cursor / Codex / Claude)
 # → run the AI, get result
 ./pipeline_run.sh pass    # ← advance gate → auto-show next</pre>
+    </div>
+    <div class="lang-he" dir="rtl" style="display:none">
+    <pre># 1. Start the dashboard server (from repo root):
+python3 -m http.server 8090
+# → Open: http://localhost:8090/PIPELINE_DASHBOARD.html
 
-    <h3>📋 All pipeline_run.sh Commands</h3>
+# 2. Every gate follows the same 3-step cycle:
+./pipeline_run.sh         # ← generate prompt (shows ▼▼▼ block)
+# → paste ▼▼▼ block into the AI tool shown (Cursor / Codex / Claude)
+# → run the AI, get result
+./pipeline_run.sh pass    # ← advance gate → auto-show next</pre>
+    </div>
+
+    <h3 class="lang-en">📋 All pipeline_run.sh Commands</h3>
+    <h3 class="lang-he" dir="rtl" style="display:none">📋 כל פקודות pipeline_run.sh</h3>
+    <div class="lang-en">
     <pre>./pipeline_run.sh                    # generate + display current gate prompt
 ./pipeline_run.sh pass               # advance PASS → show next gate
 ./pipeline_run.sh fail "reason"      # advance FAIL with reason
@@ -419,8 +508,21 @@ python3 -m http.server 8090
 ./pipeline_run.sh gate GATE_NAME     # generate prompt for a specific gate
 ./pipeline_run.sh store GATE file    # store AI output file into pipeline state
 ./pipeline_run.sh revise "notes"     # G3_5 FAIL → generate G3_PLAN revision prompt</pre>
+    </div>
+    <div class="lang-he" dir="rtl" style="display:none">
+    <pre>./pipeline_run.sh                    # generate + display current gate prompt
+./pipeline_run.sh pass               # advance PASS → show next gate
+./pipeline_run.sh fail "reason"      # advance FAIL with reason
+./pipeline_run.sh approve            # approve human gate (GATE_2, GATE_6, GATE_7)
+./pipeline_run.sh status             # show current state (no prompt)
+./pipeline_run.sh gate GATE_NAME     # generate prompt for a specific gate
+./pipeline_run.sh store GATE file    # store AI output file into pipeline state
+./pipeline_run.sh revise "notes"     # G3_5 FAIL → generate G3_PLAN revision prompt</pre>
+    </div>
 
-    <h3>🗺️ Gate Sequence &amp; Owners</h3>
+    <h3 class="lang-en">🗺️ Gate Sequence &amp; Owners</h3>
+    <h3 class="lang-he" dir="rtl" style="display:none">🗺️ רצף השלבים (Gates) ובעלים</h3>
+    <div class="lang-en">
     <div class="step-box"><div class="step-title">GATE_0 — Team 190 (Codex)</div>Validates scope: domain isolation, no active program conflicts, feasibility.</div>
     <div class="step-box"><div class="step-title">GATE_1 — Team 170 + 190 (Codex)</div>Team 170 produces LLD400 spec → Team 190 validates structure.</div>
     <div class="step-box"><div class="step-title">GATE_2 — Team 100 + Nimrod (human)</div>Do we approve building this? → <code>./pipeline_run.sh approve</code></div>
@@ -440,8 +542,32 @@ python3 -m http.server 8090
     <div class="step-box"><div class="step-title">GATE_6 — Team 100 + Nimrod (human)</div>Reality vs intent: does what was built match what we approved?</div>
     <div class="step-box"><div class="step-title">GATE_7 — Nimrod (browser)</div>Open http://localhost:8080 → UX sign-off → <code>./pipeline_run.sh approve</code></div>
     <div class="step-box"><div class="step-title">GATE_8 — Team 90 + 70 (Codex)</div>Documentation closure, AS_MADE_REPORT, registry update.</div>
+    </div>
+    <div class="lang-he" dir="rtl" style="display:none">
+    <div class="step-box"><div class="step-title">GATE_0 — Team 190 (Codex)</div>ולידציית היקף: בידוד דומיין, אין התנגשויות תוכנית פעילה.</div>
+    <div class="step-box"><div class="step-title">GATE_1 — Team 170 + 190 (Codex)</div>Team 170 מייצר LLD400 → Team 190 מאמת מבנה.</div>
+    <div class="step-box"><div class="step-title">GATE_2 — Team 100 + Nimrod (human)</div>האם מאשרים לבנות? → <code>./pipeline_run.sh approve</code></div>
+    <div class="step-box"><div class="step-title">G3_PLAN — Team 10 (Cursor)</div>בניית תוכנית עבודה: קבצים, בעלים, חוזה API, קריטריוני QA.</div>
+    <div class="step-box"><div class="step-title">G3_5 — Team 90 (Codex)</div>ולידציית תוכנית עבודה: שלמות, חוזים, קריטריוני בדיקה.</div>
+    <div class="step-box"><div class="step-title">G3_6_MANDATES — Orchestrator (auto)</div>מייצר מנדטים לצוותים. פלט: <code>implementation_mandates.md</code></div>
+    <div class="step-box" style="border-color:var(--warning)"><div class="step-title" style="color:var(--warning)">CURSOR_IMPLEMENTATION — Teams 20 + 30 (Cursor)</div>
+      <strong>לשלב זה 3 תת־צעדים — בלי פקודת CLI ביניהם:</strong>
+      <ul style="margin-top:6px">
+        <li><strong>Step A — Team 20</strong>: הדבק מנדט Team 20 → אימות API → שומר קובץ ✅</li>
+        <li><strong>Step B — Team 30</strong>: אחרי שקובץ Team 20 קיים → הדבק מנדט Team 30 → מימוש → <strong>נדרש git commit</strong></li>
+        <li><strong>המשך</strong>: <code>./pipeline_run.sh pass</code> — רק אחרי ששניהם הושלמו + commit קיים</li>
+      </ul>
+    </div>
+    <div class="step-box"><div class="step-title">GATE_4 — Team 50 (Cursor + MCP)</div>QA: בדיקות דפדפן, רשימת 10 נקודות, דוח PASS/FAIL.</div>
+    <div class="step-box"><div class="step-title">GATE_5 — Team 90 (Codex)</div>ולידציית פיתוח: קוד מול spec.</div>
+    <div class="step-box"><div class="step-title">GATE_6 — Team 100 + Nimrod (human)</div>מציאות מול כוונה: האם מה שנבנה תואם לאישור?</div>
+    <div class="step-box"><div class="step-title">GATE_7 — Nimrod (browser)</div>פתח http://localhost:8080 → אישור UX → <code>./pipeline_run.sh approve</code></div>
+    <div class="step-box"><div class="step-title">GATE_8 — Team 90 + 70 (Codex)</div>סגירת תיעוד, AS_MADE_REPORT, עדכון רג'יסטר.</div>
+    </div>
 
-    <h3>👥 How Team Mandates Work (CURSOR_IMPLEMENTATION gate)</h3>
+    <h3 class="lang-en">👥 How Team Mandates Work (CURSOR_IMPLEMENTATION gate)</h3>
+    <h3 class="lang-he" dir="rtl" style="display:none">👥 כיצד עובדים מנדטים של צוותים</h3>
+    <div class="lang-en">
     <p>The <strong>Team Mandates</strong> accordion in this dashboard shows each team's mandate. The order is enforced:</p>
     <pre>1. Check "Expected Output Files" panel → Team 20 file: 🔴
 2. Open Cursor Composer → paste Team 20 mandate → AI produces API verify file → 🟢
@@ -450,14 +576,52 @@ python3 -m http.server 8090
 5. ./pipeline_run.sh pass   ← ONLY NOW advance CURSOR_IMPLEMENTATION</pre>
     <div class="tip-box">✅ <strong>Signal that Team 20 is done:</strong> The "Expected Output Files" panel shows <strong>🟢 Team 20 API verify</strong>. Press ↺ Refresh to update.</div>
     <div class="alert-box">⚠️ <strong>If Team 20 finds an API gap</strong> (endpoint missing, wrong params): STOP. Do not start Team 30. Post to Team 00 (architect) for decision before continuing.</div>
+    </div>
+    <div class="lang-he" dir="rtl" style="display:none">
+    <p>אקורדיון <strong>Team Mandates</strong> מציג את המנדט של כל צוות. הסדר מחייב:</p>
+    <pre>1. Check "Expected Output Files" panel → Team 20 file: 🔴
+2. Open Cursor Composer → paste Team 20 mandate → AI produces API verify file → 🟢
+3. Open new Cursor Composer → paste Team 30 mandate (reads Team 20 file)
+4. Team 30 implements → git commit
+5. ./pipeline_run.sh pass   ← ONLY NOW advance CURSOR_IMPLEMENTATION</pre>
+    <div class="tip-box">✅ <strong>סימן ש־Team 20 הסתיים:</strong> בלוח "Expected Output Files" יופיע 🟢 Team 20 API verify. לחץ ↺ Refresh לעדכון.</div>
+    <div class="alert-box">⚠️ <strong>אם Team 20 מוצא פער API:</strong> עצור. אל תתחיל Team 30. העבר ל־Team 00 להחלטה.</div>
+    </div>
 
-    <h3>🔄 Handling FAIL (G3_5 or GATE_4)</h3>
+    <h3 class="lang-en">🔄 Handling FAIL (G3_5 or GATE_4)</h3>
+    <h3 class="lang-he" dir="rtl" style="display:none">🔄 טיפול בכשל (FAIL)</h3>
+    <div class="lang-en">
     <pre># After G3_5 FAIL:
 ./pipeline_run.sh store G3_PLAN _COMMUNICATION/team_10/TEAM_10_..._v1.1.0.md
 ./pipeline_run.sh revise "BLOCKER-1: ... BLOCKER-2: ..."
 # → paste revised G3_PLAN prompt into Cursor → Team 10 fixes → ./pipeline_run.sh pass</pre>
+    </div>
+    <div class="lang-he" dir="rtl" style="display:none">
+    <pre># After G3_5 FAIL:
+./pipeline_run.sh store G3_PLAN _COMMUNICATION/team_10/TEAM_10_..._v1.1.0.md
+./pipeline_run.sh revise "BLOCKER-1: ... BLOCKER-2: ..."
+# → paste revised G3_PLAN prompt into Cursor → Team 10 fixes → ./pipeline_run.sh pass</pre>
+    </div>
 
-    <h3>❓ FAQ</h3>
+    <h3 class="lang-en">❓ FAQ</h3>
+    <h3 class="lang-he" dir="rtl" style="display:none">❓ שאלות נפוצות</h3>
+    <div class="lang-en">
+    <h4>Q: I ran Team 20. What's the next trigger?</h4>
+    <p>There is no CLI trigger after Team 20. Check that the file exists (see "Expected Files" → 🟢). If 🟢 — open a new Cursor, paste Team 30 mandate.</p>
+    <h4>Q: When do I press ./pipeline_run.sh pass?</h4>
+    <p>Only when <strong>all sub-steps of the current gate are done</strong>. For CURSOR_IMPLEMENTATION: Team 20 🟢 + Team 30 🟢 + git commit exists.</p>
+    <h4>Q: I forgot where I am in the pipeline?</h4>
+    <p>Press ↺ Refresh — "Current Gate" in the sidebar shows where you are. Or press <strong>🔍 בדוק התקדמות</strong> (key <code>p</code>) for full diagnostics.</p>
+    <h4>Q: Team 90 rejected the work plan (G3_5 FAIL). What to do?</h4>
+    <p>Press <strong>🔍 בדוק התקדמות</strong> — the dashboard detects REVISION mode and shows the steps. Then: <code>./pipeline_run.sh fail "BLOCKER-1: ..."</code>, <code>./pipeline_run.sh revise "..."</code>, paste ▼▼▼ into Cursor → Team 10 fixes → <code>./pipeline_run.sh pass</code>.</p>
+    <h4>Q: Team 90 rejected at GATE_5 (dev validation). What to do?</h4>
+    <p>Press <strong>🔍 בדוק התקדמות</strong>. The issue is in code: <code>./pipeline_run.sh fail "FINDING-1: ..."</code> → send findings to Team 10 → re-run CURSOR_IMPLEMENTATION → GATE_4 → GATE_5.</p>
+    <h4>Q: Auto-refresh doesn't detect state change?</h4>
+    <p>The dashboard reads pipeline_state.json. If you haven't run <code>./pipeline_run.sh pass/fail</code>, state won't change. Press <strong>🔍 בדוק התקדמות</strong> for manual check.</p>
+    <h4>Q: I got a BLOCK from Team 190?</h4>
+    <p>Read the BLOCK findings in the file in Team 190's folder. Fix the spec or route to Team 00. Do not proceed in the pipeline.</p>
+    </div>
+    <div class="lang-he" dir="rtl" style="display:none">
     <h4>שאלה: הרצתי Team 20. מה הטריגר הבא?</h4>
     <p>אין CLI trigger אחרי Team 20. בדוק שהקובץ <code>_COMMUNICATION/team_20/TEAM_20_S001_P002_WP001_ALERTS_WIDGET_API_VERIFICATION_v1.0.0.md</code> קיים (ראה "Expected Files" → 🟢). אם 🟢 — פתח Cursor חדש, הדבק מנדט Team 30.</p>
     <h4>שאלה: מתי אני לוחץ ./pipeline_run.sh pass?</h4>
@@ -475,8 +639,11 @@ python3 -m http.server 8090
     <p>ה-dashboard קורא את pipeline_state.json — אם הסוכן עדיין לא סיים לכתוב את הoutput ולא רצת <code>./pipeline_run.sh pass/fail</code>, המצב לא ישתנה. לחץ <strong>🔍 בדוק התקדמות</strong> לבדיקה ידנית + הנחיות.</p>
     <h4>שאלה: קיבלתי BLOCK מ-Team 190?</h4>
     <p>קרא את ה-BLOCK findings בקובץ שנוצר בתיקיית Team 190. תקן את הspec או העבר ל-Team 00 להחלטה אדריכלית. אל תמשיך הלאה ב-pipeline.</p>
+    </div>
 
-    <h3>📚 Additional Tools</h3>
+    <h3 class="lang-en">📚 Additional Tools</h3>
+    <h3 class="lang-he" dir="rtl" style="display:none">📚 כלים נוספים</h3>
+    <div class="lang-en">
     <p><strong>🗺️ Roadmap &amp; Gate History page:</strong></p>
     <div><a class="doc-link" href="PIPELINE_ROADMAP.html" target="_blank">PIPELINE_ROADMAP.html</a> — Full pipeline sequence, portfolio roadmap tree, gate history, canonical task files</div>
     <p style="margin-top:8px"><strong>🔍 Progress Check</strong> (button in header or press <code>p</code>): Scans all 14 gates + current artifacts → shows full pipeline overview, current gate guidance with PASS/FAIL paths, FAIL cycle detection.</p>
@@ -487,6 +654,20 @@ python3 -m http.server 8090
       <a class="doc-link" href="_COMMUNICATION/agents_os/prompts/implementation_mandates.md" target="_blank">implementation_mandates.md</a>
       <a class="doc-link" href="agents_os_v2/orchestrator/pipeline.py" target="_blank">pipeline.py (CLI source)</a>
       <a class="doc-link" href="pipeline_run.sh" target="_blank">pipeline_run.sh</a>
+    </div>
+    </div>
+    <div class="lang-he" dir="rtl" style="display:none">
+    <p><strong>🗺️ דף Roadmap ו־Gate History:</strong></p>
+    <div><a class="doc-link" href="PIPELINE_ROADMAP.html" target="_blank">PIPELINE_ROADMAP.html</a> — רצף pipeline מלא, עץ roadmap, היסטוריית שלבים, קבצי משימה קנוניים</div>
+    <p style="margin-top:8px"><strong>🔍 Progress Check</strong> (כפתור בכותרת או מקש <code>p</code>): סורק את כל 14 השלבים + ארטיפקטים → מציג סקירת pipeline, הנחיות לשלב נוכחי עם מסלולי PASS/FAIL.</p>
+    <div>
+      <a class="doc-link" href="PIPELINE_HOWTO.md" target="_blank">PIPELINE_HOWTO.md</a>
+      <a class="doc-link" href="_COMMUNICATION/team_00/TEAM_00_S001_P002_WP001_EXPERIMENT_EXECUTION_GUIDE_v1.0.0.md" target="_blank">Experiment Execution Guide</a>
+      <a class="doc-link" href="_COMMUNICATION/agents_os/pipeline_state.json" target="_blank">pipeline_state.json</a>
+      <a class="doc-link" href="_COMMUNICATION/agents_os/prompts/implementation_mandates.md" target="_blank">implementation_mandates.md</a>
+      <a class="doc-link" href="agents_os_v2/orchestrator/pipeline.py" target="_blank">pipeline.py (CLI source)</a>
+      <a class="doc-link" href="pipeline_run.sh" target="_blank">pipeline_run.sh</a>
+    </div>
     </div>
   </div>
 </div>
@@ -530,6 +711,9 @@ python3 -m http.server 8090
 
   <!-- ── Main ──────────────────────────────────── -->
   <main>
+
+    <!-- Quick Action Bar (PASS/FAIL buttons for decision gates) -->
+    <div id="quick-action-bar"></div>
 
     <!-- Spec card -->
     <div class="spec-card">
@@ -592,10 +776,6 @@ python3 -m http.server 8090
       </div>
     </div>
 
-    <!-- Roadmap & Gate History link (separate page) -->
-    <a href="PIPELINE_ROADMAP.html" class="roadmap-link-card">
-      🗺️ Roadmap &amp; Gate History → Full pipeline sequence, program tree, canonical files
-    </a>
 
   </main>
 </div>
@@ -743,16 +923,18 @@ async function loadPipelineState() {
       </li>`;
     }).join("");
 
-    // History
+    // History (optional elements — may be in roadmap page)
     const completed = state.gates_completed || [];
     const failed    = state.gates_failed    || [];
     const allHistory = [
       ...completed.map(g => ({gate:g, status:"pass"})),
       ...failed.map(g => ({gate:g, status:"fail"})),
     ];
-    document.getElementById("history-badge").textContent =
+    const hBadge = document.getElementById("history-badge");
+    const hList  = document.getElementById("history-list");
+    if (hBadge) hBadge.textContent =
       completed.length + " pass" + (failed.length ? " · " + failed.length + " fail" : "");
-    document.getElementById("history-list").innerHTML = allHistory.length
+    if (hList) hList.innerHTML = allHistory.length
       ? allHistory.map(h =>
         `<li class="history-item">
           <span class="status-pill ${statusPillClass(h.status)}">${statusLabel(h.status)}</span>
@@ -760,8 +942,9 @@ async function loadPipelineState() {
         </li>`).join("")
       : "<li class='loading'>No completed gates yet</li>";
 
-    // Quick commands
+    // Quick commands (sidebar) + Quick action bar (main)
     buildCommands(state.current_gate);
+    buildQuickActionBar(state.current_gate);
 
     return state;
   } catch(e) {
@@ -775,20 +958,22 @@ async function loadPipelineState() {
 // ── Build quick commands (sidebar) ───────────────────────────────────────
 function buildCommands(currentGate) {
   const cmds = [
-    {text:"./pipeline_run.sh",                     desc:"Generate current gate prompt"},
-    {text:"./pipeline_run.sh pass",                desc:"Advance → PASS"},
-    {text:"./pipeline_run.sh fail \"reason\"",     desc:"Advance → FAIL"},
-    {text:"./pipeline_run.sh approve",             desc:"Approve human gate"},
-    {text:"./pipeline_run.sh status",              desc:"Show pipeline state"},
-    {text:`./pipeline_run.sh gate ${currentGate||"GATE_X"}`, desc:"Regenerate prompt"},
-    {text:"./pipeline_run.sh revise \"BLOCKER-1: ...\"", desc:"G3_5 FAIL revision"},
+    {icon:"📁", label:"cd to repo",         text:"cd /Users/nimrod/Documents/TikTrack/TikTrackAppV2-phoenix"},
+    {icon:"⚡", label:"Generate prompt",    text:"./pipeline_run.sh"},
+    {icon:"✅", label:"Advance → PASS",     text:"./pipeline_run.sh pass"},
+    {icon:"❌", label:"Advance → FAIL",     text:"./pipeline_run.sh fail \"reason\""},
+    {icon:"👤", label:"Approve gate",       text:"./pipeline_run.sh approve"},
+    {icon:"📊", label:"Show status",        text:"./pipeline_run.sh status"},
+    {icon:"🔄", label:"Regen prompt",       text:`./pipeline_run.sh gate ${currentGate||"GATE_X"}`},
+    {icon:"↩️", label:"G3_5 revise",       text:"./pipeline_run.sh revise \"BLOCKER-1: ...\""},
   ];
   const el = document.getElementById("sidebar-cmd-list");
   if (!el) return;
   el.innerHTML = cmds.map(c =>
-    `<div class="sidebar-cmd-row" title="${escHtml(c.desc)}">
-      <span class="sidebar-cmd-text">${escHtml(c.text)}</span>
-      <button class="btn sidebar-cmd-btn" onclick="copyCmd(${JSON.stringify(c.text)}, this)">⎘</button>
+    `<div class="sidebar-cmd-row" title="${escHtml(c.text)}">
+      <span class="sidebar-cmd-icon">${c.icon}</span>
+      <span class="sidebar-cmd-label">${escHtml(c.label)}</span>
+      <button class="btn sidebar-cmd-btn" onclick="copyCmd(${escAttr(JSON.stringify(c.text))}, this)">⎘</button>
     </div>`
   ).join("");
 }
@@ -851,16 +1036,16 @@ async function loadMandates() {
   // Build tabs
   const tabs = document.getElementById("team-tabs");
   tabs.innerHTML = keys.map((k,i) =>
-    `<span class="team-tab${i===0?" active":""}" onclick="selectTeam(${JSON.stringify(k)})">${k}</span>`
+    `<span class="team-tab${i===0?" active":""}" onclick="selectTeam(this, ${escAttr(JSON.stringify(k))})">${escHtml(k)}</span>`
   ).join("");
 
   if (keys.length > 0) { activeTeam = keys[0]; showMandate(keys[0]); }
 }
 
-function selectTeam(key) {
+function selectTeam(el, key) {
   activeTeam = key;
   document.querySelectorAll(".team-tab").forEach(t => t.classList.remove("active"));
-  event.target.classList.add("active");
+  el.classList.add("active");
   showMandate(key);
 }
 
@@ -874,25 +1059,48 @@ const ALL_GATE_DEFS = {
     owner:'team_190', engine:'codex',
     desc:'Team 190 validates scope: domain isolation, no active program conflicts, feasibility',
     advice:'./pipeline_run.sh → paste prompt to Codex → Team 190 validates → PASS: ./pipeline_run.sh pass',
-    failAdvice:'./pipeline_run.sh fail "reason" → fix spec definition → re-run GATE_0',
+    failAdvice:'./pipeline_run.sh fail "BLOCK-G0-NNN: ..." → fix spec → re-run GATE_0',
+    twoPaths:true,
+    passCmd:'./pipeline_run.sh pass',
+    failCmd:'./pipeline_run.sh fail "BLOCK-G0-NNN: ..."',
+    passLabel:'✅ Scope Valid — Team 190 PASS',
+    failLabel:'❌ Scope Blocked — Team 190 FAIL',
+    verdictTeam:'team_190', verdictGate:'GATE_0',
   },
   'GATE_1': {
     owner:'team_170+190', engine:'codex',
     desc:'Team 170 produces LLD400 spec → Team 190 validates structure and completeness',
     advice:'./pipeline_run.sh → paste to Codex → Team 170 writes spec + Team 190 validates → ./pipeline_run.sh pass',
-    failAdvice:'./pipeline_run.sh fail "reason" → Team 170 revises spec → re-run GATE_1',
+    failAdvice:'./pipeline_run.sh fail "BLOCK-G1-NNN: ..." → Team 170 revises spec → re-run GATE_1',
+    twoPaths:true,
+    passCmd:'./pipeline_run.sh pass',
+    failCmd:'./pipeline_run.sh fail "BLOCK-G1-NNN: ..."',
+    passLabel:'✅ LLD400 Validated — Team 190 PASS',
+    failLabel:'❌ LLD400 Rejected — Team 190 FAIL',
+    verdictTeam:'team_190', verdictGate:'GATE_1',
   },
   'GATE_2': {
     owner:'team_100', engine:'codex+human',
-    desc:'Team 100 reviews spec, recommends approval → Nimrod decides',
-    advice:'./pipeline_run.sh → paste to Codex → Team 100 outputs recommendation → ./pipeline_run.sh pass → ./pipeline_run.sh approve',
-    failAdvice:'If Team 100 flags blockers: route to Team 00 before approving',
+    desc:'Team 100 reviews spec, recommends approval → Nimrod decides (WAITING_GATE2_APPROVAL)',
+    advice:'./pipeline_run.sh → paste to Codex → Team 100 outputs recommendation → ./pipeline_run.sh pass → human approval step follows',
+    failAdvice:'./pipeline_run.sh fail "CONCERN-G2-NNN: ..." → route to Team 00 before approving',
+    twoPaths:true,
+    passCmd:'./pipeline_run.sh pass',
+    failCmd:'./pipeline_run.sh fail "CONCERN-G2-NNN: ..."',
+    passLabel:'✅ Team 100 PASS → human approval',
+    failLabel:'❌ Team 100 FAIL — blockers found',
+    verdictTeam:'team_100', verdictGate:'GATE_2',
   },
   'WAITING_GATE2_APPROVAL': {
     owner:'team_00', engine:'human',
     desc:'Nimrod final approval for GATE_2 — "do we approve building this?"',
     advice:'Review Team 100 recommendation → ./pipeline_run.sh approve',
     failAdvice:'If rejected: ./pipeline_run.sh fail "reason" → route back to spec revision',
+    twoPaths:true,
+    passCmd:'./pipeline_run.sh approve',
+    failCmd:'./pipeline_run.sh fail "reason"',
+    passLabel:'✅ Approved — proceed to implementation',
+    failLabel:'❌ Rejected — back to spec',
   },
   'G3_PLAN': {
     owner:'team_10', engine:'cursor',
@@ -910,6 +1118,9 @@ const ALL_GATE_DEFS = {
     passCmd:'./pipeline_run.sh pass',
     failCmd:'./pipeline_run.sh fail "BLOCKER-1: ..."',
     reviseCmd:'./pipeline_run.sh revise "BLOCKER-1: ..."',
+    passLabel:'✅ Work Plan Valid — Team 90 PASS',
+    failLabel:'❌ Work Plan Rejected — Team 90 FAIL',
+    verdictTeam:'team_90', verdictGate:'G3_5',
   },
   'G3_6_MANDATES': {
     owner:'orchestrator', engine:'auto',
@@ -943,12 +1154,18 @@ const ALL_GATE_DEFS = {
     owner:'team_50', engine:'cursor+mcp',
     desc:'Team 50 QA: browser automation tests, 10-point checklist, binary PASS/FAIL',
     advice:'./pipeline_run.sh → paste to Cursor → Team 50 runs tests → review report → ./pipeline_run.sh pass OR fail',
-    failAdvice:'./pipeline_run.sh fail "failed items" → route to Team 10 for code fixes → re-run CURSOR_IMPLEMENTATION → GATE_4',
+    failAdvice:'./pipeline_run.sh fail "QA-FAIL-NNN: ..." → route to Team 10 for code fixes → re-run CURSOR_IMPLEMENTATION → GATE_4',
+    twoPaths:true,
+    passCmd:'./pipeline_run.sh pass',
+    failCmd:'./pipeline_run.sh fail "QA-FAIL-NNN: ..."',
+    passLabel:'✅ QA Passed — Team 50 PASS',
+    failLabel:'❌ QA Failed — Team 50 FAIL',
+    verdictTeam:'team_50', verdictGate:'GATE_4',
     substeps:[
       {
         label:'Team 50 — QA Report',
         files:['_COMMUNICATION/team_50/TEAM_50_S001_P002_WP001_QA_REPORT_v1.0.0.md'],
-        doneMsg:'✅ QA report exists — review findings then: PASS → ./pipeline_run.sh pass | FAIL → ./pipeline_run.sh fail "items"',
+        doneMsg:'✅ QA report exists — review findings then use PASS/FAIL builder above',
         pendingMsg:'⏳ Open Cursor Composer → paste Team 50 mandate from implementation_mandates.md',
       },
     ],
@@ -957,36 +1174,117 @@ const ALL_GATE_DEFS = {
     owner:'team_90', engine:'codex',
     desc:'Team 90 dev validation: code compliance vs spec, no regressions, no spec gaps',
     advice:'./pipeline_run.sh → paste to Codex → Team 90 reviews code → Team 90 produces verdict',
-    failAdvice:'./pipeline_run.sh fail "FINDING-1: ..." → route to Team 10 for code fixes → re-run CURSOR_IMPLEMENTATION → GATE_4 → GATE_5',
+    failAdvice:'./pipeline_run.sh fail "BF-G5-NNN: ..." → route to Team 10 for code fixes → re-run CURSOR_IMPLEMENTATION → GATE_4 → GATE_5',
     twoPaths:true,
     passCmd:'./pipeline_run.sh pass',
-    failCmd:'./pipeline_run.sh fail "FINDING-1: ..."',
+    failCmd:'./pipeline_run.sh fail "BF-G5-NNN: ..."',
+    passLabel:'✅ Code Valid — Team 90 PASS',
+    failLabel:'❌ Code Rejected — Team 90 FAIL',
+    verdictTeam:'team_90', verdictGate:'GATE_5',
   },
   'GATE_6': {
     owner:'team_100', engine:'codex+human',
     desc:'Team 100 reality vs intent: does what was built match what was approved?',
-    advice:'./pipeline_run.sh → paste to Codex → Team 100 reviews → ./pipeline_run.sh pass → ./pipeline_run.sh approve',
-    failAdvice:'Major gap: route to Team 00 for architectural decision. Minor: approve with conditions.',
+    advice:'./pipeline_run.sh → paste to Codex → Team 100 reviews → ./pipeline_run.sh pass → human approval step follows',
+    failAdvice:'./pipeline_run.sh fail "GAP-G6-NNN: ..." → major gap: route to Team 00. Minor: approve with conditions.',
+    twoPaths:true,
+    passCmd:'./pipeline_run.sh pass',
+    failCmd:'./pipeline_run.sh fail "GAP-G6-NNN: ..."',
+    passLabel:'✅ Reality Match — Team 100 PASS',
+    failLabel:'❌ Intent Gap — Team 100 FAIL',
+    verdictTeam:'team_100', verdictGate:'GATE_6',
   },
   'WAITING_GATE6_APPROVAL': {
     owner:'team_00', engine:'human',
     desc:'Nimrod approves GATE_6 — "does the built product match what we approved?"',
     advice:'Review GATE_6 findings → ./pipeline_run.sh approve',
     failAdvice:'If rejected: ./pipeline_run.sh fail "reason" → route to Team 00',
+    twoPaths:true,
+    passCmd:'./pipeline_run.sh approve',
+    failCmd:'./pipeline_run.sh fail "reason"',
+    passLabel:'✅ Approved — proceed to UX review',
+    failLabel:'❌ Rejected — route to Team 00',
   },
   'GATE_7': {
     owner:'team_00', engine:'human',
     desc:'Nimrod browser UX sign-off — live review at http://localhost:8080',
     advice:'Open http://localhost:8080 → review feature UX → ./pipeline_run.sh approve',
-    failAdvice:'Issues found: document findings → route to Team 10 for fixes → re-run from GATE_4',
+    failAdvice:'Issues found: document findings → ./pipeline_run.sh fail "UX-NNN: ..." → route to Team 10',
+    twoPaths:true,
+    passCmd:'./pipeline_run.sh approve',
+    failCmd:'./pipeline_run.sh fail "UX-NNN: ..."',
+    passLabel:'✅ UX Approved — Nimrod sign-off',
+    failLabel:'❌ UX Issues — document findings',
   },
   'GATE_8': {
     owner:'team_90+70', engine:'codex',
     desc:'Team 90+70 docs closure: AS_MADE_REPORT, registry update, WSM update',
     advice:'./pipeline_run.sh → paste to Codex → Team 90+70 produce docs → ./pipeline_run.sh pass → program CLOSED',
-    failAdvice:'Docs incomplete: Team 70 revises → re-run GATE_8',
+    failAdvice:'./pipeline_run.sh fail "DOC-NNN: ..." → Team 70 revises → re-run GATE_8',
+    twoPaths:true,
+    passCmd:'./pipeline_run.sh pass',
+    failCmd:'./pipeline_run.sh fail "DOC-NNN: ..."',
+    passLabel:'✅ Docs Complete — program CLOSED',
+    failLabel:'❌ Docs Incomplete — Team 70 revise',
+    verdictTeam:'team_90', verdictGate:'GATE_8',
   },
 };
+
+// ── Verdict file candidates per gate (for auto-detection) ─────────────────
+function getVerdictCandidates(gate, wp) {
+  const d = '_COMMUNICATION/';
+  const t90 = `${d}team_90/`, t190 = `${d}team_190/`, t100 = `${d}team_100/`, t50 = `${d}team_50/`, t70 = `${d}team_70/`;
+  const v = {
+    'GATE_0': [
+      `${t190}TEAM_190_${wp}_GATE_0_VERDICT_v1.0.0.md`,
+      `${t190}TEAM_190_${wp}_GATE_0_VALIDATION_v1.0.0.md`,
+      `${t190}TEAM_190_${wp}_GATE0_VERDICT_v1.0.0.md`,
+      `${t190}TEAM_190_${wp}_SCOPE_VALIDATION_v1.0.0.md`,
+    ],
+    'GATE_1': [
+      `${t190}TEAM_190_${wp}_GATE_1_VERDICT_v1.0.0.md`,
+      `${t190}TEAM_190_${wp}_GATE_1_VALIDATION_v1.0.0.md`,
+      `${t190}TEAM_190_${wp}_LLD400_VALIDATION_v1.0.0.md`,
+      `${t190}TEAM_190_${wp}_GATE1_VERDICT_v1.0.0.md`,
+    ],
+    'GATE_2': [
+      `${t100}TEAM_100_${wp}_GATE_2_VERDICT_v1.0.0.md`,
+      `${t100}TEAM_100_${wp}_GATE_2_SPEC_REVIEW_v1.0.0.md`,
+      `${t100}TEAM_100_${wp}_GATE2_VERDICT_v1.0.0.md`,
+    ],
+    'G3_5': [
+      `${t90}TEAM_90_${wp}_G3_5_VERDICT_v1.0.0.md`,
+      `${t90}TEAM_90_${wp}_G3_5_VALIDATION_v1.0.0.md`,
+      `${t90}TEAM_90_${wp}_WORK_PLAN_VALIDATION_v1.0.0.md`,
+    ],
+    'GATE_4': [
+      `${t50}TEAM_50_${wp}_QA_REPORT_v1.0.0.md`,
+      `${t50}TEAM_50_${wp}_GATE_4_REPORT_v1.0.0.md`,
+      `${t50}TEAM_50_${wp}_GATE4_QA_v1.0.0.md`,
+    ],
+    'GATE_5': [
+      `${t90}TEAM_90_${wp}_GATE_5_VALIDATION_v1.0.0.md`,
+      `${t90}TEAM_90_${wp}_GATE5_VALIDATION_v1.0.0.md`,
+      `${t90}TEAM_90_${wp}_GATE_5_VERDICT_v1.0.0.md`,
+      `${t90}TEAM_90_${wp}_G5_VALIDATION_v1.0.0.md`,
+      `${t90}TEAM_90_${wp}_GATE_5_REVIEW_v1.0.0.md`,
+      `${t90}TEAM_90_${wp}_GATE5_VERDICT_v1.0.0.md`,
+    ],
+    'GATE_6': [
+      `${t100}TEAM_100_${wp}_GATE_6_VERDICT_v1.0.0.md`,
+      `${t100}TEAM_100_${wp}_GATE_6_REVIEW_v1.0.0.md`,
+      `${t100}TEAM_100_${wp}_GATE6_VERDICT_v1.0.0.md`,
+      `${t100}TEAM_100_${wp}_REALITY_VS_INTENT_v1.0.0.md`,
+    ],
+    'GATE_8': [
+      `${t90}TEAM_90_${wp}_GATE_8_VERDICT_v1.0.0.md`,
+      `${t90}TEAM_90_${wp}_GATE8_VERDICT_v1.0.0.md`,
+      `${t70}TEAM_70_${wp}_GATE_8_DOCS_v1.0.0.md`,
+      `${t70}TEAM_70_${wp}_AS_MADE_REPORT_v1.0.0.md`,
+    ],
+  };
+  return v[gate] || [];
+}
 
 // ── Progress Check ─────────────────────────────────────────────────────────
 async function runProgressCheck() {
@@ -1047,18 +1345,40 @@ async function runProgressCheck() {
   if (gate === 'G3_PLAN' && failed.includes('G3_5')) {
     html += `<div style="background:rgba(210,153,34,0.1);border:1px solid var(--warning);border-radius:6px;padding:10px 14px;margin-bottom:12px">
       <div style="font-weight:600;color:var(--warning);margin-bottom:6px">⚠️ REVISION MODE — G3_5 failed the previous work plan</div>
-      <div style="font-size:12px;margin-bottom:8px">Team 90 rejected the work plan. You need to run the revision command with the specific blockers:</div>
+      <div style="font-size:12px;margin-bottom:8px">Team 90 rejected the work plan. Run revision command with specific blockers:</div>
       <div style="font-family:var(--mono);font-size:11px;background:#010409;padding:8px;border-radius:4px;margin-bottom:6px">./pipeline_run.sh revise "BLOCKER-1: ... BLOCKER-2: ..."</div>
-      <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Then: paste ▼▼▼ block into Cursor → Team 10 fixes work plan → ./pipeline_run.sh pass</div>
-      <button class="btn" onclick="navigator.clipboard.writeText('./pipeline_run.sh revise &quot;BLOCKER-1: ...&quot;').then(()=>{this.textContent='✓ Copied!';setTimeout(()=>this.textContent='📋 Copy revise cmd',1500)})">📋 Copy revise cmd</button>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Then: paste ▼▼▼ block into Cursor → Team 10 fixes → ./pipeline_run.sh pass</div>
+      <button class="btn" onclick="copyCmd('./pipeline_run.sh revise \\'BLOCKER-1: ...\\'', this)">📋 Copy revise cmd</button>
     </div>`;
   }
 
-  // ── GATE_5 FAIL routing guidance ────────────────────────────────────────
+  // ── GATE_5 fail cycle detection (currently AT GATE_5, has failed before) ─
+  if (gate === 'GATE_5' && failed.includes('GATE_5')) {
+    const g5Count = failed.filter(g => g === 'GATE_5').length;
+    const defaultFailCmd = `./pipeline_run.sh fail "BF-G5-NNN: ..."`;
+    html += `<div style="background:rgba(248,81,73,0.08);border:2px solid var(--danger);border-radius:8px;padding:12px 14px;margin-bottom:12px">
+      <div style="font-weight:700;color:var(--danger);margin-bottom:8px">🔄 GATE_5 FAIL CYCLE — ${g5Count}× failed</div>
+      <div style="font-size:12px;margin-bottom:10px">Team 90 found code issues <strong>${g5Count} time${g5Count>1?'s':''}</strong>. Use the builder below to generate the exact fail command from Team 90's output file.</div>
+      <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px">Step 1 — Generate FAIL command:</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-bottom:6px">Paste Team 90's BF-G5-NNN items below (auto-detect will try first):</div>
+      <div style="font-size:10px;margin-bottom:4px" id="pc-g5-status">🔍 Searching for Team 90 output…</div>
+      <textarea id="pc-g5-ta" class="findings-textarea" style="min-height:60px" placeholder="BF-G5-001: missing validation; BF-G5-002: wrong endpoint…"
+        oninput="pcUpdateFindingsCmd()"></textarea>
+      <div class="findings-cmd-row">
+        <div class="findings-cmd-text" id="pc-g5-preview">${escHtml(defaultFailCmd)}</div>
+        <button class="findings-copy-btn" onclick="copyText(document.getElementById('pc-g5-preview').textContent, this)">⎘ Copy → terminal</button>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-top:10px;margin-bottom:4px">Step 2 — Route to Team 10 for code fix:</div>
+      <div style="font-size:11px;color:var(--text-muted)">Team 10 fixes code → git commit → ./pipeline_run.sh pass → GATE_4 re-runs → GATE_5 re-runs.</div>
+    </div>`;
+  }
+
+  // ── GATE_5 re-implementation banner (currently at CURSOR_IMPLEMENTATION after GATE_5 fail) ─
   if (gate === 'CURSOR_IMPLEMENTATION' && failed.includes('GATE_5')) {
-    html += `<div style="background:rgba(248,81,73,0.08);border:1px solid var(--danger);border-radius:6px;padding:10px 14px;margin-bottom:12px">
-      <div style="font-weight:600;color:var(--danger);margin-bottom:4px">🔄 Re-implementation — GATE_5 rejected code previously</div>
-      <div style="font-size:12px">Team 90 found code issues. Fix code → commit → ./pipeline_run.sh pass to re-run GATE_4 → GATE_5.</div>
+    const g5Count = failed.filter(g => g === 'GATE_5').length;
+    html += `<div style="background:rgba(248,81,73,0.06);border:1px solid var(--danger);border-radius:6px;padding:10px 14px;margin-bottom:12px">
+      <div style="font-weight:600;color:var(--danger);margin-bottom:4px">🔄 Re-implementation — GATE_5 rejected code (${g5Count}× total)</div>
+      <div style="font-size:12px">Team 90 found code issues. Fix code → commit → ./pipeline_run.sh pass → GATE_4 → GATE_5.</div>
     </div>`;
   }
 
@@ -1097,10 +1417,26 @@ async function runProgressCheck() {
       if (!stepDone) allDone = false;
     }
 
-    if (allDone) {
+    // For gates with BOTH substeps AND twoPaths (e.g. GATE_4), show the PASS/FAIL section too
+    if (def.twoPaths) {
+      const passCmd = def.passCmd || './pipeline_run.sh pass';
+      const failCmd = def.failCmd || './pipeline_run.sh fail "reason"';
+      html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+        <div style="background:rgba(63,185,80,0.08);border:1px solid var(--success);border-radius:6px;padding:8px">
+          <div style="color:var(--success);font-weight:600;font-size:12px;margin-bottom:4px">${escHtml(def.passLabel||'✅ PASS')}</div>
+          <div style="font-family:var(--mono);font-size:10px;background:#010409;padding:4px 6px;border-radius:4px;margin-bottom:6px">${escHtml(passCmd)}</div>
+          <button class="btn" style="font-size:10px" onclick="copyCmd(${escAttr(JSON.stringify(passCmd))}, this)">📋 Copy</button>
+        </div>
+        <div style="background:rgba(248,81,73,0.08);border:1px solid var(--danger);border-radius:6px;padding:8px">
+          <div style="color:var(--danger);font-weight:600;font-size:12px;margin-bottom:4px">${escHtml(def.failLabel||'❌ FAIL')}</div>
+          <div style="font-family:var(--mono);font-size:10px;background:#010409;padding:4px 6px;border-radius:4px;margin-bottom:6px">${escHtml(failCmd)}</div>
+          <button class="btn" style="font-size:10px" onclick="copyCmd(${escAttr(JSON.stringify(failCmd))}, this)">📋 Copy</button>
+        </div>
+      </div>`;
+    } else if (allDone) {
       html += `<div class="prog-done-banner">
         <span style="color:var(--success);font-weight:600">✅ All steps complete — gate ready to advance</span>
-        <button class="btn" onclick="navigator.clipboard.writeText('./pipeline_run.sh pass').then(()=>{this.textContent='✓ Copied!';setTimeout(()=>this.textContent='📋 Copy',1500)})">📋 Copy</button>
+        <button class="btn" onclick="copyCmd('./pipeline_run.sh pass', this)">📋 Copy</button>
       </div>
       <div style="margin-top:6px;font-family:var(--mono);font-size:12px;color:var(--text-muted)">./pipeline_run.sh pass</div>`;
     } else if (firstPendingMsg) {
@@ -1108,37 +1444,60 @@ async function runProgressCheck() {
     }
 
   } else {
-    // ── Standard gate guidance ───────────────────────────────────────────
+    // ── Standard gate guidance (no substeps) ─────────────────────────────
     html += `<div style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px">Gate Guidance</div>`;
 
     if (def.twoPaths) {
-      // Two-path gates (G3_5, GATE_5) — show PASS and FAIL explicitly
+      // Decision gate — full PASS/FAIL display
       if (def.advice) {
-        html += `<div style="font-size:12px;margin-bottom:10px">${escHtml(def.advice)}</div>`;
+        html += `<div style="font-size:12px;margin-bottom:10px;color:var(--text-muted)">${escHtml(def.advice)}</div>`;
       }
+      const passCmd = def.passCmd || './pipeline_run.sh pass';
+      const failCmd = def.failCmd || './pipeline_run.sh fail "reason"';
+      const passLabel = def.passLabel || '✅ PASS';
+      const failLabel = def.failLabel || '❌ FAIL';
+      const needsBuilder = !!def.verdictTeam;
+
       html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
         <div style="background:rgba(63,185,80,0.08);border:1px solid var(--success);border-radius:6px;padding:8px">
-          <div style="color:var(--success);font-weight:600;font-size:12px;margin-bottom:6px">✅ If Team 90 PASS</div>
-          <div style="font-family:var(--mono);font-size:11px;background:#010409;padding:5px 8px;border-radius:4px;margin-bottom:6px">${escHtml(def.passCmd||'./pipeline_run.sh pass')}</div>
-          <button class="btn" style="font-size:10px" onclick="navigator.clipboard.writeText(${JSON.stringify(def.passCmd||'./pipeline_run.sh pass')}).then(()=>{this.textContent='✓ Copied!';setTimeout(()=>this.textContent='📋 Copy',1500)})">📋 Copy</button>
+          <div style="color:var(--success);font-weight:600;font-size:12px;margin-bottom:6px">${escHtml(passLabel)}</div>
+          <div style="font-family:var(--mono);font-size:11px;background:#010409;padding:5px 8px;border-radius:4px;margin-bottom:6px">${escHtml(passCmd)}</div>
+          <button class="btn" style="font-size:10px" onclick="copyCmd(${escAttr(JSON.stringify(passCmd))}, this)">📋 Copy</button>
         </div>
         <div style="background:rgba(248,81,73,0.08);border:1px solid var(--danger);border-radius:6px;padding:8px">
-          <div style="color:var(--danger);font-weight:600;font-size:12px;margin-bottom:6px">❌ If Team 90 FAIL</div>
-          <div style="font-family:var(--mono);font-size:11px;background:#010409;padding:5px 8px;border-radius:4px;margin-bottom:6px">${escHtml(def.failCmd||'./pipeline_run.sh fail "reason"')}</div>
-          <button class="btn" style="font-size:10px" onclick="navigator.clipboard.writeText(${JSON.stringify(def.failCmd||'./pipeline_run.sh fail "reason"')}).then(()=>{this.textContent='✓ Copied!';setTimeout(()=>this.textContent='📋 Copy',1500)})">📋 Copy</button>
+          <div style="color:var(--danger);font-weight:600;font-size:12px;margin-bottom:6px">${escHtml(failLabel)}</div>
+          <div style="font-family:var(--mono);font-size:11px;background:#010409;padding:5px 8px;border-radius:4px;margin-bottom:6px">${escHtml(failCmd)}</div>
+          <button class="btn" style="font-size:10px" onclick="copyCmd(${escAttr(JSON.stringify(failCmd))}, this)">📋 Copy</button>
         </div>
       </div>`;
+
+      // Findings builder for AI-verdict gates (in progress-check modal)
+      if (needsBuilder) {
+        html += `<div class="findings-builder" style="margin-top:0">
+          <div class="findings-builder-title">✏️ FAIL Command Builder <span id="pc-status-${gate}" class="findings-status"></span></div>
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:5px">Paste blocking findings or auto-detect from verdict file:</div>
+          <textarea id="pc-ta-${gate}" class="findings-textarea"
+            placeholder="${escAttr(failCmd)}"
+            oninput="pcUpdateCmd('${escAttr(gate)}')"></textarea>
+          <div class="findings-cmd-row">
+            <div class="findings-cmd-text" id="pc-preview-${gate}">${escHtml(failCmd)}</div>
+            <button class="findings-copy-btn" onclick="copyText(document.getElementById('pc-preview-${gate}').textContent, this)">⎘ Copy</button>
+          </div>
+        </div>`;
+      }
+
       if (def.reviseCmd) {
-        html += `<div style="background:rgba(210,153,34,0.08);border:1px solid var(--warning);border-radius:6px;padding:8px;margin-bottom:8px">
+        html += `<div style="background:rgba(210,153,34,0.08);border:1px solid var(--warning);border-radius:6px;padding:8px;margin-top:8px">
           <div style="color:var(--warning);font-weight:600;font-size:12px;margin-bottom:4px">↩️ After FAIL — generate revision prompt</div>
           <div style="font-family:var(--mono);font-size:11px;background:#010409;padding:5px 8px;border-radius:4px;margin-bottom:6px">${escHtml(def.reviseCmd)}</div>
-          <div style="font-size:11px;color:var(--text-muted)">${escHtml(def.failAdvice||'')}</div>
+          <button class="btn" style="font-size:10px" onclick="copyCmd(${escAttr(JSON.stringify(def.reviseCmd))}, this)">📋 Copy</button>
         </div>`;
       } else if (def.failAdvice) {
         html += `<div style="font-size:11px;color:var(--text-muted);margin-top:4px">${escHtml(def.failAdvice)}</div>`;
       }
+
     } else {
-      // Standard linear gate
+      // Standard linear gate (no PASS/FAIL choice)
       if (def.advice) {
         html += `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin-bottom:8px">
           <div style="font-size:11px;font-weight:600;margin-bottom:4px">ℹ️ Next action:</div>
@@ -1165,12 +1524,13 @@ async function runProgressCheck() {
     }
 
     // Human gate: highlight approve command
-    if (cfg.engine && cfg.engine.includes('human')) {
+    const isHumanGate = cfg.engine && cfg.engine.includes('human');
+    if (isHumanGate && !def.twoPaths) {
       html += `<div class="tip-box" style="margin-top:10px;display:flex;align-items:center;justify-content:space-between">
         <span><strong>⏸ Human gate</strong> — after review:</span>
         <div style="display:flex;align-items:center;gap:8px">
           <code>./pipeline_run.sh approve</code>
-          <button class="btn" onclick="navigator.clipboard.writeText('./pipeline_run.sh approve').then(()=>{this.textContent='✓ Copied!';setTimeout(()=>this.textContent='📋 Copy',1500)})">📋 Copy</button>
+          <button class="btn" onclick="copyCmd('./pipeline_run.sh approve', this)">📋 Copy</button>
         </div>
       </div>`;
     }
@@ -1181,9 +1541,67 @@ async function runProgressCheck() {
     html += `<div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;color:var(--text-muted)">
       ✓ Completed: ${completed.map(g=>`<span style="color:var(--success);font-family:var(--mono)">${escHtml(g)}</span>`).join(' → ')}
     </div>`;
+    if (failed.length) {
+      html += `<div style="font-size:11px;color:var(--text-muted);margin-top:4px">
+        ✗ Failed (all): ${failed.map(g=>`<span style="color:var(--danger);font-family:var(--mono)">${escHtml(g)}</span>`).join(', ')}
+      </div>`;
+    }
   }
 
   content.innerHTML = html;
+
+  // ── Post-render: init async auto-loaders for PC findings builders ─────────
+  if (gate === 'GATE_5' && failed.includes('GATE_5')) {
+    // Auto-load Team 90 output into the GATE_5 cycle findings builder
+    const pcG5Gate = 'GATE_5';
+    const _savedGate = _qbarGate;
+    _qbarGate = pcG5Gate;
+    await autoLoadVerdictFile(pcG5Gate, 'pc-g5-status', 'pc-g5-ta', 'pc-g5-preview', false);
+    _qbarGate = _savedGate;
+    // Wire oninput
+    const ta = document.getElementById('pc-g5-ta');
+    if (ta) ta.oninput = () => {
+      const raw = ta.value.trim();
+      const pre = document.getElementById('pc-g5-preview');
+      if (pre) pre.textContent = raw ? `./pipeline_run.sh fail "${raw.replace(/"/g,"'")}"` : `./pipeline_run.sh fail "BF-G5-NNN: ..."`;
+    };
+  }
+  // For other twoPaths gates with verdictTeam — auto-load in modal
+  if (def.twoPaths && def.verdictTeam) {
+    const _saved = _qbarGate;
+    _qbarGate = gate;
+    await autoLoadVerdictFile(gate, `pc-status-${gate}`, `pc-ta-${gate}`, `pc-preview-${gate}`, false);
+    _qbarGate = _saved;
+    const ta = document.getElementById(`pc-ta-${gate}`);
+    const failCmd = def.failCmd || './pipeline_run.sh fail "reason"';
+    if (ta) ta.oninput = () => {
+      const raw = ta.value.trim();
+      const pre = document.getElementById(`pc-preview-${gate}`);
+      if (pre) pre.textContent = raw ? `./pipeline_run.sh fail "${raw.replace(/"/g,"'")}"` : failCmd;
+    };
+  }
+}
+
+// ── Progress-check modal: update findings cmd (for pc-g5 builder) ────────
+function pcUpdateFindingsCmd() {
+  const ta = document.getElementById('pc-g5-ta');
+  const pre = document.getElementById('pc-g5-preview');
+  if (!ta || !pre) return;
+  const raw = ta.value.trim();
+  pre.textContent = raw
+    ? `./pipeline_run.sh fail "${raw.replace(/"/g,"'")}"`
+    : `./pipeline_run.sh fail "BF-G5-NNN: ..."`;
+}
+
+// ── Unified pcUpdateCmd for modal findings builders ───────────────────────
+function pcUpdateCmd(gate) {
+  const ta  = document.getElementById(`pc-ta-${gate}`);
+  const pre = document.getElementById(`pc-preview-${gate}`);
+  if (!ta || !pre) return;
+  const raw = ta.value.trim();
+  const def = ALL_GATE_DEFS[gate] || {};
+  const failCmd = def.failCmd || './pipeline_run.sh fail "reason"';
+  pre.textContent = raw ? `./pipeline_run.sh fail "${raw.replace(/"/g,"'")}"` : failCmd;
 }
 
 function closeProgress() {
@@ -1213,7 +1631,202 @@ async function checkExpectedFiles() {
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────
-function escHtml(s) { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function escHtml(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function escAttr(s) { return escHtml(s).replace(/"/g,"&quot;"); }
+
+// ── Governance drift log (Path B/C events for system learning) ────────────
+function logVerdictDrift(gate, event, detail) {
+  try {
+    const key = 'pipeline_verdict_drift';
+    const log = JSON.parse(localStorage.getItem(key) || '[]');
+    log.push({ ts: new Date().toISOString(), gate, event, detail });
+    localStorage.setItem(key, JSON.stringify(log.slice(-100)));
+  } catch(e) { /* storage not available */ }
+}
+
+// ── Extract findings from verdict file text ────────────────────────────────
+function extractFindings(text) {
+  if (!text) return '';
+  const findings = [];
+  const pattern = /^(?:\d+\.\s+)?(BF-G[\w\d._-]+|BLOCK(?:ER)?-[\w\d._-]+|FINDING-[\w\d._-]+|QA-FAIL-[\w\d._-]+|DOC-[\w\d._-]+|GAP-G\d-\w+|CONCERN-[\w\d._-]+|ISSUE-[\w\d._-]+)\s*[—:–\-]+\s*(.+)/im;
+  for (const raw of text.split('\n')) {
+    const line = raw.trim();
+    if (!line) continue;
+    const m = line.match(pattern);
+    if (!m) continue;
+    let desc = m[2].trim();
+    // Truncate at file paths or Hebrew source labels
+    const cutPoints = [desc.indexOf('/Users'), desc.indexOf('מקור'), desc.search(/\/[A-Za-z_]/)];
+    const cut = cutPoints.filter(i => i > 5).sort((a,b)=>a-b)[0];
+    if (cut !== undefined) desc = desc.substring(0, cut).trim();
+    desc = desc.replace(/[.,;:\s—–]+$/, '').trim();
+    if (desc.length > 120) desc = desc.substring(0, 120).trim() + '…';
+    if (desc) findings.push(`${m[1]}: ${desc}`);
+  }
+  return findings.join('; ');
+}
+
+// ── Quick Action Bar state ─────────────────────────────────────────────────
+let _qbarGate = null;
+let _qbarCopyMap = {};
+
+// ── Auto-detect verdict file for a gate ───────────────────────────────────
+async function autoLoadVerdictFile(gate, statusId, taId, previewId, isRevise) {
+  if (!pipelineState) return;
+  const wp = pipelineState.work_package_id || '';
+  const candidates = getVerdictCandidates(gate, wp);
+  if (!candidates.length) return;
+
+  const statusEl = document.getElementById(statusId);
+  if (!statusEl) return;
+  statusEl.innerHTML = `<span class="findings-status" style="color:var(--text-muted)">🔍 Searching…</span>`;
+
+  let foundText = null, foundPath = '';
+  for (const path of candidates) {
+    if (_qbarGate !== gate) return; // stale guard
+    const t = await fetchText(path);
+    if (t) { foundText = t; foundPath = path; break; }
+  }
+
+  if (!foundText) {
+    statusEl.innerHTML = `<span class="findings-status" style="color:var(--danger)">🔴 File not found — paste findings manually below</span>`;
+    logVerdictDrift(gate, 'PATH_C_NOT_FOUND', { candidates });
+    return;
+  }
+
+  const canonical = candidates[0];
+  const isCanonical = (foundPath === canonical);
+
+  if (isCanonical) {
+    statusEl.innerHTML = `<span class="findings-status" style="color:var(--success)">🟢 Auto-loaded: ${escHtml(foundPath)}</span>`;
+  } else {
+    statusEl.innerHTML = `<span class="findings-status" style="color:var(--success)">🟢 Loaded: ${escHtml(foundPath)}</span>
+      <span class="findings-status" style="color:var(--warning)"> ⚠️ Path drift — expected: ${escHtml(canonical)}</span>`;
+    logVerdictDrift(gate, 'PATH_B_NON_CANONICAL', { found: foundPath, expected: canonical });
+  }
+
+  const findings = extractFindings(foundText);
+  const ta = document.getElementById(taId);
+  if (ta && findings) {
+    ta.value = findings;
+    ta.style.borderColor = 'var(--success)';
+    updateFindingsCmd(gate, taId, previewId, isRevise);
+  }
+}
+
+// ── Update the findings command preview ───────────────────────────────────
+function updateFindingsCmd(gate, taId, previewId, isRevise) {
+  const ta = document.getElementById(taId);
+  const preview = document.getElementById(previewId);
+  if (!ta || !preview) return;
+
+  const raw = ta.value.trim();
+  const def = ALL_GATE_DEFS[gate] || {};
+
+  let cmd;
+  if (!raw) {
+    cmd = isRevise
+      ? `./pipeline_run.sh revise "BLOCKER-1: [paste findings]"`
+      : (def.failCmd || `./pipeline_run.sh fail "reason"`);
+  } else {
+    const safe = raw.replace(/"/g, "'");
+    cmd = isRevise
+      ? `./pipeline_run.sh revise "${safe}"`
+      : `./pipeline_run.sh fail "${safe}"`;
+  }
+
+  preview.textContent = cmd;
+  _qbarCopyMap[previewId] = cmd;
+}
+
+// ── Copy findings command ─────────────────────────────────────────────────
+function copyFindingsCmd(previewId, btn) {
+  const cmd = _qbarCopyMap[previewId] || document.getElementById(previewId)?.textContent || '';
+  copyText(cmd, btn);
+}
+
+// ── Build Quick Action Bar (decision gates only) ───────────────────────────
+async function buildQuickActionBar(gate) {
+  _qbarGate = gate;
+  const bar = document.getElementById('quick-action-bar');
+  if (!bar) return;
+
+  const def = ALL_GATE_DEFS[gate] || {};
+  if (!def.twoPaths) { bar.innerHTML = ''; return; }
+
+  const passCmd   = def.passCmd || './pipeline_run.sh pass';
+  const isHuman   = (def.engine === 'human');
+  const isRevise  = (gate === 'G3_5');
+  const needsBuilder = !!def.verdictTeam || isRevise; // AI-verdict gates need findings builder
+
+  // Header row of PASS/FAIL buttons
+  const passLabel = def.passLabel || '✅ PASS';
+  const failLabel = def.failLabel || '❌ FAIL';
+  const approveOrPass = isHuman ? 'approve' : 'pass';
+
+  let html = `<div class="quick-action-bar">
+    <button class="qa-btn qa-btn-pass" onclick="copyCmd(${escAttr(JSON.stringify(passCmd))}, this)">
+      ${escHtml(passLabel)} &nbsp;<span class="terminal-hint">⎘ copy → terminal</span>
+    </button>`;
+
+  if (needsBuilder) {
+    html += `<button class="qa-btn qa-btn-fail" disabled style="opacity:0.45;cursor:default">
+      ${escHtml(failLabel)} &nbsp;<span style="font-size:10px;font-weight:400">↓ use builder</span>
+    </button>`;
+  } else {
+    const failCmdDef = def.failCmd || './pipeline_run.sh fail "reason"';
+    html += `<button class="qa-btn qa-btn-fail" onclick="copyCmd(${escAttr(JSON.stringify(failCmdDef))}, this)">
+      ${escHtml(failLabel)} &nbsp;<span class="terminal-hint">⎘ copy → terminal</span>
+    </button>`;
+  }
+
+  html += `</div>`;
+
+  // Findings builder for AI-verdict gates
+  if (needsBuilder) {
+    const defaultCmd = isRevise
+      ? `./pipeline_run.sh revise "BLOCKER-1: [paste findings]"`
+      : (def.failCmd || `./pipeline_run.sh fail "reason"`);
+
+    html += `<div class="findings-builder">
+      <div class="findings-builder-title">
+        ✏️ FAIL Command Builder
+        <span id="qbar-status"></span>
+      </div>
+      <div style="font-size:10px;color:var(--text-muted);margin-bottom:6px">
+        Paste the blocking findings from the verdict file (or auto-detect below):
+      </div>
+      <textarea id="qbar-ta" class="findings-textarea"
+        placeholder="BF-G5-001: missing validation; BF-G5-002: wrong endpoint…"
+        oninput="updateFindingsCmd(${escAttr(JSON.stringify(gate))}, 'qbar-ta', 'qbar-preview', ${isRevise})"
+      ></textarea>
+      ${isRevise ? `<input id="qbar-filepath" class="findings-filepath" placeholder="Path to Team 10 revised work plan (for revise command)" oninput="updateFindingsCmd(${escAttr(JSON.stringify(gate))}, 'qbar-ta', 'qbar-preview', true)">` : ''}
+      <div class="findings-cmd-row">
+        <div class="findings-cmd-text" id="qbar-preview">${escHtml(defaultCmd)}</div>
+        <button class="findings-copy-btn" onclick="copyFindingsCmd('qbar-preview', this)">⎘ Copy → terminal</button>
+      </div>
+    </div>`;
+
+    // Kick off auto-detect (runs async after HTML is set)
+    setTimeout(() => autoLoadVerdictFile(gate, 'qbar-status', 'qbar-ta', 'qbar-preview', isRevise), 50);
+  }
+
+  // Revise command for G3_5
+  if (isRevise && def.reviseCmd) {
+    html += `<div style="margin-top:6px;padding:8px 12px;background:rgba(210,153,34,0.08);border:1px solid var(--warning);border-radius:6px;font-size:11px">
+      <span style="color:var(--warning);font-weight:600">↩️ After FAIL</span> — generate revision prompt:
+      <span style="font-family:var(--mono);font-size:10px"> ./pipeline_run.sh revise "..."</span>
+      <button class="btn" style="font-size:10px;margin-left:8px" onclick="copyCmd(${escAttr(JSON.stringify(def.reviseCmd))}, this)">⎘</button>
+    </div>`;
+  }
+
+  bar.innerHTML = html;
+
+  // If needsBuilder, start the async autoLoad
+  if (needsBuilder) {
+    await autoLoadVerdictFile(gate, 'qbar-status', 'qbar-ta', 'qbar-preview', isRevise);
+  }
+}
 
 // ── Main load ─────────────────────────────────────────────────────────────
 async function loadAll() {
@@ -1235,8 +1848,23 @@ document.getElementById("auto-refresh-toggle").addEventListener("change", functi
 });
 
 // ── Help modal ────────────────────────────────────────────────────────────
+function toggleLang() {
+  const current = localStorage.getItem("pipeline_dashboard_lang") || "en";
+  const next = current === "en" ? "he" : "en";
+  localStorage.setItem("pipeline_dashboard_lang", next);
+  applyLang(next);
+}
+function applyLang(lang) {
+  document.querySelectorAll(".lang-en").forEach(el => { el.style.display = lang === "en" ? "" : "none"; });
+  document.querySelectorAll(".lang-he").forEach(el => { el.style.display = lang === "he" ? "" : "none"; });
+  const btn = document.getElementById("lang-toggle-btn");
+  if (btn) btn.textContent = "🌐 " + (lang === "en" ? "EN" : "HE");
+}
 function toggleHelp() {
   document.getElementById("help-modal").classList.toggle("open");
+  if (document.getElementById("help-modal").classList.contains("open")) {
+    applyLang(localStorage.getItem("pipeline_dashboard_lang") || "en");
+  }
 }
 function closeHelpOutside(e) {
   if (e.target === document.getElementById("help-modal")) toggleHelp();

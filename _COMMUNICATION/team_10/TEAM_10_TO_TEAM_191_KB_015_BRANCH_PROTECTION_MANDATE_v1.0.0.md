@@ -7,7 +7,7 @@
 **cc:** Team 60, Team 170, Team 190  
 **date:** 2026-03-13  
 **status:** ACTIVE  
-**scope:** KB-015 — CI/CD PR quality gate pipeline (Branch Protection Rules)  
+**scope:** KB-015 — CI/CD PR quality gate pipeline (Branch Protection / Repository Rulesets)  
 **authority:** KNOWN_BUGS_REGISTER; ARCHITECT_DIRECTIVE_QUALITY_INFRASTRUCTURE
 
 ---
@@ -31,7 +31,7 @@
 
 **KB-015:** "No CI/CD PR quality gate pipeline" — אין שער איכות חוסם ל־PR לפני merge.
 
-הבאג נרשם ב־2026-03-03 כחלק מסריקת Cloud Agent. הכוונה: אף ש־CI רץ על PR, **ניתן למזג PR גם כאשר CI נכשל** — אלא אם מוגדרות Branch Protection Rules ב־GitHub שמחייבות את ה־status checks לעבור לפני merge.
+הבאג נרשם ב־2026-03-03 כחלק מסריקת Cloud Agent. הכוונה: אף ש־CI רץ על PR, **ניתן למזג PR גם כאשר CI נכשל** — אלא אם מוגדרות ב־GitHub מדיניות אכיפה לשערי merge (Branch Protection Rules או Repository Rulesets) שמחייבות את ה־status checks לעבור לפני merge.
 
 ### 2.2 מה קיים בקוד (מאומת)
 
@@ -46,7 +46,7 @@
 
 ### 2.3 מה חסר (לא ניתן לוודא מתוך repo)
 
-**Branch Protection Rules** על `main` (ו־`develop` אם רלוונטי):
+**Merge-gate enforcement** על `main` (ו־`develop` אם רלוונטי) באמצעות Branch Protection Rules **או** Repository Rulesets:
 
 - "Require status checks to pass before merging" — **לא מופעל** (או לא מוגדר)
 - Required status checks: `Backend Tests & Security`, `Frontend Build & Lint` — **לא נבחרו**
@@ -65,15 +65,15 @@
 
 ### 3.1 משימה ראשית
 
-**להגדיר Branch Protection Rules** ב־GitHub כך ש־CI ישמש כשער איכות חוסם ל־PR.
+**להגדיר merge-gate enforcement** ב־GitHub כך ש־CI ישמש כשער איכות חוסם ל־PR (ב־Branch Protection או Rulesets לפי יכולות הרפו).
 
 ### 3.2 פעולות חובה
 
 | # | פעולה | פרטים |
 |---|--------|--------|
-| 1 | גישה ל־Settings | GitHub → Repo → Settings → Branches → Branch protection rules |
+| 1 | גישה ל־Settings | GitHub → Repo → Settings → Branches / Rules |
 | 2 | עריכת כלל עבור `main` | הוסף או עדכן rule ל־`main` |
-| 3 | הפעלת "Require status checks" | ✅ Require status checks to pass before merging |
+| 3 | הפעלת שער סטטוסים | ✅ Require status checks to pass before merging (או ruleset required_status_checks מקביל) |
 | 4 | בחירת status checks | נדרש: `Backend Tests & Security`, `Frontend Build & Lint` |
 | 5 | אופציונלי — עדכניות | ✅ Require branches to be up to date before merging (מומלץ) |
 | 6 | develop (אם קיים) | אותה הגדרה ל־`develop` אם המשגר משתמש בו |
@@ -87,12 +87,12 @@
 
 יש לבחור **בדיוק** את השמות הללו ב־"Require status checks".
 
-### 3.4 אם אין גישת Settings
+### 3.4 אם אין גישת Settings / Endpoint branch-protection לא זמין
 
-אם ל־Team 191 אין הרשאות Settings ב־GitHub:
+אם ל־Team 191 אין הרשאות Settings ב־GitHub או שמנגנון branch-protection endpoint לא זמין בסביבת הרפו:
 
 1. להכין **מסמך בקשה מובנה** לבעל הרפו / מנהל (Nimrod) עם ההוראות למעלה.
-2. לציין: קישור ל־KNOWN_BUGS_REGISTER, קישור למנדט זה, רשימת הפעולות המדויקות.
+2. לציין: קישור ל־KNOWN_BUGS_REGISTER, קישור למנדט זה, רשימת הפעולות המדויקות, ובמידת הצורך נתיב Rulesets כחלופה קנונית.
 3. לאחר ביצוע — להחזיר ל־Team 10 דוח סגירה.
 
 ---

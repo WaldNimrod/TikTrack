@@ -3,7 +3,7 @@
 
 **From:** Team 170 (Governance Spec / Documentation / UI Spec)
 **To:** Team 100 (Program Manager), Team 190 (Validation — as required)
-**Date:** 2026-03-13
+**date:** 2026-03-13
 **Mandate:** TEAM_170_PIPELINE_DASHBOARD_HEBREW_UI_MANDATE_v1.0.0.md
 **Target file:** PIPELINE_DASHBOARD.html (repo root)
 
@@ -88,4 +88,16 @@ Translation rules applied: gate → שלב/gate; pipeline, PASS, FAIL, file path
 
 ---
 
+## 7. Closure (post re-validation)
+
+**Status:** CLOSED — task completed.
+
+- **Team 190 revalidation:** PASS (2026-03-13). BF-01, BF-02, BF-03 closed.
+- **Canonical revalidation result:** `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_170_TEAM_100_PIPELINE_DASHBOARD_HEBREW_UI_REVALIDATION_RESULT_v1.0.1.md`
+- **Known Bugs Register:** KB-2026-03-13-25 closed in `documentation/docs-governance/01-FOUNDATIONS/KNOWN_BUGS_REGISTRY_v1.0.0.md` with remediation + revalidation evidence chain.
+- **Formal task seal:** `_COMMUNICATION/team_170/TEAM_170_PIPELINE_DASHBOARD_HEBREW_UI_SOP013_SEAL_v1.0.0.md`
+
+---
+
 **log_entry | TEAM_170 | PIPELINE_DASHBOARD_HEBREW_UI | COMPLETION_SUBMISSION | 2026-03-13**
+**log_entry | TEAM_170 | PIPELINE_DASHBOARD_HEBREW_UI | CLOSED_AFTER_REVALIDATION_PASS_KB_CLOSED | 2026-03-13**

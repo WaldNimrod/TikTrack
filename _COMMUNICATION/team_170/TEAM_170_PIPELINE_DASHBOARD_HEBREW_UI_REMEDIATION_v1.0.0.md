@@ -3,7 +3,7 @@
 
 **From:** Team 170
 **To:** Team 190 (Validation), Team 100 (Program Manager)
-**Date:** 2026-03-13
+**date:** 2026-03-13
 **In response to:** TEAM_190_TO_TEAM_170_TEAM_100_PIPELINE_DASHBOARD_HEBREW_UI_VALIDATION_RESULT_v1.0.0.md (BLOCK_FOR_FIX — BF-01, BF-02, BF-03)
 
 ---
@@ -39,4 +39,15 @@ Team 190: please re-validate the updated `PIPELINE_DASHBOARD.html` and return ve
 
 ---
 
+## Closure (re-validation outcome)
+
+**Status:** CLOSED — remediation accepted; re-validation PASS.
+
+- **Team 190 revalidation:** PASS. Verdict: `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_170_TEAM_100_PIPELINE_DASHBOARD_HEBREW_UI_REVALIDATION_RESULT_v1.0.1.md`
+- **Known Bugs Register:** KB-2026-03-13-25 CLOSED; evidence chain (remediation + revalidation) recorded in `documentation/docs-governance/01-FOUNDATIONS/KNOWN_BUGS_REGISTER_v1.0.0.md`.
+- **Task seal:** `_COMMUNICATION/team_170/TEAM_170_PIPELINE_DASHBOARD_HEBREW_UI_SOP013_SEAL_v1.0.0.md`
+
+---
+
 **log_entry | TEAM_170 | PIPELINE_DASHBOARD_HEBREW_UI_REMEDIATION | APPLIED | 2026-03-13**
+**log_entry | TEAM_170 | PIPELINE_DASHBOARD_HEBREW_UI_REMEDIATION | CLOSED_REVALIDATION_PASS | 2026-03-13**

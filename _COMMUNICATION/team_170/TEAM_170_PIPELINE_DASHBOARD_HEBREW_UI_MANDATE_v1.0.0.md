@@ -3,7 +3,7 @@
 
 **From:** Team 100 (Program Manager) on behalf of Team 00 (Chief Architect)
 **To:** Team 170 (Governance Spec / Documentation / UI Spec)
-**Date:** 2026-03-13
+**date:** 2026-03-13
 **Priority:** Medium
 **Type:** UI Enhancement Mandate
 

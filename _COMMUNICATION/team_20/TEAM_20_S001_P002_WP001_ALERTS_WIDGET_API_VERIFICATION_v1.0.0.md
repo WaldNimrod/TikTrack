@@ -5,6 +5,7 @@
 **from:** Team 20 (Backend)  
 **ref:** S001-P002 WP001 Alerts Summary Widget on D15.I home dashboard  
 **date:** 2026-03-12  
+**historical_record:** true  
 **status:** VERIFIED — No backend changes required  
 
 ---

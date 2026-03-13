@@ -1,6 +1,7 @@
 ---
 **id:** TEAM_00_S001_P002_EXPERIMENT_FINDINGS_LOG_v1.0.0
 **from:** Team 00 (Chief Architect)
+**date:** 2026-03-13
 **date_opened:** 2026-03-13
 **status:** ACTIVE — collecting during experiment
 **purpose:** Live log of findings, gaps, decisions, and open questions from the S001-P002 live-fire experiment. To be reviewed systematically after experiment completion.

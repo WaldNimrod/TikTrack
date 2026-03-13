@@ -58,14 +58,46 @@ def load_conventions(scope: str) -> str:
     return ""
 
 
-def build_context_reset(team_id: str) -> str:
-    """Context Loading Protocol — mandatory opening line."""
-    team_label = team_id.upper().replace("_", " ")
+_TEAM_ROLES = {
+    "team_10":  "Gateway",
+    "team_20":  "API-Verify",
+    "team_30":  "Frontend",
+    "team_50":  "QA",
+    "team_90":  "Dev-Validator",
+    "team_100": "Arch-Authority",
+    "team_170": "Spec-Author",
+    "team_190": "Constitutional-Validator",
+}
+
+
+def build_identity_stamp(
+    team_id: str,
+    gate_id: str,
+    work_package_id: str = "N/A",
+    stage_id: str = "S002",
+) -> str:
+    """Lean identity stamp — ~40 tokens. Canonical replacement for CONTEXT_RESET.
+
+    Prevents context drift without verbose re-injection.
+    Format: **ACTIVE: TEAM_XX (Role)** gate=... | wp=... | stage=... | date=...
+
+    Use fresh=True in build_full_agent_prompt() to additionally prepend the full identity.
+    """
+    role = _TEAM_ROLES.get(team_id, team_id.upper())
+    today = date.today().isoformat()
     return (
-        f"{team_label}_CONTEXT_RESET – "
-        f"Load attached governance rules and state. "
-        f"Confirm active stage, active flow, active domain, and allowed gate range before proceeding."
+        f"**ACTIVE: {team_id.upper()} ({role})**  "
+        f"gate={gate_id} | wp={work_package_id} | stage={stage_id} | {today}"
     )
+
+
+def build_context_reset(team_id: str) -> str:
+    """DEPRECATED — use build_identity_stamp() instead.
+
+    Kept for backward compatibility with conversations/*.py files.
+    Returns a lean stamp rather than the old verbose CONTEXT_RESET line.
+    """
+    return build_identity_stamp(team_id, gate_id="N/A")
 
 
 def build_state_summary() -> str:
@@ -182,29 +214,31 @@ def build_full_agent_prompt(
     work_package_id: str = "N/A",
     scope: str = "full",
     include_conventions: bool = False,
+    fresh: bool = False,
+    stage_id: str = "S002",
 ) -> str:
-    """
-    Build a complete prompt for an agent call with all 4 layers.
-    This is the SYSTEM PROMPT sent to the LLM engine.
+    """Build a complete prompt for an agent call.
+
+    fresh=True (new session): includes full identity file + governance rules (heavy, ~1000+ tokens).
+    fresh=False (continuing session): lean stamp only (40 tokens). Agent already has context.
     """
     parts = []
 
-    # Context reset (per Context Loading Protocol)
-    parts.append(build_context_reset(team_id))
+    # Identity stamp — always present, prevents drift
+    parts.append(build_identity_stamp(team_id, gate_id, work_package_id, stage_id))
     parts.append("")
 
-    # Layer 1: Identity
-    parts.append("# Layer 1: Your Identity and Role")
-    parts.append(load_team_identity(team_id))
-    parts.append("")
+    if fresh:
+        # Full identity + governance for new sessions
+        parts.append("# Your Identity and Role")
+        parts.append(load_team_identity(team_id))
+        parts.append("")
+        parts.append("# Governance Rules")
+        parts.append(load_governance_rules())
+        parts.append("")
 
-    # Layer 2: Governance
-    parts.append("# Layer 2: Governance Rules")
-    parts.append(load_governance_rules())
-    parts.append("")
-
-    # Layer 3: State
-    parts.append("# Layer 3: Current Project State")
+    # State snapshot — always include (changes every session)
+    parts.append("# Current Project State")
     parts.append(build_state_summary())
     parts.append("")
 
@@ -216,13 +250,8 @@ def build_full_agent_prompt(
             parts.append(conv)
             parts.append("")
 
-    # Drift prevention reminder
-    parts.append("# Drift Prevention")
-    parts.append("- No assumption-based decisions.")
-    parts.append("- All governance updates must pass validation.")
-    parts.append("- No cross-domain leakage.")
-    parts.append(f"- Current gate: {gate_id}")
-    parts.append(f"- Work package: {work_package_id}")
+    # Gate + WP context anchor
+    parts.append(f"gate={gate_id} | wp={work_package_id} | no-assumption-decisions | no-cross-domain-leakage")
     parts.append("")
 
     return "\n".join(parts)

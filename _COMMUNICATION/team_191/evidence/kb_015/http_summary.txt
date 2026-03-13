@@ -1,0 +1,4 @@
+main_branch=404
+develop_branch=404
+main_protection=401
+main_required_status_checks=401

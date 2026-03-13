@@ -155,7 +155,7 @@ def show_next(state: PipelineState | None = None):
     print(f"╚══════════════════════════════════════════════════════════╝")
 
 
-def generate_prompt(gate_id: str, force_gate4: bool = False):
+def generate_prompt(gate_id: str, force_gate4: bool = False, revision_notes: str = "", fresh: bool = False):
     state = PipelineState.load()
     if gate_id == "WAITING_FOR_IMPLEMENTATION_COMMIT":
         gate_id = "GATE_4"  # Alias: retry GATE_4 after commit
@@ -168,7 +168,7 @@ def generate_prompt(gate_id: str, force_gate4: bool = False):
                 _log(f"⛔ {b.check_id}: {b.message}")
             _log("GATE_0 blocked by Data Model Validator. Fix schema issues and re-run.")
             return
-        prompt = _generate_gate_0_prompt(state)
+        prompt = _generate_gate_0_prompt(state, fresh)
     elif gate_id == "GATE_1":
         spec_content = state.lld400_content or state.spec_brief
         dm_findings = run_data_model_checks("GATE_1", spec_content, "lld400_or_spec")
@@ -180,7 +180,7 @@ def generate_prompt(gate_id: str, force_gate4: bool = False):
             return
         prompt = _generate_gate_1_prompt(state)
     elif gate_id == "GATE_2":
-        prompt = _generate_gate_2_prompt(state)
+        prompt = _generate_gate_2_prompt(state, fresh)
     elif gate_id == "WAITING_GATE2_APPROVAL":
         analysis = state.lld400_content[:500] if state.lld400_content else "(no analysis stored)"
         _print_human_approval_prompt("GATE_2", analysis, state.spec_brief)
@@ -194,9 +194,9 @@ def generate_prompt(gate_id: str, force_gate4: bool = False):
             "  --query   GATE_2 --question '…' → Ask follow-up\n"
         )
     elif gate_id == "G3_PLAN":
-        prompt = _generate_g3_plan_prompt(state)
+        prompt = _generate_g3_plan_prompt(state, revision_notes=revision_notes, fresh=fresh)
     elif gate_id == "G3_5":
-        prompt = _generate_g3_5_prompt(state)
+        prompt = _generate_g3_5_prompt(state, fresh)
     elif gate_id == "G3_6_MANDATES":
         prompt = _generate_mandates(state)
     elif gate_id == "CURSOR_IMPLEMENTATION":
@@ -225,9 +225,9 @@ def generate_prompt(gate_id: str, force_gate4: bool = False):
                 _log(f"⛔ {b.check_id}: {b.message}")
             _log("GATE_5 blocked by Data Model Validator. Fix migration and re-run.")
             return
-        prompt = _generate_gate_5_prompt(state)
+        prompt = _generate_gate_5_prompt(state, fresh)
     elif gate_id == "GATE_6":
-        prompt = _generate_gate_6_prompt(state)
+        prompt = _generate_gate_6_prompt(state, fresh)
     elif gate_id == "WAITING_GATE6_APPROVAL":
         impl_summary = ", ".join(state.implementation_files[:10]) if state.implementation_files else "(no impl files stored)"
         _print_human_approval_prompt("GATE_6", impl_summary, state.spec_brief)
@@ -243,7 +243,7 @@ def generate_prompt(gate_id: str, force_gate4: bool = False):
     elif gate_id == "GATE_7":
         prompt = _generate_gate_7_prompt(state)
     elif gate_id == "GATE_8":
-        prompt = _generate_gate_8_prompt(state)
+        prompt = _generate_gate_8_prompt(state, fresh)
     else:
         print(f"Unknown gate: {gate_id}")
         return
@@ -255,12 +255,43 @@ def generate_prompt(gate_id: str, force_gate4: bool = False):
     print(f"\nFull prompt at: {path}")
 
 
-def _generate_gate_0_prompt(state: PipelineState) -> str:
-    identity = load_team_identity("team_190")
-    return (
-        f"TEAM_190_CONTEXT_RESET – Confirm active stage S002.\n\n"
-        f"{identity}\n\n"
+_TEAM_ROLES = {
+    "team_10":  "Gateway",
+    "team_20":  "API-Verify",
+    "team_30":  "Frontend",
+    "team_50":  "QA",
+    "team_90":  "Dev-Validator",
+    "team_100": "Arch-Authority",
+    "team_170": "Spec-Author",
+    "team_190": "Constitutional-Validator",
+}
+
+
+def _team_header(team_id: str, gate_name: str, state: "PipelineState", fresh: bool = False) -> str:
+    """Lean identity stamp — ~40 tokens. Prevents context drift without full re-injection.
+
+    Format: **ACTIVE: TEAM_XX (Role)** gate=... | wp=... | stage=... | date=...
+
+    fresh=True: prepends the full team constitution (for brand-new sessions).
+    fresh=False (default): stamp only (for continuing sessions — agent already has context).
+    """
+    role = _TEAM_ROLES.get(team_id, team_id.upper())
+    today = datetime.now().strftime("%Y-%m-%d")
+    stamp = (
+        f"**ACTIVE: {team_id.upper()} ({role})**  "
+        f"gate={gate_name} | wp={state.work_package_id} | "
+        f"stage={state.stage_id} | {today}\n\n"
         f"---\n\n"
+    )
+    if fresh:
+        identity = load_team_identity(team_id)
+        return f"{identity}\n\n---\n\n{stamp}"
+    return stamp
+
+
+def _generate_gate_0_prompt(state: PipelineState, fresh: bool = False) -> str:
+    return (
+        f"{_team_header('team_190', 'GATE_0', state, fresh)}"
         f"# GATE_0 — Validate Scope\n\n"
         f"Validate the following scope brief for constitutional compliance.\n"
         f"Check: domain isolation, no conflict with active programs, feasibility.\n"
@@ -288,12 +319,9 @@ def _generate_gate_1_prompt(state: PipelineState) -> str:
     )
 
 
-def _generate_gate_2_prompt(state: PipelineState) -> str:
-    identity = load_team_identity("team_100")
+def _generate_gate_2_prompt(state: PipelineState, fresh: bool = False) -> str:
     return (
-        f"TEAM_100_CONTEXT_RESET – Load SSM and WSM. Confirm active stage S002.\n\n"
-        f"{identity}\n\n"
-        f"---\n\n"
+        f"{_team_header('team_100', 'GATE_2', state, fresh)}"
         f"# GATE_2 — Approve Architectural Intent\n\n"
         f"Question: Do we approve building this?\n\n"
         f"## Approved Spec (LLD400 from GATE_1)\n\n"
@@ -304,28 +332,49 @@ def _generate_gate_2_prompt(state: PipelineState) -> str:
     )
 
 
-def _generate_g3_plan_prompt(state: PipelineState) -> str:
+def _generate_g3_plan_prompt(state: PipelineState, revision_notes: str = "", fresh: bool = False) -> str:
+    header = _team_header("team_10", "G3_PLAN", state, fresh)
+    spec = state.lld400_content[:4000] if state.lld400_content else state.spec_brief
+
+    if revision_notes:
+        # Revision mode: G3_5 failed — ask Team 10 to fix the existing plan
+        existing_plan_ref = "_COMMUNICATION/team_10/" if not state.work_plan else ""
+        return (
+            f"{header}"
+            f"# G3_PLAN REVISION — Fix Work Plan per G3_5 Blockers\n\n"
+            f"Your work plan was reviewed by Team 90 (G3_5) and **FAILED**.\n"
+            f"Do NOT produce a new plan from scratch — update the existing plan to address the blockers below.\n\n"
+            f"## G3_5 Blockers to Fix\n\n{revision_notes}\n\n"
+            f"## Existing Work Plan\n\n"
+            f"{state.work_plan[:4000] if state.work_plan else '[work plan not in state — check _COMMUNICATION/team_10/ for your prior output]'}\n\n"
+            f"## Spec (for reference)\n\n{spec}\n\n"
+            f"## Required Output\n\n"
+            f"Produce an updated work plan that resolves every blocker above.\n"
+            f"For each blocker, confirm how you fixed it.\n"
+            f"Save to: `_COMMUNICATION/team_10/TEAM_10_S001_P002_WP001_G3_PLAN_WORK_PLAN_v1.1.0.md`\n\n"
+            f"## Pipeline State\n\n{build_state_summary()}"
+        )
+
+    # Fresh mode: first run of G3_PLAN
     return (
-        f"# Work Plan — Cursor Composer Session\n\n"
-        f"You are Team 10 (Gateway). Build a work plan for this spec.\n\n"
-        f"## Approved Spec\n\n"
-        f"{state.lld400_content[:4000] if state.lld400_content else state.spec_brief}\n\n"
+        f"{header}"
+        f"# G3_PLAN — Build Work Plan from Approved Spec\n\n"
+        f"## Approved Spec\n\n{spec}\n\n"
         f"## Required Output\n\n"
-        f"1. List of files to create/modify per team:\n"
-        f"   - Team 20 (Backend): models, schemas, services, routers, tests\n"
-        f"   - Team 30 (Frontend): HTML pages, JS modules, CSS\n"
+        f"1. Files to create/modify per team (canonical paths):\n"
+        f"   - Team 20 (API verify only): confirm existing API endpoints — no code changes\n"
+        f"   - Team 30 (Frontend): exact file paths to create/modify in `ui/src/`\n"
+        f"   - Team 50 (QA): test scenarios + run commands + PASS criteria\n"
         f"2. Execution order with dependencies\n"
-        f"3. MCP test scenarios for each page/endpoint\n"
-        f"4. Acceptance criteria per deliverable"
+        f"3. Per-team acceptance criteria (field contract, empty state, error state for UI)\n"
+        f"4. API contract: endpoint, params, response shape\n\n"
+        f"## Pipeline State\n\n{build_state_summary()}"
     )
 
 
-def _generate_g3_5_prompt(state: PipelineState) -> str:
-    identity = load_team_identity("team_90")
+def _generate_g3_5_prompt(state: PipelineState, fresh: bool = False) -> str:
     return (
-        f"TEAM_90_CONTEXT_RESET\n\n"
-        f"{identity}\n\n"
-        f"---\n\n"
+        f"{_team_header('team_90', 'G3_5', state, fresh)}"
         f"# G3.5 — Validate Work Plan\n\n"
         f"Validate this work plan for implementation readiness.\n"
         f"Check: completeness, team assignments, deliverables, test coverage.\n"
@@ -335,34 +384,77 @@ def _generate_g3_5_prompt(state: PipelineState) -> str:
     )
 
 
+def _extract_team_task(work_plan: str, team_num: int) -> str:
+    """Extract team-specific task section from pipe-delimited work plan string."""
+    if not work_plan:
+        return ""
+    sections = [s.strip() for s in work_plan.split("|")]
+    team_key = f"Team {team_num}"
+    for section in sections:
+        if section.startswith(team_key):
+            return section
+    return ""
+
+
 def _generate_mandates(state: PipelineState) -> str:
-    """Deterministic mandate generation from work plan."""
+    """Generate per-team implementation mandates driven by the approved work plan."""
     from ..context.injection import load_conventions
     backend_conv = load_conventions("backend")
     frontend_conv = load_conventions("frontend")
 
-    mandates = f"# Implementation Mandates — Generated by V2 Orchestrator\n\n"
-    mandates += f"Spec: {state.spec_brief}\n"
-    mandates += f"WP: {state.work_package_id}\n\n"
+    team_20_task = _extract_team_task(state.work_plan, 20)
+    team_30_task = _extract_team_task(state.work_plan, 30)
+    team_50_task = _extract_team_task(state.work_plan, 50)
 
-    mandates += f"---\n\n## Team 20 Mandate (Backend — Cursor Composer)\n\n"
-    mandates += f"### Context\n{backend_conv[:1000]}\n\n"
-    mandates += f"### Task\nImplement backend for: {state.spec_brief}\n\n"
-    mandates += f"### From Work Plan\n{state.work_plan[:2000] if state.work_plan else '[work plan]'}\n\n"
-    mandates += f"### Acceptance\n- All unit tests pass\n- mypy clean\n- API endpoints return correct responses\n\n"
+    full_work_plan = state.work_plan if state.work_plan else "[work plan not available — run G3_PLAN first]"
 
-    mandates += f"---\n\n## Team 30 Mandate (Frontend — Cursor Composer + MCP)\n\n"
-    mandates += f"### Context\n{frontend_conv[:1000]}\n\n"
-    mandates += f"### Task\nImplement frontend for: {state.spec_brief}\n\n"
-    mandates += f"### From Work Plan\n{state.work_plan[:2000] if state.work_plan else '[work plan]'}\n\n"
-    mandates += f"### MCP Test Scenarios\n"
-    mandates += f"After implementation, test with MCP browser tools:\n"
-    mandates += f"1. Navigate to the new page\n"
-    mandates += f"2. Verify all UI elements render (browser_snapshot)\n"
-    mandates += f"3. Test CRUD operations (create, read, update, delete)\n"
-    mandates += f"4. Verify validation (submit empty form, check error states)\n"
-    mandates += f"5. Verify data displays correctly after operations\n\n"
-    mandates += f"### Acceptance\n- Page renders correctly\n- All CRUD works via UI\n- MCP test scenarios pass\n- Vite build passes\n\n"
+    mandates = f"# Implementation Mandates — {state.work_package_id}\n\n"
+    mandates += f"**Spec:** {state.spec_brief}\n"
+    mandates += f"**WP:** {state.work_package_id}\n\n"
+    mandates += f"---\n\n"
+    mandates += f"## Full Work Plan (reference)\n\n{full_work_plan}\n\n"
+    mandates += f"---\n\n"
+
+    # Team 20 mandate
+    mandates += f"## Team 20 Mandate (API Verification — Cursor Composer)\n\n"
+    mandates += f"### Your Task\n"
+    mandates += (team_20_task if team_20_task else f"Verify backend APIs required for: {state.spec_brief}") + "\n\n"
+    mandates += f"### Backend Conventions\n{backend_conv[:800]}\n\n"
+    mandates += f"### Acceptance\n"
+    mandates += f"- Document API params and response shape in `_COMMUNICATION/team_20/`\n"
+    mandates += f"- Confirm all required endpoints exist and behave as specified\n"
+    mandates += f"- No code changes unless a blocker is found\n\n"
+
+    # Team 30 mandate
+    mandates += f"---\n\n## Team 30 Mandate (Frontend Implementation — Cursor Composer + MCP)\n\n"
+    mandates += f"### Your Task\n"
+    mandates += (team_30_task if team_30_task else f"Implement frontend for: {state.spec_brief}") + "\n\n"
+    mandates += f"### Frontend Conventions\n{frontend_conv[:800]}\n\n"
+    mandates += f"### MCP Verification (run after implementation)\n"
+    mandates += f"1. Navigate to the target page and login\n"
+    mandates += f"2. `browser_snapshot` — verify new component renders\n"
+    mandates += f"3. Test visible count badge when alerts exist\n"
+    mandates += f"4. Verify widget is hidden when 0 unread alerts\n"
+    mandates += f"5. Click alert item — confirm navigation to D34\n"
+    mandates += f"6. Click count badge — confirm navigation to D34 (filtered unread)\n"
+    mandates += f"7. `cd ui && npx vite build` — must succeed\n\n"
+    mandates += f"### Acceptance\n"
+    mandates += f"- All files listed in work plan created/modified\n"
+    mandates += f"- collapsible-container Iron Rule applied\n"
+    mandates += f"- maskedLog used for all console output\n"
+    mandates += f"- Vite build passes\n"
+    mandates += f"- MCP scenarios above all pass\n\n"
+
+    # Team 50 mandate
+    mandates += f"---\n\n## Team 50 Mandate (QA — after Team 30 complete)\n\n"
+    mandates += f"### Your Task\n"
+    mandates += (team_50_task if team_50_task else f"Run QA for: {state.spec_brief}") + "\n\n"
+    mandates += f"### Prerequisite\n"
+    mandates += f"Team 20 API verification complete AND Team 30 implementation complete.\n\n"
+    mandates += f"### Acceptance\n"
+    mandates += f"- All FAST_3 checks pass\n"
+    mandates += f"- D34 regression: no regressions\n"
+    mandates += f"- QA report produced to `_COMMUNICATION/team_50/`\n\n"
 
     path = _save_prompt("implementation_mandates.md", mandates)
     return mandates
@@ -404,10 +496,9 @@ def _generate_gate_4_prompt(state: PipelineState) -> str:
     )
 
 
-def _generate_gate_5_prompt(state: PipelineState) -> str:
-    identity = load_team_identity("team_90")
+def _generate_gate_5_prompt(state: PipelineState, fresh: bool = False) -> str:
     return (
-        f"TEAM_90_CONTEXT_RESET\n\n{identity}\n\n---\n\n"
+        f"{_team_header('team_90', 'GATE_5', state, fresh)}"
         f"# GATE_5 — Dev Validation\n\n"
         f"Validate implementation against approved spec.\n\n"
         f"## Check\n"
@@ -421,10 +512,9 @@ def _generate_gate_5_prompt(state: PipelineState) -> str:
     )
 
 
-def _generate_gate_6_prompt(state: PipelineState) -> str:
-    identity = load_team_identity("team_100")
+def _generate_gate_6_prompt(state: PipelineState, fresh: bool = False) -> str:
     return (
-        f"TEAM_100_CONTEXT_RESET – Load SSM and WSM.\n\n{identity}\n\n---\n\n"
+        f"{_team_header('team_100', 'GATE_6', state, fresh)}"
         f"# GATE_6 — Reality vs Intent\n\n"
         f"Does what was built match what we approved at GATE_2?\n\n"
         f"## Approved Spec\n{state.lld400_content[:2000] if state.lld400_content else state.spec_brief}\n\n"
@@ -448,10 +538,9 @@ def _generate_gate_7_prompt(state: PipelineState) -> str:
     )
 
 
-def _generate_gate_8_prompt(state: PipelineState) -> str:
-    identity_90 = load_team_identity("team_90")
+def _generate_gate_8_prompt(state: PipelineState, fresh: bool = False) -> str:
     return (
-        f"TEAM_90_CONTEXT_RESET\n\n{identity_90}\n\n---\n\n"
+        f"{_team_header('team_90', 'GATE_8', state, fresh)}"
         f"# GATE_8 — Documentation Closure\n\n"
         f"1. Produce AS_MADE_REPORT: what was built, files modified, evidence\n"
         f"2. Verify documentation indexes are consistent\n"
@@ -518,6 +607,52 @@ def advance_gate(gate_id: str, status: str, reason: str = ""):
         show_next(state)
 
 
+def store_artifact(gate_id: str, file_path: str):
+    """Store agent output file content to the appropriate pipeline state field.
+
+    Gate → field mapping:
+      GATE_1                → state.lld400_content
+      G3_PLAN               → state.work_plan
+      CURSOR_IMPLEMENTATION → state.implementation_files (one path per line)
+    """
+    path = Path(file_path)
+    if not path.exists():
+        path = REPO_ROOT / file_path
+    if not path.exists():
+        _log(f"ERROR: File not found: {file_path}")
+        return
+
+    content = path.read_text(encoding="utf-8")
+    state = PipelineState.load()
+
+    GATE_TO_FIELD: dict[str, str] = {
+        "GATE_1": "lld400_content",
+        "G3_PLAN": "work_plan",
+        "CURSOR_IMPLEMENTATION": "implementation_files",
+    }
+
+    field_name = GATE_TO_FIELD.get(gate_id)
+    if not field_name:
+        _log(f"ERROR: No state field mapping for gate: {gate_id}")
+        _log(f"Supported gates: {', '.join(GATE_TO_FIELD.keys())}")
+        return
+
+    if field_name == "implementation_files":
+        files = [
+            line.strip()
+            for line in content.splitlines()
+            if line.strip() and not line.startswith("#")
+        ]
+        state.implementation_files = files
+        _log(f"Stored {len(files)} implementation file paths to state.implementation_files")
+    else:
+        setattr(state, field_name, content)
+        _log(f"Stored {len(content)} chars to state.{field_name}")
+
+    state.save()
+    _log(f"Gate {gate_id} artifact stored successfully.")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Agents_OS V2 Pipeline — Team 10 Orchestrator")
     parser.add_argument("--spec", type=str, help="Start pipeline with spec brief")
@@ -525,7 +660,15 @@ def main():
     parser.add_argument("--next", action="store_true", help="Show next action")
     parser.add_argument("--advance", nargs=2, metavar=("GATE", "STATUS"), help="Advance gate: GATE_X PASS|FAIL")
     parser.add_argument("--reason", type=str, default="", help="Failure reason")
+    parser.add_argument("--store-artifact", nargs=2, metavar=("GATE", "FILE"),
+                        help="Store agent output file to pipeline state. G3_PLAN→work_plan, G3_5→validation, CURSOR_IMPLEMENTATION→impl_files")
     parser.add_argument("--generate-prompt", type=str, metavar="GATE", help="Generate prompt for gate")
+    parser.add_argument("--revision-notes", type=str, default="",
+                        help="Revision notes to include in prompt (for G3_PLAN after G3_5 FAIL). "
+                             "Pass blocker text or path to blocker report file.")
+    parser.add_argument("--fresh", action="store_true",
+                        help="Prepend full team constitution to prompt (for brand-new sessions). "
+                             "Default: lean stamp only (for continuing sessions).")
     parser.add_argument("--stage", type=str, default="S002", help="Stage ID")
     parser.add_argument("--approve", type=str, metavar="GATE", help="Approve gate (GATE_2, GATE_6, GATE_7)")
     parser.add_argument("--reject", type=str, metavar="GATE", help="Reject gate (GATE_2, GATE_6, GATE_7)")
@@ -538,7 +681,10 @@ def main():
     )
     args = parser.parse_args()
 
-    if args.status:
+    if args.store_artifact:
+        gate_id, file_path = args.store_artifact
+        store_artifact(gate_id, file_path)
+    elif args.status:
         show_status()
     elif args.next:
         show_next()
@@ -586,9 +732,19 @@ def main():
         else:
             _log(f"ERROR: --query only valid for GATE_2, GATE_6 (got {gate})")
     elif args.generate_prompt:
+        # If --revision-notes is a file path, read it; otherwise use as inline text
+        revision_notes = ""
+        if args.revision_notes:
+            rn_path = Path(args.revision_notes)
+            if rn_path.exists():
+                revision_notes = rn_path.read_text(encoding="utf-8")
+            else:
+                revision_notes = args.revision_notes
         generate_prompt(
             args.generate_prompt,
             force_gate4=getattr(args, "force_gate4", False),
+            revision_notes=revision_notes,
+            fresh=getattr(args, "fresh", False),
         )
     else:
         parser.print_help()

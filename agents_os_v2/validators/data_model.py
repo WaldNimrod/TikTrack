@@ -26,7 +26,14 @@ SQL_RESERVED = frozenset({
 
 DDL_MARKERS = [
     "ALTER TABLE", "CREATE TABLE", "ADD COLUMN",
-    "migration", "schema change", "DDL", "alembic",
+    "alembic", "DDL",
+]
+
+# Negation patterns: if spec explicitly says NO schema change, skip validation
+NO_SCHEMA_PATTERNS = [
+    "no schema change", "no migration", "no new backend",
+    "no backend", "no db change", "no database change",
+    "schema changes: none", "backend requirement: none",
 ]
 
 # Default alembic versions path (relative to repo root)
@@ -52,7 +59,16 @@ def _is_financial_column(col_name: str) -> bool:
 
 
 def _has_schema_change(content: str) -> bool:
-    """Check if spec content implies schema change per DDL_MARKERS."""
+    """
+    Check if spec content implies schema change per DDL_MARKERS.
+    Returns False if spec explicitly declares no schema change (negation guard).
+    Only fires on actual SQL DDL keywords (ALTER TABLE, CREATE TABLE, ADD COLUMN, alembic).
+    Does NOT fire on plain English mentions of 'migration' or 'schema change' words.
+    """
+    lower = content.lower()
+    # Negation guard: explicit "no schema change" statements suppress all checks
+    if any(pat in lower for pat in NO_SCHEMA_PATTERNS):
+        return False
     upper = content.upper()
     return any(marker.upper() in upper for marker in DDL_MARKERS)
 

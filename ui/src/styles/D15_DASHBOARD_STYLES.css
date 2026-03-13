@@ -862,6 +862,35 @@ tt-section .dashboard-section__body .info-summary {
   margin-block-end: var(--spacing-sm, 8px);
 }
 
+/* Compact variant for AlertsSummaryWidget (D15.I) */
+.active-alerts__card--compact {
+  padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 8px);
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s ease;
+}
+
+.active-alerts__card--compact:hover {
+  background: var(--apple-bg-secondary, #f5f5f7);
+}
+
+.active-alerts__card-symbol {
+  font-weight: 600;
+  color: var(--entity-ticker-color, var(--color-primary));
+}
+
+.active-alerts__card-sep {
+  color: var(--apple-text-tertiary, #8e8e93);
+  margin-inline: 0.25em;
+}
+.active-alerts__card-time {
+  font-size: 0.85em;
+  color: var(--apple-text-secondary, #86868b);
+}
+
 .active-alerts__empty-text {
   font-size: var(--font-size-base, 0.92rem);
 }

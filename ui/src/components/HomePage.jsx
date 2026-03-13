@@ -11,6 +11,7 @@
 
 import React, { useState, useEffect } from 'react';
 import PageFooter from './core/PageFooter.jsx';
+import AlertsSummaryWidget from './AlertsSummaryWidget.jsx';
 import { debugLog } from '../utils/debug.js';
 import authService from '../cubes/identity/services/auth.js';
 
@@ -38,6 +39,9 @@ const HomePage = () => {
 
   // Portfolio summary toggle state
   const [showPortfolioSummary, setShowPortfolioSummary] = useState(false);
+
+  // Alerts count for section-header bell (when section closed)
+  const [alertsCount, setAlertsCount] = useState(0);
 
   // Widget tabs state
   const [activeTabs, setActiveTabs] = useState({
@@ -179,15 +183,15 @@ const HomePage = () => {
                   </div>
                   <div className="index-section__header-actions">
                     {/* Alert bell - only shown when there are alerts AND section is closed */}
-                    {!openSections['top'] && (
-                      <button 
+                    {!openSections['top'] && alertsCount > 0 && (
+                      <a 
+                        href="/alerts.html?trigger_status=triggered_unread"
                         className="index-section__header-alert-btn" 
-                        aria-label="פתח התראות פעילות"
-                        onClick={() => handleSectionToggle('top')}
+                        aria-label={`${alertsCount} התראות לא נקראו`}
                       >
                         <span className="index-section__header-alert-icon">🔔</span>
-                        <span className="index-section__header-alert-count">3</span>
-                      </button>
+                        <span className="index-section__header-alert-count">{alertsCount}</span>
+                      </a>
                     )}
                     <button 
                       className="index-section__header-toggle-btn" 
@@ -212,242 +216,7 @@ const HomePage = () => {
                 {/* Section Body */}
                 {openSections['top'] && (
                   <div className="index-section__body">
-                    {/* Active Alerts Component */}
-                    <div className="active-alerts" data-role="container">
-                      <div className="active-alerts__header">
-                        <div className="active-alerts__title-group">
-                          <button 
-                            type="button" 
-                            className="active-alerts__title-trigger" 
-                            aria-label="פתח עמוד ההתראות"
-                          >
-                            <span className="active-alerts__title-icon" aria-hidden="true">🔔</span>
-                            <span className="active-alerts__title-text" data-role="title-text">התראות פעילות</span>
-                          </button>
-                          <span className="active-alerts__count-badge" data-role="count" aria-live="polite">3</span>
-                        </div>
-                        <div className="active-alerts__filters" data-role="filters" aria-label="סינון לפי סוג התראה"></div>
-                      </div>
-
-                      <div className="active-alerts__body">
-                        <div className="active-alerts__list" data-role="list" role="list">
-                          {/* Alert Card 1: Trade Alert */}
-                          <article 
-                            className="active-alerts__card active-alerts__card--trades" 
-                            role="listitem" 
-                            data-alert-id="1" 
-                            data-entity-type="trades"
-                          >
-                            <div className="active-alerts__card-header">
-                              <div className="active-alerts__header-linked">
-                                <div 
-                                  className="linked-object-card notes-linked-object active-alerts__linked-entity" 
-                                  role="link" 
-                                  tabIndex="0" 
-                                  data-entity-type="trades" 
-                                  data-entity-id="1"
-                                >
-                                  <div className="linked-object-card-icon">
-                                    <img 
-                                      src="/images/icons/entities/trades.svg" 
-                                      alt="טרייד" 
-                                      className="linked-object-card-icon-img" 
-                                      width="60" 
-                                      height="60"
-                                    />
-                                  </div>
-                                  <div className="linked-object-card-content">
-                                    <div className="linked-object-card-title">
-                                      <span className="linked-object-card-type">טרייד</span>
-                                      <span className="linked-object-card-name">טרייד 1</span>
-                                    </div>
-                                    <div className="linked-object-card-meta">
-                                      <span className="status-badge" data-status-category="open" data-entity="trades">פתוח</span>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="active-alerts__details">
-                                <button className="btn btn-view-alert" type="button" aria-label="פרטי התראה">
-                                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
-                                    <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
-                                  </svg>
-                                </button>
-                              </div>
-                            </div>
-                            <div className="active-alerts__card-body">
-                              <div className="active-alerts__row active-alerts__row--condition">
-                                <span className="active-alerts__row-label">תנאי</span>
-                                <span className="active-alerts__row-value">מחיר &gt; 189.98</span>
-                              </div>
-                              <div className="active-alerts__row active-alerts__row--message">
-                                <span className="active-alerts__row-label">הודעה</span>
-                                <span className="active-alerts__row-value">⚡ התראה חדשה: מחיר INTC הגיע ל-$189.98 - הזדמנות לקנייה</span>
-                              </div>
-                            </div>
-                            <div className="active-alerts__card-footer">
-                              <time className="active-alerts__timestamp">2026-02-01 10:30</time>
-                              <div className="active-alerts__actions">
-                                <button 
-                                  type="button" 
-                                  className="active-alerts__mark_read" 
-                                  data-alert-id="1" 
-                                  aria-label="סמן התראה כנקראה"
-                                >
-                                  ✓
-                                </button>
-                              </div>
-                            </div>
-                          </article>
-
-                          {/* Alert Card 2: Account Alert */}
-                          <article 
-                            className="active-alerts__card active-alerts__card--account" 
-                            role="listitem" 
-                            data-alert-id="2" 
-                            data-entity-type="trading_accounts"
-                          >
-                            <div className="active-alerts__card-header">
-                              <div className="active-alerts__header-linked">
-                                <div 
-                                  className="linked-object-card notes-linked-object active-alerts__linked-entity" 
-                                  role="link" 
-                                  tabIndex="0" 
-                                  data-entity-type="trading_accounts" 
-                                  data-entity-id="1"
-                                >
-                                  <div className="linked-object-card-icon">
-                                    <img 
-                                      src="/images/icons/entities/trading_accounts.svg" 
-                                      alt="חשבון מסחר" 
-                                      className="linked-object-card-icon-img" 
-                                      width="60" 
-                                      height="60"
-                                    />
-                                  </div>
-                                  <div className="linked-object-card-content">
-                                    <div className="linked-object-card-title">
-                                      <span className="linked-object-card-type">חשבון מסחר</span>
-                                      <span className="linked-object-card-name">חשבון 1</span>
-                                    </div>
-                                    <div className="linked-object-card-meta">
-                                      <span className="status-badge" data-status-category="active" data-entity="trading_accounts">פעיל</span>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="active-alerts__details">
-                                <button className="btn btn-view-alert" type="button" aria-label="פרטי התראה">
-                                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
-                                    <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
-                                  </svg>
-                                </button>
-                              </div>
-                            </div>
-                            <div className="active-alerts__card-body">
-                              <div className="active-alerts__row active-alerts__row--condition">
-                                <span className="active-alerts__row-label">תנאי</span>
-                                <span className="active-alerts__row-value">יתרה &lt; $10,000</span>
-                              </div>
-                              <div className="active-alerts__row active-alerts__row--message">
-                                <span className="active-alerts__row-label">הודעה</span>
-                                <span className="active-alerts__row-value">⚠️ התראה: יתרת חשבון מסחר נמוכה - נדרש מימון</span>
-                              </div>
-                            </div>
-                            <div className="active-alerts__card-footer">
-                              <time className="active-alerts__timestamp">2026-02-01 09:15</time>
-                              <div className="active-alerts__actions">
-                                <button 
-                                  type="button" 
-                                  className="active-alerts__mark_read" 
-                                  data-alert-id="2" 
-                                  aria-label="סמן התראה כנקראה"
-                                >
-                                  ✓
-                                </button>
-                              </div>
-                            </div>
-                          </article>
-
-                          {/* Alert Card 3: Ticker Alert */}
-                          <article 
-                            className="active-alerts__card active-alerts__card--ticker" 
-                            role="listitem" 
-                            data-alert-id="3" 
-                            data-entity-type="ticker"
-                          >
-                            <div className="active-alerts__card-header">
-                              <div className="active-alerts__header-linked">
-                                <div 
-                                  className="linked-object-card notes-linked-object active-alerts__linked-entity" 
-                                  role="link" 
-                                  tabIndex="0" 
-                                  data-entity-type="ticker" 
-                                  data-entity-id="1"
-                                >
-                                  <div className="linked-object-card-icon">
-                                    <img 
-                                      src="/images/icons/entities/tickers.svg" 
-                                      alt="טיקר" 
-                                      className="linked-object-card-icon-img" 
-                                      width="60" 
-                                      height="60"
-                                    />
-                                  </div>
-                                  <div className="linked-object-card-content">
-                                    <div className="linked-object-card-title">
-                                      <span className="linked-object-card-type">טיקר</span>
-                                      <span className="linked-object-card-name">AAPL</span>
-                                    </div>
-                                    <div className="linked-object-card-meta">
-                                      <span className="status-badge" data-status-category="active" data-entity="ticker">פעיל</span>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="active-alerts__details">
-                                <button className="btn btn-view-alert" type="button" aria-label="פרטי התראה">
-                                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
-                                    <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
-                                  </svg>
-                                </button>
-                              </div>
-                            </div>
-                            <div className="active-alerts__card-body">
-                              <div className="active-alerts__row active-alerts__row--condition">
-                                <span className="active-alerts__row-label">תנאי</span>
-                                <span className="active-alerts__row-value">מחיר &gt; $150.00</span>
-                              </div>
-                              <div className="active-alerts__row active-alerts__row--message">
-                                <span className="active-alerts__row-label">הודעה</span>
-                                <span className="active-alerts__row-value">📈 התראה: AAPL עלה מעל $150.00 - סימן חיובי</span>
-                              </div>
-                            </div>
-                            <div className="active-alerts__card-footer">
-                              <time className="active-alerts__timestamp">2026-02-01 08:45</time>
-                              <div className="active-alerts__actions">
-                                <button 
-                                  type="button" 
-                                  className="active-alerts__mark_read" 
-                                  data-alert-id="3" 
-                                  aria-label="סמן התראה כנקראה"
-                                >
-                                  ✓
-                                </button>
-                              </div>
-                            </div>
-                          </article>
-                        </div>
-                        <div className="active-alerts__empty is-hidden" data-role="empty-state">
-                          <span className="active-alerts__empty-icon" aria-hidden="true">🔕</span>
-                          <span className="active-alerts__empty-text">אין התראות חדשות</span>
-                        </div>
-                      </div>
-                    </div>
-
+                    <AlertsSummaryWidget onData={({ total }) => setAlertsCount(total)} />
                     {/* Summary Information */}
                     <div className="info-summary" id="summaryStats">
                       {/* First Row: Summary Stats */}

@@ -73,7 +73,7 @@
 | `trading_account_id` חסר/לא תקף | שגיאה — Account not found |
 | `transaction_date` עתידי | אזהרה / שגיאה לפי מדיניות |
 | `currency` לא ISO 4217 | שגיאה — Invalid currency |
-| דיוק amount > 8 ספרות | קיטוע/עיגול ל־8 ספרות (החלטה נדרשת) |
+| דיוק amount > 6 ספרות | קיטוע/עיגול ל־6 ספרות (תואם NUMERIC(20,6)) |
 
 ---
 

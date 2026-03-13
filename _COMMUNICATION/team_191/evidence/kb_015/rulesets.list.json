@@ -1,0 +1,21 @@
+[
+  {
+    "id": 13883302,
+    "name": "main",
+    "target": "branch",
+    "source_type": "Repository",
+    "source": "WaldNimrod/TikTrack",
+    "enforcement": "active",
+    "node_id": "RRS_lACqUmVwb3NpdG9yec49ujgpzgDT16Y",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/WaldNimrod/TikTrack/rulesets/13883302"
+      },
+      "html": {
+        "href": "https://github.com/WaldNimrod/TikTrack/rules/13883302"
+      }
+    },
+    "created_at": "2026-03-13T15:51:42.173+01:00",
+    "updated_at": "2026-03-13T15:59:16.698+01:00"
+  }
+]

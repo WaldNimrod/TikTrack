@@ -82,7 +82,7 @@ EXECUTIONS & IMPORT CENTER (Cash Flows + Executions, IBKR + IBI via BaseConnecto
 
 ### שלב 5 — ישויות מורכבות (Trades/Plans)
 
-תוכניות טריידים, טריידים, דשבורד טיקר, יומן מסחר והיסטוריית טרייד (D31), וניהול תגיות (D38).
+תוכניות טריידים, טריידים, דשבורד טיקר (D27 — תלוי בנתוני היסטוריה: eod_prices, history_250d), יומן מסחר והיסטוריית טרייד (D31), וניהול תגיות (D38).
 בנוסף: D26-Phase2 (watch_lists enhancement) נפתח לאחר D29 GATE_8 PASS ומוסיף Position, P/L, P/L%, ATR(14) ו-flag_color filtering משופר.
 
 ### שלב 6 — תובנות וניתוח (Advanced Analytics)

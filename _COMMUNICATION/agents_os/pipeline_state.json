@@ -1,19 +1,17 @@
 {
-  "pipe_run_id": "7501bb4a",
+  "pipe_run_id": "4f524513",
   "work_package_id": "S001-P002-WP001",
   "stage_id": "S001",
-  "spec_brief": "S001-P002 WP001: Alerts Summary Widget on D15.I home dashboard. Read-only frontend component. Triggered-unread count badge + list of N=5 most recent, fully hidden when 0. Uses existing GET /api/v1/alerts/ endpoint. Per-alert: ticker symbol, condition label, triggered_at relative time. Click item navigates to D34. Click badge navigates to D34 filtered unread. collapsible-container Iron Rule. maskedLog mandatory. No new backend, no schema changes.",
+  "spec_brief": "S001-P002 WP001: Alerts Summary Widget on D15.I home dashboard. Read-only frontend component. Triggered-unread count badge + list of N=5 most recent, fully hidden when 0. Uses existing GET /api/v1/alerts/ endpoint. Per-alert: ticker symbol · condition label · triggered_at relative time. Click item → D34. Click badge → D34 filtered unread. collapsible-container Iron Rule. maskedLog mandatory. No new backend, no schema changes.",
   "current_gate": "G3_5",
   "gates_completed": [
     "GATE_0",
     "GATE_1",
     "GATE_2",
     "WAITING_GATE2_APPROVAL",
-    "G3_PLAN",
     "G3_PLAN"
   ],
   "gates_failed": [
-    "G3_5",
     "G3_5"
   ],
   "lld400_content": "",
@@ -22,6 +20,6 @@
   "implementation_files": [],
   "implementation_endpoints": [],
   "spec_path": "",
-  "started_at": "2026-03-12T23:59:31.614807+00:00",
-  "last_updated": "2026-03-13T01:27:52.616496+00:00"
+  "started_at": "2026-03-13T02:10:10.757633+00:00",
+  "last_updated": "2026-03-13T11:52:30.692104+00:00"
 }

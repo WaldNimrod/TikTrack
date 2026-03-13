@@ -1,0 +1,7 @@
+main.branch=200
+develop.branch=404
+main.baseline.protection=404
+main.baseline.required_status_checks=404
+main.apply.required_status_checks=404
+main.post.required_status_checks=404
+main.post.protection=404

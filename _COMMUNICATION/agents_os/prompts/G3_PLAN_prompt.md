@@ -9,8 +9,7 @@ Do NOT produce a new plan from scratch — update the existing plan to address t
 
 ## G3_5 Blockers to Fix
 
-B-G35-004: Credential inconsistency — work plan §6 uses admin/418141 but scripts/run-alerts-d34-qa-api.sh line 7 uses TikTrackAdmin/4181. Use TikTrackAdmin/4181 everywhere — this is the canonical admin credential (confirmed). Fix ALL credential references in the work plan.
-B-G35-005: No deterministic QA state setup/reset procedure — scenarios require 'ensure 0 triggered_unread' and 'ensure ≥1 triggered_unread' but Team 50 has no instruction for how to reach those states. Add explicit setup steps: (a) how to create and trigger at least 1 unread alert via API before positive tests; (b) how to reset (mark-as-read or delete) for zero-state tests. Use existing API endpoints — GET/POST /api/v1/alerts/ already confirmed.
+BLOCKER-1: QA credential inconsistency. Work plan API test uses admin/418141 but canonical credentials are TikTrackAdmin/4181. Fix ALL credential references. BLOCKER-2: Manual QA setup not reproducible. Section 6.4 needs explicit curl commands to reset/create triggered_unread state before each check.
 
 ## Existing Work Plan
 
@@ -136,7 +135,7 @@ Step 4: FAST_3 — Nimrod browser sign-off
 
 ## Spec (for reference)
 
-S001-P002 WP001: Alerts Summary Widget on D15.I home dashboard. Read-only frontend component. Triggered-unread count badge + list of N=5 most recent, fully hidden when 0. Uses existing GET /api/v1/alerts/ endpoint. Per-alert: ticker symbol, condition label, triggered_at relative time. Click item navigates to D34. Click badge navigates to D34 filtered unread. collapsible-container Iron Rule. maskedLog mandatory. No new backend, no schema changes.
+S001-P002 WP001: Alerts Summary Widget on D15.I home dashboard. Read-only frontend component. Triggered-unread count badge + list of N=5 most recent, fully hidden when 0. Uses existing GET /api/v1/alerts/ endpoint. Per-alert: ticker symbol · condition label · triggered_at relative time. Click item → D34. Click badge → D34 filtered unread. collapsible-container Iron Rule. maskedLog mandatory. No new backend, no schema changes.
 
 ## Required Output
 

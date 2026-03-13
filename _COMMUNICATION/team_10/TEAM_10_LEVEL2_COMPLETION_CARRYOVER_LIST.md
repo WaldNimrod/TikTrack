@@ -1,5 +1,6 @@
 # Team 10 — Level 2 Completion Carryover List
 **project_domain:** TIKTRACK
+**date:** 2026-03-13
 
 **id:** `TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST`  
 **owner:** Team 10 (The Gateway)  
@@ -34,8 +35,8 @@ This list is Level-2 and must stay linked from Level-1 roadmap.
 | CARRY-011 | `documentation/docs-system/01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md:66` | D30-D32 advanced research pages: full specs missing | Batch 6 | Team 31 + Team 30 + Team 70 | OPEN |
 | CARRY-012 | `documentation/docs-system/01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md:67` | D37 Data Import marked urgent | Batch 4 | Team 31 + Team 30 + Team 20 | OPEN |
 | CARRY-013 | `documentation/docs-system/01-ARCHITECTURE/TT2_OFFICIAL_PAGE_TRACKER.md:68` | D38-D39 Settings pages require detailed spec | Batch 3/5 | Team 31 + Team 30 + Team 70 | OPEN |
-| CARRY-014 | `documentation/docs-system/01-ARCHITECTURE/LOGIC/PENDING_LOGIC_ALERTS.md:17` | Pending undefined logic alert not triaged | Governance fix | Team 10 + Team 20 | OPEN |
-| CARRY-015 | `documentation/docs-system/01-ARCHITECTURE/CASH_FLOW_PARSER_SPEC.md:75` | Precision rule conflict note still marked "decision required" | Stage-1 SSOT hygiene | Team 10 + Team 20 + Team 60 | OPEN |
+| CARRY-014 | `documentation/docs-system/01-ARCHITECTURE/LOGIC/PENDING_LOGIC_ALERTS.md:17` | Pending undefined logic alert not triaged | Governance fix | Team 10 + Team 20 | **CLOSED** (2026-03-13: שורת undefined הוסרה) |
+| CARRY-015 | `documentation/docs-system/01-ARCHITECTURE/CASH_FLOW_PARSER_SPEC.md:75` | Precision rule conflict note still marked "decision required" | Stage-1 SSOT hygiene | Team 10 + Team 20 + Team 60 | **CLOSED** (2026-03-13: יושר ל־6 ספרות, תואם קוד) |
 
 ---
 

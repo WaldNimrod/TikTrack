@@ -6,7 +6,7 @@
 **version:** 1.0.0  
 **owner:** Team 170 (canonical maintenance); Team 190 is validation intake authority  
 **date:** 2026-03-03  
-**last_updated:** 2026-03-13  
+**last_updated:** 2026-03-13 (KB-016 CLOSED; KB-08 count→153; KB-015 MoV added)  
 **status:** ACTIVE  
 **purpose:** Single canonical register for validated known bugs that are accepted into a batched remediation cycle or marked as immediate blockers.
 
@@ -83,7 +83,7 @@ This cadence is an operational batching rule, not a gate override.
 | KB-2026-03-03-05 | 2026-03-03 | SHARED | CLOUD_AGENT_SCAN | MEDIUM | IN_REMEDIATION | Team 170 | Team 10 | KB-003: DDL table name drift (`brokers_fees` vs `trading_account_fees`) | `_COMMUNICATION/team_00/CLOUD_AGENT_QUALITY_SCAN_REPORT_2026-03-03.md#KB-003` | IMMEDIATE | S002-P003-WP002 Cloud-Agent Immediate Lane (CA-IMM-01) |
 | KB-2026-03-03-06 | 2026-03-03 | SHARED | CLOUD_AGENT_SCAN | MEDIUM | CLOSED | Team 20 | Team 10 | KB-004: Suite A exchange-rates contract issue resolved; DDL authority remains `conversion_rate` in production schema | `_COMMUNICATION/team_00/CLOUD_AGENT_QUALITY_SCAN_REPORT_2026-03-03.md#KB-004` | BATCHED | Closed in Batch-1 remediation (Team 20 fix confirmed) |
 | KB-2026-03-03-07 | 2026-03-03 | SHARED | CLOUD_AGENT_SCAN | MEDIUM | CLOSED | Team 20 | Team 10 | KB-005: Suite A precision drift on `ticker_prices.market_cap` resolved (NUMERIC(24,4) ratified) | `_COMMUNICATION/team_00/CLOUD_AGENT_QUALITY_SCAN_REPORT_2026-03-03.md#KB-005` | BATCHED | Closed in Batch-1 remediation (Team 20 fix confirmed) |
-| KB-2026-03-03-08 | 2026-03-03 | SHARED | CLOUD_AGENT_SCAN | MEDIUM | OPEN | Team 20 | Team 10 | KB-006: mypy scan reports 131 type errors across backend modules | `_COMMUNICATION/team_00/CLOUD_AGENT_QUALITY_SCAN_REPORT_2026-03-03.md#KB-006` | BATCHED | Cloud-Agent Batched Remediation Round (CA-BAT-01) |
+| KB-2026-03-03-08 | 2026-03-03 | SHARED | CLOUD_AGENT_SCAN | MEDIUM | OPEN | Team 20 | Team 10 | KB-006: mypy scan reports 153 type errors across backend modules (42 files) | `_COMMUNICATION/team_00/CLOUD_AGENT_QUALITY_SCAN_REPORT_2026-03-03.md#KB-006` | BATCHED | Cloud-Agent Batched Remediation Round (CA-BAT-01) |
 | KB-2026-03-03-09 | 2026-03-03 | SHARED | CLOUD_AGENT_SCAN | HIGH | CLOSED | Team 20 | Team 10 | KB-007: Missing await finding resolved; coroutine path confirmed valid | `api/integrations/market_data/cache_first_service.py:57` | IMMEDIATE | Closed in Batch-1 remediation (Team 20 validation confirmed) |
 | KB-2026-03-03-10 | 2026-03-03 | SHARED | CLOUD_AGENT_SCAN | LOW | CLOSED | Team 30 | Team 10 | KB-008: JSX lint finding resolved; ESLint run clean | `ui/src/components/HomePage.jsx:456` | BATCHED | Closed in Batch-1 remediation (Team 30 validation confirmed) |
 | KB-2026-03-03-11 | 2026-03-03 | SHARED | CLOUD_AGENT_SCAN | MEDIUM | CLOSED | Team 30 | Team 10 | KB-009: Parse error finding resolved; async usage confirmed valid | `ui/scripts/visual-diff.js:260` | BATCHED | Closed in Batch-1 remediation (Team 30 validation confirmed) |
@@ -93,7 +93,7 @@ This cadence is an operational batching rule, not a gate override.
 | KB-2026-03-03-15 | 2026-03-03 | SHARED | CLOUD_AGENT_SCAN | HIGH | CLOSED | Team 30 | Team 10 | KB-013: `rollup` path-traversal vulnerability remediated; 0 HIGH+ confirmed | `_COMMUNICATION/team_00/CLOUD_AGENT_QUALITY_SCAN_REPORT_2026-03-03.md#KB-013` | IMMEDIATE | Closed in Batch-1 remediation (Team 30 security rerun) |
 | KB-2026-03-03-16 | 2026-03-03 | SHARED | CLOUD_AGENT_SCAN | HIGH | CLOSED | Team 30 | Team 10 | KB-014: ESLint baseline confirmed on mainline (`ui/.eslintrc.cjs`) | `ui/.eslintrc.cjs` | BATCHED | Closed in Batch-1 remediation (Team 30 confirmation) |
 | KB-2026-03-03-17 | 2026-03-03 | SHARED | CLOUD_AGENT_SCAN | CRITICAL | OPEN | Team 60 | Team 10 | KB-015: No CI/CD PR quality gate pipeline | `_COMMUNICATION/team_190/CLOUD_AGENT_VALIDATION_REPORT_2026-03-03.md#KB-015` | IMMEDIATE | S002-P003-WP002 Cloud-Agent Immediate Lane (CA-IMM-01) |
-| KB-2026-03-03-18 | 2026-03-03 | SHARED | CLOUD_AGENT_SCAN | HIGH | OPEN | Team 60 | Team 10 | KB-016: Pre-commit enforcement model missing (Husky/pre-commit) | `_COMMUNICATION/team_190/CLOUD_AGENT_VALIDATION_REPORT_2026-03-03.md#KB-016` | IMMEDIATE | S002-P003-WP002 Cloud-Agent Immediate Lane (CA-IMM-01) |
+| KB-2026-03-03-18 | 2026-03-03 | SHARED | CLOUD_AGENT_SCAN | HIGH | CLOSED | Team 60 | Team 10 | KB-016: Pre-commit enforcement model missing (Husky/pre-commit) | `_COMMUNICATION/team_190/CLOUD_AGENT_VALIDATION_REPORT_2026-03-03.md#KB-016` | IMMEDIATE | Closed 2026-03-13: `.pre-commit-config.yaml` with 4 blocking hooks (unit tests, bandit, detect-secrets, frontend build); `make install-pre-commit` |
 | KB-2026-03-03-19 | 2026-03-03 | SHARED | CLOUD_AGENT_SCAN | MEDIUM | OPEN | Team 60 | Team 10 | KB-017: Code formatter policy not enforced (Black/Prettier) | `_COMMUNICATION/team_00/CLOUD_AGENT_QUALITY_SCAN_REPORT_2026-03-03.md#KB-017` | BATCHED | Cloud-Agent Batched Remediation Round (CA-BAT-01) |
 | KB-2026-03-03-20 | 2026-03-03 | SHARED | CLOUD_AGENT_SCAN | LOW | OPEN | Team 20 | Team 10 | KB-018: `structlog` listed but unused in backend runtime | `_COMMUNICATION/team_00/CLOUD_AGENT_QUALITY_SCAN_REPORT_2026-03-03.md#KB-018` | BATCHED | Cloud-Agent Batched Remediation Round (CA-BAT-01) |
 | KB-2026-03-03-21 | 2026-03-03 | SHARED | CLOUD_AGENT_SCAN | MEDIUM | OPEN | Team 20 | Team 10 | KB-019: `system_settings` accessed via raw SQL without ORM model | `_COMMUNICATION/team_00/CLOUD_AGENT_QUALITY_SCAN_REPORT_2026-03-03.md#KB-019` | BATCHED | Cloud-Agent Batched Remediation Round (CA-BAT-01) |
@@ -155,6 +155,42 @@ This cadence is an operational batching rule, not a gate override.
   - Team 190 final validation PASS (Team 190 replacing Team 90 for this cycle)
   - bug status closed on `2026-03-13`
 
+### KB-2026-03-03-17 (KB-015) — MoV (Method of Verification) עדכון 2026-03-13
+
+| רכיב | סטטוס | הערות |
+|------|--------|-------|
+| **CI Workflow** | ✅ קיים | `.github/workflows/ci.yml` — רץ על `push` + `pull_request` ל־main, develop |
+| **BLOCKING checks** | ✅ מוגדרים | Unit Tests, Suite B Cache Failover, Bandit HIGH, Frontend Build — כולם חוסמים (ללא continue-on-error) |
+| **שמות Status Checks** | `Backend Tests & Security`, `Frontend Build & Lint` | אלו השמות שיופיעו ב־GitHub PR checks |
+| **Branch Protection** | ❓ **לא ניתן לוודא מתוך repo** | נדרש אימות ידני ב־GitHub Settings |
+
+**MoV לסגירת KB-015:**
+
+1. **אימות מקוד (מבוצע):**
+   - [x] קובץ `ci.yml` קיים ותקף
+   - [x] Trigger: `pull_request` ל־main, develop
+   - [x] שני jobs: backend-quality, frontend-quality
+   - [x] BLOCKING steps ללא continue-on-error
+
+2. **אימות ב־GitHub (נדרש מהמשתמש):**
+   - [ ] Settings → Branches → Branch protection rules → main (ו־develop אם רלוונטי)
+   - [ ] "Require status checks to pass before merging" — **מופעל**
+   - [ ] Status checks נדרשים: `Backend Tests & Security`, `Frontend Build & Lint` — **נבחרו**
+   - [ ] אופציונלי: "Require branches to be up to date before merging"
+
+3. **בדיקה מעשית:**
+   - פתח PR עם שינוי שגורם ל־pytest ליפול
+   - ודא שאי־אפשר למזג כל עוד CI אדום
+
+**סיכום:** אם Branch Protection מוגדר נכון — **CLOSE**. אם לא — **OPEN** עד להגדרת Team 60/מנהל repo.
+
+### KB-2026-03-03-18 (KB-016) — Closure evidence
+
+- `.pre-commit-config.yaml` — 4 hooks חוסמים: phoenix-unit-tests, phoenix-bandit-security, phoenix-detect-secrets, phoenix-frontend-build
+- `Makefile`: `install-pre-commit`, `run-pre-commit-all`
+- `docs/CONTRIBUTING.md`: הוראות `pre-commit install`
+- ARCHITECT_DIRECTIVE_QUALITY_INFRASTRUCTURE §6: ADOPT
+
 ---
 
 ## Maintenance Note
@@ -178,3 +214,4 @@ Operational maintenance model:
 **log_entry | TEAM_170 | KNOWN_BUGS_REGISTER | KB_ROUTING_AND_STATUS_CORRECTION_APPLIED_PER_TEAM_00_DIRECTIVE | 2026-03-03**
 **log_entry | TEAM_190 | KNOWN_BUGS_REGISTER | KB_2026_03_12_24_INTAKE_AND_URGENT_CYCLE_ACTIVATED | 2026-03-12**
 **log_entry | TEAM_190 | KNOWN_BUGS_REGISTER | KB_2026_03_12_24_CLOSED_AFTER_FINAL_VALIDATION | TEAM_190_REPLACES_TEAM_90_FOR_THIS_CYCLE | 2026-03-13**
+**log_entry | TEAM_10 | KNOWN_BUGS_REGISTER | KB_016_CLOSED_PRECOMMIT_EXISTS_KBCount_153_MoV_KB015_ADDED | 2026-03-13**

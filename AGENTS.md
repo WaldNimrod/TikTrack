@@ -56,7 +56,7 @@ TikTrack Phoenix is a full-stack stock/portfolio tracking web app:
 ### Linting & Type Checking
 
 - **ESLint**: Config at `ui/.eslintrc.cjs`. Run: `cd ui && ./node_modules/.bin/eslint . --ext js,jsx`. Note: `scripts/` files use Node.js globals (overridden in config).
-- **mypy**: Config at `api/mypy.ini`. Run: `source api/venv/bin/activate && mypy api/ --config-file api/mypy.ini`. Currently 131 issues in 33 files (tracked as KB-006).
+- **mypy**: Config at `api/mypy.ini`. Run: `source api/venv/bin/activate && mypy api/ --config-file api/mypy.ini`. Currently 153 issues in 42 files (tracked as KB-006).
 - **Vite build**: `cd ui && npx vite build` — succeeds and serves as build-time check.
 
 ### Security Scanning

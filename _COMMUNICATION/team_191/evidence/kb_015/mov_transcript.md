@@ -1,4 +1,5 @@
 # KB-015 MoV Transcript (Ruleset Enforcement)
+**date:** 2026-03-13
 
 ## Commands
 

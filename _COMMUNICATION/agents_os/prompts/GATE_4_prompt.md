@@ -1,5 +1,3 @@
-**date:** 2026-03-11
-
 # GATE_4 — QA (Cursor Composer + MCP)
 
 Run comprehensive QA on the implementation:

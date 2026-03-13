@@ -13,17 +13,10 @@
     "G3_5",
     "G3_6_MANDATES",
     "CURSOR_IMPLEMENTATION",
-    "GATE_4",
-    "CURSOR_IMPLEMENTATION",
-    "GATE_4",
-    "CURSOR_IMPLEMENTATION",
     "GATE_4"
   ],
   "gates_failed": [
     "G3_5",
-    "GATE_5",
-    "GATE_5",
-    "GATE_5",
     "GATE_5",
     "GATE_5",
     "GATE_5",
@@ -37,5 +30,5 @@
   "implementation_endpoints": [],
   "spec_path": "",
   "started_at": "2026-03-13T02:10:10.757633+00:00",
-  "last_updated": "2026-03-13T22:14:24.731590+00:00"
+  "last_updated": "2026-03-13T21:04:44.926096+00:00"
 }

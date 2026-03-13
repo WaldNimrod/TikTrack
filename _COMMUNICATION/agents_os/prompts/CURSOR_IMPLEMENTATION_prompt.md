@@ -1,7 +1,5 @@
 # CURSOR IMPLEMENTATION
 
-date: 2026-03-13
-
 Open the mandates file and paste each team's mandate into a Cursor Composer session:
 
   File: _COMMUNICATION/agents_os/prompts/implementation_mandates.md

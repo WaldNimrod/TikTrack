@@ -13,6 +13,7 @@ scope: Alerts Summary Widget — G3 Build Work Plan (G3_5 BLOCKER REMEDIATION)
 authority_mode: TEAM_10_GATE_3_OWNER
 supersedes: TEAM_10_S001_P002_WP001_G3_PLAN_WORK_PLAN_v1.0.0
 g35_remediation: B-G35-001, B-G35-002, B-G35-003
+g35_blocker_fixes: BLOCKER-1, BLOCKER-2
 ---
 
 # Team 10 | S001-P002 WP001 — G3 Work Plan v1.1.0 (G3_5 Remediation)
@@ -24,6 +25,8 @@ g35_remediation: B-G35-001, B-G35-002, B-G35-003
 | **B-G35-001** | Canonical file paths added for Team 20 and Team 50 deliverables (§2.1, §2.3) |
 | **B-G35-002** | Test contract expanded with exact run commands and binary PASS/FAIL criteria (§6) |
 | **B-G35-003** | Team 30 acceptance criteria augmented with field contract, empty-state contract, error-state contract (§7.2) |
+| **BLOCKER-1** | All credential refs changed from `admin/418141` → `TikTrackAdmin/4181` (§6.2) |
+| **BLOCKER-2** | §6.4 explicit `curl` setup commands added to reset/create `triggered_unread` state before each check |
 
 ---
 
@@ -151,7 +154,7 @@ Backend and frontend must be running:
 BACKEND="http://localhost:8082"
 TOKEN=$(curl -s -X POST "$BACKEND/api/v1/auth/login" \
   -H "Content-Type: application/json" \
-  -d '{"username_or_email":"admin","password":"418141"}' \
+  -d '{"username_or_email":"TikTrackAdmin","password":"4181"}' \
   | python3 -c "import sys,json; print(json.load(sys.stdin).get('access_token',''))")
 
 # Test 1: Unread filter + limit 5
@@ -175,19 +178,57 @@ bash scripts/run-alerts-d34-qa-api.sh
 | 2 | Auth required | `curl ... /alerts` (no Authorization header) | HTTP 401 | HTTP ≠ 401 |
 | 3 | Pagination | Response `data` length | ≤ 5 items | > 5 items |
 
-### 6.4 D15.I Manual / MCP Browser Tests — Binary PASS/FAIL
+### 6.4 Setup — Reproducible State Reset (BLOCKER-2)
+
+**Run these commands before each corresponding check.** Uses canonical credentials: `TikTrackAdmin` / `4181`.
+
+**Obtain token (required for all setup commands):**
+```bash
+BACKEND="http://localhost:8082"
+TOKEN=$(curl -s -X POST "$BACKEND/api/v1/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{"username_or_email":"TikTrackAdmin","password":"4181"}' \
+  | python3 -c "import sys,json; print(json.load(sys.stdin).get('access_token',''))")
+```
+
+**Setup for Scenario 1 (Empty state — 0 triggered_unread):**
+```bash
+# Get all triggered_unread alert IDs and PATCH each to triggered_read
+IDS=$(curl -s -H "Authorization: Bearer $TOKEN" \
+  "$BACKEND/api/v1/alerts?trigger_status=triggered_unread&per_page=100" \
+  | python3 -c "import sys,json; d=json.load(sys.stdin); print(' '.join(str(x['id']) for x in d.get('data',[])))")
+for id in $IDS; do
+  curl -s -X PATCH -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+    -d '{"trigger_status":"triggered_read"}' "$BACKEND/api/v1/alerts/$id" > /dev/null
+done
+```
+
+**Setup for Scenario 2 (Non-empty state — ≥1 triggered_unread):**
+```bash
+# Get first alert ID and PATCH to triggered_unread (prerequisite: at least 1 alert exists)
+ALERT_ID=$(curl -s -H "Authorization: Bearer $TOKEN" "$BACKEND/api/v1/alerts?per_page=1" \
+  | python3 -c "import sys,json; d=json.load(sys.stdin); arr=d.get('data',[]); print(arr[0]['id'] if arr else '')")
+[ -n "$ALERT_ID" ] && curl -s -X PATCH -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"trigger_status":"triggered_unread"}' "$BACKEND/api/v1/alerts/$ALERT_ID" > /dev/null
+```
+
+*If no alerts exist, create one via D34 or run `bash scripts/run-alerts-d34-qa-api.sh` once to seed data.*
+
+---
+
+### 6.5 D15.I Manual / MCP Browser Tests — Binary PASS/FAIL
 
 | # | Scenario | Steps | PASS | FAIL |
 |---|----------|-------|------|------|
-| 1 | Empty state | Login; ensure 0 triggered_unread; load D15.I | Widget not rendered (no DOM for alerts summary) | Widget visible when 0 unread |
-| 2 | Non-empty state | Login; ensure ≥1 triggered_unread; load D15.I | Widget visible; badge shows integer count | Widget hidden or badge missing |
+| 1 | Empty state | Run **Setup for Scenario 1** (§6.4); login as TikTrackAdmin/4181; load D15.I | Widget not rendered (no DOM for alerts summary) | Widget visible when 0 unread |
+| 2 | Non-empty state | Run **Setup for Scenario 2** (§6.4); login as TikTrackAdmin/4181; load D15.I | Widget visible; badge shows integer count | Widget hidden or badge missing |
 | 3 | Alert list content | Inspect list items | Each item shows ticker · condition · relative time | Missing any of the three |
 | 4 | Item click | Click one alert item | Navigate to `/alerts.html` (D34) | No navigation or wrong target |
 | 5 | Badge click | Click count badge | Navigate to `/alerts.html?trigger_status=triggered_unread` | No navigation or missing query |
 | 6 | Layout integrity | Inspect D15.I | No overflow/overlap; collapsible toggle works | Layout broken |
 | 7 | D34 regression | Load D34 standalone | D34 renders as before | D34 broken |
 
-### 6.5 Team 50 Report Requirements
+### 6.6 Team 50 Report Requirements
 
 Team 50 must include in `TEAM_50_S001_P002_WP001_QA_REPORT_v1.0.0.md`:
 - Per scenario: **PASS** or **FAIL**
@@ -283,3 +324,5 @@ Use `index-section__header` + `index-section__body` with `openSections` toggle. 
 **log_entry | TEAM_10 | B-G35-001 | CANONICAL_PATHS_ADDED | 2026-03-13**
 **log_entry | TEAM_10 | B-G35-002 | TEST_CONTRACT_RUN_COMMANDS_PASS_FAIL | 2026-03-13**
 **log_entry | TEAM_10 | B-G35-003 | TEAM30_FIELD_EMPTY_ERROR_CONTRACTS | 2026-03-13**
+**log_entry | TEAM_10 | BLOCKER-1 | CREDENTIALS_TIKTRACKADMIN_4181 | 2026-03-13**
+**log_entry | TEAM_10 | BLOCKER-2 | SECTION_6.4_EXPLICIT_CURL_SETUP_COMMANDS | 2026-03-13**

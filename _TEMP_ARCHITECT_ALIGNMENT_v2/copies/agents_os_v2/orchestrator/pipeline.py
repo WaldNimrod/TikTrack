@@ -279,98 +279,6 @@ def route_after_fail(gate_id: str, route_type: str, notes: str = ""):
     show_next(state)
 
 
-def _verdict_candidates(gate_id: str, work_package_id: str) -> list[Path]:
-    """Return ordered list of candidate verdict file paths for a given gate.
-
-    Mirrors the JS getVerdictCandidates() in PIPELINE_DASHBOARD.html — must stay in sync.
-    NOTE: File names use underscores (S001_P002_WP001) while WP IDs use hyphens
-    (S001-P002-WP001). Both variants are checked.
-    """
-    wp  = work_package_id or ""
-    wpu = wp.replace("-", "_")   # S001-P002-WP001 → S001_P002_WP001 (file naming convention)
-    d   = REPO_ROOT / "_COMMUNICATION"
-    t90  = d / "team_90"
-    t190 = d / "team_190"
-    t100 = d / "team_100"
-    t50  = d / "team_50"
-    t70  = d / "team_70"
-    # Each gate: underscore form (wpu) first — canonical file naming convention.
-    # Hyphen form (wp) kept as fallback for forward-compatibility.
-    # "TO_TEAM_10" prefix variant included for teams that use routing-style names.
-    patterns: dict[str, list[Path]] = {
-        "GATE_0": [
-            t190 / f"TEAM_190_{wpu}_GATE_0_VERDICT_v1.0.0.md",
-            t190 / f"TEAM_190_{wpu}_GATE_0_VALIDATION_v1.0.0.md",
-            t190 / f"TEAM_190_{wp}_GATE_0_VERDICT_v1.0.0.md",
-        ],
-        "GATE_1": [
-            t190 / f"TEAM_190_{wpu}_GATE_1_VERDICT_v1.0.0.md",
-            t190 / f"TEAM_190_{wpu}_LLD400_VALIDATION_v1.0.0.md",
-            t190 / f"TEAM_190_{wp}_GATE_1_VERDICT_v1.0.0.md",
-        ],
-        "GATE_2": [
-            t100 / f"TEAM_100_{wpu}_GATE_2_VERDICT_v1.0.0.md",
-            t100 / f"TEAM_100_{wpu}_GATE_2_SPEC_REVIEW_v1.0.0.md",
-            t100 / f"TEAM_100_{wp}_GATE_2_VERDICT_v1.0.0.md",
-        ],
-        "G3_5": [
-            t90 / f"TEAM_90_{wpu}_G3_5_VERDICT_v1.0.0.md",
-            t90 / f"TEAM_90_{wpu}_G3_5_VALIDATION_v1.0.0.md",
-            t90 / f"TEAM_90_{wpu}_WORK_PLAN_VALIDATION_v1.0.0.md",
-            t90 / f"TEAM_90_TO_TEAM_10_{wpu}_VALIDATION_RESPONSE.md",
-            t90 / f"TEAM_90_{wp}_G3_5_VERDICT_v1.0.0.md",
-        ],
-        "GATE_4": [
-            t50 / f"TEAM_50_{wpu}_QA_REPORT_v1.0.0.md",
-            t50 / f"TEAM_50_{wpu}_GATE_4_REPORT_v1.0.0.md",
-            t50 / f"TEAM_50_{wp}_QA_REPORT_v1.0.0.md",
-        ],
-        "GATE_5": [
-            t90 / f"TEAM_90_{wpu}_GATE_5_VALIDATION_v1.0.0.md",
-            t90 / f"TEAM_90_{wpu}_GATE5_VALIDATION_v1.0.0.md",
-            t90 / f"TEAM_90_{wpu}_GATE_5_VERDICT_v1.0.0.md",
-            t90 / f"TEAM_90_{wpu}_G5_VALIDATION_v1.0.0.md",
-            t90 / f"TEAM_90_{wpu}_GATE_5_REVIEW_v1.0.0.md",
-            t90 / f"TEAM_90_TO_TEAM_10_{wpu}_GATE_5_VALIDATION_v1.0.0.md",
-            t90 / f"TEAM_90_{wp}_GATE_5_VALIDATION_v1.0.0.md",
-        ],
-        "GATE_6": [
-            t100 / f"TEAM_100_{wpu}_GATE_6_VERDICT_v1.0.0.md",
-            t100 / f"TEAM_100_{wpu}_GATE_6_REVIEW_v1.0.0.md",
-            t100 / f"TEAM_100_{wp}_GATE_6_VERDICT_v1.0.0.md",
-        ],
-        "GATE_8": [
-            t90 / f"TEAM_90_{wpu}_GATE_8_VERDICT_v1.0.0.md",
-            t70 / f"TEAM_70_{wpu}_GATE_8_DOCS_v1.0.0.md",
-            t90 / f"TEAM_90_{wp}_GATE_8_VERDICT_v1.0.0.md",
-        ],
-    }
-    return patterns.get(gate_id, [])
-
-
-def _extract_route_recommendation(gate_id: str, work_package_id: str) -> tuple[str | None, str]:
-    """Read the verdict file for a gate and extract route_recommendation: doc|full.
-
-    Returns (route_type, source_path) where route_type is 'doc', 'full', or None.
-    Searches through candidate verdict file paths in order.
-    """
-    import re
-    candidates = _verdict_candidates(gate_id, work_package_id)
-    for path in candidates:
-        if path.exists():
-            text = path.read_text(encoding="utf-8")
-            # Match: route_recommendation: doc  or  route_recommendation: full
-            # Also matches with optional quotes, inline comment, or extra whitespace.
-            m = re.search(
-                r'^route_recommendation\s*[:\-]\s*(doc|full)\b',
-                text,
-                re.IGNORECASE | re.MULTILINE,
-            )
-            if m:
-                return m.group(1).lower(), str(path)
-    return None, ""
-
-
 def generate_prompt(gate_id: str, force_gate4: bool = False, revision_notes: str = "", fresh: bool = False):
     state = PipelineState.load()
     if gate_id == "WAITING_FOR_IMPLEMENTATION_COMMIT":
@@ -593,15 +501,7 @@ def _generate_g3_5_prompt(state: PipelineState, fresh: bool = False) -> str:
         f"{_team_header('team_90', 'G3_5', state, fresh)}"
         f"# G3.5 — Validate Work Plan\n\n"
         f"Validate this work plan for implementation readiness.\n"
-        f"Check: completeness, team assignments, deliverables, test coverage.\n\n"
-        f"## MANDATORY: route_recommendation\n\n"
-        f"**If FAIL — include at the top of your response:**\n\n"
-        f"```\nroute_recommendation: doc\n```  ← plan has format/governance/wording issues only\n"
-        f"```\nroute_recommendation: full\n``` ← plan has structural/scope/logic problems\n\n"
-        f"Classification:\n"
-        f"- `doc`: blockers are grammar, missing paths, credential text, format-only\n"
-        f"- `full`: scope unclear, wrong team assignments, missing deliverables, logic errors\n\n"
-        f"This field drives automatic pipeline routing. Missing = manual block.\n\n"
+        f"Check: completeness, team assignments, deliverables, test coverage.\n"
         f"Respond with: PASS or FAIL + blocking findings.\n\n"
         f"## Work Plan\n\n"
         f"{state.work_plan[:4000] if state.work_plan else '[Paste work plan from G3_PLAN output]'}"
@@ -732,21 +632,6 @@ def _generate_gate_5_prompt(state: PipelineState, fresh: bool = False) -> str:
         f"4. No architectural violations\n"
         f"5. GATE_4 QA: PASS\n\n"
         f"## Spec\n{state.lld400_content[:3000] if state.lld400_content else state.spec_brief}\n\n"
-        f"## MANDATORY: route_recommendation\n\n"
-        f"**If BLOCKING_REPORT — you MUST include this field at the top of your response:**\n\n"
-        f"```\n"
-        f"route_recommendation: doc\n"
-        f"```\n"
-        f"OR\n"
-        f"```\n"
-        f"route_recommendation: full\n"
-        f"```\n\n"
-        f"**Classification rules:**\n"
-        f"- `route_recommendation: doc` — ALL blockers are in: documentation, QA contract text,\n"
-        f"  credentials, file paths, governance format, work plan wording. Zero code changes needed.\n"
-        f"- `route_recommendation: full` — ANY blocker requires: code logic changes, architectural\n"
-        f"  redesign, missing feature implementation, data model change, or mixed doc+code issues.\n\n"
-        f"This field drives automatic pipeline routing. Missing or ambiguous = manual block.\n\n"
         f"Respond with: VALIDATION_RESPONSE — PASS or BLOCKING_REPORT."
     )
 
@@ -758,11 +643,6 @@ def _generate_gate_6_prompt(state: PipelineState, fresh: bool = False) -> str:
         f"Does what was built match what we approved at GATE_2?\n\n"
         f"## Approved Spec\n{state.lld400_content[:2000] if state.lld400_content else state.spec_brief}\n\n"
         f"## Implementation Summary\n{', '.join(state.implementation_files[:20]) if state.implementation_files else '[list files created]'}\n\n"
-        f"## MANDATORY: route_recommendation\n\n"
-        f"**If REJECTED — include at the top of your response:**\n\n"
-        f"```\nroute_recommendation: doc\n```  ← minor gaps, code fix only, no re-planning\n"
-        f"```\nroute_recommendation: full\n``` ← intent mismatch, needs full re-implementation\n\n"
-        f"This field drives automatic pipeline routing. Missing = manual block.\n\n"
         f"Respond with: APPROVED or REJECTED + rejection route."
     )
 
@@ -837,39 +717,6 @@ def advance_gate(gate_id: str, status: str, reason: str = ""):
     else:
         state.gates_failed.append(gate_id)
         _log(f"GATE {gate_id} FAILED: {reason}")
-        # ── Auto-routing from verdict file ────────────────────────────────────
-        # The reviewing team (Team 90, 190, etc.) must include:
-        #   route_recommendation: doc   ← doc/governance fixes only
-        #   route_recommendation: full  ← code/design issues, full cycle required
-        # If found, route automatically. If not found, warn and leave for manual routing.
-        if gate_id in FAIL_ROUTING:
-            auto_route, verdict_path = _extract_route_recommendation(
-                gate_id, state.work_package_id
-            )
-            if auto_route:
-                target_gate, desc = FAIL_ROUTING[gate_id][auto_route]
-                _log(f"")
-                _log(f"╔══ AUTO-ROUTING (from verdict file) ═══════════════════════╗")
-                _log(f"║  Source:       {verdict_path[-70:]}")
-                _log(f"║  Detected:     route_recommendation: {auto_route.upper()}")
-                _log(f"║  Description:  {desc[:60]}")
-                _log(f"║  → Target:     {target_gate}")
-                _log(f"╚══════════════════════════════════════════════════════════╝")
-                state.current_gate = target_gate
-            else:
-                _log(f"")
-                _log(f"╔══ MANUAL ROUTING REQUIRED ════════════════════════════════╗")
-                _log(f"║  Verdict file did not declare route_recommendation.")
-                _log(f"║  The reviewing team MUST include one of:")
-                _log(f"║    route_recommendation: doc   (doc/governance only)")
-                _log(f"║    route_recommendation: full  (code/design issues)")
-                _log(f"║")
-                _log(f"║  Until routing is done, pipeline stays at: {gate_id}")
-                _log(f"║")
-                _log(f"║  To route manually:")
-                _log(f'║    ./pipeline_run.sh route doc  "{(reason or "reason")[:40]}"')
-                _log(f'║    ./pipeline_run.sh route full "{(reason or "reason")[:40]}"')
-                _log(f"╚══════════════════════════════════════════════════════════╝")
 
     state.save()
     _log(f"{gate_id}: {status}")

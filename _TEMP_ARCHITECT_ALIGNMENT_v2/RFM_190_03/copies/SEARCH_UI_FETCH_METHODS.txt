@@ -1,0 +1,10 @@
+command: rg -n "fetch\(|method:\"POST\\"|method:\"PUT\\"|method:\"PATCH\\"|method:\"DELETE\\"" PIPELINE_DASHBOARD.html PIPELINE_ROADMAP.html
+PIPELINE_DASHBOARD.html:861:  const r = await fetch(path + "?t=" + Date.now());
+PIPELINE_DASHBOARD.html:866:  const r = await fetch(path + "?t=" + Date.now());
+PIPELINE_DASHBOARD.html:871:  const r = await fetch(path + "?t=" + Date.now(), {method:"HEAD"}).catch(() => ({ok:false}));
+PIPELINE_DASHBOARD.html:1390:    const r = await fetch('_COMMUNICATION/agents_os/pipeline_state.json?t=' + Date.now());
+PIPELINE_ROADMAP.html:287:  const r = await fetch(path + "?t=" + Date.now());
+PIPELINE_ROADMAP.html:292:  const r = await fetch(path + "?t=" + Date.now());
+PIPELINE_ROADMAP.html:296:  const r = await fetch(path + "?t=" + Date.now(), {method:"HEAD"}).catch(()=>({ok:false}));
+PIPELINE_ROADMAP.html:776:      fetch('documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md?t='+Date.now()),
+PIPELINE_ROADMAP.html:777:      fetch('documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md?t='+Date.now()),

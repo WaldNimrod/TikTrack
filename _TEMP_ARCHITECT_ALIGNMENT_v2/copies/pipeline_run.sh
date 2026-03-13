@@ -105,38 +105,19 @@ case "${1:-next}" in
     REASON="${2:-no reason given}"
     echo "[pipeline_run] Advancing $GATE → FAIL: $REASON"
     $CLI --advance "$GATE" FAIL --reason "$REASON"
+    $CLI --status
     echo ""
-    # Check if auto-routing moved the gate forward (route_recommendation in verdict file)
-    NEXT_GATE=$(_get_gate)
-    if [[ "$NEXT_GATE" != "$GATE" ]]; then
-      echo "════════════════════════════════════════════════════════════"
-      echo "  ✅ AUTO-ROUTED (route_recommendation found in verdict file)"
-      echo "  $GATE → $NEXT_GATE"
-      echo "════════════════════════════════════════════════════════════"
-      if [[ "$NEXT_GATE" == "G3_PLAN" ]]; then
-        echo "[pipeline_run] → Now at G3_PLAN. Generate revision prompt:"
-        echo "    ./pipeline_run.sh revise \"$REASON\""
-      else
-        _generate_and_show "$NEXT_GATE"
-      fi
-    else
-      $CLI --status
-      echo ""
-      echo "════════════════════════════════════════════════════════════"
-      echo "  ⚠️  MANUAL ROUTING REQUIRED"
-      echo "  Verdict file missing route_recommendation: doc|full."
-      echo "  Ask the reviewing team to add this field before proceeding."
-      echo ""
-      echo "  Manual override (only if verdict file unavailable):"
-      echo "  Option A — Doc/governance issues ONLY (quick fix):"
-      echo "    ./pipeline_run.sh route doc \"$REASON\""
-      echo "    → Team 10 fixes docs → re-commit → GATE_4 → GATE_5"
-      echo ""
-      echo "  Option B — Substantial/code issues (full cycle):"
-      echo "    ./pipeline_run.sh route full \"$REASON\""
-      echo "    → G3_PLAN → mandates → implementation → QA → GATE_5"
-      echo "════════════════════════════════════════════════════════════"
-    fi
+    echo "════════════════════════════════════════════════════════════"
+    echo "  GATE FAILED — choose routing path:"
+    echo ""
+    echo "  Option A — Doc/governance issues ONLY (quick fix):"
+    echo "    ./pipeline_run.sh route doc \"$REASON\""
+    echo "    → Team 10 fixes docs → GATE_4 → GATE_5 (no re-plan)"
+    echo ""
+    echo "  Option B — Substantial/code issues (full cycle):"
+    echo "    ./pipeline_run.sh route full \"$REASON\""
+    echo "    → G3_PLAN → mandates → implementation → QA → GATE_5"
+    echo "════════════════════════════════════════════════════════════"
     ;;
 
   approve)

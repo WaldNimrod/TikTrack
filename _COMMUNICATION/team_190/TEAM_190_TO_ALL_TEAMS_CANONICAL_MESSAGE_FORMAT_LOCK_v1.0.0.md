@@ -167,3 +167,14 @@ No grace window for gate-bound validation requests.
 ---
 
 **log_entry | TEAM_190 | CANONICAL_MESSAGE_FORMAT_LOCK | ENFORCED | 2026-02-23**
+
+---
+
+## Amendment Notice (2026-03-13)
+
+**Agent activation prompts** (pasted into Cursor/Codex/Claude sessions) now use a separate, lean standard:
+
+→ **Agent Prompt Identity Stamp Standard v1.0.0**
+→ `_COMMUNICATION/team_190/TEAM_190_PROMPT_STANDARD_AMENDMENT_v1.0.0.md`
+
+This canonical message format (for inter-team governance documents as files) is **unchanged**.

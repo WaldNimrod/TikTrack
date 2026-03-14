@@ -1390,10 +1390,10 @@ async function loadPrompt(gate) {
   const promptIcon = document.getElementById("acc-prompt-icon");
   const promptTitle= document.getElementById("acc-prompt-title");
   if (isMandateGate) {
-    // Copy button: fully disabled — copy from Mandate Tabs ↑
+    // Copy button: fully disabled — copy from Mandate Tabs ↓ (below)
     if (copyBtn) {
       copyBtn.textContent = "📄 Gate Context";
-      copyBtn.title       = "Per-team mandates are in the Mandate Tabs above ↑";
+      copyBtn.title       = "Per-team mandates are in the Mandate Tabs below ↓";
       copyBtn.disabled    = true;
       copyBtn.style.opacity = "0.35";
       copyBtn.style.cursor  = "not-allowed";

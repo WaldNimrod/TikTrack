@@ -35,12 +35,14 @@
     button.btn-primary { background:var(--current); border-color:var(--current); color:#fff; }
     button.btn-primary:hover { background:#388bfd; border-color:#388bfd; }
 
-    /* ── Layout ── */
-    main { padding:20px; max-width:1280px; margin:0 auto; }
+    /* ── Page layout: main column + right sidebar ── */
+    .page-layout { display:grid; grid-template-columns:1fr 300px; gap:16px; padding:16px 20px; max-width:1400px; margin:0 auto; align-items:start; }
+    @media(max-width:960px) { .page-layout { grid-template-columns:1fr; } }
 
     /* ── Section cards ── */
-    .section-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px; margin-bottom:16px; }
-    .section-title { font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:14px; display:flex; align-items:center; gap:10px; }
+    .section-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:14px 16px; margin-bottom:12px; }
+    .section-card:last-child { margin-bottom:0; }
+    .section-title { font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
     .badge { font-size:10px; padding:2px 8px; border-radius:10px; background:var(--surface2); border:1px solid var(--border); color:var(--text-muted); text-transform:none; letter-spacing:0; font-weight:400; }
 
     /* ── Status pills ── */
@@ -51,60 +53,20 @@
     .pill-pending { background:rgba(139,148,158,0.1); color:var(--text-muted); border:1px solid var(--border); }
     .pill-human   { background:rgba(210,153,34,0.15); color:var(--warning); border:1px solid var(--warning); }
 
-    /* ── Program selector ── */
-    .prog-selector-bar { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
-    .prog-selector-bar label { font-size:12px; color:var(--text-muted); }
-    .prog-selector-bar select {
-      background:var(--surface2); border:1px solid var(--border); color:var(--text);
-      padding:5px 10px; border-radius:6px; font-size:12px; cursor:pointer;
-      flex:1; max-width:480px;
-    }
-    .prog-selector-bar select:focus { outline:none; border-color:var(--accent); }
-    .prog-selector-bar select option { background:var(--surface2); }
-    .prog-selector-bar select optgroup { background:var(--surface); }
-
-    /* ── Domain banners ── */
-    .domain-banners { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
-    @media(max-width:700px) { .domain-banners { grid-template-columns:1fr; } }
-    .domain-banner { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:14px 16px; }
-    .domain-banner.tiktrack-banner { border-left:3px solid var(--accent); }
-    .domain-banner.agentsos-banner { border-left:3px solid var(--success); }
-    .domain-banner-title { font-size:12px; font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
-    .domain-banner-title .domain-dot { width:8px; height:8px; border-radius:50%; }
-    .domain-dot-tt  { background:var(--accent); }
-    .domain-dot-aos { background:var(--success); }
-    .domain-stat-row { display:flex; gap:14px; flex-wrap:wrap; }
-    .domain-stat { text-align:center; }
-    .domain-stat-num { font-size:20px; font-weight:700; line-height:1.1; }
-    .domain-stat-lbl { font-size:10px; color:var(--text-muted); }
-    .domain-stat-num.num-tt  { color:var(--accent); }
-    .domain-stat-num.num-aos { color:var(--success); }
-    .domain-stat-num.num-done { color:var(--success); }
-    .domain-stat-num.num-active { color:var(--warning); }
-    .domain-stat-num.num-plan  { color:var(--text-muted); }
-
-    /* ── Gate visual map (vertical list) ── */
-    .gate-map-list { list-style:none; }
-    .gm-row { display:flex; align-items:center; gap:8px; padding:5px 4px; border-bottom:1px solid var(--border); }
-    .gm-row:last-child { border-bottom:none; }
-    .gm-row-current { background:rgba(31,111,235,0.07); border-radius:4px; }
-    .gm-dev-marker { background:rgba(248,81,73,0.18); color:var(--danger); border:1px solid var(--danger);
-      border-radius:8px; font-size:9px; font-weight:700; padding:1px 6px; white-space:nowrap; }
-
     /* ── Roadmap tree ── */
-    .rm-stage { border:1px solid var(--border); border-radius:8px; margin-bottom:8px; overflow:hidden; }
+    .rm-stage { border:1px solid var(--border); border-radius:8px; margin-bottom:6px; overflow:hidden; }
     .rm-stage-active { border-color:var(--current) !important; }
-    .rm-stage-header { display:flex; align-items:center; gap:8px; padding:10px 14px; background:var(--surface); cursor:pointer; transition:background 0.15s; user-select:none; }
+    .rm-stage-header { display:flex; align-items:center; gap:8px; padding:9px 12px; background:var(--surface); cursor:pointer; transition:background 0.15s; user-select:none; }
     .rm-stage-header:hover { background:var(--surface2); }
     .rm-chevron { color:var(--text-muted); font-size:10px; transition:transform 0.2s; }
     .rm-stage.rm-open .rm-chevron { transform:rotate(90deg); }
     .rm-stage-id   { font-family:var(--mono); font-size:12px; font-weight:700; color:var(--accent); min-width:42px; }
     .rm-stage-name { font-size:13px; font-weight:500; flex:1; }
-    .rm-programs { padding:6px 14px 12px 24px; display:none; }
+    .rm-programs { padding:6px 12px 10px 22px; display:none; }
     .rm-stage.rm-open .rm-programs { display:block; }
     .rm-program { display:flex; align-items:center; gap:7px; padding:4px 6px; border-radius:4px; font-size:11px; margin-bottom:2px; cursor:pointer; transition:background 0.12s; }
     .rm-program:hover { background:rgba(88,166,255,0.07); }
-    .rm-program-active { background:rgba(31,111,235,0.12); font-weight:600; }
+    .rm-program-active   { background:rgba(31,111,235,0.12); font-weight:600; }
     .rm-program-selected { background:rgba(88,166,255,0.14) !important; outline:1px solid var(--accent); }
     .rm-prog-id   { font-family:var(--mono); color:var(--text-muted); min-width:92px; font-size:10px; }
     .rm-prog-name { flex:1; }
@@ -117,28 +79,16 @@
     .rm-s-planned  { background:rgba(139,148,158,0.1); color:#8b949e; }
     .rm-s-deferred { background:rgba(210,153,34,0.15); color:#d29922; }
     .rm-s-hold     { background:rgba(248,81,73,0.1);   color:#f85149; }
-    .rm-validation { padding:8px 12px; background:var(--surface2); border-radius:6px; margin-bottom:12px; font-size:12px; }
-    .rm-val-ok  { color:var(--success); }
-    .rm-val-err { color:var(--danger); margin-bottom:4px; }
 
     /* ── Program detail panel ── */
-    .prog-detail-panel { background:var(--surface2); border:1px solid var(--accent); border-radius:8px; padding:14px 16px; margin-bottom:12px; font-size:12px; }
+    .prog-detail-panel { background:var(--surface2); border:1px solid var(--accent); border-radius:8px; padding:12px 14px; margin-top:0; margin-bottom:12px; font-size:12px; }
     .prog-detail-panel h3 { font-size:13px; font-weight:600; margin-bottom:8px; color:var(--accent); }
     .prog-detail-row { display:flex; gap:6px; margin-bottom:4px; }
-    .prog-detail-lbl { color:var(--text-muted); min-width:120px; font-size:11px; }
+    .prog-detail-lbl { color:var(--text-muted); min-width:100px; font-size:11px; }
     .prog-detail-val { font-size:11px; }
     .prog-gate-mirror { font-family:var(--mono); font-size:10px; color:var(--text-muted); margin-top:6px; padding:6px 8px; background:var(--surface); border-radius:4px; word-break:break-word; }
 
-    /* ── Gate history ── */
-    .gate-history-list { list-style:none; }
-    .history-item { display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid var(--border); font-size:12px; }
-    .history-item:last-child { border-bottom:none; }
-    .history-gate { font-family:var(--mono); font-size:11px; flex:1; }
-    .history-step { font-size:10px; color:var(--text-muted); }
-    .fail-cycle-tag { font-size:9px; padding:1px 6px; border-radius:5px; font-weight:700;
-      background:rgba(248,81,73,0.18); color:var(--danger); border:1px solid var(--danger); }
-
-    /* ── Gate full sequence ── */
+    /* ── Gate sequence table ── */
     .gate-seq-table { width:100%; border-collapse:collapse; }
     .gate-seq-table th { font-size:10px; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); text-align:left; padding:4px 8px; border-bottom:1px solid var(--border); }
     .gate-seq-table td { font-size:11px; padding:5px 8px; border-bottom:1px solid var(--border); }
@@ -147,16 +97,56 @@
     .gate-name-cell { font-family:var(--mono); }
     .decision-marker { font-size:9px; color:var(--warning); margin-left:4px; }
 
-    /* ── Canonical files ── */
-    .cf-row { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid var(--border); }
-    .cf-row:last-child { border-bottom:none; }
-    .cf-row a { color:var(--accent); text-decoration:none; font-size:12px; flex:1; }
-    .cf-row a:hover { text-decoration:underline; }
-    .cf-path { font-family:var(--mono); font-size:9px; color:var(--text-muted); }
+    /* ── Gate history ── */
+    .gate-history-list { list-style:none; }
+    .history-item { display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid var(--border); font-size:12px; }
+    .history-item:last-child { border-bottom:none; }
+    .history-gate { font-family:var(--mono); font-size:11px; flex:1; }
+    .fail-cycle-tag { font-size:9px; padding:1px 6px; border-radius:5px; font-weight:700;
+      background:rgba(248,81,73,0.18); color:var(--danger); border:1px solid var(--danger); }
 
-    /* ── Two-col layout ── */
-    .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-    @media(max-width:900px) { .two-col { grid-template-columns:1fr; } }
+    /* ── Sidebar cards ── */
+    .sidebar { min-width:0; }
+    .stat-domain-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:12px 14px; margin-bottom:8px; }
+    .stat-domain-card.tiktrack-card { border-left:3px solid var(--accent); }
+    .stat-domain-card.agentsos-card  { border-left:3px solid var(--success); }
+    .stat-domain-card.total-card     { border-left:3px solid var(--warning); }
+    .stat-domain-title { font-size:11px; font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:7px; }
+    .stat-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+    .stat-dot-tt  { background:var(--accent); }
+    .stat-dot-aos { background:var(--success); }
+    .stat-dot-tot { background:var(--warning); }
+    .stat-row { display:flex; gap:10px; flex-wrap:wrap; }
+    .stat-item { text-align:center; }
+    .stat-num  { font-size:18px; font-weight:700; line-height:1.15; }
+    .stat-lbl  { font-size:9px; color:var(--text-muted); }
+    .num-tt    { color:var(--accent); }
+    .num-aos   { color:var(--success); }
+    .num-tot   { color:var(--warning); }
+    .num-done  { color:var(--success); }
+    .num-actv  { color:var(--warning); }
+    .num-plan  { color:var(--text-muted); }
+
+    /* ── Sidebar section card ── */
+    .sidebar-section-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:12px 14px; margin-bottom:8px; }
+    .sidebar-section-title { font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+
+    /* ── Canonical files (compact sidebar style) ── */
+    .cf-row { display:flex; align-items:center; gap:7px; padding:4px 0; border-bottom:1px solid var(--border); }
+    .cf-row:last-child { border-bottom:none; }
+    .cf-row a { color:var(--accent); text-decoration:none; font-size:11px; flex:1; }
+    .cf-row a:hover { text-decoration:underline; }
+    .cf-path { font-family:var(--mono); font-size:9px; color:var(--text-muted); display:none; }
+
+    /* ── Validation panel ── */
+    .rm-val-ok  { color:var(--success); font-size:12px; }
+    .rm-val-err { color:var(--danger); font-size:12px; margin-bottom:4px; }
+
+    /* ── Stage conflict warning ── */
+    .conflict-banner { background:rgba(248,81,73,0.1); border:1px solid var(--danger); border-radius:6px;
+      padding:10px 12px; margin-bottom:8px; font-size:12px; color:var(--danger); }
+    .conflict-banner strong { display:block; margin-bottom:4px; }
+    .conflict-banner .log-line { font-family:var(--mono); font-size:10px; color:var(--text-muted); margin-top:6px; background:rgba(0,0,0,0.3); padding:3px 6px; border-radius:3px; }
 
     /* ── Misc ── */
     .loading { color:var(--text-muted); font-style:italic; font-size:12px; }
@@ -184,76 +174,88 @@
   </div>
   <div class="header-right">
     <label class="refresh-label">
-      <input type="checkbox" id="auto-refresh"> Auto (30s)
+      <input type="checkbox" id="auto-refresh"> Auto (5s)
       <span class="refresh-dot" id="refresh-dot" style="display:none"></span>
     </label>
     <button class="btn btn-primary" onclick="loadAll()">↺ Refresh</button>
   </div>
 </header>
 
-<main>
+<!-- Hidden select kept for programmatic use by onProgSelect / buildProgramSelector -->
+<select id="prog-select" style="display:none" onchange="onProgSelect(this.value)">
+  <option value="">— All programs —</option>
+</select>
 
-  <!-- Program Selector -->
-  <div class="section-card" style="padding:12px 16px; margin-bottom:16px;">
-    <div class="prog-selector-bar">
-      <label>🔍 Program / WP focus:</label>
-      <select id="prog-select" onchange="onProgSelect(this.value)">
-        <option value="">— All programs (overview) —</option>
-      </select>
-      <span id="prog-select-status" style="font-size:11px; color:var(--text-muted)"></span>
+<div class="page-layout">
+
+  <!-- ── LEFT: Main content column ────────────────────────────────── -->
+  <div class="main-col">
+
+    <!-- Portfolio Roadmap Tree -->
+    <div class="section-card">
+      <div class="section-title">Portfolio Roadmap <span class="badge" id="roadmap-badge">—</span></div>
+      <div id="roadmap-tree"><span class="loading">Loading…</span></div>
     </div>
-    <!-- Program detail panel (shown when a program is selected) -->
+
+    <!-- Program Detail Panel (shown below roadmap when a program is selected) -->
     <div id="prog-detail" style="display:none"></div>
-  </div>
 
-  <!-- Domain Banners -->
-  <div class="domain-banners" id="domain-banners">
-    <div class="loading" style="grid-column:1/-1">Loading domain stats…</div>
-  </div>
-
-  <!-- Gate Visual Map -->
-  <div class="section-card">
-    <div class="section-title">Gate Visual Map <span class="badge" id="map-badge">—</span></div>
-    <div class="gate-map-wrap" id="gate-map-content"><span class="loading">Loading…</span></div>
-  </div>
-
-  <!-- Two-column: Roadmap Tree  |  Gate Sequence + History -->
-  <div class="two-col">
-
-    <!-- LEFT: Roadmap Tree -->
-    <div>
-      <div class="section-card">
-        <div class="section-title">Portfolio Roadmap <span class="badge" id="roadmap-badge">—</span></div>
-        <div class="rm-validation" id="rm-validation"><span class="loading">Loading…</span></div>
-        <div id="roadmap-tree"><span class="loading">Loading…</span></div>
-      </div>
+    <!-- Full Gate Sequence -->
+    <div class="section-card">
+      <div class="section-title">Full Gate Sequence <span class="badge" id="seq-badge">—</span></div>
+      <div id="gate-seq-content"><span class="loading">Loading…</span></div>
     </div>
 
-    <!-- RIGHT: Gate Sequence + History -->
-    <div>
-      <div class="section-card">
-        <div class="section-title">Full Gate Sequence <span class="badge" id="seq-badge">—</span></div>
-        <div id="gate-seq-content"><span class="loading">Loading…</span></div>
-      </div>
-
-      <div class="section-card">
-        <div class="section-title">Gate History <span class="badge" id="history-badge">—</span></div>
-        <div id="history-content"><span class="loading">Loading…</span></div>
-      </div>
+    <!-- Gate History -->
+    <div class="section-card">
+      <div class="section-title">Gate History <span class="badge" id="history-badge">—</span></div>
+      <div id="history-content"><span class="loading">Loading…</span></div>
     </div>
 
-  </div>
+  </div><!-- /main-col -->
 
-  <!-- Full-width: Canonical Task Files -->
-  <div class="section-card">
-    <div class="section-title">Canonical Task Files <span class="badge" id="cf-badge">—</span></div>
-    <div id="cf-content"><span class="loading">Loading…</span></div>
-  </div>
+  <!-- ── RIGHT: Sidebar ────────────────────────────────────────────── -->
+  <aside class="sidebar">
 
-</main>
+    <!-- Stage / Domain Conflict Warnings — filled by checkStageConflict() -->
+    <div id="conflict-warnings" style="display:none"></div>
+
+    <!-- TikTrack Stats -->
+    <div class="stat-domain-card tiktrack-card" id="stat-tiktrack">
+      <div class="stat-domain-title"><span class="stat-dot stat-dot-tt"></span>TikTrack</div>
+      <div class="stat-row"><span class="loading">Loading…</span></div>
+    </div>
+
+    <!-- Agents_OS Stats -->
+    <div class="stat-domain-card agentsos-card" id="stat-agentsos">
+      <div class="stat-domain-title"><span class="stat-dot stat-dot-aos"></span>Agents_OS</div>
+      <div class="stat-row"><span class="loading">Loading…</span></div>
+    </div>
+
+    <!-- Total Stats -->
+    <div class="stat-domain-card total-card" id="stat-total">
+      <div class="stat-domain-title"><span class="stat-dot stat-dot-tot"></span>Portfolio Total</div>
+      <div class="stat-row"><span class="loading">Loading…</span></div>
+    </div>
+
+    <!-- Canonical Task Files -->
+    <div class="sidebar-section-card">
+      <div class="sidebar-section-title">Canonical Task Files <span class="badge" id="cf-badge">—</span></div>
+      <div id="cf-content"><span class="loading">Loading…</span></div>
+    </div>
+
+    <!-- Hierarchy Validation -->
+    <div class="sidebar-section-card">
+      <div class="sidebar-section-title">Hierarchy Validation <span class="badge" id="val-badge">—</span></div>
+      <div id="val-content"><span class="loading">Loading…</span></div>
+    </div>
+
+  </aside><!-- /sidebar -->
+
+</div><!-- /page-layout -->
 
 <script>
-// ── Gate configuration (mirrors pipeline.py) ──────────────────────────────
+// ── Gate configuration ─────────────────────────────────────────────────────
 const GATE_SEQUENCE = [
   "GATE_0","GATE_1","GATE_2","WAITING_GATE2_APPROVAL",
   "G3_PLAN","G3_5","G3_6_MANDATES",
@@ -274,7 +276,7 @@ const GATE_CONFIG = {
   "GATE_5":                 {owner:"team_90",     engine:"codex",         desc:"Team 90 — dev validation",           twoPaths:true},
   "GATE_6":                 {owner:"team_100",    engine:"codex+human",   desc:"Team 100 — reality vs intent",       twoPaths:true},
   "WAITING_GATE6_APPROVAL": {owner:"team_00",     engine:"human",         desc:"Nimrod — GATE_6 approval",           twoPaths:true},
-  "GATE_7":                 {owner:"team_00",     engine:"human",         desc:"Nimrod — UX sign-off",               twoPaths:true},
+  "GATE_7":                 {owner:"team_90",     engine:"human",         desc:"Team 90 orchestrates; Nimrod UX sign-off", twoPaths:true},
   "GATE_8":                 {owner:"team_90",     engine:"codex",         desc:"Team 90+70 — docs closure",          twoPaths:true},
 };
 
@@ -289,6 +291,7 @@ const CANONICAL_FILES = [
   {label:"Program Registry",             path:"../../documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md"},
   {label:"SSM (Governance Constitution)", path:"../../documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md"},
   {label:"Iron Rules",                   path:"../../documentation/docs-governance/01-FOUNDATIONS/03_IRON_RULES_AND_GOVERNANCE_CONSTITUTION.md"},
+  {label:"ADR-031 Open Items",           path:"../../_COMMUNICATION/agents_os/AGENTS_OS_ADR031_OPEN_ITEMS_v1.0.0.md"},
 ];
 
 // ── State ──────────────────────────────────────────────────────────────────
@@ -314,6 +317,9 @@ async function fileExists(path) {
 function escHtml(s) {
   return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
+function escAttr(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
 
 // ── Gate status helpers ────────────────────────────────────────────────────
 function gateStatus(gate, state) {
@@ -332,31 +338,23 @@ function statusLabel(s) {
   return {current:"▶ ACTIVE",pass:"✓ PASS",fail:"✗ FAIL",pending:"pending",human:"⏸ HUMAN"}[s]||s;
 }
 
-// ── Markdown table parser (fixed) ──────────────────────────────────────────
-// Previous version had a bug: separator detection happened before headers were found,
-// causing schema rows in PROGRAM_REGISTRY to be parsed as data rows.
-// Fix: require header row → separator row ordering strictly.
+// ── Markdown table parser ──────────────────────────────────────────────────
 function extractTable(mdText, firstColName) {
   const rows  = [];
   const lines = mdText.split('\n');
   let i = 0;
   while (i < lines.length) {
     const line = lines[i].trim();
-    // Skip non-table lines
     if (!line.startsWith('|')) { i++; continue; }
-    // Check if this row contains firstColName as a header
     const cols = line.split('|').slice(1,-1).map(c=>c.trim());
     if (!cols.includes(firstColName)) { i++; continue; }
-    // Found potential header row — now look for separator immediately after (skip blanks)
     let sepIdx = i + 1;
     while (sepIdx < lines.length && !lines[sepIdx].trim()) sepIdx++;
     if (sepIdx >= lines.length) { i++; continue; }
     const sep = lines[sepIdx].trim();
     if (!sep.startsWith('|')) { i++; continue; }
     const sepCols = sep.split('|').slice(1,-1).map(c=>c.trim());
-    // Separator must be all dashes/colons/spaces (e.g. |---|---|)
     if (!sepCols.every(c => /^[-: ]+$/.test(c))) { i++; continue; }
-    // Valid table found — parse data rows
     const headers = cols;
     i = sepIdx + 1;
     while (i < lines.length) {
@@ -364,14 +362,13 @@ function extractTable(mdText, firstColName) {
       if (!dline) { i++; continue; }
       if (!dline.startsWith('|')) break;
       const dcols = dline.split('|').slice(1,-1).map(c=>c.trim());
-      // Another separator row = end of table
       if (dcols.every(c => /^[-: ]*$/.test(c))) break;
       const row = {};
       headers.forEach((h,j) => { row[h] = dcols[j] !== undefined ? dcols[j] : ''; });
       rows.push(row);
       i++;
     }
-    break; // Only parse first matching table
+    break;
   }
   return rows;
 }
@@ -411,10 +408,9 @@ async function loadPipelineState() {
   }
 }
 
-// ── Populate program selector ──────────────────────────────────────────────
+// ── Program selector (hidden, used programmatically) ─────────────────────
 function buildProgramSelector(programs, state) {
   const sel = document.getElementById("prog-select");
-  // Group by stage
   const byStage = {};
   for (const p of programs) {
     const sid = p['stage_id'] || 'UNKNOWN';
@@ -427,35 +423,26 @@ function buildProgramSelector(programs, state) {
     for (const p of byStage[sid]) {
       const pid = p['program_id'];
       const name = (p['program_name']||'').replace(/\*\*/g,'');
-      const domain = p['domain']||'';
-      const domShort = domain.includes('AGENTS') ? '[AOS]' : '[TT]';
-      const statusShort = rmStatusLabel(p['status']);
-      const active = state && (state.work_package_id||'').startsWith(pid) ? ' ★' : '';
-      html += `<option value="${escHtml(pid)}">${escHtml(pid)} — ${escHtml(name)} ${domShort} (${statusShort})${active}</option>`;
+      html += `<option value="${escHtml(pid)}">${escHtml(pid)} — ${escHtml(name)}</option>`;
     }
     html += '</optgroup>';
   }
   sel.innerHTML = html;
 
-  // Auto-select active program if present
+  // Auto-select active program
   if (state && state.work_package_id) {
     const activeProg = state.work_package_id.replace(/-WP\d+.*$/,'');
     for (let i = 0; i < sel.options.length; i++) {
-      if (sel.options[i].value === activeProg) {
-        sel.selectedIndex = i;
-        break;
-      }
+      if (sel.options[i].value === activeProg) { sel.selectedIndex = i; break; }
     }
   }
 }
 
-// ── Program detail panel ───────────────────────────────────────────────────
+// ── Program detail panel (shown below roadmap tree) ──────────────────────
 function onProgSelect(pid) {
   const detailEl = document.getElementById("prog-detail");
-  const statusEl = document.getElementById("prog-select-status");
   if (!pid) {
     detailEl.style.display = "none";
-    statusEl.textContent = "";
     highlightRoadmapProgram(null);
     renderGateSequence(pipelineState, null);
     renderGateHistory(pipelineState, null);
@@ -469,7 +456,6 @@ function onProgSelect(pid) {
   const status = rmStatusLabel(prog['status']);
   const mirror = (prog['current_gate_mirror']||'—').replace(/\*\*/g,'');
   const domCls = domain.includes('AGENTS') ? 'domain-agentsos' : 'domain-tiktrack';
-
   const isActive = pipelineState && (pipelineState.work_package_id||'').startsWith(pid);
 
   detailEl.innerHTML = `
@@ -487,15 +473,13 @@ function onProgSelect(pid) {
         <span class="prog-detail-lbl">Status:</span>
         <span class="prog-detail-val"><span class="rm-status ${rmStatusClass(prog['status'])}">${status}</span></span>
       </div>
-      ${isActive ? '<div class="prog-detail-row"><span class="prog-detail-lbl">⚡ Pipeline:</span><span class="prog-detail-val" style="color:var(--accent)">ACTIVE in pipeline — WP: ' + escHtml(pipelineState.work_package_id) + '</span></div>' : ''}
+      ${isActive ? `<div class="prog-detail-row"><span class="prog-detail-lbl">⚡ Pipeline:</span><span class="prog-detail-val" style="color:var(--accent)">ACTIVE — WP: ${escHtml(pipelineState.work_package_id)}</span></div>` : ''}
       <div class="prog-gate-mirror">Gate mirror: ${escHtml(mirror)}</div>
     </div>`;
   detailEl.style.display = "block";
-  statusEl.textContent = `Showing: ${pid}`;
 
   highlightRoadmapProgram(pid);
 
-  // Update Gate Sequence + Gate History to show the selected program's state
   const vs = makeVirtualState(pid);
   renderGateSequence(vs, pid);
   renderGateHistory(vs, pid);
@@ -506,7 +490,6 @@ function highlightRoadmapProgram(pid) {
     el.classList.remove("rm-program-selected");
     if (pid && el.dataset.pid === pid) {
       el.classList.add("rm-program-selected");
-      // Auto-open parent stage
       const stageEl = el.closest(".rm-stage");
       if (stageEl) stageEl.classList.add("rm-open");
       el.scrollIntoView({behavior:"smooth", block:"nearest"});
@@ -515,10 +498,6 @@ function highlightRoadmapProgram(pid) {
 }
 
 // ── Virtual state for non-active programs ─────────────────────────────────
-// Returns a state object suitable for renderGateSequence / renderGateHistory.
-// For the live active program → returns pipelineState with _isLive flag.
-// For completed programs → all gates shown as passed.
-// For others → all gates pending with status annotation.
 function makeVirtualState(pid) {
   if (!pid) return pipelineState;
   const activeWp   = pipelineState ? (pipelineState.work_package_id || '') : '';
@@ -534,105 +513,56 @@ function makeVirtualState(pid) {
     _isVirtual:   true,
     _progStatus:  status,
     work_package_id: pid,
-    current_gate:    isDone ? null : null,
+    current_gate:    null,
     gates_completed: isDone ? GATE_SEQUENCE.slice() : [],
     gates_failed:    [],
   };
 }
 
-// ── Domain banners ─────────────────────────────────────────────────────────
-function renderDomainBanners(programs, state) {
-  const el = document.getElementById("domain-banners");
-
-  function domainStats(domain) {
-    const ps = programs.filter(p => (p['domain']||'').includes(domain));
+// ── Domain stats (sidebar cards) ──────────────────────────────────────────
+function renderDomainStats(programs, state) {
+  function domainStats(keyword) {
+    const ps = programs.filter(p => (p['domain']||'').includes(keyword));
     return {
       total:    ps.length,
-      complete: ps.filter(p => rmStatusLabel(p['status']) === 'COMPLETE' || rmStatusLabel(p['status']) === 'CLOSED').length,
+      complete: ps.filter(p => ['COMPLETE','CLOSED'].includes(rmStatusLabel(p['status']))).length,
       active:   ps.filter(p => rmStatusLabel(p['status']) === 'ACTIVE').length,
       planned:  ps.filter(p => rmStatusLabel(p['status']) === 'PLANNED').length,
       deferred: ps.filter(p => ['DEFERRED','HOLD','FROZEN'].includes(rmStatusLabel(p['status']))).length,
     };
   }
 
+  function statsHtml(s, numClass) {
+    return `<div class="stat-row">
+      <div class="stat-item"><div class="stat-num ${numClass}">${s.total}</div><div class="stat-lbl">Total</div></div>
+      <div class="stat-item"><div class="stat-num num-done">${s.complete}</div><div class="stat-lbl">Done</div></div>
+      <div class="stat-item"><div class="stat-num num-actv">${s.active}</div><div class="stat-lbl">Active</div></div>
+      <div class="stat-item"><div class="stat-num num-plan">${s.planned}</div><div class="stat-lbl">Planned</div></div>
+      ${s.deferred ? `<div class="stat-item"><div class="stat-num" style="color:var(--warning)">${s.deferred}</div><div class="stat-lbl">Deferred</div></div>` : ''}
+    </div>`;
+  }
+
   const tt  = domainStats('TIKTRACK');
   const aos = domainStats('AGENTS');
+  const tot = { total: programs.length, complete: tt.complete+aos.complete, active: tt.active+aos.active, planned: tt.planned+aos.planned, deferred: tt.deferred+aos.deferred };
 
-  el.innerHTML = `
-    <div class="domain-banner tiktrack-banner">
-      <div class="domain-banner-title">
-        <span class="domain-dot domain-dot-tt"></span>
-        TikTrack — Trading App
-      </div>
-      <div class="domain-stat-row">
-        <div class="domain-stat"><div class="domain-stat-num num-tt">${tt.total}</div><div class="domain-stat-lbl">Total</div></div>
-        <div class="domain-stat"><div class="domain-stat-num num-done">${tt.complete}</div><div class="domain-stat-lbl">Complete</div></div>
-        <div class="domain-stat"><div class="domain-stat-num num-active">${tt.active}</div><div class="domain-stat-lbl">Active</div></div>
-        <div class="domain-stat"><div class="domain-stat-num num-plan">${tt.planned}</div><div class="domain-stat-lbl">Planned</div></div>
-        ${tt.deferred ? `<div class="domain-stat"><div class="domain-stat-num" style="color:var(--warning)">${tt.deferred}</div><div class="domain-stat-lbl">Deferred</div></div>` : ''}
-      </div>
-    </div>
-    <div class="domain-banner agentsos-banner">
-      <div class="domain-banner-title">
-        <span class="domain-dot domain-dot-aos"></span>
-        Agents_OS — Automation Layer
-      </div>
-      <div class="domain-stat-row">
-        <div class="domain-stat"><div class="domain-stat-num num-aos">${aos.total}</div><div class="domain-stat-lbl">Total</div></div>
-        <div class="domain-stat"><div class="domain-stat-num num-done">${aos.complete}</div><div class="domain-stat-lbl">Complete</div></div>
-        <div class="domain-stat"><div class="domain-stat-num num-active">${aos.active}</div><div class="domain-stat-lbl">Active</div></div>
-        <div class="domain-stat"><div class="domain-stat-num num-plan">${aos.planned}</div><div class="domain-stat-lbl">Planned</div></div>
-        ${aos.deferred ? `<div class="domain-stat"><div class="domain-stat-num" style="color:var(--warning)">${aos.deferred}</div><div class="domain-stat-lbl">Deferred</div></div>` : ''}
-      </div>
-    </div>`;
+  document.getElementById("stat-tiktrack").innerHTML =
+    `<div class="stat-domain-title"><span class="stat-dot stat-dot-tt"></span>TikTrack</div>${statsHtml(tt,'num-tt')}`;
+  document.getElementById("stat-agentsos").innerHTML =
+    `<div class="stat-domain-title"><span class="stat-dot stat-dot-aos"></span>Agents_OS</div>${statsHtml(aos,'num-aos')}`;
+  document.getElementById("stat-total").innerHTML =
+    `<div class="stat-domain-title"><span class="stat-dot stat-dot-tot"></span>Portfolio Total</div>${statsHtml(tot,'num-tot')}`;
 }
 
-// ── Gate visual map (vertical list, one row per gate) ─────────────────────
-function renderGateMap(state) {
-  const el = document.getElementById("gate-map-content");
-  const completed = (state&&state.gates_completed)||[];
-  const failed    = (state&&state.gates_failed)||[];
-  const current   = state ? state.current_gate : null;
+// ── Stage conflict / hierarchy warnings ──────────────────────────────────
+function checkStageConflict(stages, programs, state) {
+  const conflictEl = document.getElementById("conflict-warnings");
+  const valEl      = document.getElementById("val-content");
+  const valBadge   = document.getElementById("val-badge");
+  const warnings   = [];
+  const errors     = [];
 
-  const failCounts = {};
-  for (const g of failed) { failCounts[g] = (failCounts[g]||0) + 1; }
-
-  const passCount = completed.length;
-  const failCount = Object.keys(failCounts).length;
-  document.getElementById("map-badge").textContent =
-    `${passCount} passed${failCount ? ' · ' + failCount + ' had fails' : ''} · ${GATE_SEQUENCE.length} total`;
-
-  let html = '<ul class="gate-map-list">';
-  GATE_SEQUENCE.forEach((g, i) => {
-    const cfg   = GATE_CONFIG[g]||{};
-    const s     = gateStatus(g, state);
-    const isCur = g === current;
-    const icon  = s==='pass'?'✓':s==='fail'?'✗':s==='current'?'▶':s==='human'?'⏸':'○';
-    const color = s==='pass'?'var(--success)':s==='fail'?'var(--danger)':s==='current'?'var(--accent)':s==='human'?'var(--warning)':'var(--text-muted)';
-    const decMk = cfg.twoPaths
-      ? '<span class="decision-marker" title="Decision gate: PASS or FAIL required">⬢</span>' : '';
-    const failMk = failCounts[g]
-      ? `<span class="gm-dev-marker">▲${failCounts[g]}×</span>` : '';
-
-    html += `<li class="gm-row${isCur?' gm-row-current':''}" title="${escHtml(cfg.desc||g)}">
-      <span style="font-size:10px;color:var(--text-muted);min-width:18px;text-align:right">${i+1}</span>
-      <span class="status-pill ${statusPillClass(s)}" style="font-size:10px;min-width:70px;text-align:center">${icon} ${s.toUpperCase()}</span>
-      <span style="font-family:var(--mono);font-size:11px;flex:1;color:${color}">${escHtml(g)}${decMk}</span>
-      <span style="font-size:10px;color:var(--text-muted);min-width:80px">${escHtml(cfg.owner||'—')}</span>
-      ${failMk}
-    </li>`;
-  });
-  html += '</ul>';
-  el.innerHTML = html;
-}
-
-// ── Roadmap tree ──────────────────────────────────────────────────────────
-function renderRoadmapTree(stages, programs, state) {
-  const treeEl  = document.getElementById("roadmap-tree");
-  const validEl = document.getElementById("rm-validation");
-
-  // Validate
-  const errors = [];
+  // Hierarchy validation: duplicate IDs, orphan programs
   const stageIds = stages.map(s=>s['stage_id']).filter(Boolean);
   const progIds  = programs.map(p=>p['program_id']).filter(Boolean);
   stageIds.filter((id,i)=>stageIds.indexOf(id)!==i).forEach(id=>errors.push(`Duplicate stage ID: ${id}`));
@@ -640,12 +570,58 @@ function renderRoadmapTree(stages, programs, state) {
   programs.filter(p=>p['stage_id']&&!stageIds.includes(p['stage_id'])).forEach(p=>errors.push(`Orphan program (invalid stage_id): ${p['program_id']}`));
   programs.filter(p=>!p['stage_id']).forEach(p=>errors.push(`Program missing stage_id: ${p['program_id']}`));
 
-  if (!errors.length) {
-    validEl.innerHTML = `<div class="rm-val-ok">✅ ${stages.length} stages · ${programs.length} programs · 0 errors</div>`;
-  } else {
-    validEl.innerHTML = errors.map(e=>`<div class="rm-val-err">❌ ${escHtml(e)}</div>`).join('');
+  // Stage closure check: if pipeline_state.stage_id points to a CLOSED stage
+  if (state && state.stage_id) {
+    const pipeStage = state.stage_id;
+    const stageEntry = stages.find(s => s['stage_id'] === pipeStage);
+    if (stageEntry) {
+      const sl = rmStatusLabel(stageEntry['status']);
+      if (sl === 'CLOSED' || sl === 'COMPLETE') {
+        warnings.push({
+          msg: `Pipeline stage_id "${pipeStage}" is marked ${sl} in roadmap — active programs must belong to the current open stage.`,
+          log: `pipeline_state.stage_id=${pipeStage} | Roadmap stage status=${sl} | Rule: Stage is a milestone — one-directional. If re-using a program from a closed stage, create a new version in the active stage.`,
+        });
+      }
+    }
+    // Active program in wrong stage
+    if (state.work_package_id) {
+      const activeProg = state.work_package_id.replace(/-WP\d+.*$/, '');
+      const progEntry  = programs.find(p => p['program_id'] === activeProg);
+      if (progEntry && progEntry['stage_id'] !== pipeStage) {
+        warnings.push({
+          msg: `Active WP program "${activeProg}" belongs to stage "${progEntry['stage_id']}" but pipeline_state.stage_id is "${pipeStage}".`,
+          log: `program_id=${activeProg} | program.stage_id=${progEntry['stage_id']} | pipeline.stage_id=${pipeStage} | Sync required.`,
+        });
+      }
+    }
   }
-  document.getElementById("roadmap-badge").textContent = `${stages.length}S / ${programs.length}P${errors.length?' ⚠️':' ✅'}`;
+
+  // Render hierarchy validation
+  if (!errors.length) {
+    valEl.innerHTML = `<div class="rm-val-ok">✅ ${stages.length} stages · ${programs.length} programs · 0 errors</div>`;
+    valBadge.textContent = `${stages.length}S / ${programs.length}P ✅`;
+  } else {
+    valEl.innerHTML = errors.map(e=>`<div class="rm-val-err">❌ ${escHtml(e)}</div>`).join('');
+    valBadge.textContent = `${stages.length}S / ${programs.length}P ⚠️ ${errors.length} err`;
+  }
+
+  // Render conflict warnings
+  if (!warnings.length) {
+    conflictEl.style.display = 'none';
+    return;
+  }
+  conflictEl.style.display = '';
+  conflictEl.innerHTML = warnings.map(w => `
+    <div class="conflict-banner">
+      <strong>⚠️ Stage/Program Conflict</strong>
+      ${escHtml(w.msg)}
+      <div class="log-line">${escHtml(w.log)}</div>
+    </div>`).join('');
+}
+
+// ── Roadmap tree ──────────────────────────────────────────────────────────
+function renderRoadmapTree(stages, programs, state) {
+  const treeEl = document.getElementById("roadmap-tree");
 
   const activeWp   = state ? (state.work_package_id||'') : '';
   const activeProg = activeWp ? activeWp.replace(/-WP\d+.*$/,'') : '';
@@ -680,7 +656,8 @@ function renderRoadmapTree(stages, programs, state) {
         const domShort = domain.includes('AGENTS') ? 'AOS' : 'TT';
         const psc = rmStatusClass(prog['status']);
         const psl = rmStatusLabel(prog['status']);
-        html += `<div class="rm-program${isActive?' rm-program-active':''}" data-pid="${escHtml(pid)}" onclick="document.getElementById('prog-select').value='${escHtml(pid)}';onProgSelect('${escHtml(pid)}')">
+        html += `<div class="rm-program${isActive?' rm-program-active':''}" data-pid="${escHtml(pid)}"
+          onclick="document.getElementById('prog-select').value='${escHtml(pid)}';onProgSelect('${escHtml(pid)}')">
           <span style="font-size:9px;color:${isActive?'var(--accent)':'transparent'};width:10px">▶</span>
           <span class="rm-prog-id">${escHtml(pid)}</span>
           <span class="rm-prog-name">${escHtml((prog['program_name']||'').replace(/\*\*/g,''))}</span>
@@ -691,6 +668,8 @@ function renderRoadmapTree(stages, programs, state) {
     }
     html += `</div></div>`;
   }
+
+  document.getElementById("roadmap-badge").textContent = `${stages.length}S / ${programs.length}P`;
   treeEl.innerHTML = html;
 }
 
@@ -732,8 +711,6 @@ function renderGateHistory(state, forPid) {
 
   const completed = state.gates_completed || [];
   const failed    = state.gates_failed    || [];
-
-  // Count fail cycles per gate
   const failCounts = {};
   for (const g of failed) { failCounts[g] = (failCounts[g]||0) + 1; }
 
@@ -745,14 +722,9 @@ function renderGateHistory(state, forPid) {
     return;
   }
 
-  // Build ordered history from completed gates (in sequence order)
   const history = GATE_SEQUENCE
     .filter(g => completed.includes(g) || failed.includes(g))
-    .map(g => ({
-      gate:     g,
-      passed:   completed.includes(g),
-      failCnt:  failCounts[g]||0,
-    }));
+    .map(g => ({ gate:g, passed:completed.includes(g), failCnt:failCounts[g]||0 }));
 
   el.innerHTML = `<ul class="gate-history-list">` +
     history.map((h,i) => `<li class="history-item">
@@ -760,23 +732,22 @@ function renderGateHistory(state, forPid) {
       <span class="status-pill ${h.passed?'pill-pass':'pill-fail'}">${h.passed?'✓ PASS':'✗ FAIL'}</span>
       <span class="history-gate">${escHtml(h.gate)}</span>
       ${h.failCnt ? `<span class="fail-cycle-tag">▲${h.failCnt}× fail</span>` : ''}
-    </li>`).join('') +
-    `</ul>`;
+    </li>`).join('') + `</ul>`;
 }
 
-// ── Canonical task files ───────────────────────────────────────────────────
+// ── Canonical task files (sidebar) ────────────────────────────────────────
 async function loadCanonicalFiles() {
-  const el = document.getElementById("cf-content");
+  const el    = document.getElementById("cf-content");
+  const badge = document.getElementById("cf-badge");
   const results = await Promise.all(CANONICAL_FILES.map(async f => ({...f, exists:await fileExists(f.path)})));
-  const found = results.filter(r=>r.exists).length;
-  document.getElementById("cf-badge").textContent = `${found}/${results.length} found`;
+  const found   = results.filter(r=>r.exists).length;
+  badge.textContent = `${found}/${results.length}`;
 
   el.innerHTML = results.map(f => `<div class="cf-row">
     <span>${f.exists?'🟢':'🔴'}</span>
     <a href="#"
        onclick="openFileViewer(${escAttr(JSON.stringify(f.path))},${escAttr(JSON.stringify(f.label))});return false;"
-       title="View file contents">${escHtml(f.label)}</a>
-    <span class="cf-path">${escHtml(f.path)}</span>
+       title="${escAttr(f.path)}">${escHtml(f.label)}</a>
   </div>`).join('');
 }
 
@@ -784,7 +755,6 @@ async function loadCanonicalFiles() {
 async function loadAll() {
   const state = await loadPipelineState();
 
-  // Load roadmap files
   let roadmapText = '', registryText = '';
   try {
     const [r1,r2] = await Promise.all([
@@ -795,9 +765,7 @@ async function loadAll() {
     [roadmapText, registryText] = await Promise.all([r1.text(), r2.text()]);
   } catch(e) {
     document.getElementById("roadmap-tree").innerHTML =
-      '<div class="error-msg">❌ Cannot load roadmap files — is the HTTP server running? (python3 -m http.server 8090)</div>';
-    document.getElementById("domain-banners").innerHTML =
-      '<div class="error-msg" style="grid-column:1/-1">❌ Cannot load registry files</div>';
+      '<div class="error-msg">❌ Cannot load roadmap files — is the HTTP server running?<br><code style="font-size:10px">python3 -m http.server 8090</code></div>';
     renderGateSequence(state, null);
     renderGateHistory(state, null);
     await loadCanonicalFiles();
@@ -809,15 +777,14 @@ async function loadAll() {
   allStages   = stages;
   allPrograms = programs;
 
-  // Render all sections
-  renderDomainBanners(programs, state);
+  renderDomainStats(programs, state);
+  checkStageConflict(stages, programs, state);
   buildProgramSelector(programs, state);
-  renderGateMap(state);
   renderRoadmapTree(stages, programs, state);
   renderGateSequence(state, null);
   renderGateHistory(state, null);
 
-  // Auto-select active program in selector (trigger detail panel)
+  // Auto-select active program in hidden selector
   const selEl = document.getElementById("prog-select");
   if (selEl.value) onProgSelect(selEl.value);
 
@@ -843,7 +810,6 @@ function closeFileViewer() {
   document.getElementById('file-viewer-modal').style.display = 'none';
 }
 
-// Close viewer on Escape
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeFileViewer();
 });
@@ -853,7 +819,7 @@ document.getElementById("auto-refresh").addEventListener("change", function() {
   const dot = document.getElementById("refresh-dot");
   if (this.checked) {
     dot.style.display = "inline-block";
-    refreshTimer = setInterval(loadAll, 30000);
+    refreshTimer = setInterval(loadAll, 5000);
   } else {
     dot.style.display = "none";
     clearInterval(refreshTimer);

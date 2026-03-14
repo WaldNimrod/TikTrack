@@ -2518,11 +2518,76 @@ async function buildQuickActionBar(gate) {
   }
 }
 
+// ── Health warnings (reads STATE_SNAPSHOT.json, shows issues with severity + copyable log) ──
+async function loadHealthWarnings() {
+  const panel   = document.getElementById('health-warnings-panel');
+  const content = document.getElementById('health-warnings-content');
+  if (!panel || !content) return;
+
+  const warnings = [];
+
+  try {
+    const domainPath = currentDomain === 'agents_os'
+      ? '../../_COMMUNICATION/agents_os/STATE_SNAPSHOT.json'
+      : '../../_COMMUNICATION/agents_os/STATE_SNAPSHOT.json';
+    const snapshot = await fetchJSON(domainPath);
+    const gov = snapshot.governance || {};
+
+    // AD-V2-01: active_stage missing from STATE_SNAPSHOT
+    if (!gov.active_stage) {
+      warnings.push({ sev:'error',
+        msg:'Active stage unknown — STATE_SNAPSHOT missing active_stage field',
+        log:'AD-V2-01 | state_reader.py was searching for "current_stage_id" but WSM field is "active_stage_id" | Fix: re-run python3 -m agents_os_v2.observers.state_reader' });
+    }
+
+    // Check for active_program field (added by new parser)
+    if (!gov.active_program && gov.active_stage) {
+      warnings.push({ sev:'warning',
+        msg:'Active program unknown — active_program_id field not found in WSM',
+        log:'state_reader.py | WSM may not have active_program_id field set | Check: documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md' });
+    }
+
+    // AD-V2-05: pipeline state stage vs WSM active stage mismatch
+    if (pipelineState && gov.active_stage) {
+      const pipeStage = pipelineState.stage_id || '';
+      const wsmStage  = gov.active_stage;
+      if (pipeStage && pipeStage !== wsmStage) {
+        warnings.push({ sev:'warning',
+          msg:`Stage mismatch: pipeline_state says "${pipeStage}" but WSM active_stage_id is "${wsmStage}"`,
+          log:`AD-V2-05 | pipeline_state.stage_id=${pipeStage} vs WSM active_stage_id=${wsmStage} | Update pipeline_state.json or sync WSM` });
+      }
+    }
+  } catch(e) {
+    warnings.push({ sev:'warning',
+      msg:'STATE_SNAPSHOT.json not found — system health unknown',
+      log:`Run: python3 -m agents_os_v2.observers.state_reader  |  Error: ${String(e)}` });
+  }
+
+  if (warnings.length === 0) {
+    panel.style.display = 'none';
+    return;
+  }
+
+  panel.style.display = '';
+  const sevIcon = { error:'🔴', warning:'🟡', info:'🟢' };
+  content.innerHTML = warnings.map(w => `
+    <div class="health-warn-item hw-${escHtml(w.sev)}">
+      <span class="hw-icon">${sevIcon[w.sev] || '⚪'}</span>
+      <div class="hw-body">
+        <div class="hw-msg">${escHtml(w.msg)}</div>
+        <div class="hw-log-row">
+          <code class="hw-log">${escHtml(w.log)}</code>
+          <button class="btn hw-copy-btn" onclick="copyText(${escAttr(JSON.stringify(w.log))}, this)" title="Copy log details">⎘</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
 // ── Main load ─────────────────────────────────────────────────────────────
 async function loadAll() {
   const state = await loadPipelineState();
   if (state) await loadPrompt(state.current_gate);
-  await Promise.all([loadMandates(), checkExpectedFiles()]);
+  await Promise.all([loadMandates(), checkExpectedFiles(), loadHealthWarnings()]);
 }
 
 // ── Auto-refresh ──────────────────────────────────────────────────────────
@@ -2530,7 +2595,7 @@ document.getElementById("auto-refresh-toggle").addEventListener("change", functi
   const dot = document.getElementById("refresh-dot");
   if (this.checked) {
     dot.style.display = "inline-block";
-    refreshTimer = setInterval(loadAll, 30000);
+    refreshTimer = setInterval(loadAll, 5000);
   } else {
     dot.style.display = "none";
     clearInterval(refreshTimer);

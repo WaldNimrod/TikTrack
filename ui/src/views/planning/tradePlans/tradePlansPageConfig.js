@@ -8,5 +8,9 @@ window.UAI.config = {
   requiresAuth: true,
   requiresHeader: true,
   components: [],
-  metadata: { title: 'תוכניות טריידים', description: 'עמוד תוכניות טריידים', version: '1.0.0' },
+  metadata: {
+    title: 'תוכניות טריידים',
+    description: 'עמוד תוכניות טריידים',
+    version: '1.0.0',
+  },
 };

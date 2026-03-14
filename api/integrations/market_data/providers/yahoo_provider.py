@@ -94,6 +94,7 @@ def _fetch_prices_batch_sync(symbols: List[str]) -> Dict[str, PriceResult]:
         # 100ms between batches — Legacy pattern (yahoo_finance_adapter.py §1.2)
         if i > 0:
             import time
+
             time.sleep(0.1)
         batch = symbols[i : i + batch_size]
         symbols_param = ",".join(batch)
@@ -141,15 +142,23 @@ def _fetch_prices_batch_sync(symbols: List[str]) -> Dict[str, PriceResult]:
                         else datetime.now(timezone.utc)
                     )
                     close_raw = q.get("regularMarketPreviousClose")
-                    close_dec = _tase_agorot_to_ils(_to_decimal(close_raw), sym) if close_raw else price
+                    close_dec = (
+                        _tase_agorot_to_ils(_to_decimal(close_raw), sym) if close_raw else price
+                    )
                     vol_raw = q.get("regularMarketVolume")
                     vol = int(vol_raw) if vol_raw is not None and str(vol_raw) != "nan" else None
                     result[sym] = PriceResult(
                         symbol=sym,
                         price=price,
-                        open_price=_tase_agorot_to_ils(_to_decimal(q.get("regularMarketOpen")), sym),
-                        high_price=_tase_agorot_to_ils(_to_decimal(q.get("regularMarketDayHigh")), sym),
-                        low_price=_tase_agorot_to_ils(_to_decimal(q.get("regularMarketDayLow")), sym),
+                        open_price=_tase_agorot_to_ils(
+                            _to_decimal(q.get("regularMarketOpen")), sym
+                        ),
+                        high_price=_tase_agorot_to_ils(
+                            _to_decimal(q.get("regularMarketDayHigh")), sym
+                        ),
+                        low_price=_tase_agorot_to_ils(
+                            _to_decimal(q.get("regularMarketDayLow")), sym
+                        ),
                         close_price=close_dec if close_dec else price,
                         volume=vol,
                         market_cap=_to_decimal(q.get("marketCap")),
@@ -172,6 +181,7 @@ def _fetch_market_status_sync() -> Optional[str]:
     """
     try:
         import httpx
+
         url = "https://query1.finance.yahoo.com/v7/finance/quote"
         params = {"symbols": _MARKET_STATUS_SYMBOL}
         headers = {"User-Agent": _next_user_agent()}
@@ -219,6 +229,7 @@ def _fetch_last_close_via_v8_chart(symbol: str) -> Optional[PriceResult]:
     alt = _to_forex_style_symbol(symbol)
     if alt and alt != symbol:
         import time
+
         time.sleep(2)  # רווח לפני ניסיון פורמט חלופי (BTCUSD=X)
         return _fetch_last_close_via_v8_chart_inner(alt, preferred_symbol=symbol)
     return None
@@ -230,6 +241,7 @@ def _fetch_last_close_via_v8_chart_inner(
     """Inner: fetch from v8/chart. preferred_symbol = סימבול להחזרה (e.g. BTC-USD when fetching BTCUSD=X)."""
     import time
     import httpx
+
     out_sym = preferred_symbol or symbol
     url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
     params = {"interval": "1d", "range": "1mo"}  # 1mo = ~22 trading days, תמיד יש נתונים
@@ -242,11 +254,13 @@ def _fetch_last_close_via_v8_chart_inner(
                 r = client.get(url, params=params)
                 if r.status_code == 429:
                     # Exponential backoff: 5s → 10s → 20s (Legacy pattern: yahoo_finance_adapter.py L349-354)
-                    wait_time = (2 ** attempt) * 5
+                    wait_time = (2**attempt) * 5
                     if attempt < 2:
                         logger.warning(
                             "Yahoo v8/chart 429 for %s (attempt %d/3) — backing off %ds",
-                            symbol, attempt + 1, wait_time,
+                            symbol,
+                            attempt + 1,
+                            wait_time,
                         )
                         time.sleep(wait_time)
                         continue
@@ -277,7 +291,11 @@ def _fetch_last_close_via_v8_chart_inner(
                 return None
             ts_unix = timestamps[-1] if timestamps else None
             try:
-                ts = datetime.fromtimestamp(ts_unix, tz=timezone.utc) if ts_unix else datetime.now(timezone.utc)
+                ts = (
+                    datetime.fromtimestamp(ts_unix, tz=timezone.utc)
+                    if ts_unix
+                    else datetime.now(timezone.utc)
+                )
             except (ValueError, TypeError, OSError):
                 ts = datetime.now(timezone.utc)
             i = -1
@@ -288,7 +306,11 @@ def _fetch_last_close_via_v8_chart_inner(
             o = _to_decimal(opens[i]) if abs(i) <= len(opens) and opens[i] else None
             h = _to_decimal(highs[i]) if abs(i) <= len(highs) and highs[i] else None
             lw = _to_decimal(lows[i]) if abs(i) <= len(lows) and lows[i] else None
-            vol = int(vols[i]) if abs(i) <= len(vols) and vols[i] is not None and str(vols[i]) != "nan" else None
+            vol = (
+                int(vols[i])
+                if abs(i) <= len(vols) and vols[i] is not None and str(vols[i]) != "nan"
+                else None
+            )
             # TASE agorot → ILS (Mandate B2)
             price = _tase_agorot_to_ils(price, out_sym)
             o = _tase_agorot_to_ils(o, out_sym)
@@ -312,7 +334,9 @@ def _fetch_last_close_via_v8_chart_inner(
         except YahooSymbolRateLimitedException:
             raise  # G7-FIX-2A: propagate per-symbol rate limit to caller
         except Exception as e:
-            logger.debug("Yahoo v8/chart last-close attempt %s failed for %s: %s", attempt + 1, symbol, e)
+            logger.debug(
+                "Yahoo v8/chart last-close attempt %s failed for %s: %s", attempt + 1, symbol, e
+            )
             if attempt < 2:
                 time.sleep(5)
     return None
@@ -322,6 +346,7 @@ def _fetch_market_cap_only_v7(symbol: str) -> Optional[Decimal]:
     """AUTO-WP003-05: Minimal v7/quote request to get marketCap. v8/chart does not return it. H3: headers for 401."""
     try:
         import httpx
+
         if os.environ.get("GATE7_CC_EVIDENCE"):
             logger.info("GATE7_CC_YAHOO_HTTP")
         url = "https://query1.finance.yahoo.com/v7/finance/quote"
@@ -350,6 +375,7 @@ def _fetch_price_via_quote_api(symbol: str) -> Optional[PriceResult]:
     """v7/finance/quote — CC-WP003-04 v7-first path; also used as fallback. H3: Accept/Referer to reduce 401."""
     try:
         import httpx
+
         if os.environ.get("GATE7_CC_EVIDENCE"):
             logger.info("GATE7_CC_YAHOO_HTTP")
         url = "https://query1.finance.yahoo.com/v7/finance/quote"
@@ -405,7 +431,8 @@ def _fetch_price_via_quote_api(symbol: str) -> Optional[PriceResult]:
 
 def _fetch_price_sync(symbol: str) -> Optional[PriceResult]:
     """מחיר סגירה EOD — חייב להחזיר תמיד. לא תוך־יום; שוק סגור לא משנה.
-    CC-WP003-04 / Team 50: v7→yfinance→v8. v7 (401) + v8 (429) common; yfinance bypasses Yahoo direct HTTP."""
+    CC-WP003-04 / Team 50: v7→yfinance→v8. v7 (401) + v8 (429) common; yfinance bypasses Yahoo direct HTTP.
+    """
     # v7 first (least 429 when it works)
     result = _fetch_price_via_quote_api(symbol)
     if result and result.price and result.price > 0:
@@ -446,7 +473,9 @@ def _history_to_price_result(symbol: str, last) -> Optional[PriceResult]:
         ts = ts.replace(tzinfo=timezone.utc)
     close = last["Close"]
     try:
-        vol = int(last["Volume"]) if "Volume" in last.index and str(last["Volume"]) != "nan" else None
+        vol = (
+            int(last["Volume"]) if "Volume" in last.index and str(last["Volume"]) != "nan" else None
+        )
     except (ValueError, TypeError, KeyError):
         vol = None
     return PriceResult(
@@ -467,6 +496,7 @@ def _fetch_fx_via_quote_api(from_ccy: str, to_ccy: str) -> Optional[ExchangeRate
     """Fallback: v7/finance/quote for FX when history() fails."""
     try:
         import httpx
+
         pair = f"{from_ccy}{to_ccy}=X"
         url = "https://query1.finance.yahoo.com/v7/finance/quote"
         params = {"symbols": pair}
@@ -552,20 +582,28 @@ def _fetch_history_v8_chart(
     """Direct v8/chart — עובד (v7/quote = 401). SPEC-PROV-YF-HIST. Retry 3×5s.
     250d full: range=2y (~504 cal days). Gap-fill: period1/period2 only (no range)."""
     import time
+
     for attempt in range(3):
         try:
             import httpx
+
             url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
             if date_from and date_to:
                 # Gap-fill: use period1/period2 only. period2 = start of day after date_to (to include date_to)
                 p1 = datetime.combine(date_from, datetime.min.time()).replace(tzinfo=timezone.utc)
-                p2 = datetime.combine(date_to + timedelta(days=1), datetime.min.time()).replace(tzinfo=timezone.utc)
+                p2 = datetime.combine(date_to + timedelta(days=1), datetime.min.time()).replace(
+                    tzinfo=timezone.utc
+                )
                 period1_ts = int(p1.timestamp())
                 period2_ts = int(p2.timestamp())
                 params = {"interval": "1d", "period1": period1_ts, "period2": period2_ts}
                 logger.info(
                     "Yahoo gap-fill: symbol=%s date_from=%s date_to=%s period1=%d period2=%d",
-                    symbol, date_from, date_to, period1_ts, period2_ts,
+                    symbol,
+                    date_from,
+                    date_to,
+                    period1_ts,
+                    period2_ts,
                 )
             else:
                 # Full 250d: range=2y covers ~504 cal days (~252 trading days)
@@ -576,17 +614,20 @@ def _fetch_history_v8_chart(
                 r = client.get(url, params=params, headers=headers)
                 if r.status_code == 429:
                     # Exponential backoff: 5s → 10s → 20s (Legacy pattern)
-                    wait_time = (2 ** attempt) * 5
+                    wait_time = (2**attempt) * 5
                     if attempt < 2:
                         logger.warning(
                             "Yahoo v8/chart 429 for %s history (attempt %d/3) — backing off %ds",
-                            symbol, attempt + 1, wait_time,
+                            symbol,
+                            attempt + 1,
+                            wait_time,
                         )
                         time.sleep(wait_time)
                         continue
                     # All retries exhausted — set cooldown (SOP-015)
                     from ..provider_cooldown import set_cooldown
                     from ..market_data_settings import get_provider_cooldown_minutes
+
                     cooldown_min = get_provider_cooldown_minutes()
                     set_cooldown("YAHOO_FINANCE", cooldown_min)
                     logger.warning("Yahoo v8/chart 429 — cooldown %d min (SOP-015)", cooldown_min)
@@ -624,7 +665,11 @@ def _fetch_history_v8_chart(
                     continue
                 if date_to and ts.date() > date_to:
                     continue
-                result.append(OHLCVRow(date=ts, open_price=o, high_price=h, low_price=lw, close_price=c, volume=v))
+                result.append(
+                    OHLCVRow(
+                        date=ts, open_price=o, high_price=h, low_price=lw, close_price=c, volume=v
+                    )
+                )
             if result:
                 # Dedupe by date (keep last occurrence)
                 seen: set = set()
@@ -645,7 +690,9 @@ def _fetch_history_v8_chart(
             if attempt < 2:
                 time.sleep(5)
         except Exception as e:
-            logger.warning("Yahoo v8/chart failed for %s (attempt %d/3): %s", symbol, attempt + 1, e)
+            logger.warning(
+                "Yahoo v8/chart failed for %s (attempt %d/3): %s", symbol, attempt + 1, e
+            )
             if attempt < 2:
                 time.sleep(5)
     if date_from and date_to:
@@ -665,11 +712,17 @@ def _fetch_history_sync(
         return result
     try:
         import yfinance as yf
+
         # RULE 1: NO custom Session for yfinance — causes 429 (DEBUG_YAHOO_RESULTS, YAHOO_FINANCE_DATA_AND_REQUEST_LOGIC)
         ticker = yf.Ticker(symbol)
         end_d = date_to or datetime.now(timezone.utc).date()
         start_d = date_from or (end_d - timedelta(days=400))
-        info = ticker.history(start=start_d.isoformat(), end=(end_d + timedelta(days=1)).isoformat(), interval="1d", debug=False)
+        info = ticker.history(
+            start=start_d.isoformat(),
+            end=(end_d + timedelta(days=1)).isoformat(),
+            interval="1d",
+            debug=False,
+        )
         if info is None or info.empty:
             return []
         rows = info.tail(trading_days) if not (date_from or date_to) else info
@@ -681,14 +734,20 @@ def _fetch_history_sync(
                 ts = ts.to_pydatetime()
             if ts.tzinfo is None:
                 ts = ts.replace(tzinfo=timezone.utc)
-            out.append(OHLCVRow(
-                date=ts,
-                open_price=_to_decimal(row.get("Open")) or Decimal("0"),
-                high_price=_to_decimal(row.get("High")) or Decimal("0"),
-                low_price=_to_decimal(row.get("Low")) or Decimal("0"),
-                close_price=_to_decimal(row.get("Close")) or Decimal("0"),
-                volume=int(row["Volume"]) if "Volume" in row.index and str(row.get("Volume", "")) != "nan" else None,
-            ))
+            out.append(
+                OHLCVRow(
+                    date=ts,
+                    open_price=_to_decimal(row.get("Open")) or Decimal("0"),
+                    high_price=_to_decimal(row.get("High")) or Decimal("0"),
+                    low_price=_to_decimal(row.get("Low")) or Decimal("0"),
+                    close_price=_to_decimal(row.get("Close")) or Decimal("0"),
+                    volume=(
+                        int(row["Volume"])
+                        if "Volume" in row.index and str(row.get("Volume", "")) != "nan"
+                        else None
+                    ),
+                )
+            )
         return out
     except Exception as e:
         logger.warning("Yahoo yfinance fallback failed for %s: %s", symbol, e)
@@ -698,7 +757,10 @@ def _fetch_history_sync(
 def _replay_price(fixtures_dir: Optional[Path], symbol: str) -> Optional[PriceResult]:
     """REPLAY: load from fixtures — zero HTTP calls."""
     from ..replay_loader import load_prices_eod, load_prices_intraday
-    base = fixtures_dir or (Path(__file__).resolve().parent.parent.parent.parent / "tests" / "fixtures" / "market_data")
+
+    base = fixtures_dir or (
+        Path(__file__).resolve().parent.parent.parent.parent / "tests" / "fixtures" / "market_data"
+    )
     for loader in (load_prices_intraday, load_prices_eod):
         data = loader(base) if base else {}
         raw = data.get(symbol) if isinstance(data, dict) else None
@@ -706,7 +768,11 @@ def _replay_price(fixtures_dir: Optional[Path], symbol: str) -> Optional[PriceRe
             continue
         try:
             ts = raw.get("as_of", "")
-            as_of = datetime.fromisoformat(ts.replace("Z", "+00:00")) if ts else datetime.now(timezone.utc)
+            as_of = (
+                datetime.fromisoformat(ts.replace("Z", "+00:00"))
+                if ts
+                else datetime.now(timezone.utc)
+            )
             return PriceResult(
                 symbol=raw.get("symbol", symbol),
                 price=_to_decimal(raw.get("price")),
@@ -724,10 +790,15 @@ def _replay_price(fixtures_dir: Optional[Path], symbol: str) -> Optional[PriceRe
     return None
 
 
-def _replay_fx(fixtures_dir: Optional[Path], from_ccy: str, to_ccy: str) -> Optional[ExchangeRateResult]:
+def _replay_fx(
+    fixtures_dir: Optional[Path], from_ccy: str, to_ccy: str
+) -> Optional[ExchangeRateResult]:
     """REPLAY: load from fixtures — zero HTTP calls."""
     from ..replay_loader import load_fx_eod
-    base = fixtures_dir or (Path(__file__).resolve().parent.parent.parent.parent / "tests" / "fixtures" / "market_data")
+
+    base = fixtures_dir or (
+        Path(__file__).resolve().parent.parent.parent.parent / "tests" / "fixtures" / "market_data"
+    )
     data = load_fx_eod(base) if base else {}
     key = f"{from_ccy}_{to_ccy}"
     raw = data.get(key)
@@ -735,7 +806,9 @@ def _replay_fx(fixtures_dir: Optional[Path], from_ccy: str, to_ccy: str) -> Opti
         return None
     try:
         ts = raw.get("as_of", "")
-        as_of = datetime.fromisoformat(ts.replace("Z", "+00:00")) if ts else datetime.now(timezone.utc)
+        as_of = (
+            datetime.fromisoformat(ts.replace("Z", "+00:00")) if ts else datetime.now(timezone.utc)
+        )
         return ExchangeRateResult(
             from_currency=raw.get("from_currency", from_ccy),
             to_currency=raw.get("to_currency", to_ccy),
@@ -750,22 +823,31 @@ def _replay_fx(fixtures_dir: Optional[Path], from_ccy: str, to_ccy: str) -> Opti
 def _replay_history(fixtures_dir: Optional[Path], symbol: str, trading_days: int) -> list:
     """REPLAY: load 250d history from fixtures — zero HTTP calls."""
     from ..replay_loader import load_prices_history
-    base = fixtures_dir or (Path(__file__).resolve().parent.parent.parent.parent / "tests" / "fixtures" / "market_data")
+
+    base = fixtures_dir or (
+        Path(__file__).resolve().parent.parent.parent.parent / "tests" / "fixtures" / "market_data"
+    )
     data = load_prices_history(base) if base else {}
     rows_data = data.get(symbol, []) if isinstance(data, dict) else []
     result = []
     for item in rows_data[-trading_days:]:
         try:
             d = item.get("date", "")
-            ts = datetime.fromisoformat(d.replace("Z", "+00:00")) if d else datetime.now(timezone.utc)
-            result.append(OHLCVRow(
-                date=ts,
-                open_price=_to_decimal(item.get("open_price")) or Decimal("0"),
-                high_price=_to_decimal(item.get("high_price")) or Decimal("0"),
-                low_price=_to_decimal(item.get("low_price")) or Decimal("0"),
-                close_price=_to_decimal(item.get("close_price")) or Decimal("0"),
-                volume=int(item["volume"]) if item.get("volume") is not None else None,
-            ))
+            ts = (
+                datetime.fromisoformat(d.replace("Z", "+00:00"))
+                if d
+                else datetime.now(timezone.utc)
+            )
+            result.append(
+                OHLCVRow(
+                    date=ts,
+                    open_price=_to_decimal(item.get("open_price")) or Decimal("0"),
+                    high_price=_to_decimal(item.get("high_price")) or Decimal("0"),
+                    low_price=_to_decimal(item.get("low_price")) or Decimal("0"),
+                    close_price=_to_decimal(item.get("close_price")) or Decimal("0"),
+                    volume=int(item["volume"]) if item.get("volume") is not None else None,
+                )
+            )
         except (KeyError, TypeError, ValueError):
             pass
     return result
@@ -793,15 +875,11 @@ class YahooProvider(MarketDataProvider):
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, _fetch_prices_batch_sync, symbols)
 
-    async def get_exchange_rate(
-        self, from_ccy: str, to_ccy: str
-    ) -> Optional[ExchangeRateResult]:
+    async def get_exchange_rate(self, from_ccy: str, to_ccy: str) -> Optional[ExchangeRateResult]:
         if self._mode == "REPLAY":
             return _replay_fx(self._fixtures_dir, from_ccy, to_ccy)
         loop = asyncio.get_event_loop()
-        return await loop.run_in_executor(
-            None, _fetch_fx_sync, from_ccy, to_ccy
-        )
+        return await loop.run_in_executor(None, _fetch_fx_sync, from_ccy, to_ccy)
 
     async def get_ticker_history(
         self,

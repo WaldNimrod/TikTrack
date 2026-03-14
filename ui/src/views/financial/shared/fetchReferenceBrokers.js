@@ -19,8 +19,9 @@ export async function fetchReferenceBrokers() {
   const arr = Array.isArray(items) ? items : [];
   return arr.map((item) => ({
     value: item.value ?? item.display_name ?? item.label ?? '',
-    label: item.display_name ?? item.displayName ?? item.label ?? item.value ?? '',
+    label:
+      item.display_name ?? item.displayName ?? item.label ?? item.value ?? '',
     is_supported: item.is_supported ?? item.isSupported ?? true,
-    default_fees: item.default_fees ?? item.defaultFees ?? []
+    default_fees: item.default_fees ?? item.defaultFees ?? [],
   }));
 }

@@ -2,16 +2,16 @@
  * Trading Accounts Data Loader - טעינת נתונים מ-API עבור Trading Accounts View
  * -----------------------------------------------------------------------------
  * טעינת נתונים מ-API עבור כל הקונטיינרים ב-Trading Accounts View
- * 
+ *
  * @description טעינת נתונים מ-API עבור:
  * - קונטיינר 0: סיכום מידע והתראות פעילות
  * - קונטיינר 1: טבלת חשבונות מסחר
  * - קונטיינר 2: כרטיסי סיכום תנועות
  * - קונטיינר 3: טבלת תנועות
  * - קונטיינר 4: טבלת פוזיציות
- * 
+ *
  * @version v1.0 - Uses sharedServices.js (PDSC Client) for all API calls
- * 
+ *
  * Note: Trading Accounts API schema not in API Integration Guide yet.
  * Using Shared_Services.js for consistency with D18 and D21.
  * PDSC Boundary Contract: documentation/01-ARCHITECTURE/TT2_PDSC_BOUNDARY_CONTRACT.md
@@ -25,8 +25,14 @@ import { apiToReact } from '../../../cubes/shared/utils/transformers.js';
 
 // Import masked log utility for security compliance
 import { maskedLog } from '../../../utils/maskedLog.js';
-import { toCanonicalStatus, toHebrewStatus } from '../../../utils/statusAdapter.js';
-import { toFlowTypeLabel, getFlowTypeEntity } from '../../../utils/flowTypeValues.js';
+import {
+  toCanonicalStatus,
+  toHebrewStatus,
+} from '../../../utils/statusAdapter.js';
+import {
+  toFlowTypeLabel,
+  getFlowTypeEntity,
+} from '../../../utils/flowTypeValues.js';
 import { formatDailyChangeFromAbsolute } from '../../../utils/formatChange.js';
 
 /**
@@ -55,7 +61,12 @@ function normalizeTradingAccountId(value) {
     return undefined;
   }
   // If value is "הכול" or empty string, return undefined
-  if (value === 'הכול' || value === '' || value === null || value === undefined) {
+  if (
+    value === 'הכול' ||
+    value === '' ||
+    value === null ||
+    value === undefined
+  ) {
     return undefined;
   }
   // If value is a valid ULID, return it
@@ -68,12 +79,12 @@ function normalizeTradingAccountId(value) {
 
 /**
  * Fetch Trading Accounts
- * 
+ *
  * @description Uses Shared_Services.js (PDSC Client) for API calls
  * Query Parameters (camelCase → snake_case automatically):
  * - status (string, optional) - Filter by status
  * - search (string, optional) - Search in account names
- * 
+ *
  * @param {Object} filters - Filter parameters (camelCase)
  * @returns {Promise<Object>} Response data with data array and total
  */
@@ -81,45 +92,48 @@ async function fetchTradingAccounts(filters = {}) {
   try {
     // Ensure Shared Services is initialized
     await sharedServices.init();
-    
+
     // Use Shared_Services.get() - automatically handles:
     // - routes.json SSOT
     // - Transformers (camelCase → snake_case for query params)
     // - Error handling (PDSC Error Schema)
     // - Response transformation (snake_case → camelCase)
     const response = await sharedServices.get('/trading_accounts', filters);
-    
+
     // Response is already transformed by Shared_Services
     return {
       data: response.data || [],
-      total: response.total || 0
+      total: response.total || 0,
     };
   } catch (error) {
     // Gate B Fix: Handle errors gracefully - don't log full error object
     // Use masked log for security compliance (prevents token leakage)
-    maskedLog('[Trading Accounts Data Loader] Error fetching trading accounts:', { 
-      errorCode: error.code,
-      status: error.status
-    });
-    
+    maskedLog(
+      '[Trading Accounts Data Loader] Error fetching trading accounts:',
+      {
+        errorCode: error.code,
+        status: error.status,
+      },
+    );
+
     // Handle PDSC Error Schema
     if (error.code) {
       maskedLog('[Trading Accounts Data Loader] PDSC Error:', {
         code: error.code,
-        message: error.message_i18n || error.message
+        message: error.message_i18n || error.message,
       });
     }
-    
+
     return { data: [], total: 0 };
   }
 }
 
 /**
  * Fetch Cash Flows
- * 
+ *
  * @description Uses Shared_Services.js (PDSC Client) for API calls
  * Reuses Cash Flows API integration (same as D21)
- * 
+ *
  * @param {Object} filters - Filter parameters (camelCase)
  * @returns {Promise<Object>} Response data with data array, total, and summary
  */
@@ -127,13 +141,15 @@ async function fetchCashFlows(filters = {}) {
   try {
     // Ensure Shared Services is initialized
     await sharedServices.init();
-    
+
     // Gate B Fix: Normalize tradingAccountId - only send if valid ULID
     // Gate B Fix: Remove dateRange object - it should be split into dateFrom/dateTo before calling API
     // Gate B Fix: Remove empty strings - they cause 400 errors
     const normalizedFilters = { ...filters };
     if (normalizedFilters.tradingAccountId) {
-      const normalizedId = normalizeTradingAccountId(normalizedFilters.tradingAccountId);
+      const normalizedId = normalizeTradingAccountId(
+        normalizedFilters.tradingAccountId,
+      );
       if (normalizedId) {
         normalizedFilters.tradingAccountId = normalizedId;
       } else {
@@ -141,15 +157,15 @@ async function fetchCashFlows(filters = {}) {
       }
     }
     delete normalizedFilters.dateRange; // Remove dateRange object - Shared_Services will handle dateFrom/dateTo
-    
+
     // Gate B Fix: Remove empty strings from filters
-    Object.keys(normalizedFilters).forEach(key => {
+    Object.keys(normalizedFilters).forEach((key) => {
       const value = normalizedFilters[key];
       if (value === '' || (typeof value === 'string' && value.trim() === '')) {
         delete normalizedFilters[key];
       }
     });
-    
+
     // Use Shared_Services.get() - automatically handles:
     // - routes.json SSOT
     // - Transformers (camelCase → snake_case for query params)
@@ -158,54 +174,66 @@ async function fetchCashFlows(filters = {}) {
     // Note: filters should be in camelCase (e.g., tradingAccountId, dateFrom, dateTo, flowType)
     // Shared_Services will automatically transform to snake_case for API
     const response = await sharedServices.get('/cash_flows', normalizedFilters);
-    
+
     // Parse decimal strings to numbers for summary
-    const summary = response.summary ? {
-      totalDeposits: parseFloat(response.summary.total_deposits || response.summary.totalDeposits || '0'),
-      totalWithdrawals: parseFloat(response.summary.total_withdrawals || response.summary.totalWithdrawals || '0'),
-      netFlow: parseFloat(response.summary.net_flow || response.summary.netFlow || '0')
-    } : {
-      totalDeposits: 0,
-      totalWithdrawals: 0,
-      netFlow: 0
-    };
-    
+    const summary = response.summary
+      ? {
+          totalDeposits: parseFloat(
+            response.summary.total_deposits ||
+              response.summary.totalDeposits ||
+              '0',
+          ),
+          totalWithdrawals: parseFloat(
+            response.summary.total_withdrawals ||
+              response.summary.totalWithdrawals ||
+              '0',
+          ),
+          netFlow: parseFloat(
+            response.summary.net_flow || response.summary.netFlow || '0',
+          ),
+        }
+      : {
+          totalDeposits: 0,
+          totalWithdrawals: 0,
+          netFlow: 0,
+        };
+
     return {
       data: response.data || [],
       total: response.total || 0,
-      summary: summary
+      summary: summary,
     };
   } catch (error) {
     // Gate B Fix: Handle errors gracefully - don't log full error object
     // Use masked log for security compliance (prevents token leakage)
-    maskedLog('[Trading Accounts Data Loader] Error fetching cash flows:', { 
+    maskedLog('[Trading Accounts Data Loader] Error fetching cash flows:', {
       errorCode: error.code,
-      status: error.status
+      status: error.status,
     });
-    
+
     // Handle PDSC Error Schema
     if (error.code) {
       maskedLog('[Trading Accounts Data Loader] PDSC Error:', {
         code: error.code,
-        message: error.message_i18n || error.message
+        message: error.message_i18n || error.message,
       });
     }
-    
-    return { 
-      data: [], 
-      total: 0, 
-      summary: { 
-        totalDeposits: 0, 
-        totalWithdrawals: 0, 
-        netFlow: 0 
-      } 
+
+    return {
+      data: [],
+      total: 0,
+      summary: {
+        totalDeposits: 0,
+        totalWithdrawals: 0,
+        netFlow: 0,
+      },
     };
   }
 }
 
 /**
  * Fetch Trading Accounts Summary
- * 
+ *
  * @description Uses Shared_Services.js (PDSC Client) for API calls
  * Query Parameters (camelCase → snake_case automatically):
  * - status (string, optional) - Filter by status
@@ -214,7 +242,7 @@ async function fetchCashFlows(filters = {}) {
  * - dateFrom (date, optional) - Filter by date >= dateFrom (YYYY-MM-DD)
  * - dateTo (date, optional) - Filter by date <= dateTo (YYYY-MM-DD)
  * - search (string, optional) - Search in account names
- * 
+ *
  * @param {Object} filters - Filter parameters (camelCase)
  * @returns {Promise<Object>} Summary data from Backend
  */
@@ -222,53 +250,63 @@ async function fetchTradingAccountsSummary(filters = {}) {
   try {
     // Ensure Shared Services is initialized
     await sharedServices.init();
-    
+
     // Gate B Fix: Remove pagination parameters from summary call
     // Summary endpoints don't need pagination (page, page_size)
     const summaryFilters = { ...filters };
     delete summaryFilters.page;
     delete summaryFilters.pageSize;
-    
+
     // Gate B Fix: Normalize tradingAccountId - only send if valid ULID
     if (summaryFilters.tradingAccountId) {
-      const normalizedId = normalizeTradingAccountId(summaryFilters.tradingAccountId);
+      const normalizedId = normalizeTradingAccountId(
+        summaryFilters.tradingAccountId,
+      );
       if (normalizedId) {
         summaryFilters.tradingAccountId = normalizedId;
       } else {
         delete summaryFilters.tradingAccountId;
       }
     }
-    
+
     // Use Shared_Services.get() - automatically handles:
     // - routes.json SSOT
     // - Transformers (camelCase → snake_case for query params)
     // - Error handling (PDSC Error Schema)
     // - Response transformation (snake_case → camelCase)
-    const response = await sharedServices.get('/trading_accounts/summary', summaryFilters);
-    
+    const response = await sharedServices.get(
+      '/trading_accounts/summary',
+      summaryFilters,
+    );
+
     // Response is already transformed by Shared_Services
     const summary = response.summary || response;
-    
+
     // Use masked log for security compliance (prevents token leakage)
-    maskedLog('[Trading Accounts Data Loader] Summary fetched from Backend', { summary });
-    
+    maskedLog('[Trading Accounts Data Loader] Summary fetched from Backend', {
+      summary,
+    });
+
     return summary;
   } catch (error) {
     // Gate B Fix: Handle errors gracefully - don't log full error object
     // Use masked log for security compliance (prevents token leakage)
-    maskedLog('[Trading Accounts Data Loader] Error fetching trading accounts summary:', { 
-      errorCode: error.code,
-      status: error.status
-    });
-    
+    maskedLog(
+      '[Trading Accounts Data Loader] Error fetching trading accounts summary:',
+      {
+        errorCode: error.code,
+        status: error.status,
+      },
+    );
+
     // Handle PDSC Error Schema
     if (error.code) {
       maskedLog('[Trading Accounts Data Loader] PDSC Error:', {
         code: error.code,
-        message: error.message_i18n || error.message
+        message: error.message_i18n || error.message,
       });
     }
-    
+
     // Return default summary structure - don't throw to prevent SEVERE errors
     return {
       totalAccounts: 0,
@@ -277,18 +315,18 @@ async function fetchTradingAccountsSummary(filters = {}) {
       totalPl: 0,
       totalValue: 0,
       avgValue: 0,
-      activePositions: 0
+      activePositions: 0,
     };
   }
 }
 
 /**
  * Fetch Cash Flows Summary
- * 
+ *
  * @description Uses Shared_Services.js (PDSC Client) for API calls
  * Reuses Cash Flows Summary API integration (same as D21)
  * Used for Container 2 (Cash Flows Summary Cards)
- * 
+ *
  * @param {Object} filters - Filter parameters (camelCase)
  * @returns {Promise<Object>} Summary data
  */
@@ -296,7 +334,7 @@ async function fetchCashFlowsSummary(filters = {}) {
   try {
     // Ensure Shared Services is initialized
     await sharedServices.init();
-    
+
     // Gate B Fix: Remove pagination parameters from summary call
     // Summary endpoints don't need pagination (page, page_size)
     // Gate B Fix: Remove dateRange object - it should be split into dateFrom/dateTo before calling API
@@ -305,25 +343,27 @@ async function fetchCashFlowsSummary(filters = {}) {
     delete summaryFilters.page;
     delete summaryFilters.pageSize;
     delete summaryFilters.dateRange; // Remove dateRange object - Shared_Services will handle dateFrom/dateTo
-    
+
     // Gate B Fix: Remove empty strings from filters
-    Object.keys(summaryFilters).forEach(key => {
+    Object.keys(summaryFilters).forEach((key) => {
       const value = summaryFilters[key];
       if (value === '' || (typeof value === 'string' && value.trim() === '')) {
         delete summaryFilters[key];
       }
     });
-    
+
     // Gate B Fix: Normalize tradingAccountId - only send if valid ULID
     if (summaryFilters.tradingAccountId) {
-      const normalizedId = normalizeTradingAccountId(summaryFilters.tradingAccountId);
+      const normalizedId = normalizeTradingAccountId(
+        summaryFilters.tradingAccountId,
+      );
       if (normalizedId) {
         summaryFilters.tradingAccountId = normalizedId;
       } else {
         delete summaryFilters.tradingAccountId;
       }
     }
-    
+
     // Use Shared_Services.get() - automatically handles:
     // - routes.json SSOT
     // - Transformers (camelCase → snake_case for query params)
@@ -331,47 +371,65 @@ async function fetchCashFlowsSummary(filters = {}) {
     // - Response transformation (snake_case → camelCase)
     // Note: filters should be in camelCase (e.g., tradingAccountId, dateFrom, dateTo)
     // Shared_Services will automatically transform to snake_case for API
-    const response = await sharedServices.get('/cash_flows/summary', summaryFilters);
-    
+    const response = await sharedServices.get(
+      '/cash_flows/summary',
+      summaryFilters,
+    );
+
     // Parse decimal strings to numbers
-    const summary = response.summary ? {
-      totalDeposits: parseFloat(response.summary.total_deposits || response.summary.totalDeposits || '0'),
-      totalWithdrawals: parseFloat(response.summary.total_withdrawals || response.summary.totalWithdrawals || '0'),
-      netFlow: parseFloat(response.summary.net_flow || response.summary.netFlow || '0')
-    } : {
-      totalDeposits: 0,
-      totalWithdrawals: 0,
-      netFlow: 0
-    };
-    
+    const summary = response.summary
+      ? {
+          totalDeposits: parseFloat(
+            response.summary.total_deposits ||
+              response.summary.totalDeposits ||
+              '0',
+          ),
+          totalWithdrawals: parseFloat(
+            response.summary.total_withdrawals ||
+              response.summary.totalWithdrawals ||
+              '0',
+          ),
+          netFlow: parseFloat(
+            response.summary.net_flow || response.summary.netFlow || '0',
+          ),
+        }
+      : {
+          totalDeposits: 0,
+          totalWithdrawals: 0,
+          netFlow: 0,
+        };
+
     return summary;
   } catch (error) {
     // Gate B Fix: Handle errors gracefully - don't log full error object
     // Use masked log for security compliance (prevents token leakage)
-    maskedLog('[Trading Accounts Data Loader] Error fetching cash flows summary:', { 
-      errorCode: error.code,
-      status: error.status
-    });
-    
+    maskedLog(
+      '[Trading Accounts Data Loader] Error fetching cash flows summary:',
+      {
+        errorCode: error.code,
+        status: error.status,
+      },
+    );
+
     // Handle PDSC Error Schema
     if (error.code) {
       maskedLog('[Trading Accounts Data Loader] PDSC Error:', {
         code: error.code,
-        message: error.message_i18n || error.message
+        message: error.message_i18n || error.message,
       });
     }
-    
+
     return { totalDeposits: 0, totalWithdrawals: 0, netFlow: 0 };
   }
 }
 
 /**
  * Fetch Positions
- * 
+ *
  * @description Uses Shared_Services.js (PDSC Client) for API calls
  * Note: Positions API schema not in API Integration Guide yet.
  * Using Shared_Services.js for consistency.
- * 
+ *
  * @param {Object} filters - Filter parameters (camelCase)
  * @returns {Promise<Object>} Response data with data array and total
  */
@@ -379,27 +437,29 @@ async function fetchPositions(filters = {}) {
   try {
     // Ensure Shared Services is initialized
     await sharedServices.init();
-    
+
     // Gate B Fix: Normalize tradingAccountId - only send if valid ULID
     // Gate B Fix: Remove empty strings - they cause 400 errors
     const normalizedFilters = { ...filters };
     if (normalizedFilters.tradingAccountId) {
-      const normalizedId = normalizeTradingAccountId(normalizedFilters.tradingAccountId);
+      const normalizedId = normalizeTradingAccountId(
+        normalizedFilters.tradingAccountId,
+      );
       if (normalizedId) {
         normalizedFilters.tradingAccountId = normalizedId;
       } else {
         delete normalizedFilters.tradingAccountId;
       }
     }
-    
+
     // Gate B Fix: Remove empty strings from filters
-    Object.keys(normalizedFilters).forEach(key => {
+    Object.keys(normalizedFilters).forEach((key) => {
       const value = normalizedFilters[key];
       if (value === '' || (typeof value === 'string' && value.trim() === '')) {
         delete normalizedFilters[key];
       }
     });
-    
+
     // Use Shared_Services.get() - automatically handles:
     // - routes.json SSOT
     // - Transformers (camelCase → snake_case for query params)
@@ -408,35 +468,35 @@ async function fetchPositions(filters = {}) {
     // Note: filters should be in camelCase (e.g., tradingAccountId)
     // Shared_Services will automatically transform to snake_case for API
     const response = await sharedServices.get('/positions', normalizedFilters);
-    
+
     // Response is already transformed by Shared_Services
     return {
       data: response.data || [],
-      total: response.total || 0
+      total: response.total || 0,
     };
   } catch (error) {
     // Gate B Fix: Handle errors gracefully - don't log full error object
     // Use masked log for security compliance (prevents token leakage)
-    maskedLog('[Trading Accounts Data Loader] Error fetching positions:', { 
+    maskedLog('[Trading Accounts Data Loader] Error fetching positions:', {
       errorCode: error.code,
-      status: error.status
+      status: error.status,
     });
-    
+
     // Handle PDSC Error Schema
     if (error.code) {
       maskedLog('[Trading Accounts Data Loader] PDSC Error:', {
         code: error.code,
-        message: error.message_i18n || error.message
+        message: error.message_i18n || error.message,
       });
     }
-    
+
     return { data: [], total: 0 };
   }
 }
 
 /**
  * Load Container 0: Summary and Alerts
- * 
+ *
  * @description Loads summary from trading_accounts/summary endpoint (SSOT v1.2.0: REQUIRED)
  * No local calculation - all data comes from Backend endpoint
  */
@@ -449,61 +509,84 @@ async function loadContainer0() {
     const accountFilter = document.getElementById('selectedAccount');
     const dateRangeFilter = document.getElementById('selectedDateRange');
     const searchInput = document.getElementById('searchFilterInput');
-    
+
     if (statusFilter && statusFilter.textContent !== 'כל סטטוס') {
       globalFilters.status = toCanonicalStatus(statusFilter.textContent);
     }
-    
-    if (investmentTypeFilter && investmentTypeFilter.textContent !== 'כל סוג השקעה') {
+
+    if (
+      investmentTypeFilter &&
+      investmentTypeFilter.textContent !== 'כל סוג השקעה'
+    ) {
       globalFilters.investmentType = investmentTypeFilter.textContent;
     }
-    
+
     if (accountFilter && accountFilter.textContent !== 'כל חשבון מסחר') {
       // TODO: Extract account ULID from filter when available
       globalFilters.tradingAccountId = null;
     }
-    
+
     if (dateRangeFilter && dateRangeFilter.textContent !== 'כל זמן') {
       // TODO: Extract date range from filter when available
       globalFilters.dateFrom = null;
       globalFilters.dateTo = null;
     }
-    
+
     if (searchInput && searchInput.value) {
       globalFilters.search = searchInput.value;
     }
-    
+
     // Fetch summary from Backend endpoint (SSOT v1.2.0: REQUIRED)
     const summaryData = await fetchTradingAccountsSummary(globalFilters);
-    
+
     // Extract summary values (handle both snake_case and camelCase from Shared_Services)
-    const totalAccounts = summaryData.totalAccounts || summaryData.total_accounts || 0;
-    const activeAccounts = summaryData.activeAccounts || summaryData.active_accounts || 0;
-    const totalBalance = parseFloat(summaryData.totalBalance || summaryData.total_balance || 0);
-    const totalPnL = parseFloat(summaryData.totalPl || summaryData.total_pl || summaryData.totalPnL || 0);
-    const totalValue = parseFloat(summaryData.totalValue || summaryData.total_value || 0);
-    const avgValue = parseFloat(summaryData.avgValue || summaryData.avg_value || 0);
-    const activePositions = summaryData.activePositions || summaryData.active_positions || 0;
-    
+    const totalAccounts =
+      summaryData.totalAccounts || summaryData.total_accounts || 0;
+    const activeAccounts =
+      summaryData.activeAccounts || summaryData.active_accounts || 0;
+    const totalBalance = parseFloat(
+      summaryData.totalBalance || summaryData.total_balance || 0,
+    );
+    const totalPnL = parseFloat(
+      summaryData.totalPl || summaryData.total_pl || summaryData.totalPnL || 0,
+    );
+    const totalValue = parseFloat(
+      summaryData.totalValue || summaryData.total_value || 0,
+    );
+    const avgValue = parseFloat(
+      summaryData.avgValue || summaryData.avg_value || 0,
+    );
+    const activePositions =
+      summaryData.activePositions || summaryData.active_positions || 0;
+
     // Update summary stats
     const totalAccountsEl = document.getElementById('totalAccounts');
     const activeAccountsEl = document.getElementById('activeAccounts');
     const totalBalanceEl = document.getElementById('totalBalance');
     const totalPnLEl = document.getElementById('totalPnL');
-    
+
     if (totalAccountsEl) totalAccountsEl.textContent = totalAccounts;
     if (activeAccountsEl) activeAccountsEl.textContent = activeAccounts;
     if (totalBalanceEl) {
-      const balanceSpan = totalBalanceEl.querySelector('.numeric-value-positive') || totalBalanceEl;
-      balanceSpan.textContent = window.tableFormatters?.formatCurrency(totalBalance, 'USD', 2) || `$${totalBalance.toFixed(2)}`;
+      const balanceSpan =
+        totalBalanceEl.querySelector('.numeric-value-positive') ||
+        totalBalanceEl;
+      balanceSpan.textContent =
+        window.tableFormatters?.formatCurrency(totalBalance, 'USD', 2) ||
+        `$${totalBalance.toFixed(2)}`;
     }
     if (totalPnLEl) {
-      const pnlSpan = totalPnLEl.querySelector('.numeric-value-positive') || totalPnLEl;
+      const pnlSpan =
+        totalPnLEl.querySelector('.numeric-value-positive') || totalPnLEl;
       const isPositive = totalPnL >= 0;
-      pnlSpan.className = isPositive ? 'numeric-value-positive' : 'numeric-value-negative';
-      pnlSpan.textContent = window.tableFormatters?.formatCurrency(totalPnL, 'USD', 2) || `$${totalPnL.toFixed(2)}`;
+      pnlSpan.className = isPositive
+        ? 'numeric-value-positive'
+        : 'numeric-value-negative';
+      pnlSpan.textContent =
+        window.tableFormatters?.formatCurrency(totalPnL, 'USD', 2) ||
+        `$${totalPnL.toFixed(2)}`;
     }
-    
+
     // Update expanded summary
     const expandedContent = document.getElementById('portfolioSummaryContent');
     if (expandedContent) {
@@ -514,18 +597,20 @@ async function loadContainer0() {
         <span>P/L כולל: <span class="numeric-value-positive" dir="ltr">${window.tableFormatters?.formatCurrency(totalPnL, 'USD', 2) || `$${totalPnL.toFixed(2)}`}</span></span>
       `;
     }
-    
+
     // Update header count
-    const headerCount = document.querySelector('[data-section="summary-alerts"] .index-section__header-count');
+    const headerCount = document.querySelector(
+      '[data-section="summary-alerts"] .index-section__header-count',
+    );
     if (headerCount) {
       headerCount.textContent = '0 התראות פעילות'; // TODO: Add alerts when available
     }
   } catch (error) {
     // Gate B Fix: Handle errors gracefully - don't log full error object
     // Use masked log for security compliance (prevents token leakage)
-    maskedLog('Error loading Container 0:', { 
+    maskedLog('Error loading Container 0:', {
       errorCode: error.code,
-      status: error.status
+      status: error.status,
     });
   }
 }
@@ -538,25 +623,29 @@ async function loadContainer1(filters = {}) {
     const accountsData = await fetchTradingAccounts(filters);
     const accounts = accountsData.data || [];
     const tbody = document.querySelector('#accountsTable tbody');
-    
+
     if (!tbody) return;
-    
+
     tbody.innerHTML = '';
-    
-    accounts.forEach(account => {
+
+    accounts.forEach((account) => {
       const row = document.createElement('tr');
       row.className = 'phoenix-table__row';
       row.setAttribute('role', 'row');
-      
-      const formatCurrency = window.tableFormatters?.formatCurrency || ((val, curr) => `${curr === 'USD' ? '$' : ''}${val.toFixed(2)}`);
-      const formatDate = window.tableFormatters?.formatDate || ((date) => {
-        const d = new Date(date);
-        return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
-      });
-      
+
+      const formatCurrency =
+        window.tableFormatters?.formatCurrency ||
+        ((val, curr) => `${curr === 'USD' ? '$' : ''}${val.toFixed(2)}`);
+      const formatDate =
+        window.tableFormatters?.formatDate ||
+        ((date) => {
+          const d = new Date(date);
+          return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+        });
+
       const canon = account.isActive ? 'active' : 'inactive';
       const statusBadge = `<span class="phoenix-table__status-badge phoenix-table__status-badge--${canon}" data-status-category="${canon}">${toHebrewStatus(canon)}</span>`;
-      
+
       row.innerHTML = `
         <td class="phoenix-table__cell col-name" role="cell">${account.accountName || account.account_name || account.displayName || ''}</td>
         <td class="phoenix-table__cell col-currency" role="cell">${account.currency || ''}</td>
@@ -609,28 +698,32 @@ async function loadContainer1(filters = {}) {
           </div>
         </td>
       `;
-      
+
       tbody.appendChild(row);
     });
-    
+
     // Update pagination info
-    const paginationInfo = document.querySelector('#accountsTable + .phoenix-table-pagination .phoenix-table-pagination__info span');
+    const paginationInfo = document.querySelector(
+      '#accountsTable + .phoenix-table-pagination .phoenix-table-pagination__info span',
+    );
     if (paginationInfo) {
       paginationInfo.textContent = `מציג ${accounts.length > 0 ? 1 : 0}-${accounts.length} מתוך ${accountsData.total || 0} רשומות`;
     }
-    
+
     // Update header count
-    const activeAccounts = accounts.filter(acc => acc.isActive).length;
-    const headerCount = document.querySelector('[data-section="trading-accounts-management"] .index-section__header-count');
+    const activeAccounts = accounts.filter((acc) => acc.isActive).length;
+    const headerCount = document.querySelector(
+      '[data-section="trading-accounts-management"] .index-section__header-count',
+    );
     if (headerCount) {
       headerCount.textContent = `${activeAccounts} חשבונות פעילים`;
     }
   } catch (error) {
     // Gate B Fix: Handle errors gracefully - don't log full error object
     // Use masked log for security compliance (prevents token leakage)
-    maskedLog('Error loading Container 1:', { 
+    maskedLog('Error loading Container 1:', {
       errorCode: error.code,
-      status: error.status
+      status: error.status,
     });
   }
 }
@@ -641,12 +734,16 @@ async function loadContainer1(filters = {}) {
 async function loadContainer2(filters = {}) {
   try {
     const summaryData = await fetchCashFlowsSummary(filters);
-    const cardsContainer = document.querySelector('.account-movements-summary-cards');
-    
+    const cardsContainer = document.querySelector(
+      '.account-movements-summary-cards',
+    );
+
     if (!cardsContainer) return;
-    
-    const formatCurrency = window.tableFormatters?.formatCurrency || ((val, curr) => `${curr === 'USD' ? '$' : ''}${val.toFixed(2)}`);
-    
+
+    const formatCurrency =
+      window.tableFormatters?.formatCurrency ||
+      ((val, curr) => `${curr === 'USD' ? '$' : ''}${val.toFixed(2)}`);
+
     cardsContainer.innerHTML = `
       <div class="summary-card">
         <div class="summary-card__label">סה"כ הפקדות</div>
@@ -669,9 +766,11 @@ async function loadContainer2(filters = {}) {
         </div>
       </div>
     `;
-    
+
     // Update header count
-    const headerCount = document.querySelector('[data-section="account-movements-summary"] .index-section__header-count');
+    const headerCount = document.querySelector(
+      '[data-section="account-movements-summary"] .index-section__header-count',
+    );
     if (headerCount) {
       const flowsData = await fetchCashFlows(filters);
       headerCount.textContent = `${flowsData.total || 0} תנועות`;
@@ -679,9 +778,9 @@ async function loadContainer2(filters = {}) {
   } catch (error) {
     // Gate B Fix: Handle errors gracefully - don't log full error object
     // Use masked log for security compliance (prevents token leakage)
-    maskedLog('Error loading Container 2:', { 
+    maskedLog('Error loading Container 2:', {
       errorCode: error.code,
-      status: error.status
+      status: error.status,
     });
   }
 }
@@ -694,26 +793,40 @@ async function loadContainer3(filters = {}) {
     const flowsData = await fetchCashFlows(filters);
     const flows = flowsData.data || [];
     const tbody = document.querySelector('#accountActivityTable tbody');
-    
+
     if (!tbody) return;
-    
+
     tbody.innerHTML = '';
-    
-    flows.forEach(flow => {
+
+    flows.forEach((flow) => {
       const row = document.createElement('tr');
       row.className = 'phoenix-table__row';
       row.setAttribute('role', 'row');
-      
-      const formatCurrency = window.tableFormatters?.formatCurrency || ((val, curr) => `${curr === 'USD' ? '$' : ''}${val.toFixed(2)}`);
-      const formatDate = window.tableFormatters?.formatDate || ((date) => {
-        const d = new Date(date);
-        return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
-      });
-      
-      const flowStatusCanon = flow.status === 'VERIFIED' ? 'active' : flow.status === 'PENDING' ? 'pending' : 'inactive';
-      const flowStatusLabel = flow.status === 'VERIFIED' ? 'מאומת' : flow.status === 'PENDING' ? 'ממתין' : (flow.status || '');
+
+      const formatCurrency =
+        window.tableFormatters?.formatCurrency ||
+        ((val, curr) => `${curr === 'USD' ? '$' : ''}${val.toFixed(2)}`);
+      const formatDate =
+        window.tableFormatters?.formatDate ||
+        ((date) => {
+          const d = new Date(date);
+          return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+        });
+
+      const flowStatusCanon =
+        flow.status === 'VERIFIED'
+          ? 'active'
+          : flow.status === 'PENDING'
+            ? 'pending'
+            : 'inactive';
+      const flowStatusLabel =
+        flow.status === 'VERIFIED'
+          ? 'מאומת'
+          : flow.status === 'PENDING'
+            ? 'ממתין'
+            : flow.status || '';
       const statusBadge = `<span class="phoenix-table__status-badge phoenix-table__status-badge--${flowStatusCanon}" data-status-category="${flowStatusCanon}">${flowStatusLabel}</span>`;
-      
+
       const flowTypeVal = flow.flowType || flow.flow_type || '';
       const flowTypeEntity = getFlowTypeEntity(flowTypeVal);
       const flowTypeBadge = `<span class="phoenix-table__status-badge operation-type-badge" data-operation-type="${(flowTypeVal || '').toLowerCase()}" data-entity="${flowTypeEntity}">${toFlowTypeLabel(flowTypeVal) || flowTypeVal || ''}</span>`;
@@ -739,27 +852,31 @@ async function loadContainer3(filters = {}) {
           </button>
         </td>
       `;
-      
+
       tbody.appendChild(row);
     });
-    
+
     // Update pagination info
-    const paginationInfo = document.querySelector('#accountActivityTable + .phoenix-table-pagination .phoenix-table-pagination__info span');
+    const paginationInfo = document.querySelector(
+      '#accountActivityTable + .phoenix-table-pagination .phoenix-table-pagination__info span',
+    );
     if (paginationInfo) {
       paginationInfo.textContent = `מציג ${flows.length > 0 ? 1 : 0}-${flows.length} מתוך ${flowsData.total || 0} רשומות`;
     }
-    
+
     // Update header count
-    const headerCount = document.querySelector('[data-section="account-by-dates"] .index-section__header-count');
+    const headerCount = document.querySelector(
+      '[data-section="account-by-dates"] .index-section__header-count',
+    );
     if (headerCount) {
       headerCount.textContent = `${flowsData.total || 0} רשומות`;
     }
   } catch (error) {
     // Gate B Fix: Handle errors gracefully - don't log full error object
     // Use masked log for security compliance (prevents token leakage)
-    maskedLog('Error loading Container 3:', { 
+    maskedLog('Error loading Container 3:', {
       errorCode: error?.code,
-      status: error?.status
+      status: error?.status,
     });
   }
 }
@@ -772,45 +889,58 @@ async function loadContainer4(filters = {}) {
     const positionsData = await fetchPositions(filters);
     const positions = positionsData.data || [];
     const tbody = document.querySelector('#positionsTable tbody');
-    
+
     if (!tbody) return;
-    
+
     tbody.innerHTML = '';
-    
-    positions.forEach(position => {
+
+    positions.forEach((position) => {
       const row = document.createElement('tr');
       row.className = 'phoenix-table__row';
       row.setAttribute('role', 'row');
-      
-      const formatCurrency = window.tableFormatters?.formatCurrency || ((val, curr) => `${curr === 'USD' ? '$' : ''}${val.toFixed(2)}`);
-      const formatNumber = window.tableFormatters?.formatNumber || ((val, dec) => val.toFixed(dec));
-      const formatPercentage = window.tableFormatters?.formatPercentage || ((val, dec) => `${val.toFixed(dec)}%`);
-      
-      const directionBadge = position.direction === 'LONG'
-        ? '<span class="phoenix-table__status-badge phoenix-table__status-badge--long">לונג</span>'
-        : '<span class="phoenix-table__status-badge phoenix-table__status-badge--short">שורט</span>';
-      
+
+      const formatCurrency =
+        window.tableFormatters?.formatCurrency ||
+        ((val, curr) => `${curr === 'USD' ? '$' : ''}${val.toFixed(2)}`);
+      const formatNumber =
+        window.tableFormatters?.formatNumber ||
+        ((val, dec) => val.toFixed(dec));
+      const formatPercentage =
+        window.tableFormatters?.formatPercentage ||
+        ((val, dec) => `${val.toFixed(dec)}%`);
+
+      const directionBadge =
+        position.direction === 'LONG'
+          ? '<span class="phoenix-table__status-badge phoenix-table__status-badge--long">לונג</span>'
+          : '<span class="phoenix-table__status-badge phoenix-table__status-badge--short">שורט</span>';
+
       const posCanon = position.status === 'OPEN' ? 'active' : 'inactive';
       const statusBadge = `<span class="phoenix-table__status-badge phoenix-table__status-badge--${posCanon}" data-status-category="${posCanon}">${toHebrewStatus(posCanon)}</span>`;
-      
+
       // Format current price with daily change: אחוז(סכום) per SSOT
       const dailyChangePct = parseFloat(position.dailyChangePercent || 0);
-      const dailyChangeAbs = parseFloat(position.dailyChange ?? position.daily_change ?? 0);
-      const changeStr = formatDailyChangeFromAbsolute(dailyChangePct, dailyChangeAbs, 'USD');
+      const dailyChangeAbs = parseFloat(
+        position.dailyChange ?? position.daily_change ?? 0,
+      );
+      const changeStr = formatDailyChangeFromAbsolute(
+        dailyChangePct,
+        dailyChangeAbs,
+        'USD',
+      );
       const currentPriceHtml = `<div class="current-price-display"><span class="numeric-value-positive" dir="ltr">${formatCurrency(parseFloat(position.currentPrice || 0), 'USD', 2)}</span><span class="${dailyChangePct >= 0 ? 'numeric-value-positive' : 'numeric-value-negative'}" dir="ltr" style="font-size:0.85em"> ${changeStr}</span></div>`;
-      
+
       // Format P/L
       const plHtml = window.tableFormatters?.formatPL
         ? window.tableFormatters.formatPL(
             parseFloat(position.unrealizedPl || 0),
             parseFloat(position.unrealizedPlPercent || 0),
-            'USD'
+            'USD',
           ).outerHTML
         : `<span class="${parseFloat(position.unrealizedPl || 0) >= 0 ? 'numeric-value-positive' : 'numeric-value-negative'}" dir="ltr">
             ${formatCurrency(parseFloat(position.unrealizedPl || 0), 'USD', 1)}
             (${formatPercentage(parseFloat(position.unrealizedPlPercent || 0), 1)})
           </span>`;
-      
+
       row.innerHTML = `
         <td class="phoenix-table__cell col-symbol" role="cell">${position.symbol || ''}</td>
         <td class="phoenix-table__cell col-quantity" role="cell">${formatNumber(parseFloat(position.quantity || 0), 0)}</td>
@@ -836,28 +966,34 @@ async function loadContainer4(filters = {}) {
           </button>
         </td>
       `;
-      
+
       tbody.appendChild(row);
     });
-    
+
     // Update pagination info
-    const paginationInfo = document.querySelector('#positionsTable + .phoenix-table-pagination .phoenix-table-pagination__info span');
+    const paginationInfo = document.querySelector(
+      '#positionsTable + .phoenix-table-pagination .phoenix-table-pagination__info span',
+    );
     if (paginationInfo) {
       paginationInfo.textContent = `מציג ${positions.length > 0 ? 1 : 0}-${positions.length} מתוך ${positionsData.total || 0} רשומות`;
     }
-    
+
     // Update header count
-    const headerCount = document.querySelector('[data-section="positions-by-account"] .index-section__header-count');
+    const headerCount = document.querySelector(
+      '[data-section="positions-by-account"] .index-section__header-count',
+    );
     if (headerCount) {
-      const activePositions = positions.filter(pos => pos.status === 'OPEN').length;
+      const activePositions = positions.filter(
+        (pos) => pos.status === 'OPEN',
+      ).length;
       headerCount.textContent = `${activePositions} פוזיציות פעילות`;
     }
   } catch (error) {
     // Gate B Fix: Handle errors gracefully - don't log full error object
     // Use masked log for security compliance (prevents token leakage)
-    maskedLog('Error loading Container 4:', { 
+    maskedLog('Error loading Container 4:', {
       errorCode: error.code,
-      status: error.status
+      status: error.status,
     });
   }
 }
@@ -867,8 +1003,11 @@ async function loadContainer4(filters = {}) {
  */
 function isAuthenticated() {
   try {
-    const token = localStorage.getItem('access_token') || localStorage.getItem('authToken') ||
-                  sessionStorage.getItem('access_token') || sessionStorage.getItem('authToken');
+    const token =
+      localStorage.getItem('access_token') ||
+      localStorage.getItem('authToken') ||
+      sessionStorage.getItem('access_token') ||
+      sessionStorage.getItem('authToken');
     return !!token && String(token).trim() !== '';
   } catch (_) {
     return false;
@@ -882,7 +1021,9 @@ function isAuthenticated() {
 function initializeTradingAccountsDataLoader() {
   // Gate A Fix: Don't load data for guests - wait for auth redirect or skip
   if (!isAuthenticated()) {
-    maskedLog('[Trading Accounts Data Loader] Guest detected, skipping loadAllContainers');
+    maskedLog(
+      '[Trading Accounts Data Loader] Guest detected, skipping loadAllContainers',
+    );
     return;
   }
   if (document.readyState === 'loading') {
@@ -903,7 +1044,7 @@ async function loadAllContainers() {
     loadContainer1(),
     loadContainer2(),
     loadContainer3(),
-    loadContainer4()
+    loadContainer4(),
   ]);
 }
 
@@ -920,7 +1061,7 @@ export {
   fetchTradingAccountsSummary,
   fetchCashFlows,
   fetchCashFlowsSummary,
-  fetchPositions
+  fetchPositions,
 };
 
 // Export main loader function for DataStage
@@ -928,10 +1069,10 @@ export async function loadTradingAccountsData(filters = {}) {
   // Get filters from Bridge if not provided
   const bridgeFilters = window.PhoenixBridge?.state?.filters || {};
   const mergedFilters = { ...bridgeFilters, ...filters };
-  
+
   // Load all containers with merged filters
   await loadAllContainers();
-  
+
   // Return data structure compatible with other loaders
   return {
     containers: {
@@ -939,8 +1080,8 @@ export async function loadTradingAccountsData(filters = {}) {
       1: null, // Container 1 data is loaded directly into DOM
       2: null, // Container 2 data is loaded directly into DOM
       3: null, // Container 3 data is loaded directly into DOM
-      4: null  // Container 4 data is loaded directly into DOM
-    }
+      4: null, // Container 4 data is loaded directly into DOM
+    },
   };
 }
 
@@ -957,7 +1098,7 @@ window.TradingAccountsDataLoader = {
   fetchCashFlows,
   fetchCashFlowsSummary,
   fetchPositions,
-  loadTradingAccountsData
+  loadTradingAccountsData,
 };
 
 // Auto-initialize

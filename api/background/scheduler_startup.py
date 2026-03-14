@@ -28,6 +28,7 @@ def _get_minutes(job_config: dict) -> int:
     if isinstance(minutes, str) and minutes.startswith("from_settings:"):
         key = minutes.split(":", 1)[1]
         from ..core.config import settings
+
         return getattr(settings, key.lower(), 15)
     return int(minutes) if minutes else 15
 
@@ -36,10 +37,13 @@ def _get_sync_intraday_minutes() -> int:
     """PHASE_3: Current cadence for sync_ticker_prices_intraday (market-open vs off-hours)."""
     try:
         from ..integrations.market_data.market_data_settings import get_current_cadence_minutes
+
         return get_current_cadence_minutes()
     except Exception:
         return _get_minutes(
-            next((c for c in JOB_REGISTRY if c.get("job_name") == "sync_ticker_prices_intraday"), {})
+            next(
+                (c for c in JOB_REGISTRY if c.get("job_name") == "sync_ticker_prices_intraday"), {}
+            )
         )
 
 
@@ -59,6 +63,7 @@ def _make_job_wrapper(cfg: dict, dependents: List[str] = None):
     async def _wrapper():
         from ..core.database import AsyncSessionLocal
         from .job_runner import run_job
+
         mod = __import__(module_path, fromlist=[func_name])
         fn = getattr(mod, func_name)
         async with AsyncSessionLocal() as db:
@@ -72,12 +77,11 @@ def _make_job_wrapper(cfg: dict, dependents: List[str] = None):
                     _scheduler.modify_job(dep_id, next_run_time=now)
                     logger.info(
                         "APScheduler: triggered dependent job %s after %s completed",
-                        dep_id, job_name,
+                        dep_id,
+                        job_name,
                     )
                 except Exception as exc:
-                    logger.warning(
-                        "APScheduler: could not trigger dependent %s: %s", dep_id, exc
-                    )
+                    logger.warning("APScheduler: could not trigger dependent %s: %s", dep_id, exc)
         # PHASE_3 Price Reliability: dynamic cadence for intraday sync (market-open vs off-hours).
         if job_name == "sync_ticker_prices_intraday" and _scheduler:
             try:
@@ -86,13 +90,18 @@ def _make_job_wrapper(cfg: dict, dependents: List[str] = None):
                     get_intraday_interval_minutes,
                     get_off_hours_interval_minutes,
                 )
+
                 # G7 CC-01 evidence: force market_open in log when collecting evidence outside 09:30–16:00 ET.
                 if os.environ.get("G7_CC01_EVIDENCE_FORCE_MARKET_OPEN") == "1":
                     cadence = get_intraday_interval_minutes()
                     mode = "market_open"
                 else:
                     cadence = get_current_cadence_minutes()
-                    mode = "off_hours" if cadence == get_off_hours_interval_minutes() else "market_open"
+                    mode = (
+                        "off_hours"
+                        if cadence == get_off_hours_interval_minutes()
+                        else "market_open"
+                    )
                 next_run = now + timedelta(minutes=cadence)
                 _scheduler.modify_job(
                     job_name,
@@ -101,7 +110,9 @@ def _make_job_wrapper(cfg: dict, dependents: List[str] = None):
                 )
                 logger.info(
                     "PHASE_3 price sync cadence: mode=%s interval_min=%d next_run=%s",
-                    mode, cadence, next_run.isoformat(),
+                    mode,
+                    cadence,
+                    next_run.isoformat(),
                 )
             except Exception as exc:
                 logger.warning("PHASE_3 cadence reschedule failed: %s", exc)
@@ -137,7 +148,11 @@ async def start_scheduler():
             dependents = dep_map.get(cfg["job_name"], [])
             wrapper = _make_job_wrapper(cfg, dependents)
             # PHASE_3: intraday sync uses dynamic cadence (market-open vs off-hours).
-            mins = _get_sync_intraday_minutes() if cfg["job_name"] == "sync_ticker_prices_intraday" else _get_minutes(cfg)
+            mins = (
+                _get_sync_intraday_minutes()
+                if cfg["job_name"] == "sync_ticker_prices_intraday"
+                else _get_minutes(cfg)
+            )
             is_dependent = bool(cfg.get("run_after"))
             # Dependent jobs wait one interval on startup; parent will trigger them sooner.
             first_run = now if not is_dependent else now + timedelta(minutes=mins)
@@ -153,7 +168,11 @@ async def start_scheduler():
                 "APScheduler: registered job %s (interval=%dm, first_run=%s)",
                 cfg["job_name"],
                 mins,
-                "immediate" if not is_dependent else f"delayed +{mins}m (run_after={cfg['run_after']})",
+                (
+                    "immediate"
+                    if not is_dependent
+                    else f"delayed +{mins}m (run_after={cfg['run_after']})"
+                ),
             )
         except Exception as e:
             logger.warning("APScheduler: skip job %s: %s", cfg.get("job_name"), e)

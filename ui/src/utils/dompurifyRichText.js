@@ -7,12 +7,30 @@
 
 import DOMPurify from 'dompurify';
 
-const ALLOWED_TAGS = ['p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li', 'span', 'h3', 'h4'];
+const ALLOWED_TAGS = [
+  'p',
+  'br',
+  'strong',
+  'em',
+  'u',
+  'a',
+  'ul',
+  'ol',
+  'li',
+  'span',
+  'h3',
+  'h4',
+];
 const ALLOWED_ATTR = ['href', 'target', 'rel', 'class', 'dir', 'style'];
 
 /** Allow only class values starting with phx-rt-- */
 const PHX_RT_PREFIX = 'phx-rt--';
-const ALLOWED_SPAN_CLASSES = ['phx-rt--success', 'phx-rt--warning', 'phx-rt--danger', 'phx-rt--highlight'];
+const ALLOWED_SPAN_CLASSES = [
+  'phx-rt--success',
+  'phx-rt--warning',
+  'phx-rt--danger',
+  'phx-rt--highlight',
+];
 
 /** href: only http, https, mailto */
 const SAFE_URI = /^(?:(?:https?|mailto):)/i;
@@ -37,23 +55,34 @@ export function sanitizeRichTextHtml(dirty) {
     hooks: {
       uponSanitizeAttribute: (node, data) => {
         if (data.attrName === 'class' && data.attrValue) {
-          const allowed = data.attrValue.split(/\s+/).filter((c) =>
-            c && (ALLOWED_SPAN_CLASSES.includes(c) || c.startsWith(PHX_RT_PREFIX))
-          );
+          const allowed = data.attrValue
+            .split(/\s+/)
+            .filter(
+              (c) =>
+                c &&
+                (ALLOWED_SPAN_CLASSES.includes(c) ||
+                  c.startsWith(PHX_RT_PREFIX)),
+            );
           data.attrValue = allowed.join(' ');
         }
-        if (data.attrName === 'href' && data.attrValue && !SAFE_URI.test(data.attrValue)) {
+        if (
+          data.attrName === 'href' &&
+          data.attrValue &&
+          !SAFE_URI.test(data.attrValue)
+        ) {
           data.attrValue = '';
         }
         if (data.attrName === 'style' && data.attrValue) {
-          const m = data.attrValue.match(/text-align\s*:\s*(left|center|right|justify)/i);
+          const m = data.attrValue.match(
+            /text-align\s*:\s*(left|center|right|justify)/i,
+          );
           data.attrValue = m ? `text-align: ${m[1].toLowerCase()}` : '';
         }
         if (data.attrName === 'dir' && data.attrValue) {
           const v = (data.attrValue || '').toLowerCase();
           if (!['ltr', 'rtl', 'auto'].includes(v)) data.attrValue = '';
         }
-      }
-    }
+      },
+    },
   });
 }

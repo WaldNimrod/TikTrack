@@ -55,13 +55,28 @@
 |--------|------|
 | `agents_os/` | README, AGENTS_OS_FOUNDATION*, כל תוכן ייחודי למערכת האיגנטים |
 | `agents_os/docs-governance/` | Concept Package, MB3A POC Spec, AOS_workpack, כל אפיון/ספק ייחודי ל־Agents_OS |
-| `agents_os/documentation/` | (אופציונלי) תעוד נוסף ייחודי ל־Agents_OS — לא קנון משותף |
+| `agents_os/documentation/` | ספריית תיעוד ייעודית — אינדקס 00_INDEX + תיקיות לוגיות (אופציה C ממומשת): |
+| ↳ `agents_os/documentation/01-FOUNDATIONS/` | מסמכי יסוד: AGENTS_OS_FOUNDATION, חבילת קונספט (Cover, Domain Isolation, Architect) |
+| ↳ `agents_os/documentation/02-SPECS/` | מפרטים: Concept Package, AOS Workpack, קרנטין |
+| ↳ `agents_os/documentation/03-TEMPLATES/` | קישורים לתבניות משותפות (LLD400, LOD200 ב־06-TEMPLATES) |
 
 ### 2.3 תעוד מערכת (TikTrack)
 
 **שורש:** `documentation/docs-system/` — ארכיטקטורה, שרת, עיצוב, מוצר (קיים).
 
-### 2.4 תקשורת וארכיון
+### 2.3.1 תעוד Agents_OS (מאורגן)
+
+**שורש:** `documentation/docs-agents-os/` — אינדקס ראשי, סקירה, ארכיטקטורה, CLI, נהלים, תבניות (מקביל ל־docs-system). ראה [00_AGENTS_OS_MASTER_INDEX.md](../../docs-agents-os/00_AGENTS_OS_MASTER_INDEX.md).
+
+### 2.4 דוחות וארטיפקטים — נתיב קנוני יחיד (מחייב)
+
+**נתיב קבוע:** דוחות וארטיפקטים (Evidence, QA, Gate) — **רק** תחת:
+- `documentation/reports/05-REPORTS` (ותת־תיקיות: artifacts, artifacts_SESSION_01 וכו')
+- `documentation/reports/08-REPORTS`
+
+**איסור:** אסור ליצור או להשתמש ב־`documentation/05-REPORTS`, `documentation/08-REPORTS` (בשורש documentation), או ב־`05-REPORTS`/`08-REPORTS` בשורש ה־repo. תיקיות כפולות יארכיינו; קוד ונהלים מפנים לנתיב הקנוני בלבד.
+
+### 2.5 תקשורת וארכיון
 
 | נתיב | תוכן |
 |------|------|
@@ -96,6 +111,9 @@
 | FAST_TRACK_EXECUTION_PROTOCOL (active) | `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.2.0.md` |
 | אינדקס נהלים | `documentation/docs-governance/00-INDEX/GOVERNANCE_PROCEDURES_INDEX.md` |
 | Source Map | `documentation/docs-governance/00-INDEX/GOVERNANCE_PROCEDURES_SOURCE_MAP.md` |
+| **דוחות וארטיפקטים** | `documentation/reports/05-REPORTS`, `documentation/reports/08-REPORTS` *(נתיב קבוע יחיד; ראה §2.4)* |
+| **ספריית תיעוד Agents_OS** | `agents_os/documentation/00_INDEX.md` (01-FOUNDATIONS, 02-SPECS, 03-TEMPLATES) |
+| **תיעוד מערכת TikTrack** | `documentation/docs-system/00_INDEX.md` |
 
 ---
 
@@ -106,4 +124,4 @@
 
 ---
 
-**log_entry | TEAM_170 | DOCUMENTATION_FOLDER_STRUCTURE_CANONICAL | DELIVERED | 2026-02-22**
+**log_entry | TEAM_170 | DOCUMENTATION_FOLDER_STRUCTURE_CANONICAL | DELIVERED | 2026-03-14**

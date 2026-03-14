@@ -1,323 +1,705 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="he" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ניהול טיקרים | TikTrack Phoenix</title>
-  
-  <!-- Favicon - Gate B Fix: Prevent 404 SEVERE errors -->
-  <link rel="icon" type="image/x-icon" href="/images/icons/favicon.ico">
-  
-  <!-- ============================================
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ניהול טיקרים | TikTrack Phoenix</title>
+
+    <!-- Favicon - Gate B Fix: Prevent 404 SEVERE errors -->
+    <link rel="icon" type="image/x-icon" href="/images/icons/favicon.ico" />
+
+    <!-- ============================================
        CSS Loading Order (CRITICAL - DO NOT CHANGE)
        Per: documentation/04-DESIGN_UX_UI/CSS_LOADING_ORDER.md
        ============================================ -->
-  
-  <!-- 1. Pico CSS (Framework) - MUST BE FIRST -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
-  
-  <!-- 2. Phoenix Base Styles (Global defaults & DNA variables) -->
-  <link rel="stylesheet" href="/src/styles/phoenix-base.css">
-  
-  <!-- 3. LEGO Components (Reusable components) -->
-  <link rel="stylesheet" href="/src/styles/phoenix-components.css">
-  
-  <!-- 4. Header Component (Unified Header Styles) -->
-  <link rel="stylesheet" href="/src/styles/phoenix-header.css">
-  
-  <!-- 5. Page-Specific Styles (Dashboard-specific styles) -->
-  <link rel="stylesheet" href="/src/styles/D15_DASHBOARD_STYLES.css">
-  
-  <!-- 6. Modal Styles -->
-  <link rel="stylesheet" href="/src/styles/phoenix-modal.css">
-  
-  <script src="https://unpkg.com/lucide@latest"></script>
-</head>
-<body class="tickers-page context-management entity-ticker">
-  
-  <!-- ============================================
+
+    <!-- 1. Pico CSS (Framework) - MUST BE FIRST -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css"
+    />
+
+    <!-- 2. Phoenix Base Styles (Global defaults & DNA variables) -->
+    <link rel="stylesheet" href="/src/styles/phoenix-base.css" />
+
+    <!-- 3. LEGO Components (Reusable components) -->
+    <link rel="stylesheet" href="/src/styles/phoenix-components.css" />
+
+    <!-- 4. Header Component (Unified Header Styles) -->
+    <link rel="stylesheet" href="/src/styles/phoenix-header.css" />
+
+    <!-- 5. Page-Specific Styles (Dashboard-specific styles) -->
+    <link rel="stylesheet" href="/src/styles/D15_DASHBOARD_STYLES.css" />
+
+    <!-- 6. Modal Styles -->
+    <link rel="stylesheet" href="/src/styles/phoenix-modal.css" />
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body class="tickers-page context-management entity-ticker">
+    <!-- ============================================
        Header Loader - MANDATORY per POL-015
        טוען unified-header.html דינמית — אלמנט ראש דף לכל עמוד (מלבד Auth)
        ============================================ -->
-  <script src="/src/components/core/headerLoader.js"></script>
-  
-  <!-- ============================================
+    <script src="/src/components/core/headerLoader.js"></script>
+
+    <!-- ============================================
        UAI Entry Point (Unified App Init)
        Per: TT2_PAGE_TEMPLATE_CONTRACT (POL-015)
        ============================================ -->
-  <script src="/src/views/management/tickers/tickersPageConfig.js"></script>
-  <script type="module" src="/src/components/core/UnifiedAppInit.js"></script>
+    <script src="/src/views/management/tickers/tickersPageConfig.js"></script>
+    <script type="module" src="/src/components/core/UnifiedAppInit.js"></script>
 
-  <!-- ============================================
+    <!-- ============================================
        PAGE WRAPPER + CONTAINER STRUCTURE
        LEGO System: page-wrapper > page-container > main > tt-container > tt-section(s)
        ============================================ -->
-  
-  <div class="page-wrapper">
-    <div class="page-container">
-      <main>
-        <tt-container>
-          
-  <!-- ============================================
+
+    <div class="page-wrapper">
+      <div class="page-container">
+        <main>
+          <tt-container>
+            <!-- ============================================
        CONTAINER 0: סיכום מידע
        ============================================ -->
-  
-  <tt-section data-section="summary">
-    <div class="index-section__header">
-      <div class="index-section__header-title">
-        <img src="/images/icons/entities/tickers.svg" alt="טיקרים" class="index-section__header-icon" width="35" height="35">
-        <h1 class="index-section__header-text">ניהול טיקרים</h1>
-      </div>
-      <div class="index-section__header-actions">
-        <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M6 9l6 6l6 -6"></path>
-          </svg>
-        </button>
-      </div>
-    </div>
 
-    <div class="index-section__body">
-      <tt-section-row>
-        <div class="col-12">
-          <div class="info-summary" id="summaryStats">
-            <div class="info-summary__row info-summary__row--first">
-              <div class="info-summary__content">
-                <div>סה"כ טיקרים: <strong id="totalTickers">0</strong></div>
-                <div>טיקרים פעילים: <strong id="activeTickers">0</strong></div>
+            <tt-section data-section="summary">
+              <div class="index-section__header">
+                <div class="index-section__header-title">
+                  <img
+                    src="/images/icons/entities/tickers.svg"
+                    alt="טיקרים"
+                    class="index-section__header-icon"
+                    width="35"
+                    height="35"
+                  />
+                  <h1 class="index-section__header-text">ניהול טיקרים</h1>
+                </div>
+                <div class="index-section__header-actions">
+                  <button
+                    class="index-section__header-toggle-btn js-section-toggle"
+                    aria-label="הצג/הסתר"
+                  >
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="M6 9l6 6l6 -6"></path>
+                    </svg>
+                  </button>
+                </div>
               </div>
-              <div id="stalenessClockCard" class="staleness-clock-card" aria-live="polite" data-price-label="עודכן ב" data-fetched-label="עודכן ב">
-                <span class="staleness-clock-card__loading">טוען עדכון נתונים...</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </tt-section-row>
-    </div>
-  </tt-section>
 
-  <!-- ============================================
+              <div class="index-section__body">
+                <tt-section-row>
+                  <div class="col-12">
+                    <div class="info-summary" id="summaryStats">
+                      <div class="info-summary__row info-summary__row--first">
+                        <div class="info-summary__content">
+                          <div>
+                            סה"כ טיקרים: <strong id="totalTickers">0</strong>
+                          </div>
+                          <div>
+                            טיקרים פעילים: <strong id="activeTickers">0</strong>
+                          </div>
+                        </div>
+                        <div
+                          id="stalenessClockCard"
+                          class="staleness-clock-card"
+                          aria-live="polite"
+                          data-price-label="עודכן ב"
+                          data-fetched-label="עודכן ב"
+                        >
+                          <span class="staleness-clock-card__loading"
+                            >טוען עדכון נתונים...</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </tt-section-row>
+              </div>
+            </tt-section>
+
+            <!-- ============================================
        CONTAINER 0.5: בקרת תקינות נתונים (TEAM_20)
        GET /tickers/{id}/data-integrity
        ============================================ -->
-  
-  <tt-section data-section="data-integrity">
-    <div class="index-section__header">
-      <div class="index-section__header-title">
-        <h2 class="index-section__header-text">בקרת תקינות נתונים</h2>
-      </div>
-      <div class="index-section__header-meta index-section__header-meta--align-end">
-        <select id="tickerDataIntegritySelect" class="index-section__header-filter-select" aria-label="לבחור טיקר">
-          <option value="">— לבחור טיקר —</option>
-        </select>
-        <button type="button" id="tickerDataIntegrityCheckBtn" class="index-section__header-action-btn js-check-data-integrity" aria-label="בדיקת נתונים" title="בדיקת נתונים">
-          <span>✓ בדיקת נתונים</span>
-        </button>
-      </div>
-      <div class="index-section__header-actions">
-        <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M6 9l6 6l6 -6"></path>
-          </svg>
-        </button>
-      </div>
-    </div>
-    <div class="index-section__body">
-      <tt-section-row>
-        <div class="col-12">
-          <div class="data-integrity-panel">
-            <div id="tickerDataIntegrityDetail" class="data-integrity-detail"></div>
-            <tt-section-row id="tickerDataIntegrityGapsRow" class="data-integrity-gaps-row" hidden>
-              <div id="tickerDataIntegrityBackfillBanner" class="data-integrity-gaps-row__col1"></div>
-              <div class="data-integrity-gaps-row__col2">
-                <strong>חוסרים:</strong> <span id="tickerDataIntegrityGaps">—</span>
-              </div>
-            </tt-section-row>
-          </div>
-        </div>
-      </tt-section-row>
-    </div>
-  </tt-section>
 
-  <!-- ============================================
+            <tt-section data-section="data-integrity">
+              <div class="index-section__header">
+                <div class="index-section__header-title">
+                  <h2 class="index-section__header-text">בקרת תקינות נתונים</h2>
+                </div>
+                <div
+                  class="index-section__header-meta index-section__header-meta--align-end"
+                >
+                  <select
+                    id="tickerDataIntegritySelect"
+                    class="index-section__header-filter-select"
+                    aria-label="לבחור טיקר"
+                  >
+                    <option value="">— לבחור טיקר —</option>
+                  </select>
+                  <button
+                    type="button"
+                    id="tickerDataIntegrityCheckBtn"
+                    class="index-section__header-action-btn js-check-data-integrity"
+                    aria-label="בדיקת נתונים"
+                    title="בדיקת נתונים"
+                  >
+                    <span>✓ בדיקת נתונים</span>
+                  </button>
+                </div>
+                <div class="index-section__header-actions">
+                  <button
+                    class="index-section__header-toggle-btn js-section-toggle"
+                    aria-label="הצג/הסתר"
+                  >
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="M6 9l6 6l6 -6"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="index-section__body">
+                <tt-section-row>
+                  <div class="col-12">
+                    <div class="data-integrity-panel">
+                      <div
+                        id="tickerDataIntegrityDetail"
+                        class="data-integrity-detail"
+                      ></div>
+                      <tt-section-row
+                        id="tickerDataIntegrityGapsRow"
+                        class="data-integrity-gaps-row"
+                        hidden
+                      >
+                        <div
+                          id="tickerDataIntegrityBackfillBanner"
+                          class="data-integrity-gaps-row__col1"
+                        ></div>
+                        <div class="data-integrity-gaps-row__col2">
+                          <strong>חוסרים:</strong>
+                          <span id="tickerDataIntegrityGaps">—</span>
+                        </div>
+                      </tt-section-row>
+                    </div>
+                  </div>
+                </tt-section-row>
+              </div>
+            </tt-section>
+
+            <!-- ============================================
        CONTAINER 1: טבלת טיקרים
        ============================================ -->
-  
-  <tt-section data-section="tickers-management">
-    <div class="index-section__header">
-      <div class="index-section__header-title">
-        <img src="/images/icons/entities/tickers.svg" alt="טיקרים" class="index-section__header-icon" width="35" height="35">
-        <h1 class="index-section__header-text">רשימת טיקרים</h1>
-      </div>
-      <div class="index-section__header-meta">
-        <span class="index-section__header-count" id="tableTickersCount">0 טיקרים</span>
-      </div>
-      <div class="index-section__header-actions">
-        <div class="filter-buttons-container tickers-filter-bar" data-role="tickers-filter">
-          <label for="tickersFilterType" class="sr-only">סוג טיקר</label>
-          <select id="tickersFilterType" class="index-section__header-filter-select js-tickers-filter-type" aria-label="סינון לפי סוג טיקר" data-filter="ticker_type">
-            <option value="">כל הסוגים</option>
-            <option value="STOCK">STOCK</option>
-            <option value="ETF">ETF</option>
-            <option value="OPTION">OPTION</option>
-            <option value="FUTURE">FUTURE</option>
-            <option value="FOREX">FOREX</option>
-            <option value="CRYPTO">CRYPTO</option>
-            <option value="INDEX">INDEX</option>
-          </select>
-          <div class="filter-buttons-container filter-buttons-container--inline" data-filter-group="is_active">
-            <button type="button" class="filter-icon-btn filter-icon-btn--active js-tickers-filter-active" data-is-active="" data-filter-type="ticker" aria-label="הצג הכל" title="הצג הכל"><img src="/images/icons/entities/tickers.svg" alt="" width="20" height="20" aria-hidden="true"></button>
-            <button type="button" class="filter-icon-btn js-tickers-filter-active" data-is-active="true" data-filter-type="ticker" aria-label="פעילים בלבד" title="פעילים בלבד"><img src="/images/icons/tabler/check.svg" alt="" width="20" height="20" aria-hidden="true"></button>
-            <button type="button" class="filter-icon-btn js-tickers-filter-active" data-is-active="false" data-filter-type="ticker" aria-label="לא פעילים בלבד" title="לא פעילים בלבד"><img src="/images/icons/tabler/x.svg" alt="" width="20" height="20" aria-hidden="true"></button>
-          </div>
-        </div>
-        <button class="index-section__header-action-btn js-add-ticker" aria-label="הוספת טיקר" title="הוספת טיקר">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <path d="M12 5v14M5 12h14"></path>
-          </svg>
-          <span class="index-section__header-action-text">הוספת טיקר</span>
-        </button>
-        <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M6 9l6 6l6 -6"></path>
-          </svg>
-        </button>
-      </div>
-    </div>
 
-    <div class="index-section__body">
-      <tt-section-row>
-        <div class="col-12">
-          
-          <div class="phoenix-table-wrapper" data-tickers-actions-hover="true">
-            <table id="tickersTable" class="phoenix-table js-table phoenix-table--actions-hover" data-table-type="tickers" role="table" aria-label="ניהול טיקרים">
-              <thead class="phoenix-table__head" role="rowgroup">
-                <tr class="phoenix-table__row" role="row">
-                  <th class="phoenix-table__header col-symbol js-table-sort-trigger" data-sortable="true" data-sort-key="symbol" data-sort-type="string" data-column-index="0" role="columnheader" aria-sort="none" tabindex="0">
-                    <span class="phoenix-table__header-text">סמל</span>
-                    <span class="phoenix-table__sort-indicator js-sort-indicator">
-                      <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M8 9l4 -4l4 4"></path>
-                        <path d="M8 15l4 4l4 -4"></path>
-                      </svg>
-                    </span>
-                  </th>
-                  <th class="phoenix-table__header col-price phoenix-table__header--numeric js-table-sort-trigger" data-sortable="true" data-sort-key="current_price" data-sort-type="numeric" data-column-index="1" role="columnheader" aria-sort="none" tabindex="0">
-                    <span class="phoenix-table__header-text">מחיר</span>
-                    <span class="phoenix-table__sort-indicator js-sort-indicator">
-                      <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M8 9l4 -4l4 4"></path>
-                        <path d="M8 15l4 4l4 -4"></path>
-                      </svg>
-                    </span>
-                  </th>
-                  <th class="phoenix-table__header col-source" data-sortable="false" role="columnheader">
-                    <span class="phoenix-table__header-text">מקור</span>
-                  </th>
-                  <th class="phoenix-table__header col-last-close phoenix-table__header--numeric" data-sortable="false" role="columnheader">
-                    <span class="phoenix-table__header-text">סגירה</span>
-                  </th>
-                  <th class="phoenix-table__header col-as-of" data-sortable="false" role="columnheader">
-                    <span class="phoenix-table__header-text">עודכן ב</span>
-                  </th>
-                  <th class="phoenix-table__header col-change phoenix-table__header--numeric js-table-sort-trigger" data-sortable="true" data-sort-key="daily_change_pct" data-sort-type="numeric" data-column-index="4" role="columnheader" aria-sort="none" tabindex="0">
-                    <span class="phoenix-table__header-text">שינוי יומי</span>
-                    <span class="phoenix-table__sort-indicator js-sort-indicator">
-                      <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M8 9l4 -4l4 4"></path>
-                        <path d="M8 15l4 4l4 -4"></path>
-                      </svg>
-                    </span>
-                  </th>
-                  <th class="phoenix-table__header col-company js-table-sort-trigger" data-sortable="true" data-sort-key="company_name" data-sort-type="string" data-column-index="5" role="columnheader" aria-sort="none" tabindex="0">
-                    <span class="phoenix-table__header-text">שם חברה</span>
-                  </th>
-                  <th class="phoenix-table__header col-exchange" data-sortable="false" role="columnheader">
-                    <span class="phoenix-table__header-text">בורסה</span>
-                  </th>
-                  <th class="phoenix-table__header col-type js-table-sort-trigger" data-sortable="true" data-sort-key="ticker_type" data-sort-type="string" data-column-index="6" role="columnheader" aria-sort="none" tabindex="0">
-                    <span class="phoenix-table__header-text">סוג</span>
-                    <span class="phoenix-table__sort-indicator js-sort-indicator">
-                      <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M8 9l4 -4l4 4"></path>
-                        <path d="M8 15l4 4l4 -4"></path>
-                      </svg>
-                    </span>
-                  </th>
-                  <th class="phoenix-table__header col-status js-table-sort-trigger" data-sortable="true" data-sort-key="is_active" data-sort-type="boolean" data-column-index="7" role="columnheader" aria-sort="none" tabindex="0">
-                    <span class="phoenix-table__header-text">סטטוס</span>
-                    <span class="phoenix-table__sort-indicator js-sort-indicator">
-                      <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M8 9l4 -4l4 4"></path>
-                        <path d="M8 15l4 4l4 -4"></path>
-                      </svg>
-                    </span>
-                  </th>
-                  <th class="phoenix-table__header col-actions" data-sortable="false" role="columnheader">
-                    <span class="phoenix-table__header-text">פעולות</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="phoenix-table__body" role="rowgroup" id="tickersTableBody">
-              </tbody>
-            </table>
-          </div>
-          
-          <div class="phoenix-table-pagination">
-            <div class="phoenix-table-pagination__info">
-              <span id="paginationInfo">מציג 0-0 מתוך 0 רשומות</span>
-            </div>
-            <div class="phoenix-table-pagination__controls">
-              <div class="phoenix-table-pagination__page-size">
-                <label class="phoenix-table-pagination__page-size-label">שורות לעמוד:</label>
-                <select class="phoenix-table-pagination__page-size-select js-table-page-size" data-table-id="tickersTable">
-                  <option value="10">10</option>
-                  <option value="25" selected>25</option>
-                  <option value="50">50</option>
-                  <option value="100">100</option>
-                </select>
+            <tt-section data-section="tickers-management">
+              <div class="index-section__header">
+                <div class="index-section__header-title">
+                  <img
+                    src="/images/icons/entities/tickers.svg"
+                    alt="טיקרים"
+                    class="index-section__header-icon"
+                    width="35"
+                    height="35"
+                  />
+                  <h1 class="index-section__header-text">רשימת טיקרים</h1>
+                </div>
+                <div class="index-section__header-meta">
+                  <span
+                    class="index-section__header-count"
+                    id="tableTickersCount"
+                    >0 טיקרים</span
+                  >
+                </div>
+                <div class="index-section__header-actions">
+                  <div
+                    class="filter-buttons-container tickers-filter-bar"
+                    data-role="tickers-filter"
+                  >
+                    <label for="tickersFilterType" class="sr-only"
+                      >סוג טיקר</label
+                    >
+                    <select
+                      id="tickersFilterType"
+                      class="index-section__header-filter-select js-tickers-filter-type"
+                      aria-label="סינון לפי סוג טיקר"
+                      data-filter="ticker_type"
+                    >
+                      <option value="">כל הסוגים</option>
+                      <option value="STOCK">STOCK</option>
+                      <option value="ETF">ETF</option>
+                      <option value="OPTION">OPTION</option>
+                      <option value="FUTURE">FUTURE</option>
+                      <option value="FOREX">FOREX</option>
+                      <option value="CRYPTO">CRYPTO</option>
+                      <option value="INDEX">INDEX</option>
+                    </select>
+                    <div
+                      class="filter-buttons-container filter-buttons-container--inline"
+                      data-filter-group="is_active"
+                    >
+                      <button
+                        type="button"
+                        class="filter-icon-btn filter-icon-btn--active js-tickers-filter-active"
+                        data-is-active=""
+                        data-filter-type="ticker"
+                        aria-label="הצג הכל"
+                        title="הצג הכל"
+                      >
+                        <img
+                          src="/images/icons/entities/tickers.svg"
+                          alt=""
+                          width="20"
+                          height="20"
+                          aria-hidden="true"
+                        />
+                      </button>
+                      <button
+                        type="button"
+                        class="filter-icon-btn js-tickers-filter-active"
+                        data-is-active="true"
+                        data-filter-type="ticker"
+                        aria-label="פעילים בלבד"
+                        title="פעילים בלבד"
+                      >
+                        <img
+                          src="/images/icons/tabler/check.svg"
+                          alt=""
+                          width="20"
+                          height="20"
+                          aria-hidden="true"
+                        />
+                      </button>
+                      <button
+                        type="button"
+                        class="filter-icon-btn js-tickers-filter-active"
+                        data-is-active="false"
+                        data-filter-type="ticker"
+                        aria-label="לא פעילים בלבד"
+                        title="לא פעילים בלבד"
+                      >
+                        <img
+                          src="/images/icons/tabler/x.svg"
+                          alt=""
+                          width="20"
+                          height="20"
+                          aria-hidden="true"
+                        />
+                      </button>
+                    </div>
+                  </div>
+                  <button
+                    class="index-section__header-action-btn js-add-ticker"
+                    aria-label="הוספת טיקר"
+                    title="הוספת טיקר"
+                  >
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      aria-hidden="true"
+                    >
+                      <path d="M12 5v14M5 12h14"></path>
+                    </svg>
+                    <span class="index-section__header-action-text"
+                      >הוספת טיקר</span
+                    >
+                  </button>
+                  <button
+                    class="index-section__header-toggle-btn js-section-toggle"
+                    aria-label="הצג/הסתר"
+                  >
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="M6 9l6 6l6 -6"></path>
+                    </svg>
+                  </button>
+                </div>
               </div>
-              <div class="phoenix-table-pagination__pages" id="paginationControls">
-                <button class="phoenix-table-pagination__button" aria-label="עמוד קודם" id="prevPageBtn" disabled>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 18l6-6-6-6"></path>
-                  </svg>
-                </button>
-                <div id="pageNumbers"></div>
-                <button class="phoenix-table-pagination__button" aria-label="עמוד הבא" id="nextPageBtn" disabled>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M15 18l-6-6 6-6"></path>
-                  </svg>
-                </button>
+
+              <div class="index-section__body">
+                <tt-section-row>
+                  <div class="col-12">
+                    <div
+                      class="phoenix-table-wrapper"
+                      data-tickers-actions-hover="true"
+                    >
+                      <table
+                        id="tickersTable"
+                        class="phoenix-table js-table phoenix-table--actions-hover"
+                        data-table-type="tickers"
+                        role="table"
+                        aria-label="ניהול טיקרים"
+                      >
+                        <thead class="phoenix-table__head" role="rowgroup">
+                          <tr class="phoenix-table__row" role="row">
+                            <th
+                              class="phoenix-table__header col-symbol js-table-sort-trigger"
+                              data-sortable="true"
+                              data-sort-key="symbol"
+                              data-sort-type="string"
+                              data-column-index="0"
+                              role="columnheader"
+                              aria-sort="none"
+                              tabindex="0"
+                            >
+                              <span class="phoenix-table__header-text"
+                                >סמל</span
+                              >
+                              <span
+                                class="phoenix-table__sort-indicator js-sort-indicator"
+                              >
+                                <svg
+                                  class="phoenix-table__sort-icon js-sort-icon"
+                                  width="12"
+                                  height="12"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                >
+                                  <path d="M8 9l4 -4l4 4"></path>
+                                  <path d="M8 15l4 4l4 -4"></path>
+                                </svg>
+                              </span>
+                            </th>
+                            <th
+                              class="phoenix-table__header col-price phoenix-table__header--numeric js-table-sort-trigger"
+                              data-sortable="true"
+                              data-sort-key="current_price"
+                              data-sort-type="numeric"
+                              data-column-index="1"
+                              role="columnheader"
+                              aria-sort="none"
+                              tabindex="0"
+                            >
+                              <span class="phoenix-table__header-text"
+                                >מחיר</span
+                              >
+                              <span
+                                class="phoenix-table__sort-indicator js-sort-indicator"
+                              >
+                                <svg
+                                  class="phoenix-table__sort-icon js-sort-icon"
+                                  width="12"
+                                  height="12"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                >
+                                  <path d="M8 9l4 -4l4 4"></path>
+                                  <path d="M8 15l4 4l4 -4"></path>
+                                </svg>
+                              </span>
+                            </th>
+                            <th
+                              class="phoenix-table__header col-source"
+                              data-sortable="false"
+                              role="columnheader"
+                            >
+                              <span class="phoenix-table__header-text"
+                                >מקור</span
+                              >
+                            </th>
+                            <th
+                              class="phoenix-table__header col-last-close phoenix-table__header--numeric"
+                              data-sortable="false"
+                              role="columnheader"
+                            >
+                              <span class="phoenix-table__header-text"
+                                >סגירה</span
+                              >
+                            </th>
+                            <th
+                              class="phoenix-table__header col-as-of"
+                              data-sortable="false"
+                              role="columnheader"
+                            >
+                              <span class="phoenix-table__header-text"
+                                >עודכן ב</span
+                              >
+                            </th>
+                            <th
+                              class="phoenix-table__header col-change phoenix-table__header--numeric js-table-sort-trigger"
+                              data-sortable="true"
+                              data-sort-key="daily_change_pct"
+                              data-sort-type="numeric"
+                              data-column-index="4"
+                              role="columnheader"
+                              aria-sort="none"
+                              tabindex="0"
+                            >
+                              <span class="phoenix-table__header-text"
+                                >שינוי יומי</span
+                              >
+                              <span
+                                class="phoenix-table__sort-indicator js-sort-indicator"
+                              >
+                                <svg
+                                  class="phoenix-table__sort-icon js-sort-icon"
+                                  width="12"
+                                  height="12"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                >
+                                  <path d="M8 9l4 -4l4 4"></path>
+                                  <path d="M8 15l4 4l4 -4"></path>
+                                </svg>
+                              </span>
+                            </th>
+                            <th
+                              class="phoenix-table__header col-company js-table-sort-trigger"
+                              data-sortable="true"
+                              data-sort-key="company_name"
+                              data-sort-type="string"
+                              data-column-index="5"
+                              role="columnheader"
+                              aria-sort="none"
+                              tabindex="0"
+                            >
+                              <span class="phoenix-table__header-text"
+                                >שם חברה</span
+                              >
+                            </th>
+                            <th
+                              class="phoenix-table__header col-exchange"
+                              data-sortable="false"
+                              role="columnheader"
+                            >
+                              <span class="phoenix-table__header-text"
+                                >בורסה</span
+                              >
+                            </th>
+                            <th
+                              class="phoenix-table__header col-type js-table-sort-trigger"
+                              data-sortable="true"
+                              data-sort-key="ticker_type"
+                              data-sort-type="string"
+                              data-column-index="6"
+                              role="columnheader"
+                              aria-sort="none"
+                              tabindex="0"
+                            >
+                              <span class="phoenix-table__header-text"
+                                >סוג</span
+                              >
+                              <span
+                                class="phoenix-table__sort-indicator js-sort-indicator"
+                              >
+                                <svg
+                                  class="phoenix-table__sort-icon js-sort-icon"
+                                  width="12"
+                                  height="12"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                >
+                                  <path d="M8 9l4 -4l4 4"></path>
+                                  <path d="M8 15l4 4l4 -4"></path>
+                                </svg>
+                              </span>
+                            </th>
+                            <th
+                              class="phoenix-table__header col-status js-table-sort-trigger"
+                              data-sortable="true"
+                              data-sort-key="is_active"
+                              data-sort-type="boolean"
+                              data-column-index="7"
+                              role="columnheader"
+                              aria-sort="none"
+                              tabindex="0"
+                            >
+                              <span class="phoenix-table__header-text"
+                                >סטטוס</span
+                              >
+                              <span
+                                class="phoenix-table__sort-indicator js-sort-indicator"
+                              >
+                                <svg
+                                  class="phoenix-table__sort-icon js-sort-icon"
+                                  width="12"
+                                  height="12"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                >
+                                  <path d="M8 9l4 -4l4 4"></path>
+                                  <path d="M8 15l4 4l4 -4"></path>
+                                </svg>
+                              </span>
+                            </th>
+                            <th
+                              class="phoenix-table__header col-actions"
+                              data-sortable="false"
+                              role="columnheader"
+                            >
+                              <span class="phoenix-table__header-text"
+                                >פעולות</span
+                              >
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody
+                          class="phoenix-table__body"
+                          role="rowgroup"
+                          id="tickersTableBody"
+                        ></tbody>
+                      </table>
+                    </div>
+
+                    <div class="phoenix-table-pagination">
+                      <div class="phoenix-table-pagination__info">
+                        <span id="paginationInfo">מציג 0-0 מתוך 0 רשומות</span>
+                      </div>
+                      <div class="phoenix-table-pagination__controls">
+                        <div class="phoenix-table-pagination__page-size">
+                          <label
+                            class="phoenix-table-pagination__page-size-label"
+                            >שורות לעמוד:</label
+                          >
+                          <select
+                            class="phoenix-table-pagination__page-size-select js-table-page-size"
+                            data-table-id="tickersTable"
+                          >
+                            <option value="10">10</option>
+                            <option value="25" selected>25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                          </select>
+                        </div>
+                        <div
+                          class="phoenix-table-pagination__pages"
+                          id="paginationControls"
+                        >
+                          <button
+                            class="phoenix-table-pagination__button"
+                            aria-label="עמוד קודם"
+                            id="prevPageBtn"
+                            disabled
+                          >
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                            >
+                              <path d="M9 18l6-6-6-6"></path>
+                            </svg>
+                          </button>
+                          <div id="pageNumbers"></div>
+                          <button
+                            class="phoenix-table-pagination__button"
+                            aria-label="עמוד הבא"
+                            id="nextPageBtn"
+                            disabled
+                          >
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                            >
+                              <path d="M15 18l-6-6 6-6"></path>
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div
+                      class="ticker-status-legend"
+                      role="note"
+                      aria-label="מקרא סטטוסים"
+                    >
+                      <span class="legend__title">מקרא סטטוס:</span>
+                      <span class="legend__item"
+                        ><span
+                          class="phoenix-table__status-badge phoenix-table__status-badge--pending"
+                          data-status-category="pending"
+                          >ממתין</span
+                        >
+                        — EOD + היסטוריה בלבד, אין Intraday</span
+                      >
+                      <span class="legend__item"
+                        ><span
+                          class="phoenix-table__status-badge phoenix-table__status-badge--active"
+                          data-status-category="active"
+                          >פתוח</span
+                        >
+                        — נתונים מלאים: Intraday + EOD + היסטוריה</span
+                      >
+                      <span class="legend__item"
+                        ><span
+                          class="phoenix-table__status-badge phoenix-table__status-badge--inactive"
+                          data-status-category="inactive"
+                          >סגור</span
+                        >
+                        — EOD + היסטוריה בלבד</span
+                      >
+                      <span class="legend__item"
+                        ><span
+                          class="phoenix-table__status-badge phoenix-table__status-badge--cancelled"
+                          data-status-category="cancelled"
+                          >מבוטל</span
+                        >
+                        — לא טוען נתונים</span
+                      >
+                    </div>
+                  </div>
+                </tt-section-row>
               </div>
-            </div>
-          </div>
-
-          <div class="ticker-status-legend" role="note" aria-label="מקרא סטטוסים">
-            <span class="legend__title">מקרא סטטוס:</span>
-            <span class="legend__item"><span class="phoenix-table__status-badge phoenix-table__status-badge--pending" data-status-category="pending">ממתין</span> — EOD + היסטוריה בלבד, אין Intraday</span>
-            <span class="legend__item"><span class="phoenix-table__status-badge phoenix-table__status-badge--active" data-status-category="active">פתוח</span> — נתונים מלאים: Intraday + EOD + היסטוריה</span>
-            <span class="legend__item"><span class="phoenix-table__status-badge phoenix-table__status-badge--inactive" data-status-category="inactive">סגור</span> — EOD + היסטוריה בלבד</span>
-            <span class="legend__item"><span class="phoenix-table__status-badge phoenix-table__status-badge--cancelled" data-status-category="cancelled">מבוטל</span> — לא טוען נתונים</span>
-          </div>
-          
-        </div>
-      </tt-section-row>
+            </tt-section>
+          </tt-container>
+        </main>
+      </div>
     </div>
-  </tt-section>
 
-</tt-container>
-
-      </main>
-    </div>
-  </div>
-  
-<script src="/src/components/core/stalenessClock.js"></script>
-<script type="module" src="/src/components/core/eodStalenessCheck.js"></script>
-<script src="/src/components/core/sectionToggleHandler.js"></script>
-<script src="/src/cubes/shared/PhoenixTableSortManager.js"></script>
-<script type="module" src="/src/views/management/tickers/tickersDataIntegrityInit.js"></script>
-<script type="module" src="/src/views/management/tickers/tickersTableInit.js"></script>
-<script src="/src/views/shared/footerLoader.js"></script>
-</body>
+    <script src="/src/components/core/stalenessClock.js"></script>
+    <script
+      type="module"
+      src="/src/components/core/eodStalenessCheck.js"
+    ></script>
+    <script src="/src/components/core/sectionToggleHandler.js"></script>
+    <script src="/src/cubes/shared/PhoenixTableSortManager.js"></script>
+    <script
+      type="module"
+      src="/src/views/management/tickers/tickersDataIntegrityInit.js"
+    ></script>
+    <script
+      type="module"
+      src="/src/views/management/tickers/tickersTableInit.js"
+    ></script>
+    <script src="/src/views/shared/footerLoader.js"></script>
+  </body>
 </html>

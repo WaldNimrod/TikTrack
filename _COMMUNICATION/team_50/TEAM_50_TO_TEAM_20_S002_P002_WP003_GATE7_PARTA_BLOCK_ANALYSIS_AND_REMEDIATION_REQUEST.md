@@ -30,8 +30,8 @@
 | AUTO-WP003 Phase 2 | 4/4 PASS |
 
 **לוגים לדוגמה:**
-- `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_2026-03-11_212850.log`
-- `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_2026-03-11_221540.log`
+- `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_2026-03-11_212850.log`
+- `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_2026-03-11_221540.log`
 
 ---
 

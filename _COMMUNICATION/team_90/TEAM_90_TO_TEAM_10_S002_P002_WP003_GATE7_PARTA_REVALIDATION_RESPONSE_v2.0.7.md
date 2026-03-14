@@ -57,7 +57,7 @@ Submitted package is not admissible for Part A closure.
 1. **BF-G7PA-701 (missing mandatory artifact):**  
    `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_90_S002_P002_WP003_GATE7_PARTA_QA_CORROBORATION_v2.0.7.md` is missing in repository.
 2. **BF-G7PA-702 (CC-01 evidence missing):**  
-   `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log` is missing and JSON has `pass_01=null`; CC-01 cannot be validated.
+   `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log` is missing and JSON has `pass_01=null`; CC-01 cannot be validated.
 
 ---
 

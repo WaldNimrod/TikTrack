@@ -42,6 +42,7 @@ async def _live_data_check(
         get_provider_mapping,
         resolve_symbols_for_fetch,
     )
+
     pm = get_provider_mapping(symbol, ticker_type, market, metadata=None)
     yahoo_sym, alpha_sym, alpha_market = resolve_symbols_for_fetch(symbol, ticker_type, pm)
     for provider_cls in (YahooProvider,):
@@ -75,6 +76,7 @@ async def validate_ticker_with_providers(
     Use for edit when symbol/ticker_type/exchange changes. Create uses _live_data_check inside create_system_ticker.
     """
     from ..core.config import settings
+
     if not getattr(settings, "run_live_symbol_validation", True):
         return
     symbol_uc = symbol.strip().upper()
@@ -91,6 +93,7 @@ async def validate_ticker_with_providers(
 def _symbol_advisory_key(symbol: str) -> int:
     """G7R Batch5: Deterministic bigint for pg_advisory_xact_lock (single-create invariant)."""
     import hashlib
+
     h = hashlib.sha256(symbol.strip().upper().encode()).digest()
     return int.from_bytes(h[:8], "big") % (2**63)
 
@@ -117,6 +120,7 @@ async def create_system_ticker(
     """
     from sqlalchemy import text
     from ..core.config import settings
+
     symbol_uc = symbol.strip().upper()
     ticker_type_uc = ticker_type.upper()
 
@@ -126,18 +130,22 @@ async def create_system_ticker(
 
     # Uniqueness check (after lock; another txn cannot have created meanwhile)
     # G7R Batch5: Return existing instead of 409 — idempotent get-or-create for concurrency
-    stmt = select(Ticker).where(
-        and_(Ticker.symbol == symbol_uc, Ticker.deleted_at.is_(None))
-    )
+    stmt = select(Ticker).where(and_(Ticker.symbol == symbol_uc, Ticker.deleted_at.is_(None)))
     existing = (await db.execute(stmt)).scalar_one_or_none()
     if existing:
         return existing
 
     # Live validation: default ON (TEAM_50). Only skip when skip_live_check=True and not force_validate; never run if bypass.
     # RUN_LIVE_SYMBOL_VALIDATION=false or SKIP_LIVE_DATA_CHECK=true disables for dev only.
-    force_validate = os.environ.get("VALIDATE_SYMBOL_ALWAYS", "").strip().lower() in ("true", "1", "yes")
+    force_validate = os.environ.get("VALIDATE_SYMBOL_ALWAYS", "").strip().lower() in (
+        "true",
+        "1",
+        "yes",
+    )
     run_validation = getattr(settings, "run_live_symbol_validation", True)
-    do_live = run_validation and not _is_live_check_bypass() and (force_validate or not skip_live_check)
+    do_live = (
+        run_validation and not _is_live_check_bypass() and (force_validate or not skip_live_check)
+    )
     if do_live:
         live_ok = await _live_data_check(symbol_uc, ticker_type=ticker_type_uc, market=market)
         if not live_ok:

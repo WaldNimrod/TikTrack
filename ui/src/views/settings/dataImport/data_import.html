@@ -1,108 +1,153 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="he" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ייבוא נתונים | TikTrack Phoenix</title>
-  
-  <!-- Favicon - Gate B Fix: Prevent 404 SEVERE errors -->
-  <link rel="icon" type="image/x-icon" href="/images/icons/favicon.ico">
-  
-  <!-- ============================================
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ייבוא נתונים | TikTrack Phoenix</title>
+
+    <!-- Favicon - Gate B Fix: Prevent 404 SEVERE errors -->
+    <link rel="icon" type="image/x-icon" href="/images/icons/favicon.ico" />
+
+    <!-- ============================================
        CSS Loading Order (CRITICAL - DO NOT CHANGE)
        Per: documentation/04-DESIGN_UX_UI/CSS_LOADING_ORDER.md
        ============================================ -->
-  
-  <!-- 1. Pico CSS (Framework) - MUST BE FIRST -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
-  
-  <!-- 2. Phoenix Base Styles (Global defaults & DNA variables) -->
-  <link rel="stylesheet" href="/src/styles/phoenix-base.css">
-  
-  <!-- 3. LEGO Components (Reusable components) -->
-  <link rel="stylesheet" href="/src/styles/phoenix-components.css">
-  
-  <!-- 4. Header Component (Unified Header Styles) -->
-  <link rel="stylesheet" href="/src/styles/phoenix-header.css">
-  
-  <!-- 5. Page-Specific Styles (Dashboard-specific styles) -->
-  <link rel="stylesheet" href="/src/styles/D15_DASHBOARD_STYLES.css">
-  
-  <!-- 6. Modal Styles -->
-  <link rel="stylesheet" href="/src/styles/phoenix-modal.css">
-  
-  <script src="https://unpkg.com/lucide@latest"></script>
-</head>
-<body class="data-import-page context-settings entity-execution">
-  
-  <!-- ============================================
+
+    <!-- 1. Pico CSS (Framework) - MUST BE FIRST -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css"
+    />
+
+    <!-- 2. Phoenix Base Styles (Global defaults & DNA variables) -->
+    <link rel="stylesheet" href="/src/styles/phoenix-base.css" />
+
+    <!-- 3. LEGO Components (Reusable components) -->
+    <link rel="stylesheet" href="/src/styles/phoenix-components.css" />
+
+    <!-- 4. Header Component (Unified Header Styles) -->
+    <link rel="stylesheet" href="/src/styles/phoenix-header.css" />
+
+    <!-- 5. Page-Specific Styles (Dashboard-specific styles) -->
+    <link rel="stylesheet" href="/src/styles/D15_DASHBOARD_STYLES.css" />
+
+    <!-- 6. Modal Styles -->
+    <link rel="stylesheet" href="/src/styles/phoenix-modal.css" />
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body class="data-import-page context-settings entity-execution">
+    <!-- ============================================
        Header Loader - MANDATORY per POL-015
        טוען unified-header.html דינמית — אלמנט ראש דף לכל עמוד (מלבד Auth)
        ============================================ -->
-  <script src="/src/components/core/headerLoader.js"></script>
-  
-  <!-- ============================================
+    <script src="/src/components/core/headerLoader.js"></script>
+
+    <!-- ============================================
        UAI Entry Point (Unified App Init)
        Per: TT2_PAGE_TEMPLATE_CONTRACT (POL-015)
        ============================================ -->
-  <script src="/src/views/settings/dataImport/dataImportPageConfig.js"></script>
-  <script type="module" src="/src/components/core/UnifiedAppInit.js"></script>
+    <script src="/src/views/settings/dataImport/dataImportPageConfig.js"></script>
+    <script type="module" src="/src/components/core/UnifiedAppInit.js"></script>
 
-  <!-- ============================================
+    <!-- ============================================
        PAGE WRAPPER + CONTAINER STRUCTURE
        LEGO System: page-wrapper > page-container > main > tt-container > tt-section(s)
        ============================================ -->
-  
-  <div class="page-wrapper">
-    <div class="page-container">
-      <main>
-        <tt-container>
-  <tt-section data-section="summary" data-entity="execution">
-    <div class="index-section__header">
-      <div class="index-section__header-title">
-        <img src="/images/icons/entities/development.svg" alt="ייבוא נתונים" class="index-section__header-icon" width="35" height="35">
-        <h1 class="index-section__header-text">ייבוא נתונים</h1>
-      </div>
-      <div class="index-section__header-actions">
-        <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6l6 -6"></path></svg>
-        </button>
-      </div>
-    </div>
-    <div class="index-section__body">
-      <tt-section-row><div class="col-12">
-        <div class="info-summary" id="summaryStats">
-          <div class="info-summary__row info-summary__row--first">
-            <div class="info-summary__content"><div>סיכום מידע — ייבוא נתונים</div></div>
-          </div>
-        </div>
-      </div></tt-section-row>
-    </div>
-  </tt-section>
-  <tt-section data-section="data-import-main" data-entity="execution">
-    <div class="index-section__header">
-      <div class="index-section__header-title">
-        <img src="/images/icons/entities/development.svg" alt="ייבוא נתונים" class="index-section__header-icon" width="35" height="35">
-        <h1 class="index-section__header-text">ייבוא נתונים</h1>
-      </div>
-      <div class="index-section__header-actions">
-        <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6l6 -6"></path></svg>
-        </button>
-      </div>
-    </div>
-    <div class="index-section__body">
-      <tt-section-row><div class="col-12"><!-- תוכן יוגדר בהמשך --></div></tt-section-row>
-    </div>
-  </tt-section>
-</tt-container>
 
-      </main>
+    <div class="page-wrapper">
+      <div class="page-container">
+        <main>
+          <tt-container>
+            <tt-section data-section="summary" data-entity="execution">
+              <div class="index-section__header">
+                <div class="index-section__header-title">
+                  <img
+                    src="/images/icons/entities/development.svg"
+                    alt="ייבוא נתונים"
+                    class="index-section__header-icon"
+                    width="35"
+                    height="35"
+                  />
+                  <h1 class="index-section__header-text">ייבוא נתונים</h1>
+                </div>
+                <div class="index-section__header-actions">
+                  <button
+                    class="index-section__header-toggle-btn js-section-toggle"
+                    aria-label="הצג/הסתר"
+                  >
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="M6 9l6 6l6 -6"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="index-section__body">
+                <tt-section-row
+                  ><div class="col-12">
+                    <div class="info-summary" id="summaryStats">
+                      <div class="info-summary__row info-summary__row--first">
+                        <div class="info-summary__content">
+                          <div>סיכום מידע — ייבוא נתונים</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div></tt-section-row
+                >
+              </div>
+            </tt-section>
+            <tt-section data-section="data-import-main" data-entity="execution">
+              <div class="index-section__header">
+                <div class="index-section__header-title">
+                  <img
+                    src="/images/icons/entities/development.svg"
+                    alt="ייבוא נתונים"
+                    class="index-section__header-icon"
+                    width="35"
+                    height="35"
+                  />
+                  <h1 class="index-section__header-text">ייבוא נתונים</h1>
+                </div>
+                <div class="index-section__header-actions">
+                  <button
+                    class="index-section__header-toggle-btn js-section-toggle"
+                    aria-label="הצג/הסתר"
+                  >
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="M6 9l6 6l6 -6"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="index-section__body">
+                <tt-section-row
+                  ><div class="col-12">
+                    <!-- תוכן יוגדר בהמשך -->
+                  </div></tt-section-row
+                >
+              </div>
+            </tt-section>
+          </tt-container>
+        </main>
+      </div>
     </div>
-  </div>
-  
-<script src="/src/components/core/sectionToggleHandler.js"></script>
-<script src="/src/views/shared/footerLoader.js"></script>
-<script src="/src/components/core/headerLinksUpdater.js"></script>
-</body>
+
+    <script src="/src/components/core/sectionToggleHandler.js"></script>
+    <script src="/src/views/shared/footerLoader.js"></script>
+    <script src="/src/components/core/headerLinksUpdater.js"></script>
+  </body>
 </html>

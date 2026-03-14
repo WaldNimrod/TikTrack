@@ -50,7 +50,7 @@ def test_cleanup_runs():
 
 def test_evidence_emitted():
     """Evidence JSON exists with last_run_time, rows_pruned"""
-    p = Path("documentation/05-REPORTS/artifacts/TEAM_60_CLEANUP_EVIDENCE.json")
+    p = Path("documentation/reports/05-REPORTS/artifacts/TEAM_60_CLEANUP_EVIDENCE.json")
     if not p.exists():
         fail("evidence", "TEAM_60_CLEANUP_EVIDENCE.json missing"); return
     try:

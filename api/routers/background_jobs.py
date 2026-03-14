@@ -26,6 +26,7 @@ async def health_check(
 ):
     """Lightweight health — scheduler alive. No job_run_log query. Fast path for responsiveness checks."""
     from ..background.scheduler_startup import get_scheduler
+
     sched = get_scheduler()
     return {
         "status": "ok",
@@ -47,14 +48,21 @@ async def list_jobs(
     last_runs = {}
     try:
         result = await db.execute(
-            text("""
+            text(
+                """
                 SELECT DISTINCT ON (job_name) job_name, status, started_at, duration_ms, records_processed
                 FROM admin_data.job_run_log
                 ORDER BY job_name, started_at DESC
-            """)
+            """
+            )
         )
         for row in result.fetchall():
-            last_runs[row[0]] = {"status": row[1], "started_at": row[2], "duration_ms": row[3], "records_processed": row[4]}
+            last_runs[row[0]] = {
+                "status": row[1],
+                "started_at": row[2],
+                "duration_ms": row[3],
+                "records_processed": row[4],
+            }
     except ProgrammingError as e:
         logger.warning("job_run_log not available: %s", e)
     except Exception as e:
@@ -64,16 +72,18 @@ async def list_jobs(
     for cfg in JOB_REGISTRY:
         job_id = cfg["job_name"]
         lr = last_runs.get(job_id, {})
-        jobs.append({
-            "job_name": job_id,
-            "description": cfg.get("description", ""),
-            "enabled": cfg.get("enabled_default", True),
-            "is_scheduled": bool(sched and sched.get_job(job_id)),
-            "last_run_at": lr.get("started_at").isoformat() if lr.get("started_at") else None,
-            "last_status": lr.get("status"),
-            "last_duration_ms": lr.get("duration_ms"),
-            "last_records_processed": lr.get("records_processed"),
-        })
+        jobs.append(
+            {
+                "job_name": job_id,
+                "description": cfg.get("description", ""),
+                "enabled": cfg.get("enabled_default", True),
+                "is_scheduled": bool(sched and sched.get_job(job_id)),
+                "last_run_at": lr.get("started_at").isoformat() if lr.get("started_at") else None,
+                "last_status": lr.get("status"),
+                "last_duration_ms": lr.get("duration_ms"),
+                "last_records_processed": lr.get("records_processed"),
+            }
+        )
     return {"jobs": jobs, "total": len(jobs)}
 
 
@@ -86,12 +96,14 @@ async def list_runs(
     """Recent runs across all jobs. Fast single-query path."""
     try:
         result = await db.execute(
-            text("""
+            text(
+                """
                 SELECT job_name, id, started_at, completed_at, status, runtime_class, duration_ms, records_processed
                 FROM admin_data.job_run_log
                 ORDER BY started_at DESC
                 LIMIT :limit
-            """),
+            """
+            ),
             {"limit": limit},
         )
         rows = result.fetchall()
@@ -123,14 +135,16 @@ async def get_analytics(
     cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
     try:
         result = await db.execute(
-            text("""
+            text(
+                """
                 SELECT job_name, COUNT(*),
                        COALESCE(SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END), 0),
                        COALESCE(SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END), 0)
                 FROM admin_data.job_run_log
                 WHERE started_at > :cutoff
                 GROUP BY job_name
-            """),
+            """
+            ),
             {"cutoff": cutoff},
         )
         rows = result.fetchall()
@@ -149,19 +163,22 @@ async def get_job_detail(
 ):
     """Single job detail + 24h run history."""
     from ..background.scheduler_registry import JOB_REGISTRY
+
     cfg = next((j for j in JOB_REGISTRY if j["job_name"] == job_name), None)
     if not cfg:
         raise HTTPException(status_code=404, detail="Job not found")
 
     try:
         result = await db.execute(
-            text("""
+            text(
+                """
                 SELECT id, started_at, completed_at, status, duration_ms, records_processed, records_updated, error_count
                 FROM admin_data.job_run_log
                 WHERE job_name = :job_name AND started_at > NOW() - INTERVAL '24 hours'
                 ORDER BY started_at DESC
                 LIMIT 20
-            """),
+            """
+            ),
             {"job_name": job_name},
         )
         rows = result.fetchall()
@@ -194,13 +211,15 @@ async def get_job_history(
     """Paginated run history."""
     try:
         result = await db.execute(
-            text("""
+            text(
+                """
                 SELECT id, started_at, completed_at, status, duration_ms, records_processed, error_count
                 FROM admin_data.job_run_log
                 WHERE job_name = :job_name
                 ORDER BY started_at DESC
                 LIMIT :limit
-            """),
+            """
+            ),
             {"job_name": job_name, "limit": limit},
         )
         rows = result.fetchall()

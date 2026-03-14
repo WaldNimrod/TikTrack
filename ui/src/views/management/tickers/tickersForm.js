@@ -4,16 +4,31 @@
  * R2 1.7: exchange dropdown (GET /reference/exchanges), exchange_id in create
  */
 
-import { createModal, closeModal } from '../../../components/shared/PhoenixModal.js';
+import {
+  createModal,
+  closeModal,
+} from '../../../components/shared/PhoenixModal.js';
 import sharedServices from '../../../components/core/sharedServices.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 import { STATUS_VALUES } from '../../../utils/statusValues.js';
 
-const TICKER_TYPES = ['STOCK', 'ETF', 'OPTION', 'FUTURE', 'FOREX', 'CRYPTO', 'INDEX'];
+const TICKER_TYPES = [
+  'STOCK',
+  'ETF',
+  'OPTION',
+  'FUTURE',
+  'FOREX',
+  'CRYPTO',
+  'INDEX',
+];
 
 /** Resolve status for form: prefer status from API, else is_active true->active, false->cancelled */
 function getInitialStatus(data) {
-  const canon = data?.status ? (['pending', 'active', 'inactive', 'cancelled'].includes(data.status) ? data.status : null) : null;
+  const canon = data?.status
+    ? ['pending', 'active', 'inactive', 'cancelled'].includes(data.status)
+      ? data.status
+      : null
+    : null;
   if (canon) return canon;
   const isActive = data?.is_active ?? data?.isActive ?? true;
   return isActive ? 'active' : 'cancelled';
@@ -28,11 +43,13 @@ function createTickerFormHTML(data = null, exchanges = []) {
   const selectedExchangeId = data?.exchange_id ?? data?.exchangeId ?? '';
 
   const typeOptions = TICKER_TYPES.map(
-    (t) => `<option value="${t}" ${tickerType === t ? 'selected' : ''}>${t}</option>`
+    (t) =>
+      `<option value="${t}" ${tickerType === t ? 'selected' : ''}>${t}</option>`,
   ).join('');
 
   const statusOptions = STATUS_VALUES.map(
-    (s) => `<option value="${s.value}" ${initialStatus === s.value ? 'selected' : ''}>${s.label}</option>`
+    (s) =>
+      `<option value="${s.value}" ${initialStatus === s.value ? 'selected' : ''}>${s.label}</option>`,
   ).join('');
 
   const exchangeOptions = [
@@ -117,7 +134,9 @@ export async function showTickerFormModal(data, onSave) {
     const raw = res?.data ?? res ?? [];
     exchanges = Array.isArray(raw) ? raw : [];
   } catch (e) {
-    maskedLog('[Tickers Form] Failed to load exchanges:', { errorCode: e?.code });
+    maskedLog('[Tickers Form] Failed to load exchanges:', {
+      errorCode: e?.code,
+    });
   }
 
   const formHTML = createTickerFormHTML(data, exchanges);
@@ -133,7 +152,9 @@ export async function showTickerFormModal(data, onSave) {
       if (!form) return;
 
       if (!form.checkValidity()) {
-        const summaryEl = document.getElementById('tickerFormValidationSummary');
+        const summaryEl = document.getElementById(
+          'tickerFormValidationSummary',
+        );
         if (summaryEl) {
           summaryEl.textContent = 'יש לתקן את השדות המסומנים לפני שמירה';
           summaryEl.hidden = false;
@@ -142,21 +163,33 @@ export async function showTickerFormModal(data, onSave) {
         return;
       }
 
-      document.getElementById('tickerFormValidationSummary')?.setAttribute('hidden', '');
-      const symbol = document.getElementById('tickerSymbol')?.value?.trim() ?? '';
-      const companyName = document.getElementById('tickerCompanyName')?.value?.trim() || null;
-      const tickerType = document.getElementById('tickerType')?.value ?? 'STOCK';
+      document
+        .getElementById('tickerFormValidationSummary')
+        ?.setAttribute('hidden', '');
+      const symbol =
+        document.getElementById('tickerSymbol')?.value?.trim() ?? '';
+      const companyName =
+        document.getElementById('tickerCompanyName')?.value?.trim() || null;
+      const tickerType =
+        document.getElementById('tickerType')?.value ?? 'STOCK';
       const status = document.getElementById('tickerStatus')?.value ?? 'active';
-      const exchangeId = document.getElementById('tickerExchange')?.value?.trim() || null;
+      const exchangeId =
+        document.getElementById('tickerExchange')?.value?.trim() || null;
       const isActive = status !== 'cancelled';
 
-      document.querySelectorAll('#tickerForm .form-error').forEach((el) => { el.textContent = ''; });
-      document.getElementById('tickerFormValidationSummary')?.setAttribute('hidden', '');
+      document.querySelectorAll('#tickerForm .form-error').forEach((el) => {
+        el.textContent = '';
+      });
+      document
+        .getElementById('tickerFormValidationSummary')
+        ?.setAttribute('hidden', '');
 
       if (!symbol) {
         const errEl = document.getElementById('tickerSymbolError');
         if (errEl) errEl.textContent = 'חובה להזין סמל';
-        const summaryEl = document.getElementById('tickerFormValidationSummary');
+        const summaryEl = document.getElementById(
+          'tickerFormValidationSummary',
+        );
         if (summaryEl) {
           summaryEl.textContent = 'חובה להזין סמל';
           summaryEl.hidden = false;
@@ -181,11 +214,18 @@ export async function showTickerFormModal(data, onSave) {
           }
           closeModal();
         } catch (error) {
-          maskedLog('[Tickers Form] Error saving:', { errorCode: error?.code, status: error?.status });
-          const msg = String(error?.message ?? error?.detail ?? 'שגיאה בשמירה').trim();
+          maskedLog('[Tickers Form] Error saving:', {
+            errorCode: error?.code,
+            status: error?.status,
+          });
+          const msg = String(
+            error?.message ?? error?.detail ?? 'שגיאה בשמירה',
+          ).trim();
           const errEl = document.getElementById('tickerSymbolError');
           if (errEl) errEl.textContent = msg;
-          const summaryEl = document.getElementById('tickerFormValidationSummary');
+          const summaryEl = document.getElementById(
+            'tickerFormValidationSummary',
+          );
           if (summaryEl) {
             summaryEl.textContent = msg;
             summaryEl.hidden = false;

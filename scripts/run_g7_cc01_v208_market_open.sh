@@ -6,7 +6,7 @@
 set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-LOG_PATH="$PROJECT_ROOT/documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_8.log"
+LOG_PATH="$PROJECT_ROOT/documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_8.log"
 PORT=8083
 cd "$PROJECT_ROOT"
 mkdir -p "$(dirname "$LOG_PATH")"
@@ -39,7 +39,7 @@ done
 curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:$PORT/health" | grep -q 200 || { echo "Backend failed to start."; exit 1; }
 
 echo "=== Run A (market_open) verify ==="
-BACKEND_URL="http://127.0.0.1:$PORT" G7_PART_A_LOG_PATH="documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_8.log" G7_PART_A_MODE=market_open \
+BACKEND_URL="http://127.0.0.1:$PORT" G7_PART_A_LOG_PATH="documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_8.log" G7_PART_A_MODE=market_open \
   python3 scripts/verify_g7_part_a_runtime.py || { kill -9 $BACKEND_PID 2>/dev/null; exit 1; }
 
 kill -9 $BACKEND_PID 2>/dev/null
@@ -50,14 +50,14 @@ grep -q "mode=market_open" "$LOG_PATH" || { echo "FAIL: Log does not contain mod
 echo "PASS: Log contains mode=market_open."
 
 # Ensure JSON has run_id and log_path for v2.0.8
-JSON_PATH="$PROJECT_ROOT/documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json"
+JSON_PATH="$PROJECT_ROOT/documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json"
 if [ -f "$JSON_PATH" ]; then
   python3 -c "
 import json
 p = '$JSON_PATH'
 with open(p) as f: d = json.load(f)
 d['run_id'] = 'v2.0.8-cc01-market-open'
-d['log_path'] = 'documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_8.log'
+d['log_path'] = 'documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_8.log'
 with open(p, 'w') as f: json.dump(d, f, indent=2)
 "
 fi

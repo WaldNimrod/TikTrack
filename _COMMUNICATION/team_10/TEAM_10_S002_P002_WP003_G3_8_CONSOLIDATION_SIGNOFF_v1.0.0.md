@@ -18,7 +18,7 @@
 | 2 | Team 30 B1 Completion | `_COMMUNICATION/team_30/TEAM_30_TO_TEAM_10_S002_P002_WP003_GATE7_FULL_MANDATE_COMPLETION.md` | ✅ verified |
 | 3 | Team 50 B4 Completion | `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_S002_P002_WP003_PHASE2_RUNTIME_COMPLETION.md` | ✅ verified |
 | 4 | Phase 2 Runtime Test | `tests/auto-wp003-runtime.test.js` | ✅ verified |
-| 5 | Runtime Results JSON | `documentation/05-REPORTS/artifacts/TEAM_50_AUTO_WP003_RUNTIME_RESULTS.json` | ✅ verified |
+| 5 | Runtime Results JSON | `documentation/reports/05-REPORTS/artifacts/TEAM_50_AUTO_WP003_RUNTIME_RESULTS.json` | ✅ verified |
 
 ---
 

@@ -35,43 +35,95 @@ const TARGET_TYPE_LABELS = {
   trade: 'טרייד',
   trade_plan: 'תוכנית',
   ticker: 'טיקר',
-  datetime: 'תאריך/שעה'
+  datetime: 'תאריך/שעה',
 };
 
 /** G7R Batch1: Entity icon paths for linked entity display (§3D) */
-const ALERT_ENTITY_ICON_MAP = { ticker: '/images/icons/entities/tickers.svg', account: '/images/icons/entities/trading_accounts.svg', trade: '/images/icons/entities/trades.svg', trade_plan: '/images/icons/entities/trade_plans.svg' };
+const ALERT_ENTITY_ICON_MAP = {
+  ticker: '/images/icons/entities/tickers.svg',
+  account: '/images/icons/entities/trading_accounts.svg',
+  trade: '/images/icons/entities/trades.svg',
+  trade_plan: '/images/icons/entities/trade_plans.svg',
+};
 
 /** T50-1: Map alert target_type to entity type for links (account → trading_accounts) */
-const ALERT_TYPE_TO_ENTITY = { ticker: 'ticker', account: 'trading_account', trade: 'trade', trade_plan: 'trade_plan' };
+const ALERT_TYPE_TO_ENTITY = {
+  ticker: 'ticker',
+  account: 'trading_account',
+  trade: 'trade',
+  trade_plan: 'trade_plan',
+};
 
 /** Format alert linked entity: icon + resolved name + link to details (T50-1) */
 function formatAlertLinkedEntity(alert) {
-  const targetType = (alert.target_type != null ? alert.target_type : alert.targetType) || '';
-  const resolvedName = alert.linked_entity_display ?? alert.target_display_name ?? (alert.ticker_symbol ?? alert.tickerSymbol) ?? '';
-  const targetId = (alert.target_id != null ? alert.target_id : alert.targetId) || (alert.ticker_id ?? alert.tickerId) || '';
+  const targetType =
+    (alert.target_type != null ? alert.target_type : alert.targetType) || '';
+  const resolvedName =
+    alert.linked_entity_display ??
+    alert.target_display_name ??
+    alert.ticker_symbol ??
+    alert.tickerSymbol ??
+    '';
+  const targetId =
+    (alert.target_id != null ? alert.target_id : alert.targetId) ||
+    (alert.ticker_id ?? alert.tickerId) ||
+    '';
   const typeLabel = TARGET_TYPE_LABELS[targetType] || targetType || '';
-  const displayName = resolvedName || (targetId ? typeLabel + ' ' + String(targetId).slice(0, 8) + '…' : typeLabel || '—');
+  const displayName =
+    resolvedName ||
+    (targetId
+      ? typeLabel + ' ' + String(targetId).slice(0, 8) + '…'
+      : typeLabel || '—');
   const iconPath = targetType ? ALERT_ENTITY_ICON_MAP[targetType] : null;
   const targetDt = alert.target_datetime ?? alert.targetDatetime;
   if (targetType === 'datetime' && targetDt) {
     try {
       const dt = new Date(targetDt);
-      const dtStr = dt.toLocaleString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      const dtStr = dt.toLocaleString('he-IL', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
       return `<span class="linked-object-badge entity-datetime" title="תאריך/שעה: ${String(dtStr).replace(/"/g, '&quot;')}">🕐 ${dtStr}</span>`;
-    } catch (_) { /* ignore invalid date */ }
+    } catch (_) {
+      /* ignore invalid date */
+    }
   }
-  if (!targetType && !targetId) return '<span class="linked-object-badge">—</span>';
-  const iconHtml = iconPath ? `<img src="${iconPath}" alt="" class="linked-entity-icon" width="16" height="16" aria-hidden="true" />` : '';
+  if (!targetType && !targetId)
+    return '<span class="linked-object-badge">—</span>';
+  const iconHtml = iconPath
+    ? `<img src="${iconPath}" alt="" class="linked-entity-icon" width="16" height="16" aria-hidden="true" />`
+    : '';
   const entityType = ALERT_TYPE_TO_ENTITY[targetType];
-  const href = entityType && targetId ? getEntityDetailUrl(entityType, targetId) : null;
+  const href =
+    entityType && targetId ? getEntityDetailUrl(entityType, targetId) : null;
   const badgeHtml = `<span class="linked-object-badge entity-${targetType}" title="${(typeLabel + (displayName ? ' ' + displayName : '')).replace(/"/g, '&quot;')}">${iconHtml} ${displayName}</span>`;
-  if (href) return `<a href="${href}" class="linked-object-badge-link" data-entity-type="${entityType}" data-entity-id="${String(targetId).replace(/"/g, '&quot;')}">${badgeHtml}</a>`;
+  if (href)
+    return `<a href="${href}" class="linked-object-badge-link" data-entity-type="${entityType}" data-entity-id="${String(targetId).replace(/"/g, '&quot;')}">${badgeHtml}</a>`;
   return badgeHtml;
 }
 
 /** G7R Batch1: Condition field/operator labels for formatted display */
-const CONDITION_FIELD_LABELS = { price: 'מחיר', open_price: 'מחיר פתיחה', high_price: 'מחיר גבוה', low_price: 'מחיר נמוך', close_price: 'מחיר סגירה', volume: 'נפח', market_cap: 'שווי שוק' };
-const CONDITION_OP_LABELS = { '>': '>', '<': '<', '>=': '>=', '<=': '<=', '=': '=', crosses_above: 'חוצה כלפי מעלה', crosses_below: 'חוצה כלפי מטה' };
+const CONDITION_FIELD_LABELS = {
+  price: 'מחיר',
+  open_price: 'מחיר פתיחה',
+  high_price: 'מחיר גבוה',
+  low_price: 'מחיר נמוך',
+  close_price: 'מחיר סגירה',
+  volume: 'נפח',
+  market_cap: 'שווי שוק',
+};
+const CONDITION_OP_LABELS = {
+  '>': '>',
+  '<': '<',
+  '>=': '>=',
+  '<=': '<=',
+  '=': '=',
+  crosses_above: 'חוצה כלפי מעלה',
+  crosses_below: 'חוצה כלפי מטה',
+};
 
 function formatConditionDisplay(field, op, value) {
   if (!field || !op) return null;
@@ -85,7 +137,13 @@ function formatDate(iso) {
   if (!iso) return '—';
   try {
     const d = new Date(iso);
-    return d.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    return d.toLocaleDateString('he-IL', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   } catch {
     return iso;
   }
@@ -95,7 +153,7 @@ function formatTriggerStatus(ts) {
   const labels = {
     untriggered: 'ממתין להפעלה',
     triggered_unread: 'הופעל — לא נקרא',
-    triggered_read: 'הופעל — נקרא'
+    triggered_read: 'הופעל — נקרא',
   };
   return labels[ts] || ts || '—';
 }
@@ -108,15 +166,16 @@ function renderSummary(summary) {
   el('activeAlerts').textContent = s.activeAlerts != null ? s.activeAlerts : 0;
   el('newAlerts').textContent = s.newAlerts != null ? s.newAlerts : 0;
   const triggered = el('triggeredAlerts');
-  if (triggered) triggered.textContent = s.triggeredAlerts != null ? s.triggeredAlerts : 0;
+  if (triggered)
+    triggered.textContent = s.triggeredAlerts != null ? s.triggeredAlerts : 0;
 }
 
 function sortAlertsData(arr, sortKey, sortDir) {
   if (!sortKey || !arr.length) return arr;
   const dir = sortDir === 'desc' ? -1 : 1;
   return [...arr].sort((a, b) => {
-    let va = (a[sortKey] != null ? a[sortKey] : '');
-    let vb = (b[sortKey] != null ? b[sortKey] : '');
+    let va = a[sortKey] != null ? a[sortKey] : '';
+    let vb = b[sortKey] != null ? b[sortKey] : '';
     if (typeof va === 'string') va = va.toLowerCase();
     if (typeof vb === 'string') vb = vb.toLowerCase();
     if (va < vb) return -1 * dir;
@@ -134,7 +193,10 @@ function updatePagination() {
   const end = Math.min(currentPage * currentPageSize, total);
 
   const infoEl = document.getElementById('alertsPaginationInfo');
-  if (infoEl) infoEl.textContent = P ? P.formatInfoText(start, end, total) : `מציג ${start}-${end} מתוך ${total} רשומות`;
+  if (infoEl)
+    infoEl.textContent = P
+      ? P.formatInfoText(start, end, total)
+      : `מציג ${start}-${end} מתוך ${total} רשומות`;
 
   const prevBtn = document.getElementById('alertsPrevPageBtn');
   const nextBtn = document.getElementById('alertsNextPageBtn');
@@ -146,7 +208,11 @@ function updatePagination() {
     pageNumbersEl.innerHTML = '';
     for (let i = 1; i <= totalPages; i++) {
       const btn = document.createElement('button');
-      btn.className = 'phoenix-table-pagination__page-number' + (i === currentPage ? ' phoenix-table-pagination__page-number--active' : '');
+      btn.className =
+        'phoenix-table-pagination__page-number' +
+        (i === currentPage
+          ? ' phoenix-table-pagination__page-number--active'
+          : '');
       btn.textContent = i;
       btn.addEventListener('click', () => {
         currentPage = i;
@@ -180,18 +246,46 @@ function renderTableFromState() {
 
 function renderAlertRow(alert) {
   const linkedEntityHtml = formatAlertLinkedEntity(alert);
-  const condField = alert.condition_field != null ? alert.condition_field : alert.conditionField;
-  const condOp = alert.condition_operator != null ? alert.condition_operator : alert.conditionOperator;
-  const condVal = alert.condition_value != null ? alert.condition_value : alert.conditionValue;
-  const condition = alert.condition_summary || formatConditionDisplay(condField, condOp, condVal) || '—';
-  const isActive = (alert.is_active != null ? alert.is_active : alert.isActive) !== false;
-  const isTriggered = (alert.is_triggered != null ? alert.is_triggered : alert.isTriggered) === true;
-  const triggerStatus = (alert.trigger_status != null ? alert.trigger_status : alert.triggerStatus) || (isTriggered ? 'triggered_unread' : 'untriggered');
-  const created = formatDate(alert.created_at != null ? alert.created_at : alert.createdAt);
+  const condField =
+    alert.condition_field != null
+      ? alert.condition_field
+      : alert.conditionField;
+  const condOp =
+    alert.condition_operator != null
+      ? alert.condition_operator
+      : alert.conditionOperator;
+  const condVal =
+    alert.condition_value != null
+      ? alert.condition_value
+      : alert.conditionValue;
+  const condition =
+    alert.condition_summary ||
+    formatConditionDisplay(condField, condOp, condVal) ||
+    '—';
+  const isActive =
+    (alert.is_active != null ? alert.is_active : alert.isActive) !== false;
+  const isTriggered =
+    (alert.is_triggered != null ? alert.is_triggered : alert.isTriggered) ===
+    true;
+  const triggerStatus =
+    (alert.trigger_status != null
+      ? alert.trigger_status
+      : alert.triggerStatus) ||
+    (isTriggered ? 'triggered_unread' : 'untriggered');
+  const created = formatDate(
+    alert.created_at != null ? alert.created_at : alert.createdAt,
+  );
   const id = alert.id || alert.external_ulid || '';
-  const triggerClass = triggerStatus === 'triggered_unread' ? 'trigger-unread' : (triggerStatus === 'triggered_read' ? 'trigger-read' : '');
+  const triggerClass =
+    triggerStatus === 'triggered_unread'
+      ? 'trigger-unread'
+      : triggerStatus === 'triggered_read'
+        ? 'trigger-read'
+        : '';
 
-  const ticker = (alert.ticker_symbol != null ? alert.ticker_symbol : alert.tickerSymbol) || '—';
+  const ticker =
+    (alert.ticker_symbol != null ? alert.ticker_symbol : alert.tickerSymbol) ||
+    '—';
   return `
     <tr class="phoenix-table__row ${triggerClass}" data-alert-id="${id}" role="row">
       <td class="phoenix-table__cell col-linked-object" data-field="target_type">${linkedEntityHtml}</td>
@@ -226,7 +320,14 @@ function renderAlertRow(alert) {
 }
 
 function renderTable(alerts) {
-  const raw = Array.isArray(alerts) ? alerts : (alerts?.data ?? alerts?.alerts ?? alerts?.results ?? alerts?.items ?? []) || [];
+  const raw = Array.isArray(alerts)
+    ? alerts
+    : (alerts?.data ??
+        alerts?.alerts ??
+        alerts?.results ??
+        alerts?.items ??
+        []) ||
+      [];
   const reportedTotal = alerts?.total ?? alerts?.total_count ?? null;
   const total = Math.max(raw.length, reportedTotal ?? 0);
   tableData = { data: raw, total };
@@ -235,56 +336,80 @@ function renderTable(alerts) {
 }
 
 function initPaginationHandlers() {
-  const pageSizeSelect = document.querySelector('.js-table-page-size[data-table-id="alertsTable"]');
+  const pageSizeSelect = document.querySelector(
+    '.js-table-page-size[data-table-id="alertsTable"]',
+  );
   const prevBtn = document.getElementById('alertsPrevPageBtn');
   const nextBtn = document.getElementById('alertsNextPageBtn');
 
   if (pageSizeSelect) {
-    pageSizeSelect.addEventListener('change', function() {
+    pageSizeSelect.addEventListener('change', function () {
       currentPageSize = parseInt(this.value, 10) || 25;
       currentPage = 1;
       renderTableFromState();
     });
   }
-  if (prevBtn) prevBtn.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderTableFromState(); } });
-  if (nextBtn) nextBtn.addEventListener('click', () => {
-    const totalPages = Math.ceil(tableData.total / currentPageSize);
-    if (currentPage < totalPages) { currentPage++; renderTableFromState(); }
-  });
+  if (prevBtn)
+    prevBtn.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderTableFromState();
+      }
+    });
+  if (nextBtn)
+    nextBtn.addEventListener('click', () => {
+      const totalPages = Math.ceil(tableData.total / currentPageSize);
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderTableFromState();
+      }
+    });
 }
 
 function initSortManager() {
   const table = document.getElementById('alertsTable');
   if (!table || !window.PhoenixTableSortManager) return;
   const sortManager = new window.PhoenixTableSortManager(table);
-  table.addEventListener('phoenix-table-sorted', function(e) {
+  table.addEventListener('phoenix-table-sorted', function (e) {
     const detail = e.detail || {};
     currentSortKey = detail.sortKey || null;
-    const dir = (detail.sortDirection || detail.sortDir || 'asc');
+    const dir = detail.sortDirection || detail.sortDir || 'asc';
     currentSortDir = typeof dir === 'string' ? dir.toLowerCase() : 'asc';
-    if (currentSortDir !== 'asc' && currentSortDir !== 'desc') currentSortDir = 'asc';
+    if (currentSortDir !== 'asc' && currentSortDir !== 'desc')
+      currentSortDir = 'asc';
     renderTableFromState();
   });
 }
 
 function bindFilters() {
-  const container = document.querySelector('[data-section="alerts-management"] .filter-buttons-container');
+  const container = document.querySelector(
+    '[data-section="alerts-management"] .filter-buttons-container',
+  );
   if (!container) return;
   container.querySelectorAll('.filter-icon-btn').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const type = btn.dataset.filterType || 'all';
-      container.querySelectorAll('.filter-icon-btn').forEach((b) => b.classList.remove('filter-icon-btn--active'));
+      container
+        .querySelectorAll('.filter-icon-btn')
+        .forEach((b) => b.classList.remove('filter-icon-btn--active'));
       btn.classList.add('filter-icon-btn--active');
       currentFilterType = type;
       window.PhoenixBridge = window.PhoenixBridge || {};
       window.PhoenixBridge.state = window.PhoenixBridge.state || {};
-      window.PhoenixBridge.state.filters = { ...(window.PhoenixBridge.state.filters || {}), targetType: type === 'all' ? undefined : type };
+      window.PhoenixBridge.state.filters = {
+        ...(window.PhoenixBridge.state.filters || {}),
+        targetType: type === 'all' ? undefined : type,
+      };
       try {
-        const result = await loadAlertsData({ targetType: type === 'all' ? undefined : type });
+        const result = await loadAlertsData({
+          targetType: type === 'all' ? undefined : type,
+        });
         renderSummary(result.summary);
         renderTable(result.alerts);
       } catch (err) {
-        maskedLog('[Alerts] Filter error:', { message: (err && err.message) || 'Unknown' });
+        maskedLog('[Alerts] Filter error:', {
+          message: (err && err.message) || 'Unknown',
+        });
         renderTable([]);
       }
     });
@@ -293,56 +418,101 @@ function bindFilters() {
 
 async function refreshAlertsTable() {
   try {
-    const filters = (window.PhoenixBridge && window.PhoenixBridge.state && window.PhoenixBridge.state.filters) || {};
-    const result = await loadAlertsData({ targetType: filters.targetType === 'all' ? undefined : filters.targetType });
+    const filters =
+      (window.PhoenixBridge &&
+        window.PhoenixBridge.state &&
+        window.PhoenixBridge.state.filters) ||
+      {};
+    const result = await loadAlertsData({
+      targetType: filters.targetType === 'all' ? undefined : filters.targetType,
+    });
     renderSummary(result.summary);
     renderTable(result.alerts);
   } catch (err) {
-    maskedLog('[Alerts] Refresh error:', { message: (err && err.message) || 'Unknown' });
+    maskedLog('[Alerts] Refresh error:', {
+      message: (err && err.message) || 'Unknown',
+    });
   }
 }
 
 /** G7R Batch2: Priority badge classes per §3D */
-const PRIORITY_CLASSES = { LOW: 'priority-low', MEDIUM: 'priority-medium', HIGH: 'priority-high', CRITICAL: 'priority-critical' };
+const PRIORITY_CLASSES = {
+  LOW: 'priority-low',
+  MEDIUM: 'priority-medium',
+  HIGH: 'priority-high',
+  CRITICAL: 'priority-critical',
+};
 function formatPriorityBadge(priority) {
   const p = (priority || 'MEDIUM').toUpperCase();
   const cls = PRIORITY_CLASSES[p] || 'priority-medium';
-  const labels = { LOW: 'נמוך', MEDIUM: 'בינוני', HIGH: 'גבוה', CRITICAL: 'קריטי' };
+  const labels = {
+    LOW: 'נמוך',
+    MEDIUM: 'בינוני',
+    HIGH: 'גבוה',
+    CRITICAL: 'קריטי',
+  };
   return `<span class="badge ${cls}">${labels[p] || p}</span>`;
 }
 
 async function handleViewAlert(alertItem) {
   const id = alertItem.id || alertItem.external_ulid || '';
   const title = (alertItem.title || '').trim() || '—';
-  const alertType = (alertItem.alert_type != null ? alertItem.alert_type : alertItem.alertType) || 'PRICE';
+  const alertType =
+    (alertItem.alert_type != null
+      ? alertItem.alert_type
+      : alertItem.alertType) || 'PRICE';
   const priority = (alertItem.priority ?? alertItem.priorityVal) || 'MEDIUM';
-  const isActive = (alertItem.is_active != null ? alertItem.is_active : alertItem.isActive) !== false;
+  const isActive =
+    (alertItem.is_active != null ? alertItem.is_active : alertItem.isActive) !==
+    false;
   const condF = alertItem.condition_field ?? alertItem.conditionField;
   const condO = alertItem.condition_operator ?? alertItem.conditionOperator;
   const condV = alertItem.condition_value ?? alertItem.conditionValue;
-  const condition = alertItem.condition_summary || formatConditionDisplay(condF, condO, condV) || 'ללא תנאי';
-  const triggerStatus = (alertItem.trigger_status != null ? alertItem.trigger_status : alertItem.triggerStatus) || 'untriggered';
-  const triggeredAt = formatDate(alertItem.triggered_at != null ? alertItem.triggered_at : alertItem.triggeredAt);
-  const expiresAt = formatDate(alertItem.expires_at != null ? alertItem.expires_at : alertItem.expiresAt);
-  const created = formatDate(alertItem.created_at != null ? alertItem.created_at : alertItem.createdAt);
-  const updated = formatDate(alertItem.updated_at != null ? alertItem.updated_at : alertItem.updatedAt);
+  const condition =
+    alertItem.condition_summary ||
+    formatConditionDisplay(condF, condO, condV) ||
+    'ללא תנאי';
+  const triggerStatus =
+    (alertItem.trigger_status != null
+      ? alertItem.trigger_status
+      : alertItem.triggerStatus) || 'untriggered';
+  const triggeredAt = formatDate(
+    alertItem.triggered_at != null
+      ? alertItem.triggered_at
+      : alertItem.triggeredAt,
+  );
+  const expiresAt = formatDate(
+    alertItem.expires_at != null ? alertItem.expires_at : alertItem.expiresAt,
+  );
+  const created = formatDate(
+    alertItem.created_at != null ? alertItem.created_at : alertItem.createdAt,
+  );
+  const updated = formatDate(
+    alertItem.updated_at != null ? alertItem.updated_at : alertItem.updatedAt,
+  );
   const canRearm = triggerStatus === 'triggered_read';
 
   if (triggerStatus === 'triggered_unread') {
     try {
       await sharedServices.init();
-      await sharedServices.patch(`/alerts/${id}`, { trigger_status: 'triggered_read' });
+      await sharedServices.patch(`/alerts/${id}`, {
+        trigger_status: 'triggered_read',
+      });
     } catch (err) {
-      maskedLog('[Alerts] Mark read error:', { message: (err && err.message) || 'Unknown' });
+      maskedLog('[Alerts] Mark read error:', {
+        message: (err && err.message) || 'Unknown',
+      });
     }
   }
 
   const linkedEntityHtml = formatAlertLinkedEntity(alertItem);
-  const rearmHtml = canRearm ? `
+  const rearmHtml = canRearm
+    ? `
     <div class="form-group" style="margin-top:12px;">
       <button type="button" class="phoenix-modal__save-btn js-alert-rearm-btn" data-alert-id="${id}">הפעל מחדש</button>
     </div>
-  ` : '';
+  `
+    : '';
 
   const html = `
     <div class="phoenix-form alert-detail-content">
@@ -366,7 +536,7 @@ async function handleViewAlert(alertItem) {
     entity: 'alert',
     showSaveButton: false,
     cancelButtonText: 'ביטול',
-    onClose: () => {}
+    onClose: () => {},
   });
 
   const rearmBtn = document.querySelector('.js-alert-rearm-btn');
@@ -374,16 +544,20 @@ async function handleViewAlert(alertItem) {
     rearmBtn.addEventListener('click', async () => {
       try {
         await sharedServices.init();
-        await sharedServices.patch(`/alerts/${id}`, { trigger_status: 'untriggered' });
+        await sharedServices.patch(`/alerts/${id}`, {
+          trigger_status: 'untriggered',
+        });
         document.getElementById('phoenix-modal-backdrop')?.remove();
         refreshAlertsTable();
       } catch (err) {
-        maskedLog('[Alerts] Re-arm error:', { message: (err && err.message) || 'Unknown' });
+        maskedLog('[Alerts] Re-arm error:', {
+          message: (err && err.message) || 'Unknown',
+        });
         createModal({
           title: 'שגיאה',
           content: '<p>שגיאה בהפעלה מחדש</p>',
           showSaveButton: false,
-          cancelButtonText: 'ביטול'
+          cancelButtonText: 'ביטול',
         });
       }
     });
@@ -393,7 +567,9 @@ async function handleViewAlert(alertItem) {
 function bindAddButton() {
   const addBtn = document.querySelector('.js-add-alert');
   if (!addBtn) return;
-  addBtn.addEventListener('click', () => openAlertsForm(null, refreshAlertsTable));
+  addBtn.addEventListener('click', () =>
+    openAlertsForm(null, refreshAlertsTable),
+  );
 }
 
 function bindRowActions() {
@@ -406,7 +582,9 @@ function bindRowActions() {
     const viewBtn = e.target.closest('.js-action-view');
     const id = (editBtn || delBtn || toggleBtn || viewBtn)?.dataset?.alertId;
     if (!id) return;
-    const alertItem = (tableData.data || []).find((a) => String(a.id || a.external_ulid || '') === String(id));
+    const alertItem = (tableData.data || []).find(
+      (a) => String(a.id || a.external_ulid || '') === String(id),
+    );
     if (editBtn) {
       openAlertsForm(alertItem, refreshAlertsTable);
       return;
@@ -414,16 +592,22 @@ function bindRowActions() {
     if (toggleBtn) {
       try {
         await sharedServices.init();
-        const current = (alertItem && (alertItem.is_active != null ? alertItem.is_active : alertItem.isActive)) !== false;
+        const current =
+          (alertItem &&
+            (alertItem.is_active != null
+              ? alertItem.is_active
+              : alertItem.isActive)) !== false;
         await sharedServices.patch(`/alerts/${id}`, { is_active: !current });
         refreshAlertsTable();
       } catch (err) {
-        maskedLog('[Alerts] Toggle error:', { message: (err && err.message) || 'Unknown' });
+        maskedLog('[Alerts] Toggle error:', {
+          message: (err && err.message) || 'Unknown',
+        });
         createModal({
           title: 'שגיאה',
           content: '<p>שגיאה בעדכון סטטוס</p>',
           showSaveButton: false,
-          cancelButtonText: 'ביטול'
+          cancelButtonText: 'ביטול',
         });
       }
       return;
@@ -444,15 +628,17 @@ function bindRowActions() {
             document.getElementById('phoenix-modal-backdrop')?.remove();
             refreshAlertsTable();
           } catch (err) {
-            maskedLog('[Alerts] Delete error:', { message: (err && err.message) || 'Unknown' });
+            maskedLog('[Alerts] Delete error:', {
+              message: (err && err.message) || 'Unknown',
+            });
             createModal({
               title: 'שגיאה',
               content: '<p>שגיאה במחיקה</p>',
               showSaveButton: false,
-              cancelButtonText: 'ביטול'
+              cancelButtonText: 'ביטול',
             });
           }
-        }
+        },
       });
       return;
     }

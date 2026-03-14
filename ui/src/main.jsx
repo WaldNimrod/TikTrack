@@ -2,10 +2,10 @@
  * Main Entry Point - TikTrack Phoenix Frontend
  * ---------------------------------------------
  * Application bootstrap and CSS loading order
- * 
+ *
  * @description Entry point for React application with CRITICAL CSS loading order
  * @infrastructure Team 60 - CSS loading order MUST follow CSS Standards Protocol
- * 
+ *
  * CSS Loading Order (CRITICAL - DO NOT CHANGE):
  * 1. Pico CSS (CDN - loaded in index.html)
  * 2. phoenix-base.css - Global defaults & DNA variables
@@ -39,24 +39,28 @@ import './styles/D15_IDENTITY_STYLES.css';
  */
 (async () => {
   try {
-    const [{ default: sharedServices }, { default: authService }] = await Promise.all([
-      import('./components/core/sharedServices.js'),
-      import('./cubes/identity/services/auth.js')
-    ]);
+    const [{ default: sharedServices }, { default: authService }] =
+      await Promise.all([
+        import('./components/core/sharedServices.js'),
+        import('./cubes/identity/services/auth.js'),
+      ]);
     await sharedServices.init();
     sharedServices.on401 = () => authService.handle401Logout();
     authService.checkTokenExpiryOnBoot();
-    if (authService.isAuthenticated()) authService.startProactiveRefreshScheduler();
+    if (authService.isAuthenticated())
+      authService.startProactiveRefreshScheduler();
   } catch (_) {}
 })();
 
 /**
  * Application Bootstrap
- * 
+ *
  * @description Initializes React root and renders AppRouter
  * ADR-013 SSOT: React mount marker for E2E load-order assert (Header Loader must run first)
  */
-try { window.__reactMountStart = window.__reactMountStart || Date.now(); } catch (_) {}
+try {
+  window.__reactMountStart = window.__reactMountStart || Date.now();
+} catch (_) {}
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
@@ -64,5 +68,5 @@ root.render(
     <PhoenixFilterProvider>
       <AppRouter />
     </PhoenixFilterProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

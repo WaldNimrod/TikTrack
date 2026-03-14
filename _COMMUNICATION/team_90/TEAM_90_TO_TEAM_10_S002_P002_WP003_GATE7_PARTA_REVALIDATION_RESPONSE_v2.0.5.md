@@ -45,7 +45,7 @@ Part A remains blocked on evidence admissibility for CC-WP003-01.
 
 | Condition ID | Verdict | Basis |
 |---|---|---|
-| CC-WP003-01 | **NOT_EVIDENCED** | Shared run log `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_5.log` contains off-hours cadence entries only and does not evidence a dedicated market-open run window. |
+| CC-WP003-01 | **NOT_EVIDENCED** | Shared run log `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_5.log` contains off-hours cadence entries only and does not evidence a dedicated market-open run window. |
 | CC-WP003-02 | **PASS** | Off-hours run is evidenced in shared log; JSON reports `cc_02_yahoo_call_count=0` with `pass_02=true`. |
 | CC-WP003-04 | **PASS** | Shared log corroboration and JSON both report `cc_04_yahoo_429_count=0` with `pass_04=true`; no Team 50/60 contradiction in v2.0.5 set. |
 

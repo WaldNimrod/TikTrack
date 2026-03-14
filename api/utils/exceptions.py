@@ -14,9 +14,9 @@ from typing import Optional
 class HTTPExceptionWithCode(HTTPException):
     """
     HTTPException with mandatory error_code support.
-    
+
     All API errors must include an error_code for consistent error handling.
-    
+
     Usage:
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -24,13 +24,9 @@ class HTTPExceptionWithCode(HTTPException):
             error_code=ErrorCodes.AUTH_INVALID_CREDENTIALS
         )
     """
-    
+
     def __init__(
-        self,
-        status_code: int,
-        detail: str,
-        error_code: str,
-        headers: Optional[dict] = None
+        self, status_code: int, detail: str, error_code: str, headers: Optional[dict] = None
     ):
         super().__init__(status_code=status_code, detail=detail, headers=headers)
         self.error_code = error_code
@@ -39,7 +35,7 @@ class HTTPExceptionWithCode(HTTPException):
 # Error Code Constants
 class ErrorCodes:
     """Standard error codes for the API."""
-    
+
     # Authentication Errors
     AUTH_INVALID_CREDENTIALS = "AUTH_INVALID_CREDENTIALS"
     AUTH_TOKEN_EXPIRED = "AUTH_TOKEN_EXPIRED"
@@ -51,14 +47,14 @@ class ErrorCodes:
     AUTH_TOKEN_MISSING = "AUTH_TOKEN_MISSING"
     AUTH_REFRESH_TOKEN_INVALID = "AUTH_REFRESH_TOKEN_INVALID"
     AUTH_REFRESH_TOKEN_MISSING = "AUTH_REFRESH_TOKEN_MISSING"
-    
+
     # Validation Errors
     VALIDATION_FIELD_REQUIRED = "VALIDATION_FIELD_REQUIRED"
     VALIDATION_INVALID_EMAIL = "VALIDATION_INVALID_EMAIL"
     VALIDATION_INVALID_PHONE = "VALIDATION_INVALID_PHONE"
     VALIDATION_INVALID_FORMAT = "VALIDATION_INVALID_FORMAT"
     VALIDATION_INVALID_PASSWORD = "VALIDATION_INVALID_PASSWORD"
-    
+
     # User Errors
     USER_NOT_FOUND = "USER_NOT_FOUND"
     USER_ALREADY_EXISTS = "USER_ALREADY_EXISTS"
@@ -67,7 +63,7 @@ class ErrorCodes:
     USER_LOCKED = "USER_LOCKED"
     USER_EMAIL_NOT_VERIFIED = "USER_EMAIL_NOT_VERIFIED"
     USER_PHONE_NOT_VERIFIED = "USER_PHONE_NOT_VERIFIED"
-    
+
     # Password Reset Errors
     PASSWORD_RESET_INVALID_TOKEN = "PASSWORD_RESET_INVALID_TOKEN"
     PASSWORD_RESET_TOKEN_EXPIRED = "PASSWORD_RESET_TOKEN_EXPIRED"
@@ -75,13 +71,13 @@ class ErrorCodes:
     PASSWORD_RESET_CODE_EXPIRED = "PASSWORD_RESET_CODE_EXPIRED"
     PASSWORD_RESET_MAX_ATTEMPTS = "PASSWORD_RESET_MAX_ATTEMPTS"
     PASSWORD_RESET_NO_PHONE = "PASSWORD_RESET_NO_PHONE"
-    
+
     # Trading Account Errors (D16 validation)
     ACCOUNT_NAME_DUPLICATE = "ACCOUNT_NAME_DUPLICATE"
     ACCOUNT_NUMBER_DUPLICATE = "ACCOUNT_NUMBER_DUPLICATE"
     # ADR-018: Broker "other" / unsupported - block API/import
     BROKER_NOT_SUPPORTED_FOR_API_IMPORT = "BROKER_NOT_SUPPORTED_FOR_API_IMPORT"
-    
+
     # Ticker Errors (G7R Batch2 Stream B, Batch5 BF-G7-008)
     TICKER_SYMBOL_DUPLICATE = "TICKER_SYMBOL_DUPLICATE"
     TICKER_SYMBOL_INVALID = "TICKER_SYMBOL_INVALID"  # Invalid symbol (provider cannot fetch)
@@ -93,7 +89,7 @@ class ErrorCodes:
     API_KEY_UPDATE_FAILED = "API_KEY_UPDATE_FAILED"
     API_KEY_DELETE_FAILED = "API_KEY_DELETE_FAILED"
     API_KEY_VERIFY_FAILED = "API_KEY_VERIFY_FAILED"
-    
+
     # Generic Errors (Team 90 SSOT)
     RESOURCE_NOT_FOUND = "RESOURCE_NOT_FOUND"
     PERMISSION_DENIED = "PERMISSION_DENIED"

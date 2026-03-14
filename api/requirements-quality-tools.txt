@@ -2,3 +2,4 @@ bandit
 pip-audit
 detect-secrets
 mypy
+black>=24.0.0

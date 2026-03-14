@@ -40,9 +40,9 @@
 
 | פריט | מיקום |
 |------|-------|
-| Evidence Log | `documentation/05-REPORTS/artifacts/TEAM_50_EXTERNAL_DATA_AUTOMATED_TESTING_EVIDENCE_LOG.md` |
-| Cleanup Evidence | `documentation/05-REPORTS/artifacts/TEAM_60_CLEANUP_EVIDENCE.json` |
-| לוח זמנים | `documentation/05-REPORTS/artifacts/TEAM_50_EXTERNAL_DATA_CI_SCHEDULE.md` |
+| Evidence Log | `documentation/reports/05-REPORTS/artifacts/TEAM_50_EXTERNAL_DATA_AUTOMATED_TESTING_EVIDENCE_LOG.md` |
+| Cleanup Evidence | `documentation/reports/05-REPORTS/artifacts/TEAM_60_CLEANUP_EVIDENCE.json` |
+| לוח זמנים | `documentation/reports/05-REPORTS/artifacts/TEAM_50_EXTERNAL_DATA_CI_SCHEDULE.md` |
 
 ---
 

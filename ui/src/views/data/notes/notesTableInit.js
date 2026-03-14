@@ -25,27 +25,51 @@ const PARENT_TYPE_LABELS = {
   trade: 'טרייד',
   trade_plan: 'תוכנית',
   ticker: 'טיקר',
-  datetime: 'תאריך/שעה'
+  datetime: 'תאריך/שעה',
 };
 
 /** G7R Batch1: Entity icon paths for linked entity display (§3D — icon + name) */
-const ENTITY_ICON_MAP = { ticker: '/images/icons/entities/tickers.svg', account: '/images/icons/entities/trading_accounts.svg', trade: '/images/icons/entities/trades.svg', trade_plan: '/images/icons/entities/trade_plans.svg' };
+const ENTITY_ICON_MAP = {
+  ticker: '/images/icons/entities/tickers.svg',
+  account: '/images/icons/entities/trading_accounts.svg',
+  trade: '/images/icons/entities/trades.svg',
+  trade_plan: '/images/icons/entities/trade_plans.svg',
+};
 
 /** Build linked entity display: icon + resolved name (§3D — linked_entity_display from API when available); datetime: formatted parent_datetime */
 function formatLinkedEntityDisplay(note) {
-  const parentType = (note.parent_type != null ? note.parent_type : note.parentType) || '';
-  const parentId = (note.parent_id != null ? note.parent_id : note.parentId) || '';
+  const parentType =
+    (note.parent_type != null ? note.parent_type : note.parentType) || '';
+  const parentId =
+    (note.parent_id != null ? note.parent_id : note.parentId) || '';
   const parentDt = note.parent_datetime ?? note.parentDatetime;
   const typeLabel = PARENT_TYPE_LABELS[parentType] || parentType || '';
   if (parentType === 'datetime' && parentDt) {
-    const dtStr = typeof parentDt === 'string' ? parentDt : new Date(parentDt).toLocaleString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const dtStr =
+      typeof parentDt === 'string'
+        ? parentDt
+        : new Date(parentDt).toLocaleString('he-IL', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          });
     return `<span class="linked-object-badge entity-datetime" title="תאריך/שעה: ${String(dtStr).replace(/"/g, '&quot;')}">🕐 ${String(dtStr).replace(/</g, '&lt;')}</span>`;
   }
-  const resolvedName = note.linked_entity_display ?? note.linked_entity_name ?? '';
-  const displayName = resolvedName || (parentId ? typeLabel + ' ' + String(parentId).slice(0, 8) + '…' : typeLabel || '—');
+  const resolvedName =
+    note.linked_entity_display ?? note.linked_entity_name ?? '';
+  const displayName =
+    resolvedName ||
+    (parentId
+      ? typeLabel + ' ' + String(parentId).slice(0, 8) + '…'
+      : typeLabel || '—');
   const iconPath = parentType ? ENTITY_ICON_MAP[parentType] : null;
-  if (!parentType && !parentId) return '<span class="linked-object-badge">—ללא קישור—</span>';
-  const iconHtml = iconPath ? `<img src="${iconPath}" alt="" class="linked-entity-icon" width="16" height="16" aria-hidden="true" />` : '';
+  if (!parentType && !parentId)
+    return '<span class="linked-object-badge">—ללא קישור—</span>';
+  const iconHtml = iconPath
+    ? `<img src="${iconPath}" alt="" class="linked-entity-icon" width="16" height="16" aria-hidden="true" />`
+    : '';
   const entityType = parentType === 'account' ? 'trading_account' : parentType;
   const href = parentId ? getEntityDetailUrl(entityType, parentId) : null;
   const badgeHtml = `${iconHtml} ${displayName}`;
@@ -62,7 +86,13 @@ function formatDate(iso) {
   if (!iso) return '—';
   try {
     const d = new Date(iso);
-    return d.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    return d.toLocaleDateString('he-IL', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   } catch {
     return iso;
   }
@@ -75,9 +105,23 @@ function getFormatIcon(contentType, filename) {
   const ext = (filename || '').split('.').pop() || '';
   const type = (contentType || '').toLowerCase();
   if (type.includes('pdf') || ext === 'pdf') return '📄';
-  if (type.includes('image') || ['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext)) return '🖼';
-  if (type.includes('sheet') || type.includes('excel') || ['xls', 'xlsx'].includes(ext)) return '📊';
-  if (type.includes('word') || type.includes('document') || ['doc', 'docx'].includes(ext)) return '📝';
+  if (
+    type.includes('image') ||
+    ['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext)
+  )
+    return '🖼';
+  if (
+    type.includes('sheet') ||
+    type.includes('excel') ||
+    ['xls', 'xlsx'].includes(ext)
+  )
+    return '📊';
+  if (
+    type.includes('word') ||
+    type.includes('document') ||
+    ['doc', 'docx'].includes(ext)
+  )
+    return '📝';
   return '📎';
 }
 
@@ -86,13 +130,23 @@ function getFormatIcon(contentType, filename) {
  * When API returns attachment_count or attachments array, show indicator
  */
 function getAttachmentDisplay(note) {
-  const count = note.attachment_count ?? (note.attachments && Array.isArray(note.attachments) ? note.attachments.length : 0);
+  const count =
+    note.attachment_count ??
+    (note.attachments && Array.isArray(note.attachments)
+      ? note.attachments.length
+      : 0);
   if (!count) return '—';
   const att = note.attachments && note.attachments[0];
-  const name = att && (att.original_filename || att.originalFilename || att.filename);
+  const name =
+    att && (att.original_filename || att.originalFilename || att.filename);
   const contentType = att && (att.content_type || att.contentType);
   const icon = getFormatIcon(contentType, name);
-  const label = count > 1 ? `📎 ${count} קבצים` : (name ? `${icon} ${(name.length > 18 ? name.slice(0, 15) + '…' : name).replace(/"/g, '&quot;')}` : `📎 1`);
+  const label =
+    count > 1
+      ? `📎 ${count} קבצים`
+      : name
+        ? `${icon} ${(name.length > 18 ? name.slice(0, 15) + '…' : name).replace(/"/g, '&quot;')}`
+        : `📎 1`;
   return `<span class="attachment-cell attachment-indicator" title="${count > 1 ? count + ' קבצים מצורפים' : (name || '').replace(/"/g, '&quot;')}">${label}</span>`;
 }
 
@@ -115,7 +169,8 @@ function renderSummary(summary) {
   const s = summary || {};
   el('totalNotes').textContent = s.totalNotes != null ? s.totalNotes : 0;
   el('recentNotes').textContent = s.recentNotes != null ? s.recentNotes : 0;
-  el('totalLinks').textContent = s.totalAttachments != null ? s.totalAttachments : 0;
+  el('totalLinks').textContent =
+    s.totalAttachments != null ? s.totalAttachments : 0;
   el('pinnedNotes').textContent = s.pinnedNotes != null ? s.pinnedNotes : 0;
   const byType = s.notesByParentType || {};
   el('notesByTicker').textContent = byType.ticker != null ? byType.ticker : 0;
@@ -126,10 +181,19 @@ function renderSummary(summary) {
  * Render note row
  */
 function renderNoteRow(note) {
-  const parentType = (note.parent_type != null ? note.parent_type : note.parentType) || 'general';
-  const titleDisplay = (note.title != null ? String(note.title).trim() : '') || stripHtml(note.content != null ? note.content : '') || '—';
-  const created = formatDate(note.created_at != null ? note.created_at : note.createdAt);
-  const updated = formatDate(note.updated_at != null ? note.updated_at : note.updatedAt);
+  const parentType =
+    (note.parent_type != null ? note.parent_type : note.parentType) ||
+    'general';
+  const titleDisplay =
+    (note.title != null ? String(note.title).trim() : '') ||
+    stripHtml(note.content != null ? note.content : '') ||
+    '—';
+  const created = formatDate(
+    note.created_at != null ? note.created_at : note.createdAt,
+  );
+  const updated = formatDate(
+    note.updated_at != null ? note.updated_at : note.updatedAt,
+  );
   const id = note.id;
   const linkedEntityHtml = formatLinkedEntityDisplay(note);
 
@@ -175,7 +239,11 @@ function renderNoteRow(note) {
   `;
 }
 
-const SORT_KEY_MAP = { created_at: 'createdAt', updated_at: 'updatedAt', parent_type: 'parentType' };
+const SORT_KEY_MAP = {
+  created_at: 'createdAt',
+  updated_at: 'updatedAt',
+  parent_type: 'parentType',
+};
 
 /**
  * Sort notes array by key
@@ -185,8 +253,8 @@ function sortNotesData(arr, sortKey, sortDir) {
   const key = SORT_KEY_MAP[sortKey] || sortKey;
   const dir = sortDir === 'desc' ? -1 : 1;
   return [...arr].sort((a, b) => {
-    let va = a[sortKey] != null ? a[sortKey] : (a[key] != null ? a[key] : '');
-    let vb = b[sortKey] != null ? b[sortKey] : (b[key] != null ? b[key] : '');
+    let va = a[sortKey] != null ? a[sortKey] : a[key] != null ? a[key] : '';
+    let vb = b[sortKey] != null ? b[sortKey] : b[key] != null ? b[key] : '';
     if (typeof va === 'string') va = va.toLowerCase();
     if (typeof vb === 'string') vb = vb.toLowerCase();
     if (va < vb) return -1 * dir;
@@ -211,13 +279,16 @@ function updatePagination() {
           start: t === 0 ? 0 : (currentPage - 1) * currentPageSize + 1,
           end: Math.min(currentPage * currentPageSize, t),
           total: t,
-          totalPages: tp
+          totalPages: tp,
         };
       })();
   const { start, end, total, totalPages } = state;
 
   const infoEl = document.getElementById('notesPaginationInfo');
-  if (infoEl) infoEl.textContent = P ? P.formatInfoText(start, end, total) : `מציג ${start}-${end} מתוך ${total} רשומות`;
+  if (infoEl)
+    infoEl.textContent = P
+      ? P.formatInfoText(start, end, total)
+      : `מציג ${start}-${end} מתוך ${total} רשומות`;
 
   const prevBtn = document.getElementById('notesPrevPageBtn');
   const nextBtn = document.getElementById('notesNextPageBtn');
@@ -229,7 +300,11 @@ function updatePagination() {
     pageNumbersEl.innerHTML = '';
     for (let i = 1; i <= totalPages; i++) {
       const btn = document.createElement('button');
-      btn.className = 'phoenix-table-pagination__page-number' + (i === currentPage ? ' phoenix-table-pagination__page-number--active' : '');
+      btn.className =
+        'phoenix-table-pagination__page-number' +
+        (i === currentPage
+          ? ' phoenix-table-pagination__page-number--active'
+          : '');
       btn.textContent = i;
       btn.addEventListener('click', () => {
         currentPage = i;
@@ -264,7 +339,10 @@ function renderTableFromState() {
  * CRITICAL: total must always reflect actual row count for correct pagination display.
  */
 function renderTable(notes) {
-  const raw = Array.isArray(notes) ? notes : (notes?.data ?? notes?.notes ?? notes?.results ?? notes?.items ?? []) || [];
+  const raw = Array.isArray(notes)
+    ? notes
+    : (notes?.data ?? notes?.notes ?? notes?.results ?? notes?.items ?? []) ||
+      [];
   const reportedTotal = notes?.total ?? notes?.total_count ?? null;
   const total = Math.max(raw.length, reportedTotal ?? 0);
   tableData = { data: raw, total };
@@ -277,13 +355,20 @@ function renderTable(notes) {
  */
 function buildAttachmentsHtml(attachments, noteId) {
   if (!attachments || !attachments.length) return '<p>אין קבצים מצורפים</p>';
-  return attachments.map((att) => {
-    const name = att.original_filename || att.originalFilename || att.filename || 'קובץ';
-    const attId = att.id || att.external_ulid;
-    const icon = getFormatIcon(att.content_type || att.contentType, name);
-    const downloadUrl = att.download_url || `/api/v1/notes/${noteId}/attachments/${attId}/download`;
-    const esc = (s) => String(s ?? '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
-    return `
+  return attachments
+    .map((att) => {
+      const name =
+        att.original_filename || att.originalFilename || att.filename || 'קובץ';
+      const attId = att.id || att.external_ulid;
+      const icon = getFormatIcon(att.content_type || att.contentType, name);
+      const downloadUrl =
+        att.download_url ||
+        `/api/v1/notes/${noteId}/attachments/${attId}/download`;
+      const esc = (s) =>
+        String(s ?? '')
+          .replace(/"/g, '&quot;')
+          .replace(/</g, '&lt;');
+      return `
       <div class="note-attachment-row" data-note-id="${noteId}" data-attachment-id="${attId}">
         <span class="attachment-icon">${icon}</span>
         <span class="attachment-name">${esc(name)}</span>
@@ -293,7 +378,8 @@ function buildAttachmentsHtml(attachments, noteId) {
         </span>
         <button type="button" class="table-action-btn js-attachment-remove" data-attachment-id="${attId}" data-note-id="${noteId}" aria-label="מחק קובץ" title="מחק קובץ">✕</button>
       </div>`;
-  }).join('');
+    })
+    .join('');
 }
 
 /** Bind attachment download/open/remove handlers (BF-G7-024) */
@@ -302,11 +388,16 @@ function bindNoteAttachmentHandlers(noteId) {
   if (!container) return;
 
   async function fetchAttachmentBlob(attId, filename) {
-    const { default: sharedServices } = await import('../../../components/core/sharedServices.js');
+    const { default: sharedServices } =
+      await import('../../../components/core/sharedServices.js');
     await sharedServices.init();
-    const url = sharedServices.buildUrl(`/notes/${noteId}/attachments/${attId}/download`);
+    const url = sharedServices.buildUrl(
+      `/notes/${noteId}/attachments/${attId}/download`,
+    );
     const token = sharedServices.getToken();
-    const res = await fetch(url, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+    const res = await fetch(url, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return res.blob();
   }
@@ -316,7 +407,10 @@ function bindNoteAttachmentHandlers(noteId) {
       e.preventDefault();
       const attId = link.dataset.attachmentId;
       const row = link.closest('.note-attachment-row');
-      const filename = (row && row.querySelector('.attachment-name')) ? row.querySelector('.attachment-name').textContent.trim() : 'download';
+      const filename =
+        row && row.querySelector('.attachment-name')
+          ? row.querySelector('.attachment-name').textContent.trim()
+          : 'download';
       if (!attId || !noteId) return;
       try {
         const blob = await fetchAttachmentBlob(attId, filename);
@@ -326,8 +420,15 @@ function bindNoteAttachmentHandlers(noteId) {
         a.click();
         URL.revokeObjectURL(a.href);
       } catch (err) {
-        maskedLog('[Notes] Download attachment error:', { message: (err && err.message) || 'Unknown' });
-        createModal({ title: 'שגיאה', content: '<p>שגיאה בהורדת הקובץ</p>', showSaveButton: false, cancelButtonText: 'ביטול' });
+        maskedLog('[Notes] Download attachment error:', {
+          message: (err && err.message) || 'Unknown',
+        });
+        createModal({
+          title: 'שגיאה',
+          content: '<p>שגיאה בהורדת הקובץ</p>',
+          showSaveButton: false,
+          cancelButtonText: 'ביטול',
+        });
       }
     });
   });
@@ -337,7 +438,10 @@ function bindNoteAttachmentHandlers(noteId) {
       e.preventDefault();
       const attId = link.dataset.attachmentId;
       const row = link.closest('.note-attachment-row');
-      const filename = (row && row.querySelector('.attachment-name')) ? row.querySelector('.attachment-name').textContent.trim() : 'file';
+      const filename =
+        row && row.querySelector('.attachment-name')
+          ? row.querySelector('.attachment-name').textContent.trim()
+          : 'file';
       if (!attId || !noteId) return;
       try {
         const blob = await fetchAttachmentBlob(attId, filename);
@@ -345,8 +449,15 @@ function bindNoteAttachmentHandlers(noteId) {
         window.open(url, '_blank', 'noopener,noreferrer');
         setTimeout(() => URL.revokeObjectURL(url), 60000);
       } catch (err) {
-        maskedLog('[Notes] Open attachment error:', { message: (err && err.message) || 'Unknown' });
-        createModal({ title: 'שגיאה', content: '<p>שגיאה בפתיחת הקובץ</p>', showSaveButton: false, cancelButtonText: 'ביטול' });
+        maskedLog('[Notes] Open attachment error:', {
+          message: (err && err.message) || 'Unknown',
+        });
+        createModal({
+          title: 'שגיאה',
+          content: '<p>שגיאה בפתיחת הקובץ</p>',
+          showSaveButton: false,
+          cancelButtonText: 'ביטול',
+        });
       }
     });
   });
@@ -356,15 +467,24 @@ function bindNoteAttachmentHandlers(noteId) {
       const attId = btn.dataset.attachmentId;
       if (!attId || !noteId) return;
       try {
-        const { default: sharedServices } = await import('../../../components/core/sharedServices.js');
+        const { default: sharedServices } =
+          await import('../../../components/core/sharedServices.js');
         await sharedServices.init();
         await sharedServices.delete(`/notes/${noteId}/attachments/${attId}`);
         const row = btn.closest('.note-attachment-row');
         if (row) row.remove();
-        if (!container.querySelector('.note-attachment-row')) container.innerHTML = '<p>אין קבצים מצורפים</p>';
+        if (!container.querySelector('.note-attachment-row'))
+          container.innerHTML = '<p>אין קבצים מצורפים</p>';
       } catch (err) {
-        maskedLog('[Notes] Remove attachment error:', { message: (err && err.message) || 'Unknown' });
-        createModal({ title: 'שגיאה', content: '<p>שגיאה בהסרת הקובץ</p>', showSaveButton: false, cancelButtonText: 'ביטול' });
+        maskedLog('[Notes] Remove attachment error:', {
+          message: (err && err.message) || 'Unknown',
+        });
+        createModal({
+          title: 'שגיאה',
+          content: '<p>שגיאה בהסרת הקובץ</p>',
+          showSaveButton: false,
+          cancelButtonText: 'ביטול',
+        });
       }
     });
   });
@@ -375,21 +495,28 @@ function bindNoteAttachmentHandlers(noteId) {
  */
 async function handleViewNote(noteId) {
   try {
-    const { default: sharedServices } = await import('../../../components/core/sharedServices.js');
+    const { default: sharedServices } =
+      await import('../../../components/core/sharedServices.js');
     await sharedServices.init();
     const [noteRes, attachmentsRes] = await Promise.all([
       sharedServices.get('/notes/' + noteId),
-      sharedServices.get('/notes/' + noteId + '/attachments').catch(() => ({ data: [] }))
+      sharedServices
+        .get('/notes/' + noteId + '/attachments')
+        .catch(() => ({ data: [] })),
     ]);
-    const n = (noteRes && noteRes.data) ? noteRes.data : noteRes;
-    const attList = Array.isArray(attachmentsRes) ? attachmentsRes : (attachmentsRes?.data ?? attachmentsRes?.attachments ?? []) || [];
-    const content = (n && n.content) ? n.content : '';
-    const title = (n && n.title) ? n.title : '';
-    const tags = (n && n.tags) ? n.tags : [];
+    const n = noteRes && noteRes.data ? noteRes.data : noteRes;
+    const attList = Array.isArray(attachmentsRes)
+      ? attachmentsRes
+      : (attachmentsRes?.data ?? attachmentsRes?.attachments ?? []) || [];
+    const content = n && n.content ? n.content : '';
+    const title = n && n.title ? n.title : '';
+    const tags = n && n.tags ? n.tags : [];
     const linkedEntityHtml = formatLinkedEntityDisplay(n || {});
     const created = formatDate((n && n.created_at) || (n && n.createdAt));
     const updated = formatDate((n && n.updated_at) || (n && n.updatedAt));
-    const tagsHtml = tags.length ? `<div class="form-group"><strong>תגיות:</strong> ${tags.map(t => `<span class="badge tag-badge">${String(t).replace(/</g, '&lt;')}</span>`).join(' ')}</div>` : '';
+    const tagsHtml = tags.length
+      ? `<div class="form-group"><strong>תגיות:</strong> ${tags.map((t) => `<span class="badge tag-badge">${String(t).replace(/</g, '&lt;')}</span>`).join(' ')}</div>`
+      : '';
     const attachmentsHtml = buildAttachmentsHtml(attList, noteId);
 
     const html = `
@@ -410,17 +537,19 @@ async function handleViewNote(noteId) {
       entity: 'note',
       showSaveButton: false,
       cancelButtonText: 'ביטול',
-      onClose: function() {}
+      onClose: function () {},
     });
 
     setTimeout(() => bindNoteAttachmentHandlers(noteId), 0);
   } catch (err) {
-    maskedLog('[Notes] View error:', { message: (err && err.message) || 'Unknown' });
+    maskedLog('[Notes] View error:', {
+      message: (err && err.message) || 'Unknown',
+    });
     createModal({
       title: 'שגיאה',
       content: '<p>שגיאה בטעינת פרטי ההערה</p>',
       showSaveButton: false,
-      cancelButtonText: 'ביטול'
+      cancelButtonText: 'ביטול',
     });
   }
 }
@@ -429,12 +558,14 @@ async function handleViewNote(noteId) {
  * Init pagination handlers — page size, prev, next
  */
 function initPaginationHandlers() {
-  const pageSizeSelect = document.querySelector('.js-table-page-size[data-table-id="notesTable"]');
+  const pageSizeSelect = document.querySelector(
+    '.js-table-page-size[data-table-id="notesTable"]',
+  );
   const prevBtn = document.getElementById('notesPrevPageBtn');
   const nextBtn = document.getElementById('notesNextPageBtn');
 
   if (pageSizeSelect) {
-    pageSizeSelect.addEventListener('change', function() {
+    pageSizeSelect.addEventListener('change', function () {
       currentPageSize = parseInt(this.value, 10) || 25;
       currentPage = 1;
       renderTableFromState();
@@ -466,12 +597,13 @@ function initSortManager() {
   const table = document.getElementById('notesTable');
   if (!table || !window.PhoenixTableSortManager) return;
   const sortManager = new window.PhoenixTableSortManager(table);
-  table.addEventListener('phoenix-table-sorted', function(e) {
+  table.addEventListener('phoenix-table-sorted', function (e) {
     const detail = e.detail || {};
     currentSortKey = detail.sortKey || null;
-    const dir = (detail.sortDirection || detail.sortDir || 'asc');
+    const dir = detail.sortDirection || detail.sortDir || 'asc';
     currentSortDir = typeof dir === 'string' ? dir.toLowerCase() : 'asc';
-    if (currentSortDir !== 'asc' && currentSortDir !== 'desc') currentSortDir = 'asc';
+    if (currentSortDir !== 'asc' && currentSortDir !== 'desc')
+      currentSortDir = 'asc';
     renderTableFromState();
   });
 }
@@ -485,12 +617,19 @@ function bindFilters() {
   container.querySelectorAll('.filter-icon-btn').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const type = btn.dataset.filterType || 'all';
-      container.querySelectorAll('.filter-icon-btn').forEach((b) => b.classList.remove('filter-icon-btn--active'));
+      container
+        .querySelectorAll('.filter-icon-btn')
+        .forEach((b) => b.classList.remove('filter-icon-btn--active'));
       btn.classList.add('filter-icon-btn--active');
       window.PhoenixBridge = window.PhoenixBridge || {};
       window.PhoenixBridge.state = window.PhoenixBridge.state || {};
-      window.PhoenixBridge.state.filters = { ...(window.PhoenixBridge.state.filters || {}), parentType: type === 'all' ? undefined : type };
-      const result = await loadNotesData({ parentType: type === 'all' ? undefined : type });
+      window.PhoenixBridge.state.filters = {
+        ...(window.PhoenixBridge.state.filters || {}),
+        parentType: type === 'all' ? undefined : type,
+      };
+      const result = await loadNotesData({
+        parentType: type === 'all' ? undefined : type,
+      });
       renderTable(result.notes);
     });
   });
@@ -507,12 +646,14 @@ function bindAddButton() {
       const { openNotesForm } = await import('./notesForm.js');
       openNotesForm();
     } catch (err) {
-      maskedLog('[Notes] Form load error:', { message: (err && err.message) || 'Unknown' });
+      maskedLog('[Notes] Form load error:', {
+        message: (err && err.message) || 'Unknown',
+      });
       createModal({
         title: 'שגיאה',
         content: '<p>שגיאה בטעינת טופס הוספת הערה</p>',
         showSaveButton: false,
-        cancelButtonText: 'ביטול'
+        cancelButtonText: 'ביטול',
       });
     }
   });
@@ -523,51 +664,58 @@ function bindAddButton() {
  */
 function bindRowActions() {
   const tbody = document.getElementById('notesTableBody');
-  if (tbody) tbody.addEventListener('click', async (e) => {
-    const viewBtn = e.target.closest('.js-action-view');
-    const editBtn = e.target.closest('.js-action-edit');
-    const delBtn = e.target.closest('.js-action-delete');
-    const btn = viewBtn || editBtn || delBtn;
-    const id = btn && btn.dataset.noteId;
-    if (!id) return;
-    if (viewBtn) {
-      handleViewNote(id);
-    } else if (editBtn && window.openNotesForm) {
-      window.openNotesForm(id);
-    } else if (delBtn) {
-      createModal({
-        title: 'מחיקת הערה',
-        content: '<p>האם למחוק את ההערה?</p>',
-        entity: 'note',
-        showSaveButton: true,
-        confirmMode: true,
-        saveButtonText: 'מחיקה',
-        cancelButtonText: 'ביטול',
-        onSave: async () => {
-          try {
-            const { default: sharedServices } = await import('../../../components/core/sharedServices.js');
-            await sharedServices.init();
-            await sharedServices.delete(`/notes/${id}`);
-            document.getElementById('phoenix-modal-backdrop')?.remove();
-            if (window.refreshNotesTable) await window.refreshNotesTable();
-            else {
-              const result = await loadNotesData((window.PhoenixBridge && window.PhoenixBridge.state && window.PhoenixBridge.state.filters) || {});
-              renderSummary(result.summary);
-              renderTable(result.notes);
+  if (tbody)
+    tbody.addEventListener('click', async (e) => {
+      const viewBtn = e.target.closest('.js-action-view');
+      const editBtn = e.target.closest('.js-action-edit');
+      const delBtn = e.target.closest('.js-action-delete');
+      const btn = viewBtn || editBtn || delBtn;
+      const id = btn && btn.dataset.noteId;
+      if (!id) return;
+      if (viewBtn) {
+        handleViewNote(id);
+      } else if (editBtn && window.openNotesForm) {
+        window.openNotesForm(id);
+      } else if (delBtn) {
+        createModal({
+          title: 'מחיקת הערה',
+          content: '<p>האם למחוק את ההערה?</p>',
+          entity: 'note',
+          showSaveButton: true,
+          confirmMode: true,
+          saveButtonText: 'מחיקה',
+          cancelButtonText: 'ביטול',
+          onSave: async () => {
+            try {
+              const { default: sharedServices } =
+                await import('../../../components/core/sharedServices.js');
+              await sharedServices.init();
+              await sharedServices.delete(`/notes/${id}`);
+              document.getElementById('phoenix-modal-backdrop')?.remove();
+              if (window.refreshNotesTable) await window.refreshNotesTable();
+              else {
+                const result = await loadNotesData(
+                  (window.PhoenixBridge &&
+                    window.PhoenixBridge.state &&
+                    window.PhoenixBridge.state.filters) ||
+                    {},
+                );
+                renderSummary(result.summary);
+                renderTable(result.notes);
+              }
+            } catch (err) {
+              maskedLog('[Notes] Delete error:', { status: err && err.status });
+              createModal({
+                title: 'שגיאה',
+                content: '<p>שגיאה במחיקה</p>',
+                showSaveButton: false,
+                cancelButtonText: 'ביטול',
+              });
             }
-          } catch (err) {
-            maskedLog('[Notes] Delete error:', { status: (err && err.status) });
-            createModal({
-              title: 'שגיאה',
-              content: '<p>שגיאה במחיקה</p>',
-              showSaveButton: false,
-              cancelButtonText: 'ביטול'
-            });
-          }
-        }
-      });
-    }
-  });
+          },
+        });
+      }
+    });
 }
 
 /**
@@ -606,9 +754,15 @@ window.initNotesTable = initNotesTable;
  * Refresh table (called after add/edit/delete)
  */
 export async function refreshNotesTable() {
-  const filters = (window.PhoenixBridge && window.PhoenixBridge.state && window.PhoenixBridge.state.filters) || {};
+  const filters =
+    (window.PhoenixBridge &&
+      window.PhoenixBridge.state &&
+      window.PhoenixBridge.state.filters) ||
+    {};
   const parentType = filters.parentType;
-  const result = await loadNotesData({ parentType: parentType === 'all' ? undefined : parentType });
+  const result = await loadNotesData({
+    parentType: parentType === 'all' ? undefined : parentType,
+  });
   renderSummary(result.summary);
   renderTable(result.notes);
 }

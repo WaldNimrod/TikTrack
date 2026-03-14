@@ -2,7 +2,7 @@
  * ProtectedRoute - רכיב הגנה על Routes
  * -------------------------------------
  * רכיב React להגנה על routes שדורשים אימות
- * 
+ *
  * @description בודק אם המשתמש מחובר ומפנה ל-login אם לא
  * @legacyReference Legacy.auth.isAuthenticated()
  */
@@ -15,17 +15,21 @@ import { debugLog } from '../../../../utils/debug.js';
 
 /**
  * ProtectedRoute Component
- * 
+ *
  * @description רכיב wrapper שמגן על routes שדורשים אימות
  * Stage 1: Enhanced to support Admin-only (Type D) per ADR-013
  * @legacyReference Legacy.auth.isAuthenticated()
- * 
+ *
  * @param {Object} props - Component props
  * @param {React.ReactNode} props.children - התוכן להגנה
  * @param {boolean} [props.requireAuth=true] - האם נדרש אימות (default: true)
  * @param {boolean} [props.requireAdmin=false] - האם נדרש תפקיד מנהל (Type D: Admin-only)
  */
-const ProtectedRoute = ({ children, requireAuth = true, requireAdmin = false }) => {
+const ProtectedRoute = ({
+  children,
+  requireAuth = true,
+  requireAdmin = false,
+}) => {
   const [isAuthenticated, setIsAuthenticated] = useState(null); // null = checking
   const [isAdmin, setIsAdmin] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
@@ -34,17 +38,19 @@ const ProtectedRoute = ({ children, requireAuth = true, requireAdmin = false }) 
     /**
      * Check Authentication Status
      * Stage 1: Enhanced to support Admin-only (Type D) per ADR-013
-     * 
+     *
      * @description בודק את סטטוס האימות ו-role (אם נדרש)
      */
     const checkAuth = async () => {
       setIsChecking(true);
-      debugLog('Auth', 'ProtectedRoute: Checking authentication status', { requireAdmin });
+      debugLog('Auth', 'ProtectedRoute: Checking authentication status', {
+        requireAdmin,
+      });
 
       try {
         // Check if access token exists
         const hasToken = authService.isAuthenticated();
-        
+
         if (!hasToken) {
           setIsAuthenticated(false);
           setIsAdmin(false);
@@ -57,14 +63,14 @@ const ProtectedRoute = ({ children, requireAuth = true, requireAdmin = false }) 
         try {
           await authService.getCurrentUser();
           setIsAuthenticated(true);
-          
+
           // Check admin role if required (Type D: Admin-only)
           if (requireAdmin) {
             const userIsAdmin = authService.isAdmin();
             setIsAdmin(userIsAdmin);
-            debugLog('Auth', 'ProtectedRoute: User authenticated', { 
+            debugLog('Auth', 'ProtectedRoute: User authenticated', {
               isAdmin: userIsAdmin,
-              role: authService.getUserRole()
+              role: authService.getUserRole(),
             });
           } else {
             setIsAdmin(false); // Not checking admin for regular routes
@@ -79,7 +85,11 @@ const ProtectedRoute = ({ children, requireAuth = true, requireAdmin = false }) 
       } catch (error) {
         setIsAuthenticated(false);
         setIsAdmin(false);
-        audit.error('Auth', 'ProtectedRoute: Authentication check failed', error);
+        audit.error(
+          'Auth',
+          'ProtectedRoute: Authentication check failed',
+          error,
+        );
       } finally {
         setIsChecking(false);
       }
@@ -115,9 +125,13 @@ const ProtectedRoute = ({ children, requireAuth = true, requireAdmin = false }) 
     return <Navigate to="/" replace />;
   }
   if (requireAdmin && isAuthenticated && !isAdmin) {
-    debugLog('Auth', 'ProtectedRoute: USER on admin route → redirect to Home (/) per ADR-013', {
-      role: authService.getUserRole()
-    });
+    debugLog(
+      'Auth',
+      'ProtectedRoute: USER on admin route → redirect to Home (/) per ADR-013',
+      {
+        role: authService.getUserRole(),
+      },
+    );
     return <Navigate to="/" replace />;
   }
 

@@ -12,25 +12,86 @@ import sharedServices from '../../../components/core/sharedServices.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 
 const FIELD_HINTS = {
-  max_active_tickers: 'מספר מקסימלי של טיקרים שמקבלים עדכון Intraday בו-זמנית. ≥50 = עומס גבוה.',
-  intraday_interval_minutes: 'כל כמה דקות מתבצע עדכון Intraday. ערך נמוך = עומס API גבוה.',
-  off_hours_interval_minutes: 'מרווח בין עדכונים מחוץ לשעות המסחר. ניתן לקבוע ערך גבוה יותר לחיסכון בAPI.',
-  provider_cooldown_minutes: 'המתנה אחרי קבלת שגיאת 429 (Rate Limit). ערך נמוך = סיכון לחסימה חוזרת.',
-  alpha_quota_cooldown_hours: 'המתנה לאחר ניצול quota יומי של Alpha Vantage. ברירת מחדל: 24 שעות.',
-  max_symbols_per_request: 'כמה סימבולים שולחים בבקשה אחת ל-Yahoo. Yahoo מגביל לפחות מ-50 במקביל.',
-  delay_between_symbols_seconds: 'השהייה בין בקשות. ערך גבוה = פחות 429, זמן sync ארוך יותר.',
+  max_active_tickers:
+    'מספר מקסימלי של טיקרים שמקבלים עדכון Intraday בו-זמנית. ≥50 = עומס גבוה.',
+  intraday_interval_minutes:
+    'כל כמה דקות מתבצע עדכון Intraday. ערך נמוך = עומס API גבוה.',
+  off_hours_interval_minutes:
+    'מרווח בין עדכונים מחוץ לשעות המסחר. ניתן לקבוע ערך גבוה יותר לחיסכון בAPI.',
+  provider_cooldown_minutes:
+    'המתנה אחרי קבלת שגיאת 429 (Rate Limit). ערך נמוך = סיכון לחסימה חוזרת.',
+  alpha_quota_cooldown_hours:
+    'המתנה לאחר ניצול quota יומי של Alpha Vantage. ברירת מחדל: 24 שעות.',
+  max_symbols_per_request:
+    'כמה סימבולים שולחים בבקשה אחת ל-Yahoo. Yahoo מגביל לפחות מ-50 במקביל.',
+  delay_between_symbols_seconds:
+    'השהייה בין בקשות. ערך גבוה = פחות 429, זמן sync ארוך יותר.',
   intraday_enabled: 'כיבוי → Intraday sync לא פועל כלל. EOD עדיין פועל.',
 };
 
 const FIELDS = [
-  { key: 'max_active_tickers', label: 'מקסימום טיקרים פעילים (Intraday)', type: 'number', min: 1, max: 500, default: 50 },
-  { key: 'intraday_interval_minutes', label: 'מרווח Intraday (דקות)', type: 'number', min: 5, max: 240, default: 15 },
-  { key: 'off_hours_interval_minutes', label: 'מרווח מחוץ לשעות מסחר (דקות)', type: 'number', min: 15, max: 240, default: 60 },
-  { key: 'provider_cooldown_minutes', label: 'זמן Cooldown אחרי 429 (דקות)', type: 'number', min: 5, max: 120, default: 15 },
-  { key: 'alpha_quota_cooldown_hours', label: 'המתנת Quota Alpha (שעות)', type: 'number', min: 6, max: 48, default: 24 },
-  { key: 'max_symbols_per_request', label: 'מקסימום סימבולים לבקשה', type: 'number', min: 1, max: 50, default: 50 },
-  { key: 'delay_between_symbols_seconds', label: 'רווח (שניות) בין סימבולים', type: 'number', min: 0, max: 30, default: 1 },
-  { key: 'intraday_enabled', label: 'הפעלת רענון Intraday', type: 'boolean', default: true },
+  {
+    key: 'max_active_tickers',
+    label: 'מקסימום טיקרים פעילים (Intraday)',
+    type: 'number',
+    min: 1,
+    max: 500,
+    default: 50,
+  },
+  {
+    key: 'intraday_interval_minutes',
+    label: 'מרווח Intraday (דקות)',
+    type: 'number',
+    min: 5,
+    max: 240,
+    default: 15,
+  },
+  {
+    key: 'off_hours_interval_minutes',
+    label: 'מרווח מחוץ לשעות מסחר (דקות)',
+    type: 'number',
+    min: 15,
+    max: 240,
+    default: 60,
+  },
+  {
+    key: 'provider_cooldown_minutes',
+    label: 'זמן Cooldown אחרי 429 (דקות)',
+    type: 'number',
+    min: 5,
+    max: 120,
+    default: 15,
+  },
+  {
+    key: 'alpha_quota_cooldown_hours',
+    label: 'המתנת Quota Alpha (שעות)',
+    type: 'number',
+    min: 6,
+    max: 48,
+    default: 24,
+  },
+  {
+    key: 'max_symbols_per_request',
+    label: 'מקסימום סימבולים לבקשה',
+    type: 'number',
+    min: 1,
+    max: 50,
+    default: 50,
+  },
+  {
+    key: 'delay_between_symbols_seconds',
+    label: 'רווח (שניות) בין סימבולים',
+    type: 'number',
+    min: 0,
+    max: 30,
+    default: 1,
+  },
+  {
+    key: 'intraday_enabled',
+    label: 'הפעלת רענון Intraday',
+    type: 'boolean',
+    default: true,
+  },
 ];
 
 const ERROR_MESSAGES = {
@@ -92,7 +153,12 @@ async function loadSettings() {
     renderForm(container, data);
   } catch (e) {
     maskedLog('[System Management] Failed to load market-data settings:', e);
-    const msg = e.status === 403 ? ERROR_MESSAGES[403] : (e.status === 503 ? ERROR_MESSAGES[503] : 'לא ניתן לטעון הגדרות. יש לבדוק חיבור ל-Backend.');
+    const msg =
+      e.status === 403
+        ? ERROR_MESSAGES[403]
+        : e.status === 503
+          ? ERROR_MESSAGES[503]
+          : 'לא ניתן לטעון הגדרות. יש לבדוק חיבור ל-Backend.';
     container.innerHTML = `<p class="settings-error">${msg}</p>`;
   }
 }
@@ -151,7 +217,7 @@ async function handleSave(ev) {
   if (errorEl) errorEl.textContent = '';
   if (successEl) successEl.textContent = '';
   btn.disabled = true;
-    btn.textContent = 'שמירה...';
+  btn.textContent = 'שמירה...';
 
   const payload = {};
   const inputs = form.querySelectorAll('.js-market-data-input');
@@ -160,12 +226,16 @@ async function handleSave(ev) {
     const field = FIELDS.find((f) => f.key === key);
     if (!field) return;
     if (field.type === 'boolean') {
-      if (input.checked !== (currentValues[key] === true || currentValues[key] === 'true')) {
+      if (
+        input.checked !==
+        (currentValues[key] === true || currentValues[key] === 'true')
+      ) {
         payload[key] = input.checked;
       }
     } else {
       const num = Number(input.value);
-      if (!Number.isNaN(num) && num !== Number(currentValues[key])) payload[key] = num;
+      if (!Number.isNaN(num) && num !== Number(currentValues[key]))
+        payload[key] = num;
     }
   });
 
@@ -191,13 +261,21 @@ async function handleSave(ev) {
     } catch (_) {}
     const panel = document.getElementById('marketDataSettingsPanel');
     if (panel) renderHeatCard(panel, currentValues, summary);
-    renderForm(document.getElementById('marketDataSettingsValues'), currentValues);
+    renderForm(
+      document.getElementById('marketDataSettingsValues'),
+      currentValues,
+    );
     const newForm = document.getElementById('marketDataSettingsForm');
     if (newForm) newForm.addEventListener('submit', handleSave);
   } catch (e) {
     maskedLog('[System Management] PATCH market-data failed:', e);
-    if (form) form.querySelectorAll('.input--error').forEach((el) => el.classList.remove('input--error'));
-    form.querySelectorAll('.field-error-message').forEach((el) => { el.textContent = ''; });
+    if (form)
+      form
+        .querySelectorAll('.input--error')
+        .forEach((el) => el.classList.remove('input--error'));
+    form.querySelectorAll('.field-error-message').forEach((el) => {
+      el.textContent = '';
+    });
     let msg = ERROR_MESSAGES[e.status] ?? 'שגיאה בשמירה. נסה שוב.';
     if (e.status === 422 && e.validation_errors?.length) {
       e.validation_errors.forEach((v) => {
@@ -210,7 +288,10 @@ async function handleSave(ev) {
       });
       msg = e.validation_errors.map((v) => `${v.key}: ${v.error}`).join('; ');
     } else if (e.status === 422 && e.detail) {
-      const d = typeof e.detail === 'string' ? e.detail : e.detail?.message ?? JSON.stringify(e.detail);
+      const d =
+        typeof e.detail === 'string'
+          ? e.detail
+          : (e.detail?.message ?? JSON.stringify(e.detail));
       msg = d;
     }
     if (errorEl) errorEl.textContent = msg;

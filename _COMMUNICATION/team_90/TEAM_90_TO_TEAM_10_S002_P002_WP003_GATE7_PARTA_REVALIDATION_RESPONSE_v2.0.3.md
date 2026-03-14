@@ -45,9 +45,9 @@ Part A is not admissible for closure in this cycle.
 
 | Condition ID | Verdict | Basis |
 |---|---|---|
-| CC-WP003-01 | **NOT_EVIDENCED** | `G7_PART_A_RUNTIME_EVIDENCE.json` reports `cc_01_yahoo_call_count=0`, but referenced run log `documentation/05-REPORTS/artifacts_SESSION_WP003_ROUND5/G7_PART_A_RUN_A_B.log` is effectively empty (no runtime trace for Run A). |
+| CC-WP003-01 | **NOT_EVIDENCED** | `G7_PART_A_RUNTIME_EVIDENCE.json` reports `cc_01_yahoo_call_count=0`, but referenced run log `documentation/reports/05-REPORTS/artifacts_SESSION_WP003_ROUND5/G7_PART_A_RUN_A_B.log` is effectively empty (no runtime trace for Run A). |
 | CC-WP003-02 | **NOT_EVIDENCED** | Same admissibility gap as CC-01: explicit count exists in JSON but no supporting runtime trace in the referenced Run A/B log. |
-| CC-WP003-04 | **BLOCK** | Team 60 v2.0.3 reports PASS, but Team 50 v2.0.3 corroboration includes G7-VERIFY run with `pass_04=False` and one cooldown activation (`documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_2026-03-12_002350.log`). Deterministic closure is not established. |
+| CC-WP003-04 | **BLOCK** | Team 60 v2.0.3 reports PASS, but Team 50 v2.0.3 corroboration includes G7-VERIFY run with `pass_04=False` and one cooldown activation (`documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_2026-03-12_002350.log`). Deterministic closure is not established. |
 
 ---
 

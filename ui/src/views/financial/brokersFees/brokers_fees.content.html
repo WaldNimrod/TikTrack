@@ -1,178 +1,393 @@
 <tt-container>
-          
-          <!-- ============================================
+  <!-- ============================================
                CONTAINER 0: רשימת ברוקרים, הסבר על "אחר", סיכום מידע
                ============================================ -->
-          
-          <tt-section data-section="brokers-list-and-summary">
-            <div class="index-section__header">
-              <div class="index-section__header-title">
-                <img src="/images/icons/entities/trading_accounts.svg" alt="ברוקרים" class="index-section__header-icon" width="35" height="35">
-                <h1 class="index-section__header-text">ברוקרים ועמלות</h1>
-              </div>
-              <div class="index-section__header-actions">
-                <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M6 9l6 6l6 -6"></path>
-                  </svg>
-                </button>
-              </div>
-            </div>
 
-            <div class="index-section__body">
-              <tt-section-row>
-                <div class="col-12">
-                  <div class="info-summary" id="summaryStats">
-                    <div class="info-summary__row info-summary__row--first">
-                      <div class="info-summary__content">
-                        <div>סה"כ ברוקרים: <strong id="totalBrokers">0</strong></div>
-                        <div>ברוקרים פעילים: <strong id="activeBrokers">0</strong></div>
-                        <div>עמלה ממוצעת לפעולה: <strong id="avgCommissionPerTrade"><span class="numeric-value-positive" dir="ltr">$0.00</span></strong></div>
-                        <div>סה"כ עמלות קבועות לחודש: <strong id="monthlyFixedCommissions"><span class="numeric-value-positive" dir="ltr">$0.00</span></strong></div>
-                        <div>סה"כ עמלות קבועות לשנה: <strong id="yearlyFixedCommissions"><span class="numeric-value-positive" dir="ltr">$0.00</span></strong></div>
-                        <div class="info-summary__brokers-row">ברוקרים נתמכים: <span id="brokersList" class="info-summary__brokers-list">טוען רשימת ברוקרים...</span></div>
-                      </div>
-                      <div id="stalenessClockCard" class="staleness-clock-card" aria-live="polite" data-price-label="עודכן ב" data-fetched-label="עודכן ב">
-                        <span class="staleness-clock-card__loading">טוען עדכון נתונים...</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="brokers-list-panel__other-explanation">
-                    <h3 class="brokers-list-panel__subtitle">מגבלת שימוש בברוקר "אחר"</h3>
-                    <p>בחירת ברוקר "אחר" מאפשרת להגדיר חשבון מסחר עם שם חופשי, אולם חשבון מסחר זה <strong>לא יתמך</strong> בחיבור API או בייבוא קבצים אוטומטי.</p>
-                    <p><strong>כדי להוסיף ברוקר חדש למערכת באופן מלא:</strong> יש לפנות לצוות TikTrack. נדרשת אינטגרציה עם ממשקי ה־API של הברוקר, תמיכה בייבוא נתונים, והגדרת מבנה עמלות.</p>
-                  </div>
+  <tt-section data-section="brokers-list-and-summary">
+    <div class="index-section__header">
+      <div class="index-section__header-title">
+        <img
+          src="/images/icons/entities/trading_accounts.svg"
+          alt="ברוקרים"
+          class="index-section__header-icon"
+          width="35"
+          height="35"
+        />
+        <h1 class="index-section__header-text">ברוקרים ועמלות</h1>
+      </div>
+      <div class="index-section__header-actions">
+        <button
+          class="index-section__header-toggle-btn js-section-toggle"
+          aria-label="הצג/הסתר"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M6 9l6 6l6 -6"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="index-section__body">
+      <tt-section-row>
+        <div class="col-12">
+          <div class="info-summary" id="summaryStats">
+            <div class="info-summary__row info-summary__row--first">
+              <div class="info-summary__content">
+                <div>סה"כ ברוקרים: <strong id="totalBrokers">0</strong></div>
+                <div>ברוקרים פעילים: <strong id="activeBrokers">0</strong></div>
+                <div>
+                  עמלה ממוצעת לפעולה:
+                  <strong id="avgCommissionPerTrade"
+                    ><span class="numeric-value-positive" dir="ltr"
+                      >$0.00</span
+                    ></strong
+                  >
                 </div>
-              </tt-section-row>
+                <div>
+                  סה"כ עמלות קבועות לחודש:
+                  <strong id="monthlyFixedCommissions"
+                    ><span class="numeric-value-positive" dir="ltr"
+                      >$0.00</span
+                    ></strong
+                  >
+                </div>
+                <div>
+                  סה"כ עמלות קבועות לשנה:
+                  <strong id="yearlyFixedCommissions"
+                    ><span class="numeric-value-positive" dir="ltr"
+                      >$0.00</span
+                    ></strong
+                  >
+                </div>
+                <div class="info-summary__brokers-row">
+                  ברוקרים נתמכים:
+                  <span id="brokersList" class="info-summary__brokers-list"
+                    >טוען רשימת ברוקרים...</span
+                  >
+                </div>
+              </div>
+              <div
+                id="stalenessClockCard"
+                class="staleness-clock-card"
+                aria-live="polite"
+                data-price-label="עודכן ב"
+                data-fetched-label="עודכן ב"
+              >
+                <span class="staleness-clock-card__loading"
+                  >טוען עדכון נתונים...</span
+                >
+              </div>
             </div>
-          </tt-section>
+          </div>
+          <div class="brokers-list-panel__other-explanation">
+            <h3 class="brokers-list-panel__subtitle">
+              מגבלת שימוש בברוקר "אחר"
+            </h3>
+            <p>
+              בחירת ברוקר "אחר" מאפשרת להגדיר חשבון מסחר עם שם חופשי, אולם חשבון
+              מסחר זה <strong>לא יתמך</strong> בחיבור API או בייבוא קבצים
+              אוטומטי.
+            </p>
+            <p>
+              <strong>כדי להוסיף ברוקר חדש למערכת באופן מלא:</strong> יש לפנות
+              לצוות TikTrack. נדרשת אינטגרציה עם ממשקי ה־API של הברוקר, תמיכה
+              בייבוא נתונים, והגדרת מבנה עמלות.
+            </p>
+          </div>
+        </div>
+      </tt-section-row>
+    </div>
+  </tt-section>
 
-          <!-- ============================================
+  <!-- ============================================
                CONTAINER 1: ניהול ברוקרים ועמלות
                ============================================
                Content: Table (Brokers & Commissions)
                Filters: None (uses global filters only)
                ============================================ -->
-          
-          <tt-section data-section="brokers-management">
-            <!-- Section Header -->
-            <div class="index-section__header">
-              <div class="index-section__header-title">
-                <img src="/images/icons/entities/trading_accounts.svg" alt="ברוקרים" class="index-section__header-icon" width="35" height="35">
-                <h1 class="index-section__header-text">הגדרות ברוקרים ועמלות</h1>
-              </div>
-              <div class="index-section__header-meta index-section__header-meta--align-end">
-                <span class="index-section__header-count" id="tableBrokersCount">0 עמלות</span>
-                <select id="tradingAccountFilterSelect" class="index-section__header-filter-select js-trading-account-filter" aria-label="סנן לפי חשבון מסחר">
-                  <option value="">כל החשבונות</option>
+
+  <tt-section data-section="brokers-management">
+    <!-- Section Header -->
+    <div class="index-section__header">
+      <div class="index-section__header-title">
+        <img
+          src="/images/icons/entities/trading_accounts.svg"
+          alt="ברוקרים"
+          class="index-section__header-icon"
+          width="35"
+          height="35"
+        />
+        <h1 class="index-section__header-text">הגדרות ברוקרים ועמלות</h1>
+      </div>
+      <div
+        class="index-section__header-meta index-section__header-meta--align-end"
+      >
+        <span class="index-section__header-count" id="tableBrokersCount"
+          >0 עמלות</span
+        >
+        <select
+          id="tradingAccountFilterSelect"
+          class="index-section__header-filter-select js-trading-account-filter"
+          aria-label="סנן לפי חשבון מסחר"
+        >
+          <option value="">כל החשבונות</option>
+        </select>
+      </div>
+      <div class="index-section__header-actions">
+        <button
+          class="index-section__header-action-btn js-add-broker-fee"
+          aria-label="הוסיפו עמלה"
+          title="הוסיפו עמלה"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M12 5v14M5 12h14"></path>
+          </svg>
+          <span>הוסיפו עמלה</span>
+        </button>
+        <button
+          class="index-section__header-toggle-btn js-section-toggle"
+          aria-label="הצג/הסתר"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M6 9l6 6l6 -6"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Section Body -->
+    <div class="index-section__body">
+      <tt-section-row>
+        <div class="col-12">
+          <!-- Table Wrapper -->
+          <div class="phoenix-table-wrapper">
+            <table
+              id="brokersTable"
+              class="phoenix-table js-table"
+              data-table-type="brokers"
+              role="table"
+              aria-label="ניהול ברוקרים ועמלות"
+            >
+              <thead class="phoenix-table__head" role="rowgroup">
+                <tr class="phoenix-table__row" role="row">
+                  <th
+                    class="phoenix-table__header col-broker col-account js-table-sort-trigger"
+                    data-sortable="true"
+                    data-sort-key="account_name"
+                    data-sort-type="string"
+                    data-column-index="0"
+                    role="columnheader"
+                    aria-sort="none"
+                    tabindex="0"
+                  >
+                    <span class="phoenix-table__header-text">חשבון מסחר</span>
+                    <span
+                      class="phoenix-table__sort-indicator js-sort-indicator"
+                    >
+                      <svg
+                        class="phoenix-table__sort-icon js-sort-icon"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M8 9l4 -4l4 4"></path>
+                        <path d="M8 15l4 4l4 -4"></path>
+                      </svg>
+                    </span>
+                  </th>
+                  <th
+                    class="phoenix-table__header col-commission-type js-table-sort-trigger"
+                    data-sortable="true"
+                    data-sort-key="commission_type"
+                    data-sort-type="string"
+                    data-column-index="1"
+                    role="columnheader"
+                    aria-sort="none"
+                    tabindex="0"
+                  >
+                    <span class="phoenix-table__header-text">סוג עמלה</span>
+                    <span
+                      class="phoenix-table__sort-indicator js-sort-indicator"
+                    >
+                      <svg
+                        class="phoenix-table__sort-icon js-sort-icon"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M8 9l4 -4l4 4"></path>
+                        <path d="M8 15l4 4l4 -4"></path>
+                      </svg>
+                    </span>
+                  </th>
+                  <th
+                    class="phoenix-table__header col-commission-value phoenix-table__header--numeric js-table-sort-trigger"
+                    data-sortable="true"
+                    data-sort-key="commission_value"
+                    data-sort-type="string"
+                    data-column-index="2"
+                    role="columnheader"
+                    aria-sort="none"
+                    tabindex="0"
+                  >
+                    <span class="phoenix-table__header-text">ערך עמלה</span>
+                    <span
+                      class="phoenix-table__sort-indicator js-sort-indicator"
+                    >
+                      <svg
+                        class="phoenix-table__sort-icon js-sort-icon"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M8 9l4 -4l4 4"></path>
+                        <path d="M8 15l4 4l4 -4"></path>
+                      </svg>
+                    </span>
+                  </th>
+                  <th
+                    class="phoenix-table__header col-minimum phoenix-table__header--numeric js-table-sort-trigger"
+                    data-sortable="true"
+                    data-sort-key="minimum"
+                    data-sort-type="numeric"
+                    data-column-index="3"
+                    role="columnheader"
+                    aria-sort="none"
+                    tabindex="0"
+                  >
+                    <span class="phoenix-table__header-text"
+                      >מינימום לפעולה</span
+                    >
+                    <span
+                      class="phoenix-table__sort-indicator js-sort-indicator"
+                    >
+                      <svg
+                        class="phoenix-table__sort-icon js-sort-icon"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M8 9l4 -4l4 4"></path>
+                        <path d="M8 15l4 4l4 -4"></path>
+                      </svg>
+                    </span>
+                  </th>
+                  <th
+                    class="phoenix-table__header col-actions"
+                    data-sortable="false"
+                    role="columnheader"
+                  >
+                    <span class="phoenix-table__header-text">פעולות</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody
+                class="phoenix-table__body"
+                role="rowgroup"
+                id="brokersTableBody"
+              >
+                <!-- Table rows will be populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Table Pagination -->
+          <div class="phoenix-table-pagination">
+            <div class="phoenix-table-pagination__info">
+              <span id="paginationInfo">מציג 0-0 מתוך 0 רשומות</span>
+            </div>
+            <div class="phoenix-table-pagination__controls">
+              <div class="phoenix-table-pagination__page-size">
+                <label class="phoenix-table-pagination__page-size-label"
+                  >שורות לעמוד:</label
+                >
+                <select
+                  class="phoenix-table-pagination__page-size-select js-table-page-size"
+                  data-table-id="brokersTable"
+                >
+                  <option value="10">10</option>
+                  <option value="25" selected>25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
                 </select>
               </div>
-              <div class="index-section__header-actions">
-                <button class="index-section__header-action-btn js-add-broker-fee" aria-label="הוסיפו עמלה" title="הוסיפו עמלה">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 5v14M5 12h14"></path>
+              <div
+                class="phoenix-table-pagination__pages"
+                id="paginationControls"
+              >
+                <button
+                  class="phoenix-table-pagination__button"
+                  aria-label="עמוד קודם"
+                  id="prevPageBtn"
+                  disabled
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M9 18l6-6-6-6"></path>
                   </svg>
-                  <span>הוסיפו עמלה</span>
                 </button>
-                <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M6 9l6 6l6 -6"></path>
+                <div id="pageNumbers"></div>
+                <button
+                  class="phoenix-table-pagination__button"
+                  aria-label="עמוד הבא"
+                  id="nextPageBtn"
+                  disabled
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M15 18l-6-6 6-6"></path>
                   </svg>
                 </button>
               </div>
             </div>
-
-            <!-- Section Body -->
-            <div class="index-section__body">
-              <tt-section-row>
-                <div class="col-12">
-                  
-                  <!-- Table Wrapper -->
-                  <div class="phoenix-table-wrapper">
-                    <table id="brokersTable" class="phoenix-table js-table" data-table-type="brokers" role="table" aria-label="ניהול ברוקרים ועמלות">
-                      <thead class="phoenix-table__head" role="rowgroup">
-                        <tr class="phoenix-table__row" role="row">
-                          <th class="phoenix-table__header col-broker col-account js-table-sort-trigger" data-sortable="true" data-sort-key="account_name" data-sort-type="string" data-column-index="0" role="columnheader" aria-sort="none" tabindex="0">
-                            <span class="phoenix-table__header-text">חשבון מסחר</span>
-                            <span class="phoenix-table__sort-indicator js-sort-indicator">
-                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M8 9l4 -4l4 4"></path>
-                                <path d="M8 15l4 4l4 -4"></path>
-                              </svg>
-                            </span>
-                          </th>
-                          <th class="phoenix-table__header col-commission-type js-table-sort-trigger" data-sortable="true" data-sort-key="commission_type" data-sort-type="string" data-column-index="1" role="columnheader" aria-sort="none" tabindex="0">
-                            <span class="phoenix-table__header-text">סוג עמלה</span>
-                            <span class="phoenix-table__sort-indicator js-sort-indicator">
-                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M8 9l4 -4l4 4"></path>
-                                <path d="M8 15l4 4l4 -4"></path>
-                              </svg>
-                            </span>
-                          </th>
-                          <th class="phoenix-table__header col-commission-value phoenix-table__header--numeric js-table-sort-trigger" data-sortable="true" data-sort-key="commission_value" data-sort-type="string" data-column-index="2" role="columnheader" aria-sort="none" tabindex="0">
-                            <span class="phoenix-table__header-text">ערך עמלה</span>
-                            <span class="phoenix-table__sort-indicator js-sort-indicator">
-                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M8 9l4 -4l4 4"></path>
-                                <path d="M8 15l4 4l4 -4"></path>
-                              </svg>
-                            </span>
-                          </th>
-                          <th class="phoenix-table__header col-minimum phoenix-table__header--numeric js-table-sort-trigger" data-sortable="true" data-sort-key="minimum" data-sort-type="numeric" data-column-index="3" role="columnheader" aria-sort="none" tabindex="0">
-                            <span class="phoenix-table__header-text">מינימום לפעולה</span>
-                            <span class="phoenix-table__sort-indicator js-sort-indicator">
-                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M8 9l4 -4l4 4"></path>
-                                <path d="M8 15l4 4l4 -4"></path>
-                              </svg>
-                            </span>
-                          </th>
-                          <th class="phoenix-table__header col-actions" data-sortable="false" role="columnheader">
-                            <span class="phoenix-table__header-text">פעולות</span>
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody class="phoenix-table__body" role="rowgroup" id="brokersTableBody">
-                        <!-- Table rows will be populated dynamically -->
-                      </tbody>
-                    </table>
-                  </div>
-                  
-                  <!-- Table Pagination -->
-                  <div class="phoenix-table-pagination">
-                    <div class="phoenix-table-pagination__info">
-                      <span id="paginationInfo">מציג 0-0 מתוך 0 רשומות</span>
-                    </div>
-                    <div class="phoenix-table-pagination__controls">
-                      <div class="phoenix-table-pagination__page-size">
-                        <label class="phoenix-table-pagination__page-size-label">שורות לעמוד:</label>
-                        <select class="phoenix-table-pagination__page-size-select js-table-page-size" data-table-id="brokersTable">
-                          <option value="10">10</option>
-                          <option value="25" selected>25</option>
-                          <option value="50">50</option>
-                          <option value="100">100</option>
-                        </select>
-                      </div>
-                      <div class="phoenix-table-pagination__pages" id="paginationControls">
-                        <button class="phoenix-table-pagination__button" aria-label="עמוד קודם" id="prevPageBtn" disabled>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 18l6-6-6-6"></path>
-                          </svg>
-                        </button>
-                        <div id="pageNumbers"></div>
-                        <button class="phoenix-table-pagination__button" aria-label="עמוד הבא" id="nextPageBtn" disabled>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M15 18l-6-6 6-6"></path>
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  
-                </div>
-              </tt-section-row>
-            </div>
-          </tt-section>
-
-        </tt-container>
+          </div>
+        </div>
+      </tt-section-row>
+    </div>
+  </tt-section>
+</tt-container>

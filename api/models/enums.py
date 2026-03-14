@@ -13,6 +13,7 @@ from sqlalchemy import Enum
 
 class UserRole(str, enum.Enum):
     """User role enum - maps to user_data.user_role"""
+
     USER = "USER"
     ADMIN = "ADMIN"
     SUPERADMIN = "SUPERADMIN"
@@ -20,12 +21,14 @@ class UserRole(str, enum.Enum):
 
 class ResetMethod(str, enum.Enum):
     """Password reset method enum - maps to user_data.reset_method"""
+
     EMAIL = "EMAIL"
     SMS = "SMS"
 
 
 class ApiProvider(str, enum.Enum):
     """API provider enum - maps to user_data.api_provider"""
+
     IBKR = "IBKR"
     POLYGON = "POLYGON"
     YAHOO_FINANCE = "YAHOO_FINANCE"
@@ -38,6 +41,7 @@ class ApiProvider(str, enum.Enum):
 
 class NoteCategory(str, enum.Enum):
     """Note category enum - maps to user_data.note_category (D35)"""
+
     TRADE = "TRADE"
     PSYCHOLOGY = "PSYCHOLOGY"
     ANALYSIS = "ANALYSIS"
@@ -46,6 +50,7 @@ class NoteCategory(str, enum.Enum):
 
 class AlertType(str, enum.Enum):
     """Alert type enum - maps to user_data.alert_type (D34)"""
+
     PRICE = "PRICE"
     VOLUME = "VOLUME"
     TECHNICAL = "TECHNICAL"
@@ -55,6 +60,7 @@ class AlertType(str, enum.Enum):
 
 class AlertPriority(str, enum.Enum):
     """Alert priority enum - maps to user_data.alert_priority (D34)"""
+
     LOW = "LOW"
     MEDIUM = "MEDIUM"
     HIGH = "HIGH"
@@ -63,6 +69,7 @@ class AlertPriority(str, enum.Enum):
 
 class TickerType(str, enum.Enum):
     """Ticker type enum - maps to market_data.ticker_type (D22)"""
+
     STOCK = "STOCK"
     ETF = "ETF"
     OPTION = "OPTION"
@@ -78,5 +85,7 @@ reset_method_enum = Enum(ResetMethod, name="reset_method", schema="user_data", c
 api_provider_enum = Enum(ApiProvider, name="api_provider", schema="user_data", create_type=False)
 note_category_enum = Enum(NoteCategory, name="note_category", schema="user_data", create_type=False)
 alert_type_enum = Enum(AlertType, name="alert_type", schema="user_data", create_type=False)
-alert_priority_enum = Enum(AlertPriority, name="alert_priority", schema="user_data", create_type=False)
+alert_priority_enum = Enum(
+    AlertPriority, name="alert_priority", schema="user_data", create_type=False
+)
 ticker_type_enum = Enum(TickerType, name="ticker_type", schema="market_data", create_type=False)

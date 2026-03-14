@@ -28,13 +28,13 @@ router = APIRouter(prefix="/positions", tags=["positions"])
 async def get_positions(
     trading_account_id: Optional[str] = Query(None, description="Filter by trading account ULID"),
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Get positions for current user.
-    
+
     Positions are open trades (status != 'CLOSED') aggregated by ticker_id and trading_account_id.
-    
+
     Returns list of positions with calculated fields:
     - quantity: Total quantity (aggregated)
     - avg_price: Average entry price
@@ -45,22 +45,17 @@ async def get_positions(
     - unrealized_pl: Unrealized P/L
     - unrealized_pl_percent: Unrealized P/L percentage
     - percent_of_account: Percentage of account value
-    
+
     Query Parameters:
     - trading_account_id: Filter by trading account ULID
     """
     try:
         service = get_position_service()
         positions = await service.get_positions(
-            user_id=current_user.id,
-            db=db,
-            trading_account_id=trading_account_id
+            user_id=current_user.id, db=db, trading_account_id=trading_account_id
         )
-        
-        return PositionListResponse(
-            data=positions,
-            total=len(positions)
-        )
+
+        return PositionListResponse(data=positions, total=len(positions))
     except HTTPExceptionWithCode:
         raise
     except Exception as e:
@@ -68,5 +63,5 @@ async def get_positions(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to fetch positions",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )

@@ -1,393 +1,905 @@
 <tt-container>
-          
-          <!-- ============================================
+  <!-- ============================================
                CONTAINER 0: סיכום מידע והתראות פעילות
                ============================================
                Content: Active Alerts + Summary Information
                Filters: None (uses global filters only)
                ============================================ -->
-          
-          <tt-section data-section="summary-alerts">
-            <!-- Section Header -->
-            <div class="index-section__header">
-              <div class="index-section__header-title">
-                <img src="/images/icons/entities/cash_flows.svg" alt="תזרימי מזומנים" class="index-section__header-icon" width="35" height="35">
-                <h1 class="index-section__header-text">תזרימי מזומנים</h1>
-              </div>
-              <div class="index-section__header-actions">
-                <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M6 9l6 6l6 -6"></path>
-                  </svg>
+
+  <tt-section data-section="summary-alerts">
+    <!-- Section Header -->
+    <div class="index-section__header">
+      <div class="index-section__header-title">
+        <img
+          src="/images/icons/entities/cash_flows.svg"
+          alt="תזרימי מזומנים"
+          class="index-section__header-icon"
+          width="35"
+          height="35"
+        />
+        <h1 class="index-section__header-text">תזרימי מזומנים</h1>
+      </div>
+      <div class="index-section__header-actions">
+        <button
+          class="index-section__header-toggle-btn js-section-toggle"
+          aria-label="הצג/הסתר"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M6 9l6 6l6 -6"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Section Body -->
+    <div class="index-section__body">
+      <tt-section-row>
+        <div class="col-12">
+          <!-- Active Alerts (like home page) -->
+          <div class="active-alerts" data-role="container">
+            <div class="active-alerts__header">
+              <div class="active-alerts__title-group">
+                <button
+                  type="button"
+                  class="active-alerts__title-trigger"
+                  aria-label="פתח עמוד ההתראות"
+                >
+                  <span class="active-alerts__title-icon" aria-hidden="true"
+                    >🔔</span
+                  >
+                  <span class="active-alerts__title-text" data-role="title-text"
+                    >התראות פעילות</span
+                  >
                 </button>
+                <span
+                  class="active-alerts__count-badge"
+                  data-role="count"
+                  aria-live="polite"
+                  id="cashFlowsAlertsCount"
+                  >0</span
+                >
+              </div>
+              <div
+                class="active-alerts__filters"
+                data-role="filters"
+                aria-label="סינון לפי סוג התראה"
+              ></div>
+            </div>
+            <div class="active-alerts__body">
+              <div
+                class="active-alerts__list"
+                data-role="list"
+                role="list"
+                id="cashFlowsAlertsList"
+              >
+                <!-- Alert cards populated dynamically when API available -->
+              </div>
+              <div
+                class="active-alerts__empty"
+                data-role="empty-state"
+                id="cashFlowsAlertsEmpty"
+              >
+                <span class="active-alerts__empty-icon" aria-hidden="true"
+                  >🔕</span
+                >
+                <span class="active-alerts__empty-text">אין התראות חדשות</span>
               </div>
             </div>
-
-            <!-- Section Body -->
-            <div class="index-section__body">
-              <tt-section-row>
-                <div class="col-12">
-                  <!-- Active Alerts (like home page) -->
-                  <div class="active-alerts" data-role="container">
-                    <div class="active-alerts__header">
-                      <div class="active-alerts__title-group">
-                        <button type="button" class="active-alerts__title-trigger" aria-label="פתח עמוד ההתראות">
-                          <span class="active-alerts__title-icon" aria-hidden="true">🔔</span>
-                          <span class="active-alerts__title-text" data-role="title-text">התראות פעילות</span>
-                        </button>
-                        <span class="active-alerts__count-badge" data-role="count" aria-live="polite" id="cashFlowsAlertsCount">0</span>
-                      </div>
-                      <div class="active-alerts__filters" data-role="filters" aria-label="סינון לפי סוג התראה"></div>
-                    </div>
-                    <div class="active-alerts__body">
-                      <div class="active-alerts__list" data-role="list" role="list" id="cashFlowsAlertsList">
-                        <!-- Alert cards populated dynamically when API available -->
-                      </div>
-                      <div class="active-alerts__empty" data-role="empty-state" id="cashFlowsAlertsEmpty">
-                        <span class="active-alerts__empty-icon" aria-hidden="true">🔕</span>
-                        <span class="active-alerts__empty-text">אין התראות חדשות</span>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- Summary Information -->
-                  <div class="info-summary" id="summaryStats">
-                    <!-- First Row: Summary Stats -->
-                    <div class="info-summary__row info-summary__row--first">
-                      <div class="info-summary__content">
-                        <div>סה"כ תנועות: <strong id="totalFlows">0</strong></div>
-                        <div>תנועות החודש: <strong id="monthlyFlows">0</strong></div>
-                        <div>יתרה כוללת: <strong id="totalBalance"><span class="numeric-value-positive" dir="ltr">$0.00</span></strong></div>
-                        <div>סה"כ הפקדות החודש: <strong id="monthlyDeposits"><span class="numeric-value-positive" dir="ltr">$0.00</span></strong></div>
-                        <div>סה"כ משיכות החודש: <strong id="monthlyWithdrawals"><span class="numeric-value-negative" dir="ltr">$0.00</span></strong></div>
-                      </div>
-                      <div id="stalenessClockCard" class="staleness-clock-card" aria-live="polite" data-price-label="עודכן ב" data-fetched-label="עודכן ב">
-                        <span class="staleness-clock-card__loading">טוען עדכון נתונים...</span>
-                      </div>
-                    </div>
-                    <!-- Second Row: Extended Summary (hidden by default) -->
-                    <div class="info-summary__row info-summary__row--second" id="cashFlowsSummaryContent">
-                      <div class="info-summary__content">
-                        <span>יתרה ממוצעת: <span class="numeric-value-positive" dir="ltr">$0.00</span></span>
-                        <span>תנועות השבוע: <span id="weeklyFlows">0</span></span>
-                        <span>המרות מטבע החודש: <span id="monthlyConversions">0</span></span>
-                        <span>עמלות המרה כוללות: <span class="numeric-value-positive" dir="ltr">$0.00</span></span>
-                        <span>תנועה ממוצעת: <span class="numeric-value-positive" dir="ltr">$0.00</span></span>
-                        <span>תנועה גדולה ביותר: <span class="numeric-value-positive" dir="ltr">$0.00</span></span>
-                      </div>
-                    </div>
-                  </div>
+          </div>
+          <!-- Summary Information -->
+          <div class="info-summary" id="summaryStats">
+            <!-- First Row: Summary Stats -->
+            <div class="info-summary__row info-summary__row--first">
+              <div class="info-summary__content">
+                <div>סה"כ תנועות: <strong id="totalFlows">0</strong></div>
+                <div>תנועות החודש: <strong id="monthlyFlows">0</strong></div>
+                <div>
+                  יתרה כוללת:
+                  <strong id="totalBalance"
+                    ><span class="numeric-value-positive" dir="ltr"
+                      >$0.00</span
+                    ></strong
+                  >
                 </div>
-              </tt-section-row>
+                <div>
+                  סה"כ הפקדות החודש:
+                  <strong id="monthlyDeposits"
+                    ><span class="numeric-value-positive" dir="ltr"
+                      >$0.00</span
+                    ></strong
+                  >
+                </div>
+                <div>
+                  סה"כ משיכות החודש:
+                  <strong id="monthlyWithdrawals"
+                    ><span class="numeric-value-negative" dir="ltr"
+                      >$0.00</span
+                    ></strong
+                  >
+                </div>
+              </div>
+              <div
+                id="stalenessClockCard"
+                class="staleness-clock-card"
+                aria-live="polite"
+                data-price-label="עודכן ב"
+                data-fetched-label="עודכן ב"
+              >
+                <span class="staleness-clock-card__loading"
+                  >טוען עדכון נתונים...</span
+                >
+              </div>
             </div>
-          </tt-section>
+            <!-- Second Row: Extended Summary (hidden by default) -->
+            <div
+              class="info-summary__row info-summary__row--second"
+              id="cashFlowsSummaryContent"
+            >
+              <div class="info-summary__content">
+                <span
+                  >יתרה ממוצעת:
+                  <span class="numeric-value-positive" dir="ltr"
+                    >$0.00</span
+                  ></span
+                >
+                <span>תנועות השבוע: <span id="weeklyFlows">0</span></span>
+                <span
+                  >המרות מטבע החודש:
+                  <span id="monthlyConversions">0</span></span
+                >
+                <span
+                  >עמלות המרה כוללות:
+                  <span class="numeric-value-positive" dir="ltr"
+                    >$0.00</span
+                  ></span
+                >
+                <span
+                  >תנועה ממוצעת:
+                  <span class="numeric-value-positive" dir="ltr"
+                    >$0.00</span
+                  ></span
+                >
+                <span
+                  >תנועה גדולה ביותר:
+                  <span class="numeric-value-positive" dir="ltr"
+                    >$0.00</span
+                  ></span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </tt-section-row>
+    </div>
+  </tt-section>
 
-          <!-- ============================================
+  <!-- ============================================
                CONTAINER 1: יומן תזרים מזומנים
                ============================================
                Content: Table (Cash Flows)
                Filters: Yes (Date Range + Account - Internal Filters)
                ============================================ -->
-          
-          <tt-section data-section="cash-flows-management">
-            <!-- Section Header -->
-            <div class="index-section__header">
-              <div class="index-section__header-title">
-                <img src="/images/icons/entities/cash_flows.svg" alt="תזרימי מזומנים" class="index-section__header-icon" width="35" height="35">
-                <h1 class="index-section__header-text">יומן תנועות מזומנים</h1>
+
+  <tt-section data-section="cash-flows-management">
+    <!-- Section Header -->
+    <div class="index-section__header">
+      <div class="index-section__header-title">
+        <img
+          src="/images/icons/entities/cash_flows.svg"
+          alt="תזרימי מזומנים"
+          class="index-section__header-icon"
+          width="35"
+          height="35"
+        />
+        <h1 class="index-section__header-text">יומן תנועות מזומנים</h1>
+      </div>
+      <div class="index-section__header-meta">
+        <span class="index-section__header-count" id="tableCashFlowsCount"
+          >0 תנועות</span
+        >
+      </div>
+      <div class="index-section__header-actions">
+        <div
+          class="phoenix-table-filter-group phoenix-table-filter-group--header"
+        >
+          <label class="phoenix-table-filter-label" for="cashFlowsType"
+            >סוג תנועה:</label
+          >
+          <select
+            class="phoenix-table-filter-select js-table-filter index-section__header-filter-select"
+            data-filter-key="flowType"
+            id="cashFlowsType"
+            aria-label="סינון לפי סוג תנועה"
+          >
+            <option value="">כל הסוגים</option>
+            <option value="DEPOSIT">הפקדה</option>
+            <option value="WITHDRAWAL">משיכה</option>
+            <option value="DIVIDEND">דיבידנד</option>
+            <option value="INTEREST">ריבית</option>
+            <option value="FEE">עמלה</option>
+            <option value="CURRENCY_CONVERSION">המרת מטבע</option>
+            <option value="OTHER">אחר</option>
+          </select>
+        </div>
+        <button
+          class="index-section__header-action-btn js-add-cash-flow"
+          aria-label="הוסף תזרים"
+          title="הוסף תזרים חדש"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M12 5v14M5 12h14"></path>
+          </svg>
+        </button>
+        <button
+          class="index-section__header-toggle-btn js-section-toggle"
+          aria-label="הצג/הסתר"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M6 9l6 6l6 -6"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Section Body -->
+    <div class="index-section__body">
+      <tt-section-row>
+        <div class="col-12">
+          <!-- Table Wrapper -->
+          <div class="phoenix-table-wrapper">
+            <table
+              id="cashFlowsTable"
+              class="phoenix-table js-table"
+              data-table-type="cash_flows"
+              role="table"
+              aria-label="יומן תזרים מזומנים"
+            >
+              <thead class="phoenix-table__head" role="rowgroup">
+                <tr class="phoenix-table__row" role="row">
+                  <th
+                    class="phoenix-table__header col-trade js-table-sort-trigger"
+                    data-sortable="true"
+                    data-sort-key="trade"
+                    data-sort-type="string"
+                    data-column-index="0"
+                    role="columnheader"
+                    aria-sort="none"
+                    tabindex="0"
+                  >
+                    <span class="phoenix-table__header-text">טרייד</span>
+                    <span
+                      class="phoenix-table__sort-indicator js-sort-indicator"
+                    >
+                      <svg
+                        class="phoenix-table__sort-icon js-sort-icon"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M8 9l4 -4l4 4"></path>
+                        <path d="M8 15l4 4l4 -4"></path>
+                      </svg>
+                    </span>
+                  </th>
+                  <th
+                    class="phoenix-table__header col-account js-table-sort-trigger"
+                    data-sortable="true"
+                    data-sort-key="account"
+                    data-sort-type="string"
+                    data-column-index="1"
+                    role="columnheader"
+                    aria-sort="none"
+                    tabindex="0"
+                  >
+                    <span class="phoenix-table__header-text">חשבון מסחר</span>
+                    <span
+                      class="phoenix-table__sort-indicator js-sort-indicator"
+                    >
+                      <svg
+                        class="phoenix-table__sort-icon js-sort-icon"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M8 9l4 -4l4 4"></path>
+                        <path d="M8 15l4 4l4 -4"></path>
+                      </svg>
+                    </span>
+                  </th>
+                  <th
+                    class="phoenix-table__header col-type js-table-sort-trigger"
+                    data-sortable="true"
+                    data-sort-key="type"
+                    data-sort-type="string"
+                    data-column-index="2"
+                    role="columnheader"
+                    aria-sort="none"
+                    tabindex="0"
+                    dir="rtl"
+                  >
+                    <span class="phoenix-table__header-text">סוג</span>
+                    <span
+                      class="phoenix-table__sort-indicator js-sort-indicator"
+                    >
+                      <svg
+                        class="phoenix-table__sort-icon js-sort-icon"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M8 9l4 -4l4 4"></path>
+                        <path d="M8 15l4 4l4 -4"></path>
+                      </svg>
+                    </span>
+                  </th>
+                  <th
+                    class="phoenix-table__header col-amount phoenix-table__header--numeric js-table-sort-trigger"
+                    data-sortable="true"
+                    data-sort-key="amount"
+                    data-sort-type="numeric"
+                    data-column-index="3"
+                    role="columnheader"
+                    aria-sort="none"
+                    tabindex="0"
+                  >
+                    <span class="phoenix-table__header-text">סכום</span>
+                    <span
+                      class="phoenix-table__sort-indicator js-sort-indicator"
+                    >
+                      <svg
+                        class="phoenix-table__sort-icon js-sort-icon"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M8 9l4 -4l4 4"></path>
+                        <path d="M8 15l4 4l4 -4"></path>
+                      </svg>
+                    </span>
+                  </th>
+                  <th
+                    class="phoenix-table__header col-date js-table-sort-trigger"
+                    data-sortable="true"
+                    data-sort-key="date"
+                    data-sort-type="date"
+                    data-column-index="4"
+                    role="columnheader"
+                    aria-sort="none"
+                    tabindex="0"
+                  >
+                    <span class="phoenix-table__header-text">תאריך</span>
+                    <span
+                      class="phoenix-table__sort-indicator js-sort-indicator"
+                    >
+                      <svg
+                        class="phoenix-table__sort-icon js-sort-icon"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M8 9l4 -4l4 4"></path>
+                        <path d="M8 15l4 4l4 -4"></path>
+                      </svg>
+                    </span>
+                  </th>
+                  <th
+                    class="phoenix-table__header col-description js-table-sort-trigger"
+                    data-sortable="true"
+                    data-sort-key="description"
+                    data-sort-type="string"
+                    data-column-index="5"
+                    role="columnheader"
+                    aria-sort="none"
+                    tabindex="0"
+                  >
+                    <span class="phoenix-table__header-text">תיאור</span>
+                    <span
+                      class="phoenix-table__sort-indicator js-sort-indicator"
+                    >
+                      <svg
+                        class="phoenix-table__sort-icon js-sort-icon"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M8 9l4 -4l4 4"></path>
+                        <path d="M8 15l4 4l4 -4"></path>
+                      </svg>
+                    </span>
+                  </th>
+                  <th
+                    class="phoenix-table__header col-source js-table-sort-trigger"
+                    data-sortable="true"
+                    data-sort-key="source"
+                    data-sort-type="string"
+                    data-column-index="6"
+                    role="columnheader"
+                    aria-sort="none"
+                    tabindex="0"
+                  >
+                    <span class="phoenix-table__header-text">מקור</span>
+                    <span
+                      class="phoenix-table__sort-indicator js-sort-indicator"
+                    >
+                      <svg
+                        class="phoenix-table__sort-icon js-sort-icon"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M8 9l4 -4l4 4"></path>
+                        <path d="M8 15l4 4l4 -4"></path>
+                      </svg>
+                    </span>
+                  </th>
+                  <th
+                    class="phoenix-table__header col-updated js-table-sort-trigger"
+                    data-sortable="true"
+                    data-sort-key="updated"
+                    data-sort-type="date"
+                    data-column-index="7"
+                    role="columnheader"
+                    aria-sort="none"
+                    tabindex="0"
+                  >
+                    <span class="phoenix-table__header-text">עודכן</span>
+                    <span
+                      class="phoenix-table__sort-indicator js-sort-indicator"
+                    >
+                      <svg
+                        class="phoenix-table__sort-icon js-sort-icon"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M8 9l4 -4l4 4"></path>
+                        <path d="M8 15l4 4l4 -4"></path>
+                      </svg>
+                    </span>
+                  </th>
+                  <th
+                    class="phoenix-table__header col-actions actions-cell actions-4-items"
+                    data-sortable="false"
+                    role="columnheader"
+                  >
+                    <span class="phoenix-table__header-text">פעולות</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody
+                class="phoenix-table__body"
+                role="rowgroup"
+                id="cashFlowsTableBody"
+              >
+                <!-- Table rows will be populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Table Pagination -->
+          <div class="phoenix-table-pagination">
+            <div class="phoenix-table-pagination__info">
+              <span id="cashFlowsPaginationInfo">מציג 0-0 מתוך 0 רשומות</span>
+            </div>
+            <div class="phoenix-table-pagination__controls">
+              <div class="phoenix-table-pagination__page-size">
+                <label class="phoenix-table-pagination__page-size-label"
+                  >שורות לעמוד:</label
+                >
+                <select
+                  class="phoenix-table-pagination__page-size-select js-table-page-size"
+                  data-table-id="cashFlowsTable"
+                >
+                  <option value="10">10</option>
+                  <option value="25" selected>25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
               </div>
-              <div class="index-section__header-meta">
-                <span class="index-section__header-count" id="tableCashFlowsCount">0 תנועות</span>
-              </div>
-              <div class="index-section__header-actions">
-                <div class="phoenix-table-filter-group phoenix-table-filter-group--header">
-                  <label class="phoenix-table-filter-label" for="cashFlowsType">סוג תנועה:</label>
-                  <select class="phoenix-table-filter-select js-table-filter index-section__header-filter-select" data-filter-key="flowType" id="cashFlowsType" aria-label="סינון לפי סוג תנועה">
-                    <option value="">כל הסוגים</option>
-                    <option value="DEPOSIT">הפקדה</option>
-                    <option value="WITHDRAWAL">משיכה</option>
-                    <option value="DIVIDEND">דיבידנד</option>
-                    <option value="INTEREST">ריבית</option>
-                    <option value="FEE">עמלה</option>
-                    <option value="CURRENCY_CONVERSION">המרת מטבע</option>
-                    <option value="OTHER">אחר</option>
-                  </select>
-                </div>
-                <button class="index-section__header-action-btn js-add-cash-flow" aria-label="הוסף תזרים" title="הוסף תזרים חדש">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 5v14M5 12h14"></path>
+              <div
+                class="phoenix-table-pagination__pages"
+                id="cashFlowsPaginationControls"
+              >
+                <button
+                  class="phoenix-table-pagination__button"
+                  aria-label="עמוד קודם"
+                  id="cashFlowsPrevPageBtn"
+                  disabled
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M9 18l6-6-6-6"></path>
                   </svg>
                 </button>
-                <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M6 9l6 6l6 -6"></path>
+                <div id="cashFlowsPageNumbers"></div>
+                <button
+                  class="phoenix-table-pagination__button"
+                  aria-label="עמוד הבא"
+                  id="cashFlowsNextPageBtn"
+                  disabled
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M15 18l-6-6 6-6"></path>
                   </svg>
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      </tt-section-row>
+    </div>
+  </tt-section>
 
-            <!-- Section Body -->
-            <div class="index-section__body">
-              <tt-section-row>
-                <div class="col-12">
-                  <!-- Table Wrapper -->
-                  <div class="phoenix-table-wrapper">
-                    <table id="cashFlowsTable" class="phoenix-table js-table" data-table-type="cash_flows" role="table" aria-label="יומן תזרים מזומנים">
-                      <thead class="phoenix-table__head" role="rowgroup">
-                        <tr class="phoenix-table__row" role="row">
-                          <th class="phoenix-table__header col-trade js-table-sort-trigger" data-sortable="true" data-sort-key="trade" data-sort-type="string" data-column-index="0" role="columnheader" aria-sort="none" tabindex="0">
-                            <span class="phoenix-table__header-text">טרייד</span>
-                            <span class="phoenix-table__sort-indicator js-sort-indicator">
-                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M8 9l4 -4l4 4"></path>
-                                <path d="M8 15l4 4l4 -4"></path>
-                              </svg>
-                            </span>
-                          </th>
-                          <th class="phoenix-table__header col-account js-table-sort-trigger" data-sortable="true" data-sort-key="account" data-sort-type="string" data-column-index="1" role="columnheader" aria-sort="none" tabindex="0">
-                            <span class="phoenix-table__header-text">חשבון מסחר</span>
-                            <span class="phoenix-table__sort-indicator js-sort-indicator">
-                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M8 9l4 -4l4 4"></path>
-                                <path d="M8 15l4 4l4 -4"></path>
-                              </svg>
-                            </span>
-                          </th>
-                          <th class="phoenix-table__header col-type js-table-sort-trigger" data-sortable="true" data-sort-key="type" data-sort-type="string" data-column-index="2" role="columnheader" aria-sort="none" tabindex="0" dir="rtl">
-                            <span class="phoenix-table__header-text">סוג</span>
-                            <span class="phoenix-table__sort-indicator js-sort-indicator">
-                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M8 9l4 -4l4 4"></path>
-                                <path d="M8 15l4 4l4 -4"></path>
-                              </svg>
-                            </span>
-                          </th>
-                          <th class="phoenix-table__header col-amount phoenix-table__header--numeric js-table-sort-trigger" data-sortable="true" data-sort-key="amount" data-sort-type="numeric" data-column-index="3" role="columnheader" aria-sort="none" tabindex="0">
-                            <span class="phoenix-table__header-text">סכום</span>
-                            <span class="phoenix-table__sort-indicator js-sort-indicator">
-                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M8 9l4 -4l4 4"></path>
-                                <path d="M8 15l4 4l4 -4"></path>
-                              </svg>
-                            </span>
-                          </th>
-                          <th class="phoenix-table__header col-date js-table-sort-trigger" data-sortable="true" data-sort-key="date" data-sort-type="date" data-column-index="4" role="columnheader" aria-sort="none" tabindex="0">
-                            <span class="phoenix-table__header-text">תאריך</span>
-                            <span class="phoenix-table__sort-indicator js-sort-indicator">
-                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M8 9l4 -4l4 4"></path>
-                                <path d="M8 15l4 4l4 -4"></path>
-                              </svg>
-                            </span>
-                          </th>
-                          <th class="phoenix-table__header col-description js-table-sort-trigger" data-sortable="true" data-sort-key="description" data-sort-type="string" data-column-index="5" role="columnheader" aria-sort="none" tabindex="0">
-                            <span class="phoenix-table__header-text">תיאור</span>
-                            <span class="phoenix-table__sort-indicator js-sort-indicator">
-                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M8 9l4 -4l4 4"></path>
-                                <path d="M8 15l4 4l4 -4"></path>
-                              </svg>
-                            </span>
-                          </th>
-                          <th class="phoenix-table__header col-source js-table-sort-trigger" data-sortable="true" data-sort-key="source" data-sort-type="string" data-column-index="6" role="columnheader" aria-sort="none" tabindex="0">
-                            <span class="phoenix-table__header-text">מקור</span>
-                            <span class="phoenix-table__sort-indicator js-sort-indicator">
-                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M8 9l4 -4l4 4"></path>
-                                <path d="M8 15l4 4l4 -4"></path>
-                              </svg>
-                            </span>
-                          </th>
-                          <th class="phoenix-table__header col-updated js-table-sort-trigger" data-sortable="true" data-sort-key="updated" data-sort-type="date" data-column-index="7" role="columnheader" aria-sort="none" tabindex="0">
-                            <span class="phoenix-table__header-text">עודכן</span>
-                            <span class="phoenix-table__sort-indicator js-sort-indicator">
-                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M8 9l4 -4l4 4"></path>
-                                <path d="M8 15l4 4l4 -4"></path>
-                              </svg>
-                            </span>
-                          </th>
-                          <th class="phoenix-table__header col-actions actions-cell actions-4-items" data-sortable="false" role="columnheader">
-                            <span class="phoenix-table__header-text">פעולות</span>
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody class="phoenix-table__body" role="rowgroup" id="cashFlowsTableBody">
-                        <!-- Table rows will be populated dynamically -->
-                      </tbody>
-                    </table>
-                  </div>
-                  
-                  <!-- Table Pagination -->
-                  <div class="phoenix-table-pagination">
-                    <div class="phoenix-table-pagination__info">
-                      <span id="cashFlowsPaginationInfo">מציג 0-0 מתוך 0 רשומות</span>
-                    </div>
-                    <div class="phoenix-table-pagination__controls">
-                      <div class="phoenix-table-pagination__page-size">
-                        <label class="phoenix-table-pagination__page-size-label">שורות לעמוד:</label>
-                        <select class="phoenix-table-pagination__page-size-select js-table-page-size" data-table-id="cashFlowsTable">
-                          <option value="10">10</option>
-                          <option value="25" selected>25</option>
-                          <option value="50">50</option>
-                          <option value="100">100</option>
-                        </select>
-                      </div>
-                      <div class="phoenix-table-pagination__pages" id="cashFlowsPaginationControls">
-                        <button class="phoenix-table-pagination__button" aria-label="עמוד קודם" id="cashFlowsPrevPageBtn" disabled>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 18l6-6-6-6"></path>
-                          </svg>
-                        </button>
-                        <div id="cashFlowsPageNumbers"></div>
-                        <button class="phoenix-table-pagination__button" aria-label="עמוד הבא" id="cashFlowsNextPageBtn" disabled>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M15 18l-6-6 6-6"></path>
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  
-                </div>
-              </tt-section-row>
-            </div>
-          </tt-section>
-
-          <!-- ============================================
+  <!-- ============================================
                CONTAINER 2: המרות מטבע מאוחדות
                ============================================
                Content: Table (Currency Conversions Only)
                Filters: None (uses global filters only)
                ============================================ -->
-          
-          <tt-section data-section="currency-conversions">
-            <!-- Section Header -->
-            <div class="index-section__header">
-              <div class="index-section__header-title">
-                <img src="/images/icons/entities/cash_flows.svg" alt="המרות מטבע" class="index-section__header-icon" width="35" height="35">
-                <h1 class="index-section__header-text">המרות מטבע מאוחדות</h1>
+
+  <tt-section data-section="currency-conversions">
+    <!-- Section Header -->
+    <div class="index-section__header">
+      <div class="index-section__header-title">
+        <img
+          src="/images/icons/entities/cash_flows.svg"
+          alt="המרות מטבע"
+          class="index-section__header-icon"
+          width="35"
+          height="35"
+        />
+        <h1 class="index-section__header-text">המרות מטבע מאוחדות</h1>
+      </div>
+      <div class="index-section__header-meta">
+        <span class="index-section__header-count" id="currencyConversionsCount"
+          >0 המרות</span
+        >
+      </div>
+      <div class="index-section__header-actions">
+        <button
+          class="index-section__header-toggle-btn js-section-toggle"
+          aria-label="הצג/הסתר"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M6 9l6 6l6 -6"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Section Body -->
+    <div class="index-section__body">
+      <tt-section-row>
+        <div class="col-12">
+          <!-- Table Wrapper -->
+          <div class="phoenix-table-wrapper">
+            <table
+              id="currencyConversionsTable"
+              class="phoenix-table js-table"
+              data-table-type="currency_conversions"
+              role="table"
+              aria-label="המרות מטבע מאוחדות"
+            >
+              <thead class="phoenix-table__head" role="rowgroup">
+                <tr class="phoenix-table__row" role="row">
+                  <th
+                    class="phoenix-table__header col-date js-table-sort-trigger"
+                    data-sortable="true"
+                    data-sort-key="date"
+                    data-sort-type="date"
+                    data-column-index="0"
+                    role="columnheader"
+                    aria-sort="none"
+                    tabindex="0"
+                  >
+                    <span class="phoenix-table__header-text">תאריך</span>
+                    <span
+                      class="phoenix-table__sort-indicator js-sort-indicator"
+                    >
+                      <svg
+                        class="phoenix-table__sort-icon js-sort-icon"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M8 9l4 -4l4 4"></path>
+                        <path d="M8 15l4 4l4 -4"></path>
+                      </svg>
+                    </span>
+                  </th>
+                  <th
+                    class="phoenix-table__header col-account js-table-sort-trigger"
+                    data-sortable="true"
+                    data-sort-key="account"
+                    data-sort-type="string"
+                    data-column-index="1"
+                    role="columnheader"
+                    aria-sort="none"
+                    tabindex="0"
+                  >
+                    <span class="phoenix-table__header-text">חשבון מסחר</span>
+                    <span
+                      class="phoenix-table__sort-indicator js-sort-indicator"
+                    >
+                      <svg
+                        class="phoenix-table__sort-icon js-sort-icon"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M8 9l4 -4l4 4"></path>
+                        <path d="M8 15l4 4l4 -4"></path>
+                      </svg>
+                    </span>
+                  </th>
+                  <th
+                    class="phoenix-table__header col-from phoenix-table__header--numeric js-table-sort-trigger"
+                    data-sortable="true"
+                    data-sort-key="from"
+                    data-sort-type="numeric"
+                    data-column-index="2"
+                    role="columnheader"
+                    aria-sort="none"
+                    tabindex="0"
+                  >
+                    <span class="phoenix-table__header-text">מה־</span>
+                    <span
+                      class="phoenix-table__sort-indicator js-sort-indicator"
+                    >
+                      <svg
+                        class="phoenix-table__sort-icon js-sort-icon"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M8 9l4 -4l4 4"></path>
+                        <path d="M8 15l4 4l4 -4"></path>
+                      </svg>
+                    </span>
+                  </th>
+                  <th
+                    class="phoenix-table__header col-to phoenix-table__header--numeric js-table-sort-trigger"
+                    data-sortable="true"
+                    data-sort-key="to"
+                    data-sort-type="numeric"
+                    data-column-index="3"
+                    role="columnheader"
+                    aria-sort="none"
+                    tabindex="0"
+                  >
+                    <span class="phoenix-table__header-text">ל־</span>
+                    <span
+                      class="phoenix-table__sort-indicator js-sort-indicator"
+                    >
+                      <svg
+                        class="phoenix-table__sort-icon js-sort-icon"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M8 9l4 -4l4 4"></path>
+                        <path d="M8 15l4 4l4 -4"></path>
+                      </svg>
+                    </span>
+                  </th>
+                  <th
+                    class="phoenix-table__header col-estimated-rate phoenix-table__header--numeric js-table-sort-trigger"
+                    data-sortable="true"
+                    data-sort-key="estimated_rate"
+                    data-sort-type="numeric"
+                    data-column-index="4"
+                    role="columnheader"
+                    aria-sort="none"
+                    tabindex="0"
+                  >
+                    <span class="phoenix-table__header-text">שער משוער</span>
+                    <span
+                      class="phoenix-table__sort-indicator js-sort-indicator"
+                    >
+                      <svg
+                        class="phoenix-table__sort-icon js-sort-icon"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M8 9l4 -4l4 4"></path>
+                        <path d="M8 15l4 4l4 -4"></path>
+                      </svg>
+                    </span>
+                  </th>
+                  <th
+                    class="phoenix-table__header col-identification js-table-sort-trigger"
+                    data-sortable="true"
+                    data-sort-key="identification"
+                    data-sort-type="string"
+                    data-column-index="5"
+                    role="columnheader"
+                    aria-sort="none"
+                    tabindex="0"
+                  >
+                    <span class="phoenix-table__header-text">זיהוי</span>
+                    <span
+                      class="phoenix-table__sort-indicator js-sort-indicator"
+                    >
+                      <svg
+                        class="phoenix-table__sort-icon js-sort-icon"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M8 9l4 -4l4 4"></path>
+                        <path d="M8 15l4 4l4 -4"></path>
+                      </svg>
+                    </span>
+                  </th>
+                  <th
+                    class="phoenix-table__header col-actions text-center"
+                    data-sortable="false"
+                    role="columnheader"
+                  >
+                    <span class="phoenix-table__header-text">פעולות</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody
+                class="phoenix-table__body"
+                role="rowgroup"
+                id="currencyConversionsTableBody"
+              >
+                <!-- Table rows will be populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Table Pagination -->
+          <div class="phoenix-table-pagination">
+            <div class="phoenix-table-pagination__info">
+              <span id="currencyConversionsPaginationInfo"
+                >מציג 0-0 מתוך 0 רשומות</span
+              >
+            </div>
+            <div class="phoenix-table-pagination__controls">
+              <div class="phoenix-table-pagination__page-size">
+                <label class="phoenix-table-pagination__page-size-label"
+                  >שורות לעמוד:</label
+                >
+                <select
+                  class="phoenix-table-pagination__page-size-select js-table-page-size"
+                  data-table-id="currencyConversionsTable"
+                >
+                  <option value="10">10</option>
+                  <option value="25" selected>25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
               </div>
-              <div class="index-section__header-meta">
-                <span class="index-section__header-count" id="currencyConversionsCount">0 המרות</span>
-              </div>
-              <div class="index-section__header-actions">
-                <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M6 9l6 6l6 -6"></path>
+              <div
+                class="phoenix-table-pagination__pages"
+                id="currencyConversionsPaginationControls"
+              >
+                <button
+                  class="phoenix-table-pagination__button"
+                  aria-label="עמוד קודם"
+                  id="currencyConversionsPrevPageBtn"
+                  disabled
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M9 18l6-6-6-6"></path>
+                  </svg>
+                </button>
+                <div id="currencyConversionsPageNumbers"></div>
+                <button
+                  class="phoenix-table-pagination__button"
+                  aria-label="עמוד הבא"
+                  id="currencyConversionsNextPageBtn"
+                  disabled
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M15 18l-6-6 6-6"></path>
                   </svg>
                 </button>
               </div>
             </div>
-
-            <!-- Section Body -->
-            <div class="index-section__body">
-              <tt-section-row>
-                <div class="col-12">
-                  
-                  <!-- Table Wrapper -->
-                  <div class="phoenix-table-wrapper">
-                    <table id="currencyConversionsTable" class="phoenix-table js-table" data-table-type="currency_conversions" role="table" aria-label="המרות מטבע מאוחדות">
-                      <thead class="phoenix-table__head" role="rowgroup">
-                        <tr class="phoenix-table__row" role="row">
-                          <th class="phoenix-table__header col-date js-table-sort-trigger" data-sortable="true" data-sort-key="date" data-sort-type="date" data-column-index="0" role="columnheader" aria-sort="none" tabindex="0">
-                            <span class="phoenix-table__header-text">תאריך</span>
-                            <span class="phoenix-table__sort-indicator js-sort-indicator">
-                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M8 9l4 -4l4 4"></path>
-                                <path d="M8 15l4 4l4 -4"></path>
-                              </svg>
-                            </span>
-                          </th>
-                          <th class="phoenix-table__header col-account js-table-sort-trigger" data-sortable="true" data-sort-key="account" data-sort-type="string" data-column-index="1" role="columnheader" aria-sort="none" tabindex="0">
-                            <span class="phoenix-table__header-text">חשבון מסחר</span>
-                            <span class="phoenix-table__sort-indicator js-sort-indicator">
-                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M8 9l4 -4l4 4"></path>
-                                <path d="M8 15l4 4l4 -4"></path>
-                              </svg>
-                            </span>
-                          </th>
-                          <th class="phoenix-table__header col-from phoenix-table__header--numeric js-table-sort-trigger" data-sortable="true" data-sort-key="from" data-sort-type="numeric" data-column-index="2" role="columnheader" aria-sort="none" tabindex="0">
-                            <span class="phoenix-table__header-text">מה־</span>
-                            <span class="phoenix-table__sort-indicator js-sort-indicator">
-                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M8 9l4 -4l4 4"></path>
-                                <path d="M8 15l4 4l4 -4"></path>
-                              </svg>
-                            </span>
-                          </th>
-                          <th class="phoenix-table__header col-to phoenix-table__header--numeric js-table-sort-trigger" data-sortable="true" data-sort-key="to" data-sort-type="numeric" data-column-index="3" role="columnheader" aria-sort="none" tabindex="0">
-                            <span class="phoenix-table__header-text">ל־</span>
-                            <span class="phoenix-table__sort-indicator js-sort-indicator">
-                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M8 9l4 -4l4 4"></path>
-                                <path d="M8 15l4 4l4 -4"></path>
-                              </svg>
-                            </span>
-                          </th>
-                          <th class="phoenix-table__header col-estimated-rate phoenix-table__header--numeric js-table-sort-trigger" data-sortable="true" data-sort-key="estimated_rate" data-sort-type="numeric" data-column-index="4" role="columnheader" aria-sort="none" tabindex="0">
-                            <span class="phoenix-table__header-text">שער משוער</span>
-                            <span class="phoenix-table__sort-indicator js-sort-indicator">
-                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M8 9l4 -4l4 4"></path>
-                                <path d="M8 15l4 4l4 -4"></path>
-                              </svg>
-                            </span>
-                          </th>
-                          <th class="phoenix-table__header col-identification js-table-sort-trigger" data-sortable="true" data-sort-key="identification" data-sort-type="string" data-column-index="5" role="columnheader" aria-sort="none" tabindex="0">
-                            <span class="phoenix-table__header-text">זיהוי</span>
-                            <span class="phoenix-table__sort-indicator js-sort-indicator">
-                              <svg class="phoenix-table__sort-icon js-sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M8 9l4 -4l4 4"></path>
-                                <path d="M8 15l4 4l4 -4"></path>
-                              </svg>
-                            </span>
-                          </th>
-                          <th class="phoenix-table__header col-actions text-center" data-sortable="false" role="columnheader">
-                            <span class="phoenix-table__header-text">פעולות</span>
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody class="phoenix-table__body" role="rowgroup" id="currencyConversionsTableBody">
-                        <!-- Table rows will be populated dynamically -->
-                      </tbody>
-                    </table>
-                  </div>
-                  
-                  <!-- Table Pagination -->
-                  <div class="phoenix-table-pagination">
-                    <div class="phoenix-table-pagination__info">
-                      <span id="currencyConversionsPaginationInfo">מציג 0-0 מתוך 0 רשומות</span>
-                    </div>
-                    <div class="phoenix-table-pagination__controls">
-                      <div class="phoenix-table-pagination__page-size">
-                        <label class="phoenix-table-pagination__page-size-label">שורות לעמוד:</label>
-                        <select class="phoenix-table-pagination__page-size-select js-table-page-size" data-table-id="currencyConversionsTable">
-                          <option value="10">10</option>
-                          <option value="25" selected>25</option>
-                          <option value="50">50</option>
-                          <option value="100">100</option>
-                        </select>
-                      </div>
-                      <div class="phoenix-table-pagination__pages" id="currencyConversionsPaginationControls">
-                        <button class="phoenix-table-pagination__button" aria-label="עמוד קודם" id="currencyConversionsPrevPageBtn" disabled>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 18l6-6-6-6"></path>
-                          </svg>
-                        </button>
-                        <div id="currencyConversionsPageNumbers"></div>
-                        <button class="phoenix-table-pagination__button" aria-label="עמוד הבא" id="currencyConversionsNextPageBtn" disabled>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M15 18l-6-6 6-6"></path>
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  
-                </div>
-              </tt-section-row>
-            </div>
-          </tt-section>
-
-        </tt-container>
+          </div>
+        </div>
+      </tt-section-row>
+    </div>
+  </tt-section>
+</tt-container>

@@ -32,7 +32,7 @@
 3. **דוח עדות:**  
    עדכון/יצירת `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_90_S002_P002_WP003_GATE7_PARTA_RUNTIME_EVIDENCE_REPORT_v2.0.2.md` (או גרסה עדכנית) — תאריך UTC, לוג path, ספירות מפורשות, verdicts (CC-01, CC-02, CC-04).
 4. **ארטיפקט JSON:**  
-   עדכון `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` — `log_path` לא ריק, `pass_01`/`pass_02`/`pass_04` לא null, ספירות מפורשות.
+   עדכון `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` — `log_path` לא ריק, `pass_01`/`pass_02`/`pass_04` לא null, ספירות מפורשות.
 
 ---
 
@@ -49,7 +49,7 @@
 ## 4) דליברבל
 
 - `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_90_S002_P002_WP003_GATE7_PARTA_RUNTIME_EVIDENCE_REPORT_v2.0.2.md` (או גרסה עדכנית)  
-- `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` (מעודכן)  
+- `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` (מעודכן)  
 - Team 50 יעדכן corroboration בהתאם ל־verdicts של Team 60 (אין סתירה).
 
 ---

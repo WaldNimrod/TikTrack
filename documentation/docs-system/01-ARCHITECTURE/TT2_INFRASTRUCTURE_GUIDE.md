@@ -113,7 +113,7 @@
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | תוקף Access Token | אופציונלי | — |
 | `REFRESH_TOKEN_EXPIRE_DAYS` | תוקף Refresh Token | אופציונלי | — |
 | `ENCRYPTION_KEY` | הצפנת נתונים רגישים | מומלץ | `api/.env.example` |
-| `ALPHA_VANTAGE_API_KEY` | מפתח API ל-Alpha Vantage (Market Data) | נדרש ל־User Tickers, FX EOD, Sync scripts | `api/.env.example`; `documentation/05-REPORTS/artifacts/TEAM_20_ALPHA_VANTAGE_API_KEY_GUIDELINES.md` |
+| `ALPHA_VANTAGE_API_KEY` | מפתח API ל-Alpha Vantage (Market Data) | נדרש ל־User Tickers, FX EOD, Sync scripts | `api/.env.example`; `documentation/reports/05-REPORTS/artifacts/TEAM_20_ALPHA_VANTAGE_API_KEY_GUIDELINES.md` |
 | `SKIP_LIVE_DATA_CHECK` | `true` = דילוג על בדיקת live ב־POST /me/tickers | **dev/QA בלבד** — אסור בפרודקשן | `api/.env.example` |
 
 **קבלת `ALPHA_VANTAGE_API_KEY`:** https://www.alphavantage.co/support/#api-key (חינם — 5 קריאות/דקה).
@@ -232,7 +232,7 @@ postgresql://TikTrackDbAdmin:<PASSWORD>@localhost:5432/TikTrack-phoenix-db
 - **Database Credentials:** `documentation/01-ARCHITECTURE/TT2_DATABASE_CREDENTIALS.md`
 - **Routes SSOT:** `ui/public/routes.json`
 - **Backend API Spec:** `05-DEVELOPMENT_&_CONTRACTS/OPENAPI_SPEC_V2_FINAL.yaml`
-- **ALPHA_VANTAGE_API_KEY (הנחיות מפורטות):** `documentation/05-REPORTS/artifacts/TEAM_20_ALPHA_VANTAGE_API_KEY_GUIDELINES.md`
+- **ALPHA_VANTAGE_API_KEY (הנחיות מפורטות):** `documentation/reports/05-REPORTS/artifacts/TEAM_20_ALPHA_VANTAGE_API_KEY_GUIDELINES.md`
 
 ---
 

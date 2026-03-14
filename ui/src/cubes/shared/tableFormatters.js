@@ -1,20 +1,23 @@
 import { toHebrewStatus } from '../../utils/statusAdapter.js';
-import { formatDailyChange, formatDailyChangeFromAbsolute } from '../../utils/formatChange.js';
+import {
+  formatDailyChange,
+  formatDailyChangeFromAbsolute,
+} from '../../utils/formatChange.js';
 
 /**
  * tableFormatters - פונקציות עזר לפורמט תצוגה בטבלאות
  * -----------------------------------------------------
  * פונקציות עזר לפורמט תצוגה: מספרים, מטבעות, תאריכים, באגטים, ופורמטים מיוחדים.
- * 
+ *
  * @description פונקציות עזר לפורמט תצוגה בטבלאות Phoenix
  * @standard JS Standards Protocol ✅ | Clean Slate Rule ✅
  * @legacyReference Legacy.tables.formatters
- * 
+ *
  * @example
  * // פורמט מטבע
  * const formatted = formatCurrency(1234.56, 'USD');
  * // Returns: "$1,234.56"
- * 
+ *
  * // פורמט תאריך
  * const formatted = formatDate(new Date());
  * // Returns: "01/02/2026"
@@ -22,13 +25,13 @@ import { formatDailyChange, formatDailyChangeFromAbsolute } from '../../utils/fo
 
 /**
  * formatCurrency - פורמט מטבע
- * 
+ *
  * @description פורמט מספר כמטבע עם סימן מטבע ופסיקים
  * @param {number} amount - הסכום
  * @param {string} currency - קוד מטבע (USD, EUR, ILS, וכו')
  * @param {number} decimals - מספר ספרות אחרי הנקודה (default: 2)
  * @returns {string} מחרוזת מפורמטת
- * 
+ *
  * @example
  * formatCurrency(1234.56, 'USD') // "$1,234.56"
  * formatCurrency(1234.56, 'EUR') // "€1,234.56"
@@ -49,7 +52,7 @@ function formatCurrency(amount, currency = 'USD', decimals = 2) {
     ILS: '₪',
     GBP: '£',
     JPY: '¥',
-    USDT: '₮'
+    USDT: '₮',
   };
 
   const symbol = currencySymbols[currency] || currency;
@@ -58,12 +61,12 @@ function formatCurrency(amount, currency = 'USD', decimals = 2) {
 
 /**
  * formatNumber - פורמט מספר
- * 
+ *
  * @description פורמט מספר עם פסיקים
  * @param {number} number - המספר
  * @param {number} decimals - מספר ספרות אחרי הנקודה (default: 0)
  * @returns {string} מחרוזת מפורמטת
- * 
+ *
  * @example
  * formatNumber(1234.56) // "1,235"
  * formatNumber(1234.56, 2) // "1,234.56"
@@ -82,11 +85,11 @@ function formatNumber(number, decimals = 0) {
 
 /**
  * formatDate - פורמט תאריך
- * 
+ *
  * @description פורמט תאריך לפורמט DD/MM/YY (ברירת מחדל במערכת)
  * @param {Date|string} date - תאריך (Date object או מחרוזת)
  * @returns {string} מחרוזת תאריך בפורמט DD/MM/YY
- * 
+ *
  * @example
  * formatDate(new Date('2026-02-01')) // "01/02/26"
  * formatDate('2026-02-01') // "01/02/26"
@@ -110,13 +113,13 @@ function formatDate(date) {
 
 /**
  * formatPercentage - פורמט אחוז
- * 
+ *
  * @description פורמט מספר כאחוז
  * @param {number} value - הערך (0-100 או 0-1)
  * @param {number} decimals - מספר ספרות אחרי הנקודה (default: 1)
  * @param {boolean} isDecimal - האם הערך הוא עשרוני (0-1) או אחוז (0-100) (default: false)
  * @returns {string} מחרוזת אחוז
- * 
+ *
  * @example
  * formatPercentage(3.5) // "3.5%"
  * formatPercentage(0.035, 2, true) // "3.50%"
@@ -132,13 +135,13 @@ function formatPercentage(value, decimals = 1, isDecimal = false) {
 
 /**
  * formatCurrentPrice - פורמט מחיר נוכחי עם שינוי יומי
- * 
+ *
  * @description פורמט מחיר נוכחי בפורמט: $155.34(+3.22%)
  * @param {number} price - המחיר הנוכחי
  * @param {number} changePercent - שינוי יומי באחוזים
  * @param {string} currency - קוד מטבע (default: 'USD')
  * @returns {HTMLElement} אלמנט div עם המחיר והשינוי
- * 
+ *
  * @example
  * formatCurrentPrice(155.34, 3.22, 'USD')
  * // Returns: <div class="current-price-display">
@@ -151,12 +154,14 @@ function formatCurrentPrice(price, changePercent, currency = 'USD') {
   container.className = 'current-price-display';
 
   const priceSpan = document.createElement('span');
-  priceSpan.className = changePercent >= 0 ? 'numeric-value-positive' : 'numeric-value-negative';
+  priceSpan.className =
+    changePercent >= 0 ? 'numeric-value-positive' : 'numeric-value-negative';
   priceSpan.setAttribute('dir', 'ltr');
   priceSpan.textContent = formatCurrency(price, currency, 2);
 
   const changeSpan = document.createElement('span');
-  changeSpan.className = changePercent >= 0 ? 'numeric-value-positive' : 'numeric-value-negative';
+  changeSpan.className =
+    changePercent >= 0 ? 'numeric-value-positive' : 'numeric-value-negative';
   changeSpan.setAttribute('dir', 'ltr');
   changeSpan.style.fontSize = '0.85em';
   changeSpan.textContent = `(${changePercent >= 0 ? '+' : ''}${formatPercentage(changePercent, 2)})`;
@@ -169,13 +174,13 @@ function formatCurrentPrice(price, changePercent, currency = 'USD') {
 
 /**
  * formatPL - פורמט P/L עם אחוז
- * 
+ *
  * @description פורמט P/L בפורמט: +$550.0(+3.5%) (סיפרה אחת אחרי הנקודה)
  * @param {number} plValue - ערך P/L
  * @param {number} plPercent - אחוז P/L
  * @param {string} currency - קוד מטבע (default: 'USD')
  * @returns {HTMLElement} אלמנט div עם P/L והאחוז
- * 
+ *
  * @example
  * formatPL(550.0, 3.5, 'USD')
  * // Returns: <div class="pl-display">
@@ -205,12 +210,12 @@ function formatPL(plValue, plPercent, currency = 'USD') {
 
 /**
  * formatStatusBadge - פורמט באגט סטטוס
- * 
+ *
  * @description יצירת באגט סטטוס עם עיצוב סטנדרטי
  * @param {string} status - טקסט הסטטוס
  * @param {string} statusCategory - קטגוריית סטטוס (active, inactive, long, short)
  * @returns {HTMLElement} אלמנט span עם באגט סטטוס
- * 
+ *
  * @example
  * formatStatusBadge('פעיל', 'active')
  * // Returns: <span class="phoenix-table__status-badge phoenix-table__status-badge--active">פעיל</span>
@@ -237,12 +242,12 @@ function formatStatusBadgeFromCanonical(canonicalValue, statusCategory = null) {
 
 /**
  * formatOperationTypeBadge - פורמט באגט סוג פעולה
- * 
+ *
  * @description יצירת באגט סוג פעולה עם מניפת צבעים
  * @param {string} operationType - סוג פעולה (deposit, withdrawal, transfer, execution)
  * @param {boolean} isPositive - האם הפעולה חיובית (default: true)
  * @returns {HTMLElement} אלמנט span עם באגט סוג פעולה
- * 
+ *
  * @example
  * formatOperationTypeBadge('deposit', true)
  * // Returns: <span class="operation-type-badge" data-operation-type="deposit" data-type-positive="true">הפקדה</span>
@@ -257,7 +262,7 @@ function formatOperationTypeBadge(operationType, isPositive = true) {
     deposit: 'הפקדה',
     withdrawal: 'משיכה',
     transfer: 'העברה',
-    execution: 'ביצוע'
+    execution: 'ביצוע',
   };
 
   badge.textContent = operationLabels[operationType] || operationType;
@@ -266,20 +271,20 @@ function formatOperationTypeBadge(operationType, isPositive = true) {
 
 /**
  * formatNumericValue - פורמט ערך מספרי עם צבע
- * 
+ *
  * @description פורמט ערך מספרי עם צבע חיובי/שלילי/אפס
  * @param {number} value - הערך המספרי
  * @param {string} currency - קוד מטבע (אופציונלי)
  * @param {number} decimals - מספר ספרות אחרי הנקודה (default: 2)
  * @returns {HTMLElement} אלמנט span עם הערך המפורמט
- * 
+ *
  * @example
  * formatNumericValue(1234.56, 'USD')
  * // Returns: <span class="numeric-value-positive" dir="ltr">$1,234.56</span>
  */
 function formatNumericValue(value, currency = null, decimals = 2) {
   const span = document.createElement('span');
-  
+
   if (value > 0) {
     span.className = 'numeric-value-positive';
   } else if (value < 0) {
@@ -289,7 +294,7 @@ function formatNumericValue(value, currency = null, decimals = 2) {
   }
 
   span.setAttribute('dir', 'ltr');
-  
+
   if (currency) {
     span.textContent = formatCurrency(value, currency, decimals);
   } else {
@@ -301,12 +306,12 @@ function formatNumericValue(value, currency = null, decimals = 2) {
 
 /**
  * formatCommissionValue - פורמט ערך עמלה
- * 
+ *
  * @description פורמט ערך עמלה לפי סוג העמלה (Tiered, Flat, Percentage, Fixed)
  * @param {string|number} value - ערך העמלה (מחרוזת או מספר)
  * @param {string} commissionType - סוג עמלה (tiered, flat, percentage, fixed)
  * @returns {string} מחרוזת מפורמטת
- * 
+ *
  * @example
  * formatCommissionValue('0.0035', 'tiered') // "0.0035 $ / Share"
  * formatCommissionValue('0.02', 'flat') // "0.02 % / Volume"
@@ -316,15 +321,17 @@ function formatCommissionValue(value, commissionType = '') {
   if (value === null || value === undefined || value === '') {
     return '';
   }
-  
+
   const type = (commissionType || '').toLowerCase();
-  
+
   // Convert to number if it's a string (for backward compatibility)
   // commission_value is now NUMERIC(20,6) - should be a number from API
-  const numValue = typeof value === 'string' && (value.includes('/') || value.includes('%') || value.includes('$'))
-    ? value // Already formatted string - return as is (backward compatibility)
-    : Number(value) || 0;
-  
+  const numValue =
+    typeof value === 'string' &&
+    (value.includes('/') || value.includes('%') || value.includes('$'))
+      ? value // Already formatted string - return as is (backward compatibility)
+      : Number(value) || 0;
+
   // Format based on commission type
   if (type === 'tiered') {
     return `${numValue} $ / Share`;
@@ -335,7 +342,7 @@ function formatCommissionValue(value, commissionType = '') {
   } else if (type === 'fixed') {
     return formatCurrency(numValue, 'USD', 2);
   }
-  
+
   // Default: return as string with value
   return String(numValue);
 }
@@ -355,7 +362,7 @@ if (typeof module !== 'undefined' && module.exports) {
     formatNumericValue,
     formatCommissionValue,
     formatDailyChange,
-    formatDailyChangeFromAbsolute
+    formatDailyChangeFromAbsolute,
   };
 }
 
@@ -373,5 +380,5 @@ window.tableFormatters = {
   formatNumericValue,
   formatCommissionValue,
   formatDailyChange,
-  formatDailyChangeFromAbsolute
+  formatDailyChangeFromAbsolute,
 };

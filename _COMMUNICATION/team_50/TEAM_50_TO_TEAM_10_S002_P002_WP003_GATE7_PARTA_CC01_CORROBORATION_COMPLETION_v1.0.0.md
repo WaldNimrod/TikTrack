@@ -37,7 +37,7 @@
 
 ## 4) Evidence
 
-- log_path: `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_6.log`
+- log_path: `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_6.log`
 - run_id: v2.0.6-cc01-market-open
 - run window: 2026-03-12T11:50:57Z UTC
 - verify_g7_part_a_runtime: pass_01=True, Yahoo HTTP calls=0

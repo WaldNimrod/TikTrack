@@ -15,7 +15,10 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const UI_ROOT = path.resolve(__dirname, '..');
 
-const TEMPLATE_PATH = path.join(UI_ROOT, 'src/views/shared/page-base-template.html');
+const TEMPLATE_PATH = path.join(
+  UI_ROOT,
+  'src/views/shared/page-base-template.html',
+);
 const MANIFEST_PATH = path.join(UI_ROOT, 'scripts/page-manifest.json');
 
 function loadTemplate() {

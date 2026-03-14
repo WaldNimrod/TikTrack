@@ -2,7 +2,7 @@
  * RegisterForm - רכיב הרשמה (D15)
  * --------------------------------
  * רכיב React להרשמת משתמשים חדשים
- * 
+ *
  * @description מימוש Pixel Perfect של דף ההרשמה בהתבסס על Blueprint של Team 31
  * @legacyReference Legacy.auth.register()
  * @blueprintSource _COMMUNICATION/team_31/team_31_staging/D15_REGISTER.html
@@ -13,20 +13,28 @@ import { useNavigate, Link } from 'react-router-dom';
 import authService from '../../services/auth.js';
 import { audit } from '../../../../utils/audit.js';
 import { debugLog } from '../../../../utils/debug.js';
-import { validateRegisterForm, validateUsername, validatePassword, validateConfirmPassword } from '../../../../logic/schemas/authSchema.js';
-import { validateEmail, validatePhoneNumber } from '../../../../logic/schemas/userSchema.js';
+import {
+  validateRegisterForm,
+  validateUsername,
+  validatePassword,
+  validateConfirmPassword,
+} from '../../../../logic/schemas/authSchema.js';
+import {
+  validateEmail,
+  validatePhoneNumber,
+} from '../../../../logic/schemas/userSchema.js';
 import { handleApiError } from '../../../../utils/errorHandler.js';
 import PageFooter from '../../../../components/core/PageFooter.jsx';
 
 /**
  * RegisterForm Component
- * 
+ *
  * @description רכיב הרשמה עם validation, error handling, ו-loading states
  * @legacyReference Legacy.auth.register(userData)
  */
 const RegisterForm = () => {
   const navigate = useNavigate();
-  
+
   // Form state
   const [formData, setFormData] = useState({
     username: '',
@@ -35,7 +43,7 @@ const RegisterForm = () => {
     confirmPassword: '',
     phoneNumber: '',
   });
-  
+
   // UI state
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -51,17 +59,17 @@ const RegisterForm = () => {
 
   /**
    * Handle Input Change
-   * 
+   *
    * @description מעדכן את state של הטופס ומבצע ולידציה באמצעות Schema
    * @param {Event} e - Event object
    */
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-    
+
     // Validate field using Schema
     let validationResult = null;
     switch (name) {
@@ -85,15 +93,15 @@ const RegisterForm = () => {
       default:
         break;
     }
-    
+
     // Update field error
     if (validationResult) {
-      setFieldErrors(prev => ({
+      setFieldErrors((prev) => ({
         ...prev,
-        [name]: validationResult.error
+        [name]: validationResult.error,
       }));
     }
-    
+
     // Clear general error
     if (error) {
       setError(null);
@@ -102,7 +110,7 @@ const RegisterForm = () => {
 
   /**
    * Validate Form
-   * 
+   *
    * @description בודק תקינות הטופס לפני שליחה באמצעות Schema מרכזי
    * @returns {boolean} - true אם הטופס תקין
    */
@@ -114,29 +122,29 @@ const RegisterForm = () => {
 
   /**
    * Handle Form Submit
-   * 
+   *
    * @description מטפל בשליחת הטופס והרשמה
    * @param {Event} e - Event object
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Clear previous errors
     setError(null);
     setFieldErrors({});
-    
+
     // Validate form
     if (!validateForm()) {
       debugLog('Auth', 'Register form validation failed', { fieldErrors });
       return;
     }
-    
+
     setIsLoading(true);
-    debugLog('Auth', 'Register form submitted', { 
+    debugLog('Auth', 'Register form submitted', {
       email: formData.email,
-      username: formData.username 
+      username: formData.username,
     });
-    
+
     try {
       // Prepare user data — Backend expects username_or_email, phone_number in E.164
       // TEAM_50_GATE_A: username_or_email (not username); phone_number normalized to E.164
@@ -145,7 +153,9 @@ const RegisterForm = () => {
         const phoneResult = validatePhoneNumber(formData.phoneNumber.trim());
         if (phoneResult.isValid && phoneResult.normalized) {
           // E.164 format: add + prefix for API (Backend expects ^\+?[1-9]\d{1,14}$)
-          phoneForApi = phoneResult.normalized.startsWith('+') ? phoneResult.normalized : `+${phoneResult.normalized}`;
+          phoneForApi = phoneResult.normalized.startsWith('+')
+            ? phoneResult.normalized
+            : `+${phoneResult.normalized}`;
         }
       }
 
@@ -155,32 +165,34 @@ const RegisterForm = () => {
         password: formData.password,
         ...(phoneForApi && { phoneNumber: phoneForApi }), // → phone_number (E.164)
       };
-      
+
       // Call Auth Service
       const response = await authService.register(userData);
-      
-      debugLog('Auth', 'Register successful', { userId: response.user?.externalUlids });
-      
+
+      debugLog('Auth', 'Register successful', {
+        userId: response.user?.externalUlids,
+      });
+
       // Redirect to dashboard or login
       debugLog('Auth', 'Redirecting after registration');
       navigate('/dashboard');
-      
     } catch (err) {
       // Use centralized error handler
-      const { fieldErrors: apiErrors, formError: apiError } = handleApiError(err);
-      
+      const { fieldErrors: apiErrors, formError: apiError } =
+        handleApiError(err);
+
       // Merge API field errors with existing errors
       if (Object.keys(apiErrors).length > 0) {
-        setFieldErrors(prev => ({ ...prev, ...apiErrors }));
+        setFieldErrors((prev) => ({ ...prev, ...apiErrors }));
       }
-      
+
       // Set form-level error
       if (apiError) {
         setError(apiError);
       } else {
         setError('שגיאה בהרשמה. אנא נסה שוב.');
       }
-      
+
       audit.error('Auth', 'Register failed', err);
     } finally {
       setIsLoading(false);
@@ -201,16 +213,20 @@ const RegisterForm = () => {
                 <h1 className="auth-title">הרשמה</h1>
               </div>
 
-              <form 
-                className="js-register-form" 
-                onSubmit={handleSubmit} 
+              <form
+                className="js-register-form"
+                onSubmit={handleSubmit}
                 noValidate
                 action="#"
                 method="post"
               >
                 {/* Error Feedback (hidden by default, shown on error) */}
                 {error && (
-                  <div className="auth-form__error js-error-feedback" role="alert" aria-live="polite">
+                  <div
+                    className="auth-form__error js-error-feedback"
+                    role="alert"
+                    aria-live="polite"
+                  >
                     {error}
                   </div>
                 )}
@@ -231,7 +247,9 @@ const RegisterForm = () => {
                     disabled={isLoading}
                   />
                   {fieldErrors.username && (
-                    <span className="auth-form__error-message">{fieldErrors.username}</span>
+                    <span className="auth-form__error-message">
+                      {fieldErrors.username}
+                    </span>
                   )}
                 </div>
 
@@ -251,7 +269,9 @@ const RegisterForm = () => {
                     disabled={isLoading}
                   />
                   {fieldErrors.email && (
-                    <span className="auth-form__error-message">{fieldErrors.email}</span>
+                    <span className="auth-form__error-message">
+                      {fieldErrors.email}
+                    </span>
                   )}
                 </div>
 
@@ -271,7 +291,9 @@ const RegisterForm = () => {
                     disabled={isLoading}
                   />
                   {fieldErrors.password && (
-                    <span className="auth-form__error-message">{fieldErrors.password}</span>
+                    <span className="auth-form__error-message">
+                      {fieldErrors.password}
+                    </span>
                   )}
                 </div>
 
@@ -291,7 +313,9 @@ const RegisterForm = () => {
                     disabled={isLoading}
                   />
                   {fieldErrors.confirmPassword && (
-                    <span className="auth-form__error-message">{fieldErrors.confirmPassword}</span>
+                    <span className="auth-form__error-message">
+                      {fieldErrors.confirmPassword}
+                    </span>
                   )}
                 </div>
 
@@ -310,7 +334,9 @@ const RegisterForm = () => {
                     disabled={isLoading}
                   />
                   {fieldErrors.phoneNumber && (
-                    <span className="auth-form__error-message">{fieldErrors.phoneNumber}</span>
+                    <span className="auth-form__error-message">
+                      {fieldErrors.phoneNumber}
+                    </span>
                   )}
                 </div>
 
@@ -332,7 +358,7 @@ const RegisterForm = () => {
           </tt-container>
         </main>
       </div>
-      
+
       {/* Modular Footer */}
       <PageFooter />
     </div>

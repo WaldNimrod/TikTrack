@@ -23,6 +23,7 @@ STATUS_INACTIVE = "inactive"
 
 class TradingAccountResponse(BaseModel):
     """Trading Account response schema (D16 — status canonical per TT2_SYSTEM_STATUS_VALUES_SSOT)."""
+
     external_ulid: str = Field(..., description="External ULID identifier")
     display_name: str = Field(..., alias="account_name", description="Account display name")
     broker: Optional[str] = Field(None, description="Broker name")
@@ -32,10 +33,12 @@ class TradingAccountResponse(BaseModel):
     total_pl: Decimal = Field(..., description="Total unrealized P/L")
     account_value: Decimal = Field(..., description="Total account value (cash + holdings)")
     holdings_value: Decimal = Field(..., description="Total holdings value")
-    status: str = Field(..., description="Canonical status (active|inactive) per TT2_SYSTEM_STATUS_VALUES_SSOT")
+    status: str = Field(
+        ..., description="Canonical status (active|inactive) per TT2_SYSTEM_STATUS_VALUES_SSOT"
+    )
     is_active: bool = Field(..., description="Account active status (legacy; status is canonical)")
     updated_at: datetime = Field(..., description="Last update timestamp")
-    
+
     class Config:
         populate_by_name = True
         json_schema_extra = {
@@ -51,21 +54,28 @@ class TradingAccountResponse(BaseModel):
                 "holdings_value": 1250.50,
                 "status": "active",
                 "is_active": True,
-                "updated_at": "2026-02-02T10:30:00Z"
+                "updated_at": "2026-02-02T10:30:00Z",
             }
         }
 
 
 class TradingAccountSummaryResponse(BaseModel):
     """Trading Account summary schema."""
+
     total_accounts: int = Field(..., description="Total number of trading accounts")
     active_accounts: int = Field(..., description="Number of active trading accounts")
     total_account_value: Decimal = Field(..., description="Total account value across all accounts")
     total_cash_balance: Decimal = Field(..., description="Total cash balance across all accounts")
-    total_holdings_value: Decimal = Field(..., description="Total holdings value across all accounts")
-    total_unrealized_pl: Decimal = Field(..., description="Total unrealized P/L across all accounts")
-    total_positions: int = Field(..., description="Total number of open positions across all accounts")
-    
+    total_holdings_value: Decimal = Field(
+        ..., description="Total holdings value across all accounts"
+    )
+    total_unrealized_pl: Decimal = Field(
+        ..., description="Total unrealized P/L across all accounts"
+    )
+    total_positions: int = Field(
+        ..., description="Total number of open positions across all accounts"
+    )
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -75,16 +85,17 @@ class TradingAccountSummaryResponse(BaseModel):
                 "total_cash_balance": "450000.00",
                 "total_holdings_value": "50000.00",
                 "total_unrealized_pl": "2500.50",
-                "total_positions": 15
+                "total_positions": 15,
             }
         }
 
 
 class TradingAccountListResponse(BaseModel):
     """Trading Accounts list response schema."""
+
     data: List[TradingAccountResponse] = Field(..., description="List of trading accounts")
     total: int = Field(..., description="Total count")
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -101,25 +112,34 @@ class TradingAccountListResponse(BaseModel):
                         "holdings_value": 1250.50,
                         "status": "active",
                         "is_active": True,
-                        "updated_at": "2026-02-02T10:30:00Z"
+                        "updated_at": "2026-02-02T10:30:00Z",
                     }
                 ],
-                "total": 1
+                "total": 1,
             }
         }
 
 
 class TradingAccountCreateRequest(BaseModel):
     """Trading Account create request schema (D16 — broker, account_number required)."""
+
     account_name: str = Field(..., description="Account display name", min_length=1, max_length=100)
     broker: str = Field(..., description="Broker name (required)", min_length=1, max_length=100)
-    account_number: str = Field(..., description="Account number (required)", min_length=1, max_length=50)
+    account_number: str = Field(
+        ..., description="Account number (required)", min_length=1, max_length=50
+    )
     initial_balance: Decimal = Field(..., description="Initial account balance", ge=0)
-    currency: str = Field(default="USD", description="Account currency (ISO 3-letter)", max_length=3)
+    currency: str = Field(
+        default="USD", description="Account currency (ISO 3-letter)", max_length=3
+    )
     is_active: bool = Field(default=True, description="Account active status")
-    external_account_id: Optional[str] = Field(None, description="External account ID", max_length=100)
-    account_metadata: Optional[dict] = Field(default_factory=dict, description="Additional metadata")
-    
+    external_account_id: Optional[str] = Field(
+        None, description="External account ID", max_length=100
+    )
+    account_metadata: Optional[dict] = Field(
+        default_factory=dict, description="Additional metadata"
+    )
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -130,30 +150,32 @@ class TradingAccountCreateRequest(BaseModel):
                 "currency": "USD",
                 "is_active": True,
                 "external_account_id": "IBKR_ACC_123",
-                "account_metadata": {
-                    "account_type": "MARGIN",
-                    "country": "US"
-                }
+                "account_metadata": {"account_type": "MARGIN", "country": "US"},
             }
         }
 
 
 class TradingAccountUpdateRequest(BaseModel):
     """Trading Account update request schema."""
+
     account_name: Optional[str] = Field(None, description="Account display name", max_length=100)
     broker: Optional[str] = Field(None, description="Broker name", max_length=100)
     account_number: Optional[str] = Field(None, description="Account number", max_length=50)
     initial_balance: Optional[Decimal] = Field(None, description="Initial account balance", ge=0)
-    currency: Optional[str] = Field(None, description="Account currency (ISO 3-letter)", max_length=3)
+    currency: Optional[str] = Field(
+        None, description="Account currency (ISO 3-letter)", max_length=3
+    )
     is_active: Optional[bool] = Field(None, description="Account active status")
-    external_account_id: Optional[str] = Field(None, description="External account ID", max_length=100)
+    external_account_id: Optional[str] = Field(
+        None, description="External account ID", max_length=100
+    )
     account_metadata: Optional[dict] = Field(None, description="Additional metadata")
-    
+
     class Config:
         json_schema_extra = {
             "example": {
                 "account_name": "חשבון מסחר מעודכן",
                 "broker": "TD Ameritrade",
-                "is_active": False
+                "is_active": False,
             }
         }

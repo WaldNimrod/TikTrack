@@ -89,37 +89,43 @@
 /* Rule: Background = Light variant | Text + Close Button + Border = Dark variant */
 
 /* Trading Account Entity (D16) */
-.phoenix-modal[data-entity="trading_account"] .phoenix-modal__header,
+.phoenix-modal[data-entity='trading_account'] .phoenix-modal__header,
 .phoenix-modal.modal-entity-trading_account .phoenix-modal__header {
   background-color: var(--entity-trading_account-light, #c3e6cb);
-  border-bottom-color: var(--entity-trading_account-dark, #155724); /* Dark variant per SSOT */
+  border-bottom-color: var(
+    --entity-trading_account-dark,
+    #155724
+  ); /* Dark variant per SSOT */
 }
 
 /* Brokers Fees Entity (D18) - same color as Trading Account */
-.phoenix-modal[data-entity="brokers_fee"] .phoenix-modal__header,
-.phoenix-modal[data-entity="brokers_fees"] .phoenix-modal__header,
+.phoenix-modal[data-entity='brokers_fee'] .phoenix-modal__header,
+.phoenix-modal[data-entity='brokers_fees'] .phoenix-modal__header,
 .phoenix-modal.modal-entity-brokers_fee .phoenix-modal__header,
 .phoenix-modal.modal-entity-brokers_fees .phoenix-modal__header {
   background-color: var(--entity-trading_account-light, #c3e6cb);
-  border-bottom-color: var(--entity-trading_account-dark, #155724); /* Dark variant per SSOT */
+  border-bottom-color: var(
+    --entity-trading_account-dark,
+    #155724
+  ); /* Dark variant per SSOT */
 }
 
 /* Tickers Entity (D22 — ניהול טיקרים) — Management tickers add/edit and data-integrity modals */
-.phoenix-modal[data-entity="tickers"] .phoenix-modal__header,
-.phoenix-modal[data-entity="ticker"] .phoenix-modal__header,
+.phoenix-modal[data-entity='tickers'] .phoenix-modal__header,
+.phoenix-modal[data-entity='ticker'] .phoenix-modal__header,
 .phoenix-modal.modal-entity-tickers .phoenix-modal__header,
 .phoenix-modal.modal-entity-ticker .phoenix-modal__header {
   background-color: var(--entity-ticker-light, #c5f4ea);
   border-bottom-color: var(--entity-ticker-dark, #138496);
 }
-.phoenix-modal[data-entity="tickers"] .phoenix-modal__title,
-.phoenix-modal[data-entity="ticker"] .phoenix-modal__title,
+.phoenix-modal[data-entity='tickers'] .phoenix-modal__title,
+.phoenix-modal[data-entity='ticker'] .phoenix-modal__title,
 .phoenix-modal.modal-entity-tickers .phoenix-modal__title,
 .phoenix-modal.modal-entity-ticker .phoenix-modal__title {
   color: var(--entity-ticker-dark, #138496);
 }
-.phoenix-modal[data-entity="tickers"] .phoenix-modal__close,
-.phoenix-modal[data-entity="ticker"] .phoenix-modal__close,
+.phoenix-modal[data-entity='tickers'] .phoenix-modal__close,
+.phoenix-modal[data-entity='ticker'] .phoenix-modal__close,
 .phoenix-modal.modal-entity-tickers .phoenix-modal__close,
 .phoenix-modal.modal-entity-ticker .phoenix-modal__close {
   color: var(--entity-ticker-dark, #138496);
@@ -127,31 +133,34 @@
 }
 
 /* User Tickers Entity ("הטיקרים שלי") — Plural per ARCHITECT_RESOLUTION_NAMING_FINAL */
-.phoenix-modal[data-entity="user_tickers"] .phoenix-modal__header,
+.phoenix-modal[data-entity='user_tickers'] .phoenix-modal__header,
 .phoenix-modal.modal-entity-user_tickers .phoenix-modal__header {
   background-color: var(--entity-ticker-light, #e3f2fd);
   border-bottom-color: var(--entity-ticker-dark, #1976d2);
 }
 
 /* Cash Flow Entity (D21) */
-.phoenix-modal[data-entity="cash_flow"] .phoenix-modal__header,
-.phoenix-modal[data-entity="cash_flows"] .phoenix-modal__header,
+.phoenix-modal[data-entity='cash_flow'] .phoenix-modal__header,
+.phoenix-modal[data-entity='cash_flows'] .phoenix-modal__header,
 .phoenix-modal.modal-entity-cash_flow .phoenix-modal__header,
 .phoenix-modal.modal-entity-cash_flows .phoenix-modal__header {
   background-color: var(--entity-cash_flow-light, #ffe5d3);
-  border-bottom-color: var(--entity-cash_flow-dark, #e68900); /* Dark variant per SSOT */
+  border-bottom-color: var(
+    --entity-cash_flow-dark,
+    #e68900
+  ); /* Dark variant per SSOT */
 }
 
 /* Title color - User Tickers (Plural per SSOT) */
-.phoenix-modal[data-entity="user_tickers"] .phoenix-modal__title,
+.phoenix-modal[data-entity='user_tickers'] .phoenix-modal__title,
 .phoenix-modal.modal-entity-user_tickers .phoenix-modal__title {
   color: var(--entity-ticker-dark, #1976d2);
 }
 
 /* Title color - Trading Account & Brokers Fees (Dark variant per SSOT) */
-.phoenix-modal[data-entity="trading_account"] .phoenix-modal__title,
-.phoenix-modal[data-entity="brokers_fee"] .phoenix-modal__title,
-.phoenix-modal[data-entity="brokers_fees"] .phoenix-modal__title,
+.phoenix-modal[data-entity='trading_account'] .phoenix-modal__title,
+.phoenix-modal[data-entity='brokers_fee'] .phoenix-modal__title,
+.phoenix-modal[data-entity='brokers_fees'] .phoenix-modal__title,
 .phoenix-modal.modal-entity-trading_account .phoenix-modal__title,
 .phoenix-modal.modal-entity-brokers_fee .phoenix-modal__title,
 .phoenix-modal.modal-entity-brokers_fees .phoenix-modal__title {
@@ -159,24 +168,24 @@
 }
 
 /* Title color - Cash Flow (Dark variant per SSOT) */
-.phoenix-modal[data-entity="cash_flow"] .phoenix-modal__title,
-.phoenix-modal[data-entity="cash_flows"] .phoenix-modal__title,
+.phoenix-modal[data-entity='cash_flow'] .phoenix-modal__title,
+.phoenix-modal[data-entity='cash_flows'] .phoenix-modal__title,
 .phoenix-modal.modal-entity-cash_flow .phoenix-modal__title,
 .phoenix-modal.modal-entity-cash_flows .phoenix-modal__title {
   color: var(--entity-cash_flow-dark, #e68900);
 }
 
 /* Close button color - User Tickers */
-.phoenix-modal[data-entity="user_tickers"] .phoenix-modal__close,
+.phoenix-modal[data-entity='user_tickers'] .phoenix-modal__close,
 .phoenix-modal.modal-entity-user_tickers .phoenix-modal__close {
   color: var(--entity-ticker-dark, #1976d2);
   border-color: var(--entity-ticker-dark, #1976d2);
 }
 
 /* Close button color - Trading Account & Brokers Fees (Dark variant per SSOT) */
-.phoenix-modal[data-entity="trading_account"] .phoenix-modal__close,
-.phoenix-modal[data-entity="brokers_fee"] .phoenix-modal__close,
-.phoenix-modal[data-entity="brokers_fees"] .phoenix-modal__close,
+.phoenix-modal[data-entity='trading_account'] .phoenix-modal__close,
+.phoenix-modal[data-entity='brokers_fee'] .phoenix-modal__close,
+.phoenix-modal[data-entity='brokers_fees'] .phoenix-modal__close,
 .phoenix-modal.modal-entity-trading_account .phoenix-modal__close,
 .phoenix-modal.modal-entity-brokers_fee .phoenix-modal__close,
 .phoenix-modal.modal-entity-brokers_fees .phoenix-modal__close {
@@ -185,8 +194,8 @@
 }
 
 /* Close button color - Cash Flow (Dark variant per SSOT) */
-.phoenix-modal[data-entity="cash_flow"] .phoenix-modal__close,
-.phoenix-modal[data-entity="cash_flows"] .phoenix-modal__close,
+.phoenix-modal[data-entity='cash_flow'] .phoenix-modal__close,
+.phoenix-modal[data-entity='cash_flows'] .phoenix-modal__close,
 .phoenix-modal.modal-entity-cash_flow .phoenix-modal__close,
 .phoenix-modal.modal-entity-cash_flows .phoenix-modal__close {
   color: var(--entity-cash_flow-dark, #e68900);
@@ -194,16 +203,16 @@
 }
 
 /* Note Entity (D35 — הערות) — per PAGES_ENTITY_COLOR_MAPPING */
-.phoenix-modal[data-entity="note"] .phoenix-modal__header,
+.phoenix-modal[data-entity='note'] .phoenix-modal__header,
 .phoenix-modal.modal-entity-note .phoenix-modal__header {
   background-color: var(--entity-note-light, #e2e3e5);
   border-bottom-color: var(--entity-note-dark, #383d41);
 }
-.phoenix-modal[data-entity="note"] .phoenix-modal__title,
+.phoenix-modal[data-entity='note'] .phoenix-modal__title,
 .phoenix-modal.modal-entity-note .phoenix-modal__title {
   color: var(--entity-note-dark, #383d41);
 }
-.phoenix-modal[data-entity="note"] .phoenix-modal__close,
+.phoenix-modal[data-entity='note'] .phoenix-modal__close,
 .phoenix-modal.modal-entity-note .phoenix-modal__close {
   color: var(--entity-note-dark, #383d41);
   border-color: var(--entity-note-dark, #383d41);
@@ -280,7 +289,10 @@
 
 /* Input, Textarea, Select: identical padding for same height.
    Match base specificity (phoenix-base uses input:not([type=...])×6) so we override without !important */
-.phoenix-modal__body input:not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]):not([type=file]):not([type=hidden]),
+.phoenix-modal__body
+  input:not([type='checkbox']):not([type='radio']):not([type='submit']):not(
+    [type='button']
+  ):not([type='file']):not([type='hidden']),
 .phoenix-modal__body textarea,
 .phoenix-modal__body select {
   width: 100%;
@@ -293,7 +305,10 @@
 }
 
 /* Focus: Both use primary color (color-brand) - unified */
-.phoenix-modal__body input:not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]):not([type=file]):not([type=hidden]):focus,
+.phoenix-modal__body
+  input:not([type='checkbox']):not([type='radio']):not([type='submit']):not(
+    [type='button']
+  ):not([type='file']):not([type='hidden']):focus,
 .phoenix-modal__body select:focus,
 .phoenix-modal__body textarea:focus {
   outline: none;
@@ -328,7 +343,7 @@
     max-width: 100%;
     margin: var(--spacing-md, 16px);
   }
-  
+
   .phoenix-modal__header,
   .phoenix-modal__body,
   .phoenix-modal__footer {

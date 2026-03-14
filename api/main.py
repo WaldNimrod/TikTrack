@@ -18,7 +18,26 @@ import logging
 import os
 
 from .core.config import settings
-from .routers import auth, users, api_keys, trading_accounts, cash_flows, positions, brokers_fees, reference, tickers, me_tickers, settings as settings_router, system, notes, alerts, notifications, background_jobs, trades, trade_plans
+from .routers import (
+    auth,
+    users,
+    api_keys,
+    trading_accounts,
+    cash_flows,
+    positions,
+    brokers_fees,
+    reference,
+    tickers,
+    me_tickers,
+    settings as settings_router,
+    system,
+    notes,
+    alerts,
+    notifications,
+    background_jobs,
+    trades,
+    trade_plans,
+)
 from .utils.exceptions import HTTPExceptionWithCode, ErrorCodes
 from . import __version__
 
@@ -30,6 +49,7 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     """APScheduler start/stop per ARCHITECT_DIRECTIVE_BACKGROUND_TASK_ORCHESTRATION."""
     from .background.scheduler_startup import start_scheduler, stop_scheduler
+
     await start_scheduler()
     logger.info("APScheduler started — background jobs active")
     yield
@@ -47,12 +67,13 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+
 # Register exception handlers BEFORE routers to ensure they're used
 # RequestValidationError handler must be registered early using add_exception_handler
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """
     Handler for Pydantic validation errors.
-    
+
     PDSC Error Schema (Team 90): error_code, detail, field_errors, trace_id.
     BF-G5R-001: malformed JSON (JSON decode error) → 400 per architect contract.
     """
@@ -60,9 +81,9 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     errors = exc.errors()
     first_msg = errors[0].get("msg", "Validation error") if errors else "Validation error"
     # BF-G5R-001: malformed JSON must return 400, not 422
-    is_malformed_json = (
-        "JSON decode error" in first_msg
-        or any(e.get("type", "").endswith("json_decode") or "json" in str(e.get("type", "")).lower() for e in errors)
+    is_malformed_json = "JSON decode error" in first_msg or any(
+        e.get("type", "").endswith("json_decode") or "json" in str(e.get("type", "")).lower()
+        for e in errors
     )
     status_code = 400 if is_malformed_json else 422
     # Build field_errors per Team 90 SSOT (PDSC Error Schema)
@@ -75,15 +96,17 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         "error_code": ErrorCodes.VALIDATION_INVALID_FORMAT,
         "detail": first_msg,
         "message": first_msg,  # BF-G7-017: UI compatibility (error.message ?? error.detail)
-        "field_errors": field_errors
+        "field_errors": field_errors,
     }
     return JSONResponse(status_code=status_code, content=content)
+
 
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
 # Initialize rate limiter and attach to app state
 # Import limiter from users router (shared instance)
 from .routers.users import limiter
+
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
@@ -140,66 +163,63 @@ async def health_check():
 async def detailed_health_check():
     """
     Detailed health check - verifies database and AuthService.
-    
+
     Useful for debugging connection issues.
     """
-    health_status = {
-        "status": "ok",
-        "components": {}
-    }
-    
+    health_status = {"status": "ok", "components": {}}
+
     # Check database connection
     try:
         from .core.database import AsyncSessionLocal
         from sqlalchemy import text
+
         async with AsyncSessionLocal() as session:
             await session.execute(text("SELECT 1"))
         health_status["components"]["database"] = {
             "status": "ok",
-            "message": "Database connection successful"
+            "message": "Database connection successful",
         }
     except Exception as e:
         health_status["status"] = "degraded"
         health_status["components"]["database"] = {
             "status": "error",
-            "message": f"Database connection failed: {type(e).__name__}: {str(e)}"
+            "message": f"Database connection failed: {type(e).__name__}: {str(e)}",
         }
-    
+
     # Check AuthService initialization
     try:
         from .services.auth import get_auth_service
+
         auth_service = get_auth_service()
         health_status["components"]["auth_service"] = {
             "status": "ok",
-            "message": "AuthService initialized successfully"
+            "message": "AuthService initialized successfully",
         }
     except ValueError as e:
         health_status["status"] = "degraded"
         health_status["components"]["auth_service"] = {
             "status": "error",
-            "message": f"AuthService configuration error: {str(e)}"
+            "message": f"AuthService configuration error: {str(e)}",
         }
     except Exception as e:
         health_status["status"] = "degraded"
         health_status["components"]["auth_service"] = {
             "status": "error",
-            "message": f"AuthService initialization failed: {type(e).__name__}: {str(e)}"
+            "message": f"AuthService initialization failed: {type(e).__name__}: {str(e)}",
         }
-    
+
     # Check environment variables
     import os
+
     env_vars = {
         "DATABASE_URL": "set" if os.getenv("DATABASE_URL") else "missing",
-        "JWT_SECRET_KEY": "set" if os.getenv("JWT_SECRET_KEY") else "missing"
+        "JWT_SECRET_KEY": "set" if os.getenv("JWT_SECRET_KEY") else "missing",
     }
     health_status["components"]["environment"] = env_vars
-    
+
     if health_status["status"] == "degraded":
-        return JSONResponse(
-            status_code=503,
-            content=health_status
-        )
-    
+        return JSONResponse(status_code=503, content=health_status)
+
     return health_status
 
 
@@ -211,9 +231,9 @@ async def http_exception_with_code_handler(request: Request, exc: HTTPExceptionW
         content={
             "detail": exc.detail,
             "message": exc.detail,  # BF-G7-008: UI compatibility (error.message ?? error.detail)
-            "error_code": exc.error_code
+            "error_code": exc.error_code,
         },
-        headers=exc.headers
+        headers=exc.headers,
     )
 
 
@@ -221,7 +241,7 @@ async def http_exception_with_code_handler(request: Request, exc: HTTPExceptionW
 async def http_exception_handler(request: Request, exc: HTTPException):
     """
     Handler for standard HTTPException (fallback for other errors).
-    
+
     Converts to HTTPExceptionWithCode with appropriate error code.
     This ensures all errors have an error_code.
     """
@@ -236,15 +256,15 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         error_code = ErrorCodes.VALIDATION_INVALID_FORMAT
     else:
         error_code = ErrorCodes.SERVER_ERROR
-    
+
     return JSONResponse(
         status_code=exc.status_code,
         content={
             "detail": exc.detail,
             "message": exc.detail,  # BF-G7-008/017: UI compatibility (error.message ?? error.detail)
-            "error_code": error_code
+            "error_code": error_code,
         },
-        headers=exc.headers
+        headers=exc.headers,
     )
 
 
@@ -254,14 +274,12 @@ async def global_exception_handler(request: Request, exc: Exception):
     logger.error(f"Unhandled exception: {str(exc)}", exc_info=True)
     return JSONResponse(
         status_code=500,
-        content={
-            "detail": "Internal server error",
-            "error_code": ErrorCodes.SERVER_ERROR
-        }
+        content={"detail": "Internal server error", "error_code": ErrorCodes.SERVER_ERROR},
     )
 
 
 if __name__ == "__main__":
     import uvicorn
+
     # Backend API runs on port 8082 (Frontend V2 uses port 8080 per Master Blueprint)
     uvicorn.run(app, host="0.0.0.0", port=8082)

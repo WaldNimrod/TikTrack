@@ -18,7 +18,7 @@
 
 | שדה | ערך |
 |-----|------|
-| **log_path** | `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_5.log` |
+| **log_path** | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_5.log` |
 | **run_id** | `v2.0.5-shared-2026-03-12` |
 | **pass_01** | **true** |
 | **pass_02** | **true** |
@@ -40,7 +40,7 @@
 
 ## 3) אימות הלוג
 
-- **קובץ קיים:** כן — `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_5.log`  
+- **קובץ קיים:** כן — `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_5.log`  
 - **לא ריק:** כן — runtime traces.  
 - **Shared run:** אותו log_path ו־run_id לכל Run A, Run B, CC-04.
 

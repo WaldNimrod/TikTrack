@@ -29,7 +29,7 @@ from ..schemas.identity import (
     RegisterResponse,
     RefreshResponse,
     PasswordResetRequest as PasswordResetRequestSchema,
-    PasswordResetVerify
+    PasswordResetVerify,
 )
 from ..models.enums import ResetMethod
 from ..models.identity import User, PasswordResetRequest
@@ -42,14 +42,10 @@ router = APIRouter(prefix="/auth", tags=["authentication"])
 security = HTTPBearer()
 
 
-def set_refresh_token_cookie(
-    response: Response,
-    refresh_token: str,
-    expires_at: datetime
-) -> None:
+def set_refresh_token_cookie(response: Response, refresh_token: str, expires_at: datetime) -> None:
     """
     Set refresh token in httpOnly cookie.
-    
+
     Args:
         response: FastAPI Response object
         refresh_token: Refresh token string
@@ -57,13 +53,13 @@ def set_refresh_token_cookie(
     """
     # Calculate max_age in seconds
     max_age = int((expires_at - datetime.now(timezone.utc)).total_seconds())
-    
+
     # Use "strict" in production for better CSRF protection
     # "lax" is acceptable for development and allows redirects
     samesite_setting = os.getenv("COOKIE_SAMESITE", "lax").lower()
     if samesite_setting not in ["strict", "lax", "none"]:
         samesite_setting = "lax"
-    
+
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
@@ -71,56 +67,53 @@ def set_refresh_token_cookie(
         httponly=True,
         secure=os.getenv("COOKIE_SECURE", "true").lower() == "true",  # HTTPS only in production
         samesite=samesite_setting,
-        path="/api/v1/auth"
+        path="/api/v1/auth",
     )
 
 
 def clear_refresh_token_cookie(response: Response) -> None:
     """Clear refresh token cookie."""
-    response.delete_cookie(
-        key="refresh_token",
-        path="/api/v1/auth",
-        httponly=True,
-        samesite="lax"
-    )
+    response.delete_cookie(key="refresh_token", path="/api/v1/auth", httponly=True, samesite="lax")
 
 
 @router.post("/register", response_model=RegisterResponse, status_code=status.HTTP_201_CREATED)
 async def register(
-    request: RegisterRequest,
-    response: Response,
-    db: AsyncSession = Depends(get_db)
+    request: RegisterRequest, response: Response, db: AsyncSession = Depends(get_db)
 ):
     """
     Register new user.
-    
+
     Creates new user account and returns access token + refresh token (in cookie).
     """
     try:
-        logger.info(f"Registration attempt started for: {request.username_or_email} ({request.email[:3] if request.email else 'N/A'}***)")
-        
+        logger.info(
+            f"Registration attempt started for: {request.username_or_email} ({request.email[:3] if request.email else 'N/A'}***)"
+        )
+
         # Validate input
         if not request.username_or_email or not request.email or not request.password:
             logger.warning("Registration attempt with missing required fields")
             raise HTTPExceptionWithCode(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Username, email, and password are required",
-                error_code=ErrorCodes.VALIDATION_FIELD_REQUIRED
+                error_code=ErrorCodes.VALIDATION_FIELD_REQUIRED,
             )
-        
+
         # Get auth service
         try:
             logger.debug("Initializing AuthService for registration...")
             auth_service = get_auth_service()
             logger.debug("AuthService initialized successfully")
         except Exception as e:
-            logger.error(f"Failed to initialize AuthService: {type(e).__name__}: {str(e)}", exc_info=True)
+            logger.error(
+                f"Failed to initialize AuthService: {type(e).__name__}: {str(e)}", exc_info=True
+            )
             raise HTTPExceptionWithCode(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Authentication service unavailable",
-                error_code=ErrorCodes.SERVICE_UNAVAILABLE
+                error_code=ErrorCodes.SERVICE_UNAVAILABLE,
             )
-        
+
         # Attempt registration
         try:
             logger.debug(f"Attempting registration for user: {request.username_or_email}")
@@ -129,18 +122,25 @@ async def register(
                 email=request.email,
                 password=request.password,
                 phone_number=request.phone_number,
-                db=db
+                db=db,
             )
             logger.debug("Registration service call completed successfully")
         except AuthenticationError as e:
             # Log detailed error for debugging (will be removed in production)
-            logger.error(f"Registration failed for user: {request.username_or_email} (authentication error: {str(e)})", exc_info=True)
+            logger.error(
+                f"Registration failed for user: {request.username_or_email} (authentication error: {str(e)})",
+                exc_info=True,
+            )
             # Generic error message to prevent information leakage
-            error_code = ErrorCodes.USER_ALREADY_EXISTS if "already exists" in str(e).lower() else ErrorCodes.USER_UPDATE_FAILED
+            error_code = (
+                ErrorCodes.USER_ALREADY_EXISTS
+                if "already exists" in str(e).lower()
+                else ErrorCodes.USER_UPDATE_FAILED
+            )
             raise HTTPExceptionWithCode(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Registration failed. Please check your input. Error: {str(e)}",
-                error_code=error_code
+                error_code=error_code,
             )
         except Exception as e:
             # Log detailed error for debugging
@@ -148,72 +148,73 @@ async def register(
             raise HTTPExceptionWithCode(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Registration processing failed",
-                error_code=ErrorCodes.SERVER_ERROR
+                error_code=ErrorCodes.SERVER_ERROR,
             )
-        
+
         # Set refresh token in httpOnly cookie
         try:
             if register_response.refresh_token and register_response.refresh_expires_at:
                 logger.debug("Setting refresh token cookie...")
                 set_refresh_token_cookie(
-                    response,
-                    register_response.refresh_token,
-                    register_response.refresh_expires_at
+                    response, register_response.refresh_token, register_response.refresh_expires_at
                 )
                 logger.debug("Refresh token cookie set successfully")
         except Exception as e:
-            logger.error(f"Failed to set refresh token cookie: {type(e).__name__}: {str(e)}", exc_info=True)
+            logger.error(
+                f"Failed to set refresh token cookie: {type(e).__name__}: {str(e)}", exc_info=True
+            )
             # Don't fail registration if cookie setting fails, but log it
-        
+
         # Remove refresh_token from response body (security - sent in cookie only)
         register_response.refresh_token = None
         register_response.refresh_expires_at = None
-        
+
         logger.info(f"Registration successful for user: {request.username_or_email}")
         return register_response
-        
+
     except HTTPExceptionWithCode:
         # Re-raise HTTP exceptions with error codes (already formatted)
         raise
     except Exception as e:
         # Log full error details for debugging
-        logger.error(f"Registration error (unexpected): {type(e).__name__}: {str(e)}", exc_info=True)
+        logger.error(
+            f"Registration error (unexpected): {type(e).__name__}: {str(e)}", exc_info=True
+        )
         logger.error(f"Error traceback:", exc_info=True)
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Registration failed",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )
 
 
 @router.post("/login", response_model=LoginResponse)
-async def login(
-    request: LoginRequest,
-    response: Response,
-    db: AsyncSession = Depends(get_db)
-):
+async def login(request: LoginRequest, response: Response, db: AsyncSession = Depends(get_db)):
     """
     Authenticate user and return tokens.
-    
+
     Returns access token in response body and refresh token in httpOnly cookie.
     """
     try:
-        logger.info(f"Login attempt started for: {request.username_or_email[:3] if request.username_or_email else 'N/A'}***")
-        
+        logger.info(
+            f"Login attempt started for: {request.username_or_email[:3] if request.username_or_email else 'N/A'}***"
+        )
+
         # Validate input
         if not request.username_or_email or not request.password:
             logger.warning("Login attempt with missing credentials")
             raise HTTPExceptionWithCode(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Username/email and password are required",
-                error_code=ErrorCodes.VALIDATION_FIELD_REQUIRED
+                error_code=ErrorCodes.VALIDATION_FIELD_REQUIRED,
             )
-        
+
         # Check database connection
         try:
             logger.debug("Checking database connection...")
             # Simple query to test connection
             from sqlalchemy import text
+
             await db.execute(text("SELECT 1"))
             logger.debug("Database connection OK")
         except Exception as e:
@@ -221,9 +222,9 @@ async def login(
             raise HTTPExceptionWithCode(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Database connection failed",
-                error_code=ErrorCodes.DATABASE_ERROR
+                error_code=ErrorCodes.DATABASE_ERROR,
             )
-        
+
         # Get auth service
         try:
             logger.debug("Initializing AuthService...")
@@ -231,36 +232,40 @@ async def login(
             logger.debug("AuthService initialized successfully")
         except ValueError as e:
             # JWT_SECRET_KEY validation error
-            logger.error(f"AuthService initialization failed (configuration): {str(e)}", exc_info=True)
+            logger.error(
+                f"AuthService initialization failed (configuration): {str(e)}", exc_info=True
+            )
             raise HTTPExceptionWithCode(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Authentication service configuration error",
-                error_code=ErrorCodes.SERVICE_UNAVAILABLE
+                error_code=ErrorCodes.SERVICE_UNAVAILABLE,
             )
         except Exception as e:
-            logger.error(f"Failed to initialize AuthService: {type(e).__name__}: {str(e)}", exc_info=True)
+            logger.error(
+                f"Failed to initialize AuthService: {type(e).__name__}: {str(e)}", exc_info=True
+            )
             raise HTTPExceptionWithCode(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Authentication service unavailable",
-                error_code=ErrorCodes.SERVICE_UNAVAILABLE
+                error_code=ErrorCodes.SERVICE_UNAVAILABLE,
             )
-        
+
         # Attempt login
         try:
             logger.debug(f"Attempting login for user: {request.username_or_email[:3]}***")
             login_response = await auth_service.login(
-                username_or_email=request.username_or_email,
-                password=request.password,
-                db=db
+                username_or_email=request.username_or_email, password=request.password, db=db
             )
             logger.debug("Login service call completed successfully")
         except AuthenticationError as e:
             # Generic error message to prevent information leakage
-            logger.info(f"Login failed for user: {request.username_or_email[:3]}*** (authentication error)")
+            logger.info(
+                f"Login failed for user: {request.username_or_email[:3]}*** (authentication error)"
+            )
             raise HTTPExceptionWithCode(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid credentials",
-                error_code=ErrorCodes.AUTH_INVALID_CREDENTIALS
+                error_code=ErrorCodes.AUTH_INVALID_CREDENTIALS,
             )
         except Exception as e:
             # Catch any other errors from auth service
@@ -268,30 +273,30 @@ async def login(
             raise HTTPExceptionWithCode(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Login processing failed",
-                error_code=ErrorCodes.SERVER_ERROR
+                error_code=ErrorCodes.SERVER_ERROR,
             )
-        
+
         # Set refresh token in httpOnly cookie
         try:
             if login_response.refresh_token and login_response.refresh_expires_at:
                 logger.debug("Setting refresh token cookie...")
                 set_refresh_token_cookie(
-                    response,
-                    login_response.refresh_token,
-                    login_response.refresh_expires_at
+                    response, login_response.refresh_token, login_response.refresh_expires_at
                 )
                 logger.debug("Refresh token cookie set successfully")
         except Exception as e:
-            logger.error(f"Failed to set refresh token cookie: {type(e).__name__}: {str(e)}", exc_info=True)
+            logger.error(
+                f"Failed to set refresh token cookie: {type(e).__name__}: {str(e)}", exc_info=True
+            )
             # Don't fail login if cookie setting fails, but log it
-        
+
         # Remove refresh_token from response body (security - sent in cookie only)
         login_response.refresh_token = None
         login_response.refresh_expires_at = None
-        
+
         logger.info(f"Login successful for user: {request.username_or_email[:3]}***")
         return login_response
-        
+
     except HTTPExceptionWithCode:
         # Re-raise HTTP exceptions with error codes (already formatted)
         raise
@@ -302,7 +307,7 @@ async def login(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Login failed",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )
 
 
@@ -310,11 +315,11 @@ async def login(
 async def refresh_token(
     response: Response,
     refresh_token: Optional[str] = Cookie(None),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Refresh access token using refresh token (with rotation).
-    
+
     Reads refresh token from httpOnly cookie.
     Returns new access token and sets new refresh token in cookie.
     """
@@ -322,42 +327,39 @@ async def refresh_token(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Refresh token not provided",
-            error_code=ErrorCodes.AUTH_REFRESH_TOKEN_MISSING
+            error_code=ErrorCodes.AUTH_REFRESH_TOKEN_MISSING,
         )
-    
+
     try:
         auth_service = get_auth_service()
         refresh_response = await auth_service.refresh_access_token(
-            refresh_token=refresh_token,
-            db=db
+            refresh_token=refresh_token, db=db
         )
-        
+
         # Set new refresh token in httpOnly cookie (rotation)
         if refresh_response.refresh_token and refresh_response.refresh_expires_at:
             set_refresh_token_cookie(
-                response,
-                refresh_response.refresh_token,
-                refresh_response.refresh_expires_at
+                response, refresh_response.refresh_token, refresh_response.refresh_expires_at
             )
-        
+
         # Remove refresh_token from response body (security - sent in cookie only)
         refresh_response.refresh_token = None
         refresh_response.refresh_expires_at = None
-        
+
         return refresh_response
-        
+
     except TokenError as e:
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=str(e),
-            error_code=ErrorCodes.AUTH_REFRESH_TOKEN_INVALID
+            error_code=ErrorCodes.AUTH_REFRESH_TOKEN_INVALID,
         )
     except Exception as e:
         logger.error(f"Token refresh error: {str(e)}", exc_info=True)
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Token refresh failed",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )
 
 
@@ -366,36 +368,32 @@ async def logout(
     response: Response,
     credentials: HTTPAuthorizationCredentials = Depends(security),
     refresh_token: Optional[str] = Cookie(None),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Logout user - revoke tokens.
-    
+
     Revokes access token (adds to blacklist) and refresh token.
     Clears refresh token cookie.
     """
     try:
         auth_service = get_auth_service()
         access_token = credentials.credentials
-        
-        await auth_service.logout(
-            access_token=access_token,
-            refresh_token=refresh_token,
-            db=db
-        )
-        
+
+        await auth_service.logout(access_token=access_token, refresh_token=refresh_token, db=db)
+
         # Clear refresh token cookie
         clear_refresh_token_cookie(response)
-        
+
         return None
-        
+
     except TokenError as e:
         # Even if token is invalid, clear cookie
         clear_refresh_token_cookie(response)
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=str(e),
-            error_code=ErrorCodes.AUTH_TOKEN_INVALID
+            error_code=ErrorCodes.AUTH_TOKEN_INVALID,
         )
     except Exception as e:
         logger.error(f"Logout error: {str(e)}", exc_info=True)
@@ -404,79 +402,64 @@ async def logout(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Logout failed",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )
 
 
 @router.post("/reset-password", status_code=status.HTTP_202_ACCEPTED)
-async def reset_password(
-    request: PasswordResetRequestSchema,
-    db: AsyncSession = Depends(get_db)
-):
+async def reset_password(request: PasswordResetRequestSchema, db: AsyncSession = Depends(get_db)):
     """
     Request password reset (EMAIL or SMS).
-    
+
     Creates a reset request and sends token (EMAIL) or code (SMS).
     Returns 202 Accepted immediately (security - don't reveal if user exists).
     """
     try:
         password_reset_service = get_password_reset_service()
-        
+
         # Determine identifier based on method
         identifier = request.email if request.method == ResetMethod.EMAIL else request.phone_number
-        
+
         await password_reset_service.request_reset(
-            method=request.method,
-            identifier=identifier,
-            db=db
+            method=request.method, identifier=identifier, db=db
         )
-        
+
         # Always return success (security - prevent user enumeration)
-        return {
-            "message": "If the account exists, a reset link has been sent"
-        }
-        
+        return {"message": "If the account exists, a reset link has been sent"}
+
     except PasswordResetError as e:
         # Still return success to prevent user enumeration
         logger.warning(f"Password reset request failed: {str(e)}")
-        return {
-            "message": "If the account exists, a reset link has been sent"
-        }
+        return {"message": "If the account exists, a reset link has been sent"}
     except Exception as e:
         logger.error(f"Password reset error: {str(e)}", exc_info=True)
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Password reset request failed",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )
 
 
 @router.post("/verify-reset", status_code=status.HTTP_200_OK)
-async def verify_reset(
-    data: PasswordResetVerify,
-    db: AsyncSession = Depends(get_db)
-):
+async def verify_reset(data: PasswordResetVerify, db: AsyncSession = Depends(get_db)):
     """
     Verify and complete password reset.
-    
+
     Accepts reset_token (EMAIL) or verification_code (SMS) with new password.
     Updates user password and marks reset request as USED.
     """
     try:
         password_reset_service = get_password_reset_service()
-        
+
         user = await password_reset_service.verify_reset(
             reset_token=data.reset_token,
             verification_code=data.verification_code,
             new_password=data.new_password,
-            db=db
+            db=db,
         )
-        
-        return {
-            "message": "Password reset successfully",
-            "user_id": uuid_to_ulid(user.id)
-        }
-        
+
+        return {"message": "Password reset successfully", "user_id": uuid_to_ulid(user.id)}
+
     except PasswordResetError as e:
         error_code = ErrorCodes.PASSWORD_RESET_INVALID_TOKEN
         if "expired" in str(e).lower():
@@ -488,16 +471,14 @@ async def verify_reset(
         elif "attempts" in str(e).lower():
             error_code = ErrorCodes.PASSWORD_RESET_MAX_ATTEMPTS
         raise HTTPExceptionWithCode(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
-            error_code=error_code
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e), error_code=error_code
         )
     except Exception as e:
         logger.error(f"Password reset verification error: {str(e)}", exc_info=True)
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Password reset verification failed",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )
 
 
@@ -505,11 +486,11 @@ async def verify_reset(
 async def verify_phone(
     verification_code: str = Body(..., embed=True),
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Verify phone number with SMS code.
-    
+
     User must be authenticated. Sends SMS code to user's phone number,
     then verifies the code to mark phone as verified.
     """
@@ -519,66 +500,68 @@ async def verify_phone(
             raise HTTPExceptionWithCode(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="No phone number associated with account",
-                error_code=ErrorCodes.PASSWORD_RESET_NO_PHONE
+                error_code=ErrorCodes.PASSWORD_RESET_NO_PHONE,
             )
-        
+
         # Check if already verified
         if current_user.phone_verified:
             return {
                 "message": "Phone number already verified",
                 "phone_number": current_user.phone_number,
-                "verified": True
+                "verified": True,
             }
-        
+
         # Find pending reset request for this user's phone (SMS method)
         from sqlalchemy import select
-        
-        stmt = select(PasswordResetRequest).where(
-            and_(
-                PasswordResetRequest.user_id == current_user.id,
-                PasswordResetRequest.method == ResetMethod.SMS,
-                PasswordResetRequest.sent_to == current_user.phone_number,
-                PasswordResetRequest.status == "PENDING"
+
+        stmt = (
+            select(PasswordResetRequest)
+            .where(
+                and_(
+                    PasswordResetRequest.user_id == current_user.id,
+                    PasswordResetRequest.method == ResetMethod.SMS,
+                    PasswordResetRequest.sent_to == current_user.phone_number,
+                    PasswordResetRequest.status == "PENDING",
+                )
             )
-        ).order_by(PasswordResetRequest.created_at.desc())
-        
+            .order_by(PasswordResetRequest.created_at.desc())
+        )
+
         result = await db.execute(stmt)
         reset_request = result.scalar_one_or_none()
-        
+
         if not reset_request:
             # No pending request - create one and send code
             password_reset_service = get_password_reset_service()
             reset_request = await password_reset_service.request_reset(
-                method=ResetMethod.SMS,
-                identifier=current_user.phone_number,
-                db=db
+                method=ResetMethod.SMS, identifier=current_user.phone_number, db=db
             )
             return {
                 "message": "Verification code sent to phone",
                 "phone_number": current_user.phone_number,
-                "expires_in_minutes": 15
+                "expires_in_minutes": 15,
             }
-        
+
         # Verify code
         if reset_request.verification_code != verification_code:
             reset_request.attempts_count += 1
-            
+
             if reset_request.attempts_count >= reset_request.max_attempts:
                 reset_request.status = "EXPIRED"
                 await db.commit()
                 raise HTTPExceptionWithCode(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Maximum verification attempts exceeded. Please request a new code.",
-                    error_code=ErrorCodes.PASSWORD_RESET_MAX_ATTEMPTS
+                    error_code=ErrorCodes.PASSWORD_RESET_MAX_ATTEMPTS,
                 )
-            
+
             await db.commit()
             raise HTTPExceptionWithCode(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid verification code",
-                error_code=ErrorCodes.PASSWORD_RESET_INVALID_CODE
+                error_code=ErrorCodes.PASSWORD_RESET_INVALID_CODE,
             )
-        
+
         # Check expiration
         if reset_request.code_expires_at and reset_request.code_expires_at < datetime.utcnow():
             reset_request.status = "EXPIRED"
@@ -586,27 +569,27 @@ async def verify_phone(
             raise HTTPExceptionWithCode(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Verification code has expired. Please request a new code.",
-                error_code=ErrorCodes.PASSWORD_RESET_CODE_EXPIRED
+                error_code=ErrorCodes.PASSWORD_RESET_CODE_EXPIRED,
             )
-        
+
         # Code is valid - mark phone as verified
         current_user.phone_verified = True
         current_user.phone_verified_at = datetime.utcnow()
-        
+
         # Mark reset request as USED
         reset_request.status = "USED"
         reset_request.used_at = datetime.utcnow()
-        
+
         await db.commit()
         await db.refresh(current_user)
-        
+
         return {
             "message": "Phone number verified successfully",
             "phone_number": current_user.phone_number,
             "verified": True,
-            "verified_at": current_user.phone_verified_at.isoformat()
+            "verified_at": current_user.phone_verified_at.isoformat(),
         }
-        
+
     except HTTPExceptionWithCode:
         raise
     except Exception as e:
@@ -614,5 +597,5 @@ async def verify_phone(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Phone verification failed",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )

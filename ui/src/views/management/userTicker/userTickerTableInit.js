@@ -12,15 +12,31 @@ import { showUserTickerAddModal } from './userTickerAddForm.js';
 import { showUserTickerEditModal } from './userTickerEditForm.js';
 import { createModal } from '../../../components/shared/PhoenixModal.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
-import { toHebrewStatus, normalizeToCanonicalStatus } from '../../../utils/statusAdapter.js';
-import { getPriceSourceLabel, getPriceSourceBadgeHTML, formatPriceAsOf } from '../../../utils/priceReliabilityLabels.js';
+import {
+  toHebrewStatus,
+  normalizeToCanonicalStatus,
+} from '../../../utils/statusAdapter.js';
+import {
+  getPriceSourceLabel,
+  getPriceSourceBadgeHTML,
+  formatPriceAsOf,
+} from '../../../utils/priceReliabilityLabels.js';
 import { formatDailyChange } from '../../../utils/formatChange.js';
 
-const CURRENCY_SYMBOLS = { USD: '$', EUR: '€', ILS: '₪', GBP: '£', JPY: '¥', USDT: '₮' };
+const CURRENCY_SYMBOLS = {
+  USD: '$',
+  EUR: '€',
+  ILS: '₪',
+  GBP: '£',
+  JPY: '¥',
+  USDT: '₮',
+};
 const formatCurrency = (amount, currency = 'USD') => {
   if (amount == null || isNaN(amount)) return '—';
   const sym = CURRENCY_SYMBOLS[currency?.toUpperCase?.()] ?? currency ?? '$';
-  return `${sym}${Number(amount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+  return `${sym}${Number(amount)
+    .toFixed(2)
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
 };
 
 (function initUserTickerTable() {
@@ -34,8 +50,12 @@ const formatCurrency = (amount, currency = 'USD') => {
 
   function isAuthenticated() {
     try {
-      return !!(localStorage.getItem('access_token') || localStorage.getItem('authToken') ||
-        sessionStorage.getItem('access_token') || sessionStorage.getItem('authToken'));
+      return !!(
+        localStorage.getItem('access_token') ||
+        localStorage.getItem('authToken') ||
+        sessionStorage.getItem('access_token') ||
+        sessionStorage.getItem('authToken')
+      );
     } catch (_) {
       return false;
     }
@@ -51,12 +71,20 @@ const formatCurrency = (amount, currency = 'USD') => {
         table: { data: arr, total: res?.total ?? arr.length },
         summary: {
           total_tickers: arr.length,
-          active_tickers: arr.filter((t) => t.is_active !== false && t.isActive !== false).length,
+          active_tickers: arr.filter(
+            (t) => t.is_active !== false && t.isActive !== false,
+          ).length,
         },
       };
     } catch (e) {
-      maskedLog('[UserTicker] Error loading /me/tickers:', { errorCode: e?.code, status: e?.status });
-      return { table: { data: [], total: 0 }, summary: { total_tickers: 0, active_tickers: 0 } };
+      maskedLog('[UserTicker] Error loading /me/tickers:', {
+        errorCode: e?.code,
+        status: e?.status,
+      });
+      return {
+        table: { data: [], total: 0 },
+        summary: { total_tickers: 0, active_tickers: 0 },
+      };
     }
   }
 
@@ -67,13 +95,20 @@ const formatCurrency = (amount, currency = 'USD') => {
       const data = res?.data ?? res ?? [];
       return Array.isArray(data) ? data : [];
     } catch (e) {
-      maskedLog('[UserTicker] GET /tickers for add-dropdown failed (may be admin-only):', { status: e?.status });
+      maskedLog(
+        '[UserTicker] GET /tickers for add-dropdown failed (may be admin-only):',
+        { status: e?.status },
+      );
       return [];
     }
   }
 
   function sortTableData(arr, key, dir) {
-    const keyMap = { company_name: 'companyName', current_price: 'currentPrice', daily_change_pct: 'dailyChangePct' };
+    const keyMap = {
+      company_name: 'companyName',
+      current_price: 'currentPrice',
+      daily_change_pct: 'dailyChangePct',
+    };
     const keyAlt = keyMap[key] || key;
     const copy = [...arr];
     copy.sort((a, b) => {
@@ -113,7 +148,8 @@ const formatCurrency = (amount, currency = 'USD') => {
     if (!pageData.length) {
       const row = document.createElement('tr');
       row.className = 'phoenix-table__row';
-      row.innerHTML = '<td colspan="9" class="phoenix-table__cell phoenix-table__cell--empty">אין טיקרים ברשימה שלי. הוסף טיקר קיים או טיקר חדש.</td>';
+      row.innerHTML =
+        '<td colspan="9" class="phoenix-table__cell phoenix-table__cell--empty">אין טיקרים ברשימה שלי. הוסף טיקר קיים או טיקר חדש.</td>';
       tbody.appendChild(row);
       return;
     }
@@ -126,12 +162,16 @@ const formatCurrency = (amount, currency = 'USD') => {
 
       const symbolCell = document.createElement('td');
       symbolCell.className = 'phoenix-table__cell col-symbol';
-      const displayVal = (t.display_name || t.displayName || t.symbol || '').trim() || t.symbol || '';
+      const displayVal =
+        (t.display_name || t.displayName || t.symbol || '').trim() ||
+        t.symbol ||
+        '';
       symbolCell.textContent = displayVal;
       row.appendChild(symbolCell);
 
       const priceCell = document.createElement('td');
-      priceCell.className = 'phoenix-table__cell col-price phoenix-table__cell--numeric';
+      priceCell.className =
+        'phoenix-table__cell col-price phoenix-table__cell--numeric';
       priceCell.setAttribute('dir', 'ltr');
       const priceVal = t.current_price ?? t.currentPrice ?? null;
       const priceSource = t.price_source ?? t.priceSource ?? null;
@@ -155,19 +195,29 @@ const formatCurrency = (amount, currency = 'USD') => {
       row.appendChild(sourceCell);
 
       const lastCloseCell = document.createElement('td');
-      lastCloseCell.className = 'phoenix-table__cell col-last-close phoenix-table__cell--numeric';
+      lastCloseCell.className =
+        'phoenix-table__cell col-last-close phoenix-table__cell--numeric';
       lastCloseCell.setAttribute('dir', 'ltr');
       lastCloseCell.textContent = formatCurrency(lastClose, curr);
       row.appendChild(lastCloseCell);
 
       const changeCell = document.createElement('td');
-      changeCell.className = 'phoenix-table__cell col-change phoenix-table__cell--numeric';
+      changeCell.className =
+        'phoenix-table__cell col-change phoenix-table__cell--numeric';
       changeCell.setAttribute('dir', 'ltr');
       const changeVal = t.daily_change_pct ?? t.dailyChangePct ?? null;
       const changeSpan = document.createElement('span');
       const changeNum = changeVal != null ? Number(changeVal) : null;
-      changeSpan.className = changeNum != null && changeNum >= 0 ? 'numeric-value-positive' : 'numeric-value-negative';
-      changeSpan.textContent = formatDailyChange(changeVal, priceVal, lastClose, curr);
+      changeSpan.className =
+        changeNum != null && changeNum >= 0
+          ? 'numeric-value-positive'
+          : 'numeric-value-negative';
+      changeSpan.textContent = formatDailyChange(
+        changeVal,
+        priceVal,
+        lastClose,
+        curr,
+      );
       changeCell.appendChild(changeSpan);
       row.appendChild(changeCell);
 
@@ -180,7 +230,15 @@ const formatCurrency = (amount, currency = 'USD') => {
       typeCell.className = 'phoenix-table__cell col-type';
       const typeBadge = document.createElement('span');
       const rawType = (t.ticker_type ?? t.tickerType ?? 'STOCK').toUpperCase();
-      const knownTypes = ['STOCK', 'ETF', 'OPTION', 'FUTURE', 'FOREX', 'CRYPTO', 'INDEX'];
+      const knownTypes = [
+        'STOCK',
+        'ETF',
+        'OPTION',
+        'FUTURE',
+        'FOREX',
+        'CRYPTO',
+        'INDEX',
+      ];
       const tickerType = knownTypes.includes(rawType) ? rawType : 'OTHER';
       typeBadge.className = `ticker-type-badge ticker-type-badge--${tickerType}`;
       typeBadge.textContent = rawType;
@@ -189,17 +247,21 @@ const formatCurrency = (amount, currency = 'USD') => {
 
       const statusCell = document.createElement('td');
       statusCell.className = 'phoenix-table__cell col-status';
-      const statusCanon = normalizeToCanonicalStatus(t.status) ?? (t.is_active ?? t.isActive ? 'active' : 'cancelled');
+      const statusCanon =
+        normalizeToCanonicalStatus(t.status) ??
+        ((t.is_active ?? t.isActive) ? 'active' : 'cancelled');
       const statusLabel = toHebrewStatus(statusCanon);
       const statusBadge = document.createElement('span');
       statusBadge.className = `phoenix-table__status-badge phoenix-table__status-badge--${statusCanon}`;
       statusBadge.setAttribute('data-status-category', statusCanon);
-      statusBadge.textContent = statusLabel || (t.is_active !== false ? 'פעיל' : 'לא פעיל');
+      statusBadge.textContent =
+        statusLabel || (t.is_active !== false ? 'פעיל' : 'לא פעיל');
       statusCell.appendChild(statusBadge);
       row.appendChild(statusCell);
 
       const actionsCell = document.createElement('td');
-      actionsCell.className = 'phoenix-table__cell col-actions phoenix-table__cell--actions';
+      actionsCell.className =
+        'phoenix-table__cell col-actions phoenix-table__cell--actions';
       actionsCell.innerHTML = `
         <div class="table-actions-tooltip">
           <button class="table-actions-trigger" aria-label="פעולות">
@@ -250,13 +312,17 @@ const formatCurrency = (amount, currency = 'USD') => {
   }
 
   function updatePagination() {
-    const totalPages = Math.max(1, Math.ceil(tableData.total / currentPageSize));
+    const totalPages = Math.max(
+      1,
+      Math.ceil(tableData.total / currentPageSize),
+    );
     const start = (currentPage - 1) * currentPageSize + 1;
     const end = Math.min(currentPage * currentPageSize, tableData.total);
     const infoEl = document.getElementById('paginationInfo');
     const prevBtn = document.getElementById('prevPageBtn');
     const nextBtn = document.getElementById('nextPageBtn');
-    if (infoEl) infoEl.textContent = `מציג ${start}-${end} מתוך ${tableData.total} רשומות`;
+    if (infoEl)
+      infoEl.textContent = `מציג ${start}-${end} מתוך ${tableData.total} רשומות`;
     if (prevBtn) prevBtn.disabled = currentPage <= 1;
     if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
   }
@@ -276,7 +342,9 @@ const formatCurrency = (amount, currency = 'USD') => {
   }
 
   function initPaginationHandlers() {
-    const pageSizeSelect = document.querySelector('.js-table-page-size[data-table-id="userTickersTable"]');
+    const pageSizeSelect = document.querySelector(
+      '.js-table-page-size[data-table-id="userTickersTable"]',
+    );
     const prevBtn = document.getElementById('prevPageBtn');
     const nextBtn = document.getElementById('nextPageBtn');
     if (pageSizeSelect) {
@@ -361,19 +429,30 @@ const formatCurrency = (amount, currency = 'USD') => {
 
   function handleView(ticker) {
     const sym = ticker.symbol ?? '';
-    const displayName = (ticker.display_name || ticker.displayName || '').trim() || sym;
+    const displayName =
+      (ticker.display_name || ticker.displayName || '').trim() || sym;
     const name = ticker.company_name ?? ticker.companyName ?? '';
     const curr = ticker.currency ?? ticker.currencyCode ?? 'USD';
-    const price = formatCurrency(ticker.current_price ?? ticker.currentPrice, curr);
+    const price = formatCurrency(
+      ticker.current_price ?? ticker.currentPrice,
+      curr,
+    );
     const change = formatDailyChange(
       ticker.daily_change_pct ?? ticker.dailyChangePct,
       ticker.current_price ?? ticker.currentPrice,
       ticker.last_close_price ?? ticker.lastClosePrice,
-      curr
+      curr,
     );
-    const sourceBadge = getPriceSourceBadgeHTML(ticker.price_source ?? ticker.priceSource ?? '');
-    const asOf = formatPriceAsOf(ticker.price_as_of_utc ?? ticker.priceAsOfUtc ?? null);
-    const lastClose = formatCurrency(ticker.last_close_price ?? ticker.lastClosePrice ?? null, curr);
+    const sourceBadge = getPriceSourceBadgeHTML(
+      ticker.price_source ?? ticker.priceSource ?? '',
+    );
+    const asOf = formatPriceAsOf(
+      ticker.price_as_of_utc ?? ticker.priceAsOfUtc ?? null,
+    );
+    const lastClose = formatCurrency(
+      ticker.last_close_price ?? ticker.lastClosePrice ?? null,
+      curr,
+    );
     const html = `
       <div class="phoenix-form">
         <div class="form-group"><strong>סמל:</strong> ${sym}</div>
@@ -392,7 +471,7 @@ const formatCurrency = (amount, currency = 'USD') => {
       entity: 'user_tickers',
       showSaveButton: false,
       cancelButtonText: 'ביטול',
-      onClose: () => {}
+      onClose: () => {},
     });
     const cancelBtn = document.querySelector('.phoenix-modal__cancel-btn');
     if (cancelBtn) cancelBtn.textContent = 'סגור';
@@ -401,7 +480,7 @@ const formatCurrency = (amount, currency = 'USD') => {
   function handleEdit(ticker) {
     showUserTickerEditModal({
       ticker,
-      onSuccess: () => loadAllData()
+      onSuccess: () => loadAllData(),
     });
   }
 
@@ -410,7 +489,9 @@ const formatCurrency = (amount, currency = 'USD') => {
       loadUserTickersData(),
       loadAvailableTickers(),
     ]);
-    const userTickerIds = (userTickers.table.data || []).map((t) => t.id ?? t.external_ulid).filter(Boolean);
+    const userTickerIds = (userTickers.table.data || [])
+      .map((t) => t.id ?? t.external_ulid)
+      .filter(Boolean);
 
     showUserTickerAddModal({
       availableTickers,
@@ -435,15 +516,18 @@ const formatCurrency = (amount, currency = 'USD') => {
           document.getElementById('phoenix-modal-backdrop')?.remove();
           await loadAllData();
         } catch (e) {
-          maskedLog('[UserTicker] DELETE error:', { errorCode: e?.code, status: e?.status });
+          maskedLog('[UserTicker] DELETE error:', {
+            errorCode: e?.code,
+            status: e?.status,
+          });
           createModal({
             title: 'שגיאה',
             content: '<p>שגיאה בהסרת הטיקר מהרשימה</p>',
             showSaveButton: false,
-            cancelButtonText: 'ביטול'
+            cancelButtonText: 'ביטול',
           });
         }
-      }
+      },
     });
   }
 

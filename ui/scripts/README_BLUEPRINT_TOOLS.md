@@ -1,4 +1,5 @@
 # Blueprint Comparison Tools 🛠️
+
 **project_domain:** TIKTRACK
 
 כלים לזיהוי ותיקון הבדלים בין בלופרינטים למימוש React.
@@ -10,16 +11,19 @@
 ### 1. `blueprint-diff.js` - זיהוי הבדלים
 
 **שימוש:**
+
 ```bash
 node ui/scripts/blueprint-diff.js <blueprint.html> <react-component.jsx>
 ```
 
 **דוגמה:**
+
 ```bash
 node ui/scripts/blueprint-diff.js _COMMUNICATION/team_01/team_01_staging/D15_LOGIN.html ui/src/cubes/identity/components/auth/LoginForm.jsx
 ```
 
 **פלט:**
+
 - דוח מפורט של כל ההבדלים במבנה HTML/JSX
 - רשימת מחלקות CSS חסרות/מיותרות
 - קובץ JSON מפורט: `blueprint-diff-report.json`
@@ -27,16 +31,19 @@ node ui/scripts/blueprint-diff.js _COMMUNICATION/team_01/team_01_staging/D15_LOG
 ### 2. `fix-blueprint-diff.js` - הצעות תיקון
 
 **שימוש:**
+
 ```bash
 node ui/scripts/fix-blueprint-diff.js <diff-report.json>
 ```
 
 **דוגמה:**
+
 ```bash
 node ui/scripts/fix-blueprint-diff.js ui/src/cubes/identity/components/auth/blueprint-diff-report.json
 ```
 
 **פלט:**
+
 - רשימת הצעות תיקון מפורטת
 - קובץ JSON עם כל ההצעות: `*-fix-suggestions.json`
 

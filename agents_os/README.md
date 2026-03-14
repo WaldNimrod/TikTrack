@@ -1,5 +1,15 @@
 # agents_os
 
+## Documentation
+
+→ **Full documentation: [documentation/docs-agents-os/00_AGENTS_OS_MASTER_INDEX.md](../documentation/docs-agents-os/00_AGENTS_OS_MASTER_INDEX.md)**
+
+Quick start: [AGENTS_OS_OVERVIEW.md](../documentation/docs-agents-os/01-OVERVIEW/AGENTS_OS_OVERVIEW.md)  
+CLI reference: [PIPELINE_CLI_REFERENCE.md](../documentation/docs-agents-os/03-CLI-REFERENCE/PIPELINE_CLI_REFERENCE.md)  
+UI: [agents_os/ui/PIPELINE_DASHBOARD.html](ui/PIPELINE_DASHBOARD.html)
+
+---
+
 **project_domain:** AGENTS_OS  
 **work_package_id:** S002-P001-WP001 (Spec Validation Engine)  
 **gate_id:** GATE_3

@@ -21,7 +21,7 @@
 ```
 
 **רק** בתוך 09:30–16:00 ET (Mon–Fri). הסקריפט יוצר:
-- `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log` (עם `mode=market_open`)
+- `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log` (עם `mode=market_open`)
 - עדכון `G7_PART_A_RUNTIME_EVIDENCE.json`
 
 ---

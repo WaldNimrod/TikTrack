@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agents OS — Roadmap &amp; Gate History</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:         #0d1117;  --surface:    #161b22;  --surface2:   #1c2128;
+      --border:     #30363d;  --text:       #c9d1d9;  --text-muted: #8b949e;
+      --accent:     #58a6ff;  --success:    #3fb950;  --warning:    #d29922;
+      --danger:     #f85149;  --current:    #1f6feb;
+      --mono:       'SF Mono', 'Fira Code', monospace;
+    }
+    body { background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,sans-serif; font-size:14px; min-height:100vh; }
+
+    /* ── Header ── */
+    header { background:var(--surface); border-bottom:1px solid var(--border); padding:12px 20px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+    header h1 { font-size:15px; font-weight:600; }
+    header h1 span { color:var(--accent); }
+    .header-meta { color:var(--text-muted); font-size:12px; margin-top:2px; }
+    .header-right { display:flex; gap:10px; align-items:center; }
+
+    /* ── Buttons ── */
+    button.btn, a.btn { background:var(--surface2); border:1px solid var(--border); color:var(--text); padding:5px 12px; border-radius:6px; cursor:pointer; font-size:12px; transition:border-color 0.15s; text-decoration:none; display:inline-flex; align-items:center; gap:4px; }
+    button.btn:hover, a.btn:hover { border-color:var(--accent); color:var(--accent); }
+    button.btn-primary { background:var(--current); border-color:var(--current); color:#fff; }
+    button.btn-primary:hover { background:#388bfd; border-color:#388bfd; }
+
+    /* ── Layout ── */
+    main { padding:20px; max-width:1280px; margin:0 auto; }
+
+    /* ── Section cards ── */
+    .section-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px; margin-bottom:16px; }
+    .section-title { font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:14px; display:flex; align-items:center; gap:10px; }
+    .badge { font-size:10px; padding:2px 8px; border-radius:10px; background:var(--surface2); border:1px solid var(--border); color:var(--text-muted); text-transform:none; letter-spacing:0; font-weight:400; }
+
+    /* ── Status pills ── */
+    .status-pill { display:inline-block; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600; }
+    .pill-pass    { background:rgba(63,185,80,0.15);  color:var(--success); border:1px solid var(--success); }
+    .pill-fail    { background:rgba(248,81,73,0.15);  color:var(--danger);  border:1px solid var(--danger); }
+    .pill-current { background:rgba(31,111,235,0.2);  color:var(--accent);  border:1px solid var(--current); }
+    .pill-pending { background:rgba(139,148,158,0.1); color:var(--text-muted); border:1px solid var(--border); }
+    .pill-human   { background:rgba(210,153,34,0.15); color:var(--warning); border:1px solid var(--warning); }
+
+    /* ── Program selector ── */
+    .prog-selector-bar { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+    .prog-selector-bar label { font-size:12px; color:var(--text-muted); }
+    .prog-selector-bar select {
+      background:var(--surface2); border:1px solid var(--border); color:var(--text);
+      padding:5px 10px; border-radius:6px; font-size:12px; cursor:pointer;
+      flex:1; max-width:480px;
+    }
+    .prog-selector-bar select:focus { outline:none; border-color:var(--accent); }
+    .prog-selector-bar select option { background:var(--surface2); }
+    .prog-selector-bar select optgroup { background:var(--surface); }
+
+    /* ── Domain banners ── */
+    .domain-banners { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+    @media(max-width:700px) { .domain-banners { grid-template-columns:1fr; } }
+    .domain-banner { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:14px 16px; }
+    .domain-banner.tiktrack-banner { border-left:3px solid var(--accent); }
+    .domain-banner.agentsos-banner { border-left:3px solid var(--success); }
+    .domain-banner-title { font-size:12px; font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+    .domain-banner-title .domain-dot { width:8px; height:8px; border-radius:50%; }
+    .domain-dot-tt  { background:var(--accent); }
+    .domain-dot-aos { background:var(--success); }
+    .domain-stat-row { display:flex; gap:14px; flex-wrap:wrap; }
+    .domain-stat { text-align:center; }
+    .domain-stat-num { font-size:20px; font-weight:700; line-height:1.1; }
+    .domain-stat-lbl { font-size:10px; color:var(--text-muted); }
+    .domain-stat-num.num-tt  { color:var(--accent); }
+    .domain-stat-num.num-aos { color:var(--success); }
+    .domain-stat-num.num-done { color:var(--success); }
+    .domain-stat-num.num-active { color:var(--warning); }
+    .domain-stat-num.num-plan  { color:var(--text-muted); }
+
+    /* ── Gate visual map (vertical list) ── */
+    .gate-map-list { list-style:none; }
+    .gm-row { display:flex; align-items:center; gap:8px; padding:5px 4px; border-bottom:1px solid var(--border); }
+    .gm-row:last-child { border-bottom:none; }
+    .gm-row-current { background:rgba(31,111,235,0.07); border-radius:4px; }
+    .gm-dev-marker { background:rgba(248,81,73,0.18); color:var(--danger); border:1px solid var(--danger);
+      border-radius:8px; font-size:9px; font-weight:700; padding:1px 6px; white-space:nowrap; }
+
+    /* ── Roadmap tree ── */
+    .rm-stage { border:1px solid var(--border); border-radius:8px; margin-bottom:8px; overflow:hidden; }
+    .rm-stage-active { border-color:var(--current) !important; }
+    .rm-stage-header { display:flex; align-items:center; gap:8px; padding:10px 14px; background:var(--surface); cursor:pointer; transition:background 0.15s; user-select:none; }
+    .rm-stage-header:hover { background:var(--surface2); }
+    .rm-chevron { color:var(--text-muted); font-size:10px; transition:transform 0.2s; }
+    .rm-stage.rm-open .rm-chevron { transform:rotate(90deg); }
+    .rm-stage-id   { font-family:var(--mono); font-size:12px; font-weight:700; color:var(--accent); min-width:42px; }
+    .rm-stage-name { font-size:13px; font-weight:500; flex:1; }
+    .rm-programs { padding:6px 14px 12px 24px; display:none; }
+    .rm-stage.rm-open .rm-programs { display:block; }
+    .rm-program { display:flex; align-items:center; gap:7px; padding:4px 6px; border-radius:4px; font-size:11px; margin-bottom:2px; cursor:pointer; transition:background 0.12s; }
+    .rm-program:hover { background:rgba(88,166,255,0.07); }
+    .rm-program-active { background:rgba(31,111,235,0.12); font-weight:600; }
+    .rm-program-selected { background:rgba(88,166,255,0.14) !important; outline:1px solid var(--accent); }
+    .rm-prog-id   { font-family:var(--mono); color:var(--text-muted); min-width:92px; font-size:10px; }
+    .rm-prog-name { flex:1; }
+    .rm-prog-domain { font-size:9px; padding:1px 6px; border-radius:5px; }
+    .domain-tiktrack { background:rgba(88,166,255,0.12); color:var(--accent); }
+    .domain-agentsos { background:rgba(63,185,80,0.12);  color:var(--success); }
+    .rm-status { font-size:9px; padding:1px 7px; border-radius:5px; font-weight:600; white-space:nowrap; }
+    .rm-s-active   { background:rgba(31,111,235,0.2);  color:#58a6ff; }
+    .rm-s-complete { background:rgba(63,185,80,0.15);  color:#3fb950; }
+    .rm-s-planned  { background:rgba(139,148,158,0.1); color:#8b949e; }
+    .rm-s-deferred { background:rgba(210,153,34,0.15); color:#d29922; }
+    .rm-s-hold     { background:rgba(248,81,73,0.1);   color:#f85149; }
+    .rm-validation { padding:8px 12px; background:var(--surface2); border-radius:6px; margin-bottom:12px; font-size:12px; }
+    .rm-val-ok  { color:var(--success); }
+    .rm-val-err { color:var(--danger); margin-bottom:4px; }
+
+    /* ── Program detail panel ── */
+    .prog-detail-panel { background:var(--surface2); border:1px solid var(--accent); border-radius:8px; padding:14px 16px; margin-bottom:12px; font-size:12px; }
+    .prog-detail-panel h3 { font-size:13px; font-weight:600; margin-bottom:8px; color:var(--accent); }
+    .prog-detail-row { display:flex; gap:6px; margin-bottom:4px; }
+    .prog-detail-lbl { color:var(--text-muted); min-width:120px; font-size:11px; }
+    .prog-detail-val { font-size:11px; }
+    .prog-gate-mirror { font-family:var(--mono); font-size:10px; color:var(--text-muted); margin-top:6px; padding:6px 8px; background:var(--surface); border-radius:4px; word-break:break-word; }
+
+    /* ── Gate history ── */
+    .gate-history-list { list-style:none; }
+    .history-item { display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid var(--border); font-size:12px; }
+    .history-item:last-child { border-bottom:none; }
+    .history-gate { font-family:var(--mono); font-size:11px; flex:1; }
+    .history-step { font-size:10px; color:var(--text-muted); }
+    .fail-cycle-tag { font-size:9px; padding:1px 6px; border-radius:5px; font-weight:700;
+      background:rgba(248,81,73,0.18); color:var(--danger); border:1px solid var(--danger); }
+
+    /* ── Gate full sequence ── */
+    .gate-seq-table { width:100%; border-collapse:collapse; }
+    .gate-seq-table th { font-size:10px; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); text-align:left; padding:4px 8px; border-bottom:1px solid var(--border); }
+    .gate-seq-table td { font-size:11px; padding:5px 8px; border-bottom:1px solid var(--border); }
+    .gate-seq-table tr:last-child td { border-bottom:none; }
+    .gate-seq-table tr.gate-current td { background:rgba(31,111,235,0.08); }
+    .gate-name-cell { font-family:var(--mono); }
+    .decision-marker { font-size:9px; color:var(--warning); margin-left:4px; }
+
+    /* ── Canonical files ── */
+    .cf-row { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid var(--border); }
+    .cf-row:last-child { border-bottom:none; }
+    .cf-row a { color:var(--accent); text-decoration:none; font-size:12px; flex:1; }
+    .cf-row a:hover { text-decoration:underline; }
+    .cf-path { font-family:var(--mono); font-size:9px; color:var(--text-muted); }
+
+    /* ── Two-col layout ── */
+    .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    @media(max-width:900px) { .two-col { grid-template-columns:1fr; } }
+
+    /* ── Misc ── */
+    .loading { color:var(--text-muted); font-style:italic; font-size:12px; }
+    .error-msg { color:var(--danger); font-size:12px; padding:8px; background:rgba(248,81,73,0.08); border-radius:4px; }
+    .refresh-label { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-muted); cursor:pointer; }
+    .refresh-dot { width:7px; height:7px; border-radius:50%; background:var(--success); animation:pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🗺️ Agents OS — <span>Roadmap &amp; History</span></h1>
+    <div class="header-meta" id="header-sub">Loading…</div>
+  </div>
+  <div class="header-right">
+    <label class="refresh-label">
+      <input type="checkbox" id="auto-refresh"> Auto (30s)
+      <span class="refresh-dot" id="refresh-dot" style="display:none"></span>
+    </label>
+    <button class="btn btn-primary" onclick="loadAll()">↺ Refresh</button>
+    <a class="btn" href="PIPELINE_DASHBOARD.html">← Pipeline Dashboard</a>
+  </div>
+</header>
+
+<main>
+
+  <!-- Program Selector -->
+  <div class="section-card" style="padding:12px 16px; margin-bottom:16px;">
+    <div class="prog-selector-bar">
+      <label>🔍 Program / WP focus:</label>
+      <select id="prog-select" onchange="onProgSelect(this.value)">
+        <option value="">— All programs (overview) —</option>
+      </select>
+      <span id="prog-select-status" style="font-size:11px; color:var(--text-muted)"></span>
+    </div>
+    <!-- Program detail panel (shown when a program is selected) -->
+    <div id="prog-detail" style="display:none"></div>
+  </div>
+
+  <!-- Domain Banners -->
+  <div class="domain-banners" id="domain-banners">
+    <div class="loading" style="grid-column:1/-1">Loading domain stats…</div>
+  </div>
+
+  <!-- Gate Visual Map -->
+  <div class="section-card">
+    <div class="section-title">Gate Visual Map <span class="badge" id="map-badge">—</span></div>
+    <div class="gate-map-wrap" id="gate-map-content"><span class="loading">Loading…</span></div>
+  </div>
+
+  <!-- Two-column: Roadmap Tree  |  Gate Sequence + History -->
+  <div class="two-col">
+
+    <!-- LEFT: Roadmap Tree -->
+    <div>
+      <div class="section-card">
+        <div class="section-title">Portfolio Roadmap <span class="badge" id="roadmap-badge">—</span></div>
+        <div class="rm-validation" id="rm-validation"><span class="loading">Loading…</span></div>
+        <div id="roadmap-tree"><span class="loading">Loading…</span></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Gate Sequence + History -->
+    <div>
+      <div class="section-card">
+        <div class="section-title">Full Gate Sequence <span class="badge" id="seq-badge">—</span></div>
+        <div id="gate-seq-content"><span class="loading">Loading…</span></div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-title">Gate History <span class="badge" id="history-badge">—</span></div>
+        <div id="history-content"><span class="loading">Loading…</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Full-width: Canonical Task Files -->
+  <div class="section-card">
+    <div class="section-title">Canonical Task Files <span class="badge" id="cf-badge">—</span></div>
+    <div id="cf-content"><span class="loading">Loading…</span></div>
+  </div>
+
+</main>
+
+<script>
+// ── Gate configuration (mirrors pipeline.py) ──────────────────────────────
+const GATE_SEQUENCE = [
+  "GATE_0","GATE_1","GATE_2","WAITING_GATE2_APPROVAL",
+  "G3_PLAN","G3_5","G3_6_MANDATES",
+  "CURSOR_IMPLEMENTATION",
+  "GATE_4","GATE_5","GATE_6","WAITING_GATE6_APPROVAL",
+  "GATE_7","GATE_8"
+];
+const GATE_CONFIG = {
+  "GATE_0":                 {owner:"team_190",    engine:"codex",         desc:"Team 190 — scope validation",        twoPaths:true},
+  "GATE_1":                 {owner:"team_190",    engine:"codex",         desc:"Team 170+190 — LLD400 spec",         twoPaths:true},
+  "GATE_2":                 {owner:"team_100",    engine:"codex+human",   desc:"Team 100 — approve spec",            twoPaths:true},
+  "WAITING_GATE2_APPROVAL": {owner:"team_00",     engine:"human",         desc:"Nimrod — GATE_2 approval",           twoPaths:true},
+  "G3_PLAN":                {owner:"team_10",     engine:"cursor",        desc:"Team 10 — work plan",                twoPaths:false},
+  "G3_5":                   {owner:"team_90",     engine:"codex",         desc:"Team 90 — validate work plan",       twoPaths:true},
+  "G3_6_MANDATES":          {owner:"team_10",     engine:"orchestrator",  desc:"Auto — generate team mandates",      twoPaths:false},
+  "CURSOR_IMPLEMENTATION":  {owner:"teams_20+30", engine:"cursor",        desc:"Teams 20+30 — implement",            twoPaths:false},
+  "GATE_4":                 {owner:"team_50",     engine:"cursor+mcp",    desc:"Team 50 — QA",                       twoPaths:true},
+  "GATE_5":                 {owner:"team_90",     engine:"codex",         desc:"Team 90 — dev validation",           twoPaths:true},
+  "GATE_6":                 {owner:"team_100",    engine:"codex+human",   desc:"Team 100 — reality vs intent",       twoPaths:true},
+  "WAITING_GATE6_APPROVAL": {owner:"team_00",     engine:"human",         desc:"Nimrod — GATE_6 approval",           twoPaths:true},
+  "GATE_7":                 {owner:"team_00",     engine:"human",         desc:"Nimrod — UX sign-off",               twoPaths:true},
+  "GATE_8":                 {owner:"team_90",     engine:"codex",         desc:"Team 90+70 — docs closure",          twoPaths:true},
+};
+
+const CANONICAL_FILES = [
+  {label:"Known Bugs Register",            path:"documentation/docs-governance/01-FOUNDATIONS/KNOWN_BUGS_REGISTER_v1.0.0.md"},
+  {label:"Bugs Remediation Procedure",     path:"documentation/docs-governance/04-PROCEDURES/KNOWN_BUGS_REMEDIATION_GOVERNANCE_PROCEDURE_v1.0.0.md"},
+  {label:"Master Task List (Team 10)",     path:"_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md"},
+  {label:"Level-2 Carryover List",         path:"_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md"},
+  {label:"Level-2 Registry",              path:"_COMMUNICATION/team_10/TEAM_10_LEVEL2_LISTS_REGISTRY.md"},
+  {label:"WSM — Live Operational State",  path:"documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md"},
+  {label:"Portfolio Roadmap",             path:"documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md"},
+  {label:"Program Registry",             path:"documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md"},
+  {label:"SSM (Governance Constitution)", path:"documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md"},
+  {label:"Iron Rules",                   path:"documentation/docs-governance/01-FOUNDATIONS/03_IRON_RULES_AND_GOVERNANCE_CONSTITUTION.md"},
+];
+
+// ── State ──────────────────────────────────────────────────────────────────
+let pipelineState = null;
+let allPrograms   = [];
+let allStages     = [];
+let refreshTimer  = null;
+
+// ── Utilities ──────────────────────────────────────────────────────────────
+async function fetchJSON(path) {
+  const r = await fetch(path + "?t=" + Date.now());
+  if (!r.ok) throw new Error(r.status);
+  return r.json();
+}
+async function fetchText(path) {
+  const r = await fetch(path + "?t=" + Date.now());
+  return r.ok ? r.text() : null;
+}
+async function fileExists(path) {
+  const r = await fetch(path + "?t=" + Date.now(), {method:"HEAD"}).catch(()=>({ok:false}));
+  return r.ok;
+}
+function escHtml(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+// ── Gate status helpers ────────────────────────────────────────────────────
+function gateStatus(gate, state) {
+  if (!state) return "pending";
+  if (state.current_gate === gate) return "current";
+  if ((state.gates_completed||[]).includes(gate)) return "pass";
+  if ((state.gates_failed||[]).includes(gate)) return "fail";
+  const cfg = GATE_CONFIG[gate];
+  if (cfg && cfg.engine === "human") return "human";
+  return "pending";
+}
+function statusPillClass(s) {
+  return {current:"pill-current",pass:"pill-pass",fail:"pill-fail",pending:"pill-pending",human:"pill-human"}[s]||"pill-pending";
+}
+function statusLabel(s) {
+  return {current:"▶ ACTIVE",pass:"✓ PASS",fail:"✗ FAIL",pending:"pending",human:"⏸ HUMAN"}[s]||s;
+}
+
+// ── Markdown table parser (fixed) ──────────────────────────────────────────
+// Previous version had a bug: separator detection happened before headers were found,
+// causing schema rows in PROGRAM_REGISTRY to be parsed as data rows.
+// Fix: require header row → separator row ordering strictly.
+function extractTable(mdText, firstColName) {
+  const rows  = [];
+  const lines = mdText.split('\n');
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i].trim();
+    // Skip non-table lines
+    if (!line.startsWith('|')) { i++; continue; }
+    // Check if this row contains firstColName as a header
+    const cols = line.split('|').slice(1,-1).map(c=>c.trim());
+    if (!cols.includes(firstColName)) { i++; continue; }
+    // Found potential header row — now look for separator immediately after (skip blanks)
+    let sepIdx = i + 1;
+    while (sepIdx < lines.length && !lines[sepIdx].trim()) sepIdx++;
+    if (sepIdx >= lines.length) { i++; continue; }
+    const sep = lines[sepIdx].trim();
+    if (!sep.startsWith('|')) { i++; continue; }
+    const sepCols = sep.split('|').slice(1,-1).map(c=>c.trim());
+    // Separator must be all dashes/colons/spaces (e.g. |---|---|)
+    if (!sepCols.every(c => /^[-: ]+$/.test(c))) { i++; continue; }
+    // Valid table found — parse data rows
+    const headers = cols;
+    i = sepIdx + 1;
+    while (i < lines.length) {
+      const dline = lines[i].trim();
+      if (!dline) { i++; continue; }
+      if (!dline.startsWith('|')) break;
+      const dcols = dline.split('|').slice(1,-1).map(c=>c.trim());
+      // Another separator row = end of table
+      if (dcols.every(c => /^[-: ]*$/.test(c))) break;
+      const row = {};
+      headers.forEach((h,j) => { row[h] = dcols[j] !== undefined ? dcols[j] : ''; });
+      rows.push(row);
+      i++;
+    }
+    break; // Only parse first matching table
+  }
+  return rows;
+}
+
+// ── Roadmap status helpers ─────────────────────────────────────────────────
+function rmStatusClass(status) {
+  const s = (status||'').toUpperCase();
+  if (s.includes('ACTIVE'))   return 'rm-s-active';
+  if (s.includes('COMPLET') || s.includes('CLOSED')) return 'rm-s-complete';
+  if (s.includes('DEFER'))    return 'rm-s-deferred';
+  if (s.includes('HOLD') || s.includes('FROZEN')) return 'rm-s-hold';
+  return 'rm-s-planned';
+}
+function rmStatusLabel(status) {
+  const s = (status||'').toUpperCase();
+  if (s.includes('ACTIVE'))   return 'ACTIVE';
+  if (s.includes('COMPLET'))  return 'COMPLETE';
+  if (s.includes('CLOSED'))   return 'CLOSED';
+  if (s.includes('DEFER'))    return 'DEFERRED';
+  if (s.includes('HOLD'))     return 'HOLD';
+  if (s.includes('FROZEN'))   return 'FROZEN';
+  if (s.includes('PLANNED'))  return 'PLANNED';
+  return (status||'?').slice(0,14);
+}
+
+// ── Load pipeline state ────────────────────────────────────────────────────
+async function loadPipelineState() {
+  try {
+    const state = await fetchJSON("_COMMUNICATION/agents_os/pipeline_state.json");
+    pipelineState = state;
+    document.getElementById("header-sub").textContent =
+      `WP: ${state.work_package_id||'—'}  |  Gate: ${state.current_gate||'—'}  |  Stage: ${state.stage_id||'—'}`;
+    return state;
+  } catch(e) {
+    document.getElementById("header-sub").textContent = "⚠ Could not load pipeline state";
+    return null;
+  }
+}
+
+// ── Populate program selector ──────────────────────────────────────────────
+function buildProgramSelector(programs, state) {
+  const sel = document.getElementById("prog-select");
+  // Group by stage
+  const byStage = {};
+  for (const p of programs) {
+    const sid = p['stage_id'] || 'UNKNOWN';
+    if (!byStage[sid]) byStage[sid] = [];
+    byStage[sid].push(p);
+  }
+  let html = '<option value="">— All programs (overview) —</option>';
+  for (const sid of Object.keys(byStage).sort()) {
+    html += `<optgroup label="${escHtml(sid)}">`;
+    for (const p of byStage[sid]) {
+      const pid = p['program_id'];
+      const name = (p['program_name']||'').replace(/\*\*/g,'');
+      const domain = p['domain']||'';
+      const domShort = domain.includes('AGENTS') ? '[AOS]' : '[TT]';
+      const statusShort = rmStatusLabel(p['status']);
+      const active = state && (state.work_package_id||'').startsWith(pid) ? ' ★' : '';
+      html += `<option value="${escHtml(pid)}">${escHtml(pid)} — ${escHtml(name)} ${domShort} (${statusShort})${active}</option>`;
+    }
+    html += '</optgroup>';
+  }
+  sel.innerHTML = html;
+
+  // Auto-select active program if present
+  if (state && state.work_package_id) {
+    const activeProg = state.work_package_id.replace(/-WP\d+.*$/,'');
+    for (let i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value === activeProg) {
+        sel.selectedIndex = i;
+        break;
+      }
+    }
+  }
+}
+
+// ── Program detail panel ───────────────────────────────────────────────────
+function onProgSelect(pid) {
+  const detailEl = document.getElementById("prog-detail");
+  const statusEl = document.getElementById("prog-select-status");
+  if (!pid) {
+    detailEl.style.display = "none";
+    statusEl.textContent = "";
+    highlightRoadmapProgram(null);
+    renderGateSequence(pipelineState, null);
+    renderGateHistory(pipelineState, null);
+    return;
+  }
+  const prog = allPrograms.find(p => p['program_id'] === pid);
+  if (!prog) { detailEl.style.display = "none"; return; }
+
+  const name   = (prog['program_name']||'—').replace(/\*\*/g,'');
+  const domain = prog['domain']||'—';
+  const status = rmStatusLabel(prog['status']);
+  const mirror = (prog['current_gate_mirror']||'—').replace(/\*\*/g,'');
+  const domCls = domain.includes('AGENTS') ? 'domain-agentsos' : 'domain-tiktrack';
+
+  const isActive = pipelineState && (pipelineState.work_package_id||'').startsWith(pid);
+
+  detailEl.innerHTML = `
+    <div class="prog-detail-panel">
+      <h3>${escHtml(pid)} — ${escHtml(name)}</h3>
+      <div class="prog-detail-row">
+        <span class="prog-detail-lbl">Domain:</span>
+        <span class="prog-detail-val"><span class="rm-prog-domain ${domCls}">${escHtml(domain.replace(/_/g,''))}</span></span>
+      </div>
+      <div class="prog-detail-row">
+        <span class="prog-detail-lbl">Stage:</span>
+        <span class="prog-detail-val">${escHtml(prog['stage_id']||'—')}</span>
+      </div>
+      <div class="prog-detail-row">
+        <span class="prog-detail-lbl">Status:</span>
+        <span class="prog-detail-val"><span class="rm-status ${rmStatusClass(prog['status'])}">${status}</span></span>
+      </div>
+      ${isActive ? '<div class="prog-detail-row"><span class="prog-detail-lbl">⚡ Pipeline:</span><span class="prog-detail-val" style="color:var(--accent)">ACTIVE in pipeline — WP: ' + escHtml(pipelineState.work_package_id) + '</span></div>' : ''}
+      <div class="prog-gate-mirror">Gate mirror: ${escHtml(mirror)}</div>
+    </div>`;
+  detailEl.style.display = "block";
+  statusEl.textContent = `Showing: ${pid}`;
+
+  highlightRoadmapProgram(pid);
+
+  // Update Gate Sequence + Gate History to show the selected program's state
+  const vs = makeVirtualState(pid);
+  renderGateSequence(vs, pid);
+  renderGateHistory(vs, pid);
+}
+
+function highlightRoadmapProgram(pid) {
+  document.querySelectorAll(".rm-program").forEach(el => {
+    el.classList.remove("rm-program-selected");
+    if (pid && el.dataset.pid === pid) {
+      el.classList.add("rm-program-selected");
+      // Auto-open parent stage
+      const stageEl = el.closest(".rm-stage");
+      if (stageEl) stageEl.classList.add("rm-open");
+      el.scrollIntoView({behavior:"smooth", block:"nearest"});
+    }
+  });
+}
+
+// ── Virtual state for non-active programs ─────────────────────────────────
+// Returns a state object suitable for renderGateSequence / renderGateHistory.
+// For the live active program → returns pipelineState with _isLive flag.
+// For completed programs → all gates shown as passed.
+// For others → all gates pending with status annotation.
+function makeVirtualState(pid) {
+  if (!pid) return pipelineState;
+  const activeWp   = pipelineState ? (pipelineState.work_package_id || '') : '';
+  const activeProg = activeWp ? activeWp.replace(/-WP\d+.*$/, '') : '';
+  if (pid === activeProg) return Object.assign({}, pipelineState, { _isLive: true });
+
+  const prog = allPrograms.find(p => p['program_id'] === pid);
+  if (!prog) return { _isVirtual:true, work_package_id:pid, current_gate:null, gates_completed:[], gates_failed:[] };
+
+  const status = rmStatusLabel(prog['status']);
+  const isDone = (status === 'COMPLETE' || status === 'CLOSED');
+  return {
+    _isVirtual:   true,
+    _progStatus:  status,
+    work_package_id: pid,
+    current_gate:    isDone ? null : null,
+    gates_completed: isDone ? GATE_SEQUENCE.slice() : [],
+    gates_failed:    [],
+  };
+}
+
+// ── Domain banners ─────────────────────────────────────────────────────────
+function renderDomainBanners(programs, state) {
+  const el = document.getElementById("domain-banners");
+
+  function domainStats(domain) {
+    const ps = programs.filter(p => (p['domain']||'').includes(domain));
+    return {
+      total:    ps.length,
+      complete: ps.filter(p => rmStatusLabel(p['status']) === 'COMPLETE' || rmStatusLabel(p['status']) === 'CLOSED').length,
+      active:   ps.filter(p => rmStatusLabel(p['status']) === 'ACTIVE').length,
+      planned:  ps.filter(p => rmStatusLabel(p['status']) === 'PLANNED').length,
+      deferred: ps.filter(p => ['DEFERRED','HOLD','FROZEN'].includes(rmStatusLabel(p['status']))).length,
+    };
+  }
+
+  const tt  = domainStats('TIKTRACK');
+  const aos = domainStats('AGENTS');
+
+  el.innerHTML = `
+    <div class="domain-banner tiktrack-banner">
+      <div class="domain-banner-title">
+        <span class="domain-dot domain-dot-tt"></span>
+        TikTrack — Trading App
+      </div>
+      <div class="domain-stat-row">
+        <div class="domain-stat"><div class="domain-stat-num num-tt">${tt.total}</div><div class="domain-stat-lbl">Total</div></div>
+        <div class="domain-stat"><div class="domain-stat-num num-done">${tt.complete}</div><div class="domain-stat-lbl">Complete</div></div>
+        <div class="domain-stat"><div class="domain-stat-num num-active">${tt.active}</div><div class="domain-stat-lbl">Active</div></div>
+        <div class="domain-stat"><div class="domain-stat-num num-plan">${tt.planned}</div><div class="domain-stat-lbl">Planned</div></div>
+        ${tt.deferred ? `<div class="domain-stat"><div class="domain-stat-num" style="color:var(--warning)">${tt.deferred}</div><div class="domain-stat-lbl">Deferred</div></div>` : ''}
+      </div>
+    </div>
+    <div class="domain-banner agentsos-banner">
+      <div class="domain-banner-title">
+        <span class="domain-dot domain-dot-aos"></span>
+        Agents_OS — Automation Layer
+      </div>
+      <div class="domain-stat-row">
+        <div class="domain-stat"><div class="domain-stat-num num-aos">${aos.total}</div><div class="domain-stat-lbl">Total</div></div>
+        <div class="domain-stat"><div class="domain-stat-num num-done">${aos.complete}</div><div class="domain-stat-lbl">Complete</div></div>
+        <div class="domain-stat"><div class="domain-stat-num num-active">${aos.active}</div><div class="domain-stat-lbl">Active</div></div>
+        <div class="domain-stat"><div class="domain-stat-num num-plan">${aos.planned}</div><div class="domain-stat-lbl">Planned</div></div>
+        ${aos.deferred ? `<div class="domain-stat"><div class="domain-stat-num" style="color:var(--warning)">${aos.deferred}</div><div class="domain-stat-lbl">Deferred</div></div>` : ''}
+      </div>
+    </div>`;
+}
+
+// ── Gate visual map (vertical list, one row per gate) ─────────────────────
+function renderGateMap(state) {
+  const el = document.getElementById("gate-map-content");
+  const completed = (state&&state.gates_completed)||[];
+  const failed    = (state&&state.gates_failed)||[];
+  const current   = state ? state.current_gate : null;
+
+  const failCounts = {};
+  for (const g of failed) { failCounts[g] = (failCounts[g]||0) + 1; }
+
+  const passCount = completed.length;
+  const failCount = Object.keys(failCounts).length;
+  document.getElementById("map-badge").textContent =
+    `${passCount} passed${failCount ? ' · ' + failCount + ' had fails' : ''} · ${GATE_SEQUENCE.length} total`;
+
+  let html = '<ul class="gate-map-list">';
+  GATE_SEQUENCE.forEach((g, i) => {
+    const cfg   = GATE_CONFIG[g]||{};
+    const s     = gateStatus(g, state);
+    const isCur = g === current;
+    const icon  = s==='pass'?'✓':s==='fail'?'✗':s==='current'?'▶':s==='human'?'⏸':'○';
+    const color = s==='pass'?'var(--success)':s==='fail'?'var(--danger)':s==='current'?'var(--accent)':s==='human'?'var(--warning)':'var(--text-muted)';
+    const decMk = cfg.twoPaths
+      ? '<span class="decision-marker" title="Decision gate: PASS or FAIL required">⬢</span>' : '';
+    const failMk = failCounts[g]
+      ? `<span class="gm-dev-marker">▲${failCounts[g]}×</span>` : '';
+
+    html += `<li class="gm-row${isCur?' gm-row-current':''}" title="${escHtml(cfg.desc||g)}">
+      <span style="font-size:10px;color:var(--text-muted);min-width:18px;text-align:right">${i+1}</span>
+      <span class="status-pill ${statusPillClass(s)}" style="font-size:10px;min-width:70px;text-align:center">${icon} ${s.toUpperCase()}</span>
+      <span style="font-family:var(--mono);font-size:11px;flex:1;color:${color}">${escHtml(g)}${decMk}</span>
+      <span style="font-size:10px;color:var(--text-muted);min-width:80px">${escHtml(cfg.owner||'—')}</span>
+      ${failMk}
+    </li>`;
+  });
+  html += '</ul>';
+  el.innerHTML = html;
+}
+
+// ── Roadmap tree ──────────────────────────────────────────────────────────
+function renderRoadmapTree(stages, programs, state) {
+  const treeEl  = document.getElementById("roadmap-tree");
+  const validEl = document.getElementById("rm-validation");
+
+  // Validate
+  const errors = [];
+  const stageIds = stages.map(s=>s['stage_id']).filter(Boolean);
+  const progIds  = programs.map(p=>p['program_id']).filter(Boolean);
+  stageIds.filter((id,i)=>stageIds.indexOf(id)!==i).forEach(id=>errors.push(`Duplicate stage ID: ${id}`));
+  progIds.filter((id,i)=>progIds.indexOf(id)!==i).forEach(id=>errors.push(`Duplicate program ID: ${id}`));
+  programs.filter(p=>p['stage_id']&&!stageIds.includes(p['stage_id'])).forEach(p=>errors.push(`Orphan program (invalid stage_id): ${p['program_id']}`));
+  programs.filter(p=>!p['stage_id']).forEach(p=>errors.push(`Program missing stage_id: ${p['program_id']}`));
+
+  if (!errors.length) {
+    validEl.innerHTML = `<div class="rm-val-ok">✅ ${stages.length} stages · ${programs.length} programs · 0 errors</div>`;
+  } else {
+    validEl.innerHTML = errors.map(e=>`<div class="rm-val-err">❌ ${escHtml(e)}</div>`).join('');
+  }
+  document.getElementById("roadmap-badge").textContent = `${stages.length}S / ${programs.length}P${errors.length?' ⚠️':' ✅'}`;
+
+  const activeWp   = state ? (state.work_package_id||'') : '';
+  const activeProg = activeWp ? activeWp.replace(/-WP\d+.*$/,'') : '';
+
+  let html = '';
+  for (const stage of stages) {
+    const sid = stage['stage_id']; if (!sid) continue;
+    const progs = programs.filter(p=>p['stage_id']===sid);
+    const isActiveStage = progs.some(p=>p['program_id']===activeProg);
+    const ssc = rmStatusClass(stage['status']);
+    const ssl = rmStatusLabel(stage['status']);
+    const shouldOpen = isActiveStage || ssl === 'ACTIVE' || ssl === 'COMPLETE';
+
+    html += `<div class="rm-stage${shouldOpen?' rm-stage-active rm-open':''}">
+      <div class="rm-stage-header" onclick="this.parentElement.classList.toggle('rm-open')">
+        <span class="rm-chevron">▶</span>
+        <span class="rm-stage-id">${escHtml(sid)}</span>
+        <span class="rm-stage-name">${escHtml((stage['stage_name']||'').replace(/\*\*/g,''))}</span>
+        <span class="rm-status ${ssc}">${ssl}</span>
+        <span style="font-size:10px;color:var(--text-muted);margin-left:4px">${progs.length}p</span>
+      </div>
+      <div class="rm-programs">`;
+
+    if (!progs.length) {
+      html += `<div style="font-size:11px;color:var(--text-muted);font-style:italic">No programs registered yet</div>`;
+    } else {
+      for (const prog of progs) {
+        const pid = prog['program_id'];
+        const isActive = pid === activeProg;
+        const domain = (prog['domain']||'').replace(/[^A-Z_]/g,'');
+        const domCls = domain.includes('AGENTS') ? 'domain-agentsos' : 'domain-tiktrack';
+        const domShort = domain.includes('AGENTS') ? 'AOS' : 'TT';
+        const psc = rmStatusClass(prog['status']);
+        const psl = rmStatusLabel(prog['status']);
+        html += `<div class="rm-program${isActive?' rm-program-active':''}" data-pid="${escHtml(pid)}" onclick="document.getElementById('prog-select').value='${escHtml(pid)}';onProgSelect('${escHtml(pid)}')">
+          <span style="font-size:9px;color:${isActive?'var(--accent)':'transparent'};width:10px">▶</span>
+          <span class="rm-prog-id">${escHtml(pid)}</span>
+          <span class="rm-prog-name">${escHtml((prog['program_name']||'').replace(/\*\*/g,''))}</span>
+          <span class="rm-prog-domain ${domCls}">${domShort}</span>
+          <span class="rm-status ${psc}">${psl}</span>
+        </div>`;
+      }
+    }
+    html += `</div></div>`;
+  }
+  treeEl.innerHTML = html;
+}
+
+// ── Gate full sequence table ───────────────────────────────────────────────
+function renderGateSequence(state, forPid) {
+  const el = document.getElementById("gate-seq-content");
+  const liveTag = (state && state._isLive)    ? ' 🟢' : '';
+  const virtTag = (state && state._isVirtual) ? ` · ${state._progStatus || 'virtual'}` : '';
+  document.getElementById("seq-badge").textContent =
+    `${GATE_SEQUENCE.length} gates${forPid ? ' — ' + forPid : ''}${liveTag || virtTag}`;
+  const current = state ? state.current_gate : null;
+
+  let html = `<table class="gate-seq-table">
+    <thead><tr><th>#</th><th>Gate</th><th>Owner</th><th>Engine</th><th>Status</th></tr></thead><tbody>`;
+
+  GATE_SEQUENCE.forEach((g,i) => {
+    const cfg = GATE_CONFIG[g]||{};
+    const s   = gateStatus(g, state);
+    const isCur = g === current;
+    const icon  = s==='pass'?'✓':s==='fail'?'✗':s==='current'?'▶':s==='human'?'⏸':'○';
+    const color = s==='pass'?'var(--success)':s==='fail'?'var(--danger)':s==='current'?'var(--accent)':s==='human'?'var(--warning)':'var(--text-muted)';
+    const decisionMark = cfg.twoPaths ? '<span class="decision-marker" title="Decision gate: PASS/FAIL">⬢</span>' : '';
+    html += `<tr${isCur?' class="gate-current"':''}>
+      <td style="color:var(--text-muted);font-size:10px">${i+1}</td>
+      <td class="gate-name-cell" style="color:${color}"><span style="margin-right:4px">${icon}</span>${escHtml(g)}${decisionMark}</td>
+      <td style="font-size:10px;color:var(--text-muted)">${escHtml(cfg.owner||'—')}</td>
+      <td style="font-size:10px;color:var(--text-muted)">${escHtml(cfg.engine||'—')}</td>
+      <td><span class="status-pill ${statusPillClass(s)}">${statusLabel(s)}</span></td>
+    </tr>`;
+  });
+  html += `</tbody></table>`;
+  el.innerHTML = html;
+}
+
+// ── Gate history ───────────────────────────────────────────────────────────
+function renderGateHistory(state, forPid) {
+  const el = document.getElementById("history-content");
+  if (!state) { el.innerHTML = '<span class="loading">No state loaded</span>'; return; }
+
+  const completed = state.gates_completed || [];
+  const failed    = state.gates_failed    || [];
+
+  // Count fail cycles per gate
+  const failCounts = {};
+  for (const g of failed) { failCounts[g] = (failCounts[g]||0) + 1; }
+
+  document.getElementById("history-badge").textContent =
+    `${completed.length} passed${Object.keys(failCounts).length?' · '+Object.keys(failCounts).length+' had fails':''}${forPid ? ' — ' + forPid : ''}`;
+
+  if (!completed.length && !Object.keys(failCounts).length) {
+    el.innerHTML = '<span class="loading">No gate history yet</span>';
+    return;
+  }
+
+  // Build ordered history from completed gates (in sequence order)
+  const history = GATE_SEQUENCE
+    .filter(g => completed.includes(g) || failed.includes(g))
+    .map(g => ({
+      gate:     g,
+      passed:   completed.includes(g),
+      failCnt:  failCounts[g]||0,
+    }));
+
+  el.innerHTML = `<ul class="gate-history-list">` +
+    history.map((h,i) => `<li class="history-item">
+      <span style="font-size:10px;color:var(--text-muted);min-width:18px">${i+1}</span>
+      <span class="status-pill ${h.passed?'pill-pass':'pill-fail'}">${h.passed?'✓ PASS':'✗ FAIL'}</span>
+      <span class="history-gate">${escHtml(h.gate)}</span>
+      ${h.failCnt ? `<span class="fail-cycle-tag">▲${h.failCnt}× fail</span>` : ''}
+    </li>`).join('') +
+    `</ul>`;
+}
+
+// ── Canonical task files ───────────────────────────────────────────────────
+async function loadCanonicalFiles() {
+  const el = document.getElementById("cf-content");
+  const results = await Promise.all(CANONICAL_FILES.map(async f => ({...f, exists:await fileExists(f.path)})));
+  const found = results.filter(r=>r.exists).length;
+  document.getElementById("cf-badge").textContent = `${found}/${results.length} found`;
+
+  el.innerHTML = results.map(f => `<div class="cf-row">
+    <span>${f.exists?'🟢':'🔴'}</span>
+    <a href="#"
+       onclick="openFileViewer(${escAttr(JSON.stringify(f.path))},${escAttr(JSON.stringify(f.label))});return false;"
+       title="View file contents">${escHtml(f.label)}</a>
+    <span class="cf-path">${escHtml(f.path)}</span>
+  </div>`).join('');
+}
+
+// ── Main load ──────────────────────────────────────────────────────────────
+async function loadAll() {
+  const state = await loadPipelineState();
+
+  // Load roadmap files
+  let roadmapText = '', registryText = '';
+  try {
+    const [r1,r2] = await Promise.all([
+      fetch('documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md?t='+Date.now()),
+      fetch('documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md?t='+Date.now()),
+    ]);
+    if (!r1.ok || !r2.ok) throw new Error('fetch');
+    [roadmapText, registryText] = await Promise.all([r1.text(), r2.text()]);
+  } catch(e) {
+    document.getElementById("roadmap-tree").innerHTML =
+      '<div class="error-msg">❌ Cannot load roadmap files — is the HTTP server running? (python3 -m http.server 8090)</div>';
+    document.getElementById("domain-banners").innerHTML =
+      '<div class="error-msg" style="grid-column:1/-1">❌ Cannot load registry files</div>';
+    renderGateSequence(state, null);
+    renderGateHistory(state, null);
+    await loadCanonicalFiles();
+    return;
+  }
+
+  const stages   = extractTable(roadmapText,  'stage_id');
+  const programs = extractTable(registryText, 'program_id');
+  allStages   = stages;
+  allPrograms = programs;
+
+  // Render all sections
+  renderDomainBanners(programs, state);
+  buildProgramSelector(programs, state);
+  renderGateMap(state);
+  renderRoadmapTree(stages, programs, state);
+  renderGateSequence(state, null);
+  renderGateHistory(state, null);
+
+  // Auto-select active program in selector (trigger detail panel)
+  const selEl = document.getElementById("prog-select");
+  if (selEl.value) onProgSelect(selEl.value);
+
+  await loadCanonicalFiles();
+}
+
+// ── Inline file viewer ─────────────────────────────────────────────────────
+async function openFileViewer(path, label) {
+  const modal   = document.getElementById('file-viewer-modal');
+  const titleEl = document.getElementById('fv-title');
+  const pathEl  = document.getElementById('fv-path');
+  const preEl   = document.getElementById('fv-content');
+  titleEl.textContent = label;
+  pathEl.textContent  = path;
+  preEl.textContent   = 'Loading…';
+  modal.style.display = 'block';
+  const text = await fetchText(path);
+  preEl.textContent = text ||
+    '❌ Could not load file.\nIs the HTTP server running?\n  python3 -m http.server 8090';
+}
+
+function closeFileViewer() {
+  document.getElementById('file-viewer-modal').style.display = 'none';
+}
+
+// Close viewer on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeFileViewer();
+});
+
+// ── Auto-refresh ───────────────────────────────────────────────────────────
+document.getElementById("auto-refresh").addEventListener("change", function() {
+  const dot = document.getElementById("refresh-dot");
+  if (this.checked) {
+    dot.style.display = "inline-block";
+    refreshTimer = setInterval(loadAll, 30000);
+  } else {
+    dot.style.display = "none";
+    clearInterval(refreshTimer);
+  }
+});
+
+// ── Init ───────────────────────────────────────────────────────────────────
+loadAll();
+</script>
+
+<!-- ── Inline File Viewer Modal ───────────────────────────────────────────── -->
+<div id="file-viewer-modal"
+     style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;padding:24px;overflow:auto"
+     onclick="if(event.target===this)closeFileViewer()">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;max-width:960px;margin:0 auto;padding:20px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <h3 id="fv-title" style="font-size:14px;color:var(--accent);margin:0"></h3>
+      <button class="btn" onclick="closeFileViewer()">✕ Close</button>
+    </div>
+    <div id="fv-path" style="font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-bottom:10px;word-break:break-all"></div>
+    <pre id="fv-content"
+         style="font-size:11px;line-height:1.55;white-space:pre-wrap;word-break:break-word;
+                background:var(--surface2);padding:14px;border-radius:4px;
+                max-height:75vh;overflow-y:auto;border:1px solid var(--border);
+                font-family:var(--mono)">Loading…</pre>
+  </div>
+</div>
+
+</body>
+</html>

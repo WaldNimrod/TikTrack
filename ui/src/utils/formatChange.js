@@ -4,13 +4,22 @@
  * תמיד: אחוז ואז בסוגריים מספר — לדוגמה 5%(34$) או -0.01%(0.02$)
  */
 
-const CURRENCY_SYMBOLS = { USD: '$', EUR: '€', ILS: '₪', GBP: '£', JPY: '¥', USDT: '₮' };
+const CURRENCY_SYMBOLS = {
+  USD: '$',
+  EUR: '€',
+  ILS: '₪',
+  GBP: '£',
+  JPY: '¥',
+  USDT: '₮',
+};
 
 function formatAmount(amount, currency = 'USD') {
   if (amount == null || isNaN(amount)) return '0.00';
   const sym = CURRENCY_SYMBOLS[currency?.toUpperCase?.()] ?? currency ?? '$';
   const n = Number(amount);
-  return `${sym}${Math.abs(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+  return `${sym}${Math.abs(n)
+    .toFixed(2)
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
 }
 
 /**
@@ -23,7 +32,12 @@ function formatAmount(amount, currency = 'USD') {
  * @param {string} [currency='USD'] - מטבע
  * @returns {string}
  */
-export function formatDailyChange(pct, currentPrice, lastClosePrice, currency = 'USD') {
+export function formatDailyChange(
+  pct,
+  currentPrice,
+  lastClosePrice,
+  currency = 'USD',
+) {
   const pctNum = pct != null ? Number(pct) : null;
   const curr = currentPrice != null ? Number(currentPrice) : null;
   const last = lastClosePrice != null ? Number(lastClosePrice) : null;
@@ -43,7 +57,11 @@ export function formatDailyChange(pct, currentPrice, lastClosePrice, currency = 
  * @param {number|null} absoluteAmount - שינוי מוחלט במטבע
  * @param {string} [currency='USD'] - מטבע
  */
-export function formatDailyChangeFromAbsolute(pct, absoluteAmount, currency = 'USD') {
+export function formatDailyChangeFromAbsolute(
+  pct,
+  absoluteAmount,
+  currency = 'USD',
+) {
   const pctNum = pct != null ? Number(pct) : null;
   const abs = absoluteAmount != null ? Number(absoluteAmount) : null;
   if (pctNum == null && abs == null) return '—';

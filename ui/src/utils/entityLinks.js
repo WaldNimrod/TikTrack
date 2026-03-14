@@ -3,11 +3,16 @@
  * Maps entity type + id to detail page URL for linked-object badges
  */
 const ENTITY_LINK_MAP = {
-  ticker: (id) => (id ? `/ticker_dashboard.html?ticker_id=${encodeURIComponent(id)}` : null),
-  account: (id) => (id ? `/trading_accounts.html#account-${encodeURIComponent(id)}` : null),
-  trading_account: (id) => (id ? `/trading_accounts.html#account-${encodeURIComponent(id)}` : null),
-  trade: (id) => (id ? `/trades.html?trade_id=${encodeURIComponent(id)}` : null),
-  trade_plan: (id) => (id ? `/trade_plans.html?plan_id=${encodeURIComponent(id)}` : null)
+  ticker: (id) =>
+    id ? `/ticker_dashboard.html?ticker_id=${encodeURIComponent(id)}` : null,
+  account: (id) =>
+    id ? `/trading_accounts.html#account-${encodeURIComponent(id)}` : null,
+  trading_account: (id) =>
+    id ? `/trading_accounts.html#account-${encodeURIComponent(id)}` : null,
+  trade: (id) =>
+    id ? `/trades.html?trade_id=${encodeURIComponent(id)}` : null,
+  trade_plan: (id) =>
+    id ? `/trade_plans.html?plan_id=${encodeURIComponent(id)}` : null,
 };
 
 /**

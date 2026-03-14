@@ -41,7 +41,7 @@ def _fee_to_response(fee: BrokerFee, account_name: str) -> BrokerFeeResponse:
 class BrokersFeesService:
     """
     Brokers Fees Service - ADR-015: fees per trading account.
-    
+
     Filters: trading_account_id, commission_type; broker via account join.
     """
 

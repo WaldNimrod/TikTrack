@@ -40,7 +40,10 @@
       } else if (statusRes.status === 'rejected') {
         const err = statusRes.reason;
         if (typeof console !== 'undefined' && console.debug) {
-          console.debug('[eodStalenessCheck] market-status failed:', err?.message || err?.code || 'unknown');
+          console.debug(
+            '[eodStalenessCheck] market-status failed:',
+            err?.message || err?.code || 'unknown',
+          );
         }
       }
 
@@ -58,13 +61,18 @@
       }
     } catch (e) {
       if (typeof console !== 'undefined' && console.debug) {
-        console.debug('[eodStalenessCheck] checkStaleness failed:', e?.message || 'unknown');
+        console.debug(
+          '[eodStalenessCheck] checkStaleness failed:',
+          e?.message || 'unknown',
+        );
       }
     }
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => setTimeout(checkStaleness, 500));
+    document.addEventListener('DOMContentLoaded', () =>
+      setTimeout(checkStaleness, 500),
+    );
   } else {
     setTimeout(checkStaleness, 500);
   }

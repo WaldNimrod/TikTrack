@@ -6,7 +6,7 @@
 set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-LOG_PATH="$PROJECT_ROOT/documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log"
+LOG_PATH="$PROJECT_ROOT/documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log"
 PORT=8083
 cd "$PROJECT_ROOT"
 mkdir -p "$(dirname "$LOG_PATH")"
@@ -33,7 +33,7 @@ done
 curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:$PORT/health" | grep -q 200 || { echo "Backend failed to start."; exit 1; }
 
 echo "=== Run A (market_open) verify ==="
-BACKEND_URL="http://127.0.0.1:$PORT" G7_PART_A_LOG_PATH="documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log" G7_PART_A_MODE=market_open \
+BACKEND_URL="http://127.0.0.1:$PORT" G7_PART_A_LOG_PATH="documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log" G7_PART_A_MODE=market_open \
   python3 scripts/verify_g7_part_a_runtime.py || { kill -9 $BACKEND_PID 2>/dev/null; exit 1; }
 
 kill -9 $BACKEND_PID 2>/dev/null

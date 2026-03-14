@@ -155,7 +155,7 @@ Team 20 יישם batch-first ב־EOD. אך:
 | Team 20 Remediation Completion | `_COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_S002_P002_WP003_GATE7_PARTA_REMEDIATION_COMPLETION.md` |
 | Team 50 Block Analysis | `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_20_S002_P002_WP003_GATE7_PARTA_BLOCK_ANALYSIS_AND_REMEDIATION_REQUEST.md` |
 | Architect Directive Market Data | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_MARKET_DATA_OPTIMIZATION_v1.0.0.md` |
-| Sample log | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_2026-03-11_221540.log` |
+| Sample log | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_2026-03-11_221540.log` |
 | Market Data Resilience (SSOT) | `documentation/docs-system/01-ARCHITECTURE/LOGIC/TT2_MARKET_DATA_RESILIENCE.md` |
 
 ---

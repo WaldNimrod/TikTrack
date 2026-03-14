@@ -40,7 +40,7 @@
 `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_60_S002_P002_WP003_CC01_CC02_EVIDENCE_MANDATE_v1.0.0.md`
 
 **פרומפט:**
-> צוות 60: מנדט איסוף עדות CC-01, CC-02 הופעל. בצעו Run A (market-open — explicit Yahoo call count ≤5) ו־Run B (off-hours — explicit Yahoo call count ≤2). הגישו `TEAM_60_TO_TEAM_90_S002_P002_WP003_GATE7_PARTA_RUNTIME_EVIDENCE_REPORT_v2.0.3.md` ו־עדכנו `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` עם `cc_01_yahoo_call_count`, `cc_02_yahoo_call_count`, `pass_01`, `pass_02`, `pass_04`.
+> צוות 60: מנדט איסוף עדות CC-01, CC-02 הופעל. בצעו Run A (market-open — explicit Yahoo call count ≤5) ו־Run B (off-hours — explicit Yahoo call count ≤2). הגישו `TEAM_60_TO_TEAM_90_S002_P002_WP003_GATE7_PARTA_RUNTIME_EVIDENCE_REPORT_v2.0.3.md` ו־עדכנו `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` עם `cc_01_yahoo_call_count`, `cc_02_yahoo_call_count`, `pass_01`, `pass_02`, `pass_04`.
 
 ---
 

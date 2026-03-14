@@ -22,7 +22,7 @@ from ..schemas.cash_flows import (
     CashFlowResponse,
     CashFlowCreateRequest,
     CashFlowUpdateRequest,
-    CurrencyConversionListResponse
+    CurrencyConversionListResponse,
 )
 
 logger = logging.getLogger(__name__)
@@ -35,19 +35,21 @@ async def get_cash_flows(
     trading_account_id: Optional[str] = Query(None, description="Filter by trading account ULID"),
     date_from: Optional[date] = Query(None, description="Filter by transaction_date >= date_from"),
     date_to: Optional[date] = Query(None, description="Filter by transaction_date <= date_to"),
-    flow_type: Optional[str] = Query(None, description="Filter by flow_type (DEPOSIT, WITHDRAWAL, etc.)"),
+    flow_type: Optional[str] = Query(
+        None, description="Filter by flow_type (DEPOSIT, WITHDRAWAL, etc.)"
+    ),
     search: Optional[str] = Query(None, description="Search in description and external_reference"),
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Get cash flows for current user.
-    
+
     Returns list of cash flows with summary statistics:
     - total_deposits: Total deposits
     - total_withdrawals: Total withdrawals
     - net_flow: Net cash flow (deposits - withdrawals)
-    
+
     Query Parameters:
     - trading_account_id: Filter by trading account ULID
     - date_from: Filter by transaction_date >= date_from
@@ -63,23 +65,19 @@ async def get_cash_flows(
             date_from=date_from,
             date_to=date_to,
             flow_type=flow_type,
-            search=search
+            search=search,
         )
-        
+
         # Get summary
         summary = await service.get_cash_flows_summary(
             user_id=current_user.id,
             db=db,
             trading_account_id=trading_account_id,
             date_from=date_from,
-            date_to=date_to
+            date_to=date_to,
         )
-        
-        return CashFlowListResponse(
-            data=cash_flows,
-            total=len(cash_flows),
-            summary=summary
-        )
+
+        return CashFlowListResponse(data=cash_flows, total=len(cash_flows), summary=summary)
     except HTTPExceptionWithCode:
         raise
     except Exception as e:
@@ -87,7 +85,7 @@ async def get_cash_flows(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to fetch cash flows",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )
 
 
@@ -101,16 +99,16 @@ async def get_cash_flows_summary(
     page: Optional[int] = Query(None, include_in_schema=False),
     page_size: Optional[int] = Query(None, include_in_schema=False),
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Get cash flows summary only (without list of transactions).
-    
+
     Returns summary statistics:
     - total_deposits: Total deposits
     - total_withdrawals: Total withdrawals
     - net_flow: Net cash flow (deposits - withdrawals)
-    
+
     Query Parameters:
     - trading_account_id: Filter by trading account ULID
     - date_from: Filter by transaction_date >= date_from
@@ -125,14 +123,10 @@ async def get_cash_flows_summary(
             db=db,
             trading_account_id=trading_account_id,
             date_from=date_from,
-            date_to=date_to
+            date_to=date_to,
         )
-        
-        return CashFlowListResponse(
-            data=[],
-            total=0,
-            summary=summary
-        )
+
+        return CashFlowListResponse(data=[], total=0, summary=summary)
     except HTTPExceptionWithCode:
         raise
     except Exception as e:
@@ -140,15 +134,21 @@ async def get_cash_flows_summary(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to fetch cash flows summary",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )
 
 
 @router.get("/currency_conversions", response_model=CurrencyConversionListResponse)
 async def get_currency_conversions(
-    trading_account_id: Optional[str] = Query(default=None, description="Filter by trading account ULID"),
-    date_from: Optional[date] = Query(default=None, description="Filter by transaction_date >= date_from"),
-    date_to: Optional[date] = Query(default=None, description="Filter by transaction_date <= date_to"),
+    trading_account_id: Optional[str] = Query(
+        default=None, description="Filter by trading account ULID"
+    ),
+    date_from: Optional[date] = Query(
+        default=None, description="Filter by transaction_date >= date_from"
+    ),
+    date_to: Optional[date] = Query(
+        default=None, description="Filter by transaction_date <= date_to"
+    ),
     # Ignore pagination parameters (page, page_size) - may be sent by Frontend
     # These are included to prevent 400 errors when Frontend sends them
     page: Optional[int] = Query(default=None, include_in_schema=False),
@@ -159,14 +159,14 @@ async def get_currency_conversions(
     date_range: Optional[str] = Query(default=None, include_in_schema=False),
     search: Optional[str] = Query(default=None, include_in_schema=False),
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Get currency conversions for current user.
-    
+
     Returns list of currency conversion transactions where currency differs from account base currency,
     or transactions explicitly marked as conversions in metadata.
-    
+
     Query Parameters:
     - trading_account_id: Filter by trading account ULID (optional) - if invalid, filter is ignored
     - date_from: Filter by transaction_date >= date_from (optional)
@@ -182,32 +182,29 @@ async def get_currency_conversions(
         f"page: {page}, page_size: {page_size}, "
         f"date_range: '{date_range}', search: '{search}'"
     )
-    
+
     try:
         # Normalize trading_account_id if provided (trim whitespace)
         # Handle None, empty string, or whitespace-only strings as None
         normalized_trading_account_id = None
         if trading_account_id and trading_account_id.strip():
             normalized_trading_account_id = trading_account_id.strip()
-        
+
         service = get_cash_flow_service()
         conversions = await service.get_currency_conversions(
             user_id=current_user.id,
             db=db,
             trading_account_id=normalized_trading_account_id,
             date_from=date_from,
-            date_to=date_to
+            date_to=date_to,
         )
-        
+
         logger.debug(
             f"Currency conversions response - user_id: {current_user.id}, "
             f"count: {len(conversions)}"
         )
-        
-        return CurrencyConversionListResponse(
-            data=conversions,
-            total=len(conversions)
-        )
+
+        return CurrencyConversionListResponse(data=conversions, total=len(conversions))
     except HTTPExceptionWithCode:
         raise
     except Exception as e:
@@ -215,7 +212,7 @@ async def get_currency_conversions(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to fetch currency conversions",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )
 
 
@@ -223,23 +220,21 @@ async def get_currency_conversions(
 async def get_cash_flow(
     id: str = Path(..., description="Cash flow ULID"),
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Get single cash flow by ID.
-    
+
     Args:
         id: Cash flow ULID
-        
+
     Returns:
         CashFlowResponse
     """
     try:
         service = get_cash_flow_service()
         cash_flow = await service.get_cash_flow_by_id(
-            user_id=current_user.id,
-            cash_flow_id=id,
-            db=db
+            user_id=current_user.id, cash_flow_id=id, db=db
         )
         return cash_flow
     except HTTPExceptionWithCode:
@@ -249,7 +244,7 @@ async def get_cash_flow(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to fetch cash flow",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )
 
 
@@ -257,14 +252,14 @@ async def get_cash_flow(
 async def create_cash_flow(
     request: CashFlowCreateRequest,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Create new cash flow.
-    
+
     Args:
         request: CashFlowCreateRequest with cash flow details
-        
+
     Returns:
         CashFlowResponse
     """
@@ -280,7 +275,7 @@ async def create_cash_flow(
             transaction_date=request.transaction_date,
             description=request.description,
             external_reference=request.external_reference,
-            metadata=request.metadata
+            metadata=request.metadata,
         )
         return cash_flow
     except HTTPExceptionWithCode:
@@ -290,7 +285,7 @@ async def create_cash_flow(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to create cash flow",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )
 
 
@@ -299,15 +294,15 @@ async def update_cash_flow(
     id: str = Path(..., description="Cash flow ULID"),
     request: CashFlowUpdateRequest = ...,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Update existing cash flow.
-    
+
     Args:
         id: Cash flow ULID
         request: CashFlowUpdateRequest with fields to update
-        
+
     Returns:
         CashFlowResponse
     """
@@ -324,7 +319,7 @@ async def update_cash_flow(
             transaction_date=request.transaction_date,
             description=request.description,
             external_reference=request.external_reference,
-            metadata=request.metadata
+            metadata=request.metadata,
         )
         return cash_flow
     except HTTPExceptionWithCode:
@@ -334,7 +329,7 @@ async def update_cash_flow(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to update cash flow",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )
 
 
@@ -342,24 +337,20 @@ async def update_cash_flow(
 async def delete_cash_flow(
     id: str = Path(..., description="Cash flow ULID"),
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Delete cash flow (soft delete).
-    
+
     Args:
         id: Cash flow ULID
-        
+
     Returns:
         204 No Content
     """
     try:
         service = get_cash_flow_service()
-        await service.delete_cash_flow(
-            user_id=current_user.id,
-            cash_flow_id=id,
-            db=db
-        )
+        await service.delete_cash_flow(user_id=current_user.id, cash_flow_id=id, db=db)
         return None
     except HTTPExceptionWithCode:
         raise
@@ -368,5 +359,5 @@ async def delete_cash_flow(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to delete cash flow",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )

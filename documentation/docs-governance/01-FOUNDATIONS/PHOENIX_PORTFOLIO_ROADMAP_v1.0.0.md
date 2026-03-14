@@ -90,6 +90,19 @@ EXECUTIONS & IMPORT CENTER (Cash Flows + Executions, IBKR + IBI via BaseConnecto
 ניתוח אסטרטגיות, מצב תיק; מימוש דשבורדים רמה 1.
 D32 (portfolio_state) מחייב אפיון ארכיטקטוני ייעודי ומאושר Nimrod לפני פתיחת S006 GATE_0, כולל: daily_portfolio_snapshots job, סכימת snapshots, backfill, retention policy, וכללי chart granularity לפי טווח זמן.
 
+### Agents_OS Evolution Lock (ADR-031)
+
+- רצף קנוני נעול לפיתוח Agents_OS v2:
+  - S002-P005: Writing Semantics Hardening (Stage A, immediate).
+  - S003-P007: Command Bridge Lite (Stage B, next AGENTS_OS package in Stage 3).
+  - S004-P008: Mediated Reconciliation Engine (Stage C, independent Stage 4 package after existing AGENTS_OS Stage 4 programs).
+- שיוך ותזמון מפורטים נשמרים ב-`PHOENIX_PROGRAM_REGISTRY_v1.0.0.md`.
+- חסימת desync ל-GATE_6 חלה על שני הדומיינים (AGENTS_OS + TIKTRACK), בכפוף לנעילת שרשרת חתימה קנונית.
+- מקורות החלטה מלאים:
+  - `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`
+  - `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`
+  - `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_10_TEAM_170_ADR031_THREE_STAGE_ACTIVATION_PROMPT_v1.0.0.md`
+
 ### Tag Assignment Rollout (S004 onward)
 
 Inline tag assignment נבנה יחד עם כל עמוד ישות החל מ-S004, ולא כרטרופיט מאוחר.

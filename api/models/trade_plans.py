@@ -19,6 +19,7 @@ from .base import Base
 
 class TradePlan(Base):
     """Trade Plan model - maps to user_data.trade_plans table."""
+
     __tablename__ = "trade_plans"
     __table_args__ = {"schema": "user_data"}
 

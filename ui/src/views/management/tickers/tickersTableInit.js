@@ -8,16 +8,34 @@ import sharedServices from '../../../components/core/sharedServices.js';
 import { createModal } from '../../../components/shared/PhoenixModal.js';
 import { showTickerFormModal } from './tickersForm.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
-import { toHebrewStatus, normalizeToCanonicalStatus } from '../../../utils/statusAdapter.js';
-import { getPriceSourceLabel, getPriceSourceBadgeHTML, formatPriceAsOf, getTrafficLightFromSource, getTrafficLightTooltip } from '../../../utils/priceReliabilityLabels.js';
+import {
+  toHebrewStatus,
+  normalizeToCanonicalStatus,
+} from '../../../utils/statusAdapter.js';
+import {
+  getPriceSourceLabel,
+  getPriceSourceBadgeHTML,
+  formatPriceAsOf,
+  getTrafficLightFromSource,
+  getTrafficLightTooltip,
+} from '../../../utils/priceReliabilityLabels.js';
 import { formatDailyChange } from '../../../utils/formatChange.js';
 
 /** BF-002: Currency symbols per Team 20 API (COUNTRY_TO_CURRENCY, CRYPTO parsing) */
-const CURRENCY_SYMBOLS = { USD: '$', EUR: '€', ILS: '₪', GBP: '£', JPY: '¥', USDT: '₮' };
+const CURRENCY_SYMBOLS = {
+  USD: '$',
+  EUR: '€',
+  ILS: '₪',
+  GBP: '£',
+  JPY: '¥',
+  USDT: '₮',
+};
 const formatCurrency = (amount, currency = 'USD') => {
   if (amount == null || isNaN(amount)) return '—';
   const sym = CURRENCY_SYMBOLS[currency?.toUpperCase?.()] ?? currency ?? '$';
-  return `${sym}${Number(amount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+  return `${sym}${Number(amount)
+    .toFixed(2)
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
 };
 
 (function initTickersTable() {
@@ -33,8 +51,12 @@ const formatCurrency = (amount, currency = 'USD') => {
 
   function isAuthenticated() {
     try {
-      return !!(localStorage.getItem('access_token') || localStorage.getItem('authToken') ||
-        sessionStorage.getItem('access_token') || sessionStorage.getItem('authToken'));
+      return !!(
+        localStorage.getItem('access_token') ||
+        localStorage.getItem('authToken') ||
+        sessionStorage.getItem('access_token') ||
+        sessionStorage.getItem('authToken')
+      );
     } catch (_) {
       return false;
     }
@@ -45,8 +67,13 @@ const formatCurrency = (amount, currency = 'USD') => {
       await sharedServices.init();
       const params = {};
       if (filters.ticker_type) params.ticker_type = filters.ticker_type;
-      if (filters.is_active !== undefined && filters.is_active !== null && filters.is_active !== '') {
-        params.is_active = filters.is_active === true || filters.is_active === 'true';
+      if (
+        filters.is_active !== undefined &&
+        filters.is_active !== null &&
+        filters.is_active !== ''
+      ) {
+        params.is_active =
+          filters.is_active === true || filters.is_active === 'true';
       }
       if (filters.search) params.search = filters.search;
       const [listRes, summaryRes] = await Promise.all([
@@ -58,16 +85,29 @@ const formatCurrency = (amount, currency = 'USD') => {
       const summary = summaryRes ?? {};
       return {
         table: { data: Array.isArray(data) ? data : [], total },
-        summary: { total_tickers: summary.total_tickers ?? total, active_tickers: summary.active_tickers ?? 0 },
+        summary: {
+          total_tickers: summary.total_tickers ?? total,
+          active_tickers: summary.active_tickers ?? 0,
+        },
       };
     } catch (e) {
-      maskedLog('[Tickers] Error loading data:', { errorCode: e?.code, status: e?.status });
-      return { table: { data: [], total: 0 }, summary: { total_tickers: 0, active_tickers: 0 } };
+      maskedLog('[Tickers] Error loading data:', {
+        errorCode: e?.code,
+        status: e?.status,
+      });
+      return {
+        table: { data: [], total: 0 },
+        summary: { total_tickers: 0, active_tickers: 0 },
+      };
     }
   }
 
   function sortTableData(arr, key, dir) {
-    const keyMap = { company_name: 'companyName', current_price: 'currentPrice', daily_change_pct: 'dailyChangePct' };
+    const keyMap = {
+      company_name: 'companyName',
+      current_price: 'currentPrice',
+      daily_change_pct: 'dailyChangePct',
+    };
     const keyAlt = keyMap[key] || key;
     const copy = [...arr];
     copy.sort((a, b) => {
@@ -85,10 +125,16 @@ const formatCurrency = (amount, currency = 'USD') => {
   }
 
   function updateSummary(summary) {
-    const contentEl = document.querySelector('#summaryStats .info-summary__content');
+    const contentEl = document.querySelector(
+      '#summaryStats .info-summary__content',
+    );
     const countEl = document.getElementById('tableTickersCount');
     const summaryEl = document.getElementById('summaryStats');
-    const hasFilter = !!(filterState.ticker_type || (filterState.is_active !== undefined && filterState.is_active !== '') || filterState.search);
+    const hasFilter = !!(
+      filterState.ticker_type ||
+      (filterState.is_active !== undefined && filterState.is_active !== '') ||
+      filterState.search
+    );
     const total = summary?.total_tickers ?? 0;
     const active = summary?.active_tickers ?? 0;
     const displayed = tableData.total ?? 0;
@@ -115,7 +161,8 @@ const formatCurrency = (amount, currency = 'USD') => {
     if (!pageData.length) {
       const row = document.createElement('tr');
       row.className = 'phoenix-table__row';
-      row.innerHTML = '<td colspan="11" class="phoenix-table__cell phoenix-table__cell--empty">אין נתונים להצגה</td>';
+      row.innerHTML =
+        '<td colspan="11" class="phoenix-table__cell phoenix-table__cell--empty">אין נתונים להצגה</td>';
       tbody.appendChild(row);
       return;
     }
@@ -148,7 +195,8 @@ const formatCurrency = (amount, currency = 'USD') => {
       row.appendChild(symbolCell);
 
       const priceCell = document.createElement('td');
-      priceCell.className = 'phoenix-table__cell col-price phoenix-table__cell--numeric';
+      priceCell.className =
+        'phoenix-table__cell col-price phoenix-table__cell--numeric';
       priceCell.setAttribute('dir', 'ltr');
       const priceSpan = document.createElement('span');
       priceSpan.className = 'numeric-value-positive';
@@ -163,25 +211,36 @@ const formatCurrency = (amount, currency = 'USD') => {
       row.appendChild(sourceCell);
 
       const lastCloseCell = document.createElement('td');
-      lastCloseCell.className = 'phoenix-table__cell col-last-close phoenix-table__cell--numeric';
+      lastCloseCell.className =
+        'phoenix-table__cell col-last-close phoenix-table__cell--numeric';
       lastCloseCell.setAttribute('dir', 'ltr');
       lastCloseCell.textContent = formatCurrency(lastClose, currency);
       row.appendChild(lastCloseCell);
 
       const asOfCell = document.createElement('td');
-      asOfCell.className = 'phoenix-table__cell col-as-of phoenix-table__cell-meta';
+      asOfCell.className =
+        'phoenix-table__cell col-as-of phoenix-table__cell-meta';
       asOfCell.setAttribute('dir', 'ltr');
       asOfCell.textContent = priceAsOf ? formatPriceAsOf(priceAsOf) : '—';
       row.appendChild(asOfCell);
 
       const changeCell = document.createElement('td');
-      changeCell.className = 'phoenix-table__cell col-change phoenix-table__cell--numeric';
+      changeCell.className =
+        'phoenix-table__cell col-change phoenix-table__cell--numeric';
       changeCell.setAttribute('dir', 'ltr');
       const changeVal = t.daily_change_pct ?? t.dailyChangePct ?? null;
       const changeSpan = document.createElement('span');
       const changeNum = changeVal != null ? Number(changeVal) : null;
-      changeSpan.className = changeNum != null && changeNum >= 0 ? 'numeric-value-positive' : 'numeric-value-negative';
-      changeSpan.textContent = formatDailyChange(changeVal, priceVal, lastClose, currency);
+      changeSpan.className =
+        changeNum != null && changeNum >= 0
+          ? 'numeric-value-positive'
+          : 'numeric-value-negative';
+      changeSpan.textContent = formatDailyChange(
+        changeVal,
+        priceVal,
+        lastClose,
+        currency,
+      );
       changeCell.appendChild(changeSpan);
       row.appendChild(changeCell);
 
@@ -199,7 +258,15 @@ const formatCurrency = (amount, currency = 'USD') => {
       typeCell.className = 'phoenix-table__cell col-type';
       const typeBadge = document.createElement('span');
       const rawType = (t.ticker_type ?? t.tickerType ?? 'STOCK').toUpperCase();
-      const knownTypes = ['STOCK', 'ETF', 'OPTION', 'FUTURE', 'FOREX', 'CRYPTO', 'INDEX'];
+      const knownTypes = [
+        'STOCK',
+        'ETF',
+        'OPTION',
+        'FUTURE',
+        'FOREX',
+        'CRYPTO',
+        'INDEX',
+      ];
       const tickerType = knownTypes.includes(rawType) ? rawType : 'OTHER';
       typeBadge.className = `ticker-type-badge ticker-type-badge--${tickerType}`;
       typeBadge.textContent = rawType;
@@ -209,7 +276,9 @@ const formatCurrency = (amount, currency = 'USD') => {
       const statusCell = document.createElement('td');
       statusCell.className = 'phoenix-table__cell col-status';
       // Prefer status (pending|active|inactive|cancelled); fallback: is_active -> active, !is_active -> cancelled
-      const statusCanon = normalizeToCanonicalStatus(t.status) ?? (t.is_active ?? t.isActive ? 'active' : 'cancelled');
+      const statusCanon =
+        normalizeToCanonicalStatus(t.status) ??
+        ((t.is_active ?? t.isActive) ? 'active' : 'cancelled');
       const statusLabel = toHebrewStatus(statusCanon);
       const statusBadge = document.createElement('span');
       statusBadge.className = `phoenix-table__status-badge phoenix-table__status-badge--${statusCanon}`;
@@ -219,7 +288,8 @@ const formatCurrency = (amount, currency = 'USD') => {
       row.appendChild(statusCell);
 
       const actionsCell = document.createElement('td');
-      actionsCell.className = 'phoenix-table__cell col-actions phoenix-table__cell--actions';
+      actionsCell.className =
+        'phoenix-table__cell col-actions phoenix-table__cell--actions';
       actionsCell.innerHTML = `
         <div class="table-actions-tooltip">
           <button class="table-actions-trigger" aria-label="פעולות שורה">
@@ -320,12 +390,21 @@ const formatCurrency = (amount, currency = 'USD') => {
         }
       };
       const scheduleOpen = () => {
-        if (closeT) { clearTimeout(closeT); closeT = null; }
+        if (closeT) {
+          clearTimeout(closeT);
+          closeT = null;
+        }
         if (openT) return;
-        openT = setTimeout(() => { openT = null; show(); }, HOVER_DELAY_MS);
+        openT = setTimeout(() => {
+          openT = null;
+          show();
+        }, HOVER_DELAY_MS);
       };
       const scheduleClose = () => {
-        if (openT) { clearTimeout(openT); openT = null; }
+        if (openT) {
+          clearTimeout(openT);
+          openT = null;
+        }
         if (closeT) return;
         closeT = setTimeout(() => {
           closeT = null;
@@ -336,12 +415,18 @@ const formatCurrency = (amount, currency = 'USD') => {
       row.addEventListener('mouseleave', () => {
         if (!menu.matches(':hover')) scheduleClose();
       });
-      menu.addEventListener('mouseenter', () => { if (closeT) clearTimeout(closeT); closeT = null; show(); });
+      menu.addEventListener('mouseenter', () => {
+        if (closeT) clearTimeout(closeT);
+        closeT = null;
+        show();
+      });
       menu.addEventListener('mouseleave', () => {
         if (!row.matches(':hover')) scheduleClose();
       });
       row.querySelectorAll('.table-action-btn').forEach((btn) => {
-        btn.addEventListener('click', () => { hide(); });
+        btn.addEventListener('click', () => {
+          hide();
+        });
       });
     });
     document.addEventListener('keydown', (e) => {
@@ -356,13 +441,17 @@ const formatCurrency = (amount, currency = 'USD') => {
   }
 
   function updatePagination() {
-    const totalPages = Math.max(1, Math.ceil(tableData.total / currentPageSize));
+    const totalPages = Math.max(
+      1,
+      Math.ceil(tableData.total / currentPageSize),
+    );
     const start = (currentPage - 1) * currentPageSize + 1;
     const end = Math.min(currentPage * currentPageSize, tableData.total);
     const infoEl = document.getElementById('paginationInfo');
     const prevBtn = document.getElementById('prevPageBtn');
     const nextBtn = document.getElementById('nextPageBtn');
-    if (infoEl) infoEl.textContent = `מציג ${start}-${end} מתוך ${tableData.total} רשומות`;
+    if (infoEl)
+      infoEl.textContent = `מציג ${start}-${end} מתוך ${tableData.total} רשומות`;
     if (prevBtn) prevBtn.disabled = currentPage <= 1;
     if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
   }
@@ -382,7 +471,9 @@ const formatCurrency = (amount, currency = 'USD') => {
   }
 
   function initFilterHandlers() {
-    const typeSelect = document.getElementById('tickersFilterType') || document.querySelector('.js-tickers-filter-type');
+    const typeSelect =
+      document.getElementById('tickersFilterType') ||
+      document.querySelector('.js-tickers-filter-type');
     const activeBtns = document.querySelectorAll('.js-tickers-filter-active');
     if (typeSelect) {
       typeSelect.addEventListener('change', function () {
@@ -395,7 +486,9 @@ const formatCurrency = (amount, currency = 'USD') => {
       btn.addEventListener('click', function () {
         const val = this.getAttribute('data-is-active');
         filterState.is_active = val === '' ? null : val === 'true';
-        activeBtns.forEach((b) => b.classList.remove('filter-icon-btn--active'));
+        activeBtns.forEach((b) =>
+          b.classList.remove('filter-icon-btn--active'),
+        );
         this.classList.add('filter-icon-btn--active');
         currentPage = 1;
         loadAllData();
@@ -404,7 +497,9 @@ const formatCurrency = (amount, currency = 'USD') => {
   }
 
   function initPaginationHandlers() {
-    const pageSizeSelect = document.querySelector('.js-table-page-size[data-table-id="tickersTable"]');
+    const pageSizeSelect = document.querySelector(
+      '.js-table-page-size[data-table-id="tickersTable"]',
+    );
     const prevBtn = document.getElementById('prevPageBtn');
     const nextBtn = document.getElementById('nextPageBtn');
     if (pageSizeSelect) {
@@ -469,21 +564,44 @@ const formatCurrency = (amount, currency = 'USD') => {
   }
 
   function renderDetailContent(t, data, tickerId) {
-    const eod = (data?.eod_prices ?? {});
+    const eod = data?.eod_prices ?? {};
     const intra = data?.intraday_prices ?? {};
     const hist = data?.history_250d ?? {};
-    const fmt = (ts) => !ts ? '—' : new Date(ts).toLocaleString('he-IL', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-    const gapLabel = (g) => (g === 'OK' ? 'מלא' : g === 'NO_DATA' ? 'אין נתון' : g === 'INSUFFICIENT' ? 'חלקי' : g || '—');
-    const level = (g) => (g === 'OK' ? 'success' : g === 'NO_DATA' || g === 'INSUFFICIENT' ? 'warning' : 'error');
+    const fmt = (ts) =>
+      !ts
+        ? '—'
+        : new Date(ts).toLocaleString('he-IL', {
+            day: '2-digit',
+            month: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+          });
+    const gapLabel = (g) =>
+      g === 'OK'
+        ? 'מלא'
+        : g === 'NO_DATA'
+          ? 'אין נתון'
+          : g === 'INSUFFICIENT'
+            ? 'חלקי'
+            : g || '—';
+    const level = (g) =>
+      g === 'OK'
+        ? 'success'
+        : g === 'NO_DATA' || g === 'INSUFFICIENT'
+          ? 'warning'
+          : 'error';
     const eodTs = eod.latest_fetched_at ?? eod.last_update;
     const intraTs = intra.latest_fetched_at ?? intra.last_update;
     const histTs = hist.latest_fetched_at ?? hist.last_update;
-    const esc = (v) => (v == null || v === '' ? '—' : String(v).replace(/</g, '&lt;'));
+    const esc = (v) =>
+      v == null || v === '' ? '—' : String(v).replace(/</g, '&lt;');
     const curr = t.currency ?? t.currencyCode ?? 'USD';
     const priceVal = t.current_price ?? t.currentPrice ?? null;
     const lastClose = t.last_close_price ?? t.lastClosePrice ?? null;
-    const statusCanon = t.status ?? (t.is_active ?? t.isActive ? 'active' : 'cancelled');
-    const statusLabel = toHebrewStatus(statusCanon) || (t.is_active ? 'פתוח' : 'מבוטל');
+    const statusCanon =
+      t.status ?? ((t.is_active ?? t.isActive) ? 'active' : 'cancelled');
+    const statusLabel =
+      toHebrewStatus(statusCanon) || (t.is_active ? 'פתוח' : 'מבוטל');
     const editSection = `
       <div class="data-integrity-detail-section">
         <strong>שדות עריכה</strong>
@@ -496,7 +614,7 @@ const formatCurrency = (amount, currency = 'USD') => {
         <div class="data-integrity-detail-row"><strong>מחיר נוכחי</strong><span dir="ltr">${formatCurrency(priceVal, curr)}</span></div>
         <div class="data-integrity-detail-row"><strong>סגירה</strong><span dir="ltr">${formatCurrency(lastClose, curr)}</span></div>
         <div class="data-integrity-detail-row"><strong>מקור</strong><span>${getPriceSourceBadgeHTML(t.price_source ?? t.priceSource)}</span></div>
-        <div class="data-integrity-detail-row"><strong>עודכן ב</strong><span dir="ltr">${t.price_as_of_utc ?? t.priceAsOfUtc ? formatPriceAsOf(t.price_as_of_utc ?? t.priceAsOfUtc) : '—'}</span></div>
+        <div class="data-integrity-detail-row"><strong>עודכן ב</strong><span dir="ltr">${(t.price_as_of_utc ?? t.priceAsOfUtc) ? formatPriceAsOf(t.price_as_of_utc ?? t.priceAsOfUtc) : '—'}</span></div>
       </div>
     `;
     const marketSection = `
@@ -534,7 +652,7 @@ const formatCurrency = (amount, currency = 'USD') => {
       entity: 'ticker',
       showSaveButton: false,
       cancelButtonText: 'סגור',
-      onClose: () => {}
+      onClose: () => {},
     });
 
     (async function fetchAndUpdate() {
@@ -542,20 +660,31 @@ const formatCurrency = (amount, currency = 'USD') => {
         await sharedServices.init();
         const [tickerRes, integrityRes] = await Promise.all([
           sharedServices.get(`/tickers/${tickerId}`, {}),
-          sharedServices.get(`/tickers/${tickerId}/data-integrity`, {}).catch(() => ({})),
+          sharedServices
+            .get(`/tickers/${tickerId}/data-integrity`, {})
+            .catch(() => ({})),
         ]);
         const t = tickerRes?.data ?? tickerRes ?? {};
         const data = integrityRes?.data ?? integrityRes ?? {};
-        const body = document.querySelector('#phoenix-modal .phoenix-modal__body');
+        const body = document.querySelector(
+          '#phoenix-modal .phoenix-modal__body',
+        );
         if (!body) return;
         body.innerHTML = renderDetailContent(t, data, tickerId);
         const refreshBtn = body.querySelector('.js-refresh-ticker-data');
         if (refreshBtn) {
-          refreshBtn.addEventListener('click', () => handleDetailRefresh(tickerId, body, refreshBtn));
+          refreshBtn.addEventListener('click', () =>
+            handleDetailRefresh(tickerId, body, refreshBtn),
+          );
         }
       } catch (e) {
-        maskedLog('[Tickers] Data integrity failed:', { errorCode: e?.code, status: e?.status });
-        const body = document.querySelector('#phoenix-modal .phoenix-modal__body');
+        maskedLog('[Tickers] Data integrity failed:', {
+          errorCode: e?.code,
+          status: e?.status,
+        });
+        const body = document.querySelector(
+          '#phoenix-modal .phoenix-modal__body',
+        );
         if (body) {
           body.innerHTML = `<p class="data-integrity-error">${String(e?.message ?? 'לא ניתן לטעון בקרת תקינות').replace(/</g, '&lt;')}</p>`;
         }
@@ -570,11 +699,15 @@ const formatCurrency = (amount, currency = 'USD') => {
     try {
       const [tickerRes, integrityRes] = await Promise.all([
         sharedServices.get(`/tickers/${tickerId}`, {}),
-        sharedServices.get(`/tickers/${tickerId}/data-integrity`, {}).catch(() => ({})),
+        sharedServices
+          .get(`/tickers/${tickerId}/data-integrity`, {})
+          .catch(() => ({})),
       ]);
       const t = tickerRes?.data ?? tickerRes ?? {};
       const data = integrityRes?.data ?? integrityRes ?? {};
-      const idx = tableData.data?.findIndex((x) => (x.id || x.external_ulid) === tickerId);
+      const idx = tableData.data?.findIndex(
+        (x) => (x.id || x.external_ulid) === tickerId,
+      );
       if (idx >= 0 && tableData.data) {
         tableData.data[idx] = { ...tableData.data[idx], ...t };
         updateTable(tableData.data);
@@ -582,16 +715,21 @@ const formatCurrency = (amount, currency = 'USD') => {
       bodyEl.innerHTML = renderDetailContent(t, data, tickerId);
       const flashEl = document.createElement('div');
       flashEl.className = 'modal-refresh-flash';
-      flashEl.style.cssText = 'margin-top:8px;padding:4px 8px;border-radius:4px;font-size:0.9rem;background:var(--apple-green,#34c759);color:#fff;';
+      flashEl.style.cssText =
+        'margin-top:8px;padding:4px 8px;border-radius:4px;font-size:0.9rem;background:var(--apple-green,#34c759);color:#fff;';
       flashEl.textContent = 'עודכן';
       bodyEl.appendChild(flashEl);
       setTimeout(() => flashEl.remove(), 2000);
       const newRefresh = bodyEl.querySelector('.js-refresh-ticker-data');
-      if (newRefresh) newRefresh.addEventListener('click', () => handleDetailRefresh(tickerId, bodyEl, newRefresh));
+      if (newRefresh)
+        newRefresh.addEventListener('click', () =>
+          handleDetailRefresh(tickerId, bodyEl, newRefresh),
+        );
     } catch (e) {
       const flashEl = document.createElement('div');
       flashEl.className = 'modal-refresh-flash';
-      flashEl.style.cssText = 'margin-top:8px;padding:4px 8px;border-radius:4px;font-size:0.9rem;background:var(--apple-red,#ff3b30);color:#fff;';
+      flashEl.style.cssText =
+        'margin-top:8px;padding:4px 8px;border-radius:4px;font-size:0.9rem;background:var(--apple-red,#ff3b30);color:#fff;';
       flashEl.textContent = 'שגיאה ברענון';
       bodyEl.appendChild(flashEl);
       setTimeout(() => flashEl.remove(), 2000);
@@ -617,14 +755,21 @@ const formatCurrency = (amount, currency = 'USD') => {
       updateSummary(result.summary);
       updateTable(tableData.data);
       updatePagination();
-      if (typeof window.updateStalenessClock === 'function' && tableData.data?.length > 0) {
+      if (
+        typeof window.updateStalenessClock === 'function' &&
+        tableData.data?.length > 0
+      ) {
         let maxTs = null;
         for (const t of tableData.data) {
           const ts = t.price_as_of_utc ?? t.priceAsOfUtc ?? null;
           if (ts && (!maxTs || new Date(ts) > new Date(maxTs))) maxTs = ts;
         }
         if (maxTs) {
-          window.updateStalenessClock('ok', { price_timestamp: maxTs, fetched_at: maxTs }, null);
+          window.updateStalenessClock(
+            'ok',
+            { price_timestamp: maxTs, fetched_at: maxTs },
+            null,
+          );
         }
       }
     } catch (e) {
@@ -665,13 +810,25 @@ const formatCurrency = (amount, currency = 'USD') => {
           document.getElementById('phoenix-modal-backdrop')?.remove();
           await loadAllData();
         } catch (e) {
-          maskedLog('[Tickers] Delete error:', { errorCode: e?.code, status: e?.status });
-          const msg = String(e?.message ?? e?.detail ?? 'שגיאה במחיקת הטיקר').trim();
-          const escaped = String(msg).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          maskedLog('[Tickers] Delete error:', {
+            errorCode: e?.code,
+            status: e?.status,
+          });
+          const msg = String(
+            e?.message ?? e?.detail ?? 'שגיאה במחיקת הטיקר',
+          ).trim();
+          const escaped = String(msg)
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
           document.getElementById('phoenix-modal-backdrop')?.remove();
-          createModal({ title: 'שגיאה במחיקה', content: `<p>${escaped}</p>`, showSaveButton: false, cancelButtonText: 'ביטול' });
+          createModal({
+            title: 'שגיאה במחיקה',
+            content: `<p>${escaped}</p>`,
+            showSaveButton: false,
+            cancelButtonText: 'ביטול',
+          });
         }
-      }
+      },
     });
   }
 

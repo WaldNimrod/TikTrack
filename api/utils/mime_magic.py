@@ -15,8 +15,16 @@ _MAGIC_SIGS: list[Tuple[bytes, str, tuple]] = [
     (b"%PDF", "application/pdf", ("pdf",)),
     (b"\xd0\xcf\x11\xe0", "application/vnd.ms-excel", ("xls",)),  # OLE (Excel 97-2003)
     (b"\xd0\xcf\x11\xe0", "application/msword", ("doc",)),  # OLE (Word 97-2003) — same magic
-    (b"PK\x03\x04", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ("xlsx",)),  # ZIP
-    (b"PK\x03\x04", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", ("docx",)),  # ZIP
+    (
+        b"PK\x03\x04",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        ("xlsx",),
+    ),  # ZIP
+    (
+        b"PK\x03\x04",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ("docx",),
+    ),  # ZIP
     (b"PK\x05\x06", "application/zip", ("xlsx", "docx")),  # ZIP empty/minimal
 ]
 
@@ -45,9 +53,15 @@ def detect_mime_and_extension(data: bytes) -> Optional[Tuple[str, str]]:
             if magic == b"PK\x03\x04" or magic == b"PK\x05\x06":
                 # ZIP: peek for xlsx vs docx via [Content_Types].xml
                 if b"word/" in data or b"wordprocessingml" in data[:2048]:
-                    return ("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx")
+                    return (
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        "docx",
+                    )
                 if b"xl/" in data or b"spreadsheetml" in data[:2048]:
-                    return ("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx")
+                    return (
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        "xlsx",
+                    )
                 # Default ZIP to xlsx for Office Open XML (could be either)
                 return ("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx")
             return (mime, exts[0])
@@ -55,19 +69,23 @@ def detect_mime_and_extension(data: bytes) -> Optional[Tuple[str, str]]:
     return None
 
 
-_ALLOWED_MIMES = frozenset({
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-    "application/pdf",
-    "application/vnd.ms-excel",
-    "application/msword",
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-})
+_ALLOWED_MIMES = frozenset(
+    {
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "application/pdf",
+        "application/vnd.ms-excel",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    }
+)
 
 
-def validate_mime_magic(data: bytes, claimed_content_type: Optional[str] = None) -> Tuple[bool, str]:
+def validate_mime_magic(
+    data: bytes, claimed_content_type: Optional[str] = None
+) -> Tuple[bool, str]:
     """
     Validate file by magic-bytes. Returns (ok, detected_content_type or error_msg).
     """

@@ -40,7 +40,7 @@
 |---|----------|------|
 | 1 | דוח Team 60 | `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_90_S002_P002_WP003_GATE7_PARTA_RUNTIME_EVIDENCE_REPORT_v2.0.4.md` |
 | 2 | Corroboration Team 50 | `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_90_S002_P002_WP003_GATE7_PARTA_QA_CORROBORATION_v2.0.4.md` |
-| 3 | JSON evidence | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
+| 3 | JSON evidence | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
 
 **שדות JSON:** `log_path` (קובץ קיים ולא ריק), `cc_01_yahoo_call_count`, `cc_02_yahoo_call_count`, `cc_04_yahoo_429_count`, `pass_01`, `pass_02`, `pass_04`.
 

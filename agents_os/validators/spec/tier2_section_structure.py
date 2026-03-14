@@ -8,8 +8,9 @@ from typing import List, Optional
 
 from agents_os.validators.base.validator_base import ValidatorBase, ValidatorResult
 
-LOD200_TEMPLATE_PATH = "documentation/docs-governance/AGENTS_OS_GOVERNANCE/02-TEMPLATES/LOD200_TEMPLATE_v1.0.0.md"
-LLD400_TEMPLATE_PATH = "documentation/docs-governance/AGENTS_OS_GOVERNANCE/02-TEMPLATES/LLD400_TEMPLATE_v1.0.0.md"
+# Canonical path (Option C, 2026-02-19): templates moved to shared governance 06-TEMPLATES
+LOD200_TEMPLATE_PATH = "documentation/docs-governance/06-TEMPLATES/LOD200_TEMPLATE_v1.0.0.md"
+LLD400_TEMPLATE_PATH = "documentation/docs-governance/06-TEMPLATES/LLD400_TEMPLATE_v1.0.0.md"
 
 
 def _find_project_root() -> Path:

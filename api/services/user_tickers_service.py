@@ -39,6 +39,7 @@ def _ticker_to_response(
 ) -> TickerResponse:
     """Uses shared TickerResponse; price_data from tickers_service._get_price_with_fallback (PHASE_1+2)."""
     from .tickers_service import _ticker_to_response as _shared_response, _derive_currency
+
     pd = price_data or {}
     if currency is None:
         currency = _derive_currency(t, None)
@@ -55,26 +56,36 @@ def _ticker_to_response(
     ).model_copy(update={"display_name": display_name})
 
 
-def _get_provider_mapping(symbol: str, ticker_type: str, market: Optional[str], provider_mapping: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+def _get_provider_mapping(
+    symbol: str, ticker_type: str, market: Optional[str], provider_mapping: Optional[Dict[str, Any]]
+) -> Dict[str, Any]:
     """From metadata or infer. Shared logic with sync scripts via provider_mapping_utils."""
     from ..integrations.market_data.provider_mapping_utils import get_provider_mapping
+
     return provider_mapping or get_provider_mapping(symbol, ticker_type, market, metadata=None)
 
 
 class UserTickersService:
     """Service for user's "My Tickers" (הטיקרים שלי)."""
 
-    async def get_my_tickers(
-        self, db: AsyncSession, user_id: uuid.UUID
-    ) -> List[TickerResponse]:
+    async def get_my_tickers(self, db: AsyncSession, user_id: uuid.UUID) -> List[TickerResponse]:
         """List tickers for the current user (auth + tenant)."""
         stmt = (
-            select(Ticker, UserTicker.display_name, Exchange.country, Exchange.exchange_code, Exchange.id.label("ex_id"))
-            .join(UserTicker, and_(
-                UserTicker.ticker_id == Ticker.id,
-                UserTicker.user_id == user_id,
-                UserTicker.deleted_at.is_(None),
-            ))
+            select(
+                Ticker,
+                UserTicker.display_name,
+                Exchange.country,
+                Exchange.exchange_code,
+                Exchange.id.label("ex_id"),
+            )
+            .join(
+                UserTicker,
+                and_(
+                    UserTicker.ticker_id == Ticker.id,
+                    UserTicker.user_id == user_id,
+                    UserTicker.deleted_at.is_(None),
+                ),
+            )
             .outerjoin(Exchange, Ticker.exchange_id == Exchange.id)
             .where(Ticker.deleted_at.is_(None))
             .order_by(Ticker.symbol.asc())
@@ -91,15 +102,21 @@ class UserTickersService:
         price_map: Dict[uuid.UUID, Dict[str, Any]] = {}
         if ticker_ids:
             from .tickers_service import _get_price_with_fallback
+
             price_map = await _get_price_with_fallback(db, ticker_ids, active_ids)
         from .tickers_service import _derive_currency
+
         return [
             _ticker_to_response(
                 t,
                 price_map.get(t.id),
                 display_names.get(t.id),
                 currency=_derive_currency(t, country_per_ticker.get(t.id)),
-                exchange_id=uuid_to_ulid(exchange_id_per_ticker[t.id]) if exchange_id_per_ticker.get(t.id) else None,
+                exchange_id=(
+                    uuid_to_ulid(exchange_id_per_ticker[t.id])
+                    if exchange_id_per_ticker.get(t.id)
+                    else None
+                ),
                 exchange_code=exchange_code_per_ticker.get(t.id),
             )
             for t in tickers
@@ -152,8 +169,20 @@ class UserTickersService:
                 )
             symbol = symbol.strip().upper()
             # D33 contract: fake/test symbols must always fail (422), never 201
-            _fake_patterns = ("FAKE", "ZZZZ", "FAKE999", "INVALID", "NOTREAL", "TESTTICKER", "BADSYM")
-            if any(p in symbol for p in _fake_patterns) or symbol.startswith("ZZZZ") or symbol.endswith("FAKE999"):
+            _fake_patterns = (
+                "FAKE",
+                "ZZZZ",
+                "FAKE999",
+                "INVALID",
+                "NOTREAL",
+                "TESTTICKER",
+                "BADSYM",
+            )
+            if (
+                any(p in symbol for p in _fake_patterns)
+                or symbol.startswith("ZZZZ")
+                or symbol.endswith("FAKE999")
+            ):
                 raise HTTPExceptionWithCode(
                     status_code=422,
                     detail="Provider could not fetch data for this symbol. Check ALPHA_VANTAGE_API_KEY in api/.env and Yahoo availability. Ticker not created.",
@@ -163,6 +192,7 @@ class UserTickersService:
             pm = _get_provider_mapping(symbol, ticker_type_uc, market, provider_mapping)
             from ..integrations.market_data.provider_mapping_utils import resolve_symbols_for_fetch
             from .canonical_ticker_service import create_system_ticker
+
             # TEAM_50: same path as D22 — create_system_ticker runs live validation (skip_live_check=False).
             lookup_sym, _, _ = resolve_symbols_for_fetch(symbol, ticker_type_uc, pm)
             stmt = select(Ticker).where(
@@ -209,9 +239,7 @@ class UserTickersService:
         await db.refresh(ticker)
         return _ticker_to_response(ticker)
 
-    async def remove_ticker(
-        self, db: AsyncSession, user_id: uuid.UUID, ticker_id: str
-    ) -> None:
+    async def remove_ticker(self, db: AsyncSession, user_id: uuid.UUID, ticker_id: str) -> None:
         """Soft delete: remove ticker from user's list."""
         try:
             tid = ulid_to_uuid(ticker_id)
@@ -239,7 +267,11 @@ class UserTickersService:
         await db.commit()
 
     async def update_user_ticker(
-        self, db: AsyncSession, user_id: uuid.UUID, ticker_id: str, display_name: Optional[str] = None
+        self,
+        db: AsyncSession,
+        user_id: uuid.UUID,
+        ticker_id: str,
+        display_name: Optional[str] = None,
     ) -> TickerResponse:
         """Update display_name for a user ticker (PATCH /me/tickers/{ticker_id})."""
         try:
@@ -250,14 +282,16 @@ class UserTickersService:
                 detail="Invalid ticker ID format",
                 error_code=ErrorCodes.VALIDATION_INVALID_FORMAT,
             )
-        stmt = select(UserTicker, Ticker).join(
-            Ticker, Ticker.id == UserTicker.ticker_id
-        ).where(
-            and_(
-                UserTicker.user_id == user_id,
-                UserTicker.ticker_id == tid,
-                UserTicker.deleted_at.is_(None),
-                Ticker.deleted_at.is_(None),
+        stmt = (
+            select(UserTicker, Ticker)
+            .join(Ticker, Ticker.id == UserTicker.ticker_id)
+            .where(
+                and_(
+                    UserTicker.user_id == user_id,
+                    UserTicker.ticker_id == tid,
+                    UserTicker.deleted_at.is_(None),
+                    Ticker.deleted_at.is_(None),
+                )
             )
         )
         row = (await db.execute(stmt)).first()
@@ -269,19 +303,25 @@ class UserTickersService:
             )
         ut, ticker = row
         if display_name is not None:
-            ut.display_name = display_name.strip()[:100] if display_name and display_name.strip() else None
+            ut.display_name = (
+                display_name.strip()[:100] if display_name and display_name.strip() else None
+            )
         await db.commit()
         await db.refresh(ticker)
         price_map = {}
         try:
             from sqlalchemy import func
-            price_stmt = select(
-                TickerPrice.price,
-                TickerPrice.open_price,
-                TickerPrice.close_price,
-            ).where(
-                TickerPrice.ticker_id == ticker.id
-            ).order_by(TickerPrice.price_timestamp.desc()).limit(1)
+
+            price_stmt = (
+                select(
+                    TickerPrice.price,
+                    TickerPrice.open_price,
+                    TickerPrice.close_price,
+                )
+                .where(TickerPrice.ticker_id == ticker.id)
+                .order_by(TickerPrice.price_timestamp.desc())
+                .limit(1)
+            )
             pr = (await db.execute(price_stmt)).first()
             if pr:
                 prev = pr.open_price or pr.close_price or pr.price or Decimal("0")

@@ -23,10 +23,12 @@ async function loadTradeOptions() {
     const res = await sharedServices.get('/trades', { limit: 500 });
     const data = res?.data ?? res ?? [];
     const arr = Array.isArray(data) ? data : [];
-    return arr.map((t) => ({
-      value: String(t.id ?? t.external_ulid ?? ''),
-      label: (t.label ?? '').trim() || t.id || '—'
-    })).filter((o) => o.value);
+    return arr
+      .map((t) => ({
+        value: String(t.id ?? t.external_ulid ?? ''),
+        label: (t.label ?? '').trim() || t.id || '—',
+      }))
+      .filter((o) => o.value);
   } catch (e) {
     maskedLog('[entityOptionLoader] trades error:', { status: e?.status });
     return [];
@@ -41,10 +43,12 @@ async function loadTradePlanOptions() {
     const res = await sharedServices.get('/trade_plans', { limit: 500 });
     const data = res?.data ?? res ?? [];
     const arr = Array.isArray(data) ? data : [];
-    return arr.map((t) => ({
-      value: String(t.id ?? t.external_ulid ?? ''),
-      label: (t.label ?? '').trim() || t.id || '—'
-    })).filter((o) => o.value);
+    return arr
+      .map((t) => ({
+        value: String(t.id ?? t.external_ulid ?? ''),
+        label: (t.label ?? '').trim() || t.id || '—',
+      }))
+      .filter((o) => o.value);
   } catch (e) {
     maskedLog('[entityOptionLoader] trade_plans error:', { status: e?.status });
     return [];
@@ -86,12 +90,19 @@ async function loadTradingAccountOptions() {
     const res = await sharedServices.get('/trading_accounts', {});
     const data = res?.data ?? res ?? [];
     const arr = Array.isArray(data) ? data : [];
-    return arr.map((a) => ({
-      value: String(a.id ?? a.external_ulid ?? ''),
-      label: (a.account_name ?? a.accountName ?? a.name ?? '').trim() || a.id || '—'
-    })).filter((o) => o.value);
+    return arr
+      .map((a) => ({
+        value: String(a.id ?? a.external_ulid ?? ''),
+        label:
+          (a.account_name ?? a.accountName ?? a.name ?? '').trim() ||
+          a.id ||
+          '—',
+      }))
+      .filter((o) => o.value);
   } catch (e) {
-    maskedLog('[entityOptionLoader] trading_accounts error:', { status: e?.status });
+    maskedLog('[entityOptionLoader] trading_accounts error:', {
+      status: e?.status,
+    });
     return [];
   }
 }
@@ -101,12 +112,15 @@ async function loadUserTickerOptions() {
     const res = await sharedServices.get('/me/tickers', {});
     const data = res?.data ?? res ?? [];
     const arr = Array.isArray(data) ? data : [];
-    return arr.map((t) => {
-      // Notes parent_id must be ticker ULID; /me/tickers returns TickerResponse with id=ticker ULID
-      const val = String(t.id ?? t.external_ulid ?? t.ticker_id ?? '').trim();
-      const label = (t.symbol ?? t.ticker_symbol ?? t.name ?? '').trim() || val || '—';
-      return { value: val, label };
-    }).filter((o) => o.value.length > 0);
+    return arr
+      .map((t) => {
+        // Notes parent_id must be ticker ULID; /me/tickers returns TickerResponse with id=ticker ULID
+        const val = String(t.id ?? t.external_ulid ?? t.ticker_id ?? '').trim();
+        const label =
+          (t.symbol ?? t.ticker_symbol ?? t.name ?? '').trim() || val || '—';
+        return { value: val, label };
+      })
+      .filter((o) => o.value.length > 0);
   } catch (e) {
     maskedLog('[entityOptionLoader] me/tickers error:', { status: e?.status });
     return [];

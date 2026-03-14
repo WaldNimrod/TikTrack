@@ -76,8 +76,8 @@ Corroboration command (Team 50), immediately after successful Team 60 run:
 
 1. `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_90_S002_P002_WP003_GATE7_PARTA_RUNTIME_EVIDENCE_REPORT_v2.0.9.md` (executed evidence state; not procedure-ready)
 2. `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_90_S002_P002_WP003_GATE7_PARTA_QA_CORROBORATION_v2.0.9.md` (submitted corroboration on same run)
-3. `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` (with non-null `timestamp_utc`)
-4. `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_9.log`
+3. `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` (with non-null `timestamp_utc`)
+4. `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_9.log`
 
 ---
 

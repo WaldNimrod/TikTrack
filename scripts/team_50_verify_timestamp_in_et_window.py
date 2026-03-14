@@ -38,7 +38,7 @@ if __name__ == "__main__":
     import json
     from pathlib import Path
     project = Path(__file__).resolve().parent.parent
-    json_path = project / "documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json"
+    json_path = project / "documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json"
     if not json_path.exists():
         print("BLOCK: JSON not found")
         sys.exit(1)

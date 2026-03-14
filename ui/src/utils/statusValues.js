@@ -10,11 +10,11 @@ export const STATUS_VALUES = [
   { value: 'pending', label: 'ממתין' },
   { value: 'active', label: 'פתוח' },
   { value: 'inactive', label: 'סגור' },
-  { value: 'cancelled', label: 'מבוטל' }
+  { value: 'cancelled', label: 'מבוטל' },
 ];
 
 /** Canonical values only (for API/DB) */
-export const STATUS_CANONICAL = STATUS_VALUES.map(s => s.value);
+export const STATUS_CANONICAL = STATUS_VALUES.map((s) => s.value);
 
 /** Hebrew labels only (for display/filter UI) */
-export const STATUS_LABELS_HE = STATUS_VALUES.map(s => s.label);
+export const STATUS_LABELS_HE = STATUS_VALUES.map((s) => s.label);

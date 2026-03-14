@@ -20,36 +20,58 @@ TICKER_STATUS_VALUES = ("pending", "active", "inactive", "cancelled")
 
 class TickerResponse(BaseModel):
     """Ticker response schema."""
+
     id: str = Field(..., description="External ULID identifier")
     symbol: str = Field(..., description="Ticker symbol (e.g., AAPL, BTC)")
-    display_name: Optional[str] = Field(None, max_length=100, description="User display name (from user_tickers)")
+    display_name: Optional[str] = Field(
+        None, max_length=100, description="User display name (from user_tickers)"
+    )
     company_name: Optional[str] = Field(None, description="Company name")
     ticker_type: str = Field(..., description="Ticker type (STOCK, CRYPTO, ETF, etc.)")
-    status: str = Field(..., description="Ticker lifecycle status (pending|active|inactive|cancelled)")
+    status: str = Field(
+        ..., description="Ticker lifecycle status (pending|active|inactive|cancelled)"
+    )
     is_active: bool = Field(..., description="Active status")
     delisted_date: Optional[date] = Field(None, description="Delisting date")
     created_at: datetime = Field(..., description="Creation timestamp")
     updated_at: datetime = Field(..., description="Last update timestamp")
-    current_price: Optional[Decimal] = Field(None, description="Best-available display price (PHASE_2)")
+    current_price: Optional[Decimal] = Field(
+        None, description="Best-available display price (PHASE_2)"
+    )
     daily_change_pct: Optional[Decimal] = Field(None, description="Daily change percentage")
     price_source: Optional[str] = Field(
         None,
         description="EOD | EOD_STALE | INTRADAY_FALLBACK — T190-Price provenance (PHASE_1)",
     )
-    price_as_of_utc: Optional[datetime] = Field(None, description="Timestamp of current price (PHASE_2)")
-    last_close_price: Optional[Decimal] = Field(None, description="Last EOD close value — separate from current (PHASE_2)")
-    last_close_as_of_utc: Optional[datetime] = Field(None, description="Timestamp of last close (PHASE_2)")
-    currency: Optional[str] = Field(None, description="Per-ticker currency (BF-002: IL→ILS, IT→EUR, symbol parse for CRYPTO)")
+    price_as_of_utc: Optional[datetime] = Field(
+        None, description="Timestamp of current price (PHASE_2)"
+    )
+    last_close_price: Optional[Decimal] = Field(
+        None, description="Last EOD close value — separate from current (PHASE_2)"
+    )
+    last_close_as_of_utc: Optional[datetime] = Field(
+        None, description="Timestamp of last close (PHASE_2)"
+    )
+    currency: Optional[str] = Field(
+        None, description="Per-ticker currency (BF-002: IL→ILS, IT→EUR, symbol parse for CRYPTO)"
+    )
     exchange_id: Optional[str] = Field(None, description="Exchange ULID (בורסה)")
-    exchange_code: Optional[str] = Field(None, description="Exchange code for display (NASDAQ, TASE, MIL, …)")
+    exchange_code: Optional[str] = Field(
+        None, description="Exchange code for display (NASDAQ, TASE, MIL, …)"
+    )
 
 
 class TickerCreateRequest(BaseModel):
     """Ticker create request schema. R2 1.7: exchange_id for add-form (ANAU.MI + MIL)."""
-    symbol: str = Field(..., min_length=1, max_length=20, description="Ticker symbol (e.g. ANAU.MI with exchange)")
+
+    symbol: str = Field(
+        ..., min_length=1, max_length=20, description="Ticker symbol (e.g. ANAU.MI with exchange)"
+    )
     company_name: Optional[str] = Field(None, max_length=255, description="Company name")
     ticker_type: str = Field(default="STOCK", description="Ticker type (STOCK, ETF, CRYPTO, …)")
-    exchange_id: Optional[str] = Field(None, description="Exchange ULID — from GET /reference/exchanges")
+    exchange_id: Optional[str] = Field(
+        None, description="Exchange ULID — from GET /reference/exchanges"
+    )
     is_active: bool = Field(default=True, description="Active status")
 
     @field_validator("ticker_type")
@@ -62,12 +84,15 @@ class TickerCreateRequest(BaseModel):
 
 class TickerUpdateRequest(BaseModel):
     """Ticker update request schema."""
+
     symbol: Optional[str] = Field(None, min_length=1, max_length=20)
     company_name: Optional[str] = Field(None, max_length=255)
     ticker_type: Optional[str] = Field(None)
     status: Optional[str] = Field(None, description="pending|active|inactive|cancelled")
     is_active: Optional[bool] = Field(None)
-    exchange_id: Optional[str] = Field(None, description="Exchange ULID (בורסה); when changed, provider validation runs")
+    exchange_id: Optional[str] = Field(
+        None, description="Exchange ULID (בורסה); when changed, provider validation runs"
+    )
 
     @field_validator("status")
     @classmethod
@@ -90,11 +115,16 @@ class TickerUpdateRequest(BaseModel):
 
 class AddMyTickerRequest(BaseModel):
     """Request for POST /me/tickers — add existing (ticker_id) or create new (symbol). R2 1.7: exchange_id for add-form."""
+
     ticker_id: Optional[str] = Field(None, description="Existing ticker ULID (add to list)")
-    symbol: Optional[str] = Field(None, min_length=1, max_length=20, description="Symbol (e.g. ANAU.MI) for new ticker")
+    symbol: Optional[str] = Field(
+        None, min_length=1, max_length=20, description="Symbol (e.g. ANAU.MI) for new ticker"
+    )
     company_name: Optional[str] = Field(None, max_length=255)
     ticker_type: str = Field(default="STOCK", description="Ticker type for new ticker")
-    exchange_id: Optional[str] = Field(None, description="Exchange ULID — from GET /reference/exchanges")
+    exchange_id: Optional[str] = Field(
+        None, description="Exchange ULID — from GET /reference/exchanges"
+    )
 
     @field_validator("ticker_type")
     @classmethod
@@ -106,23 +136,31 @@ class AddMyTickerRequest(BaseModel):
 
 class TickerListResponse(BaseModel):
     """Ticker list response schema."""
+
     data: List[TickerResponse]
     total: int
 
 
 class TickerSummaryResponse(BaseModel):
     """Ticker summary for top section."""
+
     total_tickers: int
     active_tickers: int
 
 
 # --- Ticker Data Integrity (בקרת תקינות נתונים) ---
 
+
 class DataDomainOverview(BaseModel):
     """Overview of a single data domain (EOD, Intraday, History)."""
+
     row_count: int = Field(..., description="Number of rows in DB")
-    latest_price_timestamp: Optional[datetime] = Field(None, description="Timestamp of latest price/as_of")
-    latest_fetched_at: Optional[datetime] = Field(None, description="When the data was last fetched")
+    latest_price_timestamp: Optional[datetime] = Field(
+        None, description="Timestamp of latest price/as_of"
+    )
+    latest_fetched_at: Optional[datetime] = Field(
+        None, description="When the data was last fetched"
+    )
     has_data: bool = Field(..., description="Whether any data exists")
     gap_status: str = Field(..., description="OK | NO_DATA | INSUFFICIENT | STALE")
     note: Optional[str] = Field(None, description="Optional clarification")
@@ -130,6 +168,7 @@ class DataDomainOverview(BaseModel):
 
 class LastUpdateEntry(BaseModel):
     """Single entry in the update log."""
+
     price_timestamp: datetime = Field(..., description="Price as-of timestamp")
     fetched_at: datetime = Field(..., description="When fetched")
     price: Optional[Decimal] = Field(None, description="Price value")
@@ -137,6 +176,7 @@ class LastUpdateEntry(BaseModel):
 
 class IndicatorsOverview(BaseModel):
     """Indicators from 250d OHLC — ATR, MA, CCI. Per MARKET_INDICATORS_AND_FUNDAMENTALS_SPEC."""
+
     atr_14: Optional[Decimal] = Field(None, description="ATR(14)")
     ma_20: Optional[Decimal] = Field(None, description="MA(20)")
     ma_50: Optional[Decimal] = Field(None, description="MA(50)")
@@ -148,12 +188,15 @@ class IndicatorsOverview(BaseModel):
 
 class TickerDataIntegrityResponse(BaseModel):
     """Ticker data integrity report — for UI verification widget."""
+
     ticker_id: str = Field(..., description="Ticker ULID")
     symbol: str = Field(..., description="Ticker symbol")
     company_name: Optional[str] = Field(None, description="Company name")
 
     eod_prices: DataDomainOverview = Field(..., description="EOD prices (ticker_prices)")
-    intraday_prices: DataDomainOverview = Field(..., description="Intraday (ticker_prices_intraday; active only)")
+    intraday_prices: DataDomainOverview = Field(
+        ..., description="Intraday (ticker_prices_intraday; active only)"
+    )
     history_250d: DataDomainOverview = Field(..., description="250d history for Indicators")
 
     indicators: Optional[IndicatorsOverview] = Field(

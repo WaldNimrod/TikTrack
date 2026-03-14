@@ -47,7 +47,7 @@
 
 ## 4. סוגי תזרים (flow_type)
 
-**מקור SSOT:** `documentation/05-REPORTS/artifacts/CASH_FLOW_TYPES_SSOT.md`
+**מקור SSOT:** `documentation/reports/05-REPORTS/artifacts/CASH_FLOW_TYPES_SSOT.md`
 
 | ערך | תיאור |
 |-----|--------|
@@ -103,7 +103,7 @@
 | מסמך | נתיב |
 |------|------|
 | Cash Flows Field Map | documentation/01-ARCHITECTURE/LOGIC/WP_20_08_C_FIELD_MAP_CASH_FLOWS.md |
-| Cash Flow Types SSOT | documentation/05-REPORTS/artifacts/CASH_FLOW_TYPES_SSOT.md |
+| Cash Flow Types SSOT | documentation/reports/05-REPORTS/artifacts/CASH_FLOW_TYPES_SSOT.md |
 | PDSC Boundary Contract | documentation/01-ARCHITECTURE/TT2_PDSC_BOUNDARY_CONTRACT.md |
 | Cash Flows model | api/models/cash_flows.py |
 | Cash Flows service | api/services/cash_flows.py |

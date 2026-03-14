@@ -2,7 +2,7 @@
  * LoginForm - רכיב התחברות (D15)
  * --------------------------------
  * רכיב React להתחברות משתמשים
- * 
+ *
  * @description מימוש Pixel Perfect של דף ההתחברות בהתבסס על Blueprint של Team 31
  * @legacyReference Legacy.auth.login()
  * @blueprintSource _COMMUNICATION/team_31/team_31_staging/D15_LOGIN.html
@@ -13,35 +13,39 @@ import { useNavigate, Link } from 'react-router-dom';
 import authService from '../../services/auth.js';
 import { audit } from '../../../../utils/audit.js';
 import { debugLog } from '../../../../utils/debug.js';
-import { validateLoginForm, validateUsernameOrEmail, validatePassword } from '../../../../logic/schemas/authSchema.js';
+import {
+  validateLoginForm,
+  validateUsernameOrEmail,
+  validatePassword,
+} from '../../../../logic/schemas/authSchema.js';
 import { handleApiError } from '../../../../utils/errorHandler.js';
 import PageFooter from '../../../../components/core/PageFooter.jsx';
 
 /**
  * LoginForm Component
- * 
+ *
  * @description רכיב התחברות עם validation, error handling, ו-loading states
  * @legacyReference Legacy.auth.login(username, password)
  */
 const LoginForm = () => {
   const navigate = useNavigate();
-  
+
   // Form state
   const [formData, setFormData] = useState({
     usernameOrEmail: '',
     password: '',
     rememberMe: true,
   });
-  
+
   // UI state
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({});
-  
+
   // G7R §3E: Populate usernameOrEmail from localStorage (after 401/expiry redirect)
   useEffect(() => {
     const saved = localStorage.getItem('usernameOrEmail');
-    if (saved) setFormData(prev => ({ ...prev, usernameOrEmail: saved }));
+    if (saved) setFormData((prev) => ({ ...prev, usernameOrEmail: saved }));
   }, []);
 
   // Add auth-layout-root class to body on mount (matches blueprint)
@@ -68,26 +72,31 @@ const LoginForm = () => {
             errorElement.hidden = false;
             errorElement.setAttribute('aria-hidden', 'false');
             errorElement.classList.remove('auth-form__error--hidden');
-            
+
             // CRITICAL: Ensure element has Hebrew text content (for test compatibility)
             // Always set text content to ensure it's visible to tests
             if (error) {
               // Force set text content (both textContent and innerText for compatibility)
               errorElement.textContent = error;
               errorElement.innerText = error;
-              
+
               // Also set innerHTML as fallback (some tests may read innerHTML)
               if (errorElement.innerHTML !== error) {
                 errorElement.innerHTML = error;
               }
-              
+
               // Verify text content is in Hebrew
-              const currentText = errorElement.textContent || errorElement.innerText || errorElement.innerHTML || '';
+              const currentText =
+                errorElement.textContent ||
+                errorElement.innerText ||
+                errorElement.innerHTML ||
+                '';
               const hasHebrew = /[\u0590-\u05FF]/.test(currentText);
-              
+
               if (!hasHebrew) {
                 // If text is not in Hebrew, use default Hebrew message
-                const defaultHebrewError = 'שם משתמש או סיסמה שגויים. אנא נסה שוב.';
+                const defaultHebrewError =
+                  'שם משתמש או סיסמה שגויים. אנא נסה שוב.';
                 errorElement.textContent = defaultHebrewError;
                 errorElement.innerText = defaultHebrewError;
                 errorElement.innerHTML = defaultHebrewError;
@@ -95,18 +104,19 @@ const LoginForm = () => {
                 setError(defaultHebrewError);
               }
             }
-            
+
             debugLog('Auth', 'Error element made visible via useEffect', {
               found: true,
               text: errorElement.textContent,
               errorState: error,
               computedDisplay: window.getComputedStyle(errorElement).display,
-              computedVisibility: window.getComputedStyle(errorElement).visibility
+              computedVisibility:
+                window.getComputedStyle(errorElement).visibility,
             });
           } else {
             debugLog('Auth', 'WARNING: Error element not found in useEffect', {
               errorState: error,
-              errorValue: error
+              errorValue: error,
             });
           }
         }, 50); // Short delay after RAF
@@ -116,17 +126,17 @@ const LoginForm = () => {
 
   /**
    * Handle Input Change
-   * 
+   *
    * @description מעדכן את state של הטופס ומבצע ולידציה באמצעות Schema
    * @param {Event} e - Event object
    */
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
-    
+
     // Validate field using Schema
     if (type !== 'checkbox') {
       let validationResult = null;
@@ -140,16 +150,16 @@ const LoginForm = () => {
         default:
           break;
       }
-      
+
       // Update field error
       if (validationResult) {
-        setFieldErrors(prev => ({
+        setFieldErrors((prev) => ({
           ...prev,
-          [name]: validationResult.error
+          [name]: validationResult.error,
         }));
       }
     }
-    
+
     // CRITICAL: Don't clear general error on input change
     // Error should persist until next form submission attempt
     // This ensures user can see the error message even while typing
@@ -157,7 +167,7 @@ const LoginForm = () => {
 
   /**
    * Validate Form
-   * 
+   *
    * @description בודק תקינות הטופס לפני שליחה באמצעות Schema מרכזי
    * @returns {boolean} - true אם הטופס תקין
    */
@@ -169,7 +179,7 @@ const LoginForm = () => {
 
   /**
    * Handle Form Submit
-   * 
+   *
    * @description מטפל בשליחת הטופס והתחברות
    * @param {Event} e - Event object
    */
@@ -177,50 +187,51 @@ const LoginForm = () => {
     // CRITICAL: Always prevent default form submission
     e.preventDefault();
     e.stopPropagation();
-    
+
     // Prevent multiple submissions
     if (isLoading) {
       return;
     }
-    
+
     // Clear previous errors only at start of new submission
     // This ensures error is cleared before new validation
     setError(null);
     setFieldErrors({});
-    
+
     debugLog('Auth', 'Form submission started - errors cleared');
-    
+
     // Validate form
     if (!validateForm()) {
       debugLog('Auth', 'Login form validation failed', { fieldErrors });
       return;
     }
-    
+
     setIsLoading(true);
-    debugLog('Auth', 'Login form submitted', { 
+    debugLog('Auth', 'Login form submitted', {
       usernameOrEmail: formData.usernameOrEmail,
-      rememberMe: formData.rememberMe 
+      rememberMe: formData.rememberMe,
     });
-    
+
     try {
       // Call Auth Service
       const response = await authService.login(
         formData.usernameOrEmail,
-        formData.password
+        formData.password,
       );
-      
-      debugLog('Auth', 'Login successful', { userId: response.user?.externalUlids });
-      
+
+      debugLog('Auth', 'Login successful', {
+        userId: response.user?.externalUlids,
+      });
+
       // Store remember me + usernameOrEmail per §3E (preserve after 401/expiry redirect)
       if (formData.rememberMe) {
         localStorage.setItem('remember_me', 'true');
         localStorage.setItem('usernameOrEmail', formData.usernameOrEmail);
       }
-      
+
       // Redirect to Home (/) per GATE_4 mandate — Login → Home
       debugLog('Auth', 'Redirecting to Home');
       navigate('/');
-      
     } catch (err) {
       // CRITICAL: Prevent any navigation or refresh on error
       debugLog('Auth', 'Login error caught', {
@@ -228,27 +239,28 @@ const LoginForm = () => {
         hasResponse: !!err.response,
         errorCode: err.response?.data?.error_code,
         detail: err.response?.data?.detail,
-        message: err.message
+        message: err.message,
       });
-      
+
       // Use centralized error handler
-      const { fieldErrors: apiErrors, formError: apiError } = handleApiError(err);
-      
+      const { fieldErrors: apiErrors, formError: apiError } =
+        handleApiError(err);
+
       debugLog('Auth', 'Error handler result', {
         hasApiErrors: Object.keys(apiErrors).length > 0,
         apiErrors,
-        formError: apiError
+        formError: apiError,
       });
-      
+
       // Merge API field errors with existing errors
       if (Object.keys(apiErrors).length > 0) {
-        setFieldErrors(prev => ({ ...prev, ...apiErrors }));
+        setFieldErrors((prev) => ({ ...prev, ...apiErrors }));
       }
-      
+
       // Set form-level error - CRITICAL: Always set error, even if apiError is null
       // Ensure error is always in Hebrew for test compatibility
       let finalError = apiError || 'שגיאה בהתחברות. אנא בדוק את פרטיך.';
-      
+
       // CRITICAL: Double-check error is in Hebrew (for test compatibility)
       const hasHebrew = /[\u0590-\u05FF]/.test(finalError);
       if (!hasHebrew) {
@@ -259,25 +271,25 @@ const LoginForm = () => {
           finalError = 'שגיאה בהתחברות. אנא בדוק את פרטיך.';
         }
       }
-      
-      debugLog('Auth', 'Setting error state', { 
+
+      debugLog('Auth', 'Setting error state', {
         finalError,
         apiError,
         hasHebrew: /[\u0590-\u05FF]/.test(finalError),
-        status: err.response?.status
+        status: err.response?.status,
       });
-      
+
       // CRITICAL: Use functional update to ensure state is set correctly
       setError(() => finalError);
-      
+
       audit.error('Auth', 'Login failed', {
         error: err,
         status: err.response?.status,
         errorCode: err.response?.data?.error_code,
         detail: err.response?.data?.detail,
-        finalError
+        finalError,
       });
-      
+
       // Ensure error is visible in DOM and scroll to it
       // CRITICAL: Test waits 2 seconds, so we have multiple checks to ensure element is rendered
       // Use requestAnimationFrame + setTimeout to ensure React state update + DOM render completes
@@ -286,12 +298,14 @@ const LoginForm = () => {
           const errorElement = document.querySelector('.js-error-feedback');
           debugLog('Auth', 'Error element check (RAF + 100ms)', {
             found: !!errorElement,
-            visible: errorElement ? window.getComputedStyle(errorElement).display !== 'none' : false,
+            visible: errorElement
+              ? window.getComputedStyle(errorElement).display !== 'none'
+              : false,
             text: errorElement?.textContent,
             errorState: error,
-            finalError: finalError
+            finalError: finalError,
           });
-          
+
           if (errorElement) {
             // Force visibility - ensure element is displayed
             errorElement.style.display = 'block';
@@ -299,26 +313,31 @@ const LoginForm = () => {
             errorElement.hidden = false;
             errorElement.setAttribute('aria-hidden', 'false');
             errorElement.classList.remove('auth-form__error--hidden');
-            
+
             // CRITICAL: Ensure element has Hebrew text content (for test compatibility)
             // Always set text content to ensure it's visible to tests
             if (finalError) {
               // Force set text content (both textContent and innerText for compatibility)
               errorElement.textContent = finalError;
               errorElement.innerText = finalError;
-              
+
               // Also set innerHTML as fallback (some tests may read innerHTML)
               if (errorElement.innerHTML !== finalError) {
                 errorElement.innerHTML = finalError;
               }
-              
+
               // Verify text content is in Hebrew
-              const currentText = errorElement.textContent || errorElement.innerText || errorElement.innerHTML || '';
+              const currentText =
+                errorElement.textContent ||
+                errorElement.innerText ||
+                errorElement.innerHTML ||
+                '';
               const hasHebrew = /[\u0590-\u05FF]/.test(currentText);
-              
+
               if (!hasHebrew) {
                 // If text is not in Hebrew, use default Hebrew message
-                const defaultHebrewError = 'שם משתמש או סיסמה שגויים. אנא נסה שוב.';
+                const defaultHebrewError =
+                  'שם משתמש או סיסמה שגויים. אנא נסה שוב.';
                 errorElement.textContent = defaultHebrewError;
                 errorElement.innerText = defaultHebrewError;
                 errorElement.innerHTML = defaultHebrewError;
@@ -326,28 +345,37 @@ const LoginForm = () => {
                 setError(defaultHebrewError);
               }
             }
-            
-            errorElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-          } else {
-            debugLog('Auth', 'ERROR: Error element not found after RAF + 100ms!', {
-              errorState: error,
-              finalError: finalError
+
+            errorElement.scrollIntoView({
+              behavior: 'smooth',
+              block: 'nearest',
             });
+          } else {
+            debugLog(
+              'Auth',
+              'ERROR: Error element not found after RAF + 100ms!',
+              {
+                errorState: error,
+                finalError: finalError,
+              },
+            );
           }
         }, 100);
       });
-      
+
       // Additional check after longer delay to ensure element persists (for slow renders)
       setTimeout(() => {
         const errorElement = document.querySelector('.js-error-feedback');
         debugLog('Auth', 'Error element check (500ms)', {
           found: !!errorElement,
-          visible: errorElement ? window.getComputedStyle(errorElement).display !== 'none' : false,
+          visible: errorElement
+            ? window.getComputedStyle(errorElement).display !== 'none'
+            : false,
           text: errorElement?.textContent,
           errorState: error,
-          finalError: finalError
+          finalError: finalError,
         });
-        
+
         if (errorElement) {
           // Double-check visibility
           errorElement.style.display = 'block';
@@ -355,26 +383,31 @@ const LoginForm = () => {
           errorElement.hidden = false;
           errorElement.setAttribute('aria-hidden', 'false');
           errorElement.classList.remove('auth-form__error--hidden');
-          
+
           // CRITICAL: Ensure element has Hebrew text content (for test compatibility)
           // Always set text content to ensure it's visible to tests
           if (finalError) {
             // Force set text content (both textContent and innerText for compatibility)
             errorElement.textContent = finalError;
             errorElement.innerText = finalError;
-            
+
             // Also set innerHTML as fallback (some tests may read innerHTML)
             if (errorElement.innerHTML !== finalError) {
               errorElement.innerHTML = finalError;
             }
-            
+
             // Verify text content is in Hebrew
-            const currentText = errorElement.textContent || errorElement.innerText || errorElement.innerHTML || '';
+            const currentText =
+              errorElement.textContent ||
+              errorElement.innerText ||
+              errorElement.innerHTML ||
+              '';
             const hasHebrew = /[\u0590-\u05FF]/.test(currentText);
-            
+
             if (!hasHebrew) {
               // If text is not in Hebrew, use default Hebrew message
-              const defaultHebrewError = 'שם משתמש או סיסמה שגויים. אנא נסה שוב.';
+              const defaultHebrewError =
+                'שם משתמש או סיסמה שגויים. אנא נסה שוב.';
               errorElement.textContent = defaultHebrewError;
               errorElement.innerText = defaultHebrewError;
               errorElement.innerHTML = defaultHebrewError;
@@ -385,25 +418,29 @@ const LoginForm = () => {
         } else {
           debugLog('Auth', 'ERROR: Error element not found after 500ms!', {
             errorState: error,
-            finalError: finalError
+            finalError: finalError,
           });
         }
       }, 500);
-      
+
       // Final check after 1 second (well before test's 2 second wait)
       setTimeout(() => {
         const errorElement = document.querySelector('.js-error-feedback');
         if (!errorElement) {
-          debugLog('Auth', 'CRITICAL ERROR: Error element still not found after 1 second!', {
-            errorState: error,
-            finalError: finalError
-          });
+          debugLog(
+            'Auth',
+            'CRITICAL ERROR: Error element still not found after 1 second!',
+            {
+              errorState: error,
+              finalError: finalError,
+            },
+          );
         } else {
           debugLog('Auth', 'Error element confirmed visible after 1 second', {
             found: true,
             text: errorElement.textContent,
             display: window.getComputedStyle(errorElement).display,
-            visibility: window.getComputedStyle(errorElement).visibility
+            visibility: window.getComputedStyle(errorElement).visibility,
           });
         }
       }, 1000);
@@ -426,15 +463,12 @@ const LoginForm = () => {
                 <h1 className="auth-title">התחברות</h1>
               </div>
 
-              <form 
-                onSubmit={handleSubmit} 
-                noValidate
-              >
+              <form onSubmit={handleSubmit} noValidate>
                 {/* Error Feedback - Always render element in DOM for test compatibility */}
                 {error && (
-                  <div 
+                  <div
                     className={`auth-form__error js-error-feedback ${error ? '' : 'auth-form__error--hidden'}`}
-                    role="alert" 
+                    role="alert"
                     aria-live="polite"
                     aria-hidden={!error}
                     data-testid="login-error-message"
@@ -459,7 +493,9 @@ const LoginForm = () => {
                     disabled={isLoading}
                   />
                   {fieldErrors.usernameOrEmail && (
-                    <span className="auth-form__error-message">{fieldErrors.usernameOrEmail}</span>
+                    <span className="auth-form__error-message">
+                      {fieldErrors.usernameOrEmail}
+                    </span>
                   )}
                 </div>
 
@@ -479,7 +515,9 @@ const LoginForm = () => {
                     disabled={isLoading}
                   />
                   {fieldErrors.password && (
-                    <span className="auth-form__error-message">{fieldErrors.password}</span>
+                    <span className="auth-form__error-message">
+                      {fieldErrors.password}
+                    </span>
                   )}
                 </div>
 
@@ -492,10 +530,13 @@ const LoginForm = () => {
                       checked={formData.rememberMe}
                       onChange={handleInputChange}
                       disabled={isLoading}
-                    />
-                    {' '}זכור אותי
+                    />{' '}
+                    זכור אותי
                   </label>
-                  <Link to="/reset-password" className="auth-link js-forgot-password-link">
+                  <Link
+                    to="/reset-password"
+                    className="auth-link js-forgot-password-link"
+                  >
                     שכחת סיסמה?
                   </Link>
                 </div>
@@ -511,7 +552,10 @@ const LoginForm = () => {
 
               <div className="auth-footer-zone">
                 <span>אין לך חשבון?</span>{' '}
-                <Link to="/register" className="auth-link-bold js-register-link">
+                <Link
+                  to="/register"
+                  className="auth-link-bold js-register-link"
+                >
                   הרשמה עכשיו
                 </Link>
               </div>
@@ -519,7 +563,7 @@ const LoginForm = () => {
           </tt-container>
         </main>
       </div>
-      
+
       {/* Modular Footer */}
       <PageFooter />
     </div>

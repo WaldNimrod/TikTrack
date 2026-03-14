@@ -6,7 +6,10 @@
  * ADR-015: "אחר" + הודעת משילות (בחירת ברוקר בלבד)
  */
 
-import { createModal, closeModal } from '../../../components/shared/PhoenixModal.js';
+import {
+  createModal,
+  closeModal,
+} from '../../../components/shared/PhoenixModal.js';
 import { maskedLog } from '../../../utils/maskedLog.js';
 import { fetchReferenceBrokers } from '../shared/fetchReferenceBrokers.js';
 import { getGovernanceMessageData } from '../shared/adr015GovernanceMessage.js';
@@ -19,13 +22,21 @@ import { getGovernanceMessageData } from '../shared/adr015GovernanceMessage.js';
  */
 function createTradingAccountFormHTML(data = null, brokerOptions = []) {
   const isEdit = data !== null;
-  const accountName = data?.accountName || data?.displayName || data?.account_name || '';
+  const accountName =
+    data?.accountName || data?.displayName || data?.account_name || '';
   const broker = data?.broker || '';
   const accountNumber = data?.accountNumber || data?.account_number || '';
-  const initialBalance = data?.initialBalance || data?.initial_balance || data?.balance || 0;
+  const initialBalance =
+    data?.initialBalance || data?.initial_balance || data?.balance || 0;
   const currency = data?.currency || 'USD';
-  const isActive = data?.isActive !== undefined ? data.isActive : (data?.is_active !== undefined ? data.is_active : true);
-  const externalAccountId = data?.externalAccountId || data?.external_account_id || '';
+  const isActive =
+    data?.isActive !== undefined
+      ? data.isActive
+      : data?.is_active !== undefined
+        ? data.is_active
+        : true;
+  const externalAccountId =
+    data?.externalAccountId || data?.external_account_id || '';
 
   // Deduplicate by value - prevents "אחר" twice (API returns "other" + user may have "אחר" from legacy)
   const byValue = new Map();
@@ -33,20 +44,36 @@ function createTradingAccountFormHTML(data = null, brokerOptions = []) {
     const v = (o.value || '').toString().trim();
     const equiv = v.toLowerCase() === 'other' || v === 'אחר';
     if (equiv) {
-      if (!byValue.has('other')) byValue.set('other', { value: 'other', label: 'אחר' });
+      if (!byValue.has('other'))
+        byValue.set('other', { value: 'other', label: 'אחר' });
       continue;
     }
-    if (v && !byValue.has(v)) byValue.set(v, { value: o.value, label: o.label || o.display_name || o.value });
+    if (v && !byValue.has(v))
+      byValue.set(v, {
+        value: o.value,
+        label: o.label || o.display_name || o.value,
+      });
   }
   // Ensure current broker is in options (legacy/edit case)
-  if (broker && broker !== 'other' && broker !== 'אחר' && !byValue.has(broker)) {
+  if (
+    broker &&
+    broker !== 'other' &&
+    broker !== 'אחר' &&
+    !byValue.has(broker)
+  ) {
     byValue.set(broker, { value: broker, label: broker });
   }
   // ADR-015 §8: "אחר" from API or inject if not present
-  if (!byValue.has('other')) byValue.set('other', { value: 'other', label: 'אחר' });
+  if (!byValue.has('other'))
+    byValue.set('other', { value: 'other', label: 'אחר' });
   const options = Array.from(byValue.values());
-  const brokerForSelect = (broker === 'אחר' ? 'other' : broker);
-const brokerOptionsHTML = options.map(o => `<option value="${String(o.value).replace(/"/g, '&quot;')}" ${brokerForSelect === o.value ? 'selected' : ''}>${String(o.label)}</option>`).join('');
+  const brokerForSelect = broker === 'אחר' ? 'other' : broker;
+  const brokerOptionsHTML = options
+    .map(
+      (o) =>
+        `<option value="${String(o.value).replace(/"/g, '&quot;')}" ${brokerForSelect === o.value ? 'selected' : ''}>${String(o.label)}</option>`,
+    )
+    .join('');
 
   const govMsg = getGovernanceMessageData();
   const governanceMessageHTML = `
@@ -163,7 +190,7 @@ function initBrokerOtherHandlers() {
   const govContainer = document.getElementById('governanceMessageContainer');
   const otherNameGroup = document.getElementById('brokerOtherNameGroup');
   if (!brokerSelect || !govContainer || !otherNameGroup) return;
-  
+
   function toggleOtherUI() {
     const isOther = brokerSelect.value === 'other';
     govContainer.style.display = isOther ? 'block' : 'none';
@@ -171,7 +198,7 @@ function initBrokerOtherHandlers() {
     const otherInput = document.getElementById('brokerOtherName');
     if (otherInput) otherInput.required = isOther;
   }
-  
+
   brokerSelect.addEventListener('change', toggleOtherUI);
   toggleOtherUI();
 }
@@ -190,53 +217,75 @@ export async function showTradingAccountFormModal(data, onSave, options = {}) {
   const modalOptions = options;
   const isEdit = data !== null;
   const title = isEdit ? 'עריכת חשבון מסחר' : 'הוספת חשבון מסחר חדש';
-  
+
   let brokerOptions = [];
   try {
     brokerOptions = await fetchReferenceBrokers();
   } catch (e) {
-    maskedLog('[Trading Accounts Form] Could not load brokers, using empty list:', { errorCode: e?.code });
+    maskedLog(
+      '[Trading Accounts Form] Could not load brokers, using empty list:',
+      { errorCode: e?.code },
+    );
   }
   const formHTML = createTradingAccountFormHTML(data, brokerOptions);
-  
+
   createModal({
     title,
     content: formHTML,
     entity: 'trading_account',
     showSaveButton: true,
     saveButtonText: 'שמירה',
-    onSave: async function() {
+    onSave: async function () {
       const form = document.getElementById('tradingAccountForm');
       if (!form) return;
-      
+
       // Validate form
       if (!form.checkValidity()) {
         form.reportValidity();
         return;
       }
-      
+
       // Collect form data
-      const accountNameValue = document.getElementById('accountName').value.trim();
-      const brokerSelectValue = document.getElementById('broker').value?.trim() || null;
-      const brokerOtherNameValue = document.getElementById('brokerOtherName')?.value?.trim() || '';
-      const accountNumberValue = document.getElementById('accountNumber').value.trim();
-      const initialBalanceInput = document.getElementById('initialBalance').value.trim();
+      const accountNameValue = document
+        .getElementById('accountName')
+        .value.trim();
+      const brokerSelectValue =
+        document.getElementById('broker').value?.trim() || null;
+      const brokerOtherNameValue =
+        document.getElementById('brokerOtherName')?.value?.trim() || '';
+      const accountNumberValue = document
+        .getElementById('accountNumber')
+        .value.trim();
+      const initialBalanceInput = document
+        .getElementById('initialBalance')
+        .value.trim();
       const currencyValue = document.getElementById('currency').value;
-      const isActiveValue = document.getElementById('isActive').value === 'true';
-      const externalAccountIdValue = document.getElementById('externalAccountId').value.trim();
-      
+      const isActiveValue =
+        document.getElementById('isActive').value === 'true';
+      const externalAccountIdValue = document
+        .getElementById('externalAccountId')
+        .value.trim();
+
       // Parse initialBalance - ensure it's a valid number
-      const initialBalanceParsed = initialBalanceInput ? parseFloat(initialBalanceInput) : NaN;
-      
+      const initialBalanceParsed = initialBalanceInput
+        ? parseFloat(initialBalanceInput)
+        : NaN;
+
       // Clear previous errors
-      ['accountNameError', 'brokerError', 'accountNumberError', 'initialBalanceError'].forEach(id => {
+      [
+        'accountNameError',
+        'brokerError',
+        'accountNumberError',
+        'initialBalanceError',
+      ].forEach((id) => {
         const el = document.getElementById(id);
         if (el) el.textContent = '';
       });
 
       // Validate required fields
       if (!accountNameValue) {
-        document.getElementById('accountNameError').textContent = 'שם חשבון מסחר הוא שדה חובה';
+        document.getElementById('accountNameError').textContent =
+          'שם חשבון מסחר הוא שדה חובה';
         return;
       }
 
@@ -246,51 +295,69 @@ export async function showTradingAccountFormModal(data, onSave, options = {}) {
       }
 
       if (!accountNumberValue) {
-        document.getElementById('accountNumberError').textContent = 'מספר חשבון מסחר הוא שדה חובה';
+        document.getElementById('accountNumberError').textContent =
+          'מספר חשבון מסחר הוא שדה חובה';
         return;
       }
-      
+
       if (isNaN(initialBalanceParsed) || initialBalanceParsed < 0) {
-        document.getElementById('initialBalanceError').textContent = 'יתרה התחלתית חייבת להיות מספר חיובי';
+        document.getElementById('initialBalanceError').textContent =
+          'יתרה התחלתית חייבת להיות מספר חיובי';
         return;
       }
 
       // Uniqueness: account name and account number must be unique per user (client-side check)
-      const existingAccounts = (modalOptions && modalOptions.existingAccounts) || [];
-      const dupName = existingAccounts.some(acc => {
+      const existingAccounts =
+        (modalOptions && modalOptions.existingAccounts) || [];
+      const dupName = existingAccounts.some((acc) => {
         const id = data?.externalUlid || data?.external_ulid || data?.id;
         const accId = acc.externalUlid || acc.external_ulid || acc.id;
         if (id && accId && String(id) === String(accId)) return false;
-        const n = (acc.accountName || acc.display_name || acc.account_name || '').trim().toLowerCase();
+        const n = (
+          acc.accountName ||
+          acc.display_name ||
+          acc.account_name ||
+          ''
+        )
+          .trim()
+          .toLowerCase();
         return n === accountNameValue.trim().toLowerCase();
       });
       if (dupName) {
-        document.getElementById('accountNameError').textContent = 'קיים כבר חשבון מסחר עם שם זה';
+        document.getElementById('accountNameError').textContent =
+          'קיים כבר חשבון מסחר עם שם זה';
         return;
       }
-      const dupNum = existingAccounts.some(acc => {
+      const dupNum = existingAccounts.some((acc) => {
         const id = data?.externalUlid || data?.external_ulid || data?.id;
         const accId = acc.externalUlid || acc.external_ulid || acc.id;
         if (id && accId && String(id) === String(accId)) return false;
-        const num = (acc.accountNumber || acc.account_number || '').trim().toLowerCase();
+        const num = (acc.accountNumber || acc.account_number || '')
+          .trim()
+          .toLowerCase();
         return num && num === accountNumberValue.trim().toLowerCase();
       });
       if (dupNum) {
-        document.getElementById('accountNumberError').textContent = 'מספר חשבון מסחר זה כבר קיים אצלך';
+        document.getElementById('accountNumberError').textContent =
+          'מספר חשבון מסחר זה כבר קיים אצלך';
         return;
       }
-      
+
       // ADR-015: when "other" selected, use custom broker name; require non-empty
-      const brokerValue = brokerSelectValue === 'other'
-        ? brokerOtherNameValue || null
-        : (brokerSelectValue || null);
-      const brokerOtherNameErrEl = document.getElementById('brokerOtherNameError');
+      const brokerValue =
+        brokerSelectValue === 'other'
+          ? brokerOtherNameValue || null
+          : brokerSelectValue || null;
+      const brokerOtherNameErrEl = document.getElementById(
+        'brokerOtherNameError',
+      );
       if (brokerSelectValue === 'other' && !brokerOtherNameValue) {
-        if (brokerOtherNameErrEl) brokerOtherNameErrEl.textContent = 'יש להזין את שם הברוקר';
+        if (brokerOtherNameErrEl)
+          brokerOtherNameErrEl.textContent = 'יש להזין את שם הברוקר';
         return;
       }
       if (brokerOtherNameErrEl) brokerOtherNameErrEl.textContent = '';
-      
+
       /* ADR-018: When broker is "other", mark is_supported=false */
       const formData = {
         accountName: accountNameValue,
@@ -300,9 +367,9 @@ export async function showTradingAccountFormModal(data, onSave, options = {}) {
         currency: currencyValue,
         isActive: isActiveValue,
         externalAccountId: externalAccountIdValue || null,
-        ...(brokerSelectValue === 'other' ? { isSupported: false } : {})
+        ...(brokerSelectValue === 'other' ? { isSupported: false } : {}),
       };
-      
+
       // Call save handler (async - don't close modal if error)
       if (onSave) {
         // Wrap in try-catch to handle errors
@@ -317,7 +384,10 @@ export async function showTradingAccountFormModal(data, onSave, options = {}) {
         } catch (error) {
           // Error handling is done in handleSaveTradingAccount
           // Don't close modal on error so user can see the error message
-          maskedLog('[Trading Accounts Form] Error saving:', { errorCode: error?.code, status: error?.status });
+          maskedLog('[Trading Accounts Form] Error saving:', {
+            errorCode: error?.code,
+            status: error?.status,
+          });
           // Modal stays open so user can fix and retry
         }
       } else {
@@ -325,10 +395,10 @@ export async function showTradingAccountFormModal(data, onSave, options = {}) {
         closeModal();
       }
     },
-    onClose: function() {
+    onClose: function () {
       // Cleanup if needed
-    }
+    },
   });
-  
+
   initBrokerOtherHandlers();
 }

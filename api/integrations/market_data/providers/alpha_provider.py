@@ -31,6 +31,7 @@ ALPHA_BASE_URL = "https://www.alphavantage.co/query"
 class AlphaQuotaExhaustedException(Exception):
     """Raised when Alpha Vantage returns Information/Note quota/rate signal."""
 
+
 ALPHA_RATE_LIMIT_SECONDS = 12.5  # 5 calls/min per spec
 
 # Module-level rate limit — shared across ALL AlphaProvider instances (per EXTERNAL_PROVIDER_ALPHA_VANTAGE_SPEC)
@@ -38,10 +39,15 @@ _alpha_last_call: float = 0.0
 _alpha_rate_lock = asyncio.Lock()
 
 
-def _replay_fx_alpha(fixtures_dir: Optional[Path], from_ccy: str, to_ccy: str) -> Optional[ExchangeRateResult]:
+def _replay_fx_alpha(
+    fixtures_dir: Optional[Path], from_ccy: str, to_ccy: str
+) -> Optional[ExchangeRateResult]:
     """REPLAY: load FX from fixtures — zero HTTP calls."""
     from ..replay_loader import load_fx_eod
-    base = fixtures_dir or (Path(__file__).resolve().parent.parent.parent.parent / "tests" / "fixtures" / "market_data")
+
+    base = fixtures_dir or (
+        Path(__file__).resolve().parent.parent.parent.parent / "tests" / "fixtures" / "market_data"
+    )
     data = load_fx_eod(base) if base else {}
     key = f"{from_ccy}_{to_ccy}"
     raw = data.get(key)
@@ -49,7 +55,9 @@ def _replay_fx_alpha(fixtures_dir: Optional[Path], from_ccy: str, to_ccy: str) -
         return None
     try:
         ts = raw.get("as_of", "")
-        as_of = datetime.fromisoformat(ts.replace("Z", "+00:00")) if ts else datetime.now(timezone.utc)
+        as_of = (
+            datetime.fromisoformat(ts.replace("Z", "+00:00")) if ts else datetime.now(timezone.utc)
+        )
         return ExchangeRateResult(
             from_currency=raw.get("from_currency", from_ccy),
             to_currency=raw.get("to_currency", to_ccy),
@@ -64,23 +72,46 @@ def _replay_fx_alpha(fixtures_dir: Optional[Path], from_ccy: str, to_ccy: str) -
 def _replay_price_alpha(fixtures_dir: Optional[Path], symbol: str) -> Optional[PriceResult]:
     """REPLAY: load price from fixtures — zero HTTP calls."""
     from ..replay_loader import load_prices_eod
-    base = fixtures_dir or (Path(__file__).resolve().parent.parent.parent.parent / "tests" / "fixtures" / "market_data")
+
+    base = fixtures_dir or (
+        Path(__file__).resolve().parent.parent.parent.parent / "tests" / "fixtures" / "market_data"
+    )
     data = load_prices_eod(base) if base else {}
     raw = data.get(symbol)
     if not raw:
         return None
     try:
         ts = raw.get("as_of", "")
-        as_of = datetime.fromisoformat(ts.replace("Z", "+00:00")) if ts else datetime.now(timezone.utc)
+        as_of = (
+            datetime.fromisoformat(ts.replace("Z", "+00:00")) if ts else datetime.now(timezone.utc)
+        )
         return PriceResult(
             symbol=raw.get("symbol", symbol),
             price=Decimal(str(raw.get("price", "0"))).quantize(Decimal("0.00000001")),
-            open_price=Decimal(str(raw.get("open_price", "0"))).quantize(Decimal("0.00000001")) if raw.get("open_price") else None,
-            high_price=Decimal(str(raw.get("high_price", "0"))).quantize(Decimal("0.00000001")) if raw.get("high_price") else None,
-            low_price=Decimal(str(raw.get("low_price", "0"))).quantize(Decimal("0.00000001")) if raw.get("low_price") else None,
-            close_price=Decimal(str(raw.get("close_price", raw.get("price", "0")))).quantize(Decimal("0.00000001")),
+            open_price=(
+                Decimal(str(raw.get("open_price", "0"))).quantize(Decimal("0.00000001"))
+                if raw.get("open_price")
+                else None
+            ),
+            high_price=(
+                Decimal(str(raw.get("high_price", "0"))).quantize(Decimal("0.00000001"))
+                if raw.get("high_price")
+                else None
+            ),
+            low_price=(
+                Decimal(str(raw.get("low_price", "0"))).quantize(Decimal("0.00000001"))
+                if raw.get("low_price")
+                else None
+            ),
+            close_price=Decimal(str(raw.get("close_price", raw.get("price", "0")))).quantize(
+                Decimal("0.00000001")
+            ),
             volume=int(raw["volume"]) if raw.get("volume") is not None else None,
-            market_cap=Decimal(str(raw["market_cap"])).quantize(Decimal("0.00000001")) if raw.get("market_cap") else None,
+            market_cap=(
+                Decimal(str(raw["market_cap"])).quantize(Decimal("0.00000001"))
+                if raw.get("market_cap")
+                else None
+            ),
             as_of=as_of,
             provider=raw.get("provider", "ALPHA_VANTAGE"),
         )
@@ -91,22 +122,39 @@ def _replay_price_alpha(fixtures_dir: Optional[Path], symbol: str) -> Optional[P
 def _replay_history_alpha(fixtures_dir: Optional[Path], symbol: str, trading_days: int) -> list:
     """REPLAY: load 250d history from fixtures — zero HTTP calls."""
     from ..replay_loader import load_prices_history
-    base = fixtures_dir or (Path(__file__).resolve().parent.parent.parent.parent / "tests" / "fixtures" / "market_data")
+
+    base = fixtures_dir or (
+        Path(__file__).resolve().parent.parent.parent.parent / "tests" / "fixtures" / "market_data"
+    )
     data = load_prices_history(base) if base else {}
     rows_data = data.get(symbol, []) if isinstance(data, dict) else []
     result = []
     for item in rows_data[-trading_days:]:
         try:
             d = item.get("date", "")
-            ts = datetime.fromisoformat(d.replace("Z", "+00:00")) if d else datetime.now(timezone.utc)
-            result.append(OHLCVRow(
-                date=ts,
-                open_price=Decimal(str(item.get("open_price", "0"))).quantize(Decimal("0.00000001")),
-                high_price=Decimal(str(item.get("high_price", "0"))).quantize(Decimal("0.00000001")),
-                low_price=Decimal(str(item.get("low_price", "0"))).quantize(Decimal("0.00000001")),
-                close_price=Decimal(str(item.get("close_price", "0"))).quantize(Decimal("0.00000001")),
-                volume=int(item["volume"]) if item.get("volume") is not None else None,
-            ))
+            ts = (
+                datetime.fromisoformat(d.replace("Z", "+00:00"))
+                if d
+                else datetime.now(timezone.utc)
+            )
+            result.append(
+                OHLCVRow(
+                    date=ts,
+                    open_price=Decimal(str(item.get("open_price", "0"))).quantize(
+                        Decimal("0.00000001")
+                    ),
+                    high_price=Decimal(str(item.get("high_price", "0"))).quantize(
+                        Decimal("0.00000001")
+                    ),
+                    low_price=Decimal(str(item.get("low_price", "0"))).quantize(
+                        Decimal("0.00000001")
+                    ),
+                    close_price=Decimal(str(item.get("close_price", "0"))).quantize(
+                        Decimal("0.00000001")
+                    ),
+                    volume=int(item["volume"]) if item.get("volume") is not None else None,
+                )
+            )
         except (KeyError, TypeError, ValueError):
             pass
     return result
@@ -119,7 +167,9 @@ class AlphaProvider(MarketDataProvider):
     Supports mode=REPLAY — zero HTTP calls.
     """
 
-    def __init__(self, api_key: Optional[str] = None, mode: str = "LIVE", fixtures_dir: Optional[Path] = None):
+    def __init__(
+        self, api_key: Optional[str] = None, mode: str = "LIVE", fixtures_dir: Optional[Path] = None
+    ):
         self._api_key = api_key or os.environ.get("ALPHA_VANTAGE_API_KEY", "")
         self._mode = (mode or "LIVE").upper()
         self._fixtures_dir = fixtures_dir
@@ -156,9 +206,7 @@ class AlphaProvider(MarketDataProvider):
                 )
             # Increment BEFORE the call (pessimistic counting = safe)
             new_count = increment_alpha_calls()
-            logger.debug(
-                "Alpha Vantage: call %d/%d today", new_count, ALPHA_DAILY_LIMIT
-            )
+            logger.debug("Alpha Vantage: call %d/%d today", new_count, ALPHA_DAILY_LIMIT)
             if new_count >= ALPHA_DAILY_LIMIT - 2:
                 logger.warning(
                     "Alpha Vantage quota low: %d/%d used today",
@@ -189,7 +237,9 @@ class AlphaProvider(MarketDataProvider):
             return val
         return (val / Decimal("100")).quantize(Decimal("0.00000001"))
 
-    async def get_ticker_price_crypto(self, symbol: str, market: str = "USD") -> Optional[PriceResult]:
+    async def get_ticker_price_crypto(
+        self, symbol: str, market: str = "USD"
+    ) -> Optional[PriceResult]:
         """
         Crypto-specific: DIGITAL_CURRENCY_DAILY endpoint.
         Per CORRECTIVE: Alpha must NOT use GLOBAL_QUOTE for crypto.
@@ -222,12 +272,14 @@ class AlphaProvider(MarketDataProvider):
             sorted_dates = sorted(series.keys(), reverse=True)
             latest_key = sorted_dates[0]
             v = series[latest_key]
+
             # Alpha returns "1a. open (USD)", "2a. high (USD)" etc when market=USD
             def _get(key_candidates):
                 for k in key_candidates:
                     if k in v and v[k] is not None:
                         return v[k]
                 return None
+
             open_val = _get([f"1a. open ({market})", "1a. open (USD)", "1. open"])
             high_val = _get([f"2a. high ({market})", "2a. high (USD)", "2. high"])
             low_val = _get([f"3a. low ({market})", "3a. low (USD)", "3. low"])
@@ -433,10 +485,16 @@ class AlphaProvider(MarketDataProvider):
                 if date_to is not None and d_date is not None and d_date > date_to:
                     continue
                 v = series[d]
-                open_val = v.get(f"1a. open ({market})") or v.get("1a. open (USD)") or v.get("1. open")
-                high_val = v.get(f"2a. high ({market})") or v.get("2a. high (USD)") or v.get("2. high")
+                open_val = (
+                    v.get(f"1a. open ({market})") or v.get("1a. open (USD)") or v.get("1. open")
+                )
+                high_val = (
+                    v.get(f"2a. high ({market})") or v.get("2a. high (USD)") or v.get("2. high")
+                )
                 low_val = v.get(f"3a. low ({market})") or v.get("3a. low (USD)") or v.get("3. low")
-                close_val = v.get(f"4a. close ({market})") or v.get("4a. close (USD)") or v.get("4. close")
+                close_val = (
+                    v.get(f"4a. close ({market})") or v.get("4a. close (USD)") or v.get("4. close")
+                )
                 vol_val = v.get("5. volume")
                 vol_int = None
                 if vol_val is not None and str(vol_val).strip():
@@ -448,14 +506,16 @@ class AlphaProvider(MarketDataProvider):
                     ts = datetime.fromisoformat(d).replace(tzinfo=timezone.utc)
                 except (ValueError, TypeError):
                     ts = datetime.now(timezone.utc)
-                result.append(OHLCVRow(
-                    date=ts,
-                    open_price=self._to_decimal(open_val) or Decimal("0"),
-                    high_price=self._to_decimal(high_val) or Decimal("0"),
-                    low_price=self._to_decimal(low_val) or Decimal("0"),
-                    close_price=self._to_decimal(close_val) or Decimal("0"),
-                    volume=vol_int,
-                ))
+                result.append(
+                    OHLCVRow(
+                        date=ts,
+                        open_price=self._to_decimal(open_val) or Decimal("0"),
+                        high_price=self._to_decimal(high_val) or Decimal("0"),
+                        low_price=self._to_decimal(low_val) or Decimal("0"),
+                        close_price=self._to_decimal(close_val) or Decimal("0"),
+                        volume=vol_int,
+                    )
+                )
         except Exception as e:
             logger.warning("Alpha crypto history fetch failed for %s/%s: %s", symbol, market, e)
         return result
@@ -510,21 +570,21 @@ class AlphaProvider(MarketDataProvider):
                         vol_int = int(float(vol_raw))  # ROOT_FIX: Alpha may return float string
                     except (TypeError, ValueError):
                         pass
-                result.append(OHLCVRow(
-                    date=ts,
-                    open_price=self._to_decimal(v.get("1. open")) or Decimal("0"),
-                    high_price=self._to_decimal(v.get("2. high")) or Decimal("0"),
-                    low_price=self._to_decimal(v.get("3. low")) or Decimal("0"),
-                    close_price=self._to_decimal(v.get("4. close")) or Decimal("0"),
-                    volume=vol_int,
-                ))
+                result.append(
+                    OHLCVRow(
+                        date=ts,
+                        open_price=self._to_decimal(v.get("1. open")) or Decimal("0"),
+                        high_price=self._to_decimal(v.get("2. high")) or Decimal("0"),
+                        low_price=self._to_decimal(v.get("3. low")) or Decimal("0"),
+                        close_price=self._to_decimal(v.get("4. close")) or Decimal("0"),
+                        volume=vol_int,
+                    )
+                )
         except Exception as e:
             logger.warning("Alpha history fetch failed for %s: %s", symbol, e)
         return result
 
-    async def get_exchange_rate(
-        self, from_ccy: str, to_ccy: str
-    ) -> Optional[ExchangeRateResult]:
+    async def get_exchange_rate(self, from_ccy: str, to_ccy: str) -> Optional[ExchangeRateResult]:
         """Primary for FX. CURRENCY_EXCHANGE_RATE endpoint. REPLAY: fixtures only."""
         if self._mode == "REPLAY":
             return _replay_fx_alpha(self._fixtures_dir, from_ccy, to_ccy)
@@ -553,9 +613,7 @@ class AlphaProvider(MarketDataProvider):
             ts = datetime.now(timezone.utc)
             if last_refresh:
                 try:
-                    ts = datetime.fromisoformat(
-                        str(last_refresh).replace(" ", "T")
-                    )
+                    ts = datetime.fromisoformat(str(last_refresh).replace(" ", "T"))
                     if ts.tzinfo is None:
                         ts = ts.replace(tzinfo=timezone.utc)
                 except (ValueError, TypeError):

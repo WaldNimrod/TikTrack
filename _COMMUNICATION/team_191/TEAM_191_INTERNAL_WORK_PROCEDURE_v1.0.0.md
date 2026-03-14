@@ -103,7 +103,8 @@ Every Team 191 closure note must include:
 2. Technical command tokens remain in English monospace for operational precision (for example: `git status`, `DATE-LINT`, `push`).
 3. Fixed translation lock for recurring Git operations:
    - `commit` = קומיט מקומי
-   - `push` = דחיפה ל-`origin/main`
+   - `push` = דחיפה לענף האינטגרציה `origin/codex/team191-integration`
+   - `merge` = מיזוג מ-`codex/team191-integration` ל-`main` דרך PR
    - `DATE-LINT` = תקינות תאריכים בקבצי governance/communication
    - `SYNC CHECK` = סנכרון WSM/Registries
    - `SNAPSHOT CHECK` = תקינות snapshot artifacts
@@ -119,11 +120,41 @@ Every Team 191 closure note must include:
    - `191 status` — show current Git/governance blocker status only.
    - `191 commit` — create context-aware local commit message and commit all intended updates.
    - `191 push` — run default `SAFE` push flow (guard checks + deterministic remediation + push).
+   - `191 merge` — run canonical merge flow from `codex/team191-integration` to `main` (PR create/check/merge/verify).
    - `191 push quick` — minimal flow (fast path; lower hygiene).
    - `191 push safe` — default balanced flow (recommended).
    - `191 push strict` — maximal hygiene flow (deep checks, slower).
+   - `191 merge quick` — verify branch sync + open PR/create PR, without auto-merge attempt.
+   - `191 merge safe` — default merge flow (recommended): create/reuse PR, verify mergeability and required checks, then merge.
+   - `191 merge strict` — safe flow + post-merge verification (`origin/main` SHA, PR merged metadata, rules compliance evidence).
 4. If mode is not specified, default mode is `SAFE`.
-5. Every `191 ?` response must include short pros/cons per mode to preserve consistent operator guidance.
+5. `191 merge` blocker contract (mandatory):
+   - If PR write permission is missing (`pull_requests=write`) or merge is blocked by repo rules/checks, return `BLOCK` with exact blocker list and owner action.
+   - Team 191 must not bypass branch protection by direct push to `main`.
+6. Every `191 ?` response must include short pros/cons per mode to preserve consistent operator guidance.
+
+---
+
+## 10) Setup Lock (One-Time + Session)
+
+1. One-time repository Git setting (mandatory):
+   - `git config push.default upstream`
+   - target effect: `191 push` can run `git push origin` without branch-name mismatch failures.
+2. Branch lock for Team 191 operation:
+   - local branch: `main`
+   - upstream target: `origin/codex/team191-integration`
+   - no direct push lane to `origin/main`.
+3. Session token loading for GitHub API actions:
+   - token file path: `/tmp/team191_github_token`
+   - loader pattern: `TOKEN="$(cat /tmp/team191_github_token)"`
+4. Mandatory fine-grained PAT permissions for full `191 merge` lane:
+   - `Pull requests: Read and write` (required for create/merge PR)
+   - `Contents: Read and write`
+   - `Metadata: Read-only`
+   - `Administration: Read and write` (required when branch/rules settings changes are in scope)
+5. Merge guard:
+   - if API returns `Resource not accessible by personal access token` or header requires `pull_requests=write`,
+     Team 191 returns `BLOCK` and routes owner to token-scope remediation.
 
 ---
 

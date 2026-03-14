@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-12T23:49:27.510445+00:00`
+- Generated (UTC): `2026-03-14T01:36:20.288343+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -16,7 +16,7 @@
 ## Portfolio Counts
 
 - stages: `6`
-- programs: `28`
+- programs: `31`
 - work_packages: `8`
 
 ## Roadmap (hierarchical)
@@ -45,7 +45,9 @@
     ├── **Program** `S002-P003` — TikTrack Alignment (D22+D33+D34+D35) | COMPLETE | domain: **TIKTRACK**
         └── **WP** `S002-P003-WP002` | CLOSED | gate: GATE_8 (PASS) | domain: **TIKTRACK**
 
-    └── **Program** `S002-P004` — Admin Review S002 | PLANNED | domain: **TIKTRACK**
+    ├── **Program** `S002-P004` — Admin Review S002 | PLANNED | domain: **TIKTRACK**
+
+    └── **Program** `S002-P005` — Agents_OS v2 Writing Semantics Hardening (ADR-031 Stage A) | PLANNED | domain: **AGENTS_OS**
 
 
 ### S003 — שלב 3 — Essential Data | PLANNED [SHARED]
@@ -62,7 +64,9 @@
 
     ├── **Program** `S003-P005` — Watch Lists (D26) | PLANNED | domain: **TIKTRACK**
 
-    └── **Program** `S003-P006` — Admin Review S003 | PLANNED | domain: **TIKTRACK**
+    ├── **Program** `S003-P006` — Admin Review S003 | PLANNED | domain: **TIKTRACK**
+
+    └── **Program** `S003-P007` — Agents_OS Command Bridge Lite (ADR-031 Stage B) | PLANNED | domain: **AGENTS_OS**
 
 
 ### S004 — שלב 4 — Financial Execution | PLANNED [SHARED]
@@ -79,7 +83,9 @@
 
     ├── **Program** `S004-P006` — Admin Review S004 | PLANNED | domain: **TIKTRACK**
 
-    └── **Program** `S004-P007` — Indicators Infrastructure | PLANNED | domain: **TIKTRACK**
+    ├── **Program** `S004-P007` — Indicators Infrastructure | PLANNED | domain: **TIKTRACK**
+
+    └── **Program** `S004-P008` — Agents_OS Mediated Reconciliation Engine (ADR-031 Stage C) | PLANNED | domain: **AGENTS_OS**
 
 
 ### S005 — שלב 5 — Trades/Plans | PLANNED [SHARED]

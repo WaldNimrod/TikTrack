@@ -2,7 +2,7 @@
  * useFeatureHook - [Description]
  * --------------------------------------------
  * Custom hook for [feature]
- * 
+ *
  * @description [תיאור ה-hook]
  */
 
@@ -13,10 +13,10 @@ import { debugLog } from '../../../utils/debug.js';
 
 /**
  * useFeatureHook Hook
- * 
+ *
  * @description [תיאור ה-hook]
  * @returns {Object} Hook state and methods
- * 
+ *
  * @example
  * const { data, loading, error, refresh } = useFeatureHook();
  */
@@ -27,7 +27,7 @@ const useFeatureHook = () => {
 
   /**
    * Load data
-   * 
+   *
    * @description Fetch data from service
    */
   const loadData = async () => {
@@ -52,7 +52,7 @@ const useFeatureHook = () => {
 
   /**
    * Refresh data
-   * 
+   *
    * @description Reload data
    */
   const refresh = () => {

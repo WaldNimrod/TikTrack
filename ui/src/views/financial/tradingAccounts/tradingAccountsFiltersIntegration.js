@@ -13,20 +13,20 @@ import { toCanonicalStatus } from '../../../utils/statusAdapter.js';
  */
 function getGlobalFilters() {
   const filters = {};
-  
+
   // Status filter (SSOT: canonical values via statusAdapter)
   const statusFilter = document.getElementById('selectedStatus');
   if (statusFilter && statusFilter.textContent !== 'כל סטטוס') {
     filters.status = toCanonicalStatus(statusFilter.textContent);
   }
-  
+
   // Account filter
   const accountFilter = document.getElementById('selectedAccount');
   if (accountFilter && accountFilter.textContent !== 'כל חשבון מסחר') {
     // TODO: Extract account ULID from filter
     filters.tradingAccountId = null; // Will be implemented when account filter provides ULID
   }
-  
+
   // Date range filter
   const dateFilter = document.getElementById('selectedDateRange');
   if (dateFilter && dateFilter.textContent !== 'כל זמן') {
@@ -34,13 +34,13 @@ function getGlobalFilters() {
     filters.dateFrom = null;
     filters.dateTo = null;
   }
-  
+
   // Search filter
   const searchInput = document.getElementById('searchFilterInput');
   if (searchInput && searchInput.value) {
     filters.search = searchInput.value;
   }
-  
+
   return filters;
 }
 
@@ -49,18 +49,18 @@ function getGlobalFilters() {
  */
 function getContainer2Filters() {
   const filters = {};
-  
+
   const dateFrom = document.getElementById('movementsDateFrom');
   const dateTo = document.getElementById('movementsDateTo');
-  
+
   if (dateFrom && dateFrom.value) {
     filters.dateFrom = dateFrom.value;
   }
-  
+
   if (dateTo && dateTo.value) {
     filters.dateTo = dateTo.value;
   }
-  
+
   return filters;
 }
 
@@ -69,23 +69,23 @@ function getContainer2Filters() {
  */
 function getContainer3Filters() {
   const filters = {};
-  
+
   const accountSelect = document.getElementById('accountByDatesSelect');
   if (accountSelect && accountSelect.value) {
     filters.tradingAccountId = accountSelect.value;
   }
-  
+
   const dateFrom = document.getElementById('accountByDatesDateFrom');
   const dateTo = document.getElementById('accountByDatesDateTo');
-  
+
   if (dateFrom && dateFrom.value) {
     filters.dateFrom = dateFrom.value;
   }
-  
+
   if (dateTo && dateTo.value) {
     filters.dateTo = dateTo.value;
   }
-  
+
   return filters;
 }
 
@@ -94,12 +94,12 @@ function getContainer3Filters() {
  */
 function getContainer4Filters() {
   const filters = {};
-  
+
   const accountSelect = document.getElementById('positionsAccountSelect');
   if (accountSelect && accountSelect.value) {
     filters.tradingAccountId = accountSelect.value;
   }
-  
+
   return filters;
 }
 
@@ -108,8 +108,10 @@ function getContainer4Filters() {
  */
 function setupFilterListeners() {
   // Global filters
-  const globalFilterInputs = document.querySelectorAll('.js-filter-toggle, .js-search-filter');
-  globalFilterInputs.forEach(input => {
+  const globalFilterInputs = document.querySelectorAll(
+    '.js-filter-toggle, .js-search-filter',
+  );
+  globalFilterInputs.forEach((input) => {
     input.addEventListener('change', () => {
       const filters = getGlobalFilters();
       if (window.TradingAccountsDataLoader) {
@@ -117,10 +119,12 @@ function setupFilterListeners() {
       }
     });
   });
-  
+
   // Container 2 filters (date range)
-  const container2DateInputs = document.querySelectorAll('#movementsDateFrom, #movementsDateTo');
-  container2DateInputs.forEach(input => {
+  const container2DateInputs = document.querySelectorAll(
+    '#movementsDateFrom, #movementsDateTo',
+  );
+  container2DateInputs.forEach((input) => {
     input.addEventListener('change', () => {
       const filters = getContainer2Filters();
       if (window.TradingAccountsDataLoader) {
@@ -128,10 +132,12 @@ function setupFilterListeners() {
       }
     });
   });
-  
+
   // Container 3 filters (account + dates)
-  const container3Inputs = document.querySelectorAll('#accountByDatesSelect, #accountByDatesDateFrom, #accountByDatesDateTo');
-  container3Inputs.forEach(input => {
+  const container3Inputs = document.querySelectorAll(
+    '#accountByDatesSelect, #accountByDatesDateFrom, #accountByDatesDateTo',
+  );
+  container3Inputs.forEach((input) => {
     input.addEventListener('change', () => {
       const filters = getContainer3Filters();
       if (window.TradingAccountsDataLoader) {
@@ -139,7 +145,7 @@ function setupFilterListeners() {
       }
     });
   });
-  
+
   // Container 4 filters (account)
   const container4Select = document.getElementById('positionsAccountSelect');
   if (container4Select) {
@@ -158,25 +164,30 @@ function setupFilterListeners() {
 async function populateAccountSelects() {
   if (!window.TradingAccountsDataLoader) return;
   // Gate A Fix: Skip API call for guests - prevents 401
-  const hasToken = !!(localStorage.getItem('access_token') || localStorage.getItem('authToken') ||
-    sessionStorage.getItem('access_token') || sessionStorage.getItem('authToken'));
+  const hasToken = !!(
+    localStorage.getItem('access_token') ||
+    localStorage.getItem('authToken') ||
+    sessionStorage.getItem('access_token') ||
+    sessionStorage.getItem('authToken')
+  );
   if (!hasToken) return;
   try {
-    const accountsData = await window.TradingAccountsDataLoader.fetchTradingAccounts();
+    const accountsData =
+      await window.TradingAccountsDataLoader.fetchTradingAccounts();
     const accounts = accountsData.data || [];
-    
+
     const selects = [
       document.getElementById('accountByDatesSelect'),
-      document.getElementById('positionsAccountSelect')
+      document.getElementById('positionsAccountSelect'),
     ];
-    
-    selects.forEach(select => {
+
+    selects.forEach((select) => {
       if (!select) return;
-      
+
       // Keep "All accounts" option
       const allOption = select.querySelector('option[value=""]');
       const currentValue = select.value;
-      
+
       // Clear existing options except "All accounts"
       select.innerHTML = '';
       if (allOption) {
@@ -187,15 +198,19 @@ async function populateAccountSelects() {
         defaultOption.textContent = 'כל החשבונות';
         select.appendChild(defaultOption);
       }
-      
+
       // Add account options
-      accounts.forEach(account => {
+      accounts.forEach((account) => {
         const option = document.createElement('option');
         option.value = account.externalUlid;
-        option.textContent = account.accountName || account.account_name || account.displayName || account.externalUlid;
+        option.textContent =
+          account.accountName ||
+          account.account_name ||
+          account.displayName ||
+          account.externalUlid;
         select.appendChild(option);
       });
-      
+
       // Restore previous selection if still valid
       if (currentValue) {
         select.value = currentValue;
@@ -203,9 +218,9 @@ async function populateAccountSelects() {
     });
   } catch (error) {
     // Use masked log for security compliance (prevents token leakage)
-    maskedLog('Error populating account selects:', { 
+    maskedLog('Error populating account selects:', {
       errorCode: error?.code,
-      status: error?.status
+      status: error?.status,
     });
   }
 }
@@ -236,7 +251,7 @@ window.TradingAccountsFiltersIntegration = {
   getContainer3Filters,
   getContainer4Filters,
   setupFilterListeners,
-  populateAccountSelects
+  populateAccountSelects,
 };
 
 // Auto-initialize

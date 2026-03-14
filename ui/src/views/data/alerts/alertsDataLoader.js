@@ -17,18 +17,33 @@ async function fetchAlertsSummary() {
     await sharedServices.init();
     const response = await sharedServices.get('/alerts/summary');
     return {
-      totalAlerts: (response.total_alerts != null ? response.total_alerts : response.totalAlerts) || 0,
-      activeAlerts: (response.active_alerts != null ? response.active_alerts : response.activeAlerts) || 0,
-      newAlerts: (response.new_alerts != null ? response.new_alerts : response.newAlerts) || 0,
-      triggeredAlerts: (response.triggered_alerts != null ? response.triggered_alerts : response.triggeredAlerts) || 0
+      totalAlerts:
+        (response.total_alerts != null
+          ? response.total_alerts
+          : response.totalAlerts) || 0,
+      activeAlerts:
+        (response.active_alerts != null
+          ? response.active_alerts
+          : response.activeAlerts) || 0,
+      newAlerts:
+        (response.new_alerts != null
+          ? response.new_alerts
+          : response.newAlerts) || 0,
+      triggeredAlerts:
+        (response.triggered_alerts != null
+          ? response.triggered_alerts
+          : response.triggeredAlerts) || 0,
     };
   } catch (error) {
-    maskedLog('[Alerts Data Loader] Error fetching summary:', { errorCode: (error && error.code), status: (error && error.status) });
+    maskedLog('[Alerts Data Loader] Error fetching summary:', {
+      errorCode: error && error.code,
+      status: error && error.status,
+    });
     return {
       totalAlerts: 0,
       activeAlerts: 0,
       newAlerts: 0,
-      triggeredAlerts: 0
+      triggeredAlerts: 0,
     };
   }
 }
@@ -50,13 +65,27 @@ async function fetchAlerts(filters = {}) {
     if (filters.per_page != null) params.per_page = filters.per_page;
     if (filters.sort) params.sort = filters.sort;
     if (filters.order) params.order = filters.order;
-    if (filters.tickerId || filters.ticker_id) params.ticker_id = filters.tickerId || filters.ticker_id;
+    if (filters.tickerId || filters.ticker_id)
+      params.ticker_id = filters.tickerId || filters.ticker_id;
     const response = await sharedServices.get('/alerts', params);
-    const data = Array.isArray(response) ? response : (response?.data ?? response?.alerts ?? response?.results ?? response?.items ?? []) || [];
-    const total = Math.max(data.length, (response.total != null ? response.total : response.total_count) || 0);
+    const data = Array.isArray(response)
+      ? response
+      : (response?.data ??
+          response?.alerts ??
+          response?.results ??
+          response?.items ??
+          []) ||
+        [];
+    const total = Math.max(
+      data.length,
+      (response.total != null ? response.total : response.total_count) || 0,
+    );
     return { data, total };
   } catch (error) {
-    maskedLog('[Alerts Data Loader] Error fetching alerts:', { errorCode: (error && error.code), status: (error && error.status) });
+    maskedLog('[Alerts Data Loader] Error fetching alerts:', {
+      errorCode: error && error.code,
+      status: error && error.status,
+    });
     return { data: [], total: 0 };
   }
 }
@@ -70,7 +99,10 @@ async function fetchAlertById(id) {
     await sharedServices.init();
     return await sharedServices.get(`/alerts/${id}`);
   } catch (error) {
-    maskedLog('[Alerts Data Loader] Error fetching alert:', { id, errorCode: (error && error.code) });
+    maskedLog('[Alerts Data Loader] Error fetching alert:', {
+      id,
+      errorCode: error && error.code,
+    });
     return null;
   }
 }
@@ -82,17 +114,24 @@ async function loadAlertsData(filters = {}) {
   try {
     const [summary, alertsData] = await Promise.all([
       fetchAlertsSummary(),
-      fetchAlerts(filters)
+      fetchAlerts(filters),
     ]);
     return {
       summary,
-      alerts: alertsData
+      alerts: alertsData,
     };
   } catch (error) {
-    maskedLog('[Alerts Data Loader] Error loading:', { errorCode: (error && error.code) });
+    maskedLog('[Alerts Data Loader] Error loading:', {
+      errorCode: error && error.code,
+    });
     return {
-      summary: { totalAlerts: 0, activeAlerts: 0, newAlerts: 0, triggeredAlerts: 0 },
-      alerts: { data: [], total: 0 }
+      summary: {
+        totalAlerts: 0,
+        activeAlerts: 0,
+        newAlerts: 0,
+        triggeredAlerts: 0,
+      },
+      alerts: { data: [], total: 0 },
     };
   }
 }

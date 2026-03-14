@@ -3,7 +3,7 @@
  * -------------------------------------
  * Component for displaying Rich-Text and Button styles dictionary
  * Used in Design System Dashboard (Type D - Admin-only)
- * 
+ *
  * @description Displays a table showing all Rich-Text styles (.phx-rt--*) and Button styles (.btn-*)
  * @version v1.0.0
  * @source SOP-012 §3
@@ -13,7 +13,7 @@ import React from 'react';
 
 /**
  * DesignSystemStylesTable Component
- * 
+ *
  * @description Table component displaying Rich-Text and Button styles dictionary
  * Used by DesignSystemDashboard component
  */
@@ -26,7 +26,7 @@ const DesignSystemStylesTable = () => {
       usage: 'Success messages, positive feedback',
       cssVariable: '--message-success',
       color: '#10b981',
-      example: <span className="phx-rt--success">דוגמה לטקסט הצלחה</span>
+      example: <span className="phx-rt--success">דוגמה לטקסט הצלחה</span>,
     },
     {
       className: '.phx-rt--warning',
@@ -34,7 +34,7 @@ const DesignSystemStylesTable = () => {
       usage: 'Warning messages, caution notices',
       cssVariable: '--message-warning',
       color: '#f59e0b',
-      example: <span className="phx-rt--warning">דוגמה לטקסט אזהרה</span>
+      example: <span className="phx-rt--warning">דוגמה לטקסט אזהרה</span>,
     },
     {
       className: '.phx-rt--danger',
@@ -42,7 +42,7 @@ const DesignSystemStylesTable = () => {
       usage: 'Error messages, critical alerts',
       cssVariable: '--message-error',
       color: '#ef4444',
-      example: <span className="phx-rt--danger">דוגמה לטקסט סכנה</span>
+      example: <span className="phx-rt--danger">דוגמה לטקסט סכנה</span>,
     },
     {
       className: '.phx-rt--highlight',
@@ -50,16 +50,64 @@ const DesignSystemStylesTable = () => {
       usage: 'Important highlights, emphasis',
       cssVariable: '--color-secondary',
       color: '#fc5a06',
-      example: <span className="phx-rt--highlight">דוגמה להדגשה</span>
-    }
+      example: <span className="phx-rt--highlight">דוגמה להדגשה</span>,
+    },
   ];
 
   // Status Badges — סטטוסים קבועים (TT2_SYSTEM_STATUS_VALUES_SSOT)
   const statusBadgeStyles = [
-    { value: 'pending', label: 'ממתין', cssVar: '--status-pending', example: <span className="phoenix-table__status-badge phoenix-table__status-badge--pending" data-status-category="pending">ממתין</span> },
-    { value: 'active', label: 'פתוח', cssVar: '--status-active', example: <span className="phoenix-table__status-badge phoenix-table__status-badge--active" data-status-category="active">פתוח</span> },
-    { value: 'inactive', label: 'סגור', cssVar: '--status-inactive', example: <span className="phoenix-table__status-badge phoenix-table__status-badge--inactive" data-status-category="inactive">סגור</span> },
-    { value: 'cancelled', label: 'מבוטל', cssVar: '--status-cancelled', example: <span className="phoenix-table__status-badge phoenix-table__status-badge--cancelled" data-status-category="cancelled">מבוטל</span> },
+    {
+      value: 'pending',
+      label: 'ממתין',
+      cssVar: '--status-pending',
+      example: (
+        <span
+          className="phoenix-table__status-badge phoenix-table__status-badge--pending"
+          data-status-category="pending"
+        >
+          ממתין
+        </span>
+      ),
+    },
+    {
+      value: 'active',
+      label: 'פתוח',
+      cssVar: '--status-active',
+      example: (
+        <span
+          className="phoenix-table__status-badge phoenix-table__status-badge--active"
+          data-status-category="active"
+        >
+          פתוח
+        </span>
+      ),
+    },
+    {
+      value: 'inactive',
+      label: 'סגור',
+      cssVar: '--status-inactive',
+      example: (
+        <span
+          className="phoenix-table__status-badge phoenix-table__status-badge--inactive"
+          data-status-category="inactive"
+        >
+          סגור
+        </span>
+      ),
+    },
+    {
+      value: 'cancelled',
+      label: 'מבוטל',
+      cssVar: '--status-cancelled',
+      example: (
+        <span
+          className="phoenix-table__status-badge phoenix-table__status-badge--cancelled"
+          data-status-category="cancelled"
+        >
+          מבוטל
+        </span>
+      ),
+    },
   ];
 
   // Button Styles Data (from DNA_BUTTON_SYSTEM.md)
@@ -70,7 +118,7 @@ const DesignSystemStylesTable = () => {
       usage: 'שמירה, אישור, שליחה',
       cssVariable: '--context-primary',
       color: '#475569',
-      example: <button className="btn btn-primary">שמירה</button>
+      example: <button className="btn btn-primary">שמירה</button>,
     },
     {
       className: '.btn-auth-primary',
@@ -78,7 +126,7 @@ const DesignSystemStylesTable = () => {
       usage: 'התחבר, הרשם',
       cssVariable: '--color-primary',
       color: '#26baac',
-      example: <button className="btn btn-auth-primary">התחבר</button>
+      example: <button className="btn btn-auth-primary">התחבר</button>,
     },
     {
       className: '.btn-success',
@@ -86,7 +134,7 @@ const DesignSystemStylesTable = () => {
       usage: 'אישור, שמירה מוצלחת',
       cssVariable: '--message-success',
       color: '#10b981',
-      example: <button className="btn btn-success">אישור</button>
+      example: <button className="btn btn-success">אישור</button>,
     },
     {
       className: '.btn-warning',
@@ -94,7 +142,7 @@ const DesignSystemStylesTable = () => {
       usage: 'מחיקה, ביטול פעולה',
       cssVariable: '--message-warning',
       color: '#f59e0b',
-      example: <button className="btn btn-warning">לבטל</button>
+      example: <button className="btn btn-warning">לבטל</button>,
     },
     {
       className: '.btn-secondary',
@@ -102,7 +150,7 @@ const DesignSystemStylesTable = () => {
       usage: 'לבטל, חזרה',
       cssVariable: '--color-secondary',
       color: '#fc5a06',
-      example: <button className="btn btn-secondary">לבטל</button>
+      example: <button className="btn btn-secondary">לבטל</button>,
     },
     {
       className: '.btn-outline-secondary',
@@ -110,7 +158,9 @@ const DesignSystemStylesTable = () => {
       usage: 'כפתור ברירת מחדל',
       cssVariable: '--color-primary',
       color: '#26baac',
-      example: <button className="btn btn-outline-secondary">ברירת מחדל</button>
+      example: (
+        <button className="btn btn-outline-secondary">ברירת מחדל</button>
+      ),
     },
     {
       className: '.btn-logout',
@@ -118,7 +168,7 @@ const DesignSystemStylesTable = () => {
       usage: 'התנתקות מהמערכת',
       cssVariable: '--color-error-red',
       color: '#ef4444',
-      example: <button className="btn btn-logout">התנתק</button>
+      example: <button className="btn btn-logout">התנתק</button>,
     },
     {
       className: '.btn-sm',
@@ -126,17 +176,24 @@ const DesignSystemStylesTable = () => {
       usage: 'כפתורים קטנים במיקומים צפופים',
       cssVariable: 'N/A',
       color: 'N/A',
-      example: <button className="btn btn-primary btn-sm">קטן</button>
-    }
+      example: <button className="btn btn-primary btn-sm">קטן</button>,
+    },
   ];
 
   return (
     <div className="design-system-styles">
       {/* Status Badges Section — סטטוסים קבועים */}
       <div className="design-system-section">
-        <h2 className="design-system-section__title">סטטוסים קבועים (Status Badges)</h2>
+        <h2 className="design-system-section__title">
+          סטטוסים קבועים (Status Badges)
+        </h2>
         <p className="design-system-section__description">
-          ארבעת הסטטוסים המערכתיים (TT2_SYSTEM_STATUS_VALUES_SSOT). צבעים מ־<code>phoenix-base.css</code> (<code>--status-*</code>). שימוש: <code>.phoenix-table__status-badge--pending|active|inactive|cancelled</code> או <code>data-status-category</code>.
+          ארבעת הסטטוסים המערכתיים (TT2_SYSTEM_STATUS_VALUES_SSOT). צבעים מ־
+          <code>phoenix-base.css</code> (<code>--status-*</code>). שימוש:{' '}
+          <code>
+            .phoenix-table__status-badge--pending|active|inactive|cancelled
+          </code>{' '}
+          או <code>data-status-category</code>.
         </p>
         <div className="phoenix-table-wrapper">
           <table className="phoenix-table">
@@ -151,9 +208,13 @@ const DesignSystemStylesTable = () => {
             <tbody className="phoenix-table__body">
               {statusBadgeStyles.map((row, index) => (
                 <tr key={index} className="phoenix-table__row">
-                  <td className="phoenix-table__cell"><code>{row.value}</code></td>
+                  <td className="phoenix-table__cell">
+                    <code>{row.value}</code>
+                  </td>
                   <td className="phoenix-table__cell">{row.label}</td>
-                  <td className="phoenix-table__cell"><code>{row.cssVar}</code></td>
+                  <td className="phoenix-table__cell">
+                    <code>{row.cssVar}</code>
+                  </td>
                   <td className="phoenix-table__cell">{row.example}</td>
                 </tr>
               ))}
@@ -166,9 +227,10 @@ const DesignSystemStylesTable = () => {
       <div className="design-system-section">
         <h2 className="design-system-section__title">Rich-Text Styles</h2>
         <p className="design-system-section__description">
-          מחלקות CSS לסגנון טקסט ב-Rich-Text Editor (TipTap). רק מחלקות המתחילות ב-<code>phx-rt--</code> מאושרות.
+          מחלקות CSS לסגנון טקסט ב-Rich-Text Editor (TipTap). רק מחלקות המתחילות
+          ב-<code>phx-rt--</code> מאושרות.
         </p>
-        
+
         <div className="phoenix-table-wrapper">
           <table className="phoenix-table">
             <thead className="phoenix-table__head">
@@ -191,9 +253,7 @@ const DesignSystemStylesTable = () => {
                   <td className="phoenix-table__cell">
                     <code>{style.cssVariable}</code>
                   </td>
-                  <td className="phoenix-table__cell">
-                    {style.example}
-                  </td>
+                  <td className="phoenix-table__cell">{style.example}</td>
                 </tr>
               ))}
             </tbody>
@@ -205,9 +265,10 @@ const DesignSystemStylesTable = () => {
       <div className="design-system-section">
         <h2 className="design-system-section__title">Button Styles</h2>
         <p className="design-system-section__description">
-          מחלקות CSS לכפתורים במערכת. כל הכפתורים משתמשים במחלקה הבסיסית <code>.btn</code>.
+          מחלקות CSS לכפתורים במערכת. כל הכפתורים משתמשים במחלקה הבסיסית{' '}
+          <code>.btn</code>.
         </p>
-        
+
         <div className="phoenix-table-wrapper">
           <table className="phoenix-table">
             <thead className="phoenix-table__head">
@@ -228,11 +289,13 @@ const DesignSystemStylesTable = () => {
                   <td className="phoenix-table__cell">{style.description}</td>
                   <td className="phoenix-table__cell">{style.usage}</td>
                   <td className="phoenix-table__cell">
-                    {style.cssVariable !== 'N/A' ? <code>{style.cssVariable}</code> : '—'}
+                    {style.cssVariable !== 'N/A' ? (
+                      <code>{style.cssVariable}</code>
+                    ) : (
+                      '—'
+                    )}
                   </td>
-                  <td className="phoenix-table__cell">
-                    {style.example}
-                  </td>
+                  <td className="phoenix-table__cell">{style.example}</td>
                 </tr>
               ))}
             </tbody>

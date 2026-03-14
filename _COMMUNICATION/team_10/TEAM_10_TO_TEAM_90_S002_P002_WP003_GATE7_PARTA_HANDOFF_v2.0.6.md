@@ -47,7 +47,7 @@
 | CC-WP003-03 (market_cap ANAU.MI, BTC-USD, TEVA.TA, SPY) | PASS | מקובל מ־v2.0.5 Re-QA |
 | **CC-WP003-04** (0 cooldown activations) | **PASS** | cc_04=0 (מקובל מ־v2.0.5) |
 
-**Run window:** 2026-03-12T11:50:57Z UTC | **log_path:** `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_6.log`
+**Run window:** 2026-03-12T11:50:57Z UTC | **log_path:** `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_6.log`
 
 ---
 
@@ -57,8 +57,8 @@
 |---|----------|------|
 | 1 | Runtime Evidence v2.0.6 | `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_90_S002_P002_WP003_GATE7_PARTA_RUNTIME_EVIDENCE_REPORT_v2.0.6.md` |
 | 2 | QA Corroboration v2.0.6 | `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_90_S002_P002_WP003_GATE7_PARTA_QA_CORROBORATION_v2.0.6.md` |
-| 3 | G7 evidence JSON | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
-| 4 | Shared log | `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_6.log` |
+| 3 | G7 evidence JSON | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
+| 4 | Shared log | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_6.log` |
 
 ---
 

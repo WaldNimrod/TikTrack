@@ -5,16 +5,34 @@
        Content: Active Alerts + Summary Information
        Per: notes_BLUEPRINT.html; TEAM_30_NOTES_PAGE_DESIGN_DATA_COMPATIBILITY_REPORT
        ============================================ -->
-  
+
   <tt-section data-section="summary-alerts" data-entity="note">
     <div class="index-section__header">
       <div class="index-section__header-title">
-        <img src="/images/icons/entities/notes.svg" alt="הערות" class="index-section__header-icon" width="35" height="35">
+        <img
+          src="/images/icons/entities/notes.svg"
+          alt="הערות"
+          class="index-section__header-icon"
+          width="35"
+          height="35"
+        />
         <h1 class="index-section__header-text">הערות</h1>
       </div>
       <div class="index-section__header-actions">
-        <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6l6 -6"></path></svg>
+        <button
+          class="index-section__header-toggle-btn js-section-toggle"
+          aria-label="הצג/הסתר"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M6 9l6 6l6 -6"></path>
+          </svg>
         </button>
       </div>
     </div>
@@ -25,39 +43,104 @@
           <div class="active-alerts" data-role="container">
             <div class="active-alerts__header">
               <div class="active-alerts__title-group">
-                <button type="button" class="active-alerts__title-trigger" aria-label="פתח עמוד ההתראות" data-action="navigate-alerts">
-                  <span class="active-alerts__title-icon" aria-hidden="true">🔔</span>
-                  <span class="active-alerts__title-text" data-role="title-text">התראות פעילות</span>
+                <button
+                  type="button"
+                  class="active-alerts__title-trigger"
+                  aria-label="פתח עמוד ההתראות"
+                  data-action="navigate-alerts"
+                >
+                  <span class="active-alerts__title-icon" aria-hidden="true"
+                    >🔔</span
+                  >
+                  <span class="active-alerts__title-text" data-role="title-text"
+                    >התראות פעילות</span
+                  >
                 </button>
-                <span class="active-alerts__count-badge" data-role="count" aria-live="polite" id="notesAlertsBadge">0</span>
+                <span
+                  class="active-alerts__count-badge"
+                  data-role="count"
+                  aria-live="polite"
+                  id="notesAlertsBadge"
+                  >0</span
+                >
               </div>
             </div>
             <div class="active-alerts__body">
-              <div class="active-alerts__list" data-role="list" role="list" id="notesAlertsList"></div>
-              <div class="active-alerts__empty" data-role="empty-state" id="notesAlertsEmpty">
-                <span class="active-alerts__empty-icon" aria-hidden="true">🔕</span>
-                <span class="active-alerts__empty-text">התראות — בתהליך פיתוח</span>
+              <div
+                class="active-alerts__list"
+                data-role="list"
+                role="list"
+                id="notesAlertsList"
+              ></div>
+              <div
+                class="active-alerts__empty"
+                data-role="empty-state"
+                id="notesAlertsEmpty"
+              >
+                <span class="active-alerts__empty-icon" aria-hidden="true"
+                  >🔕</span
+                >
+                <span class="active-alerts__empty-text"
+                  >התראות — בתהליך פיתוח</span
+                >
               </div>
             </div>
           </div>
           <!-- Summary Information -->
           <!-- T50-4: נתונים במרכז, כפתור בצד שמאל (כמו טיקרים) -->
-          <div class="info-summary info-summary--notes" id="notesSummaryStats" style="margin-top: var(--spacing-md, 16px);">
-            <div class="info-summary__row info-summary__row--first info-summary__row--notes-toggle">
+          <div
+            class="info-summary info-summary--notes"
+            id="notesSummaryStats"
+            style="margin-top: var(--spacing-md, 16px)"
+          >
+            <div
+              class="info-summary__row info-summary__row--first info-summary__row--notes-toggle"
+            >
               <div class="info-summary__content">
                 <div>סה"כ הערות: <strong id="totalNotes">0</strong></div>
-                <div>הערות חדשות (10 ימים): <strong id="recentNotes">0</strong></div>
-                <div>סה"כ קישורים (מצורפים): <strong id="totalLinks">0</strong></div>
+                <div>
+                  הערות חדשות (10 ימים): <strong id="recentNotes">0</strong>
+                </div>
+                <div>
+                  סה"כ קישורים (מצורפים): <strong id="totalLinks">0</strong>
+                </div>
               </div>
-              <button class="portfolio-summary__toggle-btn" id="notesSummaryToggleSize" aria-label="הצג סיכום מלא" title="הצג סיכום מלא">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path></svg>
+              <button
+                class="portfolio-summary__toggle-btn"
+                id="notesSummaryToggleSize"
+                aria-label="הצג סיכום מלא"
+                title="הצג סיכום מלא"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+                  <path
+                    d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"
+                  ></path>
+                </svg>
               </button>
             </div>
-            <div class="info-summary__row info-summary__row--second" id="notesSummaryContent" style="display: none;">
+            <div
+              class="info-summary__row info-summary__row--second"
+              id="notesSummaryContent"
+              style="display: none"
+            >
               <span>הערות מוצמדות: <strong id="pinnedNotes">0</strong></span>
-              <span class="notes-tags-placeholder">הערות עם תגיות: <em>תגיות — בתהליך פיתוח</em></span>
-              <span>הערות על טיקרים: <strong id="notesByTicker">0</strong></span>
-              <span>הערות על טריידים: <strong id="notesByTrade">0</strong></span>
+              <span class="notes-tags-placeholder"
+                >הערות עם תגיות: <em>תגיות — בתהליך פיתוח</em></span
+              >
+              <span
+                >הערות על טיקרים: <strong id="notesByTicker">0</strong></span
+              >
+              <span
+                >הערות על טריידים: <strong id="notesByTrade">0</strong></span
+              >
             </div>
           </div>
         </div>
@@ -71,11 +154,17 @@
        Content: Table (Notes Management) + Filter (filter-icon-btn)
        Per: notes_BLUEPRINT.html; TEAM_40_TO_TEAM_30_NOTES_FILTER_BUTTONS_CLASSES_RESPONSE
        ============================================ -->
-  
+
   <tt-section data-section="notes-management" data-entity="note">
     <div class="index-section__header">
       <div class="index-section__header-title">
-        <img src="/images/icons/entities/notes.svg" alt="הערות" class="index-section__header-icon" width="35" height="35">
+        <img
+          src="/images/icons/entities/notes.svg"
+          alt="הערות"
+          class="index-section__header-icon"
+          width="35"
+          height="35"
+        />
         <h1 class="index-section__header-text">ניהול הערות</h1>
       </div>
       <div class="index-section__header-meta">
@@ -83,28 +172,103 @@
       </div>
       <div class="index-section__header-actions">
         <div class="filter-buttons-container">
-          <button class="filter-icon-btn filter-icon-btn--active" data-filter-type="all" aria-label="הצג הכל" title="הצג הכל">
-            <img src="/images/icons/entities/notes.svg" alt="הכל" width="20" height="20">
+          <button
+            class="filter-icon-btn filter-icon-btn--active"
+            data-filter-type="all"
+            aria-label="הצג הכל"
+            title="הצג הכל"
+          >
+            <img
+              src="/images/icons/entities/notes.svg"
+              alt="הכל"
+              width="20"
+              height="20"
+            />
           </button>
-          <button class="filter-icon-btn" data-filter-type="account" aria-label="הערות על חשבונות" title="סינון לפי: חשבונות">
-            <img src="/images/icons/entities/trading_accounts.svg" alt="חשבונות" width="20" height="20">
+          <button
+            class="filter-icon-btn"
+            data-filter-type="account"
+            aria-label="הערות על חשבונות"
+            title="סינון לפי: חשבונות"
+          >
+            <img
+              src="/images/icons/entities/trading_accounts.svg"
+              alt="חשבונות"
+              width="20"
+              height="20"
+            />
           </button>
-          <button class="filter-icon-btn" data-filter-type="trade" aria-label="הערות על טריידים" title="סינון לפי: טריידים">
-            <img src="/images/icons/entities/trades.svg" alt="טריידים" width="20" height="20">
+          <button
+            class="filter-icon-btn"
+            data-filter-type="trade"
+            aria-label="הערות על טריידים"
+            title="סינון לפי: טריידים"
+          >
+            <img
+              src="/images/icons/entities/trades.svg"
+              alt="טריידים"
+              width="20"
+              height="20"
+            />
           </button>
-          <button class="filter-icon-btn" data-filter-type="trade_plan" aria-label="הערות על תוכניות" title="סינון לפי: תוכניות">
-            <img src="/images/icons/entities/trade_plans.svg" alt="תוכניות" width="20" height="20">
+          <button
+            class="filter-icon-btn"
+            data-filter-type="trade_plan"
+            aria-label="הערות על תוכניות"
+            title="סינון לפי: תוכניות"
+          >
+            <img
+              src="/images/icons/entities/trade_plans.svg"
+              alt="תוכניות"
+              width="20"
+              height="20"
+            />
           </button>
-          <button class="filter-icon-btn" data-filter-type="ticker" aria-label="הערות על טיקרים" title="סינון לפי: טיקרים">
-            <img src="/images/icons/entities/tickers.svg" alt="טיקרים" width="20" height="20">
+          <button
+            class="filter-icon-btn"
+            data-filter-type="ticker"
+            aria-label="הערות על טיקרים"
+            title="סינון לפי: טיקרים"
+          >
+            <img
+              src="/images/icons/entities/tickers.svg"
+              alt="טיקרים"
+              width="20"
+              height="20"
+            />
           </button>
         </div>
-        <button class="index-section__header-action-btn js-add-note" aria-label="הוסף הערה" title="הוסף הערה חדשה">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg>
+        <button
+          class="index-section__header-action-btn js-add-note"
+          aria-label="הוסף הערה"
+          title="הוסף הערה חדשה"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M12 5v14M5 12h14"></path>
+          </svg>
           הוסף הערה
         </button>
-        <button class="index-section__header-toggle-btn js-section-toggle" aria-label="הצג/הסתר">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6l6 -6"></path></svg>
+        <button
+          class="index-section__header-toggle-btn js-section-toggle"
+          aria-label="הצג/הסתר"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M6 9l6 6l6 -6"></path>
+          </svg>
         </button>
       </div>
     </div>
@@ -112,39 +276,129 @@
       <tt-section-row>
         <div class="col-12">
           <div class="phoenix-table-wrapper">
-            <table id="notesTable" class="phoenix-table js-table" data-table-type="notes" role="table" aria-label="ניהול הערות">
+            <table
+              id="notesTable"
+              class="phoenix-table js-table"
+              data-table-type="notes"
+              role="table"
+              aria-label="ניהול הערות"
+            >
               <thead class="phoenix-table__head" role="rowgroup">
                 <tr class="phoenix-table__row" role="row">
-                  <th class="phoenix-table__header col-linked-object" data-sortable="true" data-sort-key="parent_type" role="columnheader">אובייקט מקושר</th>
-                  <th class="phoenix-table__header col-content col-title" data-sortable="true" data-sort-key="title" role="columnheader">כותרת</th>
-                  <th class="phoenix-table__header col-attachment" role="columnheader">קובץ מצורף</th>
-                  <th class="phoenix-table__header col-created" data-sortable="true" data-sort-key="created_at" role="columnheader">נוצר ב</th>
-                  <th class="phoenix-table__header col-updated" data-sortable="true" data-sort-key="updated_at" role="columnheader">עודכן</th>
-                  <th class="phoenix-table__header col-actions" data-sortable="false" role="columnheader" aria-label="פעולות"><span class="phoenix-table__header-text sr-only">פעולות</span></th>
+                  <th
+                    class="phoenix-table__header col-linked-object"
+                    data-sortable="true"
+                    data-sort-key="parent_type"
+                    role="columnheader"
+                  >
+                    אובייקט מקושר
+                  </th>
+                  <th
+                    class="phoenix-table__header col-content col-title"
+                    data-sortable="true"
+                    data-sort-key="title"
+                    role="columnheader"
+                  >
+                    כותרת
+                  </th>
+                  <th
+                    class="phoenix-table__header col-attachment"
+                    role="columnheader"
+                  >
+                    קובץ מצורף
+                  </th>
+                  <th
+                    class="phoenix-table__header col-created"
+                    data-sortable="true"
+                    data-sort-key="created_at"
+                    role="columnheader"
+                  >
+                    נוצר ב
+                  </th>
+                  <th
+                    class="phoenix-table__header col-updated"
+                    data-sortable="true"
+                    data-sort-key="updated_at"
+                    role="columnheader"
+                  >
+                    עודכן
+                  </th>
+                  <th
+                    class="phoenix-table__header col-actions"
+                    data-sortable="false"
+                    role="columnheader"
+                    aria-label="פעולות"
+                  >
+                    <span class="phoenix-table__header-text sr-only"
+                      >פעולות</span
+                    >
+                  </th>
                 </tr>
               </thead>
-              <tbody class="phoenix-table__body" role="rowgroup" id="notesTableBody"></tbody>
+              <tbody
+                class="phoenix-table__body"
+                role="rowgroup"
+                id="notesTableBody"
+              ></tbody>
             </table>
           </div>
           <div class="phoenix-table-pagination">
-            <div class="phoenix-table-pagination__info"><span id="notesPaginationInfo">מציג 0-0 מתוך 0 רשומות</span></div>
+            <div class="phoenix-table-pagination__info">
+              <span id="notesPaginationInfo">מציג 0-0 מתוך 0 רשומות</span>
+            </div>
             <div class="phoenix-table-pagination__controls">
               <div class="phoenix-table-pagination__page-size">
-                <label class="phoenix-table-pagination__page-size-label">שורות לעמוד:</label>
-                <select class="phoenix-table-pagination__page-size-select js-table-page-size" data-table-id="notesTable">
+                <label class="phoenix-table-pagination__page-size-label"
+                  >שורות לעמוד:</label
+                >
+                <select
+                  class="phoenix-table-pagination__page-size-select js-table-page-size"
+                  data-table-id="notesTable"
+                >
                   <option value="10">10</option>
                   <option value="25" selected>25</option>
                   <option value="50">50</option>
                   <option value="100">100</option>
                 </select>
               </div>
-              <div class="phoenix-table-pagination__pages" id="notesPaginationControls">
-                <button class="phoenix-table-pagination__button" aria-label="עמוד קודם" id="notesPrevPageBtn" disabled>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"></path></svg>
+              <div
+                class="phoenix-table-pagination__pages"
+                id="notesPaginationControls"
+              >
+                <button
+                  class="phoenix-table-pagination__button"
+                  aria-label="עמוד קודם"
+                  id="notesPrevPageBtn"
+                  disabled
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M9 18l6-6-6-6"></path>
+                  </svg>
                 </button>
                 <div id="notesPageNumbers"></div>
-                <button class="phoenix-table-pagination__button" aria-label="עמוד הבא" id="notesNextPageBtn" disabled>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"></path></svg>
+                <button
+                  class="phoenix-table-pagination__button"
+                  aria-label="עמוד הבא"
+                  id="notesNextPageBtn"
+                  disabled
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M15 18l-6-6 6-6"></path>
+                  </svg>
                 </button>
               </div>
             </div>

@@ -3,7 +3,7 @@
 Seed Base Dataset for test_user
 Team 20 (Backend)
 Purpose: Minimal representative dataset (is_test_data = false) for test_user
-Reference: documentation/05-REPORTS/artifacts/SPEC_BASE_TEST_USER_DATASET.md
+Reference: documentation/reports/05-REPORTS/artifacts/SPEC_BASE_TEST_USER_DATASET.md
 """
 
 import sys

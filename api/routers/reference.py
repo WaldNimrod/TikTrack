@@ -33,12 +33,11 @@ router = APIRouter(prefix="/reference", tags=["reference"])
 
 @router.get("/brokers", response_model=BrokerReferenceResponse)
 async def get_brokers(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     Get broker list for select dropdowns (D16, D18).
-    
+
     ADR-013: API-based source only. No fallback to manual text input.
     - Primary: user's brokers from trading_accounts.broker
     - Fallback: defaults_brokers.json when user has none
@@ -53,39 +52,36 @@ async def get_brokers(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e) if settings.debug else "Failed to fetch broker list",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )
 
 
 @router.get("/exchanges", response_model=ExchangeReferenceResponse)
 async def get_exchanges(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """R2 1.7: Get exchanges for add-ticker form (symbol + exchange, ANAU.MI + MIL)."""
     try:
         items = await get_reference_exchanges(db)
         return ExchangeReferenceResponse(
-            data=[ExchangeReferenceItem(**x) for x in items],
-            total=len(items)
+            data=[ExchangeReferenceItem(**x) for x in items], total=len(items)
         )
     except Exception as e:
         logger.error("Error fetching exchanges: %s", e, exc_info=True)
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e) if settings.debug else "Failed to fetch exchanges",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )
 
 
 @router.get("/exchange-rates", response_model=ExchangeRatesResponse)
 async def get_exchange_rates_endpoint(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     Get exchange rates (FOREX) for currency conversion.
-    
+
     Per MARKET_DATA_PIPE_SPEC + ADR-022 (P3-005):
     - Cache-First: reads only from market_data.exchange_rates (no external API).
     - EOD only: data from Team 60 sync (Alpha/Yahoo). No real-time fetches.
@@ -94,13 +90,10 @@ async def get_exchange_rates_endpoint(
     """
     try:
         items, staleness = await asyncio.wait_for(
-            get_exchange_rates(db),
-            timeout=5.0  # Never block UI — 5s max
+            get_exchange_rates(db), timeout=5.0  # Never block UI — 5s max
         )
         return ExchangeRatesResponse(
-            data=[ExchangeRateItem(**x) for x in items],
-            total=len(items),
-            staleness=staleness
+            data=[ExchangeRateItem(**x) for x in items], total=len(items), staleness=staleness
         )
     except asyncio.TimeoutError:
         logger.warning("Exchange rates query timeout (5s) — returning empty")
@@ -112,5 +105,5 @@ async def get_exchange_rates_endpoint(
         raise HTTPExceptionWithCode(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e) if settings.debug else "Failed to fetch exchange rates",
-            error_code=ErrorCodes.SERVER_ERROR
+            error_code=ErrorCodes.SERVER_ERROR,
         )

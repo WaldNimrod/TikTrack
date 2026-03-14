@@ -2,15 +2,15 @@
  * AuthErrorHandler - Component לטיפול והצגת שגיאות ב-Auth Forms
  * ----------------------------------------------------------------
  * Component משותף להצגת שגיאות בטופסי Auth (general + field-level).
- * 
+ *
  * @description Component לטיפול והצגת שגיאות ב-Auth Forms עם תמיכה ב-general errors ו-field-level errors
  * @standard JS Standards Protocol ✅ | LEGO System ✅ | Accessibility ✅ | Audit Trail ✅
  * @legacyReference Legacy.auth.errorDisplay()
- * 
+ *
  * @example
  * ```javascript
- * <AuthErrorHandler 
- *   error="שגיאה כללית" 
+ * <AuthErrorHandler
+ *   error="שגיאה כללית"
  *   fieldErrors={{ username: "שם משתמש שגוי" }}
  *   showFieldErrors={true}
  * />
@@ -23,7 +23,7 @@ import { DEBUG_MODE, debugLog } from '../../../../utils/debug.js';
 
 /**
  * AuthErrorHandler Component
- * 
+ *
  * @param {Object} props - Component props
  * @param {string} [props.error] - General error message (Hebrew)
  * @param {Object} [props.fieldErrors] - Field-level errors object { fieldName: errorMessage }
@@ -32,12 +32,12 @@ import { DEBUG_MODE, debugLog } from '../../../../utils/debug.js';
  * @param {string} [props.className] - Additional CSS classes
  * @returns {React.ReactElement} - Error handler component
  */
-const AuthErrorHandler = ({ 
-  error = null, 
-  fieldErrors = {}, 
+const AuthErrorHandler = ({
+  error = null,
+  fieldErrors = {},
   showFieldErrors = true,
   testId = 'auth-error-message',
-  className = ''
+  className = '',
 }) => {
   const errorRef = useRef(null);
 
@@ -59,38 +59,50 @@ const AuthErrorHandler = ({
             errorElement.hidden = false;
             errorElement.setAttribute('aria-hidden', 'false');
             errorElement.classList.remove('auth-form__error--hidden');
-            
+
             // CRITICAL: Ensure element has Hebrew text content (for test compatibility)
             // Always set text content to ensure it's visible to tests
             if (error) {
               // Force set text content (both textContent and innerText for compatibility)
               errorElement.textContent = error;
               errorElement.innerText = error;
-              
+
               // Also set innerHTML as fallback (some tests may read innerHTML)
               if (errorElement.innerHTML !== error) {
                 errorElement.innerHTML = error;
               }
-              
+
               // Verify text content is in Hebrew
-              const currentText = errorElement.textContent || errorElement.innerText || errorElement.innerHTML || '';
+              const currentText =
+                errorElement.textContent ||
+                errorElement.innerText ||
+                errorElement.innerHTML ||
+                '';
               const hasHebrew = /[\u0590-\u05FF]/.test(currentText);
-              
+
               if (!hasHebrew && DEBUG_MODE) {
-                debugLog('AuthErrorHandler', 'Warning: Error message is not in Hebrew', { error });
+                debugLog(
+                  'AuthErrorHandler',
+                  'Warning: Error message is not in Hebrew',
+                  { error },
+                );
               }
             }
-            
+
             // Scroll to error element
-            errorElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            
+            errorElement.scrollIntoView({
+              behavior: 'smooth',
+              block: 'nearest',
+            });
+
             if (DEBUG_MODE) {
               debugLog('AuthErrorHandler', 'Error element made visible', {
                 found: true,
                 text: errorElement.textContent,
                 errorState: error,
                 computedDisplay: window.getComputedStyle(errorElement).display,
-                computedVisibility: window.getComputedStyle(errorElement).visibility
+                computedVisibility:
+                  window.getComputedStyle(errorElement).visibility,
               });
             }
           }
@@ -101,7 +113,7 @@ const AuthErrorHandler = ({
 
   /**
    * Render General Error
-   * 
+   *
    * @description Renders general error message at the top of the form
    */
   const renderGeneralError = () => {
@@ -110,10 +122,10 @@ const AuthErrorHandler = ({
     }
 
     return (
-      <div 
+      <div
         ref={errorRef}
         className={`auth-form__error js-error-feedback ${error ? '' : 'auth-form__error--hidden'} ${className}`}
-        role="alert" 
+        role="alert"
         aria-live="polite"
         aria-hidden={!error}
         data-testid={testId}
@@ -126,7 +138,7 @@ const AuthErrorHandler = ({
 
   /**
    * Render Field Error
-   * 
+   *
    * @description Renders field-level error message
    * @param {string} fieldName - Field name
    * @param {string} errorMessage - Error message
@@ -138,7 +150,7 @@ const AuthErrorHandler = ({
     }
 
     return (
-      <span 
+      <span
         className="auth-form__error-message js-field-error"
         data-field={fieldName}
         role="alert"
@@ -160,7 +172,7 @@ const AuthErrorHandler = ({
 
 /**
  * Field Error Helper Component
- * 
+ *
  * @description Helper component to render field-level errors inline
  * @param {Object} props - Component props
  * @param {string} props.fieldName - Field name
@@ -169,13 +181,13 @@ const AuthErrorHandler = ({
  */
 export const FieldError = ({ fieldName, fieldErrors = {} }) => {
   const errorMessage = fieldErrors[fieldName];
-  
+
   if (!errorMessage) {
     return null;
   }
 
   return (
-    <span 
+    <span
       className="auth-form__error-message js-field-error"
       data-field={fieldName}
       role="alert"

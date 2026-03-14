@@ -20,8 +20,9 @@ REQUIRED_MIN_AFTER_INSERT = 100  # Accept if we get at least this many new rows 
 
 class BackfillDecision(str, Enum):
     """Decision from Smart History Engine."""
-    NO_OP = "no_op"           # Data complete (250+ rows), no gaps
-    GAP_FILL = "gap_fill"     # Has gaps — fill only missing dates
+
+    NO_OP = "no_op"  # Data complete (250+ rows), no gaps
+    GAP_FILL = "gap_fill"  # Has gaps — fill only missing dates
     FULL_RELOAD = "force_reload"  # Admin requested full reload (clear + fetch all)
 
 

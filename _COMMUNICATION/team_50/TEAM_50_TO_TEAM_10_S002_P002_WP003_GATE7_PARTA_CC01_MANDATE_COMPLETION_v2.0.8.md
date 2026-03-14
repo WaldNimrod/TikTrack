@@ -25,8 +25,8 @@
 |---|----------|------|--------|
 | 1 | Team 60 Evidence Report | `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_90_..._RUNTIME_EVIDENCE_REPORT_v2.0.8.md` | ✓ |
 | 2 | Team 50 Corroboration | `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_90_..._QA_CORROBORATION_v2.0.8.md` | ✓ |
-| 3 | JSON | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` | ✓ |
-| 4 | Log | `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_8.log` | ✓ |
+| 3 | JSON | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` | ✓ |
+| 4 | Log | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_8.log` | ✓ |
 
 ---
 

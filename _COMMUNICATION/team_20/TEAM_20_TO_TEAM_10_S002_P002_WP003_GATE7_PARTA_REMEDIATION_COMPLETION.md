@@ -89,7 +89,7 @@
 |-------|--------|
 | `GATE7_CC_EVIDENCE=1 python3 scripts/run_g7_part_a_evidence.py` | **pass_04=True**, cc_wp003_04_yahoo_429_count=**0** |
 | `grep -c "429" <log>` | 0 |
-| לוג | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_2026-03-11_223450.log` |
+| לוג | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_2026-03-11_223450.log` |
 
 ---
 

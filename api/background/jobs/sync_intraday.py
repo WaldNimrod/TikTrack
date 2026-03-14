@@ -24,6 +24,7 @@ async def run(db: AsyncSession) -> dict:
     Returns {records_processed, records_updated, error_count}.
     """
     from api.integrations.market_data.market_data_settings import get_intraday_enabled
+
     if not get_intraday_enabled():
         return {"records_processed": 0, "records_updated": 0, "error_count": 0}
 
@@ -43,18 +44,23 @@ async def run(db: AsyncSession) -> dict:
     }
 
 
-async def _load_active_tickers(db: AsyncSession) -> List[Tuple[UUID, str, str, Optional[Dict[str, Any]]]]:
+async def _load_active_tickers(
+    db: AsyncSession,
+) -> List[Tuple[UUID, str, str, Optional[Dict[str, Any]]]]:
     """Load active tickers from market_data.tickers."""
     from api.integrations.market_data.market_data_settings import get_max_active_tickers
+
     max_tickers = get_max_active_tickers()
     result = await db.execute(
-        text("""
+        text(
+            """
             SELECT id, symbol, COALESCE(ticker_type::text, 'STOCK') AS ticker_type, metadata
             FROM market_data.tickers
             WHERE deleted_at IS NULL AND is_active = true
             ORDER BY symbol
             LIMIT :limit
-        """),
+        """
+        ),
         {"limit": max_tickers},
     )
     rows = result.fetchall()
@@ -63,6 +69,7 @@ async def _load_active_tickers(db: AsyncSession) -> List[Tuple[UUID, str, str, O
         meta = r[3] if len(r) > 3 else None
         if isinstance(meta, str):
             import json
+
             try:
                 meta = json.loads(meta) if meta else None
             except (json.JSONDecodeError, TypeError):
@@ -87,11 +94,13 @@ async def _get_active_trade_ticker_ids(db: AsyncSession) -> set:
 async def _get_last_fetched_at(db: AsyncSession, ticker_id: UUID) -> Optional[datetime]:
     """Return the most recent fetched_at for a ticker from ticker_prices_intraday, or None. FIX-1."""
     result = await db.execute(
-        text("""
+        text(
+            """
             SELECT fetched_at FROM market_data.ticker_prices_intraday
             WHERE ticker_id = :tid
             ORDER BY fetched_at DESC LIMIT 1
-        """),
+        """
+        ),
         {"tid": str(ticker_id)},
     )
     row = result.fetchone()
@@ -106,12 +115,36 @@ async def _get_last_fetched_at(db: AsyncSession, ticker_id: UUID) -> Optional[da
 async def _fetch_prices_for_tickers(
     db: AsyncSession,
     tickers: List[Tuple[UUID, str, str, Optional[Dict[str, Any]]]],
-) -> List[Tuple[UUID, str, Decimal, Optional[Decimal], Optional[Decimal], Optional[Decimal], Optional[Decimal], Optional[int], Optional[Decimal], datetime, str]]:
+) -> List[
+    Tuple[
+        UUID,
+        str,
+        Decimal,
+        Optional[Decimal],
+        Optional[Decimal],
+        Optional[Decimal],
+        Optional[Decimal],
+        Optional[int],
+        Optional[Decimal],
+        datetime,
+        str,
+    ]
+]:
     """Yahoo → Alpha fallback. Uses market_data_settings for config (no .env in this module)."""
     from api.integrations.market_data.providers.yahoo_provider import YahooProvider
-    from api.integrations.market_data.providers.alpha_provider import AlphaProvider, AlphaQuotaExhaustedException
-    from api.integrations.market_data.provider_cooldown import set_cooldown, set_cooldown_hours, is_in_cooldown
-    from api.integrations.market_data.provider_mapping_utils import get_provider_mapping, resolve_symbols_for_fetch
+    from api.integrations.market_data.providers.alpha_provider import (
+        AlphaProvider,
+        AlphaQuotaExhaustedException,
+    )
+    from api.integrations.market_data.provider_cooldown import (
+        set_cooldown,
+        set_cooldown_hours,
+        is_in_cooldown,
+    )
+    from api.integrations.market_data.provider_mapping_utils import (
+        get_provider_mapping,
+        resolve_symbols_for_fetch,
+    )
     from api.integrations.market_data.market_data_settings import (
         get_alpha_quota_cooldown_hours,
         get_current_cadence_minutes,
@@ -165,7 +198,9 @@ async def _fetch_prices_for_tickers(
     # --- Per-ticker: batch result → individual Yahoo → Alpha → LAST_KNOWN ---
     for ticker_id, symbol, ticker_type, metadata in tickers_to_fetch:
         pm = get_provider_mapping(symbol, ticker_type or "STOCK", None, metadata)
-        yahoo_sym, alpha_sym, alpha_market = resolve_symbols_for_fetch(symbol, ticker_type or "STOCK", pm)
+        yahoo_sym, alpha_sym, alpha_market = resolve_symbols_for_fetch(
+            symbol, ticker_type or "STOCK", pm
+        )
         pr = None
 
         if yahoo_sym and yahoo_sym in yahoo_batch:
@@ -188,19 +223,21 @@ async def _fetch_prices_for_tickers(
                 set_cooldown_hours("ALPHA_VANTAGE", get_alpha_quota_cooldown_hours())
 
         if pr and pr.price and pr.price > 0:
-            results.append((
-                ticker_id,
-                symbol,
-                pr.price,
-                pr.open_price,
-                pr.high_price,
-                pr.low_price,
-                pr.close_price or pr.price,
-                pr.volume,
-                pr.market_cap,
-                pr.as_of or datetime.now(timezone.utc),
-                pr.provider or "unknown",
-            ))
+            results.append(
+                (
+                    ticker_id,
+                    symbol,
+                    pr.price,
+                    pr.open_price,
+                    pr.high_price,
+                    pr.low_price,
+                    pr.close_price or pr.price,
+                    pr.volume,
+                    pr.market_cap,
+                    pr.as_of or datetime.now(timezone.utc),
+                    pr.provider or "unknown",
+                )
+            )
         else:
             last = await _get_last_known_price(db, ticker_id, symbol)
             if last:
@@ -216,35 +253,75 @@ async def _get_last_known_price(
     db: AsyncSession,
     ticker_id: UUID,
     symbol: str,
-) -> Optional[Tuple[UUID, str, Decimal, Optional[Decimal], Optional[Decimal], Optional[Decimal], Optional[Decimal], Optional[int], Optional[Decimal], datetime, str]]:
+) -> Optional[
+    Tuple[
+        UUID,
+        str,
+        Decimal,
+        Optional[Decimal],
+        Optional[Decimal],
+        Optional[Decimal],
+        Optional[Decimal],
+        Optional[int],
+        Optional[Decimal],
+        datetime,
+        str,
+    ]
+]:
     """Fallback when providers fail — use last known from DB."""
     for table in ["ticker_prices_intraday", "ticker_prices"]:
         result = await db.execute(
-            text(f"""
+            text(
+                f"""
                 SELECT price, open_price, high_price, low_price, close_price, volume, market_cap, price_timestamp
                 FROM market_data.{table}
                 WHERE ticker_id = :tid
                 ORDER BY price_timestamp DESC
                 LIMIT 1
-            """),
+            """
+            ),
             {"tid": str(ticker_id)},
         )
         row = result.fetchone()
         if row and row[0] and float(row[0]) > 0:
             ts = row[7] if len(row) > 7 else datetime.now(timezone.utc)
             if ts and getattr(ts, "tzinfo", None) is None:
-                ts = ts.replace(tzinfo=timezone.utc) if hasattr(ts, "replace") else datetime.now(timezone.utc)
+                ts = (
+                    ts.replace(tzinfo=timezone.utc)
+                    if hasattr(ts, "replace")
+                    else datetime.now(timezone.utc)
+                )
             close_val = row[4] or row[0]
             return (
                 ticker_id,
                 symbol,
                 Decimal(str(row[0])).quantize(DECIMAL_SCALE, rounding=ROUND_HALF_UP),
-                Decimal(str(row[1])).quantize(DECIMAL_SCALE, rounding=ROUND_HALF_UP) if row[1] else None,
-                Decimal(str(row[2])).quantize(DECIMAL_SCALE, rounding=ROUND_HALF_UP) if row[2] else None,
-                Decimal(str(row[3])).quantize(DECIMAL_SCALE, rounding=ROUND_HALF_UP) if row[3] else None,
-                Decimal(str(close_val)).quantize(DECIMAL_SCALE, rounding=ROUND_HALF_UP) if close_val else None,
+                (
+                    Decimal(str(row[1])).quantize(DECIMAL_SCALE, rounding=ROUND_HALF_UP)
+                    if row[1]
+                    else None
+                ),
+                (
+                    Decimal(str(row[2])).quantize(DECIMAL_SCALE, rounding=ROUND_HALF_UP)
+                    if row[2]
+                    else None
+                ),
+                (
+                    Decimal(str(row[3])).quantize(DECIMAL_SCALE, rounding=ROUND_HALF_UP)
+                    if row[3]
+                    else None
+                ),
+                (
+                    Decimal(str(close_val)).quantize(DECIMAL_SCALE, rounding=ROUND_HALF_UP)
+                    if close_val
+                    else None
+                ),
                 int(row[5]) if row[5] is not None else None,
-                Decimal(str(row[6])).quantize(DECIMAL_SCALE, rounding=ROUND_HALF_UP) if row[6] else None,
+                (
+                    Decimal(str(row[6])).quantize(DECIMAL_SCALE, rounding=ROUND_HALF_UP)
+                    if row[6]
+                    else None
+                ),
                 ts or datetime.now(timezone.utc),
                 "LAST_KNOWN",
             )
@@ -253,18 +330,34 @@ async def _get_last_known_price(
 
 async def _insert_intraday(
     db: AsyncSession,
-    rows: List[Tuple[UUID, str, Decimal, Optional[Decimal], Optional[Decimal], Optional[Decimal], Optional[Decimal], Optional[int], Optional[Decimal], datetime, str]],
+    rows: List[
+        Tuple[
+            UUID,
+            str,
+            Decimal,
+            Optional[Decimal],
+            Optional[Decimal],
+            Optional[Decimal],
+            Optional[Decimal],
+            Optional[int],
+            Optional[Decimal],
+            datetime,
+            str,
+        ]
+    ],
 ) -> int:
     """Insert price rows into ticker_prices_intraday."""
     now = datetime.now(timezone.utc)
     inserted = 0
     for ticker_id, symbol, price, o, h, low, c, vol, mc, as_of, provider in rows:
         await db.execute(
-            text("""
+            text(
+                """
                 INSERT INTO market_data.ticker_prices_intraday
                 (ticker_id, provider_id, price, open_price, high_price, low_price, close_price, volume, market_cap, price_timestamp, fetched_at, is_stale)
                 VALUES (:tid, NULL, :price, :o, :h, :l, :c, :vol, :mc, :as_of, :fetched, false)
-            """),
+            """
+            ),
             {
                 "tid": str(ticker_id),
                 "price": price,

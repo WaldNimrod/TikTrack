@@ -2,31 +2,31 @@
  * AuthForm - Component משותף לטופסי Auth
  * --------------------------------------
  * Component משותף עבור Identity & Authentication Cube שישמש את כל עמודי Auth (Login, Register, Reset Password).
- * 
+ *
  * @description Component משותף לטופסי Auth עם תמיכה ב-3 סוגי טפסים: Login, Register, Reset Password
  * @standard JS Standards Protocol ✅ | LEGO System ✅ | Accessibility ✅ | Audit Trail ✅ | CSS Standards ✅
  * @legacyReference Legacy.auth.form()
- * 
+ *
  * @example
  * ```javascript
  * // Login Form
- * <AuthForm 
+ * <AuthForm
  *   formType="login"
  *   onSubmit={handleLogin}
  *   isLoading={isLoading}
  *   error={error}
  * />
- * 
+ *
  * // Register Form
- * <AuthForm 
+ * <AuthForm
  *   formType="register"
  *   onSubmit={handleRegister}
  *   isLoading={isLoading}
  *   error={error}
  * />
- * 
+ *
  * // Reset Password Form
- * <AuthForm 
+ * <AuthForm
  *   formType="reset-password"
  *   onSubmit={handleResetPassword}
  *   isLoading={isLoading}
@@ -46,13 +46,16 @@ import {
   validatePassword,
   validateUsername,
   validateConfirmPassword,
-  validateIdentifier
+  validateIdentifier,
 } from '../../../logic/schemas/authSchema.js';
-import { validateEmail, validatePhoneNumber } from '../../../logic/schemas/userSchema.js';
+import {
+  validateEmail,
+  validatePhoneNumber,
+} from '../../../logic/schemas/userSchema.js';
 
 /**
  * AuthForm Component
- * 
+ *
  * @param {Object} props - Component props
  * @param {string} props.formType - Form type: 'login' | 'register' | 'reset-password'
  * @param {Function} props.onSubmit - Callback function called on form submit with form data (camelCase)
@@ -74,7 +77,7 @@ const AuthForm = ({
   title = null,
   subtitle = null,
   footerLinks = null,
-  footerText = null
+  footerText = null,
 }) => {
   // Form state based on form type
   const getInitialFormData = () => {
@@ -83,7 +86,10 @@ const AuthForm = ({
         return {
           usernameOrEmail: initialValues.usernameOrEmail || '',
           password: initialValues.password || '',
-          rememberMe: initialValues.rememberMe !== undefined ? initialValues.rememberMe : true
+          rememberMe:
+            initialValues.rememberMe !== undefined
+              ? initialValues.rememberMe
+              : true,
         };
       case 'register':
         return {
@@ -91,11 +97,11 @@ const AuthForm = ({
           email: initialValues.email || '',
           password: initialValues.password || '',
           confirmPassword: initialValues.confirmPassword || '',
-          phoneNumber: initialValues.phoneNumber || ''
+          phoneNumber: initialValues.phoneNumber || '',
         };
       case 'reset-password':
         return {
-          identifier: initialValues.identifier || ''
+          identifier: initialValues.identifier || '',
         };
       default:
         return {};
@@ -110,24 +116,25 @@ const AuthForm = ({
       case 'login':
         return {
           usernameOrEmail: (value) => validateUsernameOrEmail(value),
-          password: (value) => validatePassword(value, { minLength: 1 })
+          password: (value) => validatePassword(value, { minLength: 1 }),
         };
       case 'register':
         return {
           username: (value) => validateUsername(value),
           email: (value) => validateEmail(value),
           password: (value) => validatePassword(value, { minLength: 8 }),
-          confirmPassword: (value, additionalData) => validateConfirmPassword(value, additionalData.password),
+          confirmPassword: (value, additionalData) =>
+            validateConfirmPassword(value, additionalData.password),
           phoneNumber: (value) => {
             if (!value || !value.trim()) {
               return { isValid: true, error: null }; // Optional field
             }
             return validatePhoneNumber(value);
-          }
+          },
         };
       case 'reset-password':
         return {
-          identifier: (value) => validateIdentifier(value)
+          identifier: (value) => validateIdentifier(value),
         };
       default:
         return {};
@@ -140,10 +147,10 @@ const AuthForm = ({
     validateForm: validateFormSchema,
     fieldErrors,
     clearErrors,
-    clearFieldError
+    clearFieldError,
   } = useAuthValidation({
     schema: validationSchema,
-    formData
+    formData,
   });
 
   // Add auth-layout-root class to body on mount
@@ -156,19 +163,19 @@ const AuthForm = ({
 
   /**
    * Handle Input Change
-   * 
+   *
    * @description מעדכן את state של הטופס ומבצע ולידציה באמצעות Schema
    * @param {Event} e - Event object
    */
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    
+
     // Calculate new form data
     const newFormData = {
       ...formData,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     };
-    
+
     // Update form data
     setFormData(newFormData);
 
@@ -180,11 +187,19 @@ const AuthForm = ({
         validateField(name, value, additionalData);
       } else {
         validateField(name, value);
-        
+
         // If password changed and confirmPassword has value, re-validate confirmPassword
-        if (name === 'password' && formType === 'register' && newFormData.confirmPassword) {
+        if (
+          name === 'password' &&
+          formType === 'register' &&
+          newFormData.confirmPassword
+        ) {
           const additionalData = { password: value };
-          validateField('confirmPassword', newFormData.confirmPassword, additionalData);
+          validateField(
+            'confirmPassword',
+            newFormData.confirmPassword,
+            additionalData,
+          );
         }
       }
     }
@@ -199,7 +214,7 @@ const AuthForm = ({
 
   /**
    * Handle Form Submit
-   * 
+   *
    * @description מטפל בשליחת הטופס
    * @param {Event} e - Event object
    */
@@ -222,7 +237,7 @@ const AuthForm = ({
     if (!validationResult.isValid) {
       debugLog('AuthForm', 'Form validation failed', {
         formType,
-        errors: validationResult.errors
+        errors: validationResult.errors,
       });
       return;
     }
@@ -235,7 +250,7 @@ const AuthForm = ({
 
   /**
    * Get Form Configuration
-   * 
+   *
    * @description מחזיר את תצורת הטופס לפי סוג הטופס
    */
   const getFormConfig = () => {
@@ -246,9 +261,13 @@ const AuthForm = ({
           subtitle: subtitle || 'ברוכים הבאים ל-TikTrack',
           footerText: footerText || 'אין לך חשבון?',
           footerLinks: footerLinks || [
-            { to: '/register', text: 'הרשמה עכשיו', className: 'auth-link-bold' }
+            {
+              to: '/register',
+              text: 'הרשמה עכשיו',
+              className: 'auth-link-bold',
+            },
           ],
-          submitText: isLoading ? 'מתחבר...' : 'התחבר'
+          submitText: isLoading ? 'מתחבר...' : 'התחבר',
         };
       case 'register':
         return {
@@ -256,19 +275,17 @@ const AuthForm = ({
           subtitle: subtitle || 'הצטרפו לקהילת הסוחרים',
           footerText: footerText || null,
           footerLinks: footerLinks || [
-            { to: '/login', text: 'כבר יש לך חשבון? התחבר' }
+            { to: '/login', text: 'כבר יש לך חשבון? התחבר' },
           ],
-          submitText: isLoading ? 'יוצר חשבון...' : 'צור חשבון'
+          submitText: isLoading ? 'יוצר חשבון...' : 'צור חשבון',
         };
       case 'reset-password':
         return {
           title: title || 'שחזור סיסמה',
           subtitle: subtitle || 'הזן אימייל או טלפון לקבלת קישור איפוס',
           footerText: footerText || null,
-          footerLinks: footerLinks || [
-            { to: '/login', text: 'חזרה להתחברות' }
-          ],
-          submitText: isLoading ? 'שולח...' : 'שלח קישור איפוס'
+          footerLinks: footerLinks || [{ to: '/login', text: 'חזרה להתחברות' }],
+          submitText: isLoading ? 'שולח...' : 'שלח קישור איפוס',
         };
       default:
         return {
@@ -276,7 +293,7 @@ const AuthForm = ({
           subtitle: '',
           footerText: null,
           footerLinks: [],
-          submitText: 'שלח'
+          submitText: 'שלח',
         };
     }
   };
@@ -332,8 +349,8 @@ const AuthForm = ({
             checked={formData.rememberMe}
             onChange={handleInputChange}
             disabled={isLoading}
-          />
-          {' '}זכור אותי
+          />{' '}
+          זכור אותי
         </label>
         <Link to="/reset-password" className="auth-link">
           שכחת סיסמה?
@@ -498,11 +515,7 @@ const AuthForm = ({
         {renderFormFields()}
 
         {/* Submit Button */}
-        <button
-          type="submit"
-          className="btn-auth-primary"
-          disabled={isLoading}
-        >
+        <button type="submit" className="btn-auth-primary" disabled={isLoading}>
           {formConfig.submitText}
         </button>
       </form>

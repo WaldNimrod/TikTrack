@@ -105,7 +105,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
-| agents_os_parallel_track | S003-P001 WP001 + S003-P002 WP001 FAST_4 CLOSED (2026-03-11 / 2026-03-12). Next AGENTS_OS program: S004-P001 (Financial Precision Validator) — LOD200 must be written before FAST_0; Team 100 on hold. S003-P003 is TIKTRACK (normal GATE_0..GATE_8); G3.7 available for Team 10 at GATE_3. Governed per TEAM_00_AGENTS_OS_INDEPENDENT_ADVANCEMENT_DIRECTIVE_v1.0.0; does NOT depend on S002-P002-WP003 GATE closure. |
+| agents_os_parallel_track | S003-P001 WP001 + S003-P002 WP001 FAST_4 CLOSED (2026-03-11 / 2026-03-12). ADR-031 sequence lock: S002-P005 (Stage A immediate hotfix) -> S003-P007 (Stage B command bridge lite) -> S004-P008 (Stage C mediated reconciliation). Existing S004 AGENTS_OS baseline programs S004-P001/S004-P002/S004-P003 remain PLANNED and are not overridden by ADR-031. S003-P003 is TIKTRACK (normal GATE_0..GATE_8); G3.7 available for Team 10 at GATE_3. Governed per TEAM_00_AGENTS_OS_INDEPENDENT_ADVANCEMENT_DIRECTIVE_v1.0.0; applies to both domains for Gate-6 desync blocking policy (pending formal signer-chain lock). Sources: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`, `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`. |
 | active_program_id | S002-P002 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 90 (GATE_8 owner; closure validated) |

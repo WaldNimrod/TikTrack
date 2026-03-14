@@ -1,0 +1,7923 @@
+import {
+  r as _,
+  a as Me,
+  N as ie,
+  L as B,
+  u as oe,
+  b as $e,
+  R as Ae,
+  B as De,
+  c as Be,
+  d as J,
+} from './react-vendor-ayDCT5qY.js';
+import { a as He } from './axios-vendor-42ANG6Sg.js';
+(function () {
+  const s = document.createElement('link').relList;
+  if (s && s.supports && s.supports('modulepreload')) return;
+  for (const n of document.querySelectorAll('link[rel="modulepreload"]')) a(n);
+  new MutationObserver((n) => {
+    for (const i of n)
+      if (i.type === 'childList')
+        for (const o of i.addedNodes)
+          o.tagName === 'LINK' && o.rel === 'modulepreload' && a(o);
+  }).observe(document, { childList: !0, subtree: !0 });
+  function r(n) {
+    const i = {};
+    return (
+      n.integrity && (i.integrity = n.integrity),
+      n.referrerPolicy && (i.referrerPolicy = n.referrerPolicy),
+      n.crossOrigin === 'use-credentials'
+        ? (i.credentials = 'include')
+        : n.crossOrigin === 'anonymous'
+          ? (i.credentials = 'omit')
+          : (i.credentials = 'same-origin'),
+      i
+    );
+  }
+  function a(n) {
+    if (n.ep) return;
+    n.ep = !0;
+    const i = r(n);
+    fetch(n.href, i);
+  }
+})();
+const te = [
+  { value: 'pending', label: 'ממתין' },
+  { value: 'active', label: 'פתוח' },
+  { value: 'inactive', label: 'סגור' },
+  { value: 'cancelled', label: 'מבוטל' },
+];
+te.map((t) => t.value);
+te.map((t) => t.label);
+const Pe = new Map(te.map((t) => [t.value, t.label])),
+  Se = new Map(te.map((t) => [t.label, t.value]));
+function Ke(t) {
+  return t == null || t === '' || t === 'הכול' || t === 'כל סטטוס'
+    ? null
+    : (Se.get(t) ?? null);
+}
+function ke(t) {
+  return t == null || t === '' || t === 'הכול' || t === 'כל סטטוס'
+    ? null
+    : Pe.has(t)
+      ? t
+      : (Se.get(t) ?? null);
+}
+function Ee(t) {
+  return t == null || t === '' ? '' : (Pe.get(t) ?? t);
+}
+function qe() {
+  return [...te];
+}
+typeof window < 'u' &&
+  (window.statusAdapter = {
+    toCanonicalStatus: Ke,
+    toHebrewStatus: Ee,
+    getStatusOptions: qe,
+    normalizeToCanonicalStatus: ke,
+  });
+function We(t) {
+  return !t || typeof t != 'string' ? !1 : /^[0-9A-HJKMNP-TV-Z]{26}$/.test(t);
+}
+function re(t) {
+  return !t || t === 'הכול' || t === '' || t === null || t === void 0
+    ? null
+    : We(t)
+      ? t
+      : null;
+}
+window.PhoenixBridge = {
+  state: {
+    accounts: [],
+    filters: {
+      status: null,
+      investmentType: null,
+      tradingAccount: null,
+      dateRange: { from: null, to: null },
+      search: '',
+    },
+  },
+  updateOptions(t, s) {
+    ((this.state[t] = s),
+      this.updateFilterUI(t, s),
+      window.dispatchEvent(
+        new CustomEvent('phoenix-bridge-update', {
+          detail: { key: t, data: s },
+        }),
+      ));
+  },
+  updateFilterUI(t, s) {
+    if (t === 'accounts') {
+      const r = document.querySelector('#accountFilterMenu');
+      r &&
+        (r
+          .querySelectorAll('.account-filter-item:not([data-value="הכול"])')
+          .forEach((n) => n.remove()),
+        Array.isArray(s) &&
+          s.forEach((n) => {
+            const i = document.createElement('div');
+            ((i.className = 'account-filter-item js-filter-item'),
+              (i.dataset.value = n.id || n.externalUlid || n.name),
+              (i.innerHTML = `<span class="option-text">${n.name || n.displayName || n.id}</span>`),
+              i.addEventListener('click', () => {
+                const l = n.id || n.externalUlid || n.name;
+                this.setFilter('tradingAccount', l);
+              }));
+            const o = r.querySelector('.filter-close-btn');
+            o ? r.insertBefore(i, o) : r.appendChild(i);
+          }));
+    }
+  },
+  syncWithUrl() {
+    const t = new URLSearchParams(window.location.search);
+    if (t.has('account_id') || t.has('trading_account_id')) {
+      const s = t.get('account_id') || t.get('trading_account_id');
+      this.state.filters.tradingAccount = re(s);
+    }
+    (t.has('status') && (this.state.filters.status = t.get('status')),
+      t.has('investment_type') &&
+        (this.state.filters.investmentType = t.get('investment_type')),
+      t.has('date_from') &&
+        t.has('date_to') &&
+        (this.state.filters.dateRange = {
+          from: t.get('date_from'),
+          to: t.get('date_to'),
+        }),
+      t.has('search') && (this.state.filters.search = t.get('search')),
+      this.applyFiltersToUI(),
+      this.saveToStorage());
+  },
+  updateUrlFromFilters() {
+    const t = new URL(window.location);
+    (t.searchParams.delete('account_id'),
+      t.searchParams.delete('trading_account_id'),
+      t.searchParams.delete('status'),
+      t.searchParams.delete('investment_type'),
+      t.searchParams.delete('date_from'),
+      t.searchParams.delete('date_to'),
+      t.searchParams.delete('search'));
+    const s = re(this.state.filters.tradingAccount);
+    if (
+      (s && t.searchParams.set('trading_account_id', s),
+      this.state.filters.status &&
+        String(this.state.filters.status).trim() !== '' &&
+        t.searchParams.set('status', this.state.filters.status),
+      this.state.filters.investmentType &&
+        String(this.state.filters.investmentType).trim() !== '' &&
+        t.searchParams.set(
+          'investment_type',
+          this.state.filters.investmentType,
+        ),
+      this.state.filters.dateRange &&
+        this.state.filters.dateRange.from &&
+        this.state.filters.dateRange.to)
+    ) {
+      const r = String(this.state.filters.dateRange.from).trim(),
+        a = String(this.state.filters.dateRange.to).trim();
+      r !== '' &&
+        a !== '' &&
+        (t.searchParams.set('date_from', r), t.searchParams.set('date_to', a));
+    }
+    (this.state.filters.search &&
+      String(this.state.filters.search).trim() !== '' &&
+      t.searchParams.set('search', this.state.filters.search.trim()),
+      window.history.pushState({}, '', t));
+  },
+  applyFiltersToUI() {
+    if (this.state.filters.status) {
+      const t = document.querySelector('#selectedStatus');
+      t && (t.textContent = Ee(this.state.filters.status));
+    }
+    if (this.state.filters.investmentType) {
+      const t = document.querySelector('#selectedType');
+      t && (t.textContent = this.state.filters.investmentType);
+    }
+    if (this.state.filters.tradingAccount) {
+      const t = document.querySelector('#selectedAccount');
+      if (t) {
+        const s = this.state.accounts.find(
+          (r) =>
+            (r.id || r.externalUlid || r.name) ===
+            this.state.filters.tradingAccount,
+        );
+        s
+          ? (t.textContent = s.name || s.displayName || s.id)
+          : (t.textContent = this.state.filters.tradingAccount);
+      }
+    }
+    if (this.state.filters.dateRange.from && this.state.filters.dateRange.to) {
+      const t = document.querySelector('#selectedDateRange');
+      t &&
+        (t.textContent = `${this.state.filters.dateRange.from} - ${this.state.filters.dateRange.to}`);
+    }
+    if (this.state.filters.search) {
+      const t = document.querySelector('#searchFilterInput');
+      t && (t.value = this.state.filters.search);
+    }
+  },
+  loadFromStorage() {
+    var s;
+    const t = sessionStorage.getItem('phoenix-filters');
+    if (t)
+      try {
+        const r = JSON.parse(t);
+        window.location.search ||
+          ((this.state.filters = { ...this.state.filters, ...r }),
+          this.applyFiltersToUI());
+      } catch (r) {
+        (s = window.maskedLog) == null ||
+          s.call(
+            window,
+            'Phoenix Bridge: Failed to load filters from storage',
+            { message: r == null ? void 0 : r.message },
+          );
+      }
+  },
+  saveToStorage() {
+    var t;
+    try {
+      sessionStorage.setItem(
+        'phoenix-filters',
+        JSON.stringify(this.state.filters),
+      );
+    } catch (s) {
+      (t = window.maskedLog) == null ||
+        t.call(window, 'Phoenix Bridge: Failed to save filters to storage', {
+          message: s == null ? void 0 : s.message,
+        });
+    }
+  },
+  setFilter(t, s) {
+    if (t === 'dateRange' && typeof s == 'object')
+      this.state.filters.dateRange = s;
+    else if (t === 'tradingAccount') this.state.filters.tradingAccount = re(s);
+    else if (t === 'search') {
+      const a = String(s || '').trim();
+      this.state.filters.search = a !== '' ? a : '';
+    } else
+      t === 'status'
+        ? (this.state.filters.status = ke(s))
+        : typeof s == 'string' && s.trim() === ''
+          ? (this.state.filters[t] = '')
+          : (this.state.filters[t] = s);
+    (this.updateUrlFromFilters(),
+      this.saveToStorage(),
+      this.applyFiltersToUI());
+    const r = { ...this.state.filters };
+    (t === 'tradingAccount' && (r.tradingAccount = re(s)),
+      window.dispatchEvent(
+        new CustomEvent('phoenix-filter-change', {
+          detail: { key: t, value: s, filters: r },
+        }),
+      ));
+  },
+  clearFilters() {
+    ((this.state.filters = {
+      status: null,
+      investmentType: null,
+      tradingAccount: null,
+      dateRange: { from: null, to: null },
+      search: '',
+    }),
+      this.updateUrlFromFilters(),
+      this.saveToStorage(),
+      this.applyFiltersToUI());
+    const t = document.querySelector('#selectedStatus');
+    t && (t.textContent = 'כל סטטוס');
+    const s = document.querySelector('#selectedType');
+    s && (s.textContent = 'כל סוג השקעה');
+    const r = document.querySelector('#selectedAccount');
+    r && (r.textContent = 'כל חשבון מסחר');
+    const a = document.querySelector('#selectedDateRange');
+    a && (a.textContent = 'כל זמן');
+    const n = document.querySelector('#searchFilterInput');
+    (n && (n.value = ''),
+      window.dispatchEvent(
+        new CustomEvent('phoenix-filter-change', {
+          detail: { filters: { ...this.state.filters } },
+        }),
+      ));
+  },
+};
+function _e() {
+  function t() {
+    if (!document.querySelector('header#unified-header')) {
+      setTimeout(t, 100);
+      return;
+    }
+    (window.PhoenixBridge.syncWithUrl(),
+      window.location.search || window.PhoenixBridge.loadFromStorage(),
+      setTimeout(() => {
+        var a, n;
+        document.querySelectorAll('.js-filter-item').forEach((i) => {
+          const o = i.cloneNode(!0);
+          (i.parentNode.replaceChild(o, i),
+            o.addEventListener('click', function () {
+              const l = this.closest('.filter-group'),
+                c = l == null ? void 0 : l.querySelector('.js-filter-toggle'),
+                d = c == null ? void 0 : c.dataset.filterType,
+                h = this.dataset.value === 'הכול' ? null : this.dataset.value;
+              d && window.PhoenixBridge.setFilter(d, h);
+            }));
+        });
+        const r = document.querySelector('#searchFilterInput');
+        (r &&
+          r.addEventListener('input', function () {
+            window.PhoenixBridge.setFilter('search', this.value);
+          }),
+          (a = document.querySelector('.js-filter-reset')) == null ||
+            a.addEventListener('click', () => {
+              window.PhoenixBridge.clearFilters();
+            }),
+          (n = document.querySelector('.js-filter-clear')) == null ||
+            n.addEventListener('click', () => {
+              window.PhoenixBridge.clearFilters();
+            }));
+      }, 200));
+  }
+  t();
+}
+document.readyState === 'loading'
+  ? document.addEventListener('DOMContentLoaded', _e)
+  : _e();
+const ze = 'modulepreload',
+  Ge = function (t) {
+    return '/' + t;
+  },
+  je = {},
+  we = function (s, r, a) {
+    let n = Promise.resolve();
+    if (r && r.length > 0) {
+      document.getElementsByTagName('link');
+      const o = document.querySelector('meta[property=csp-nonce]'),
+        l =
+          (o == null ? void 0 : o.nonce) ||
+          (o == null ? void 0 : o.getAttribute('nonce'));
+      n = Promise.allSettled(
+        r.map((c) => {
+          if (((c = Ge(c)), c in je)) return;
+          je[c] = !0;
+          const d = c.endsWith('.css'),
+            h = d ? '[rel="stylesheet"]' : '';
+          if (document.querySelector(`link[href="${c}"]${h}`)) return;
+          const p = document.createElement('link');
+          if (
+            ((p.rel = d ? 'stylesheet' : ze),
+            d || (p.as = 'script'),
+            (p.crossOrigin = ''),
+            (p.href = c),
+            l && p.setAttribute('nonce', l),
+            document.head.appendChild(p),
+            d)
+          )
+            return new Promise((f, y) => {
+              (p.addEventListener('load', f),
+                p.addEventListener('error', () =>
+                  y(new Error(`Unable to preload CSS for ${c}`)),
+                ));
+            });
+        }),
+      );
+    }
+    function i(o) {
+      const l = new Event('vite:preloadError', { cancelable: !0 });
+      if (((l.payload = o), window.dispatchEvent(l), !l.defaultPrevented))
+        throw o;
+    }
+    return n.then((o) => {
+      for (const l of o || []) l.status === 'rejected' && i(l.reason);
+      return s().catch(i);
+    });
+  };
+var Te = { exports: {} },
+  ce = {};
+/**
+ * @license React
+ * react-jsx-runtime.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */ var Je = _,
+  Ye = Symbol.for('react.element'),
+  Xe = Symbol.for('react.fragment'),
+  Qe = Object.prototype.hasOwnProperty,
+  Ze = Je.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner,
+  es = { key: !0, ref: !0, __self: !0, __source: !0 };
+function Re(t, s, r) {
+  var a,
+    n = {},
+    i = null,
+    o = null;
+  (r !== void 0 && (i = '' + r),
+    s.key !== void 0 && (i = '' + s.key),
+    s.ref !== void 0 && (o = s.ref));
+  for (a in s) Qe.call(s, a) && !es.hasOwnProperty(a) && (n[a] = s[a]);
+  if (t && t.defaultProps)
+    for (a in ((s = t.defaultProps), s)) n[a] === void 0 && (n[a] = s[a]);
+  return {
+    $$typeof: Ye,
+    type: t,
+    key: i,
+    ref: o,
+    props: n,
+    _owner: Ze.current,
+  };
+}
+ce.Fragment = Xe;
+ce.jsx = Re;
+ce.jsxs = Re;
+Te.exports = ce;
+var e = Te.exports,
+  ue = {},
+  Ne = Me;
+((ue.createRoot = Ne.createRoot), (ue.hydrateRoot = Ne.hydrateRoot));
+const ss = [
+    'balance',
+    'price',
+    'amount',
+    'total',
+    'value',
+    'quantity',
+    'cost',
+    'fee',
+    'commission',
+    'profit',
+    'loss',
+    'equity',
+    'margin',
+    'minimum',
+  ],
+  ts = [
+    'description',
+    'notes',
+    'comment',
+    'message',
+    'name',
+    'title',
+    'label',
+    'commissionType',
+    'commission_type',
+    'type',
+    'parent_id',
+    'target_id',
+    'ticker_id',
+    'price_source',
+    'priceSource',
+    'price_as_of_utc',
+    'priceAsOfUtc',
+  ];
+function ne(t, s) {
+  if (
+    ts.some((i) => s.toLowerCase() === i.toLowerCase()) ||
+    !ss.some((i) => s.toLowerCase().includes(i.toLowerCase()))
+  )
+    return t;
+  if (t == null) return 0;
+  const n = Number(t);
+  return isNaN(n) ? 0 : n;
+}
+function le(t) {
+  return t === void 0 ? null : typeof t == 'number' && isNaN(t) ? 0 : t;
+}
+const q = (t) => {
+    const s = (r, a = '') => {
+      if (Array.isArray(r)) return r.map((i) => s(i, a));
+      if (r !== null && typeof r == 'object')
+        return Object.keys(r).reduce((i, o) => {
+          const l = o.replace(/_([a-z])/g, (h, p) => p.toUpperCase()),
+            c = s(r[o], l);
+          let d = ne(c, l);
+          return ((i[l] = le(d)), i);
+        }, {});
+      const n = ne(r, a);
+      return le(n);
+    };
+    return s(t);
+  },
+  O = (t) => {
+    const s = (r, a = '') => {
+      if (Array.isArray(r)) return r.map((i) => s(i, a));
+      if (r !== null && typeof r == 'object')
+        return Object.keys(r).reduce((i, o) => {
+          const l = o.replace(/[A-Z]/g, (h) => `_${h.toLowerCase()}`),
+            c = s(r[o], o);
+          let d = ne(c, o);
+          return ((i[l] = le(d)), i);
+        }, {});
+      const n = ne(r, a);
+      return le(n);
+    };
+    return s(t);
+  },
+  se =
+    typeof window < 'u'
+      ? new URLSearchParams(window.location.search).has('debug')
+      : !1,
+  x = (t, s, r = {}) => {
+    se && console.info(`[${t}] ${s}`, r);
+  },
+  be = (t, s, r = null) => {
+    console.error(`[${t}] ERROR: ${s}`, r);
+  };
+class rs {
+  constructor() {
+    ((this.isDebug = se), (this.logs = []), (this.maxLogs = 1e3));
+  }
+  log(s, r, a = null) {
+    const n = {
+      timestamp: new Date().toISOString(),
+      module: s,
+      action: r,
+      data: a,
+      userAgent: typeof navigator < 'u' ? navigator.userAgent : null,
+      url: typeof window < 'u' ? window.location.href : null,
+    };
+    (this.logs.push(n),
+      this.logs.length > this.maxLogs && this.logs.shift(),
+      this.isDebug && console.info(`🛡️ [Phoenix Audit][${s}] ${r}`, a || ''));
+  }
+  error(s, r, a = null) {
+    const n = {
+      timestamp: new Date().toISOString(),
+      module: s,
+      action: 'ERROR',
+      message: r,
+      error: a ? { message: a.message, stack: a.stack } : null,
+      userAgent: typeof navigator < 'u' ? navigator.userAgent : null,
+      url: typeof window < 'u' ? window.location.href : null,
+    };
+    (this.logs.push(n),
+      this.logs.length > this.maxLogs && this.logs.shift(),
+      console.error(`❌ [Phoenix Audit][${s}] ERROR: ${r}`, a));
+  }
+  export() {
+    return JSON.stringify(this.logs, null, 2);
+  }
+  clear() {
+    this.logs = [];
+  }
+  getLogs() {
+    return this.logs;
+  }
+}
+const m = new rs();
+function pe(t, s = 0) {
+  if (s > 10 || t == null) return t;
+  if (Array.isArray(t)) return t.map((r) => pe(r, s + 1));
+  if (typeof t == 'object') {
+    const r = {};
+    for (const [a, n] of Object.entries(t)) {
+      const i = a.toLowerCase();
+      i.includes('token') ||
+      i.includes('password') ||
+      i === 'authorization' ||
+      i === 'auth'
+        ? (r[a] = '***MASKED***')
+        : typeof n == 'object' && n !== null
+          ? (r[a] = pe(n, s + 1))
+          : (r[a] = n);
+    }
+    return r;
+  }
+  if (typeof t == 'string') {
+    if (t.match(/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/))
+      return '***MASKED_TOKEN***';
+    if (t.includes('Bearer ') && t.length > 20) return 'Bearer ***MASKED***';
+  }
+  return t;
+}
+function k(t, s = {}) {
+  const r = pe(s);
+  return (Object.keys(r).length > 0 ? console.log(t, r) : console.log(t), r);
+}
+typeof window < 'u' && (window.maskedLog = k);
+class Ie {
+  constructor() {
+    ((this._routesConfig = null),
+      (this.apiBaseUrl = null),
+      (this.backendPort = null),
+      (this.token = null),
+      (this.on401 = null));
+  }
+  get routesConfig() {
+    return this._routesConfig;
+  }
+  set routesConfig(s) {
+    ((this._routesConfig = s),
+      typeof window < 'u' && (window.routesConfig = s));
+  }
+  async init() {
+    try {
+      const s = await fetch('/routes.json');
+      if (!s.ok) throw new Error('Failed to load routes.json (SSOT)');
+      ((this.routesConfig = await s.json()),
+        (this.routesConfig.version == null ||
+          this.routesConfig.version === '') &&
+          k('[Shared Services] routes.json missing version field', {}),
+        this.routesConfig.api && this.routesConfig.api.base_url
+          ? (this.apiBaseUrl = this.routesConfig.api.base_url)
+          : this.routesConfig.api && this.routesConfig.api.version
+            ? (this.apiBaseUrl = `/api/${this.routesConfig.api.version}`)
+            : ((this.apiBaseUrl = '/api/v1'),
+              k(
+                '[Shared Services] Using fallback API base URL. Consider adding api.base_url to routes.json',
+                {},
+              )),
+        (this.backendPort = this.routesConfig.backend || 8082),
+        (this.token =
+          localStorage.getItem('access_token') ||
+          localStorage.getItem('auth_token') ||
+          sessionStorage.getItem('access_token') ||
+          sessionStorage.getItem('auth_token')),
+        k('[Shared Services] Initialized:', {
+          apiBaseUrl: this.apiBaseUrl,
+          backendPort: this.backendPort,
+          version: this.routesConfig.version,
+        }));
+    } catch (s) {
+      throw (
+        k('[Shared Services] Initialization failed:', {
+          errorMessage: s.message,
+        }),
+        s
+      );
+    }
+  }
+  getRoutesConfig() {
+    return this.routesConfig;
+  }
+  getApiBaseUrl() {
+    if (!this.apiBaseUrl)
+      throw new Error('Shared Services not initialized. Call init() first.');
+    return this.apiBaseUrl;
+  }
+  setToken(s) {
+    this.token = s;
+  }
+  getToken() {
+    return (
+      (this.token =
+        localStorage.getItem('access_token') ||
+        localStorage.getItem('auth_token') ||
+        sessionStorage.getItem('access_token') ||
+        sessionStorage.getItem('auth_token')),
+      this.token
+    );
+  }
+  buildUrl(s, r = {}) {
+    let n = `${this.getApiBaseUrl()}${s}`;
+    const i = { ...r };
+    i.dateRange &&
+      typeof i.dateRange == 'object' &&
+      !Array.isArray(i.dateRange) &&
+      (i.dateRange.from && (i.dateFrom = i.dateRange.from),
+      i.dateRange.to && (i.dateTo = i.dateRange.to),
+      delete i.dateRange);
+    const o = O(i),
+      l = new URLSearchParams(
+        Object.entries(o)
+          .filter(([c, d]) =>
+            d == null || d === '' || String(d).trim() === ''
+              ? !1
+              : typeof d == 'object' && !Array.isArray(d)
+                ? (k(
+                    '[Shared Services] Warning: Object value in query params (should be normalized):',
+                    { key: c },
+                  ),
+                  !1)
+                : !0,
+          )
+          .reduce((c, [d, h]) => {
+            if (typeof h == 'object' && !Array.isArray(h)) return c;
+            const p = String(h).trim();
+            return (p === '' || (c[d] = p), c);
+          }, {}),
+      ).toString();
+    return (l && (n += `?${l}`), n);
+  }
+  buildHeaders(s = {}) {
+    const r = { 'Content-Type': 'application/json', ...s },
+      a = this.getToken();
+    return (a && (r.Authorization = `Bearer ${a}`), r);
+  }
+  async handleResponse(s) {
+    const r = await s.json();
+    if (r.success === !1) {
+      const a = r.error || {};
+      a.code === 'AUTH_TOKEN_EXPIRED' &&
+        (this.setToken(null),
+        localStorage.removeItem('auth_token'),
+        sessionStorage.removeItem('auth_token'),
+        window.dispatchEvent(
+          new CustomEvent('auth:token-expired', { detail: { error: a } }),
+        ));
+      const n = new Error(a.message || 'API request failed');
+      throw (
+        (n.code = a.code),
+        (n.message_i18n = a.message_i18n || a.message),
+        (n.details = a.details || {}),
+        (n.response = r),
+        n
+      );
+    }
+    return (r.data && (r.data = q(r.data)), r);
+  }
+  _isProtectedEndpoint(s) {
+    if (!s || typeof s != 'string') return !1;
+    const r = s.replace(/^\//, '');
+    return ['auth', 'users/me', 'users/profile'].some(
+      (i) => r === i || r.startsWith(i + '/'),
+    )
+      ? !1
+      : [
+          'trading_accounts',
+          'cash_flows',
+          'positions',
+          'brokers_fees',
+          'reference',
+          'settings',
+        ].some((i) => r === i || r.startsWith(i + '/'));
+  }
+  async get(s, r = {}, a = {}) {
+    try {
+      if (this._isProtectedEndpoint(s)) {
+        const l = this.getToken();
+        if (!l || String(l).trim() === '') {
+          const c = new Error('Authentication required for protected endpoint');
+          throw ((c.code = 'HTTP_401'), (c.status = 401), c);
+        }
+      }
+      const n = this.buildUrl(s, r),
+        i = this.buildHeaders(a.headers);
+      let o;
+      try {
+        o = await fetch(n, { method: 'GET', headers: i, ...a });
+      } catch (l) {
+        k('[Shared Services] Fetch failed (network error):', {
+          endpoint: s,
+          errorMessage: l.message,
+        });
+        const c = new Error(`Network error: ${l.message}`);
+        throw ((c.code = 'NETWORK_ERROR'), (c.status = 0), c);
+      }
+      if (!o.ok) {
+        const l = {
+          code: `HTTP_${o.status}`,
+          message: `HTTP ${o.status}: ${o.statusText}`,
+          status: o.status,
+          statusText: o.statusText,
+        };
+        try {
+          const d = await o.json();
+          d.error
+            ? ((l.code = d.error.code || l.code),
+              (l.message =
+                d.error.message_i18n || d.error.message || l.message),
+              (l.details = d.error.details || {}))
+            : d.detail && (l.message = d.detail);
+        } catch {}
+        (k('[Shared Services] GET request failed:', {
+          endpoint: s,
+          status: o.status,
+          code: l.code,
+        }),
+          o.status === 401 && typeof this.on401 == 'function' && this.on401());
+        const c = new Error(l.message);
+        throw (
+          (c.code = l.code),
+          (c.status = l.status),
+          (c.details = l.details || {}),
+          c
+        );
+      }
+      return await this.handleResponse(o);
+    } catch (n) {
+      throw (
+        (n.status === 401 || n.code === 'HTTP_401') &&
+          typeof this.on401 == 'function' &&
+          this.on401(),
+        k('[Shared Services] GET request failed:', {
+          endpoint: s,
+          errorCode: n.code || 'UNKNOWN',
+          errorMessage: n.message,
+        }),
+        n
+      );
+    }
+  }
+  async post(s, r = {}, a = {}) {
+    try {
+      if (this._isProtectedEndpoint(s)) {
+        const d = this.getToken();
+        if (!d || String(d).trim() === '') {
+          const h = new Error('Authentication required for protected endpoint');
+          throw ((h.code = 'HTTP_401'), (h.status = 401), h);
+        }
+      }
+      const n = a.useQueryParams === !0,
+        i = n ? this.buildUrl(s, r) : this.buildUrl(s),
+        o = this.buildHeaders(a.headers),
+        l = a.skipTransform === !0 ? r : O(r);
+      let c;
+      try {
+        c = await fetch(i, {
+          method: 'POST',
+          headers: o,
+          body: n ? void 0 : JSON.stringify(l),
+          ...a,
+        });
+      } catch (d) {
+        k('[Shared Services] Fetch failed (network error):', {
+          endpoint: s,
+          errorMessage: d.message,
+        });
+        const h = new Error(`Network error: ${d.message}`);
+        throw ((h.code = 'NETWORK_ERROR'), (h.status = 0), h);
+      }
+      if (!c.ok) {
+        const d = {
+          code: `HTTP_${c.status}`,
+          message: `HTTP ${c.status}: ${c.statusText}`,
+          status: c.status,
+          statusText: c.statusText,
+        };
+        try {
+          const p = await c.json();
+          p.error
+            ? ((d.code = p.error.code || d.code),
+              (d.message =
+                p.error.message_i18n || p.error.message || d.message),
+              (d.details = p.error.details || {}))
+            : p.detail && (d.message = p.detail);
+        } catch {}
+        (k('[Shared Services] POST request failed:', {
+          endpoint: s,
+          status: c.status,
+          code: d.code,
+        }),
+          c.status === 401 && typeof this.on401 == 'function' && this.on401());
+        const h = new Error(d.message);
+        throw (
+          (h.code = d.code),
+          (h.status = d.status),
+          (h.details = d.details || {}),
+          h
+        );
+      }
+      return await this.handleResponse(c);
+    } catch (n) {
+      throw (
+        (n.status === 401 || n.code === 'HTTP_401') &&
+          typeof this.on401 == 'function' &&
+          this.on401(),
+        k('[Shared Services] POST request failed:', {
+          endpoint: s,
+          errorCode: n.code || 'UNKNOWN',
+          errorMessage: n.message,
+        }),
+        n
+      );
+    }
+  }
+  async postFormData(s, r) {
+    try {
+      if (this._isProtectedEndpoint(s)) {
+        const o = this.getToken();
+        if (!o || String(o).trim() === '') {
+          const l = new Error('Authentication required for protected endpoint');
+          throw ((l.code = 'HTTP_401'), (l.status = 401), l);
+        }
+      }
+      const a = this.buildUrl(s),
+        n = { Authorization: `Bearer ${this.getToken() || ''}` },
+        i = await fetch(a, { method: 'POST', headers: n, body: r });
+      if (!i.ok) {
+        const o = {
+          code: `HTTP_${i.status}`,
+          message: i.statusText,
+          status: i.status,
+        };
+        try {
+          const c = await i.json();
+          c.error &&
+            ((o.code = c.error.code || o.code),
+            (o.message = c.error.message_i18n || c.error.message || o.message));
+        } catch {}
+        i.status === 401 && typeof this.on401 == 'function' && this.on401();
+        const l = new Error(o.message);
+        throw ((l.code = o.code), (l.status = o.status), l);
+      }
+      return await this.handleResponse(i);
+    } catch (a) {
+      throw (
+        k('[Shared Services] POST FormData failed:', {
+          endpoint: s,
+          errorCode: a.code,
+        }),
+        a
+      );
+    }
+  }
+  async put(s, r = {}, a = {}) {
+    try {
+      if (this._isProtectedEndpoint(s)) {
+        const c = this.getToken();
+        if (!c || String(c).trim() === '') {
+          const d = new Error('Authentication required for protected endpoint');
+          throw ((d.code = 'HTTP_401'), (d.status = 401), d);
+        }
+      }
+      const n = this.buildUrl(s),
+        i = this.buildHeaders(a.headers),
+        o = O(r);
+      let l;
+      try {
+        l = await fetch(n, {
+          method: 'PUT',
+          headers: i,
+          body: JSON.stringify(o),
+          ...a,
+        });
+      } catch (c) {
+        k('[Shared Services] Fetch failed (network error):', {
+          endpoint: s,
+          errorMessage: c.message,
+        });
+        const d = new Error(`Network error: ${c.message}`);
+        throw ((d.code = 'NETWORK_ERROR'), (d.status = 0), d);
+      }
+      if (!l.ok) {
+        const c = {
+          code: `HTTP_${l.status}`,
+          message: `HTTP ${l.status}: ${l.statusText}`,
+          status: l.status,
+          statusText: l.statusText,
+        };
+        try {
+          const h = await l.json();
+          h.error
+            ? ((c.code = h.error.code || c.code),
+              (c.message =
+                h.error.message_i18n || h.error.message || c.message),
+              (c.details = h.error.details || {}))
+            : h.detail &&
+              (c.message =
+                typeof h.detail == 'string'
+                  ? h.detail
+                  : h.detail.msg || JSON.stringify(h.detail));
+        } catch {}
+        k('[Shared Services] PUT request failed:', {
+          endpoint: s,
+          status: l.status,
+          code: c.code,
+        });
+        const d = new Error(c.message);
+        throw (
+          (d.code = c.code),
+          (d.status = c.status),
+          (d.details = c.details || {}),
+          d
+        );
+      }
+      return await this.handleResponse(l);
+    } catch (n) {
+      throw (
+        k('[Shared Services] PUT request failed:', {
+          endpoint: s,
+          errorCode: n.code || 'UNKNOWN',
+          errorMessage: n.message,
+        }),
+        n
+      );
+    }
+  }
+  async patch(s, r = {}, a = {}) {
+    try {
+      if (this._isProtectedEndpoint(s)) {
+        const c = this.getToken();
+        if (!c || String(c).trim() === '') {
+          const d = new Error('Authentication required for protected endpoint');
+          throw ((d.code = 'HTTP_401'), (d.status = 401), d);
+        }
+      }
+      const n = this.buildUrl(s),
+        i = this.buildHeaders(a.headers),
+        o = a.skipTransform === !0 ? r : O(r);
+      let l;
+      try {
+        l = await fetch(n, {
+          method: 'PATCH',
+          headers: i,
+          body: JSON.stringify(o),
+          ...a,
+        });
+      } catch (c) {
+        k('[Shared Services] PATCH fetch failed:', {
+          endpoint: s,
+          errorMessage: c.message,
+        });
+        const d = new Error(`Network error: ${c.message}`);
+        throw ((d.code = 'NETWORK_ERROR'), (d.status = 0), d);
+      }
+      if (!l.ok) {
+        const c = {
+          code: `HTTP_${l.status}`,
+          message: `HTTP ${l.status}: ${l.statusText}`,
+          status: l.status,
+          statusText: l.statusText,
+        };
+        try {
+          const h = await l.json();
+          h.error
+            ? ((c.code = h.error.code || c.code),
+              (c.message =
+                h.error.message_i18n || h.error.message || c.message),
+              (c.details = h.error.details || {}))
+            : h.detail &&
+              ((c.detail = h.detail),
+              typeof h.detail == 'object' && h.detail.validation_errors
+                ? (c.validation_errors = h.detail.validation_errors)
+                : typeof h.detail == 'string' && (c.message = h.detail));
+        } catch {}
+        (k('[Shared Services] PATCH failed:', {
+          endpoint: s,
+          status: l.status,
+        }),
+          l.status === 401 && typeof this.on401 == 'function' && this.on401());
+        const d = new Error(c.message);
+        throw (
+          (d.code = c.code),
+          (d.status = c.status),
+          (d.details = c.details || {}),
+          (d.detail = c.detail),
+          (d.validation_errors = c.validation_errors),
+          d
+        );
+      }
+      return await this.handleResponse(l);
+    } catch (n) {
+      throw (
+        (n.status === 401 || n.code === 'HTTP_401') &&
+          typeof this.on401 == 'function' &&
+          this.on401(),
+        k('[Shared Services] PATCH failed:', {
+          endpoint: s,
+          errorCode: n.code,
+          errorMessage: n.message,
+        }),
+        n
+      );
+    }
+  }
+  async delete(s, r = {}) {
+    try {
+      if (this._isProtectedEndpoint(s)) {
+        const o = this.getToken();
+        if (!o || String(o).trim() === '') {
+          const l = new Error('Authentication required for protected endpoint');
+          throw ((l.code = 'HTTP_401'), (l.status = 401), l);
+        }
+      }
+      const a = this.buildUrl(s),
+        n = this.buildHeaders(r.headers);
+      let i;
+      try {
+        i = await fetch(a, { method: 'DELETE', headers: n, ...r });
+      } catch (o) {
+        k('[Shared Services] Fetch failed (network error):', {
+          endpoint: s,
+          errorMessage: o.message,
+        });
+        const l = new Error(`Network error: ${o.message}`);
+        throw ((l.code = 'NETWORK_ERROR'), (l.status = 0), l);
+      }
+      if (!i.ok) {
+        const o = {
+          code: `HTTP_${i.status}`,
+          message: `HTTP ${i.status}: ${i.statusText}`,
+          status: i.status,
+          statusText: i.statusText,
+        };
+        try {
+          const c = await i.json();
+          c.error
+            ? ((o.code = c.error.code || o.code),
+              (o.message =
+                c.error.message_i18n || c.error.message || o.message),
+              (o.details = c.error.details || {}))
+            : c.detail &&
+              (o.message =
+                typeof c.detail == 'string'
+                  ? c.detail
+                  : c.detail.msg || JSON.stringify(c.detail));
+        } catch {}
+        (k('[Shared Services] DELETE request failed:', {
+          endpoint: s,
+          status: i.status,
+          code: o.code,
+        }),
+          i.status === 401 && typeof this.on401 == 'function' && this.on401());
+        const l = new Error(o.message);
+        throw (
+          (l.code = o.code),
+          (l.status = o.status),
+          (l.details = o.details || {}),
+          l
+        );
+      }
+      return i.status === 204 ? {} : await this.handleResponse(i);
+    } catch (a) {
+      throw (
+        (a.status === 401 || a.code === 'HTTP_401') &&
+          typeof this.on401 == 'function' &&
+          this.on401(),
+        k('[Shared Services] DELETE request failed:', {
+          endpoint: s,
+          errorCode: a.code || 'UNKNOWN',
+          errorMessage: a.message,
+        }),
+        a
+      );
+    }
+  }
+}
+const R = new Ie();
+typeof window < 'u' && (window.sharedServices = R);
+R.init().catch((t) => {
+  k('[Shared Services] Auto-initialization failed:', {
+    errorMessage: t.message,
+  });
+});
+const as = Object.freeze(
+    Object.defineProperty(
+      { __proto__: null, SharedServices: Ie, default: R },
+      Symbol.toStringTag,
+      { value: 'Module' },
+    ),
+  ),
+  K = { credentials: 'include' },
+  is = 300;
+async function M() {
+  await R.init();
+}
+function ae(t) {
+  const s = (t == null ? void 0 : t.data) ?? t;
+  return q(s || {});
+}
+async function me(t) {
+  try {
+    return await t();
+  } catch (s) {
+    throw (
+      ((s == null ? void 0 : s.status) === 401 ||
+        (s == null ? void 0 : s.code) === 'HTTP_401') &&
+        E.handle401Logout(),
+      s
+    );
+  }
+}
+const E = {
+    async login(t, s) {
+      var r;
+      m.log('Auth', 'Login attempt started', { usernameOrEmail: t });
+      try {
+        await M();
+        const a = O({ usernameOrEmail: t, password: s });
+        x('Auth', 'Login payload prepared', a);
+        const n = await R.post('/auth/login', a, K),
+          i = ae(n);
+        return (
+          i.accessToken &&
+            (localStorage.setItem('access_token', i.accessToken),
+            this.startProactiveRefreshScheduler(),
+            typeof window < 'u' &&
+              window.dispatchEvent(new CustomEvent('auth:login'))),
+          m.log('Auth', 'Login successful', {
+            userId: (r = i.user) == null ? void 0 : r.externalUlids,
+          }),
+          i
+        );
+      } catch (a) {
+        throw (m.error('Auth', 'Login failure', a), a);
+      }
+    },
+    async register(t) {
+      var s;
+      m.log('Auth', 'Register attempt started', { email: t.email });
+      try {
+        await M();
+        const r = O(t);
+        x('Auth', 'Register payload prepared', r);
+        const a = await R.post('/auth/register', r, K),
+          n = ae(a);
+        return (
+          n.accessToken &&
+            (localStorage.setItem('access_token', n.accessToken),
+            this.startProactiveRefreshScheduler(),
+            typeof window < 'u' &&
+              window.dispatchEvent(new CustomEvent('auth:login'))),
+          m.log('Auth', 'Register successful', {
+            userId: (s = n.user) == null ? void 0 : s.externalUlids,
+          }),
+          n
+        );
+      } catch (r) {
+        throw (m.error('Auth', 'Register failure', r), r);
+      }
+    },
+    isInsideRefreshWindow() {
+      const t =
+        localStorage.getItem('access_token') ||
+        localStorage.getItem('auth_token');
+      if (!t || t.trim() === '') return !1;
+      try {
+        const s = t.split('.');
+        if (s.length < 2) return !1;
+        const a = JSON.parse(atob(s[1])).exp;
+        if (!a || typeof a != 'number') return !1;
+        const n = Date.now() / 1e3;
+        return !(a <= n || a - n > is);
+      } catch {
+        return !1;
+      }
+    },
+    async refreshToken() {
+      if (!this.isInsideRefreshWindow())
+        throw (
+          m.log('Auth', 'Refresh rejected — outside 5-min pre-expiry window'),
+          new Error('Refresh only permitted within 5-min pre-expiry window')
+        );
+      m.log('Auth', 'Token refresh started');
+      try {
+        await M();
+        const t = await R.post('/auth/refresh', {}, K),
+          s = ae(t);
+        return (
+          s.accessToken &&
+            (localStorage.setItem('access_token', s.accessToken),
+            R.setToken(s.accessToken)),
+          m.log('Auth', 'Token refresh successful'),
+          s
+        );
+      } catch (t) {
+        throw (m.error('Auth', 'Token refresh failure', t), t);
+      }
+    },
+    async logout() {
+      m.log('Auth', 'Logout started');
+      try {
+        (await M(), await R.post('/auth/logout', {}, K));
+      } catch (t) {
+        m.error('Auth', 'Logout API error (clearing storage anyway)', t);
+      } finally {
+        (this.stopProactiveRefreshScheduler(),
+          localStorage.removeItem('access_token'),
+          localStorage.removeItem('auth_token'),
+          sessionStorage.removeItem('access_token'),
+          sessionStorage.removeItem('auth_token'),
+          m.log('Auth', 'Logout successful'));
+      }
+    },
+    async requestPasswordReset(t, s) {
+      m.log('Auth', 'Password reset request started', {
+        method: t,
+        identifier: s,
+      });
+      try {
+        await M();
+        const r = O({
+          method: t,
+          ...(t === 'EMAIL' ? { email: s } : { phoneNumber: s }),
+        });
+        x('Auth', 'Password reset payload prepared', r);
+        const a = await R.post('/auth/reset-password', r, K);
+        return (
+          m.log('Auth', 'Password reset request successful'),
+          (a == null ? void 0 : a.data) ?? a ?? {}
+        );
+      } catch (r) {
+        throw (m.error('Auth', 'Password reset request failure', r), r);
+      }
+    },
+    async verifyPasswordReset(t) {
+      m.log('Auth', 'Password reset verify started');
+      try {
+        await M();
+        const s = O(t);
+        x('Auth', 'Password reset verify payload prepared', s);
+        const r = await R.post('/auth/verify-reset', s, K);
+        return (
+          m.log('Auth', 'Password reset verify successful'),
+          (r == null ? void 0 : r.data) ?? r
+        );
+      } catch (s) {
+        throw (m.error('Auth', 'Password reset verify failure', s), s);
+      }
+    },
+    async verifyPhone(t) {
+      m.log('Auth', 'Phone verification started');
+      try {
+        await M();
+        const s = O({ verificationCode: t });
+        x('Auth', 'Phone verification payload prepared', s);
+        const r = await R.post('/auth/verify-phone', s, K);
+        return (m.log('Auth', 'Phone verification successful'), ae(r));
+      } catch (s) {
+        throw (m.error('Auth', 'Phone verification failure', s), s);
+      }
+    },
+    async getCurrentUser() {
+      return (
+        m.log('Auth', 'Get current user started'),
+        me(async () => {
+          await M();
+          const t = await R.get('/users/me', {}, {}),
+            s = (t == null ? void 0 : t.data) ?? t,
+            r = typeof s == 'object' && s !== null ? q(s) : s;
+          return (
+            m.log('Auth', 'Get current user successful', {
+              userId: r == null ? void 0 : r.externalUlids,
+            }),
+            r
+          );
+        })
+      );
+    },
+    getUserRole() {
+      try {
+        const t = localStorage.getItem('access_token');
+        if (!t) return null;
+        try {
+          return JSON.parse(atob(t.split('.')[1])).role || null;
+        } catch (s) {
+          return (be('Auth', 'Error decoding JWT token', s), null);
+        }
+      } catch (t) {
+        return (be('Auth', 'Error getting user role', t), null);
+      }
+    },
+    isAdmin() {
+      const t = this.getUserRole();
+      return t === 'ADMIN' || t === 'SUPERADMIN';
+    },
+    async updateUser(t) {
+      return (
+        m.log('Auth', 'Update user started', { userId: t.externalUlids }),
+        me(async () => {
+          await M();
+          const s = O(t);
+          x('Auth', 'Update user payload prepared', s);
+          const r = await R.put('/users/me', s, {}),
+            a = (r == null ? void 0 : r.data) ?? r,
+            n = typeof a == 'object' && a !== null ? q(a) : a;
+          return (
+            m.log('Auth', 'Update user successful', {
+              userId: n == null ? void 0 : n.externalUlids,
+            }),
+            n
+          );
+        })
+      );
+    },
+    async changePassword(t) {
+      return (
+        m.log('Auth', 'Change password started'),
+        me(async () => {
+          (await M(), x('Auth', 'Change password payload prepared', t));
+          const s = await R.put('/users/me/password', O(t), {});
+          return (
+            m.log('Auth', 'Change password successful'),
+            (s == null ? void 0 : s.data) ?? s
+          );
+        })
+      );
+    },
+    async resendEmailVerification() {
+      m.log('Auth', 'Resend email verification started');
+      try {
+        const t = await this.getCurrentUser();
+        return (
+          await M(),
+          await R.post(
+            '/auth/reset-password',
+            O({ email: t.email, method: 'EMAIL' }),
+            K,
+          ),
+          m.log('Auth', 'Resend email verification successful'),
+          {}
+        );
+      } catch (t) {
+        throw (m.error('Auth', 'Resend email verification failure', t), t);
+      }
+    },
+    async resendPhoneVerification() {
+      m.log('Auth', 'Resend phone verification started');
+      try {
+        const t = await this.getCurrentUser(),
+          s =
+            (t == null ? void 0 : t.phoneNumbers) ??
+            (t == null ? void 0 : t.phoneNumber);
+        if (!s) throw new Error('לא נמצא מספר טלפון במערכת');
+        return (
+          await M(),
+          await R.post(
+            '/auth/reset-password',
+            O({ phoneNumber: s, method: 'SMS' }),
+            K,
+          ),
+          m.log('Auth', 'Resend phone verification successful'),
+          {}
+        );
+      } catch (t) {
+        throw (m.error('Auth', 'Resend phone verification failure', t), t);
+      }
+    },
+    isAuthenticated() {
+      return !!localStorage.getItem('access_token');
+    },
+    getAccessToken() {
+      return localStorage.getItem('access_token');
+    },
+    handle401Logout() {
+      this.stopProactiveRefreshScheduler();
+      const t = localStorage.getItem('usernameOrEmail');
+      (localStorage.clear(),
+        sessionStorage.clear(),
+        t && localStorage.setItem('usernameOrEmail', t),
+        window.dispatchEvent(new CustomEvent('auth:logout')),
+        m.log('Auth', '401 logout — redirecting to login'),
+        window.location.pathname.startsWith('/login') ||
+          (window.location.href = '/login'));
+    },
+    checkTokenExpiryOnBoot() {
+      const t =
+        localStorage.getItem('access_token') ||
+        localStorage.getItem('auth_token');
+      if (!(!t || t.trim() === ''))
+        try {
+          const s = t.split('.');
+          if (s.length < 2) return;
+          const a = JSON.parse(atob(s[1])).exp;
+          a &&
+            a < Date.now() / 1e3 &&
+            (m.log('Auth', 'Token expired on boot — clearing and redirecting'),
+            this.handle401Logout());
+        } catch {}
+    },
+    _refreshIntervalId: null,
+    startProactiveRefreshScheduler() {
+      if (this._refreshIntervalId) return;
+      const t = 60 * 1e3;
+      ((this._refreshIntervalId = setInterval(async () => {
+        var s;
+        if (this.isInsideRefreshWindow())
+          try {
+            (await this.refreshToken(),
+              m.log(
+                'Auth',
+                'Proactive refresh completed (within 5-min window)',
+              ));
+          } catch (r) {
+            if (
+              (s = r == null ? void 0 : r.message) != null &&
+              s.includes('outside 5-min')
+            )
+              return;
+            m.error('Auth', 'Proactive refresh failed', r);
+          }
+      }, t)),
+        m.log('Auth', 'Proactive refresh scheduler started'));
+    },
+    stopProactiveRefreshScheduler() {
+      this._refreshIntervalId &&
+        (clearInterval(this._refreshIntervalId),
+        (this._refreshIntervalId = null));
+    },
+  },
+  ns = Object.freeze(
+    Object.defineProperty({ __proto__: null, default: E }, Symbol.toStringTag, {
+      value: 'Module',
+    }),
+  ),
+  ye = ({ children: t, requireAuth: s = !0, requireAdmin: r = !1 }) => {
+    const [a, n] = _.useState(null),
+      [i, o] = _.useState(!1),
+      [l, c] = _.useState(!0);
+    return (
+      _.useEffect(() => {
+        s || r
+          ? (async () => {
+              (c(!0),
+                x('Auth', 'ProtectedRoute: Checking authentication status', {
+                  requireAdmin: r,
+                }));
+              try {
+                if (!E.isAuthenticated()) {
+                  (n(!1),
+                    o(!1),
+                    c(!1),
+                    x('Auth', 'ProtectedRoute: No access token found'));
+                  return;
+                }
+                try {
+                  if ((await E.getCurrentUser(), n(!0), r)) {
+                    const p = E.isAdmin();
+                    (o(p),
+                      x('Auth', 'ProtectedRoute: User authenticated', {
+                        isAdmin: p,
+                        role: E.getUserRole(),
+                      }));
+                  } else
+                    (o(!1), x('Auth', 'ProtectedRoute: User authenticated'));
+                } catch {
+                  (x('Auth', 'ProtectedRoute: Token validation failed'),
+                    n(!1),
+                    o(!1));
+                }
+              } catch (h) {
+                (n(!1),
+                  o(!1),
+                  m.error(
+                    'Auth',
+                    'ProtectedRoute: Authentication check failed',
+                    h,
+                  ));
+              } finally {
+                c(!1);
+              }
+            })()
+          : (n(!0), o(!1), c(!1));
+      }, [s, r]),
+      l
+        ? e.jsx('div', {
+            className: 'auth-layout-root',
+            dir: 'rtl',
+            children: e.jsx('tt-container', {
+              children: e.jsx('tt-section', {
+                children: e.jsx('div', {
+                  className: 'auth-loading-state',
+                  children: e.jsx('p', { children: 'בודק הרשאות...' }),
+                }),
+              }),
+            }),
+          })
+        : r && !a
+          ? (x(
+              'Auth',
+              'ProtectedRoute: Guest on admin route → redirect to Home',
+            ),
+            e.jsx(ie, { to: '/', replace: !0 }))
+          : r && a && !i
+            ? (x(
+                'Auth',
+                'ProtectedRoute: USER on admin route → redirect to Home (/) per ADR-013',
+                { role: E.getUserRole() },
+              ),
+              e.jsx(ie, { to: '/', replace: !0 }))
+            : s && !a
+              ? (x(
+                  'Auth',
+                  'ProtectedRoute: Redirecting to Home (Type C: Auth-only)',
+                ),
+                e.jsx(ie, { to: '/', replace: !0 }))
+              : e.jsx(e.Fragment, { children: t })
+    );
+  },
+  Y = () =>
+    e.jsx('footer', {
+      className: 'page-footer',
+      dir: 'rtl',
+      children: e.jsxs('div', {
+        className: 'page-footer__container',
+        children: [
+          e.jsxs('div', {
+            className: 'page-footer__column',
+            children: [
+              e.jsx('h3', {
+                className: 'page-footer__title',
+                children: 'פרטי קשר',
+              }),
+              e.jsx('p', {
+                className: 'page-footer__text',
+                children: 'דוא"ל: info@tiktrack.co.il',
+              }),
+              e.jsx('p', {
+                className: 'page-footer__text',
+                children: 'טלפון: 03-1234567',
+              }),
+              e.jsx('p', {
+                className: 'page-footer__text',
+                children: 'כתובת: רחוב דוגמה 123, תל אביב',
+              }),
+              e.jsx('p', {
+                className: 'page-footer__text',
+                children: "שעות פעילות: א'-ה' 09:00-18:00",
+              }),
+            ],
+          }),
+          e.jsxs('div', {
+            className: 'page-footer__column',
+            children: [
+              e.jsx('h3', {
+                className: 'page-footer__title',
+                children: 'מפת אתר',
+              }),
+              e.jsx('p', {
+                className: 'page-footer__text',
+                children: e.jsx(B, {
+                  to: '/',
+                  className: 'page-footer__link',
+                  children: 'דף הבית',
+                }),
+              }),
+              e.jsx('p', {
+                className: 'page-footer__text',
+                children: e.jsx(B, {
+                  to: '/portfolio',
+                  className: 'page-footer__link',
+                  children: 'פורטפוליו',
+                }),
+              }),
+              e.jsx('p', {
+                className: 'page-footer__text',
+                children: e.jsx(B, {
+                  to: '/trades',
+                  className: 'page-footer__link',
+                  children: 'טריידים',
+                }),
+              }),
+              e.jsx('p', {
+                className: 'page-footer__text',
+                children: e.jsx(B, {
+                  to: '/research',
+                  className: 'page-footer__link',
+                  children: 'מחקר',
+                }),
+              }),
+              e.jsx('p', {
+                className: 'page-footer__text',
+                children: e.jsx(B, {
+                  to: '/settings',
+                  className: 'page-footer__link',
+                  children: 'הגדרות',
+                }),
+              }),
+            ],
+          }),
+          e.jsxs('div', {
+            className: 'page-footer__column',
+            children: [
+              e.jsx('h3', {
+                className: 'page-footer__title',
+                children: 'שותפים',
+              }),
+              e.jsx('p', {
+                className: 'page-footer__text',
+                children: 'שותף אסטרטגי 1',
+              }),
+              e.jsx('p', {
+                className: 'page-footer__text',
+                children: 'שותף אסטרטגי 2',
+              }),
+              e.jsx('p', {
+                className: 'page-footer__text',
+                children: 'שותף טכנולוגי',
+              }),
+              e.jsx('p', {
+                className: 'page-footer__text',
+                children: 'שותף פיננסי',
+              }),
+            ],
+          }),
+        ],
+      }),
+    });
+function ls(t) {
+  if (!t) return '—';
+  try {
+    const s = new Date(t),
+      a = new Date() - s,
+      n = Math.floor(a / 6e4),
+      i = Math.floor(a / 36e5),
+      o = Math.floor(a / 864e5);
+    return n < 1
+      ? 'עכשיו'
+      : n < 60
+        ? `לפני ${n} דקות`
+        : i < 24
+          ? i === 1
+            ? 'לפני שעה'
+            : `לפני ${i} שעות`
+          : o < 2
+            ? 'אתמול'
+            : o < 7
+              ? `לפני ${o} ימים`
+              : s.toLocaleDateString('he-IL', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                });
+  } catch {
+    return '—';
+  }
+}
+async function os() {
+  var t;
+  try {
+    await R.init();
+    const s = await R.get('/alerts', {
+        trigger_status: 'triggered_unread',
+        per_page: 5,
+        sort: 'triggered_at',
+        order: 'desc',
+      }),
+      r = Array.isArray(s)
+        ? s
+        : ((s == null ? void 0 : s.data) ??
+            (s == null ? void 0 : s.alerts) ??
+            []) ||
+          [],
+      a = Math.max(r.length, (s == null ? void 0 : s.total) ?? 0);
+    return { data: r, total: a };
+  } catch (s) {
+    const r =
+      (s == null ? void 0 : s.status) ??
+      ((t = s == null ? void 0 : s.response) == null ? void 0 : t.status);
+    return (
+      r === 401 || k('[AlertsSummaryWidget] Fetch error:', { status: r }),
+      null
+    );
+  }
+}
+const cs = ({ onData: t }) => {
+    const [s, r] = _.useState(null),
+      [a, n] = _.useState(!0),
+      [i, o] = _.useState(!0);
+    if (
+      (_.useEffect(() => {
+        let p = !1;
+        return (
+          (async () => {
+            n(!0);
+            const f = await os();
+            p ||
+              (r(f),
+              t == null ||
+                t(
+                  f ? { total: f.total, data: f.data } : { total: 0, data: [] },
+                ),
+              n(!1));
+          })(),
+          () => {
+            p = !0;
+          }
+        );
+      }, [t]),
+      a || !s || s.total === 0)
+    )
+      return null;
+    const { data: l, total: c } = s,
+      d = '/alerts.html';
+    return e.jsxs('div', {
+      className: 'active-alerts collapsible-container',
+      'data-role': 'container',
+      children: [
+        e.jsxs('div', {
+          className: 'index-section__header',
+          children: [
+            e.jsxs('div', {
+              className: 'index-section__header-title',
+              children: [
+                e.jsxs('button', {
+                  type: 'button',
+                  className: 'active-alerts__title-trigger',
+                  'aria-label': 'פתח עמוד ההתראות',
+                  onClick: () => o((p) => !p),
+                  children: [
+                    e.jsx('span', {
+                      className: 'active-alerts__title-icon',
+                      'aria-hidden': 'true',
+                      children: '🔔',
+                    }),
+                    e.jsx('span', {
+                      className: 'active-alerts__title-text',
+                      children: 'התראות פעילות',
+                    }),
+                  ],
+                }),
+                e.jsx('a', {
+                  href: '/alerts.html?trigger_status=triggered_unread',
+                  className: 'active-alerts__count-badge',
+                  'aria-label': `${c} התראות לא נקראו`,
+                  'aria-live': 'polite',
+                  children: c,
+                }),
+              ],
+            }),
+            e.jsx('div', {
+              className: 'index-section__header-actions',
+              children: e.jsx('button', {
+                type: 'button',
+                className: 'index-section__header-toggle-btn',
+                'aria-label': i ? 'הסתר' : 'הצג',
+                'aria-expanded': i,
+                onClick: () => o((p) => !p),
+                children: e.jsx('svg', {
+                  width: '20',
+                  height: '20',
+                  viewBox: '0 0 24 24',
+                  fill: 'none',
+                  stroke: 'currentColor',
+                  strokeWidth: '2',
+                  children: e.jsx('path', { d: 'M6 9l6 6l6 -6' }),
+                }),
+              }),
+            }),
+          ],
+        }),
+        i &&
+          e.jsx('div', {
+            className: 'index-section__body',
+            children: e.jsx('div', {
+              className: 'active-alerts__list',
+              role: 'list',
+              children: l.map((p) => {
+                const f = p.ticker_symbol ?? p.target_display_name ?? '—',
+                  y = p.condition_summary ?? p.title ?? '—',
+                  j = ls(p.triggered_at ?? p.triggeredAt),
+                  u = p.id ? `${d}?id=${encodeURIComponent(p.id)}` : d;
+                return e.jsxs(
+                  'a',
+                  {
+                    href: u,
+                    className:
+                      'active-alerts__card active-alerts__card--compact',
+                    role: 'listitem',
+                    children: [
+                      e.jsx('span', {
+                        className: 'active-alerts__card-symbol',
+                        children: f,
+                      }),
+                      e.jsx('span', {
+                        className: 'active-alerts__card-sep',
+                        children: ' · ',
+                      }),
+                      e.jsx('span', {
+                        className: 'active-alerts__card-condition',
+                        children: y,
+                      }),
+                      e.jsx('span', {
+                        className: 'active-alerts__card-sep',
+                        children: ' · ',
+                      }),
+                      e.jsx('time', {
+                        className: 'active-alerts__card-time',
+                        children: j,
+                      }),
+                    ],
+                  },
+                  p.id ?? p.triggered_at ?? Math.random(),
+                );
+              }),
+            }),
+          }),
+      ],
+    });
+  },
+  ds = () => {
+    const [t, s] = _.useState(!1),
+      [r, a] = _.useState(!0),
+      [n, i] = _.useState({ top: !0, main: !0, portfolio: !0 }),
+      [o, l] = _.useState(!1),
+      [c, d] = _.useState(0),
+      [h, p] = _.useState({
+        recentTrades: 'recentTradesPane',
+        pendingActions: 'pendingAssignPlansPane',
+        tickerList: 'tickerActivePane',
+      }),
+      f = (u) => {
+        (i((w) => ({ ...w, [u]: !w[u] })),
+          x('HomePage', `Section ${u} toggled`, { isOpen: !n[u] }));
+      },
+      y = () => {
+        (l((u) => !u),
+          x('HomePage', 'Portfolio summary toggled', { isOpen: !o }));
+      },
+      j = (u, w) => {
+        (p((P) => ({ ...P, [u]: w })),
+          x('HomePage', 'Widget tab changed', { widgetId: u, tabPaneId: w }));
+      };
+    return (
+      _.useEffect(() => {
+        ((async () => {
+          a(!0);
+          try {
+            if (E.isAuthenticated())
+              try {
+                (await E.getCurrentUser(),
+                  s(!0),
+                  x(
+                    'HomePage',
+                    'User authenticated - showing Logged-in Container',
+                  ));
+              } catch {
+                (s(!1),
+                  x('HomePage', 'Token invalid - showing Guest Container'));
+              }
+            else (s(!1), x('HomePage', 'No token - showing Guest Container'));
+          } catch (w) {
+            (s(!1),
+              x('HomePage', 'Auth check failed - showing Guest Container', w));
+          } finally {
+            a(!1);
+          }
+        })(),
+          x('HomePage', 'Component mounted'));
+      }, []),
+      e.jsxs(e.Fragment, {
+        children: [
+          e.jsx('div', {
+            className: 'page-wrapper',
+            children: e.jsx('div', {
+              className: 'page-container',
+              children: e.jsxs('main', {
+                children: [
+                  !t &&
+                    e.jsx('tt-container', {
+                      'data-container-type': 'guest',
+                      children: e.jsx('tt-section', {
+                        children: e.jsxs('div', {
+                          className: 'guest-container',
+                          children: [
+                            e.jsxs('div', {
+                              className: 'guest-container__header',
+                              children: [
+                                e.jsx('h1', {
+                                  className: 'guest-container__title',
+                                  children: 'ברוכים הבאים ל-TikTrack',
+                                }),
+                                e.jsx('p', {
+                                  className: 'guest-container__subtitle',
+                                  children:
+                                    'פלטפורמה מתקדמת לניהול מסחר ופורטפוליו',
+                                }),
+                              ],
+                            }),
+                            e.jsxs('div', {
+                              className: 'guest-container__content',
+                              children: [
+                                e.jsxs('div', {
+                                  className: 'guest-container__features',
+                                  children: [
+                                    e.jsxs('div', {
+                                      className: 'guest-container__feature',
+                                      children: [
+                                        e.jsx('h3', {
+                                          children: 'ניהול פורטפוליו',
+                                        }),
+                                        e.jsx('p', {
+                                          children:
+                                            'עקוב אחר כל החשבונות והפוזיציות שלך במקום אחד',
+                                        }),
+                                      ],
+                                    }),
+                                    e.jsxs('div', {
+                                      className: 'guest-container__feature',
+                                      children: [
+                                        e.jsx('h3', {
+                                          children: 'ניתוח מתקדם',
+                                        }),
+                                        e.jsx('p', {
+                                          children:
+                                            'כלים חזקים לניתוח ביצועים וקבלת החלטות מושכלות',
+                                        }),
+                                      ],
+                                    }),
+                                    e.jsxs('div', {
+                                      className: 'guest-container__feature',
+                                      children: [
+                                        e.jsx('h3', { children: 'תמיכה מלאה' }),
+                                        e.jsx('p', {
+                                          children:
+                                            'צוות מקצועי זמין לעזור בכל שאלה',
+                                        }),
+                                      ],
+                                    }),
+                                  ],
+                                }),
+                                e.jsxs('div', {
+                                  className: 'guest-container__actions',
+                                  children: [
+                                    e.jsx('a', {
+                                      href: '/login',
+                                      className: 'btn btn-primary',
+                                      children: 'התחבר',
+                                    }),
+                                    e.jsx('a', {
+                                      href: '/register',
+                                      className: 'btn btn-secondary',
+                                      children: 'הירשם',
+                                    }),
+                                  ],
+                                }),
+                              ],
+                            }),
+                          ],
+                        }),
+                      }),
+                    }),
+                  t &&
+                    e.jsxs('tt-container', {
+                      'data-container-type': 'logged-in',
+                      children: [
+                        e.jsxs('tt-section', {
+                          'data-section': 'top',
+                          children: [
+                            e.jsxs('div', {
+                              className: 'index-section__header',
+                              children: [
+                                e.jsxs('div', {
+                                  className: 'index-section__header-title',
+                                  children: [
+                                    e.jsx('img', {
+                                      src: '/images/icons/entities/home.svg',
+                                      alt: 'דף הבית',
+                                      className: 'index-section__header-icon',
+                                      width: '20',
+                                      height: '20',
+                                    }),
+                                    e.jsx('h1', {
+                                      className: 'index-section__header-text',
+                                      children: 'דף הבית - TikTrack',
+                                    }),
+                                  ],
+                                }),
+                                e.jsxs('div', {
+                                  className: 'index-section__header-actions',
+                                  children: [
+                                    !n.top &&
+                                      c > 0 &&
+                                      e.jsxs('a', {
+                                        href: '/alerts.html?trigger_status=triggered_unread',
+                                        className:
+                                          'index-section__header-alert-btn',
+                                        'aria-label': `${c} התראות לא נקראו`,
+                                        children: [
+                                          e.jsx('span', {
+                                            className:
+                                              'index-section__header-alert-icon',
+                                            children: '🔔',
+                                          }),
+                                          e.jsx('span', {
+                                            className:
+                                              'index-section__header-alert-count',
+                                            children: c,
+                                          }),
+                                        ],
+                                      }),
+                                    e.jsx('button', {
+                                      className:
+                                        'index-section__header-toggle-btn',
+                                      'aria-label': 'הצג/הסתר',
+                                      onClick: () => f('top'),
+                                      'aria-expanded': n.top,
+                                      children: e.jsx('svg', {
+                                        width: '20',
+                                        height: '20',
+                                        viewBox: '0 0 24 24',
+                                        fill: 'none',
+                                        stroke: 'currentColor',
+                                        strokeWidth: '2',
+                                        children: e.jsx('path', {
+                                          d: 'M6 9l6 6l6 -6',
+                                        }),
+                                      }),
+                                    }),
+                                  ],
+                                }),
+                              ],
+                            }),
+                            n.top &&
+                              e.jsxs('div', {
+                                className: 'index-section__body',
+                                children: [
+                                  e.jsx(cs, { onData: ({ total: u }) => d(u) }),
+                                  e.jsxs('div', {
+                                    className: 'info-summary',
+                                    id: 'summaryStats',
+                                    children: [
+                                      e.jsxs('div', {
+                                        className:
+                                          'info-summary__row info-summary__row--first',
+                                        children: [
+                                          e.jsxs('div', {
+                                            className: 'info-summary__content',
+                                            children: [
+                                              e.jsxs('div', {
+                                                children: [
+                                                  'סה"כ טריידים:',
+                                                  ' ',
+                                                  e.jsx('strong', {
+                                                    id: 'totalTrades',
+                                                    children: '82',
+                                                  }),
+                                                ],
+                                              }),
+                                              e.jsxs('div', {
+                                                children: [
+                                                  'סה"כ התראות:',
+                                                  ' ',
+                                                  e.jsx('strong', {
+                                                    id: 'totalAlerts',
+                                                    children: '3',
+                                                  }),
+                                                ],
+                                              }),
+                                              e.jsxs('div', {
+                                                children: [
+                                                  'יתרה נוכחית:',
+                                                  ' ',
+                                                  e.jsx('strong', {
+                                                    id: 'currentBalance',
+                                                    children: e.jsx('span', {
+                                                      className:
+                                                        'numeric-value-positive',
+                                                      dir: 'ltr',
+                                                      children: '+$372,660.00',
+                                                    }),
+                                                  }),
+                                                ],
+                                              }),
+                                              e.jsxs('div', {
+                                                children: [
+                                                  'רווח/הפסד:',
+                                                  ' ',
+                                                  e.jsx('strong', {
+                                                    id: 'totalPnL',
+                                                    children: e.jsx('span', {
+                                                      className:
+                                                        'numeric-value-positive',
+                                                      dir: 'ltr',
+                                                      children: '+$1,768.00',
+                                                    }),
+                                                  }),
+                                                ],
+                                              }),
+                                            ],
+                                          }),
+                                          e.jsx('button', {
+                                            className:
+                                              'portfolio-summary__toggle-btn',
+                                            id: 'portfolioSummaryToggleSize',
+                                            'aria-label': o
+                                              ? 'הצג סיכום מצומצם'
+                                              : 'הצג סיכום מלא',
+                                            title: o
+                                              ? 'הצג סיכום מצומצם'
+                                              : 'הצג סיכום מלא',
+                                            onClick: y,
+                                            children: o
+                                              ? e.jsxs('svg', {
+                                                  width: '20',
+                                                  height: '20',
+                                                  viewBox: '0 0 24 24',
+                                                  fill: 'none',
+                                                  stroke: 'currentColor',
+                                                  strokeWidth: '2',
+                                                  children: [
+                                                    e.jsx('path', {
+                                                      d: 'M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24',
+                                                    }),
+                                                    e.jsx('line', {
+                                                      x1: '1',
+                                                      y1: '1',
+                                                      x2: '23',
+                                                      y2: '23',
+                                                    }),
+                                                  ],
+                                                })
+                                              : e.jsxs('svg', {
+                                                  width: '20',
+                                                  height: '20',
+                                                  viewBox: '0 0 24 24',
+                                                  fill: 'none',
+                                                  stroke: 'currentColor',
+                                                  strokeWidth: '2',
+                                                  children: [
+                                                    e.jsx('path', {
+                                                      d: 'M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0',
+                                                    }),
+                                                    e.jsx('path', {
+                                                      d: 'M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6',
+                                                    }),
+                                                  ],
+                                                }),
+                                          }),
+                                        ],
+                                      }),
+                                      o &&
+                                        e.jsx('div', {
+                                          className:
+                                            'info-summary__row info-summary__row--second',
+                                          id: 'portfolioSummaryContent',
+                                          children: e.jsxs('div', {
+                                            className: 'info-summary__content',
+                                            children: [
+                                              e.jsx('span', {
+                                                children:
+                                                  'חשבונות פעילים: 31 מתוך 53',
+                                              }),
+                                              e.jsxs('span', {
+                                                children: [
+                                                  'שווי כולל:',
+                                                  ' ',
+                                                  e.jsx('span', {
+                                                    className:
+                                                      'numeric-value-positive',
+                                                    dir: 'ltr',
+                                                    children: '+$372,660.00',
+                                                  }),
+                                                ],
+                                              }),
+                                              e.jsxs('span', {
+                                                children: [
+                                                  'שווי ממוצע לחשבון מסחר:',
+                                                  ' ',
+                                                  e.jsx('span', {
+                                                    className:
+                                                      'numeric-value-positive',
+                                                    dir: 'ltr',
+                                                    children: '+$7,031.32',
+                                                  }),
+                                                ],
+                                              }),
+                                              e.jsx('span', {
+                                                children: 'טריידים פתוחים: 71',
+                                              }),
+                                              e.jsxs('span', {
+                                                children: [
+                                                  'P/L כולל:',
+                                                  ' ',
+                                                  e.jsx('span', {
+                                                    className:
+                                                      'numeric-value-positive',
+                                                    dir: 'ltr',
+                                                    children: '+$1,768.00',
+                                                  }),
+                                                ],
+                                              }),
+                                            ],
+                                          }),
+                                        }),
+                                    ],
+                                  }),
+                                ],
+                              }),
+                          ],
+                        }),
+                        e.jsxs('tt-section', {
+                          'data-section': 'main',
+                          children: [
+                            e.jsxs('div', {
+                              className: 'index-section__header',
+                              children: [
+                                e.jsxs('div', {
+                                  className: 'index-section__header-title',
+                                  children: [
+                                    e.jsx('img', {
+                                      src: '/images/icons/entities/home.svg',
+                                      alt: 'לוח בקרה',
+                                      className: 'index-section__header-icon',
+                                      width: '20',
+                                      height: '20',
+                                    }),
+                                    e.jsx('h2', {
+                                      className: 'index-section__header-text',
+                                      children: 'לוח בקרה',
+                                    }),
+                                  ],
+                                }),
+                                e.jsx('div', {
+                                  className: 'index-section__header-meta',
+                                  children: e.jsx('span', {
+                                    className: 'index-section__header-count',
+                                    children:
+                                      'טריידים: 82 • התראות פעילות: 3 • חשבונות: 53',
+                                  }),
+                                }),
+                                e.jsx('div', {
+                                  className: 'index-section__header-actions',
+                                  children: e.jsx('button', {
+                                    className:
+                                      'index-section__header-toggle-btn',
+                                    'aria-label': 'הצג/הסתר',
+                                    onClick: () => f('main'),
+                                    'aria-expanded': n.main,
+                                    children: e.jsx('svg', {
+                                      width: '20',
+                                      height: '20',
+                                      viewBox: '0 0 24 24',
+                                      fill: 'none',
+                                      stroke: 'currentColor',
+                                      strokeWidth: '2',
+                                      children: e.jsx('path', {
+                                        d: 'M6 9l6 6l6 -6',
+                                      }),
+                                    }),
+                                  }),
+                                }),
+                              ],
+                            }),
+                            n.main &&
+                              e.jsxs('div', {
+                                className: 'index-section__body',
+                                children: [
+                                  e.jsxs('tt-section-row', {
+                                    children: [
+                                      e.jsxs('div', {
+                                        className: 'widget-placeholder',
+                                        children: [
+                                          e.jsxs('div', {
+                                            className:
+                                              'widget-placeholder__header',
+                                            children: [
+                                              e.jsx('div', {
+                                                className:
+                                                  'widget-placeholder__header-title-row',
+                                                children: e.jsxs('h3', {
+                                                  className:
+                                                    'widget-placeholder__title',
+                                                  children: [
+                                                    e.jsx('img', {
+                                                      src: '/images/icons/entities/trades.svg',
+                                                      alt: 'טריידים אחרונים',
+                                                      width: '20',
+                                                      height: '20',
+                                                      className:
+                                                        'widget-placeholder__title-icon',
+                                                    }),
+                                                    'טריידים אחרונים',
+                                                  ],
+                                                }),
+                                              }),
+                                              e.jsxs('ul', {
+                                                className:
+                                                  'widget-placeholder__tabs',
+                                                role: 'tablist',
+                                                children: [
+                                                  e.jsx('li', {
+                                                    className:
+                                                      'widget-placeholder__tab-item',
+                                                    role: 'presentation',
+                                                    children: e.jsx('button', {
+                                                      className: `widget-placeholder__tab-btn ${h.recentTrades === 'recentTradesPane' ? 'widget-placeholder__tab-btn--active' : ''}`,
+                                                      role: 'tab',
+                                                      'aria-selected':
+                                                        h.recentTrades ===
+                                                        'recentTradesPane',
+                                                      'aria-controls':
+                                                        'recentTradesPane',
+                                                      onClick: () =>
+                                                        j(
+                                                          'recentTrades',
+                                                          'recentTradesPane',
+                                                        ),
+                                                      children:
+                                                        'טריידים אחרונים',
+                                                    }),
+                                                  }),
+                                                  e.jsx('li', {
+                                                    className:
+                                                      'widget-placeholder__tab-item',
+                                                    role: 'presentation',
+                                                    children: e.jsx('button', {
+                                                      className: `widget-placeholder__tab-btn ${h.recentTrades === 'recentPlansPane' ? 'widget-placeholder__tab-btn--active' : ''}`,
+                                                      role: 'tab',
+                                                      'aria-selected':
+                                                        h.recentTrades ===
+                                                        'recentPlansPane',
+                                                      'aria-controls':
+                                                        'recentPlansPane',
+                                                      onClick: () =>
+                                                        j(
+                                                          'recentTrades',
+                                                          'recentPlansPane',
+                                                        ),
+                                                      children:
+                                                        'תוכניות אחרונות',
+                                                    }),
+                                                  }),
+                                                ],
+                                              }),
+                                            ],
+                                          }),
+                                          e.jsxs('div', {
+                                            className:
+                                              'widget-placeholder__body',
+                                            children: [
+                                              h.recentTrades ===
+                                                'recentTradesPane' &&
+                                                e.jsx('div', {
+                                                  className:
+                                                    'widget-placeholder__tab-content',
+                                                  id: 'recentTradesPane',
+                                                  role: 'tabpanel',
+                                                  children: e.jsxs('ul', {
+                                                    className:
+                                                      'widget-placeholder__list',
+                                                    children: [
+                                                      e.jsx('li', {
+                                                        className:
+                                                          'widget-placeholder__list-item',
+                                                        children: e.jsxs(
+                                                          'div',
+                                                          {
+                                                            className:
+                                                              'widget-placeholder__item-header',
+                                                            children: [
+                                                              e.jsxs('div', {
+                                                                className:
+                                                                  'widget-placeholder__item-title',
+                                                                children: [
+                                                                  e.jsx('img', {
+                                                                    src: '/images/icons/entities/trades.svg',
+                                                                    alt: 'טרייד',
+                                                                    width: '16',
+                                                                    height:
+                                                                      '16',
+                                                                    className:
+                                                                      'widget-placeholder__item-icon',
+                                                                  }),
+                                                                  e.jsx(
+                                                                    'span',
+                                                                    {
+                                                                      className:
+                                                                        'widget-placeholder__item-name',
+                                                                      children:
+                                                                        'SPY',
+                                                                    },
+                                                                  ),
+                                                                ],
+                                                              }),
+                                                              e.jsxs('div', {
+                                                                className:
+                                                                  'widget-placeholder__item-meta',
+                                                                children: [
+                                                                  e.jsx(
+                                                                    'span',
+                                                                    {
+                                                                      className:
+                                                                        'status-badge',
+                                                                      'data-status-category':
+                                                                        'open',
+                                                                      children:
+                                                                        'פתוח',
+                                                                    },
+                                                                  ),
+                                                                  e.jsx(
+                                                                    'span',
+                                                                    {
+                                                                      className:
+                                                                        'widget-placeholder__item-date',
+                                                                      children:
+                                                                        '25.01.26',
+                                                                    },
+                                                                  ),
+                                                                ],
+                                                              }),
+                                                              e.jsx('div', {
+                                                                className:
+                                                                  'widget-placeholder__item-amount',
+                                                                children: e.jsx(
+                                                                  'span',
+                                                                  {
+                                                                    className:
+                                                                      'numeric-value-positive',
+                                                                    dir: 'ltr',
+                                                                    children:
+                                                                      '+$175.00',
+                                                                  },
+                                                                ),
+                                                              }),
+                                                            ],
+                                                          },
+                                                        ),
+                                                      }),
+                                                      e.jsx('li', {
+                                                        className:
+                                                          'widget-placeholder__list-item',
+                                                        children: e.jsxs(
+                                                          'div',
+                                                          {
+                                                            className:
+                                                              'widget-placeholder__item-header',
+                                                            children: [
+                                                              e.jsxs('div', {
+                                                                className:
+                                                                  'widget-placeholder__item-title',
+                                                                children: [
+                                                                  e.jsx('img', {
+                                                                    src: '/images/icons/entities/trades.svg',
+                                                                    alt: 'טרייד',
+                                                                    width: '16',
+                                                                    height:
+                                                                      '16',
+                                                                    className:
+                                                                      'widget-placeholder__item-icon',
+                                                                  }),
+                                                                  e.jsx(
+                                                                    'span',
+                                                                    {
+                                                                      className:
+                                                                        'widget-placeholder__item-name',
+                                                                      children:
+                                                                        'AAPL',
+                                                                    },
+                                                                  ),
+                                                                ],
+                                                              }),
+                                                              e.jsxs('div', {
+                                                                className:
+                                                                  'widget-placeholder__item-meta',
+                                                                children: [
+                                                                  e.jsx(
+                                                                    'span',
+                                                                    {
+                                                                      className:
+                                                                        'status-badge',
+                                                                      'data-status-category':
+                                                                        'open',
+                                                                      children:
+                                                                        'פתוח',
+                                                                    },
+                                                                  ),
+                                                                  e.jsx(
+                                                                    'span',
+                                                                    {
+                                                                      className:
+                                                                        'widget-placeholder__item-date',
+                                                                      children:
+                                                                        '24.01.26',
+                                                                    },
+                                                                  ),
+                                                                ],
+                                                              }),
+                                                              e.jsx('div', {
+                                                                className:
+                                                                  'widget-placeholder__item-amount',
+                                                                children: e.jsx(
+                                                                  'span',
+                                                                  {
+                                                                    className:
+                                                                      'numeric-value-negative',
+                                                                    dir: 'ltr',
+                                                                    children:
+                                                                      '-$45.20',
+                                                                  },
+                                                                ),
+                                                              }),
+                                                            ],
+                                                          },
+                                                        ),
+                                                      }),
+                                                      e.jsx('li', {
+                                                        className:
+                                                          'widget-placeholder__list-item',
+                                                        children: e.jsxs(
+                                                          'div',
+                                                          {
+                                                            className:
+                                                              'widget-placeholder__item-header',
+                                                            children: [
+                                                              e.jsxs('div', {
+                                                                className:
+                                                                  'widget-placeholder__item-title',
+                                                                children: [
+                                                                  e.jsx('img', {
+                                                                    src: '/images/icons/entities/trades.svg',
+                                                                    alt: 'טרייד',
+                                                                    width: '16',
+                                                                    height:
+                                                                      '16',
+                                                                    className:
+                                                                      'widget-placeholder__item-icon',
+                                                                  }),
+                                                                  e.jsx(
+                                                                    'span',
+                                                                    {
+                                                                      className:
+                                                                        'widget-placeholder__item-name',
+                                                                      children:
+                                                                        'MSFT',
+                                                                    },
+                                                                  ),
+                                                                ],
+                                                              }),
+                                                              e.jsxs('div', {
+                                                                className:
+                                                                  'widget-placeholder__item-meta',
+                                                                children: [
+                                                                  e.jsx(
+                                                                    'span',
+                                                                    {
+                                                                      className:
+                                                                        'status-badge',
+                                                                      'data-status-category':
+                                                                        'closed',
+                                                                      children:
+                                                                        'סגור',
+                                                                    },
+                                                                  ),
+                                                                  e.jsx(
+                                                                    'span',
+                                                                    {
+                                                                      className:
+                                                                        'widget-placeholder__item-date',
+                                                                      children:
+                                                                        '23.01.26',
+                                                                    },
+                                                                  ),
+                                                                ],
+                                                              }),
+                                                              e.jsx('div', {
+                                                                className:
+                                                                  'widget-placeholder__item-amount',
+                                                                children: e.jsx(
+                                                                  'span',
+                                                                  {
+                                                                    className:
+                                                                      'numeric-value-positive',
+                                                                    dir: 'ltr',
+                                                                    children:
+                                                                      '+$320.50',
+                                                                  },
+                                                                ),
+                                                              }),
+                                                            ],
+                                                          },
+                                                        ),
+                                                      }),
+                                                    ],
+                                                  }),
+                                                }),
+                                              h.recentTrades ===
+                                                'recentPlansPane' &&
+                                                e.jsx('div', {
+                                                  className:
+                                                    'widget-placeholder__tab-content widget-placeholder__tab-content--hidden',
+                                                  id: 'recentPlansPane',
+                                                  role: 'tabpanel',
+                                                  children: e.jsxs('ul', {
+                                                    className:
+                                                      'widget-placeholder__list',
+                                                    children: [
+                                                      e.jsx('li', {
+                                                        className:
+                                                          'widget-placeholder__list-item',
+                                                        children: e.jsxs(
+                                                          'div',
+                                                          {
+                                                            className:
+                                                              'widget-placeholder__item-header',
+                                                            children: [
+                                                              e.jsxs('div', {
+                                                                className:
+                                                                  'widget-placeholder__item-title',
+                                                                children: [
+                                                                  e.jsx('img', {
+                                                                    src: '/images/icons/entities/trade_plans.svg',
+                                                                    alt: 'תוכנית',
+                                                                    width: '16',
+                                                                    height:
+                                                                      '16',
+                                                                    className:
+                                                                      'widget-placeholder__item-icon',
+                                                                  }),
+                                                                  e.jsx(
+                                                                    'span',
+                                                                    {
+                                                                      className:
+                                                                        'widget-placeholder__item-name',
+                                                                      children:
+                                                                        'תוכנית SPY - Swing',
+                                                                    },
+                                                                  ),
+                                                                ],
+                                                              }),
+                                                              e.jsxs('div', {
+                                                                className:
+                                                                  'widget-placeholder__item-meta',
+                                                                children: [
+                                                                  e.jsx(
+                                                                    'span',
+                                                                    {
+                                                                      className:
+                                                                        'status-badge',
+                                                                      'data-status-category':
+                                                                        'active',
+                                                                      children:
+                                                                        'פעיל',
+                                                                    },
+                                                                  ),
+                                                                  e.jsx(
+                                                                    'span',
+                                                                    {
+                                                                      className:
+                                                                        'widget-placeholder__item-date',
+                                                                      children:
+                                                                        '25.01.26',
+                                                                    },
+                                                                  ),
+                                                                ],
+                                                              }),
+                                                            ],
+                                                          },
+                                                        ),
+                                                      }),
+                                                      e.jsx('li', {
+                                                        className:
+                                                          'widget-placeholder__list-item',
+                                                        children: e.jsxs(
+                                                          'div',
+                                                          {
+                                                            className:
+                                                              'widget-placeholder__item-header',
+                                                            children: [
+                                                              e.jsxs('div', {
+                                                                className:
+                                                                  'widget-placeholder__item-title',
+                                                                children: [
+                                                                  e.jsx('img', {
+                                                                    src: '/images/icons/entities/trade_plans.svg',
+                                                                    alt: 'תוכנית',
+                                                                    width: '16',
+                                                                    height:
+                                                                      '16',
+                                                                    className:
+                                                                      'widget-placeholder__item-icon',
+                                                                  }),
+                                                                  e.jsx(
+                                                                    'span',
+                                                                    {
+                                                                      className:
+                                                                        'widget-placeholder__item-name',
+                                                                      children:
+                                                                        'תוכנית AAPL - Day Trade',
+                                                                    },
+                                                                  ),
+                                                                ],
+                                                              }),
+                                                              e.jsxs('div', {
+                                                                className:
+                                                                  'widget-placeholder__item-meta',
+                                                                children: [
+                                                                  e.jsx(
+                                                                    'span',
+                                                                    {
+                                                                      className:
+                                                                        'status-badge',
+                                                                      'data-status-category':
+                                                                        'active',
+                                                                      children:
+                                                                        'פעיל',
+                                                                    },
+                                                                  ),
+                                                                  e.jsx(
+                                                                    'span',
+                                                                    {
+                                                                      className:
+                                                                        'widget-placeholder__item-date',
+                                                                      children:
+                                                                        '24.01.26',
+                                                                    },
+                                                                  ),
+                                                                ],
+                                                              }),
+                                                            ],
+                                                          },
+                                                        ),
+                                                      }),
+                                                    ],
+                                                  }),
+                                                }),
+                                            ],
+                                          }),
+                                        ],
+                                      }),
+                                      e.jsxs('div', {
+                                        className: 'widget-placeholder',
+                                        children: [
+                                          e.jsxs('div', {
+                                            className:
+                                              'widget-placeholder__header',
+                                            children: [
+                                              e.jsxs('div', {
+                                                className:
+                                                  'widget-placeholder__header-title-row',
+                                                children: [
+                                                  e.jsxs('h3', {
+                                                    className:
+                                                      'widget-placeholder__title',
+                                                    children: [
+                                                      e.jsx('img', {
+                                                        src: '/images/icons/entities/executions.svg',
+                                                        alt: 'פעולות ממתינות',
+                                                        width: '20',
+                                                        height: '20',
+                                                        className:
+                                                          'widget-placeholder__title-icon',
+                                                      }),
+                                                      'פעולות ממתינות',
+                                                    ],
+                                                  }),
+                                                  e.jsx('div', {
+                                                    className:
+                                                      'widget-placeholder__header-badges',
+                                                    children: e.jsx('span', {
+                                                      className:
+                                                        'widget-placeholder__badge',
+                                                      children: '0',
+                                                    }),
+                                                  }),
+                                                ],
+                                              }),
+                                              e.jsxs('ul', {
+                                                className:
+                                                  'widget-placeholder__tabs',
+                                                role: 'tablist',
+                                                children: [
+                                                  e.jsx('li', {
+                                                    className:
+                                                      'widget-placeholder__tab-item',
+                                                    role: 'presentation',
+                                                    children: e.jsx('button', {
+                                                      className: `widget-placeholder__tab-btn ${h.pendingActions === 'pendingAssignPlansPane' ? 'widget-placeholder__tab-btn--active' : ''}`,
+                                                      role: 'tab',
+                                                      'aria-selected':
+                                                        h.pendingActions ===
+                                                        'pendingAssignPlansPane',
+                                                      'aria-controls':
+                                                        'pendingAssignPlansPane',
+                                                      onClick: () =>
+                                                        j(
+                                                          'pendingActions',
+                                                          'pendingAssignPlansPane',
+                                                        ),
+                                                      children: 'שיוך תוכניות',
+                                                    }),
+                                                  }),
+                                                  e.jsx('li', {
+                                                    className:
+                                                      'widget-placeholder__tab-item',
+                                                    role: 'presentation',
+                                                    children: e.jsx('button', {
+                                                      className: `widget-placeholder__tab-btn ${h.pendingActions === 'pendingAssignTradesPane' ? 'widget-placeholder__tab-btn--active' : ''}`,
+                                                      role: 'tab',
+                                                      'aria-selected':
+                                                        h.pendingActions ===
+                                                        'pendingAssignTradesPane',
+                                                      'aria-controls':
+                                                        'pendingAssignTradesPane',
+                                                      onClick: () =>
+                                                        j(
+                                                          'pendingActions',
+                                                          'pendingAssignTradesPane',
+                                                        ),
+                                                      children: 'שיוך טריידים',
+                                                    }),
+                                                  }),
+                                                  e.jsx('li', {
+                                                    className:
+                                                      'widget-placeholder__tab-item',
+                                                    role: 'presentation',
+                                                    children: e.jsx('button', {
+                                                      className: `widget-placeholder__tab-btn ${h.pendingActions === 'pendingCreatePlansPane' ? 'widget-placeholder__tab-btn--active' : ''}`,
+                                                      role: 'tab',
+                                                      'aria-selected':
+                                                        h.pendingActions ===
+                                                        'pendingCreatePlansPane',
+                                                      'aria-controls':
+                                                        'pendingCreatePlansPane',
+                                                      onClick: () =>
+                                                        j(
+                                                          'pendingActions',
+                                                          'pendingCreatePlansPane',
+                                                        ),
+                                                      children: 'יצירת תוכניות',
+                                                    }),
+                                                  }),
+                                                  e.jsx('li', {
+                                                    className:
+                                                      'widget-placeholder__tab-item',
+                                                    role: 'presentation',
+                                                    children: e.jsx('button', {
+                                                      className: `widget-placeholder__tab-btn ${h.pendingActions === 'pendingCreateTradesPane' ? 'widget-placeholder__tab-btn--active' : ''}`,
+                                                      role: 'tab',
+                                                      'aria-selected':
+                                                        h.pendingActions ===
+                                                        'pendingCreateTradesPane',
+                                                      'aria-controls':
+                                                        'pendingCreateTradesPane',
+                                                      onClick: () =>
+                                                        j(
+                                                          'pendingActions',
+                                                          'pendingCreateTradesPane',
+                                                        ),
+                                                      children: 'יצירת טריידים',
+                                                    }),
+                                                  }),
+                                                ],
+                                              }),
+                                            ],
+                                          }),
+                                          e.jsxs('div', {
+                                            className:
+                                              'widget-placeholder__body',
+                                            children: [
+                                              h.pendingActions ===
+                                                'pendingAssignPlansPane' &&
+                                                e.jsx('div', {
+                                                  className:
+                                                    'widget-placeholder__tab-content',
+                                                  id: 'pendingAssignPlansPane',
+                                                  role: 'tabpanel',
+                                                  children: e.jsx('p', {
+                                                    className:
+                                                      'widget-placeholder__text',
+                                                    children:
+                                                      'כל הטריידים מלווים בתוכנית מתאימה. עבודה מצוינת!',
+                                                  }),
+                                                }),
+                                              h.pendingActions ===
+                                                'pendingAssignTradesPane' &&
+                                                e.jsx('div', {
+                                                  className:
+                                                    'widget-placeholder__tab-content widget-placeholder__tab-content--hidden',
+                                                  id: 'pendingAssignTradesPane',
+                                                  role: 'tabpanel',
+                                                  children: e.jsx('p', {
+                                                    className:
+                                                      'widget-placeholder__text',
+                                                    children:
+                                                      'אין טריידים הזקוקים לשיוך',
+                                                  }),
+                                                }),
+                                              h.pendingActions ===
+                                                'pendingCreatePlansPane' &&
+                                                e.jsx('div', {
+                                                  className:
+                                                    'widget-placeholder__tab-content widget-placeholder__tab-content--hidden',
+                                                  id: 'pendingCreatePlansPane',
+                                                  role: 'tabpanel',
+                                                  children: e.jsx('p', {
+                                                    className:
+                                                      'widget-placeholder__text',
+                                                    children:
+                                                      'אין הצעות ליצירת תוכניות',
+                                                  }),
+                                                }),
+                                              h.pendingActions ===
+                                                'pendingCreateTradesPane' &&
+                                                e.jsx('div', {
+                                                  className:
+                                                    'widget-placeholder__tab-content widget-placeholder__tab-content--hidden',
+                                                  id: 'pendingCreateTradesPane',
+                                                  role: 'tabpanel',
+                                                  children: e.jsx('p', {
+                                                    className:
+                                                      'widget-placeholder__text',
+                                                    children:
+                                                      'אין אשכולות ליצירת טרייד',
+                                                  }),
+                                                }),
+                                            ],
+                                          }),
+                                        ],
+                                      }),
+                                    ],
+                                  }),
+                                  e.jsxs('tt-section-row', {
+                                    children: [
+                                      e.jsxs('div', {
+                                        className: 'widget-placeholder',
+                                        children: [
+                                          e.jsx('div', {
+                                            className:
+                                              'widget-placeholder__header',
+                                            children: e.jsxs('div', {
+                                              className:
+                                                'widget-placeholder__header-title-row',
+                                              children: [
+                                                e.jsxs('h3', {
+                                                  className:
+                                                    'widget-placeholder__title',
+                                                  children: [
+                                                    e.jsx('img', {
+                                                      src: '/images/icons/entities/home.svg',
+                                                      alt: 'תגיות',
+                                                      width: '20',
+                                                      height: '20',
+                                                      className:
+                                                        'widget-placeholder__title-icon',
+                                                    }),
+                                                    'תגיות',
+                                                  ],
+                                                }),
+                                                e.jsxs('form', {
+                                                  className:
+                                                    'widget-placeholder__search-form',
+                                                  children: [
+                                                    e.jsx('input', {
+                                                      type: 'search',
+                                                      className:
+                                                        'widget-placeholder__search-input',
+                                                      placeholder:
+                                                        'חיפוש תגית...',
+                                                      id: 'tagWidgetSearchInput',
+                                                    }),
+                                                    e.jsxs('select', {
+                                                      className:
+                                                        'widget-placeholder__search-select',
+                                                      id: 'tagWidgetSearchEntityFilter',
+                                                      children: [
+                                                        e.jsx('option', {
+                                                          value: '',
+                                                          children:
+                                                            'כל היישויות',
+                                                        }),
+                                                        e.jsx('option', {
+                                                          value: 'trades',
+                                                          children: 'טריידים',
+                                                        }),
+                                                        e.jsx('option', {
+                                                          value: 'trade_plans',
+                                                          children: 'תכניות',
+                                                        }),
+                                                        e.jsx('option', {
+                                                          value: 'ticker',
+                                                          children: 'טיקרים',
+                                                        }),
+                                                      ],
+                                                    }),
+                                                    e.jsx('button', {
+                                                      type: 'submit',
+                                                      className:
+                                                        'widget-placeholder__search-btn',
+                                                      'aria-label': 'חפש',
+                                                      children: e.jsxs('svg', {
+                                                        width: '16',
+                                                        height: '16',
+                                                        viewBox: '0 0 24 24',
+                                                        fill: 'none',
+                                                        stroke: 'currentColor',
+                                                        strokeWidth: '2',
+                                                        children: [
+                                                          e.jsx('circle', {
+                                                            cx: '11',
+                                                            cy: '11',
+                                                            r: '8',
+                                                          }),
+                                                          e.jsx('path', {
+                                                            d: 'm21 21-4.35-4.35',
+                                                          }),
+                                                        ],
+                                                      }),
+                                                    }),
+                                                  ],
+                                                }),
+                                              ],
+                                            }),
+                                          }),
+                                          e.jsx('div', {
+                                            className:
+                                              'widget-placeholder__body',
+                                            children: e.jsxs('div', {
+                                              className:
+                                                'widget-placeholder__tag-cloud',
+                                              children: [
+                                                e.jsx('button', {
+                                                  className:
+                                                    'widget-placeholder__tag-btn',
+                                                  type: 'button',
+                                                  children: '🏷️ test tag',
+                                                }),
+                                                e.jsx('button', {
+                                                  className:
+                                                    'widget-placeholder__tag-btn',
+                                                  type: 'button',
+                                                  children: '🏷️ swing',
+                                                }),
+                                                e.jsx('button', {
+                                                  className:
+                                                    'widget-placeholder__tag-btn',
+                                                  type: 'button',
+                                                  children: '🏷️ day-trade',
+                                                }),
+                                                e.jsx('button', {
+                                                  className:
+                                                    'widget-placeholder__tag-btn',
+                                                  type: 'button',
+                                                  children: '🏷️ long-term',
+                                                }),
+                                                e.jsx('button', {
+                                                  className:
+                                                    'widget-placeholder__tag-btn',
+                                                  type: 'button',
+                                                  children: '🏷️ tech',
+                                                }),
+                                              ],
+                                            }),
+                                          }),
+                                        ],
+                                      }),
+                                      e.jsxs('div', {
+                                        className: 'widget-placeholder',
+                                        children: [
+                                          e.jsxs('div', {
+                                            className:
+                                              'widget-placeholder__header',
+                                            children: [
+                                              e.jsxs('div', {
+                                                className:
+                                                  'widget-placeholder__header-title-row',
+                                                children: [
+                                                  e.jsxs('h3', {
+                                                    className:
+                                                      'widget-placeholder__title',
+                                                    children: [
+                                                      e.jsx('img', {
+                                                        src: '/images/icons/entities/tickers.svg',
+                                                        alt: 'רשימת טיקרים',
+                                                        width: '20',
+                                                        height: '20',
+                                                        className:
+                                                          'widget-placeholder__title-icon',
+                                                      }),
+                                                      'רשימת טיקרים',
+                                                    ],
+                                                  }),
+                                                  e.jsx('button', {
+                                                    className:
+                                                      'widget-placeholder__refresh-btn align-push-down',
+                                                    'aria-label': 'רענן',
+                                                    title: 'רענן',
+                                                    children: e.jsxs('svg', {
+                                                      width: '20',
+                                                      height: '20',
+                                                      viewBox: '0 0 24 24',
+                                                      fill: 'none',
+                                                      stroke: 'currentColor',
+                                                      strokeWidth: '2',
+                                                      children: [
+                                                        e.jsx('path', {
+                                                          d: 'M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4',
+                                                        }),
+                                                        e.jsx('path', {
+                                                          d: 'M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4',
+                                                        }),
+                                                      ],
+                                                    }),
+                                                  }),
+                                                ],
+                                              }),
+                                              e.jsxs('ul', {
+                                                className:
+                                                  'widget-placeholder__tabs',
+                                                role: 'tablist',
+                                                children: [
+                                                  e.jsx('li', {
+                                                    className:
+                                                      'widget-placeholder__tab-item',
+                                                    role: 'presentation',
+                                                    children: e.jsx('button', {
+                                                      className: `widget-placeholder__tab-btn ${h.tickerList === 'tickerActivePane' ? 'widget-placeholder__tab-btn--active' : ''}`,
+                                                      role: 'tab',
+                                                      'aria-selected':
+                                                        h.tickerList ===
+                                                        'tickerActivePane',
+                                                      'aria-controls':
+                                                        'tickerActivePane',
+                                                      onClick: () =>
+                                                        j(
+                                                          'tickerList',
+                                                          'tickerActivePane',
+                                                        ),
+                                                      children: 'טיקרים פעילים',
+                                                    }),
+                                                  }),
+                                                  e.jsx('li', {
+                                                    className:
+                                                      'widget-placeholder__tab-item',
+                                                    role: 'presentation',
+                                                    children: e.jsx('button', {
+                                                      className: `widget-placeholder__tab-btn ${h.tickerList === 'tickerWatchlistPane' ? 'widget-placeholder__tab-btn--active' : ''}`,
+                                                      role: 'tab',
+                                                      'aria-selected':
+                                                        h.tickerList ===
+                                                        'tickerWatchlistPane',
+                                                      'aria-controls':
+                                                        'tickerWatchlistPane',
+                                                      onClick: () =>
+                                                        j(
+                                                          'tickerList',
+                                                          'tickerWatchlistPane',
+                                                        ),
+                                                      children: 'רשימת צפיה',
+                                                    }),
+                                                  }),
+                                                  e.jsx('li', {
+                                                    className:
+                                                      'widget-placeholder__tab-item',
+                                                    role: 'presentation',
+                                                    children: e.jsx('button', {
+                                                      className: `widget-placeholder__tab-btn ${h.tickerList === 'tickerAllPane' ? 'widget-placeholder__tab-btn--active' : ''}`,
+                                                      role: 'tab',
+                                                      'aria-selected':
+                                                        h.tickerList ===
+                                                        'tickerAllPane',
+                                                      'aria-controls':
+                                                        'tickerAllPane',
+                                                      onClick: () =>
+                                                        j(
+                                                          'tickerList',
+                                                          'tickerAllPane',
+                                                        ),
+                                                      children: 'כל הטיקרים',
+                                                    }),
+                                                  }),
+                                                ],
+                                              }),
+                                            ],
+                                          }),
+                                          e.jsx('div', {
+                                            className:
+                                              'widget-placeholder__body',
+                                            children: e.jsx('p', {
+                                              className:
+                                                'widget-placeholder__text',
+                                              children:
+                                                'Widget ייבנה בשלב מאוחר',
+                                            }),
+                                          }),
+                                        ],
+                                      }),
+                                      e.jsxs('div', {
+                                        className: 'widget-placeholder',
+                                        children: [
+                                          e.jsx('div', {
+                                            className:
+                                              'widget-placeholder__header',
+                                            children: e.jsxs('div', {
+                                              className:
+                                                'widget-placeholder__header-title-row',
+                                              children: [
+                                                e.jsxs('h3', {
+                                                  className:
+                                                    'widget-placeholder__title',
+                                                  children: [
+                                                    e.jsx('img', {
+                                                      src: '/images/icons/entities/tickers.svg',
+                                                      alt: 'גרף טיקר',
+                                                      width: '20',
+                                                      height: '20',
+                                                      className:
+                                                        'widget-placeholder__title-icon',
+                                                    }),
+                                                    'גרף טיקר',
+                                                  ],
+                                                }),
+                                                e.jsx('button', {
+                                                  className:
+                                                    'widget-placeholder__refresh-btn align-push-down',
+                                                  'aria-label': 'רענן',
+                                                  title: 'רענן',
+                                                  children: e.jsxs('svg', {
+                                                    width: '20',
+                                                    height: '20',
+                                                    viewBox: '0 0 24 24',
+                                                    fill: 'none',
+                                                    stroke: 'currentColor',
+                                                    strokeWidth: '2',
+                                                    children: [
+                                                      e.jsx('path', {
+                                                        d: 'M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4',
+                                                      }),
+                                                      e.jsx('path', {
+                                                        d: 'M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4',
+                                                      }),
+                                                    ],
+                                                  }),
+                                                }),
+                                              ],
+                                            }),
+                                          }),
+                                          e.jsx('div', {
+                                            className:
+                                              'widget-placeholder__body',
+                                            children: e.jsxs('div', {
+                                              className:
+                                                'widget-placeholder__chart-grid',
+                                              children: [
+                                                e.jsxs('div', {
+                                                  className:
+                                                    'widget-placeholder__chart-item',
+                                                  children: [
+                                                    e.jsxs('div', {
+                                                      className:
+                                                        'widget-placeholder__chart-header',
+                                                      children: [
+                                                        e.jsxs('div', {
+                                                          className:
+                                                            'widget-placeholder__item-title',
+                                                          children: [
+                                                            e.jsx('strong', {
+                                                              className:
+                                                                'widget-placeholder__item-symbol',
+                                                              children: 'AAPL',
+                                                            }),
+                                                            e.jsx('span', {
+                                                              className:
+                                                                'widget-placeholder__item-name',
+                                                              children:
+                                                                'Apple Inc.',
+                                                            }),
+                                                          ],
+                                                        }),
+                                                        e.jsxs('div', {
+                                                          className:
+                                                            'widget-placeholder__item-price',
+                                                          children: [
+                                                            e.jsx('div', {
+                                                              className:
+                                                                'widget-placeholder__item-price-value',
+                                                              children: e.jsx(
+                                                                'span',
+                                                                {
+                                                                  className:
+                                                                    'numeric-value-positive',
+                                                                  dir: 'ltr',
+                                                                  children:
+                                                                    '$150.25',
+                                                                },
+                                                              ),
+                                                            }),
+                                                            e.jsxs('div', {
+                                                              className:
+                                                                'widget-placeholder__item-price-change',
+                                                              children: [
+                                                                e.jsx('span', {
+                                                                  className:
+                                                                    'numeric-value-positive',
+                                                                  dir: 'ltr',
+                                                                  children:
+                                                                    '+5.48%',
+                                                                }),
+                                                                e.jsx('span', {
+                                                                  className:
+                                                                    'numeric-value-positive',
+                                                                  dir: 'ltr',
+                                                                  children:
+                                                                    '+$7.89',
+                                                                }),
+                                                              ],
+                                                            }),
+                                                          ],
+                                                        }),
+                                                        e.jsx('button', {
+                                                          className:
+                                                            'widget-placeholder__action-btn',
+                                                          'aria-label':
+                                                            'דשבורד',
+                                                          title: 'דשבורד',
+                                                          children: e.jsxs(
+                                                            'svg',
+                                                            {
+                                                              width: '16',
+                                                              height: '16',
+                                                              viewBox:
+                                                                '0 0 24 24',
+                                                              fill: 'none',
+                                                              stroke:
+                                                                'currentColor',
+                                                              strokeWidth: '2',
+                                                              children: [
+                                                                e.jsx(
+                                                                  'circle',
+                                                                  {
+                                                                    cx: '12',
+                                                                    cy: '12',
+                                                                    r: '10',
+                                                                  },
+                                                                ),
+                                                                e.jsx(
+                                                                  'circle',
+                                                                  {
+                                                                    cx: '12',
+                                                                    cy: '12',
+                                                                    r: '1',
+                                                                  },
+                                                                ),
+                                                                e.jsx('path', {
+                                                                  d: 'M12 2v4M12 18v4M2 12h4M18 12h4',
+                                                                }),
+                                                              ],
+                                                            },
+                                                          ),
+                                                        }),
+                                                      ],
+                                                    }),
+                                                    e.jsx('div', {
+                                                      className:
+                                                        'widget-placeholder__chart-placeholder',
+                                                      children: e.jsx('p', {
+                                                        className:
+                                                          'widget-placeholder__text',
+                                                        children:
+                                                          'גרף יוצג כאן',
+                                                      }),
+                                                    }),
+                                                    e.jsx('div', {
+                                                      className:
+                                                        'widget-placeholder__item-metrics',
+                                                      children: e.jsxs('span', {
+                                                        className:
+                                                          'widget-placeholder__metric',
+                                                        children: [
+                                                          e.jsx('span', {
+                                                            className:
+                                                              'metric-label',
+                                                            children: 'ATR:',
+                                                          }),
+                                                          e.jsx('span', {
+                                                            className:
+                                                              'metric-value',
+                                                            children: '$2.45',
+                                                          }),
+                                                        ],
+                                                      }),
+                                                    }),
+                                                  ],
+                                                }),
+                                                e.jsxs('div', {
+                                                  className:
+                                                    'widget-placeholder__chart-item',
+                                                  children: [
+                                                    e.jsxs('div', {
+                                                      className:
+                                                        'widget-placeholder__chart-header',
+                                                      children: [
+                                                        e.jsxs('div', {
+                                                          className:
+                                                            'widget-placeholder__item-title',
+                                                          children: [
+                                                            e.jsx('strong', {
+                                                              className:
+                                                                'widget-placeholder__item-symbol',
+                                                              children: 'MSFT',
+                                                            }),
+                                                            e.jsx('span', {
+                                                              className:
+                                                                'widget-placeholder__item-name',
+                                                              children:
+                                                                'Microsoft Corp.',
+                                                            }),
+                                                          ],
+                                                        }),
+                                                        e.jsxs('div', {
+                                                          className:
+                                                            'widget-placeholder__item-price',
+                                                          children: [
+                                                            e.jsx('div', {
+                                                              className:
+                                                                'widget-placeholder__item-price-value',
+                                                              children: e.jsx(
+                                                                'span',
+                                                                {
+                                                                  className:
+                                                                    'numeric-value-positive',
+                                                                  dir: 'ltr',
+                                                                  children:
+                                                                    '$380.75',
+                                                                },
+                                                              ),
+                                                            }),
+                                                            e.jsxs('div', {
+                                                              className:
+                                                                'widget-placeholder__item-price-change',
+                                                              children: [
+                                                                e.jsx('span', {
+                                                                  className:
+                                                                    'numeric-value-positive',
+                                                                  dir: 'ltr',
+                                                                  children:
+                                                                    '+1.59%',
+                                                                }),
+                                                                e.jsx('span', {
+                                                                  className:
+                                                                    'numeric-value-positive',
+                                                                  dir: 'ltr',
+                                                                  children:
+                                                                    '+$5.88',
+                                                                }),
+                                                              ],
+                                                            }),
+                                                          ],
+                                                        }),
+                                                        e.jsx('button', {
+                                                          className:
+                                                            'widget-placeholder__action-btn',
+                                                          'aria-label':
+                                                            'דשבורד',
+                                                          title: 'דשבורד',
+                                                          children: e.jsxs(
+                                                            'svg',
+                                                            {
+                                                              width: '16',
+                                                              height: '16',
+                                                              viewBox:
+                                                                '0 0 24 24',
+                                                              fill: 'none',
+                                                              stroke:
+                                                                'currentColor',
+                                                              strokeWidth: '2',
+                                                              children: [
+                                                                e.jsx(
+                                                                  'circle',
+                                                                  {
+                                                                    cx: '12',
+                                                                    cy: '12',
+                                                                    r: '10',
+                                                                  },
+                                                                ),
+                                                                e.jsx(
+                                                                  'circle',
+                                                                  {
+                                                                    cx: '12',
+                                                                    cy: '12',
+                                                                    r: '1',
+                                                                  },
+                                                                ),
+                                                                e.jsx('path', {
+                                                                  d: 'M12 2v4M12 18v4M2 12h4M18 12h4',
+                                                                }),
+                                                              ],
+                                                            },
+                                                          ),
+                                                        }),
+                                                      ],
+                                                    }),
+                                                    e.jsx('div', {
+                                                      className:
+                                                        'widget-placeholder__chart-placeholder',
+                                                      children: e.jsx('p', {
+                                                        className:
+                                                          'widget-placeholder__text',
+                                                        children:
+                                                          'גרף יוצג כאן',
+                                                      }),
+                                                    }),
+                                                    e.jsx('div', {
+                                                      className:
+                                                        'widget-placeholder__item-metrics',
+                                                      children: e.jsxs('span', {
+                                                        className:
+                                                          'widget-placeholder__metric',
+                                                        children: [
+                                                          e.jsx('span', {
+                                                            className:
+                                                              'metric-label',
+                                                            children: 'ATR:',
+                                                          }),
+                                                          e.jsx('span', {
+                                                            className:
+                                                              'metric-value',
+                                                            children: '$4.20',
+                                                          }),
+                                                        ],
+                                                      }),
+                                                    }),
+                                                  ],
+                                                }),
+                                                e.jsxs('div', {
+                                                  className:
+                                                    'widget-placeholder__chart-item',
+                                                  children: [
+                                                    e.jsxs('div', {
+                                                      className:
+                                                        'widget-placeholder__chart-header',
+                                                      children: [
+                                                        e.jsxs('div', {
+                                                          className:
+                                                            'widget-placeholder__item-title',
+                                                          children: [
+                                                            e.jsx('strong', {
+                                                              className:
+                                                                'widget-placeholder__item-symbol',
+                                                              children: 'GOOGL',
+                                                            }),
+                                                            e.jsx('span', {
+                                                              className:
+                                                                'widget-placeholder__item-name',
+                                                              children:
+                                                                'Alphabet Inc.',
+                                                            }),
+                                                          ],
+                                                        }),
+                                                        e.jsxs('div', {
+                                                          className:
+                                                            'widget-placeholder__item-price',
+                                                          children: [
+                                                            e.jsx('div', {
+                                                              className:
+                                                                'widget-placeholder__item-price-value',
+                                                              children: e.jsx(
+                                                                'span',
+                                                                {
+                                                                  className:
+                                                                    'numeric-value-positive',
+                                                                  dir: 'ltr',
+                                                                  children:
+                                                                    '$142.30',
+                                                                },
+                                                              ),
+                                                            }),
+                                                            e.jsxs('div', {
+                                                              className:
+                                                                'widget-placeholder__item-price-change',
+                                                              children: [
+                                                                e.jsx('span', {
+                                                                  className:
+                                                                    'numeric-value-positive',
+                                                                  dir: 'ltr',
+                                                                  children:
+                                                                    '+1.14%',
+                                                                }),
+                                                                e.jsx('span', {
+                                                                  className:
+                                                                    'numeric-value-positive',
+                                                                  dir: 'ltr',
+                                                                  children:
+                                                                    '+$1.61',
+                                                                }),
+                                                              ],
+                                                            }),
+                                                          ],
+                                                        }),
+                                                        e.jsx('button', {
+                                                          className:
+                                                            'widget-placeholder__action-btn',
+                                                          'aria-label':
+                                                            'דשבורד',
+                                                          title: 'דשבורד',
+                                                          children: e.jsxs(
+                                                            'svg',
+                                                            {
+                                                              width: '16',
+                                                              height: '16',
+                                                              viewBox:
+                                                                '0 0 24 24',
+                                                              fill: 'none',
+                                                              stroke:
+                                                                'currentColor',
+                                                              strokeWidth: '2',
+                                                              children: [
+                                                                e.jsx(
+                                                                  'circle',
+                                                                  {
+                                                                    cx: '12',
+                                                                    cy: '12',
+                                                                    r: '10',
+                                                                  },
+                                                                ),
+                                                                e.jsx(
+                                                                  'circle',
+                                                                  {
+                                                                    cx: '12',
+                                                                    cy: '12',
+                                                                    r: '1',
+                                                                  },
+                                                                ),
+                                                                e.jsx('path', {
+                                                                  d: 'M12 2v4M12 18v4M2 12h4M18 12h4',
+                                                                }),
+                                                              ],
+                                                            },
+                                                          ),
+                                                        }),
+                                                      ],
+                                                    }),
+                                                    e.jsx('div', {
+                                                      className:
+                                                        'widget-placeholder__chart-placeholder',
+                                                      children: e.jsx('p', {
+                                                        className:
+                                                          'widget-placeholder__text',
+                                                        children:
+                                                          'גרף יוצג כאן',
+                                                      }),
+                                                    }),
+                                                    e.jsx('div', {
+                                                      className:
+                                                        'widget-placeholder__item-metrics',
+                                                      children: e.jsxs('span', {
+                                                        className:
+                                                          'widget-placeholder__metric',
+                                                        children: [
+                                                          e.jsx('span', {
+                                                            className:
+                                                              'metric-label',
+                                                            children: 'ATR:',
+                                                          }),
+                                                          e.jsx('span', {
+                                                            className:
+                                                              'metric-value',
+                                                            children: '$3.15',
+                                                          }),
+                                                        ],
+                                                      }),
+                                                    }),
+                                                  ],
+                                                }),
+                                              ],
+                                            }),
+                                          }),
+                                        ],
+                                      }),
+                                    ],
+                                  }),
+                                ],
+                              }),
+                          ],
+                        }),
+                        e.jsxs('tt-section', {
+                          'data-section': 'portfolio',
+                          children: [
+                            e.jsxs('div', {
+                              className: 'index-section__header',
+                              children: [
+                                e.jsxs('div', {
+                                  className: 'index-section__header-title',
+                                  children: [
+                                    e.jsx('img', {
+                                      src: '/images/icons/entities/trading_accounts.svg',
+                                      alt: 'פורטפוליו',
+                                      className: 'index-section__header-icon',
+                                      width: '20',
+                                      height: '20',
+                                    }),
+                                    e.jsx('h2', {
+                                      className: 'index-section__header-text',
+                                      children: 'פורטפוליו',
+                                    }),
+                                  ],
+                                }),
+                                e.jsx('div', {
+                                  className: 'index-section__header-meta',
+                                  children: e.jsx('span', {
+                                    className: 'index-section__header-count',
+                                    children: '3 פוזיציות פעילות',
+                                  }),
+                                }),
+                                e.jsxs('div', {
+                                  className: 'index-section__header-actions',
+                                  children: [
+                                    e.jsxs('div', {
+                                      className: 'portfolio-header-filters',
+                                      children: [
+                                        e.jsxs('select', {
+                                          id: 'portfolioAccountFilter',
+                                          className:
+                                            'portfolio-filter-select align-push-down',
+                                          'aria-label': 'לבחור חשבון מסחר',
+                                          children: [
+                                            e.jsx('option', {
+                                              value: '',
+                                              children: 'כל חשבונות המסחר',
+                                            }),
+                                            e.jsx('option', {
+                                              value: '1',
+                                              children: 'חשבון 1',
+                                            }),
+                                            e.jsx('option', {
+                                              value: '2',
+                                              children: 'חשבון 2',
+                                            }),
+                                          ],
+                                        }),
+                                        e.jsxs('div', {
+                                          className:
+                                            'portfolio-side-filters align-push-down',
+                                          role: 'group',
+                                          id: 'portfolioSideFilterGroup',
+                                          children: [
+                                            e.jsx('button', {
+                                              className:
+                                                'portfolio-side-filter-btn',
+                                              'data-side': '',
+                                              'aria-label': 'הצג הכל',
+                                              title: 'הצג הכל',
+                                              type: 'button',
+                                              children: '↕',
+                                            }),
+                                            e.jsx('button', {
+                                              className:
+                                                'portfolio-side-filter-btn portfolio-side-filter-long',
+                                              'data-side': 'long',
+                                              'aria-label': 'רק לונג',
+                                              title: 'רק לונג',
+                                              type: 'button',
+                                              children: '↑',
+                                            }),
+                                            e.jsx('button', {
+                                              className:
+                                                'portfolio-side-filter-btn portfolio-side-filter-short',
+                                              'data-side': 'short',
+                                              'aria-label': 'רק שורט',
+                                              title: 'רק שורט',
+                                              type: 'button',
+                                              children: '↓',
+                                            }),
+                                          ],
+                                        }),
+                                        e.jsxs('div', {
+                                          className:
+                                            'portfolio-checkboxes-container align-push-down',
+                                          children: [
+                                            e.jsxs('label', {
+                                              className:
+                                                'portfolio-checkbox-label',
+                                              children: [
+                                                e.jsx('input', {
+                                                  type: 'checkbox',
+                                                  id: 'portfolioIncludeClosed',
+                                                  className:
+                                                    'portfolio-checkbox-input',
+                                                }),
+                                                e.jsx('span', {
+                                                  className:
+                                                    'portfolio-checkbox-text',
+                                                  children:
+                                                    'הצג פוזיציות סגורות',
+                                                }),
+                                              ],
+                                            }),
+                                            e.jsxs('label', {
+                                              className:
+                                                'portfolio-checkbox-label',
+                                              children: [
+                                                e.jsx('input', {
+                                                  type: 'checkbox',
+                                                  id: 'portfolioUnifyAccounts',
+                                                  className:
+                                                    'portfolio-checkbox-input',
+                                                }),
+                                                e.jsx('span', {
+                                                  className:
+                                                    'portfolio-checkbox-text',
+                                                  children:
+                                                    'אחד פוזיציות בין חשבונות מסחר',
+                                                }),
+                                              ],
+                                            }),
+                                          ],
+                                        }),
+                                      ],
+                                    }),
+                                    e.jsx('button', {
+                                      className:
+                                        'index-section__header-toggle-btn',
+                                      'aria-label': 'הצג/הסתר',
+                                      onClick: () => f('portfolio'),
+                                      'aria-expanded': n.portfolio,
+                                      children: e.jsx('svg', {
+                                        width: '20',
+                                        height: '20',
+                                        viewBox: '0 0 24 24',
+                                        fill: 'none',
+                                        stroke: 'currentColor',
+                                        strokeWidth: '2',
+                                        children: e.jsx('path', {
+                                          d: 'M6 9l6 6l6 -6',
+                                        }),
+                                      }),
+                                    }),
+                                  ],
+                                }),
+                              ],
+                            }),
+                            n.portfolio &&
+                              e.jsx('div', {
+                                className: 'index-section__body',
+                                children: e.jsx('div', {
+                                  className: 'portfolio-table-wrapper',
+                                  children: e.jsxs('table', {
+                                    className: 'portfolio-table',
+                                    id: 'portfolioTable',
+                                    'data-table-type': 'portfolio',
+                                    children: [
+                                      e.jsx('thead', {
+                                        children: e.jsxs('tr', {
+                                          children: [
+                                            e.jsx('th', {
+                                              className: 'col-side',
+                                              children: 'צד',
+                                            }),
+                                            e.jsx('th', {
+                                              className: 'col-symbol',
+                                              children: 'סימבול',
+                                            }),
+                                            e.jsx('th', {
+                                              className: 'col-ticker',
+                                              children: 'נוכחי',
+                                            }),
+                                            e.jsx('th', {
+                                              className: 'col-quantity',
+                                              children: 'כמות',
+                                            }),
+                                            e.jsx('th', {
+                                              className: 'col-avg-price',
+                                              children: 'מחיר ממוצע',
+                                            }),
+                                            e.jsx('th', {
+                                              className: 'col-market-value',
+                                              children: 'שווי שוק',
+                                            }),
+                                            e.jsx('th', {
+                                              className: 'col-unrealized-pl',
+                                              children: 'P/L',
+                                            }),
+                                            e.jsx('th', {
+                                              className: 'col-account',
+                                              children: 'חשבון מסחר',
+                                            }),
+                                            e.jsx('th', {
+                                              className:
+                                                'col-percent-portfolio',
+                                              children: '% פורטפוליו',
+                                            }),
+                                            e.jsx('th', {
+                                              className: 'col-actions',
+                                              children: 'פעולות',
+                                            }),
+                                          ],
+                                        }),
+                                      }),
+                                      e.jsxs('tbody', {
+                                        children: [
+                                          e.jsxs('tr', {
+                                            children: [
+                                              e.jsx('td', {
+                                                className: 'col-side',
+                                                children: e.jsx('span', {
+                                                  className:
+                                                    'side-badge side-badge--long',
+                                                  children: '↑',
+                                                }),
+                                              }),
+                                              e.jsx('td', {
+                                                className: 'col-symbol',
+                                                children: 'AAPL',
+                                              }),
+                                              e.jsx('td', {
+                                                className: 'col-ticker',
+                                                children: e.jsx('span', {
+                                                  className:
+                                                    'numeric-value-positive',
+                                                  dir: 'ltr',
+                                                  children: '$150.25',
+                                                }),
+                                              }),
+                                              e.jsx('td', {
+                                                className: 'col-quantity',
+                                                children: '100',
+                                              }),
+                                              e.jsx('td', {
+                                                className: 'col-avg-price',
+                                                children: e.jsx('span', {
+                                                  className:
+                                                    'numeric-value-positive',
+                                                  dir: 'ltr',
+                                                  children: '$148.50',
+                                                }),
+                                              }),
+                                              e.jsx('td', {
+                                                className: 'col-market-value',
+                                                children: e.jsx('span', {
+                                                  className:
+                                                    'numeric-value-positive',
+                                                  dir: 'ltr',
+                                                  children: '$15,025.00',
+                                                }),
+                                              }),
+                                              e.jsx('td', {
+                                                className: 'col-unrealized-pl',
+                                                children: e.jsx('span', {
+                                                  className:
+                                                    'numeric-value-positive',
+                                                  dir: 'ltr',
+                                                  children: '+$175.00',
+                                                }),
+                                              }),
+                                              e.jsx('td', {
+                                                className: 'col-account',
+                                                children: 'חשבון 1',
+                                              }),
+                                              e.jsx('td', {
+                                                className:
+                                                  'col-percent-portfolio',
+                                                children: '4.03%',
+                                              }),
+                                              e.jsx('td', {
+                                                className: 'col-actions',
+                                                children: e.jsx('button', {
+                                                  className: 'btn-action',
+                                                  'aria-label': 'פעולות',
+                                                  children: '⋯',
+                                                }),
+                                              }),
+                                            ],
+                                          }),
+                                          e.jsxs('tr', {
+                                            children: [
+                                              e.jsx('td', {
+                                                className: 'col-side',
+                                                children: e.jsx('span', {
+                                                  className:
+                                                    'side-badge side-badge--short',
+                                                  children: '↓',
+                                                }),
+                                              }),
+                                              e.jsx('td', {
+                                                className: 'col-symbol',
+                                                children: 'MSFT',
+                                              }),
+                                              e.jsx('td', {
+                                                className: 'col-ticker',
+                                                children: e.jsx('span', {
+                                                  className:
+                                                    'numeric-value-positive',
+                                                  dir: 'ltr',
+                                                  children: '$380.75',
+                                                }),
+                                              }),
+                                              e.jsx('td', {
+                                                className: 'col-quantity',
+                                                children: '50',
+                                              }),
+                                              e.jsx('td', {
+                                                className: 'col-avg-price',
+                                                children: e.jsx('span', {
+                                                  className:
+                                                    'numeric-value-positive',
+                                                  dir: 'ltr',
+                                                  children: '$385.00',
+                                                }),
+                                              }),
+                                              e.jsx('td', {
+                                                className: 'col-market-value',
+                                                children: e.jsx('span', {
+                                                  className:
+                                                    'numeric-value-positive',
+                                                  dir: 'ltr',
+                                                  children: '$19,037.50',
+                                                }),
+                                              }),
+                                              e.jsx('td', {
+                                                className: 'col-unrealized-pl',
+                                                children: e.jsx('span', {
+                                                  className:
+                                                    'numeric-value-negative',
+                                                  dir: 'ltr',
+                                                  children: '-$212.50',
+                                                }),
+                                              }),
+                                              e.jsx('td', {
+                                                className: 'col-account',
+                                                children: 'חשבון 2',
+                                              }),
+                                              e.jsx('td', {
+                                                className:
+                                                  'col-percent-portfolio',
+                                                children: '5.10%',
+                                              }),
+                                              e.jsx('td', {
+                                                className: 'col-actions',
+                                                children: e.jsx('button', {
+                                                  className: 'btn-action',
+                                                  'aria-label': 'פעולות',
+                                                  children: '⋯',
+                                                }),
+                                              }),
+                                            ],
+                                          }),
+                                          e.jsxs('tr', {
+                                            children: [
+                                              e.jsx('td', {
+                                                className: 'col-side',
+                                                children: e.jsx('span', {
+                                                  className:
+                                                    'side-badge side-badge--long',
+                                                  children: '↑',
+                                                }),
+                                              }),
+                                              e.jsx('td', {
+                                                className: 'col-symbol',
+                                                children: 'GOOGL',
+                                              }),
+                                              e.jsx('td', {
+                                                className: 'col-ticker',
+                                                children: e.jsx('span', {
+                                                  className:
+                                                    'numeric-value-positive',
+                                                  dir: 'ltr',
+                                                  children: '$142.30',
+                                                }),
+                                              }),
+                                              e.jsx('td', {
+                                                className: 'col-quantity',
+                                                children: '75',
+                                              }),
+                                              e.jsx('td', {
+                                                className: 'col-avg-price',
+                                                children: e.jsx('span', {
+                                                  className:
+                                                    'numeric-value-positive',
+                                                  dir: 'ltr',
+                                                  children: '$140.00',
+                                                }),
+                                              }),
+                                              e.jsx('td', {
+                                                className: 'col-market-value',
+                                                children: e.jsx('span', {
+                                                  className:
+                                                    'numeric-value-positive',
+                                                  dir: 'ltr',
+                                                  children: '$10,672.50',
+                                                }),
+                                              }),
+                                              e.jsx('td', {
+                                                className: 'col-unrealized-pl',
+                                                children: e.jsx('span', {
+                                                  className:
+                                                    'numeric-value-positive',
+                                                  dir: 'ltr',
+                                                  children: '+$172.50',
+                                                }),
+                                              }),
+                                              e.jsx('td', {
+                                                className: 'col-account',
+                                                children: 'חשבון 1',
+                                              }),
+                                              e.jsx('td', {
+                                                className:
+                                                  'col-percent-portfolio',
+                                                children: '2.86%',
+                                              }),
+                                              e.jsx('td', {
+                                                className: 'col-actions',
+                                                children: e.jsx('button', {
+                                                  className: 'btn-action',
+                                                  'aria-label': 'פעולות',
+                                                  children: '⋯',
+                                                }),
+                                              }),
+                                            ],
+                                          }),
+                                        ],
+                                      }),
+                                    ],
+                                  }),
+                                }),
+                              }),
+                          ],
+                        }),
+                      ],
+                    }),
+                ],
+              }),
+            }),
+          }),
+          e.jsx(Y, {}),
+        ],
+      })
+    );
+  },
+  Ce = (t) =>
+    t != null && t.trim()
+      ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(t)
+        ? { isValid: !0, error: null }
+        : { isValid: !1, error: 'אימייל לא תקין' }
+      : { isValid: !1, error: 'שדה חובה' },
+  hs = (t) => {
+    if (!t) return null;
+    let s = t.replace(/[\s\-()]/g, '');
+    return (
+      (s = s.replace(/^\+/, '')),
+      (s = s.replace(/^0+/, '')),
+      /^05\d{8}$/.test(s)
+        ? `972${s.substring(1)}`
+        : /^0\d{8,9}$/.test(s)
+          ? `972${s.substring(1)}`
+          : /^[1-9]\d{1,14}$/.test(s)
+            ? (/^972\d{8,9}$/.test(s), s)
+            : /^972\d{8,9}$/.test(s)
+              ? s
+              : null
+    );
+  },
+  ge = (t) => {
+    if (!t) return { isValid: !0, error: null, normalized: null };
+    const s = hs(t);
+    return s && /^[1-9]\d{1,14}$/.test(s)
+      ? { isValid: !0, error: null, normalized: s }
+      : {
+          isValid: !1,
+          error: 'מספר טלפון חייב להיות בפורמט E.164 (דוגמה: 972501234567)',
+          normalized: null,
+        };
+  },
+  Le = (t) =>
+    t != null && t.trim()
+      ? t.trim().length < 3
+        ? { isValid: !1, error: 'שם משתמש חייב להכיל לפחות 3 תווים' }
+        : t.trim().length > 50
+          ? { isValid: !1, error: 'שם משתמש לא יכול להכיל יותר מ-50 תווים' }
+          : { isValid: !0, error: null }
+      : { isValid: !1, error: 'שדה חובה' },
+  Oe = (t) =>
+    t != null && t.trim()
+      ? { isValid: !0, error: null }
+      : { isValid: !1, error: 'שדה חובה' },
+  Z = (t, s = {}) => {
+    const { minLength: r = 8 } = s;
+    return t
+      ? t.length < r
+        ? { isValid: !1, error: `סיסמה חייבת להכיל לפחות ${r} תווים` }
+        : { isValid: !0, error: null }
+      : { isValid: !1, error: 'שדה חובה' };
+  },
+  de = (t, s) =>
+    t
+      ? t !== s
+        ? { isValid: !1, error: 'הסיסמאות אינן תואמות' }
+        : { isValid: !0, error: null }
+      : { isValid: !1, error: 'שדה חובה' },
+  Fe = (t, s = 6) =>
+    t
+      ? t.length !== s
+        ? { isValid: !1, error: `קוד אימות חייב להכיל ${s} ספרות` }
+        : /^\d+$/.test(t)
+          ? { isValid: !0, error: null }
+          : { isValid: !1, error: 'קוד אימות חייב להכיל ספרות בלבד' }
+      : { isValid: !1, error: 'שדה חובה' },
+  Ve = (t) =>
+    t != null && t.trim()
+      ? { isValid: !0, error: null }
+      : { isValid: !1, error: 'שדה חובה' },
+  fe = (t) => {
+    if (!(t != null && t.trim()))
+      return { isValid: !1, error: 'שדה חובה', method: null };
+    const s = /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      r = /^\+[1-9]\d{1,14}$/,
+      a = t.trim();
+    return s.test(a)
+      ? { isValid: !0, error: null, method: 'EMAIL' }
+      : r.test(a)
+        ? { isValid: !0, error: null, method: 'SMS' }
+        : a.includes('@')
+          ? { isValid: !1, error: 'כתובת אימייל לא תקינה', method: 'EMAIL' }
+          : {
+              isValid: !1,
+              error: 'מספר טלפון לא תקין (פורמט E.164: +972501234567)',
+              method: 'SMS',
+            };
+  },
+  ms = (t) => {
+    const s = {},
+      r = Oe(t.usernameOrEmail);
+    r.isValid || (s.usernameOrEmail = r.error);
+    const a = Z(t.password, { minLength: 1 });
+    return (
+      a.isValid || (s.password = a.error),
+      { isValid: Object.keys(s).length === 0, errors: s }
+    );
+  },
+  us = (t) => {
+    const s = {},
+      r = Le(t.username);
+    r.isValid || (s.username = r.error);
+    const a = Ce(t.email);
+    a.isValid || (s.email = a.error);
+    const n = Z(t.password, { minLength: 8 });
+    n.isValid || (s.password = n.error);
+    const i = de(t.confirmPassword, t.password);
+    if (
+      (i.isValid || (s.confirmPassword = i.error),
+      t.phoneNumber && t.phoneNumber.trim())
+    ) {
+      const o = ge(t.phoneNumber);
+      o.isValid || (s.phoneNumber = o.error);
+    }
+    return { isValid: Object.keys(s).length === 0, errors: s };
+  },
+  ps = (t) => {
+    const s = fe(t.identifier);
+    return {
+      isValid: s.isValid,
+      errors: s.isValid ? {} : { identifier: s.error },
+      method: s.method,
+    };
+  },
+  gs = (t, s) => {
+    const r = {};
+    if (s === 'EMAIL') {
+      const i = Ve(t.resetToken);
+      i.isValid || (r.resetToken = i.error);
+    } else if (s === 'SMS') {
+      const i = Fe(t.verificationCode, 6);
+      i.isValid || (r.verificationCode = i.error);
+    }
+    const a = Z(t.newPassword, { minLength: 8 });
+    a.isValid || (r.newPassword = a.error);
+    const n = de(t.confirmPassword, t.newPassword);
+    return (
+      n.isValid || (r.confirmPassword = n.error),
+      { isValid: Object.keys(r).length === 0, errors: r }
+    );
+  },
+  V = {
+    AUTH_INVALID_CREDENTIALS: 'שם משתמש או סיסמה שגויים. אנא נסה שוב.',
+    AUTH_TOKEN_EXPIRED: 'פג תוקף ההתחברות. אנא התחבר מחדש.',
+    AUTH_UNAUTHORIZED: 'אין הרשאה לבצע פעולה זו.',
+    AUTH_FORBIDDEN: 'אין הרשאה לגשת למשאב זה.',
+    VALIDATION_FIELD_REQUIRED: 'שדה חובה',
+    VALIDATION_INVALID_EMAIL: 'אימייל לא תקין',
+    VALIDATION_INVALID_PHONE: 'מספר טלפון לא תקין',
+    VALIDATION_INVALID_FORMAT: 'פורמט לא תקין',
+    VALIDATION_INVALID_TIMEZONE: 'אזור זמן לא תקין',
+    VALIDATION_INVALID_LANGUAGE: 'שפה לא תקינה',
+    VALIDATION_FIELD_TOO_LONG: 'השדה ארוך מדי',
+    USER_NOT_FOUND: 'משתמש לא נמצא.',
+    USER_ALREADY_EXISTS: 'משתמש כבר קיים.',
+    USER_UPDATE_FAILED: 'עדכון המשתמש נכשל.',
+    USER_EMAIL_EXISTS: 'כתובת אימייל זו כבר בשימוש.',
+    USER_USERNAME_EXISTS: 'שם משתמש זה כבר בשימוש.',
+    PASSWORD_INVALID: 'סיסמה שגויה.',
+    PASSWORD_TOO_SHORT: 'סיסמה חייבת להכיל לפחות 8 תווים.',
+    PASSWORD_MISMATCH: 'הסיסמאות לא תואמות.',
+    PASSWORD_SAME_AS_OLD: 'הסיסמה החדשה חייבת להיות שונה מהסיסמה הישנה.',
+    API_KEY_INVALID: 'מפתח API לא תקין.',
+    API_KEY_NOT_FOUND: 'מפתח API לא נמצא.',
+    API_RATE_LIMIT_EXCEEDED: 'חרגת ממגבלת הבקשות. אנא נסה שוב מאוחר יותר.',
+    NETWORK_ERROR: 'שגיאת רשת. אנא בדוק את החיבור.',
+    NETWORK_TIMEOUT: 'פג זמן החיבור. אנא נסה שוב.',
+    CORS_ERROR: 'שגיאת חיבור לשרת. אנא בדוק שהשרת פועל.',
+    SERVER_ERROR: 'שגיאת שרת פנימית. אנא נסה שוב מאוחר יותר.',
+    SERVER_UNAVAILABLE: 'השרת לא זמין כרגע. אנא נסה שוב מאוחר יותר.',
+    UNKNOWN_ERROR: 'שגיאה בלתי צפויה. אנא נסה שוב.',
+    BAD_REQUEST: 'בקשה לא תקינה. אנא בדוק את הפרטים שהזנת.',
+  },
+  L = (t, s = null) => {
+    if (t && V[t]) return V[t];
+    if (s) {
+      const r = s.toLowerCase();
+      for (const [n, i] of Object.entries(V))
+        if (r === n.toLowerCase()) return i;
+      return r.includes('invalid credentials') ||
+        r.includes('invalid credential')
+        ? V.AUTH_INVALID_CREDENTIALS
+        : r.includes('bad request')
+          ? V.BAD_REQUEST
+          : r.includes('field required') || r.includes('required')
+            ? V.VALIDATION_FIELD_REQUIRED
+            : r.includes('invalid email') || r.includes('email')
+              ? V.VALIDATION_INVALID_EMAIL
+              : r.includes('invalid phone') || r.includes('phone')
+                ? V.VALIDATION_INVALID_PHONE
+                : r.includes('e.164')
+                  ? 'מספר טלפון חייב להיות בפורמט E.164 (דוגמה: +972501234567)'
+                  : /[\u0590-\u05FF]/.test(s)
+                    ? s
+                    : s || V.UNKNOWN_ERROR;
+    }
+    return V.UNKNOWN_ERROR;
+  },
+  ve = (t) => t && t.replace(/_([a-z])/g, (s, r) => r.toUpperCase()),
+  xe = (t) => {
+    var l, c, d, h, p, f, y;
+    const s = {};
+    let r = null;
+    if (
+      (x('ErrorHandler', 'Processing API error', {
+        status: (l = t.response) == null ? void 0 : l.status,
+        hasErrorCode: !!(
+          (d = (c = t.response) == null ? void 0 : c.data) != null &&
+          d.error_code
+        ),
+        hasDetail: !!(
+          (p = (h = t.response) == null ? void 0 : h.data) != null && p.detail
+        ),
+      }),
+      !t.response)
+    )
+      return (
+        m.error('ErrorHandler', 'Network/CORS error', t),
+        t.code === 'ERR_NETWORK' ||
+        ((f = t.message) != null && f.includes('Network Error'))
+          ? (r = L('CORS_ERROR', 'שגיאת חיבור לשרת. אנא בדוק שהשרת פועל.'))
+          : (r = L('NETWORK_ERROR', t.message)),
+        { fieldErrors: s, formError: r }
+      );
+    const a = t.response.status,
+      n = t.response.data,
+      i = n == null ? void 0 : n.error_code,
+      o = n == null ? void 0 : n.detail;
+    if (
+      (m.error('ErrorHandler', `API error ${a}`, {
+        errorCode: i,
+        detail: Array.isArray(o) ? 'Array of errors' : o,
+        url: (y = t.config) == null ? void 0 : y.url,
+      }),
+      a === 400)
+    )
+      Array.isArray(o)
+        ? o.forEach((j) => {
+            var w;
+            const u = (w = j.loc) == null ? void 0 : w[j.loc.length - 1];
+            if (u) {
+              const P = ve(u),
+                T = j.error_code || i,
+                D = L(T, j.msg);
+              s[P] = D;
+            }
+          })
+        : typeof o == 'string'
+          ? (r = L(i, o))
+          : typeof o == 'object' &&
+            o !== null &&
+            Object.keys(o).forEach((j) => {
+              const u = ve(j),
+                w = o[j];
+              typeof w == 'string'
+                ? (s[u] = L(null, w))
+                : Array.isArray(w) && (s[u] = L(null, w[0]));
+            });
+    else if (a === 401) {
+      const j = i || 'AUTH_INVALID_CREDENTIALS';
+      let u = L(j, o);
+      (/[\u0590-\u05FF]/.test(u) ||
+        ((u = V.AUTH_INVALID_CREDENTIALS),
+        x('ErrorHandler', '401 error - forced Hebrew message', {
+          errorCode: i,
+          effectiveErrorCode: j,
+          detail: o,
+          originalTranslation: L(j, o),
+          forcedTranslation: u,
+        })),
+        (r = u),
+        x('ErrorHandler', '401 error processed', {
+          errorCode: i,
+          effectiveErrorCode: j,
+          detail: o,
+          translatedError: r,
+          hasHebrew: /[\u0590-\u05FF]/.test(r),
+          errorCodeExists: !!V[j],
+          errorCodeValue: V[j],
+        }));
+    } else
+      a === 403
+        ? (r = L(i || 'AUTH_FORBIDDEN', o || 'אין הרשאה לבצע פעולה זו.'))
+        : a === 404
+          ? (r = L(i || 'USER_NOT_FOUND', o || 'המשאב המבוקש לא נמצא.'))
+          : a === 409
+            ? (r = L(i || 'USER_ALREADY_EXISTS', o || 'המשאב כבר קיים.'))
+            : a === 429
+              ? (r = L(
+                  i || 'API_RATE_LIMIT_EXCEEDED',
+                  o || 'יותר מדי ניסיונות. אנא נסה שוב מאוחר יותר.',
+                ))
+              : a === 500
+                ? (r = L(
+                    i || 'SERVER_ERROR',
+                    o || 'שגיאת שרת פנימית. אנא נסה שוב מאוחר יותר.',
+                  ))
+                : a === 503
+                  ? (r = L(
+                      i || 'SERVER_UNAVAILABLE',
+                      o || 'השרת לא זמין כרגע. אנא נסה שוב מאוחר יותר.',
+                    ))
+                  : (r = L(i, o || `שגיאה בלתי צפויה (${a}). אנא נסה שוב.`));
+    return { fieldErrors: s, formError: r };
+  },
+  fs = () => {
+    const t = oe(),
+      [s, r] = _.useState({
+        usernameOrEmail: '',
+        password: '',
+        rememberMe: !0,
+      }),
+      [a, n] = _.useState(!1),
+      [i, o] = _.useState(null),
+      [l, c] = _.useState({});
+    (_.useEffect(() => {
+      const f = localStorage.getItem('usernameOrEmail');
+      f && r((y) => ({ ...y, usernameOrEmail: f }));
+    }, []),
+      _.useEffect(
+        () => (
+          document.body.classList.add('auth-layout-root'),
+          () => {
+            document.body.classList.remove('auth-layout-root');
+          }
+        ),
+        [],
+      ),
+      _.useEffect(() => {
+        i &&
+          requestAnimationFrame(() => {
+            setTimeout(() => {
+              const f = document.querySelector('.js-error-feedback');
+              if (f) {
+                if (
+                  ((f.style.display = 'block'),
+                  (f.style.visibility = 'visible'),
+                  (f.hidden = !1),
+                  f.setAttribute('aria-hidden', 'false'),
+                  f.classList.remove('auth-form__error--hidden'),
+                  i)
+                ) {
+                  ((f.textContent = i),
+                    (f.innerText = i),
+                    f.innerHTML !== i && (f.innerHTML = i));
+                  const y = f.textContent || f.innerText || f.innerHTML || '';
+                  if (!/[\u0590-\u05FF]/.test(y)) {
+                    const u = 'שם משתמש או סיסמה שגויים. אנא נסה שוב.';
+                    ((f.textContent = u),
+                      (f.innerText = u),
+                      (f.innerHTML = u),
+                      o(u));
+                  }
+                }
+                x('Auth', 'Error element made visible via useEffect', {
+                  found: !0,
+                  text: f.textContent,
+                  errorState: i,
+                  computedDisplay: window.getComputedStyle(f).display,
+                  computedVisibility: window.getComputedStyle(f).visibility,
+                });
+              } else
+                x('Auth', 'WARNING: Error element not found in useEffect', {
+                  errorState: i,
+                  errorValue: i,
+                });
+            }, 50);
+          });
+      }, [i]));
+    const d = (f) => {
+        const { name: y, value: j, type: u, checked: w } = f.target;
+        if (
+          (r((P) => ({ ...P, [y]: u === 'checkbox' ? w : j })),
+          u !== 'checkbox')
+        ) {
+          let P = null;
+          switch (y) {
+            case 'usernameOrEmail':
+              P = Oe(j);
+              break;
+            case 'password':
+              P = Z(j, { minLength: 1 });
+              break;
+          }
+          P && c((T) => ({ ...T, [y]: P.error }));
+        }
+      },
+      h = () => {
+        const { isValid: f, errors: y } = ms(s);
+        return (c(y), f);
+      },
+      p = async (f) => {
+        var y, j, u, w, P, T, D, X, U, W, z, G, H;
+        if ((f.preventDefault(), f.stopPropagation(), !a)) {
+          if (
+            (o(null),
+            c({}),
+            x('Auth', 'Form submission started - errors cleared'),
+            !h())
+          ) {
+            x('Auth', 'Login form validation failed', { fieldErrors: l });
+            return;
+          }
+          (n(!0),
+            x('Auth', 'Login form submitted', {
+              usernameOrEmail: s.usernameOrEmail,
+              rememberMe: s.rememberMe,
+            }));
+          try {
+            const v = await E.login(s.usernameOrEmail, s.password);
+            (x('Auth', 'Login successful', {
+              userId: (y = v.user) == null ? void 0 : y.externalUlids,
+            }),
+              s.rememberMe &&
+                (localStorage.setItem('remember_me', 'true'),
+                localStorage.setItem('usernameOrEmail', s.usernameOrEmail)),
+              x('Auth', 'Redirecting to Home'),
+              t('/'));
+          } catch (v) {
+            x('Auth', 'Login error caught', {
+              status: (j = v.response) == null ? void 0 : j.status,
+              hasResponse: !!v.response,
+              errorCode:
+                (w = (u = v.response) == null ? void 0 : u.data) == null
+                  ? void 0
+                  : w.error_code,
+              detail:
+                (T = (P = v.response) == null ? void 0 : P.data) == null
+                  ? void 0
+                  : T.detail,
+              message: v.message,
+            });
+            const { fieldErrors: S, formError: A } = xe(v);
+            (x('Auth', 'Error handler result', {
+              hasApiErrors: Object.keys(S).length > 0,
+              apiErrors: S,
+              formError: A,
+            }),
+              Object.keys(S).length > 0 && c((g) => ({ ...g, ...S })));
+            let b = A || 'שגיאה בהתחברות. אנא בדוק את פרטיך.';
+            (/[\u0590-\u05FF]/.test(b) ||
+              (((D = v.response) == null ? void 0 : D.status) === 401
+                ? (b = 'שם משתמש או סיסמה שגויים. אנא נסה שוב.')
+                : (b = 'שגיאה בהתחברות. אנא בדוק את פרטיך.')),
+              x('Auth', 'Setting error state', {
+                finalError: b,
+                apiError: A,
+                hasHebrew: /[\u0590-\u05FF]/.test(b),
+                status: (X = v.response) == null ? void 0 : X.status,
+              }),
+              o(() => b),
+              m.error('Auth', 'Login failed', {
+                error: v,
+                status: (U = v.response) == null ? void 0 : U.status,
+                errorCode:
+                  (z = (W = v.response) == null ? void 0 : W.data) == null
+                    ? void 0
+                    : z.error_code,
+                detail:
+                  (H = (G = v.response) == null ? void 0 : G.data) == null
+                    ? void 0
+                    : H.detail,
+                finalError: b,
+              }),
+              requestAnimationFrame(() => {
+                setTimeout(() => {
+                  const g = document.querySelector('.js-error-feedback');
+                  if (
+                    (x('Auth', 'Error element check (RAF + 100ms)', {
+                      found: !!g,
+                      visible: g
+                        ? window.getComputedStyle(g).display !== 'none'
+                        : !1,
+                      text: g == null ? void 0 : g.textContent,
+                      errorState: i,
+                      finalError: b,
+                    }),
+                    g)
+                  ) {
+                    if (
+                      ((g.style.display = 'block'),
+                      (g.style.visibility = 'visible'),
+                      (g.hidden = !1),
+                      g.setAttribute('aria-hidden', 'false'),
+                      g.classList.remove('auth-form__error--hidden'),
+                      b)
+                    ) {
+                      ((g.textContent = b),
+                        (g.innerText = b),
+                        g.innerHTML !== b && (g.innerHTML = b));
+                      const ee =
+                        g.textContent || g.innerText || g.innerHTML || '';
+                      if (!/[\u0590-\u05FF]/.test(ee)) {
+                        const $ = 'שם משתמש או סיסמה שגויים. אנא נסה שוב.';
+                        ((g.textContent = $),
+                          (g.innerText = $),
+                          (g.innerHTML = $),
+                          o($));
+                      }
+                    }
+                    g.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                  } else
+                    x(
+                      'Auth',
+                      'ERROR: Error element not found after RAF + 100ms!',
+                      { errorState: i, finalError: b },
+                    );
+                }, 100);
+              }),
+              setTimeout(() => {
+                const g = document.querySelector('.js-error-feedback');
+                if (
+                  (x('Auth', 'Error element check (500ms)', {
+                    found: !!g,
+                    visible: g
+                      ? window.getComputedStyle(g).display !== 'none'
+                      : !1,
+                    text: g == null ? void 0 : g.textContent,
+                    errorState: i,
+                    finalError: b,
+                  }),
+                  g)
+                ) {
+                  if (
+                    ((g.style.display = 'block'),
+                    (g.style.visibility = 'visible'),
+                    (g.hidden = !1),
+                    g.setAttribute('aria-hidden', 'false'),
+                    g.classList.remove('auth-form__error--hidden'),
+                    b)
+                  ) {
+                    ((g.textContent = b),
+                      (g.innerText = b),
+                      g.innerHTML !== b && (g.innerHTML = b));
+                    const ee =
+                      g.textContent || g.innerText || g.innerHTML || '';
+                    if (!/[\u0590-\u05FF]/.test(ee)) {
+                      const $ = 'שם משתמש או סיסמה שגויים. אנא נסה שוב.';
+                      ((g.textContent = $),
+                        (g.innerText = $),
+                        (g.innerHTML = $),
+                        o($));
+                    }
+                  }
+                } else
+                  x('Auth', 'ERROR: Error element not found after 500ms!', {
+                    errorState: i,
+                    finalError: b,
+                  });
+              }, 500),
+              setTimeout(() => {
+                const g = document.querySelector('.js-error-feedback');
+                g
+                  ? x(
+                      'Auth',
+                      'Error element confirmed visible after 1 second',
+                      {
+                        found: !0,
+                        text: g.textContent,
+                        display: window.getComputedStyle(g).display,
+                        visibility: window.getComputedStyle(g).visibility,
+                      },
+                    )
+                  : x(
+                      'Auth',
+                      'CRITICAL ERROR: Error element still not found after 1 second!',
+                      { errorState: i, finalError: b },
+                    );
+              }, 1e3));
+          } finally {
+            n(!1);
+          }
+        }
+      };
+    return e.jsxs('div', {
+      className: 'page-wrapper',
+      children: [
+        e.jsx('div', {
+          className: 'page-container',
+          children: e.jsx('main', {
+            children: e.jsx('tt-container', {
+              children: e.jsxs('tt-section', {
+                children: [
+                  e.jsxs('div', {
+                    className: 'auth-header',
+                    children: [
+                      e.jsx('div', {
+                        className: 'auth-logo',
+                        children: e.jsx('img', {
+                          src: '/images/logo.svg',
+                          alt: 'TikTrack Logo',
+                        }),
+                      }),
+                      e.jsx('p', {
+                        className: 'auth-subtitle',
+                        children: 'ברוכים הבאים ל-TikTrack',
+                      }),
+                      e.jsx('h1', {
+                        className: 'auth-title',
+                        children: 'התחברות',
+                      }),
+                    ],
+                  }),
+                  e.jsxs('form', {
+                    onSubmit: p,
+                    noValidate: !0,
+                    children: [
+                      i &&
+                        e.jsx('div', {
+                          className: `auth-form__error js-error-feedback ${i ? '' : 'auth-form__error--hidden'}`,
+                          role: 'alert',
+                          'aria-live': 'polite',
+                          'aria-hidden': !i,
+                          'data-testid': 'login-error-message',
+                          children: i,
+                        }),
+                      e.jsxs('div', {
+                        className: 'form-group',
+                        children: [
+                          e.jsx('label', {
+                            className: 'form-label',
+                            htmlFor: 'usernameOrEmail',
+                            children: 'שם משתמש / אימייל:',
+                          }),
+                          e.jsx('input', {
+                            type: 'text',
+                            id: 'usernameOrEmail',
+                            name: 'usernameOrEmail',
+                            className: `form-control js-login-username-input ${l.usernameOrEmail ? 'auth-form__input--error' : ''}`,
+                            required: !0,
+                            placeholder: 'הכנס שם משתמש',
+                            value: s.usernameOrEmail,
+                            onChange: d,
+                            disabled: a,
+                          }),
+                          l.usernameOrEmail &&
+                            e.jsx('span', {
+                              className: 'auth-form__error-message',
+                              children: l.usernameOrEmail,
+                            }),
+                        ],
+                      }),
+                      e.jsxs('div', {
+                        className: 'form-group',
+                        children: [
+                          e.jsx('label', {
+                            className: 'form-label',
+                            htmlFor: 'password',
+                            children: 'סיסמה:',
+                          }),
+                          e.jsx('input', {
+                            type: 'password',
+                            id: 'password',
+                            name: 'password',
+                            className: `form-control js-login-password-input ${l.password ? 'auth-form__input--error' : ''}`,
+                            required: !0,
+                            placeholder: 'הכנס סיסמה',
+                            value: s.password,
+                            onChange: d,
+                            disabled: a,
+                          }),
+                          l.password &&
+                            e.jsx('span', {
+                              className: 'auth-form__error-message',
+                              children: l.password,
+                            }),
+                        ],
+                      }),
+                      e.jsxs('div', {
+                        className: 'form-options',
+                        children: [
+                          e.jsxs('label', {
+                            className: 'remember-me',
+                            children: [
+                              e.jsx('input', {
+                                type: 'checkbox',
+                                name: 'rememberMe',
+                                className:
+                                  'lod-checkbox js-login-remember-checkbox',
+                                checked: s.rememberMe,
+                                onChange: d,
+                                disabled: a,
+                              }),
+                              ' ',
+                              'זכור אותי',
+                            ],
+                          }),
+                          e.jsx(B, {
+                            to: '/reset-password',
+                            className: 'auth-link js-forgot-password-link',
+                            children: 'שכחת סיסמה?',
+                          }),
+                        ],
+                      }),
+                      e.jsx('button', {
+                        type: 'submit',
+                        className: 'btn-auth-primary js-login-submit-button',
+                        disabled: a,
+                        children: a ? 'מתחבר...' : 'התחבר',
+                      }),
+                    ],
+                  }),
+                  e.jsxs('div', {
+                    className: 'auth-footer-zone',
+                    children: [
+                      e.jsx('span', { children: 'אין לך חשבון?' }),
+                      ' ',
+                      e.jsx(B, {
+                        to: '/register',
+                        className: 'auth-link-bold js-register-link',
+                        children: 'הרשמה עכשיו',
+                      }),
+                    ],
+                  }),
+                ],
+              }),
+            }),
+          }),
+        }),
+        e.jsx(Y, {}),
+      ],
+    });
+  },
+  xs = () => {
+    const t = oe(),
+      [s, r] = _.useState({
+        username: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        phoneNumber: '',
+      }),
+      [a, n] = _.useState(!1),
+      [i, o] = _.useState(null),
+      [l, c] = _.useState({});
+    _.useEffect(
+      () => (
+        document.body.classList.add('auth-layout-root'),
+        () => {
+          document.body.classList.remove('auth-layout-root');
+        }
+      ),
+      [],
+    );
+    const d = (f) => {
+        const { name: y, value: j } = f.target;
+        r((w) => ({ ...w, [y]: j }));
+        let u = null;
+        switch (y) {
+          case 'username':
+            u = Le(j);
+            break;
+          case 'email':
+            u = Ce(j);
+            break;
+          case 'password':
+            u = Z(j, { minLength: 8 });
+            break;
+          case 'confirmPassword':
+            u = de(j, s.password);
+            break;
+          case 'phoneNumber':
+            j && j.trim() && (u = ge(j));
+            break;
+        }
+        (u && c((w) => ({ ...w, [y]: u.error })), i && o(null));
+      },
+      h = () => {
+        const { isValid: f, errors: y } = us(s);
+        return (c(y), f);
+      },
+      p = async (f) => {
+        var y, j;
+        if ((f.preventDefault(), o(null), c({}), !h())) {
+          x('Auth', 'Register form validation failed', { fieldErrors: l });
+          return;
+        }
+        (n(!0),
+          x('Auth', 'Register form submitted', {
+            email: s.email,
+            username: s.username,
+          }));
+        try {
+          let u = null;
+          if ((y = s.phoneNumber) != null && y.trim()) {
+            const T = ge(s.phoneNumber.trim());
+            T.isValid &&
+              T.normalized &&
+              (u = T.normalized.startsWith('+')
+                ? T.normalized
+                : `+${T.normalized}`);
+          }
+          const w = {
+              usernameOrEmail: s.username.trim(),
+              email: s.email.trim(),
+              password: s.password,
+              ...(u && { phoneNumber: u }),
+            },
+            P = await E.register(w);
+          (x('Auth', 'Register successful', {
+            userId: (j = P.user) == null ? void 0 : j.externalUlids,
+          }),
+            x('Auth', 'Redirecting after registration'),
+            t('/dashboard'));
+        } catch (u) {
+          const { fieldErrors: w, formError: P } = xe(u);
+          (Object.keys(w).length > 0 && c((T) => ({ ...T, ...w })),
+            o(P || 'שגיאה בהרשמה. אנא נסה שוב.'),
+            m.error('Auth', 'Register failed', u));
+        } finally {
+          n(!1);
+        }
+      };
+    return e.jsxs('div', {
+      className: 'page-wrapper',
+      children: [
+        e.jsx('div', {
+          className: 'page-container',
+          children: e.jsx('main', {
+            children: e.jsx('tt-container', {
+              children: e.jsxs('tt-section', {
+                children: [
+                  e.jsxs('div', {
+                    className: 'auth-header',
+                    children: [
+                      e.jsx('div', {
+                        className: 'auth-logo',
+                        children: e.jsx('img', {
+                          src: '/images/logo.svg',
+                          alt: 'TikTrack Logo',
+                        }),
+                      }),
+                      e.jsx('p', {
+                        className: 'auth-subtitle',
+                        children: 'הצטרפו לקהילת הסוחרים',
+                      }),
+                      e.jsx('h1', {
+                        className: 'auth-title',
+                        children: 'הרשמה',
+                      }),
+                    ],
+                  }),
+                  e.jsxs('form', {
+                    className: 'js-register-form',
+                    onSubmit: p,
+                    noValidate: !0,
+                    action: '#',
+                    method: 'post',
+                    children: [
+                      i &&
+                        e.jsx('div', {
+                          className: 'auth-form__error js-error-feedback',
+                          role: 'alert',
+                          'aria-live': 'polite',
+                          children: i,
+                        }),
+                      e.jsxs('div', {
+                        className: 'form-group',
+                        children: [
+                          e.jsx('label', {
+                            className: 'form-label',
+                            htmlFor: 'username',
+                            children: 'שם משתמש:',
+                          }),
+                          e.jsx('input', {
+                            type: 'text',
+                            id: 'username',
+                            name: 'username',
+                            className: `form-control js-register-username-input ${l.username ? 'auth-form__input--error' : ''}`,
+                            required: !0,
+                            placeholder: 'בחר שם משתמש',
+                            value: s.username,
+                            onChange: d,
+                            disabled: a,
+                          }),
+                          l.username &&
+                            e.jsx('span', {
+                              className: 'auth-form__error-message',
+                              children: l.username,
+                            }),
+                        ],
+                      }),
+                      e.jsxs('div', {
+                        className: 'form-group',
+                        children: [
+                          e.jsx('label', {
+                            className: 'form-label',
+                            htmlFor: 'email',
+                            children: 'אימייל:',
+                          }),
+                          e.jsx('input', {
+                            type: 'email',
+                            id: 'email',
+                            name: 'email',
+                            className: `form-control js-register-email-input ${l.email ? 'auth-form__input--error' : ''}`,
+                            required: !0,
+                            placeholder: 'your@email.com',
+                            value: s.email,
+                            onChange: d,
+                            disabled: a,
+                          }),
+                          l.email &&
+                            e.jsx('span', {
+                              className: 'auth-form__error-message',
+                              children: l.email,
+                            }),
+                        ],
+                      }),
+                      e.jsxs('div', {
+                        className: 'form-group',
+                        children: [
+                          e.jsx('label', {
+                            className: 'form-label',
+                            htmlFor: 'password',
+                            children: 'סיסמה:',
+                          }),
+                          e.jsx('input', {
+                            type: 'password',
+                            id: 'password',
+                            name: 'password',
+                            className: `form-control js-register-password-input ${l.password ? 'auth-form__input--error' : ''}`,
+                            required: !0,
+                            placeholder: 'הכנס סיסמה',
+                            value: s.password,
+                            onChange: d,
+                            disabled: a,
+                          }),
+                          l.password &&
+                            e.jsx('span', {
+                              className: 'auth-form__error-message',
+                              children: l.password,
+                            }),
+                        ],
+                      }),
+                      e.jsxs('div', {
+                        className: 'form-group',
+                        children: [
+                          e.jsx('label', {
+                            className: 'form-label',
+                            htmlFor: 'confirmPassword',
+                            children: 'אימות סיסמה:',
+                          }),
+                          e.jsx('input', {
+                            type: 'password',
+                            id: 'confirmPassword',
+                            name: 'confirmPassword',
+                            className: `form-control js-register-confirm-password-input ${l.confirmPassword ? 'auth-form__input--error' : ''}`,
+                            required: !0,
+                            placeholder: 'הכנס סיסמה שוב',
+                            value: s.confirmPassword,
+                            onChange: d,
+                            disabled: a,
+                          }),
+                          l.confirmPassword &&
+                            e.jsx('span', {
+                              className: 'auth-form__error-message',
+                              children: l.confirmPassword,
+                            }),
+                        ],
+                      }),
+                      e.jsxs('div', {
+                        className: 'form-group',
+                        children: [
+                          e.jsx('label', {
+                            className: 'form-label',
+                            htmlFor: 'phoneNumber',
+                            children: 'טלפון (אופציונלי):',
+                          }),
+                          e.jsx('input', {
+                            type: 'tel',
+                            id: 'phoneNumber',
+                            name: 'phoneNumber',
+                            className: `form-control js-register-phone-input ${l.phoneNumber ? 'auth-form__input--error' : ''}`,
+                            placeholder: '+972-5x-xxxxxxx',
+                            value: s.phoneNumber,
+                            onChange: d,
+                            disabled: a,
+                          }),
+                          l.phoneNumber &&
+                            e.jsx('span', {
+                              className: 'auth-form__error-message',
+                              children: l.phoneNumber,
+                            }),
+                        ],
+                      }),
+                      e.jsx('button', {
+                        type: 'submit',
+                        className: 'btn-auth-primary js-register-submit-button',
+                        disabled: a,
+                        children: a ? 'יוצר חשבון...' : 'צור חשבון',
+                      }),
+                    ],
+                  }),
+                  e.jsx('div', {
+                    className: 'auth-footer-zone',
+                    children: e.jsx(B, {
+                      to: '/login',
+                      className: 'auth-link js-login-link',
+                      children: 'כבר יש לך חשבון? התחבר',
+                    }),
+                  }),
+                ],
+              }),
+            }),
+          }),
+        }),
+        e.jsx(Y, {}),
+      ],
+    });
+  },
+  _s = () => {
+    const t = oe(),
+      [s] = $e(),
+      r = s.get('token'),
+      a = s.get('code'),
+      n = !!(r || a),
+      [i, o] = _.useState({ identifier: '' }),
+      [l, c] = _.useState({
+        resetToken: r || '',
+        verificationCode: a || '',
+        newPassword: '',
+        confirmPassword: '',
+      }),
+      [d, h] = _.useState(!1),
+      [p, f] = _.useState(null),
+      [y, j] = _.useState(!1),
+      [u, w] = _.useState({}),
+      [P, T] = _.useState('EMAIL');
+    _.useEffect(
+      () => (
+        document.body.classList.add('auth-layout-root'),
+        () => {
+          document.body.classList.remove('auth-layout-root');
+        }
+      ),
+      [],
+    );
+    const D = (v) => fe(v).method || 'EMAIL',
+      X = (v) => {
+        const { value: S } = v.target;
+        if ((o({ identifier: S }), S.trim())) {
+          const A = fe(S);
+          (T(A.method || 'EMAIL'), w((b) => ({ ...b, identifier: A.error })));
+        } else
+          w((A) => {
+            const b = { ...A };
+            return (delete b.identifier, b);
+          });
+        p && f(null);
+      },
+      U = (v) => {
+        const { name: S, value: A } = v.target;
+        c((g) => ({ ...g, [S]: A }));
+        const b = r ? 'EMAIL' : 'SMS';
+        let C = null;
+        switch (S) {
+          case 'resetToken':
+            b === 'EMAIL' && (C = Ve(A));
+            break;
+          case 'verificationCode':
+            b === 'SMS' && (C = Fe(A, 6));
+            break;
+          case 'newPassword':
+            C = Z(A, { minLength: 8 });
+            break;
+          case 'confirmPassword':
+            C = de(A, l.newPassword);
+            break;
+        }
+        (C && w((g) => ({ ...g, [S]: C.error })), p && f(null));
+      },
+      W = () => {
+        const { isValid: v, errors: S, method: A } = ps(i);
+        return (w(S), A && T(A), v);
+      },
+      z = () => {
+        const v = r ? 'EMAIL' : 'SMS',
+          { isValid: S, errors: A } = gs(l, v);
+        return (w(A), S);
+      },
+      G = async (v) => {
+        var A, b;
+        if ((v.preventDefault(), f(null), w({}), !W())) {
+          x('Auth', 'Password reset request validation failed', {
+            fieldErrors: u,
+          });
+          return;
+        }
+        h(!0);
+        const S = D(i.identifier);
+        x('Auth', 'Password reset request started', {
+          method: S,
+          identifier: i.identifier,
+        });
+        try {
+          (await E.requestPasswordReset(S, i.identifier.trim()),
+            j(!0),
+            x('Auth', 'Password reset request successful'),
+            setTimeout(() => {
+              j(!1);
+            }, 3e3));
+        } catch (C) {
+          const g =
+            ((b = (A = C.response) == null ? void 0 : A.data) == null
+              ? void 0
+              : b.detail) ||
+            C.message ||
+            'שגיאה בשליחת בקשה. אנא נסה שוב.';
+          (f(g), m.error('Auth', 'Password reset request failed', C));
+        } finally {
+          h(!1);
+        }
+      },
+      H = async (v) => {
+        if ((v.preventDefault(), f(null), w({}), !z())) {
+          x('Auth', 'Password reset verify validation failed', {
+            fieldErrors: u,
+          });
+          return;
+        }
+        h(!0);
+        const S = r ? 'EMAIL' : 'SMS';
+        x('Auth', 'Password reset verify started', { method: S });
+        try {
+          const A = {
+            newPassword: l.newPassword,
+            ...(S === 'EMAIL'
+              ? { resetToken: l.resetToken }
+              : { verificationCode: l.verificationCode }),
+          };
+          (await E.verifyPasswordReset(A),
+            j(!0),
+            x('Auth', 'Password reset verify successful'),
+            setTimeout(() => {
+              t('/login');
+            }, 2e3));
+        } catch (A) {
+          const { fieldErrors: b, formError: C } = xe(A);
+          (Object.keys(b).length > 0 && w((g) => ({ ...g, ...b })),
+            f(C || 'שגיאה באיפוס הסיסמה. אנא נסה שוב.'),
+            m.error('Auth', 'Password reset verify failed', A));
+        } finally {
+          h(!1);
+        }
+      };
+    return n
+      ? e.jsxs('div', {
+          className: 'page-wrapper',
+          children: [
+            e.jsx('div', {
+              className: 'page-container',
+              children: e.jsx('main', {
+                children: e.jsx('tt-container', {
+                  children: e.jsxs('tt-section', {
+                    children: [
+                      e.jsxs('div', {
+                        className: 'auth-header',
+                        children: [
+                          e.jsx('div', {
+                            className: 'auth-logo',
+                            children: e.jsx('img', {
+                              src: '/images/logo.svg',
+                              alt: 'TikTrack Logo',
+                            }),
+                          }),
+                          e.jsx('p', {
+                            className: 'auth-subtitle',
+                            children: 'הזן סיסמה חדשה',
+                          }),
+                          e.jsx('h1', {
+                            className: 'auth-title',
+                            children: 'איפוס סיסמה',
+                          }),
+                        ],
+                      }),
+                      e.jsxs('form', {
+                        className: 'js-reset-verify-form',
+                        onSubmit: H,
+                        children: [
+                          e.jsx('div', {
+                            className: 'auth-form__error js-error-feedback',
+                            hidden: !p,
+                            children: p,
+                          }),
+                          e.jsx('div', {
+                            className: 'auth-form__success js-success-feedback',
+                            hidden: !y,
+                            children:
+                              'הסיסמה אופסה בהצלחה! מפנה לדף ההתחברות...',
+                          }),
+                          r &&
+                            e.jsxs('div', {
+                              className: 'form-group',
+                              children: [
+                                e.jsx('label', {
+                                  className: 'form-label',
+                                  htmlFor: 'resetToken',
+                                  children: 'קוד איפוס:',
+                                }),
+                                e.jsx('input', {
+                                  type: 'text',
+                                  id: 'resetToken',
+                                  name: 'resetToken',
+                                  className: `form-control js-reset-token-input ${u.resetToken ? 'auth-form__input--error' : ''}`,
+                                  required: !0,
+                                  placeholder: 'הכנס קוד איפוס מהאימייל',
+                                  value: l.resetToken,
+                                  onChange: U,
+                                  disabled: d,
+                                }),
+                                u.resetToken &&
+                                  e.jsx('span', {
+                                    className: 'auth-form__error-message',
+                                    children: u.resetToken,
+                                  }),
+                              ],
+                            }),
+                          a &&
+                            e.jsxs('div', {
+                              className: 'form-group',
+                              children: [
+                                e.jsx('label', {
+                                  className: 'form-label',
+                                  htmlFor: 'verificationCode',
+                                  children: 'קוד אימות SMS:',
+                                }),
+                                e.jsx('input', {
+                                  type: 'text',
+                                  id: 'verificationCode',
+                                  name: 'verificationCode',
+                                  className: `form-control js-reset-code-input ${u.verificationCode ? 'auth-form__input--error' : ''}`,
+                                  required: !0,
+                                  placeholder: 'הכנס קוד 6 ספרות',
+                                  maxLength: 6,
+                                  value: l.verificationCode,
+                                  onChange: U,
+                                  disabled: d,
+                                }),
+                                u.verificationCode &&
+                                  e.jsx('span', {
+                                    className: 'auth-form__error-message',
+                                    children: u.verificationCode,
+                                  }),
+                              ],
+                            }),
+                          e.jsxs('div', {
+                            className: 'form-group',
+                            children: [
+                              e.jsx('label', {
+                                className: 'form-label',
+                                htmlFor: 'newPassword',
+                                children: 'סיסמה חדשה:',
+                              }),
+                              e.jsx('input', {
+                                type: 'password',
+                                id: 'newPassword',
+                                name: 'newPassword',
+                                className: `form-control js-reset-new-password-input ${u.newPassword ? 'auth-form__input--error' : ''}`,
+                                required: !0,
+                                placeholder: 'הכנס סיסמה חדשה',
+                                value: l.newPassword,
+                                onChange: U,
+                                disabled: d,
+                              }),
+                              u.newPassword &&
+                                e.jsx('span', {
+                                  className: 'auth-form__error-message',
+                                  children: u.newPassword,
+                                }),
+                            ],
+                          }),
+                          e.jsxs('div', {
+                            className: 'form-group',
+                            children: [
+                              e.jsx('label', {
+                                className: 'form-label',
+                                htmlFor: 'confirmPassword',
+                                children: 'אימות סיסמה:',
+                              }),
+                              e.jsx('input', {
+                                type: 'password',
+                                id: 'confirmPassword',
+                                name: 'confirmPassword',
+                                className: `form-control js-reset-confirm-password-input ${u.confirmPassword ? 'auth-form__input--error' : ''}`,
+                                required: !0,
+                                placeholder: 'הכנס סיסמה שוב',
+                                value: l.confirmPassword,
+                                onChange: U,
+                                disabled: d,
+                              }),
+                              u.confirmPassword &&
+                                e.jsx('span', {
+                                  className: 'auth-form__error-message',
+                                  children: u.confirmPassword,
+                                }),
+                            ],
+                          }),
+                          e.jsx('button', {
+                            type: 'submit',
+                            className:
+                              'btn-auth-primary js-reset-verify-submit-button',
+                            disabled: d,
+                            children: d ? 'מאפס סיסמה...' : 'אפס סיסמה',
+                          }),
+                        ],
+                      }),
+                      e.jsx('div', {
+                        className: 'auth-footer-zone',
+                        children: e.jsx(B, {
+                          to: '/login',
+                          className: 'auth-link js-back-to-login-link',
+                          children: 'חזרה להתחברות',
+                        }),
+                      }),
+                    ],
+                  }),
+                }),
+              }),
+            }),
+            e.jsx(Y, {}),
+          ],
+        })
+      : e.jsxs('div', {
+          className: 'page-wrapper',
+          children: [
+            e.jsx('div', {
+              className: 'page-container',
+              children: e.jsx('main', {
+                children: e.jsx('tt-container', {
+                  children: e.jsxs('tt-section', {
+                    children: [
+                      e.jsxs('div', {
+                        className: 'auth-header',
+                        children: [
+                          e.jsx('div', {
+                            className: 'auth-logo',
+                            children: e.jsx('img', {
+                              src: './images/logo.svg',
+                              alt: 'TikTrack Logo',
+                            }),
+                          }),
+                          e.jsx('p', {
+                            className: 'auth-subtitle',
+                            children: 'הזן אימייל או טלפון לקבלת קישור איפוס',
+                          }),
+                          e.jsx('h1', {
+                            className: 'auth-title',
+                            children: 'שחזור סיסמה',
+                          }),
+                        ],
+                      }),
+                      e.jsxs('form', {
+                        className: 'js-reset-request-form',
+                        onSubmit: G,
+                        children: [
+                          e.jsx('div', {
+                            className: 'auth-form__error js-error-feedback',
+                            hidden: !p,
+                            children: p,
+                          }),
+                          e.jsxs('div', {
+                            className: 'auth-form__success js-success-feedback',
+                            hidden: !y,
+                            children: [
+                              'בקשה נשלחה בהצלחה! בדוק את',
+                              ' ',
+                              P === 'EMAIL' ? 'האימייל' : 'ה-SMS',
+                              ' שלך.',
+                            ],
+                          }),
+                          e.jsxs('div', {
+                            className: 'form-group',
+                            children: [
+                              e.jsx('label', {
+                                className: 'form-label',
+                                htmlFor: 'identifier',
+                                children: 'אימייל או טלפון:',
+                              }),
+                              e.jsx('input', {
+                                type: 'text',
+                                id: 'identifier',
+                                name: 'identifier',
+                                className: `form-control js-reset-identifier-input ${u.identifier ? 'auth-form__input--error' : ''}`,
+                                required: !0,
+                                placeholder:
+                                  'your@email.com או +972-5x-xxxxxxx',
+                                value: i.identifier,
+                                onChange: X,
+                                disabled: d,
+                              }),
+                              u.identifier &&
+                                e.jsx('span', {
+                                  className: 'auth-form__error-message',
+                                  children: u.identifier,
+                                }),
+                              i.identifier &&
+                                e.jsxs('p', {
+                                  className: 'auth-form__hint',
+                                  children: [
+                                    'שיטת איפוס: ',
+                                    P === 'EMAIL' ? 'אימייל' : 'SMS',
+                                  ],
+                                }),
+                            ],
+                          }),
+                          e.jsx('button', {
+                            type: 'submit',
+                            className:
+                              'btn-auth-primary js-reset-request-submit-button',
+                            disabled: d,
+                            children: d ? 'שולח...' : 'שלח קישור איפוס',
+                          }),
+                        ],
+                      }),
+                      e.jsx('div', {
+                        className: 'auth-footer-zone',
+                        children: e.jsx(B, {
+                          to: '/login',
+                          className: 'auth-link js-back-to-login-link',
+                          children: 'חזרה להתחברות',
+                        }),
+                      }),
+                    ],
+                  }),
+                }),
+              }),
+            }),
+            e.jsx(Y, {}),
+          ],
+        });
+  },
+  js = 'https://api.tiktrack.com/api/v1',
+  Q = He.create({
+    baseURL: js,
+    headers: { 'Content-Type': 'application/json' },
+    withCredentials: !0,
+  });
+Q.interceptors.request.use(
+  (t) => {
+    const s = E.getAccessToken();
+    return (s && (t.headers.Authorization = `Bearer ${s}`), t);
+  },
+  (t) => Promise.reject(t),
+);
+const ws = {
+    async list() {
+      m.log('APIKeys', 'List API keys started');
+      try {
+        const t = await Q.get('/user/api-keys'),
+          s = q(t.data);
+        return (
+          m.log('APIKeys', 'List API keys successful', { count: s.length }),
+          s
+        );
+      } catch (t) {
+        throw (m.error('APIKeys', 'List API keys failure', t), t);
+      }
+    },
+    async create(t) {
+      m.log('APIKeys', 'Create API key started', { provider: t.provider });
+      try {
+        const s = O(t);
+        x('APIKeys', 'Create API key payload prepared', s);
+        const r = await Q.post('/user/api-keys', s),
+          a = q(r.data);
+        return (
+          m.log('APIKeys', 'Create API key successful', {
+            keyId: a.externalUlids,
+          }),
+          a
+        );
+      } catch (s) {
+        throw (m.error('APIKeys', 'Create API key failure', s), s);
+      }
+    },
+    async update(t, s) {
+      m.log('APIKeys', 'Update API key started', { keyId: t });
+      try {
+        const r = O(s);
+        x('APIKeys', 'Update API key payload prepared', r);
+        const a = await Q.put(`/user/api-keys/${t}`, r),
+          n = q(a.data);
+        return (m.log('APIKeys', 'Update API key successful', { keyId: t }), n);
+      } catch (r) {
+        throw (m.error('APIKeys', 'Update API key failure', r), r);
+      }
+    },
+    async delete(t) {
+      m.log('APIKeys', 'Delete API key started', { keyId: t });
+      try {
+        (await Q.delete(`/user/api-keys/${t}`),
+          m.log('APIKeys', 'Delete API key successful', { keyId: t }));
+      } catch (s) {
+        throw (m.error('APIKeys', 'Delete API key failure', s), s);
+      }
+    },
+    async verify(t) {
+      m.log('APIKeys', 'Verify API key started', { keyId: t });
+      try {
+        const s = await Q.post(`/user/api-keys/${t}/verify`),
+          r = q(s.data);
+        return (
+          m.log('APIKeys', 'Verify API key successful', {
+            keyId: t,
+            isVerified: r.isVerified,
+          }),
+          r
+        );
+      } catch (s) {
+        throw (m.error('APIKeys', 'Verify API key failure', s), s);
+      }
+    },
+  },
+  Ns = () => {
+    const t = oe(),
+      [s, r] = _.useState(null),
+      [a, n] = _.useState(!0),
+      [i, o] = _.useState({
+        username: '',
+        email: '',
+        phoneNumber: '',
+        firstName: '',
+        lastName: '',
+        displayName: '',
+      }),
+      [l, c] = _.useState({
+        currentPassword: '',
+        newPassword: '',
+        confirmNewPassword: '',
+      }),
+      [d, h] = _.useState({
+        aiDefaultProvider: 'gemini',
+        geminiApiKey: '',
+        perplexityApiKey: '',
+      }),
+      [p, f] = _.useState(!1),
+      [y, j] = _.useState(!1),
+      [u, w] = _.useState(!1),
+      [P, T] = _.useState(!1),
+      [D, X] = _.useState(!1),
+      [U, W] = _.useState(''),
+      [z, G] = _.useState(!1),
+      [H, v] = _.useState({ 'section-0': !0, 'section-3': !0 }),
+      [S, A] = _.useState([]),
+      [b, C] = _.useState(!1);
+    (_.useEffect(() => {
+      (async () => {
+        var I;
+        try {
+          n(!0);
+          const F = await E.getCurrentUser();
+          (r(F),
+            o({
+              username: F.username || '',
+              email: F.email || '',
+              phoneNumber: F.phoneNumber || F.phone_numbers || '',
+              firstName: F.firstName || '',
+              lastName: F.lastName || '',
+              displayName: F.displayName || '',
+            }),
+            x('ProfileView', 'User data loaded', { userId: F.externalUlids }));
+        } catch (F) {
+          (m.error('ProfileView', 'Failed to load user data', F),
+            ((I = F.response) == null ? void 0 : I.status) === 401 && t('/'));
+        } finally {
+          n(!1);
+        }
+      })();
+    }, [t]),
+      _.useEffect(() => {
+        (async () => {
+          try {
+            C(!0);
+            const I = await ws.list();
+            (A(I), x('ProfileView', 'API keys loaded', { count: I.length }));
+          } catch (I) {
+            m.error('ProfileView', 'Failed to load API keys', I);
+          } finally {
+            C(!1);
+          }
+        })();
+      }, []));
+    const g = (N) => {
+        v((I) => ({ ...I, [N]: !I[N] }));
+      },
+      ee = async (N) => {
+        (N.preventDefault(), f(!0));
+        try {
+          const I = {
+            firstName: i.firstName,
+            lastName: i.lastName,
+            displayName: i.displayName,
+            phoneNumber: i.phoneNumber || null,
+          };
+          (await E.updateUser(I), x('ProfileView', 'User info updated'));
+          const F = await E.getCurrentUser();
+          r(F);
+        } catch (I) {
+          m.error('ProfileView', 'Failed to update user info', I);
+        } finally {
+          f(!1);
+        }
+      },
+      he = async (N) => {
+        if ((N.preventDefault(), l.newPassword !== l.confirmNewPassword)) {
+          m.error('ProfileView', 'Password mismatch');
+          return;
+        }
+        j(!0);
+        try {
+          (await E.changePassword({
+            old_password: l.currentPassword,
+            new_password: l.newPassword,
+          }),
+            x('ProfileView', 'Password updated'),
+            c({
+              currentPassword: '',
+              newPassword: '',
+              confirmNewPassword: '',
+            }));
+        } catch (I) {
+          m.error('ProfileView', 'Failed to update password', I);
+        } finally {
+          j(!1);
+        }
+      },
+      $ = async (N) => {
+        (N.preventDefault(), w(!0));
+        try {
+          x('ProfileView', 'API keys save requested');
+        } catch (I) {
+          m.error('ProfileView', 'Failed to save API keys', I);
+        } finally {
+          w(!1);
+        }
+      },
+      Ue = async () => {
+        try {
+          (await E.logout(), t('/'), x('ProfileView', 'User logged out'));
+        } catch (N) {
+          (m.error('ProfileView', 'Logout error', N), t('/'));
+        }
+      };
+    return a
+      ? e.jsxs(e.Fragment, {
+          children: [
+            e.jsx('div', {
+              className: 'page-wrapper',
+              children: e.jsx('div', {
+                className: 'page-container',
+                children: e.jsx('main', {
+                  'data-context': 'settings',
+                  children: e.jsx('tt-container', {
+                    children: e.jsx('tt-section', {
+                      children: e.jsx('p', { children: 'טוען...' }),
+                    }),
+                  }),
+                }),
+              }),
+            }),
+            e.jsx(Y, {}),
+          ],
+        })
+      : e.jsxs(e.Fragment, {
+          children: [
+            e.jsx('div', {
+              className: 'page-wrapper',
+              children: e.jsx('div', {
+                className: 'page-container',
+                children: e.jsx('main', {
+                  'data-context': 'settings',
+                  children: e.jsxs('tt-container', {
+                    children: [
+                      e.jsxs('tt-section', {
+                        'data-section': 'section-0',
+                        children: [
+                          e.jsxs('div', {
+                            className: 'index-section__header',
+                            children: [
+                              e.jsxs('div', {
+                                className: 'index-section__header-title',
+                                children: [
+                                  e.jsx('img', {
+                                    src: '/images/icons/entities/user.svg',
+                                    alt: 'מידע',
+                                    className: 'index-section__header-icon',
+                                    width: '35',
+                                    height: '35',
+                                  }),
+                                  e.jsx('h1', {
+                                    className: 'index-section__header-text',
+                                    children: 'מידע',
+                                  }),
+                                ],
+                              }),
+                              e.jsx('div', {
+                                className: 'index-section__header-meta',
+                                children: e.jsx('span', {
+                                  className: 'index-section__header-count',
+                                  children: 'מידע אישי וסטטוס אימות',
+                                }),
+                              }),
+                              e.jsx('div', {
+                                className: 'index-section__header-actions',
+                                children: e.jsx('button', {
+                                  className:
+                                    'index-section__header-toggle-btn js-section-toggle',
+                                  'aria-label': 'הצג/הסתר',
+                                  onClick: () => g('section-0'),
+                                  'aria-expanded': H['section-0'],
+                                  children: e.jsx('svg', {
+                                    width: '20',
+                                    height: '20',
+                                    viewBox: '0 0 24 24',
+                                    fill: 'none',
+                                    stroke: 'currentColor',
+                                    strokeWidth: '2',
+                                    children: e.jsx('path', {
+                                      d: 'M6 9l6 6l6 -6',
+                                    }),
+                                  }),
+                                }),
+                              }),
+                            ],
+                          }),
+                          H['section-0'] &&
+                            e.jsxs('div', {
+                              className: 'index-section__body',
+                              children: [
+                                e.jsxs('tt-section-row', {
+                                  children: [
+                                    e.jsx('div', {
+                                      className: 'col-md-6',
+                                      children: e.jsxs('div', {
+                                        className: 'card h-100',
+                                        children: [
+                                          e.jsx('div', {
+                                            className: 'card-header bg-light',
+                                            children: e.jsx('h6', {
+                                              className: 'mb-0 text-muted',
+                                              children: 'פרטי משתמש',
+                                            }),
+                                          }),
+                                          e.jsx('div', {
+                                            className: 'card-body',
+                                            children: e.jsx('form', {
+                                              id: 'userInfoForm',
+                                              onSubmit: ee,
+                                              children: e.jsxs('div', {
+                                                className: 'row g-3',
+                                                children: [
+                                                  e.jsxs('div', {
+                                                    className: 'col-12',
+                                                    children: [
+                                                      e.jsx('label', {
+                                                        className: 'form-label',
+                                                        htmlFor:
+                                                          'profileUsername',
+                                                        children: 'שם משתמש',
+                                                      }),
+                                                      e.jsx('input', {
+                                                        type: 'text',
+                                                        id: 'profileUsername',
+                                                        className:
+                                                          'form-control',
+                                                        readOnly: !0,
+                                                        value: i.username,
+                                                      }),
+                                                    ],
+                                                  }),
+                                                  e.jsxs('div', {
+                                                    className: 'col-12',
+                                                    children: [
+                                                      e.jsxs('label', {
+                                                        className:
+                                                          'form-label form-label-with-verify',
+                                                        htmlFor: 'profileEmail',
+                                                        children: [
+                                                          'אימייל',
+                                                          s &&
+                                                            e.jsx('span', {
+                                                              className: `profile-verify-icon ${s.isEmailVerified ? 'profile-verify-icon--verified' : 'profile-verify-icon--not-verified'}`,
+                                                              title:
+                                                                s.isEmailVerified
+                                                                  ? 'מאומת'
+                                                                  : 'לא מאומת',
+                                                              children:
+                                                                s.isEmailVerified
+                                                                  ? e.jsx(
+                                                                      'svg',
+                                                                      {
+                                                                        width:
+                                                                          '14',
+                                                                        height:
+                                                                          '14',
+                                                                        viewBox:
+                                                                          '0 0 24 24',
+                                                                        fill: 'none',
+                                                                        stroke:
+                                                                          'currentColor',
+                                                                        strokeWidth:
+                                                                          '2',
+                                                                        children:
+                                                                          e.jsx(
+                                                                            'path',
+                                                                            {
+                                                                              d: 'M20 6L9 17l-5-5',
+                                                                            },
+                                                                          ),
+                                                                      },
+                                                                    )
+                                                                  : e.jsxs(
+                                                                      'svg',
+                                                                      {
+                                                                        width:
+                                                                          '14',
+                                                                        height:
+                                                                          '14',
+                                                                        viewBox:
+                                                                          '0 0 24 24',
+                                                                        fill: 'none',
+                                                                        stroke:
+                                                                          'currentColor',
+                                                                        strokeWidth:
+                                                                          '2',
+                                                                        children:
+                                                                          [
+                                                                            e.jsx(
+                                                                              'circle',
+                                                                              {
+                                                                                cx: '12',
+                                                                                cy: '12',
+                                                                                r: '10',
+                                                                              },
+                                                                            ),
+                                                                            e.jsx(
+                                                                              'path',
+                                                                              {
+                                                                                d: 'M12 8v4M12 16h.01',
+                                                                              },
+                                                                            ),
+                                                                          ],
+                                                                      },
+                                                                    ),
+                                                            }),
+                                                        ],
+                                                      }),
+                                                      e.jsx('input', {
+                                                        type: 'email',
+                                                        id: 'profileEmail',
+                                                        className:
+                                                          'form-control dir-ltr',
+                                                        placeholder:
+                                                          'הכנס כתובת אימייל',
+                                                        readOnly: !0,
+                                                        dir: 'ltr',
+                                                        value: i.email,
+                                                      }),
+                                                      e.jsx('small', {
+                                                        className:
+                                                          'form-text text-muted',
+                                                        children:
+                                                          'אימייל לא ניתן לשינוי מכאן',
+                                                      }),
+                                                      s &&
+                                                        !s.isEmailVerified &&
+                                                        e.jsx('div', {
+                                                          className:
+                                                            'profile-verify-row',
+                                                          children: e.jsx(
+                                                            'button',
+                                                            {
+                                                              type: 'button',
+                                                              className:
+                                                                'btn btn-sm btn-outline-secondary',
+                                                              onClick:
+                                                                async () => {
+                                                                  try {
+                                                                    (await E.resendEmailVerification(),
+                                                                      m.log(
+                                                                        'ProfileView',
+                                                                        'Email verification sent',
+                                                                      ));
+                                                                  } catch (N) {
+                                                                    m.error(
+                                                                      'ProfileView',
+                                                                      'Resend email failed',
+                                                                      N,
+                                                                    );
+                                                                  }
+                                                                },
+                                                              children:
+                                                                'שלח אימות',
+                                                            },
+                                                          ),
+                                                        }),
+                                                    ],
+                                                  }),
+                                                  e.jsxs('div', {
+                                                    className: 'col-12',
+                                                    children: [
+                                                      e.jsxs('label', {
+                                                        className:
+                                                          'form-label form-label-with-verify',
+                                                        htmlFor: 'profilePhone',
+                                                        children: [
+                                                          'טלפון',
+                                                          s &&
+                                                            (s.phoneNumbers ||
+                                                              s.phoneNumber) &&
+                                                            e.jsx('span', {
+                                                              className: `profile-verify-icon ${s.phoneVerified ? 'profile-verify-icon--verified' : 'profile-verify-icon--not-verified'}`,
+                                                              title:
+                                                                s.phoneVerified
+                                                                  ? 'מאומת'
+                                                                  : 'לא מאומת',
+                                                              children:
+                                                                s.phoneVerified
+                                                                  ? e.jsx(
+                                                                      'svg',
+                                                                      {
+                                                                        width:
+                                                                          '14',
+                                                                        height:
+                                                                          '14',
+                                                                        viewBox:
+                                                                          '0 0 24 24',
+                                                                        fill: 'none',
+                                                                        stroke:
+                                                                          'currentColor',
+                                                                        strokeWidth:
+                                                                          '2',
+                                                                        children:
+                                                                          e.jsx(
+                                                                            'path',
+                                                                            {
+                                                                              d: 'M20 6L9 17l-5-5',
+                                                                            },
+                                                                          ),
+                                                                      },
+                                                                    )
+                                                                  : e.jsxs(
+                                                                      'svg',
+                                                                      {
+                                                                        width:
+                                                                          '14',
+                                                                        height:
+                                                                          '14',
+                                                                        viewBox:
+                                                                          '0 0 24 24',
+                                                                        fill: 'none',
+                                                                        stroke:
+                                                                          'currentColor',
+                                                                        strokeWidth:
+                                                                          '2',
+                                                                        children:
+                                                                          [
+                                                                            e.jsx(
+                                                                              'circle',
+                                                                              {
+                                                                                cx: '12',
+                                                                                cy: '12',
+                                                                                r: '10',
+                                                                              },
+                                                                            ),
+                                                                            e.jsx(
+                                                                              'path',
+                                                                              {
+                                                                                d: 'M12 8v4M12 16h.01',
+                                                                              },
+                                                                            ),
+                                                                          ],
+                                                                      },
+                                                                    ),
+                                                            }),
+                                                        ],
+                                                      }),
+                                                      e.jsx('input', {
+                                                        type: 'tel',
+                                                        id: 'profilePhone',
+                                                        className:
+                                                          'form-control dir-ltr',
+                                                        placeholder:
+                                                          '+972501234567',
+                                                        dir: 'ltr',
+                                                        value: i.phoneNumber,
+                                                        onChange: (N) =>
+                                                          o({
+                                                            ...i,
+                                                            phoneNumber:
+                                                              N.target.value,
+                                                          }),
+                                                      }),
+                                                      e.jsx('small', {
+                                                        className:
+                                                          'form-text text-muted dir-ltr',
+                                                        children:
+                                                          'פורמט E.164 (למשל +972501234567)',
+                                                      }),
+                                                      s &&
+                                                        (s.phoneNumbers ||
+                                                          s.phoneNumber) &&
+                                                        !s.phoneVerified &&
+                                                        e.jsx('div', {
+                                                          className:
+                                                            'profile-verify-row',
+                                                          children: e.jsxs(
+                                                            'div',
+                                                            {
+                                                              className:
+                                                                'd-flex align-items-center gap-2 flex-wrap',
+                                                              children: [
+                                                                e.jsx(
+                                                                  'button',
+                                                                  {
+                                                                    type: 'button',
+                                                                    className:
+                                                                      'btn btn-sm btn-outline-secondary',
+                                                                    onClick:
+                                                                      async () => {
+                                                                        try {
+                                                                          (await E.resendPhoneVerification(),
+                                                                            m.log(
+                                                                              'ProfileView',
+                                                                              'Phone verification code sent',
+                                                                            ));
+                                                                        } catch (N) {
+                                                                          m.error(
+                                                                            'ProfileView',
+                                                                            'Resend phone verification failed',
+                                                                            N,
+                                                                          );
+                                                                        }
+                                                                      },
+                                                                    children:
+                                                                      'שלח קוד',
+                                                                  },
+                                                                ),
+                                                                e.jsx('input', {
+                                                                  type: 'text',
+                                                                  className:
+                                                                    'form-control form-control-sm profile-verify-code-input dir-ltr',
+                                                                  placeholder:
+                                                                    'קוד 6 ספרות',
+                                                                  maxLength: 6,
+                                                                  value: U,
+                                                                  onChange: (
+                                                                    N,
+                                                                  ) =>
+                                                                    W(
+                                                                      N.target.value.replace(
+                                                                        /\D/g,
+                                                                        '',
+                                                                      ),
+                                                                    ),
+                                                                }),
+                                                                e.jsx(
+                                                                  'button',
+                                                                  {
+                                                                    type: 'button',
+                                                                    className:
+                                                                      'btn btn-sm btn-primary',
+                                                                    disabled:
+                                                                      U.length !==
+                                                                        6 || z,
+                                                                    onClick:
+                                                                      async () => {
+                                                                        if (
+                                                                          U.length ===
+                                                                          6
+                                                                        ) {
+                                                                          G(!0);
+                                                                          try {
+                                                                            (await E.verifyPhone(
+                                                                              U,
+                                                                            ),
+                                                                              W(
+                                                                                '',
+                                                                              ));
+                                                                            const N =
+                                                                              await E.getCurrentUser();
+                                                                            r(
+                                                                              N,
+                                                                            );
+                                                                          } catch (N) {
+                                                                            m.error(
+                                                                              'ProfileView',
+                                                                              'Phone verification failed',
+                                                                              N,
+                                                                            );
+                                                                          } finally {
+                                                                            G(
+                                                                              !1,
+                                                                            );
+                                                                          }
+                                                                        }
+                                                                      },
+                                                                    children: z
+                                                                      ? 'מאמת...'
+                                                                      : 'אימות',
+                                                                  },
+                                                                ),
+                                                              ],
+                                                            },
+                                                          ),
+                                                        }),
+                                                    ],
+                                                  }),
+                                                  e.jsxs('div', {
+                                                    className: 'col-md-6',
+                                                    children: [
+                                                      e.jsx('label', {
+                                                        className: 'form-label',
+                                                        htmlFor:
+                                                          'profileFirstName',
+                                                        children: 'שם פרטי',
+                                                      }),
+                                                      e.jsx('input', {
+                                                        type: 'text',
+                                                        id: 'profileFirstName',
+                                                        className:
+                                                          'form-control',
+                                                        placeholder:
+                                                          'הכנס שם פרטי',
+                                                        value: i.firstName,
+                                                        onChange: (N) =>
+                                                          o({
+                                                            ...i,
+                                                            firstName:
+                                                              N.target.value,
+                                                          }),
+                                                      }),
+                                                    ],
+                                                  }),
+                                                  e.jsxs('div', {
+                                                    className: 'col-md-6',
+                                                    children: [
+                                                      e.jsx('label', {
+                                                        className: 'form-label',
+                                                        htmlFor:
+                                                          'profileLastName',
+                                                        children: 'שם משפחה',
+                                                      }),
+                                                      e.jsx('input', {
+                                                        type: 'text',
+                                                        id: 'profileLastName',
+                                                        className:
+                                                          'form-control',
+                                                        placeholder:
+                                                          'הכנס שם משפחה',
+                                                        value: i.lastName,
+                                                        onChange: (N) =>
+                                                          o({
+                                                            ...i,
+                                                            lastName:
+                                                              N.target.value,
+                                                          }),
+                                                      }),
+                                                    ],
+                                                  }),
+                                                  e.jsxs('div', {
+                                                    className: 'col-12',
+                                                    children: [
+                                                      e.jsx('label', {
+                                                        className: 'form-label',
+                                                        htmlFor:
+                                                          'profileDisplayName',
+                                                        children: 'שם תצוגה',
+                                                      }),
+                                                      e.jsx('input', {
+                                                        type: 'text',
+                                                        id: 'profileDisplayName',
+                                                        className:
+                                                          'form-control',
+                                                        placeholder:
+                                                          'שם שיוצג במערכת',
+                                                        value: i.displayName,
+                                                        onChange: (N) =>
+                                                          o({
+                                                            ...i,
+                                                            displayName:
+                                                              N.target.value,
+                                                          }),
+                                                      }),
+                                                    ],
+                                                  }),
+                                                  e.jsx('div', {
+                                                    className: 'col-12',
+                                                    children: e.jsx('div', {
+                                                      className:
+                                                        'd-flex justify-content-end',
+                                                      children: e.jsx(
+                                                        'button',
+                                                        {
+                                                          type: 'submit',
+                                                          className:
+                                                            'btn btn-primary',
+                                                          id: 'updateInfoBtn',
+                                                          disabled: p,
+                                                          children: e.jsx(
+                                                            'span',
+                                                            {
+                                                              id: 'updateInfoBtnText',
+                                                              children: p
+                                                                ? 'מעדכן...'
+                                                                : 'עדכן פרטים',
+                                                            },
+                                                          ),
+                                                        },
+                                                      ),
+                                                    }),
+                                                  }),
+                                                ],
+                                              }),
+                                            }),
+                                          }),
+                                        ],
+                                      }),
+                                    }),
+                                    e.jsx('div', {
+                                      className: 'col-md-6',
+                                      children: e.jsxs('div', {
+                                        className: 'card h-100',
+                                        children: [
+                                          e.jsx('div', {
+                                            className: 'card-header bg-light',
+                                            children: e.jsx('h6', {
+                                              className: 'mb-0 text-muted',
+                                              children: 'שינוי סיסמה',
+                                            }),
+                                          }),
+                                          e.jsx('div', {
+                                            className: 'card-body',
+                                            children: e.jsx('form', {
+                                              id: 'passwordForm',
+                                              onSubmit: he,
+                                              children: e.jsxs('div', {
+                                                className: 'row g-3',
+                                                children: [
+                                                  e.jsxs('div', {
+                                                    className: 'col-12',
+                                                    children: [
+                                                      e.jsx('label', {
+                                                        className: 'form-label',
+                                                        htmlFor:
+                                                          'currentPassword',
+                                                        children:
+                                                          'סיסמה נוכחית',
+                                                      }),
+                                                      e.jsx('input', {
+                                                        type: 'password',
+                                                        id: 'currentPassword',
+                                                        className:
+                                                          'form-control',
+                                                        placeholder:
+                                                          'הכנס סיסמה נוכחית',
+                                                        required: !0,
+                                                        value:
+                                                          l.currentPassword,
+                                                        onChange: (N) =>
+                                                          c({
+                                                            ...l,
+                                                            currentPassword:
+                                                              N.target.value,
+                                                          }),
+                                                      }),
+                                                    ],
+                                                  }),
+                                                  e.jsxs('div', {
+                                                    className: 'col-12',
+                                                    children: [
+                                                      e.jsx('label', {
+                                                        className: 'form-label',
+                                                        htmlFor: 'newPassword',
+                                                        children: 'סיסמה חדשה',
+                                                      }),
+                                                      e.jsx('input', {
+                                                        type: 'password',
+                                                        id: 'newPassword',
+                                                        className:
+                                                          'form-control',
+                                                        placeholder:
+                                                          'הכנס סיסמה חדשה (מינימום 6 תווים)',
+                                                        required: !0,
+                                                        minLength: '6',
+                                                        value: l.newPassword,
+                                                        onChange: (N) =>
+                                                          c({
+                                                            ...l,
+                                                            newPassword:
+                                                              N.target.value,
+                                                          }),
+                                                      }),
+                                                    ],
+                                                  }),
+                                                  e.jsxs('div', {
+                                                    className: 'col-12',
+                                                    children: [
+                                                      e.jsx('label', {
+                                                        className: 'form-label',
+                                                        htmlFor:
+                                                          'confirmNewPassword',
+                                                        children:
+                                                          'אימות סיסמה חדשה',
+                                                      }),
+                                                      e.jsx('input', {
+                                                        type: 'password',
+                                                        id: 'confirmNewPassword',
+                                                        className:
+                                                          'form-control',
+                                                        placeholder:
+                                                          'אמת סיסמה חדשה',
+                                                        required: !0,
+                                                        minLength: '6',
+                                                        value:
+                                                          l.confirmNewPassword,
+                                                        onChange: (N) =>
+                                                          c({
+                                                            ...l,
+                                                            confirmNewPassword:
+                                                              N.target.value,
+                                                          }),
+                                                      }),
+                                                    ],
+                                                  }),
+                                                  e.jsx('div', {
+                                                    className: 'col-12',
+                                                    children: e.jsx('div', {
+                                                      className:
+                                                        'd-flex justify-content-end',
+                                                      children: e.jsx(
+                                                        'button',
+                                                        {
+                                                          type: 'submit',
+                                                          className:
+                                                            'btn btn-warning',
+                                                          id: 'updatePasswordBtn',
+                                                          disabled: y,
+                                                          children: e.jsx(
+                                                            'span',
+                                                            {
+                                                              id: 'updatePasswordBtnText',
+                                                              children: y
+                                                                ? 'מעדכן...'
+                                                                : 'עדכן סיסמה',
+                                                            },
+                                                          ),
+                                                        },
+                                                      ),
+                                                    }),
+                                                  }),
+                                                ],
+                                              }),
+                                            }),
+                                          }),
+                                        ],
+                                      }),
+                                    }),
+                                  ],
+                                }),
+                                e.jsx('tt-section-row', {
+                                  children: e.jsx('div', {
+                                    className: 'col-12',
+                                    children: e.jsx('div', {
+                                      className:
+                                        'd-flex justify-content-end action-buttons-row',
+                                      children: e.jsx('button', {
+                                        type: 'button',
+                                        className: 'btn btn-primary btn-logout',
+                                        onClick: Ue,
+                                        children: 'התנתק',
+                                      }),
+                                    }),
+                                  }),
+                                }),
+                              ],
+                            }),
+                        ],
+                      }),
+                      e.jsxs('tt-section', {
+                        'data-section': 'section-3',
+                        children: [
+                          e.jsxs('div', {
+                            className: 'index-section__header',
+                            children: [
+                              e.jsxs('div', {
+                                className: 'index-section__header-title',
+                                children: [
+                                  e.jsx('img', {
+                                    src: '/images/icons/entities/trading_accounts.svg',
+                                    alt: 'מפתחות API',
+                                    className: 'index-section__header-icon',
+                                    width: '35',
+                                    height: '35',
+                                  }),
+                                  e.jsx('h2', {
+                                    className: 'index-section__header-text',
+                                    children: 'מפתחות API',
+                                  }),
+                                ],
+                              }),
+                              e.jsx('div', {
+                                className: 'index-section__header-meta',
+                                children: e.jsx('span', {
+                                  className: 'index-section__header-count',
+                                  children:
+                                    'ניהול מפתחות API לחיבורים חיצוניים',
+                                }),
+                              }),
+                              e.jsx('div', {
+                                className: 'index-section__header-actions',
+                                children: e.jsx('button', {
+                                  className:
+                                    'index-section__header-toggle-btn js-section-toggle',
+                                  'aria-label': 'הצג/הסתר',
+                                  onClick: () => g('section-3'),
+                                  'aria-expanded': H['section-3'],
+                                  children: e.jsx('svg', {
+                                    width: '20',
+                                    height: '20',
+                                    viewBox: '0 0 24 24',
+                                    fill: 'none',
+                                    stroke: 'currentColor',
+                                    strokeWidth: '2',
+                                    children: e.jsx('path', {
+                                      d: 'M6 9l6 6l6 -6',
+                                    }),
+                                  }),
+                                }),
+                              }),
+                            ],
+                          }),
+                          H['section-3'] &&
+                            e.jsx('div', {
+                              className: 'index-section__body',
+                              children: e.jsx('tt-section-row', {
+                                children: e.jsx('div', {
+                                  className: 'col-12',
+                                  children: e.jsx('div', {
+                                    className: 'card',
+                                    children: e.jsx('div', {
+                                      className: 'card-body',
+                                      children: e.jsx('form', {
+                                        id: 'aiAnalysisSettingsForm',
+                                        onSubmit: $,
+                                        children: e.jsxs('div', {
+                                          className: 'row g-3',
+                                          children: [
+                                            e.jsxs('div', {
+                                              className: 'col-md-6',
+                                              children: [
+                                                e.jsx('label', {
+                                                  className: 'form-label',
+                                                  htmlFor: 'aiDefaultProvider',
+                                                  children:
+                                                    'מנוע AI ברירת מחדל',
+                                                }),
+                                                e.jsxs('select', {
+                                                  id: 'aiDefaultProvider',
+                                                  className: 'form-select',
+                                                  required: !0,
+                                                  value: d.aiDefaultProvider,
+                                                  onChange: (N) =>
+                                                    h({
+                                                      ...d,
+                                                      aiDefaultProvider:
+                                                        N.target.value,
+                                                    }),
+                                                  children: [
+                                                    e.jsx('option', {
+                                                      value: 'gemini',
+                                                      children:
+                                                        'Gemini (מומלץ למתחילים)',
+                                                    }),
+                                                    e.jsx('option', {
+                                                      value: 'perplexity',
+                                                      children: 'Perplexity',
+                                                    }),
+                                                  ],
+                                                }),
+                                                e.jsx('small', {
+                                                  className:
+                                                    'form-text text-muted',
+                                                  children:
+                                                    'בחר מנוע AI שישמש כברירת מחדל לניתוחים',
+                                                }),
+                                                e.jsxs('div', {
+                                                  className: 'mt-3',
+                                                  children: [
+                                                    e.jsx('label', {
+                                                      className: 'form-label',
+                                                      htmlFor: 'geminiApiKey',
+                                                      children:
+                                                        'Gemini API Key',
+                                                    }),
+                                                    e.jsxs('div', {
+                                                      className: 'input-group',
+                                                      children: [
+                                                        e.jsx('input', {
+                                                          type: P
+                                                            ? 'text'
+                                                            : 'password',
+                                                          id: 'geminiApiKey',
+                                                          className:
+                                                            'form-control',
+                                                          placeholder:
+                                                            'הכנס Gemini API Key',
+                                                          value: d.geminiApiKey,
+                                                          onChange: (N) =>
+                                                            h({
+                                                              ...d,
+                                                              geminiApiKey:
+                                                                N.target.value,
+                                                            }),
+                                                        }),
+                                                        e.jsx('button', {
+                                                          className:
+                                                            'btn btn-outline-secondary',
+                                                          type: 'button',
+                                                          id: 'toggleGeminiKeyBtn',
+                                                          title:
+                                                            'הצג/הסתר מפתח',
+                                                          onClick: () => T(!P),
+                                                          children: e.jsx(
+                                                            'span',
+                                                            {
+                                                              id: 'toggleGeminiKeyIcon',
+                                                              children: P
+                                                                ? '👁️'
+                                                                : '👁️‍🗨️',
+                                                            },
+                                                          ),
+                                                        }),
+                                                      ],
+                                                    }),
+                                                    e.jsx('small', {
+                                                      className:
+                                                        'form-text text-muted',
+                                                      children:
+                                                        'המפתח יישמר מוצפן במסד הנתונים',
+                                                    }),
+                                                    e.jsxs('div', {
+                                                      className:
+                                                        'd-flex align-items-center gap-2 mt-2',
+                                                      children: [
+                                                        e.jsx('div', {
+                                                          id: 'geminiKeyStatus',
+                                                          className:
+                                                            'status-display flex-grow-1',
+                                                        }),
+                                                        e.jsx('button', {
+                                                          type: 'button',
+                                                          className:
+                                                            'btn btn-secondary btn-sm',
+                                                          id: 'validateGeminiBtn',
+                                                          children: e.jsx(
+                                                            'span',
+                                                            {
+                                                              id: 'validateGeminiBtnText',
+                                                              children: 'בדוק',
+                                                            },
+                                                          ),
+                                                        }),
+                                                      ],
+                                                    }),
+                                                  ],
+                                                }),
+                                                e.jsxs('div', {
+                                                  className: 'mt-3',
+                                                  children: [
+                                                    e.jsx('label', {
+                                                      className: 'form-label',
+                                                      htmlFor:
+                                                        'perplexityApiKey',
+                                                      children:
+                                                        'Perplexity API Key',
+                                                    }),
+                                                    e.jsxs('div', {
+                                                      className: 'input-group',
+                                                      children: [
+                                                        e.jsx('input', {
+                                                          type: D
+                                                            ? 'text'
+                                                            : 'password',
+                                                          id: 'perplexityApiKey',
+                                                          className:
+                                                            'form-control',
+                                                          placeholder:
+                                                            'הכנס Perplexity API Key',
+                                                          value:
+                                                            d.perplexityApiKey,
+                                                          onChange: (N) =>
+                                                            h({
+                                                              ...d,
+                                                              perplexityApiKey:
+                                                                N.target.value,
+                                                            }),
+                                                        }),
+                                                        e.jsx('button', {
+                                                          className:
+                                                            'btn btn-outline-secondary',
+                                                          type: 'button',
+                                                          id: 'togglePerplexityKeyBtn',
+                                                          title:
+                                                            'הצג/הסתר מפתח',
+                                                          onClick: () => X(!D),
+                                                          children: e.jsx(
+                                                            'span',
+                                                            {
+                                                              id: 'togglePerplexityKeyIcon',
+                                                              children: D
+                                                                ? '👁️'
+                                                                : '👁️‍🗨️',
+                                                            },
+                                                          ),
+                                                        }),
+                                                      ],
+                                                    }),
+                                                    e.jsx('small', {
+                                                      className:
+                                                        'form-text text-muted',
+                                                      children:
+                                                        'המפתח יישמר מוצפן במסד הנתונים',
+                                                    }),
+                                                    e.jsxs('div', {
+                                                      className:
+                                                        'd-flex align-items-center gap-2 mt-2',
+                                                      children: [
+                                                        e.jsx('div', {
+                                                          id: 'perplexityKeyStatus',
+                                                          className:
+                                                            'status-display flex-grow-1',
+                                                        }),
+                                                        e.jsx('button', {
+                                                          type: 'button',
+                                                          className:
+                                                            'btn btn-secondary btn-sm',
+                                                          id: 'validatePerplexityBtn',
+                                                          children: e.jsx(
+                                                            'span',
+                                                            {
+                                                              id: 'validatePerplexityBtnText',
+                                                              children: 'בדוק',
+                                                            },
+                                                          ),
+                                                        }),
+                                                      ],
+                                                    }),
+                                                  ],
+                                                }),
+                                              ],
+                                            }),
+                                            e.jsxs('div', {
+                                              className: 'col-md-6',
+                                              children: [
+                                                e.jsx('label', {
+                                                  className: 'form-label',
+                                                  children:
+                                                    'איפה להשיג מפתח API?',
+                                                }),
+                                                e.jsxs('div', {
+                                                  className:
+                                                    'alert alert-info mb-0',
+                                                  children: [
+                                                    e.jsxs('div', {
+                                                      className: 'mb-2',
+                                                      children: [
+                                                        e.jsx('strong', {
+                                                          children: 'Gemini:',
+                                                        }),
+                                                        e.jsx('br', {}),
+                                                        e.jsxs('small', {
+                                                          children: [
+                                                            '1. עבור ל-',
+                                                            e.jsx('a', {
+                                                              href: 'https://aistudio.google.com/',
+                                                              target: '_blank',
+                                                              className:
+                                                                'alert-link',
+                                                              rel: 'noopener noreferrer',
+                                                              children:
+                                                                'Google AI Studio',
+                                                            }),
+                                                            e.jsx('br', {}),
+                                                            '2. לחץ על "Get API Key"',
+                                                            e.jsx('br', {}),
+                                                            '3. העתק את המפתח',
+                                                          ],
+                                                        }),
+                                                      ],
+                                                    }),
+                                                    e.jsxs('div', {
+                                                      children: [
+                                                        e.jsx('strong', {
+                                                          children:
+                                                            'Perplexity:',
+                                                        }),
+                                                        e.jsx('br', {}),
+                                                        e.jsxs('small', {
+                                                          children: [
+                                                            '1. עבור ל-',
+                                                            e.jsx('a', {
+                                                              href: 'https://www.perplexity.ai/api',
+                                                              target: '_blank',
+                                                              className:
+                                                                'alert-link',
+                                                              rel: 'noopener noreferrer',
+                                                              children:
+                                                                'Perplexity API',
+                                                            }),
+                                                            e.jsx('br', {}),
+                                                            '2. התחבר או צור חשבון',
+                                                            e.jsx('br', {}),
+                                                            '3. עבור ל-"API Keys"',
+                                                            e.jsx('br', {}),
+                                                            '4. לחץ על "Create API Key"',
+                                                            e.jsx('br', {}),
+                                                            '5. העתק את המפתח',
+                                                          ],
+                                                        }),
+                                                      ],
+                                                    }),
+                                                  ],
+                                                }),
+                                              ],
+                                            }),
+                                            e.jsx('div', {
+                                              className: 'col-12',
+                                              children: e.jsx('div', {
+                                                className:
+                                                  'd-flex justify-content-end',
+                                                children: e.jsx('button', {
+                                                  type: 'submit',
+                                                  className: 'btn btn-success',
+                                                  id: 'saveAiAnalysisBtn',
+                                                  disabled: u,
+                                                  children: e.jsx('span', {
+                                                    id: 'saveAiAnalysisBtnText',
+                                                    children: u
+                                                      ? 'שומר...'
+                                                      : 'שמור הגדרות',
+                                                  }),
+                                                }),
+                                              }),
+                                            }),
+                                          ],
+                                        }),
+                                      }),
+                                    }),
+                                  }),
+                                }),
+                              }),
+                            }),
+                        ],
+                      }),
+                    ],
+                  }),
+                }),
+              }),
+            }),
+            e.jsx(Y, {}),
+          ],
+        });
+  },
+  bs = () => {
+    const t = [
+        {
+          className: '.phx-rt--success',
+          description: 'טקסט הצלחה (ירוק)',
+          usage: 'Success messages, positive feedback',
+          cssVariable: '--message-success',
+          color: '#10b981',
+          example: e.jsx('span', {
+            className: 'phx-rt--success',
+            children: 'דוגמה לטקסט הצלחה',
+          }),
+        },
+        {
+          className: '.phx-rt--warning',
+          description: 'טקסט אזהרה (כתום)',
+          usage: 'Warning messages, caution notices',
+          cssVariable: '--message-warning',
+          color: '#f59e0b',
+          example: e.jsx('span', {
+            className: 'phx-rt--warning',
+            children: 'דוגמה לטקסט אזהרה',
+          }),
+        },
+        {
+          className: '.phx-rt--danger',
+          description: 'טקסט סכנה (אדום)',
+          usage: 'Error messages, critical alerts',
+          cssVariable: '--message-error',
+          color: '#ef4444',
+          example: e.jsx('span', {
+            className: 'phx-rt--danger',
+            children: 'דוגמה לטקסט סכנה',
+          }),
+        },
+        {
+          className: '.phx-rt--highlight',
+          description: 'הדגשה צבעונית',
+          usage: 'Important highlights, emphasis',
+          cssVariable: '--color-secondary',
+          color: '#fc5a06',
+          example: e.jsx('span', {
+            className: 'phx-rt--highlight',
+            children: 'דוגמה להדגשה',
+          }),
+        },
+      ],
+      s = [
+        {
+          value: 'pending',
+          label: 'ממתין',
+          cssVar: '--status-pending',
+          example: e.jsx('span', {
+            className:
+              'phoenix-table__status-badge phoenix-table__status-badge--pending',
+            'data-status-category': 'pending',
+            children: 'ממתין',
+          }),
+        },
+        {
+          value: 'active',
+          label: 'פתוח',
+          cssVar: '--status-active',
+          example: e.jsx('span', {
+            className:
+              'phoenix-table__status-badge phoenix-table__status-badge--active',
+            'data-status-category': 'active',
+            children: 'פתוח',
+          }),
+        },
+        {
+          value: 'inactive',
+          label: 'סגור',
+          cssVar: '--status-inactive',
+          example: e.jsx('span', {
+            className:
+              'phoenix-table__status-badge phoenix-table__status-badge--inactive',
+            'data-status-category': 'inactive',
+            children: 'סגור',
+          }),
+        },
+        {
+          value: 'cancelled',
+          label: 'מבוטל',
+          cssVar: '--status-cancelled',
+          example: e.jsx('span', {
+            className:
+              'phoenix-table__status-badge phoenix-table__status-badge--cancelled',
+            'data-status-category': 'cancelled',
+            children: 'מבוטל',
+          }),
+        },
+      ],
+      r = [
+        {
+          className: '.btn-primary',
+          description: 'פעולה ראשית',
+          usage: 'שמירה, אישור, שליחה',
+          cssVariable: '--context-primary',
+          color: '#475569',
+          example: e.jsx('button', {
+            className: 'btn btn-primary',
+            children: 'שמירה',
+          }),
+        },
+        {
+          className: '.btn-auth-primary',
+          description: 'כפתור ראשי בעמודי Auth',
+          usage: 'התחבר, הרשם',
+          cssVariable: '--color-primary',
+          color: '#26baac',
+          example: e.jsx('button', {
+            className: 'btn btn-auth-primary',
+            children: 'התחבר',
+          }),
+        },
+        {
+          className: '.btn-success',
+          description: 'פעולות הצלחה',
+          usage: 'אישור, שמירה מוצלחת',
+          cssVariable: '--message-success',
+          color: '#10b981',
+          example: e.jsx('button', {
+            className: 'btn btn-success',
+            children: 'אישור',
+          }),
+        },
+        {
+          className: '.btn-warning',
+          description: 'פעולות אזהרה',
+          usage: 'מחיקה, ביטול פעולה',
+          cssVariable: '--message-warning',
+          color: '#f59e0b',
+          example: e.jsx('button', {
+            className: 'btn btn-warning',
+            children: 'לבטל',
+          }),
+        },
+        {
+          className: '.btn-secondary',
+          description: 'פעולות משניות',
+          usage: 'לבטל, חזרה',
+          cssVariable: '--color-secondary',
+          color: '#fc5a06',
+          example: e.jsx('button', {
+            className: 'btn btn-secondary',
+            children: 'לבטל',
+          }),
+        },
+        {
+          className: '.btn-outline-secondary',
+          description: 'כפתור ברירת מחדל (הפוך)',
+          usage: 'כפתור ברירת מחדל',
+          cssVariable: '--color-primary',
+          color: '#26baac',
+          example: e.jsx('button', {
+            className: 'btn btn-outline-secondary',
+            children: 'ברירת מחדל',
+          }),
+        },
+        {
+          className: '.btn-logout',
+          description: 'התנתקות',
+          usage: 'התנתקות מהמערכת',
+          cssVariable: '--color-error-red',
+          color: '#ef4444',
+          example: e.jsx('button', {
+            className: 'btn btn-logout',
+            children: 'התנתק',
+          }),
+        },
+        {
+          className: '.btn-sm',
+          description: 'כפתור קטן',
+          usage: 'כפתורים קטנים במיקומים צפופים',
+          cssVariable: 'N/A',
+          color: 'N/A',
+          example: e.jsx('button', {
+            className: 'btn btn-primary btn-sm',
+            children: 'קטן',
+          }),
+        },
+      ];
+    return e.jsxs('div', {
+      className: 'design-system-styles',
+      children: [
+        e.jsxs('div', {
+          className: 'design-system-section',
+          children: [
+            e.jsx('h2', {
+              className: 'design-system-section__title',
+              children: 'סטטוסים קבועים (Status Badges)',
+            }),
+            e.jsxs('p', {
+              className: 'design-system-section__description',
+              children: [
+                'ארבעת הסטטוסים המערכתיים (TT2_SYSTEM_STATUS_VALUES_SSOT). צבעים מ־',
+                e.jsx('code', { children: 'phoenix-base.css' }),
+                ' (',
+                e.jsx('code', { children: '--status-*' }),
+                '). שימוש:',
+                ' ',
+                e.jsx('code', {
+                  children:
+                    '.phoenix-table__status-badge--pending|active|inactive|cancelled',
+                }),
+                ' ',
+                'או ',
+                e.jsx('code', { children: 'data-status-category' }),
+                '.',
+              ],
+            }),
+            e.jsx('div', {
+              className: 'phoenix-table-wrapper',
+              children: e.jsxs('table', {
+                className: 'phoenix-table',
+                children: [
+                  e.jsx('thead', {
+                    className: 'phoenix-table__head',
+                    children: e.jsxs('tr', {
+                      className: 'phoenix-table__row',
+                      children: [
+                        e.jsx('th', {
+                          className: 'phoenix-table__header',
+                          children: 'ערך קנוני',
+                        }),
+                        e.jsx('th', {
+                          className: 'phoenix-table__header',
+                          children: 'תצוגה עברית',
+                        }),
+                        e.jsx('th', {
+                          className: 'phoenix-table__header',
+                          children: 'משתנה צבע',
+                        }),
+                        e.jsx('th', {
+                          className: 'phoenix-table__header',
+                          children: 'דוגמה',
+                        }),
+                      ],
+                    }),
+                  }),
+                  e.jsx('tbody', {
+                    className: 'phoenix-table__body',
+                    children: s.map((a, n) =>
+                      e.jsxs(
+                        'tr',
+                        {
+                          className: 'phoenix-table__row',
+                          children: [
+                            e.jsx('td', {
+                              className: 'phoenix-table__cell',
+                              children: e.jsx('code', { children: a.value }),
+                            }),
+                            e.jsx('td', {
+                              className: 'phoenix-table__cell',
+                              children: a.label,
+                            }),
+                            e.jsx('td', {
+                              className: 'phoenix-table__cell',
+                              children: e.jsx('code', { children: a.cssVar }),
+                            }),
+                            e.jsx('td', {
+                              className: 'phoenix-table__cell',
+                              children: a.example,
+                            }),
+                          ],
+                        },
+                        n,
+                      ),
+                    ),
+                  }),
+                ],
+              }),
+            }),
+          ],
+        }),
+        e.jsxs('div', {
+          className: 'design-system-section',
+          children: [
+            e.jsx('h2', {
+              className: 'design-system-section__title',
+              children: 'Rich-Text Styles',
+            }),
+            e.jsxs('p', {
+              className: 'design-system-section__description',
+              children: [
+                'מחלקות CSS לסגנון טקסט ב-Rich-Text Editor (TipTap). רק מחלקות המתחילות ב-',
+                e.jsx('code', { children: 'phx-rt--' }),
+                ' מאושרות.',
+              ],
+            }),
+            e.jsx('div', {
+              className: 'phoenix-table-wrapper',
+              children: e.jsxs('table', {
+                className: 'phoenix-table',
+                children: [
+                  e.jsx('thead', {
+                    className: 'phoenix-table__head',
+                    children: e.jsxs('tr', {
+                      className: 'phoenix-table__row',
+                      children: [
+                        e.jsx('th', {
+                          className: 'phoenix-table__header',
+                          children: 'מחלקה',
+                        }),
+                        e.jsx('th', {
+                          className: 'phoenix-table__header',
+                          children: 'תיאור',
+                        }),
+                        e.jsx('th', {
+                          className: 'phoenix-table__header',
+                          children: 'שימוש',
+                        }),
+                        e.jsx('th', {
+                          className: 'phoenix-table__header',
+                          children: 'CSS Variable',
+                        }),
+                        e.jsx('th', {
+                          className: 'phoenix-table__header',
+                          children: 'דוגמה',
+                        }),
+                      ],
+                    }),
+                  }),
+                  e.jsx('tbody', {
+                    className: 'phoenix-table__body',
+                    children: t.map((a, n) =>
+                      e.jsxs(
+                        'tr',
+                        {
+                          className: 'phoenix-table__row',
+                          children: [
+                            e.jsx('td', {
+                              className: 'phoenix-table__cell',
+                              children: e.jsx('code', {
+                                children: a.className,
+                              }),
+                            }),
+                            e.jsx('td', {
+                              className: 'phoenix-table__cell',
+                              children: a.description,
+                            }),
+                            e.jsx('td', {
+                              className: 'phoenix-table__cell',
+                              children: a.usage,
+                            }),
+                            e.jsx('td', {
+                              className: 'phoenix-table__cell',
+                              children: e.jsx('code', {
+                                children: a.cssVariable,
+                              }),
+                            }),
+                            e.jsx('td', {
+                              className: 'phoenix-table__cell',
+                              children: a.example,
+                            }),
+                          ],
+                        },
+                        n,
+                      ),
+                    ),
+                  }),
+                ],
+              }),
+            }),
+          ],
+        }),
+        e.jsxs('div', {
+          className: 'design-system-section',
+          children: [
+            e.jsx('h2', {
+              className: 'design-system-section__title',
+              children: 'Button Styles',
+            }),
+            e.jsxs('p', {
+              className: 'design-system-section__description',
+              children: [
+                'מחלקות CSS לכפתורים במערכת. כל הכפתורים משתמשים במחלקה הבסיסית',
+                ' ',
+                e.jsx('code', { children: '.btn' }),
+                '.',
+              ],
+            }),
+            e.jsx('div', {
+              className: 'phoenix-table-wrapper',
+              children: e.jsxs('table', {
+                className: 'phoenix-table',
+                children: [
+                  e.jsx('thead', {
+                    className: 'phoenix-table__head',
+                    children: e.jsxs('tr', {
+                      className: 'phoenix-table__row',
+                      children: [
+                        e.jsx('th', {
+                          className: 'phoenix-table__header',
+                          children: 'מחלקה',
+                        }),
+                        e.jsx('th', {
+                          className: 'phoenix-table__header',
+                          children: 'תיאור',
+                        }),
+                        e.jsx('th', {
+                          className: 'phoenix-table__header',
+                          children: 'שימוש',
+                        }),
+                        e.jsx('th', {
+                          className: 'phoenix-table__header',
+                          children: 'CSS Variable',
+                        }),
+                        e.jsx('th', {
+                          className: 'phoenix-table__header',
+                          children: 'דוגמה',
+                        }),
+                      ],
+                    }),
+                  }),
+                  e.jsx('tbody', {
+                    className: 'phoenix-table__body',
+                    children: r.map((a, n) =>
+                      e.jsxs(
+                        'tr',
+                        {
+                          className: 'phoenix-table__row',
+                          children: [
+                            e.jsx('td', {
+                              className: 'phoenix-table__cell',
+                              children: e.jsx('code', {
+                                children: a.className,
+                              }),
+                            }),
+                            e.jsx('td', {
+                              className: 'phoenix-table__cell',
+                              children: a.description,
+                            }),
+                            e.jsx('td', {
+                              className: 'phoenix-table__cell',
+                              children: a.usage,
+                            }),
+                            e.jsx('td', {
+                              className: 'phoenix-table__cell',
+                              children:
+                                a.cssVariable !== 'N/A'
+                                  ? e.jsx('code', { children: a.cssVariable })
+                                  : '—',
+                            }),
+                            e.jsx('td', {
+                              className: 'phoenix-table__cell',
+                              children: a.example,
+                            }),
+                          ],
+                        },
+                        n,
+                      ),
+                    ),
+                  }),
+                ],
+              }),
+            }),
+          ],
+        }),
+      ],
+    });
+  },
+  ys = [
+    {
+      title: '1. Brand Colors (6 משתנים)',
+      rows: [
+        {
+          label: 'Primary',
+          vars: [
+            '--color-primary-light',
+            '--color-primary',
+            '--color-primary-dark',
+          ],
+        },
+        {
+          label: 'Secondary',
+          vars: [
+            '--color-secondary-light',
+            '--color-secondary',
+            '--color-secondary-dark',
+          ],
+        },
+      ],
+    },
+    {
+      title: '2. Entity Colors (27 משתנים)',
+      rows: [
+        {
+          label: 'trade',
+          vars: [
+            '--entity-trade-light',
+            '--entity-trade',
+            '--entity-trade-dark',
+          ],
+        },
+        {
+          label: 'trade_plan',
+          vars: [
+            '--entity-trade_plan-light',
+            '--entity-trade_plan',
+            '--entity-trade_plan-dark',
+          ],
+        },
+        {
+          label: 'execution',
+          vars: [
+            '--entity-execution-light',
+            '--entity-execution',
+            '--entity-execution-dark',
+          ],
+        },
+        {
+          label: 'trading_account',
+          vars: [
+            '--entity-trading_account-light',
+            '--entity-trading_account',
+            '--entity-trading_account-dark',
+          ],
+        },
+        {
+          label: 'cash_flow',
+          vars: [
+            '--entity-cash_flow-light',
+            '--entity-cash_flow',
+            '--entity-cash_flow-dark',
+          ],
+        },
+        {
+          label: 'ticker',
+          vars: [
+            '--entity-ticker-light',
+            '--entity-ticker',
+            '--entity-ticker-dark',
+          ],
+        },
+        {
+          label: 'alert',
+          vars: [
+            '--entity-alert-light',
+            '--entity-alert',
+            '--entity-alert-dark',
+          ],
+        },
+        {
+          label: 'note',
+          vars: ['--entity-note-light', '--entity-note', '--entity-note-dark'],
+        },
+        {
+          label: 'research',
+          vars: [
+            '--entity-research-light',
+            '--entity-research',
+            '--entity-research-dark',
+          ],
+        },
+      ],
+    },
+    {
+      title: '3. Message & Status (12 משתנים)',
+      rows: [
+        {
+          label: 'info',
+          vars: [
+            '--message-info-light',
+            '--message-info',
+            '--message-info-dark',
+          ],
+        },
+        {
+          label: 'warning',
+          vars: [
+            '--message-warning-light',
+            '--message-warning',
+            '--message-warning-dark',
+          ],
+        },
+        {
+          label: 'error',
+          vars: [
+            '--message-error-light',
+            '--message-error',
+            '--message-error-dark',
+          ],
+        },
+        {
+          label: 'success',
+          vars: [
+            '--message-success-light',
+            '--message-success',
+            '--message-success-dark',
+          ],
+        },
+      ],
+    },
+    {
+      title: '3.1 סטטוסים קבועים — System Status (12 משתנים)',
+      rows: [
+        {
+          label: 'pending (ממתין)',
+          vars: [
+            '--status-pending-light',
+            '--status-pending',
+            '--status-pending-dark',
+          ],
+        },
+        {
+          label: 'active (פתוח)',
+          vars: [
+            '--status-active-light',
+            '--status-active',
+            '--status-active-dark',
+          ],
+        },
+        {
+          label: 'inactive (סגור)',
+          vars: [
+            '--status-inactive-light',
+            '--status-inactive',
+            '--status-inactive-dark',
+          ],
+        },
+        {
+          label: 'cancelled (מבוטל)',
+          vars: [
+            '--status-cancelled-light',
+            '--status-cancelled',
+            '--status-cancelled-dark',
+          ],
+        },
+      ],
+    },
+    {
+      title: '4. Investment Types (3 משתנים)',
+      rows: [
+        { label: 'trade', vars: ['--investment-trade-color'] },
+        { label: 'investment', vars: ['--investment-investment-color'] },
+        { label: 'passive', vars: ['--investment-passive-color'] },
+      ],
+    },
+    {
+      title: '5. Numeric Values (9 משתנים)',
+      rows: [
+        {
+          label: 'positive',
+          vars: [
+            '--numeric-positive-light',
+            '--numeric-positive',
+            '--numeric-positive-dark',
+          ],
+        },
+        {
+          label: 'negative',
+          vars: [
+            '--numeric-negative-light',
+            '--numeric-negative',
+            '--numeric-negative-dark',
+          ],
+        },
+        {
+          label: 'zero',
+          vars: [
+            '--numeric-zero-light',
+            '--numeric-zero',
+            '--numeric-zero-dark',
+          ],
+        },
+      ],
+    },
+    {
+      title: '6. Base & Border (6 משתנים)',
+      rows: [
+        {
+          label: 'background',
+          vars: ['--color-background', '--color-background-secondary'],
+        },
+        { label: 'text', vars: ['--color-text', '--color-text-secondary'] },
+        { label: 'border', vars: ['--color-border', '--color-border-light'] },
+      ],
+    },
+  ],
+  vs = ({ label: t, vars: s }) =>
+    e.jsxs('tr', {
+      className: 'phoenix-table__row',
+      children: [
+        e.jsx('td', {
+          className: 'phoenix-table__cell',
+          children: e.jsx('code', { children: t }),
+        }),
+        e.jsx('td', {
+          className: 'phoenix-table__cell',
+          children: e.jsx('div', {
+            className: 'design-system-colors-swatches',
+            children: s.map((r) =>
+              e.jsxs(
+                'div',
+                {
+                  className: 'design-system-color-item',
+                  children: [
+                    e.jsx('div', {
+                      className: 'design-system-color-swatch',
+                      style: { background: `var(${r})` },
+                      title: r,
+                    }),
+                    e.jsx('code', {
+                      className: 'design-system-color-var',
+                      children: r,
+                    }),
+                  ],
+                },
+                r,
+              ),
+            ),
+          }),
+        }),
+      ],
+    }),
+  As = () =>
+    e.jsxs('div', {
+      className: 'design-system-section',
+      children: [
+        e.jsx('h2', {
+          className: 'design-system-section__title',
+          children: 'משתני צבע DNA',
+        }),
+        e.jsxs('p', {
+          className: 'design-system-section__description',
+          children: [
+            'משתני הצבע מ־',
+            e.jsx('code', { children: 'phoenix-base.css' }),
+            ' (כולל סטטוסים קבועים). הצבעים מקושרים למשתנים — ללא inline.',
+          ],
+        }),
+        e.jsx('div', {
+          className: 'phoenix-table-wrapper',
+          children: e.jsxs('table', {
+            className: 'phoenix-table',
+            children: [
+              e.jsx('thead', {
+                className: 'phoenix-table__head',
+                children: e.jsxs('tr', {
+                  className: 'phoenix-table__row',
+                  children: [
+                    e.jsx('th', {
+                      className: 'phoenix-table__header',
+                      children: 'קטגוריה/שם',
+                    }),
+                    e.jsx('th', {
+                      className: 'phoenix-table__header',
+                      children: 'משתנה + Swatch',
+                    }),
+                  ],
+                }),
+              }),
+              e.jsx('tbody', {
+                className: 'phoenix-table__body',
+                children: ys.map((t) =>
+                  e.jsxs(
+                    Ae.Fragment,
+                    {
+                      children: [
+                        e.jsx('tr', {
+                          className:
+                            'phoenix-table__row design-system-category-header',
+                          children: e.jsx('td', {
+                            colSpan: 2,
+                            className: 'phoenix-table__cell',
+                            children: e.jsx('strong', { children: t.title }),
+                          }),
+                        }),
+                        t.rows.map((s) =>
+                          e.jsx(vs, { label: s.label, vars: s.vars }, s.label),
+                        ),
+                      ],
+                    },
+                    t.title,
+                  ),
+                ),
+              }),
+            ],
+          }),
+        }),
+      ],
+    }),
+  Ps = () => (
+    x('Admin', 'DesignSystemDashboard: Component mounted'),
+    e.jsx('div', {
+      className: 'page-wrapper admin-dashboard-placeholder',
+      children: e.jsx('div', {
+        className: 'page-container',
+        children: e.jsx('main', {
+          children: e.jsx('tt-container', {
+            children: e.jsxs('tt-section', {
+              children: [
+                e.jsx('div', {
+                  className: 'index-section__header',
+                  children: e.jsx('div', {
+                    className: 'index-section__header-title',
+                    children: e.jsx('h1', {
+                      className: 'index-section__header-text',
+                      children: 'Design System Dashboard',
+                    }),
+                  }),
+                }),
+                e.jsxs('div', {
+                  className: 'index-section__body',
+                  children: [e.jsx(As, {}), e.jsx(bs, {})],
+                }),
+              ],
+            }),
+          }),
+        }),
+      }),
+    })
+  ),
+  Ss = () =>
+    e.jsx(De, {
+      children: e.jsxs(Be, {
+        children: [
+          e.jsx(J, { path: '/login', element: e.jsx(fs, {}) }),
+          e.jsx(J, { path: '/register', element: e.jsx(xs, {}) }),
+          e.jsx(J, { path: '/reset-password', element: e.jsx(_s, {}) }),
+          e.jsx(J, { path: '/', element: e.jsx(ds, {}) }),
+          e.jsx(J, {
+            path: '/profile',
+            element: e.jsx(ye, { children: e.jsx(Ns, {}) }),
+          }),
+          e.jsx(J, {
+            path: '/admin/design-system',
+            element: e.jsx(ye, {
+              requireAuth: !0,
+              requireAdmin: !0,
+              children: e.jsx(Ps, {}),
+            }),
+          }),
+          e.jsx(J, { path: '*', element: e.jsx(ie, { to: '/', replace: !0 }) }),
+        ],
+      }),
+    }),
+  ks = _.createContext(null),
+  Es = ({ children: t }) => {
+    const [s, r] = _.useState({
+        status: null,
+        investmentType: null,
+        tradingAccount: null,
+        dateRange: { from: null, to: null },
+        search: '',
+      }),
+      a = _.useCallback((l, c) => {
+        r((d) => {
+          const h = { ...d, [l]: c };
+          return (
+            typeof window < 'u' &&
+              window.PhoenixBridge &&
+              window.PhoenixBridge.setFilter &&
+              window.PhoenixBridge.setFilter(l, c),
+            se &&
+              m.log('Filters', `Filter changed: ${l}`, {
+                key: l,
+                value: c,
+                previousValue: d[l],
+                allFilters: h,
+              }),
+            h
+          );
+        });
+      }, []),
+      n = _.useCallback(() => {
+        const l = {
+          status: null,
+          investmentType: null,
+          tradingAccount: null,
+          dateRange: { from: null, to: null },
+          search: '',
+        };
+        (r(l),
+          typeof window < 'u' &&
+            window.PhoenixBridge &&
+            window.PhoenixBridge.clearFilters &&
+            window.PhoenixBridge.clearFilters(),
+          se &&
+            m.log('Filters', 'All filters cleared', {
+              previousFilters: s,
+              newFilters: l,
+            }));
+      }, [s]),
+      i = _.useCallback(() => s, [s]);
+    (_.useEffect(() => {
+      if (typeof window < 'u' && window.PhoenixBridge) {
+        const l = (c) => {
+          if (c.detail && c.detail.filters) {
+            const d = c.detail.filters;
+            r((h) => {
+              const p = { ...h, ...d };
+              return (
+                se &&
+                  m.log('Filters', 'Filters updated from Bridge', {
+                    bridgeFilters: d,
+                    previousFilters: h,
+                    newFilters: p,
+                  }),
+                p
+              );
+            });
+          }
+        };
+        if (
+          (window.addEventListener('phoenix-filter-change', l),
+          window.PhoenixBridge.state && window.PhoenixBridge.state.filters)
+        ) {
+          const c = window.PhoenixBridge.state.filters;
+          r((d) => ({ ...d, ...c }));
+        }
+        return () => {
+          window.removeEventListener('phoenix-filter-change', l);
+        };
+      }
+    }, []),
+      _.useEffect(() => {
+        typeof window < 'u' &&
+          window.PhoenixBridge &&
+          window.PhoenixBridge.setFilter &&
+          window.PhoenixBridge.state &&
+          (window.PhoenixBridge.state.filters = {
+            ...window.PhoenixBridge.state.filters,
+            ...s,
+          });
+      }, [s]));
+    const o = { filters: s, setFilter: a, clearFilters: n, getFilters: i };
+    return e.jsx(ks.Provider, { value: o, children: t });
+  };
+(async () => {
+  try {
+    const [{ default: t }, { default: s }] = await Promise.all([
+      we(() => Promise.resolve().then(() => as), void 0),
+      we(() => Promise.resolve().then(() => ns), void 0),
+    ]);
+    (await t.init(),
+      (t.on401 = () => s.handle401Logout()),
+      s.checkTokenExpiryOnBoot(),
+      s.isAuthenticated() && s.startProactiveRefreshScheduler());
+  } catch {}
+})();
+try {
+  window.__reactMountStart = window.__reactMountStart || Date.now();
+} catch {}
+const Ts = ue.createRoot(document.getElementById('root'));
+Ts.render(
+  e.jsx(Ae.StrictMode, { children: e.jsx(Es, { children: e.jsx(Ss, {}) }) }),
+);
+//# sourceMappingURL=index-DVuzUdde.js.map

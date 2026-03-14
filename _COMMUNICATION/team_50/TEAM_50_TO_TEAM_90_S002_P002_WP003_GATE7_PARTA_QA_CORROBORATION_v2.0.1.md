@@ -30,7 +30,7 @@ No contradiction.
 | Item | Value |
 |------|-------|
 | Evidence run | 4 consecutive EOD cycles (`run_g7_part_a_evidence.py`) |
-| Log path | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_2026-03-11_212850.log` |
+| Log path | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_2026-03-11_212850.log` |
 | report_date_utc | 2026-03-11T21:28:50Z |
 | cc_04_yahoo_429_count | 3 |
 | pass_01 | false (not evidenced) |
@@ -44,8 +44,8 @@ No contradiction.
 | Artifact | Path |
 |----------|------|
 | Team 60 Report v2.0.1 | `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_90_S002_P002_WP003_GATE7_PARTA_RUNTIME_EVIDENCE_REPORT_v2.0.1.md` |
-| G7 Part A evidence JSON | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
-| Captured log | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_2026-03-11_212850.log` |
+| G7 Part A evidence JSON | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
+| Captured log | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_2026-03-11_212850.log` |
 
 ---
 

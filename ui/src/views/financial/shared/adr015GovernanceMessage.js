@@ -20,6 +20,6 @@ export function getGovernanceMessageData() {
   return {
     body: MESSAGE_BODY,
     linkHref: PRIMARY_ADMIN_CONTACT,
-    linkText: 'צור קשר'
+    linkText: 'צור קשר',
   };
 }

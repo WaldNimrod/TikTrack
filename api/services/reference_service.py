@@ -53,13 +53,15 @@ def _load_defaults() -> List[BrokerReferenceItem]:
         for item in raw:
             df = [DefaultFeeItem(**x) for x in item.get("default_fees", [])]
             dname = item.get("display_name", item["value"])
-            items.append(BrokerReferenceItem(
-                value=item["value"],
-                display_name=dname,
-                label=dname,
-                is_supported=item.get("is_supported", True),
-                default_fees=df,
-            ))
+            items.append(
+                BrokerReferenceItem(
+                    value=item["value"],
+                    display_name=dname,
+                    label=dname,
+                    is_supported=item.get("is_supported", True),
+                    default_fees=df,
+                )
+            )
         return items
     except Exception as e:
         logger.error(f"Failed to load defaults_brokers.json: {e}")
@@ -69,7 +71,7 @@ def _load_defaults() -> List[BrokerReferenceItem]:
 async def get_reference_brokers(user_id: uuid.UUID, db: AsyncSession) -> List[BrokerReferenceItem]:
     """
     Get broker list for D16 (select broker when creating account).
-    
+
     ADR-015:
     - Primary: distinct broker from user_data.trading_accounts (user's accounts)
     - Fallback/enrichment: defaults_brokers.json (display_name, is_supported, default_fees)
@@ -81,11 +83,13 @@ async def get_reference_brokers(user_id: uuid.UUID, db: AsyncSession) -> List[Br
     # User's brokers from trading_accounts (broker field)
     stmt = (
         select(TradingAccount.broker)
-        .where(and_(
-            TradingAccount.user_id == user_id,
-            TradingAccount.deleted_at.is_(None),
-            TradingAccount.broker.isnot(None),
-        ))
+        .where(
+            and_(
+                TradingAccount.user_id == user_id,
+                TradingAccount.deleted_at.is_(None),
+                TradingAccount.broker.isnot(None),
+            )
+        )
         .distinct()
     )
     result = await db.execute(stmt)
@@ -103,13 +107,15 @@ async def get_reference_brokers(user_id: uuid.UUID, db: AsyncSession) -> List[Br
             continue  # already in defaults
         if n_lower in ("other", "אחר"):
             continue  # "other" always from defaults - prevent duplicate "אחר"
-        custom_items.append(BrokerReferenceItem(
-            value=n,
-            display_name=n,
-            label=n,
-            is_supported=False,
-            default_fees=[],
-        ))
+        custom_items.append(
+            BrokerReferenceItem(
+                value=n,
+                display_name=n,
+                label=n,
+                is_supported=False,
+                default_fees=[],
+            )
+        )
 
     # Build final list: known brokers from defaults (excluding "other") + custom + "other"
     others = [it for it in defaults if it.value.lower() == "other"]

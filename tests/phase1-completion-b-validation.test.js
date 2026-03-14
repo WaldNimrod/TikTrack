@@ -8,7 +8,7 @@
  * 2. API CRUD: Brokers Fees and Cash Flows — Create, Read, Update, Delete
  * 3. Trading Accounts: read-only (no POST/PUT/DELETE in API) — display only
  *
- * Output: documentation/05-REPORTS/artifacts_SESSION_01/phase1-completion-b-validation-results.json
+ * Output: documentation/reports/05-REPORTS/artifacts_SESSION_01/phase1-completion-b-validation-results.json
  */
 
 import fs from 'fs';
@@ -272,7 +272,7 @@ async function run() {
 }
 
 function saveResults() {
-  const outDir = path.join(__dirname, '..', 'documentation', '05-REPORTS', 'artifacts_SESSION_01');
+  const outDir = path.join(__dirname, '..', 'documentation', 'reports', '05-REPORTS', 'artifacts_SESSION_01');
   if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
   const outPath = path.join(outDir, 'phase1-completion-b-validation-results.json');
   fs.writeFileSync(outPath, JSON.stringify(results, null, 2));

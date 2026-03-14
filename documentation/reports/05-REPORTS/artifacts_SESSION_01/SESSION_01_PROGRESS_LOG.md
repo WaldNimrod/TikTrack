@@ -77,10 +77,10 @@
 **Review Status:** ✅ **APPROVED** (with minor recommendations)
 
 **Files:**
-- `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_10_REVIEW_TEAM_20_PHASE_1.1_1.2.md` (Initial Review)
-- `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_10_PHASE_1_COMPLETE_REVIEW.md` (Phase 1 Complete Review)
-- `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_20_TASK_20.1.*_EVIDENCE.md` (8 files)
-- `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_20_PHASE_1_PRE_QA_COMPLETION.md` (Completion Report)
+- `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_10_REVIEW_TEAM_20_PHASE_1.1_1.2.md` (Initial Review)
+- `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_10_PHASE_1_COMPLETE_REVIEW.md` (Phase 1 Complete Review)
+- `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_20_TASK_20.1.*_EVIDENCE.md` (8 files)
+- `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_20_PHASE_1_PRE_QA_COMPLETION.md` (Completion Report)
 
 ---
 
@@ -93,7 +93,7 @@
 - ✅ Task 40.1.2: Auth Components Styles
 
 **Files:**
-- `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_40_TASK_40.1.1_EVIDENCE.md`
+- `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_40_TASK_40.1.1_EVIDENCE.md`
 
 ---
 
@@ -106,8 +106,8 @@
 - ✅ Task 50.1.2: Sanity Checklist Creation
 
 **Files:**
-- `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_TASK_50.1.1_EVIDENCE.md`
-- `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_TASK_50.1.2_EVIDENCE.md`
+- `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_50_TASK_50.1.1_EVIDENCE.md`
+- `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_50_TASK_50.1.2_EVIDENCE.md`
 
 ---
 
@@ -130,9 +130,9 @@
 - ✅ Team 20 response approved
 
 **Files:**
-- `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_QA_FEEDBACK_VERIFICATION.md`
-- `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_QA_FEEDBACK_FINAL_APPROVAL.md`
-- `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_10_QA_APPROVAL_PHASE_1.4.md`
+- `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_50_QA_FEEDBACK_VERIFICATION.md`
+- `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_50_QA_FEEDBACK_FINAL_APPROVAL.md`
+- `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_10_QA_APPROVAL_PHASE_1.4.md`
 
 ---
 
@@ -183,7 +183,7 @@
 ### Documentation:
 - `documentation/06-GOVERNANCE_&_COMPLIANCE/gins/GIN_2026_008_TECHNICAL_CLARIFICATIONS.md` (updated)
 - `documentation/05-DEVELOPMENT_&_CONTRACTS/OPENAPI_SPEC_V2.5.2.yaml` (new)
-- `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_10_REVIEW_TEAM_20_PHASE_1.1_1.2.md` (new)
+- `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_10_REVIEW_TEAM_20_PHASE_1.1_1.2.md` (new)
 
 ### Communication:
 - 15+ team communication files in `_COMMUNICATION/`
@@ -218,8 +218,8 @@
 - ✅ Review approved for Phase 1.4 QA
 
 **Files:**
-- `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_20_PHASE_1_PRE_QA_COMPLETION.md`
-- `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_10_PHASE_1_COMPLETE_REVIEW.md`
+- `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_20_PHASE_1_PRE_QA_COMPLETION.md`
+- `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_10_PHASE_1_COMPLETE_REVIEW.md`
 
 ---
 
@@ -330,7 +330,7 @@
 - ✅ Example file from Architect reviewed and integrated
 
 **Files:**
-- `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_10_JS_STANDARDS_REVIEW_REPORT.md` (Review report)
+- `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_10_JS_STANDARDS_REVIEW_REPORT.md` (Review report)
 - `documentation/07-POLICIES/TT2_JS_STANDARDS_PROTOCOL.md` (MANDATORY protocol)
 - `documentation/02-DEVELOPMENT/TT2_JS_DEVELOPER_GUIDE.md` (Developer guide)
 - `_COMMUNICATION/nimrod/js_standards_example.js` (Architect example)
@@ -471,7 +471,7 @@
 
 **Files:**
 - `documentation/06-GOVERNANCE_&_COMPLIANCE/standards/TEAM_50_QA_REPORT_TEMPLATE.md` (Template)
-- `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_FORMAT_ADOPTION_EVIDENCE.md` (Evidence)
+- `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_50_FORMAT_ADOPTION_EVIDENCE.md` (Evidence)
 - `_COMMUNICATION/TEAM_50_TO_TEAM_10_FORMAT_ADOPTION_COMPLETE.md` (Completion report)
 - `_COMMUNICATION/TEAM_10_TO_TEAM_50_FORMAT_ADOPTION_APPROVAL.md` (Approval)
 
@@ -523,10 +523,10 @@
 **Files Created:**
 - `scripts/check-ports.sh` - Port diagnostic script
 - `scripts/fix-port-8082.sh` - Port 8082 fix script
-- `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_60_PORT_ISSUE_RESOLUTION.md`
-- `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_60_SERVER_STARTUP_REPORT.md`
-- `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_60_SQLALCHEMY_VERIFICATION.md`
-- `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_60_BACKEND_STARTUP_FINAL_SUCCESS.md`
+- `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_60_PORT_ISSUE_RESOLUTION.md`
+- `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_60_SERVER_STARTUP_REPORT.md`
+- `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_60_SQLALCHEMY_VERIFICATION.md`
+- `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_60_BACKEND_STARTUP_FINAL_SUCCESS.md`
 
 **Communication:**
 - ✅ `_COMMUNICATION/TEAM_60_TO_TEAM_10_PORT_ISSUE_RESOLVED.md`
@@ -585,9 +585,9 @@
 
 **Files:**
 - `_COMMUNICATION/TEAM_50_TO_TEAM_10_PHASE_1.3_QA_COMPLETE.md` (Summary report)
-- `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_PHASE_1.3_RUNTIME_QA_RESULTS.md` (Detailed results)
-- `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_PHASE_1.3_QA_COMPLETE_WITH_EVIDENCE.md` (Evidence report)
-- `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_30_QA_FEEDBACK_RESPONSE.md` (Team 30's fixes)
+- `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_50_PHASE_1.3_RUNTIME_QA_RESULTS.md` (Detailed results)
+- `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_50_PHASE_1.3_QA_COMPLETE_WITH_EVIDENCE.md` (Evidence report)
+- `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_30_QA_FEEDBACK_RESPONSE.md` (Team 30's fixes)
 
 **Impact:**
 - ✅ Phase 1.3 Frontend QA completed successfully
@@ -834,7 +834,7 @@ Team 50 completed comprehensive QA testing of the authentication system. All cri
 
 **Files:**
 - `_COMMUNICATION/TEAM_50_TO_TEAM_10_AUTHENTICATION_COMPLETE.md` (Final QA report)
-- `documentation/05-REPORTS/artifacts_SESSION_01/TEAM_50_REVOKED_TOKENS_TABLE_VERIFICATION_COMPLETE.md` (Detailed QA report)
+- `documentation/reports/05-REPORTS/artifacts_SESSION_01/TEAM_50_REVOKED_TOKENS_TABLE_VERIFICATION_COMPLETE.md` (Detailed QA report)
 - `_COMMUNICATION/TEAM_60_TO_TEAM_10_REVOKED_TOKENS_TABLE_CREATED.md` (Table creation)
 - `_COMMUNICATION/team_20/TEAM_20_TO_TEAM_50_LOGIN_ISSUE_FIXED.md` (ULID fix)
 

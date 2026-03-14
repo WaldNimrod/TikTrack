@@ -52,7 +52,7 @@
 | B2 Completion | `_COMMUNICATION/team_20/TEAM_20_TO_TEAM_10_S002_P002_WP003_TASE_AGOROT_FIX_COMPLETION.md` |
 | B4 Completion | `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_S002_P002_WP003_PHASE2_RUNTIME_COMPLETION.md` |
 | Phase 2 Test | `tests/auto-wp003-runtime.test.js` |
-| Runtime Results | `documentation/05-REPORTS/artifacts/TEAM_50_AUTO_WP003_RUNTIME_RESULTS.json` |
+| Runtime Results | `documentation/reports/05-REPORTS/artifacts/TEAM_50_AUTO_WP003_RUNTIME_RESULTS.json` |
 | G3.8 Sign-off | `_COMMUNICATION/team_10/TEAM_10_S002_P002_WP003_G3_8_CONSOLIDATION_SIGNOFF_v1.0.0.md` |
 | G3.9 Handoff | `_COMMUNICATION/team_10/TEAM_10_S002_P002_WP003_G3_9_GATE4_HANDOFF_v1.0.0.md` |
 

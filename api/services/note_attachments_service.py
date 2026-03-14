@@ -24,11 +24,13 @@ MAX_ATTACHMENTS_PER_NOTE = 3
 def _safe_filename(filename: str) -> str:
     """Sanitize filename for storage (remove path, special chars)."""
     base = os.path.basename(filename.strip())
-    base = re.sub(r'[^\w\-\.]', '_', base)
+    base = re.sub(r"[^\w\-\.]", "_", base)
     return base or "attachment"
 
 
-def _storage_path(user_id: uuid.UUID, note_id: uuid.UUID, attachment_id: uuid.UUID, safe_name: str) -> str:
+def _storage_path(
+    user_id: uuid.UUID, note_id: uuid.UUID, attachment_id: uuid.UUID, safe_name: str
+) -> str:
     """Relative path: users/{user_id}/notes/{note_id}/{attachment_id}_{safe_filename}"""
     return f"users/{user_id}/notes/{note_id}/{attachment_id}_{safe_name}"
 
@@ -63,7 +65,11 @@ class NoteAttachmentsService:
         return cls._instance
 
     async def count_attachments(self, db: AsyncSession, note_id: uuid.UUID) -> int:
-        stmt = select(func.count()).select_from(NoteAttachment).where(NoteAttachment.note_id == note_id)
+        stmt = (
+            select(func.count())
+            .select_from(NoteAttachment)
+            .where(NoteAttachment.note_id == note_id)
+        )
         result = await db.execute(stmt)
         return result.scalar() or 0
 

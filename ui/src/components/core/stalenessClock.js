@@ -42,7 +42,7 @@
     success: 'נתונים עדכניים',
     info: 'נתונים מלפני פחות מ־24 שעות',
     warning: 'נתונים מלפני 24–72 שעות',
-    error: 'נתונים ישנים או חסרים'
+    error: 'נתונים ישנים או חסרים',
   };
 
   const MARKET_LEVEL = {
@@ -52,15 +52,20 @@
     POST: 'info',
     POSTPOST: 'warning',
     CLOSED: 'error',
-    unknown: 'warning'
+    unknown: 'warning',
   };
 
-  const CLOCK_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+  const CLOCK_SVG =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
 
-  const ICON_SUNRISE = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4"/><path d="m4.93 10.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 13.07 2.83-2.83"/><path d="M12 6a6 6 0 0 1 6 6"/><circle cx="12" cy="12" r="4"/></svg>';
-  const ICON_TRENDING = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>';
-  const ICON_MOON = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>';
-  const ICON_UNKNOWN = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>';
+  const ICON_SUNRISE =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4"/><path d="m4.93 10.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 13.07 2.83-2.83"/><path d="M12 6a6 6 0 0 1 6 6"/><circle cx="12" cy="12" r="4"/></svg>';
+  const ICON_TRENDING =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>';
+  const ICON_MOON =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>';
+  const ICON_UNKNOWN =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>';
   const MARKET_ICONS = {
     REGULAR: ICON_TRENDING,
     PRE: ICON_SUNRISE,
@@ -68,7 +73,7 @@
     POST: ICON_SUNRISE,
     POSTPOST: ICON_SUNRISE,
     CLOSED: ICON_MOON,
-    unknown: ICON_UNKNOWN
+    unknown: ICON_UNKNOWN,
   };
 
   function getConfig(card) {
@@ -79,7 +84,7 @@
       showPriceTime: card.dataset.showPriceTime !== 'false',
       showFetchedTime: card.dataset.showFetchedTime !== 'false',
       priceLabel: card.dataset.priceLabel || 'עודכן ב',
-      fetchedLabel: card.dataset.fetchedLabel || 'עודכן ב'
+      fetchedLabel: card.dataset.fetchedLabel || 'עודכן ב',
     };
   }
 
@@ -124,7 +129,11 @@
     try {
       const d = new Date(ts);
       if (isNaN(d.getTime())) return '—';
-      return d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit', hour12: false });
+      return d.toLocaleTimeString('he-IL', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
     } catch (_) {
       return '—';
     }
@@ -144,11 +153,20 @@
     if (!card) return;
 
     const cfg = config || getConfig(card);
-    const priceTs = timestamps?.price_timestamp ?? timestamps?.priceTimestamp ?? null;
-    const fetchedTs = timestamps?.fetched_at ?? timestamps?.fetchedAt ?? (typeof timestamps === 'string' || (timestamps && timestamps instanceof Date) ? timestamps : null);
+    const priceTs =
+      timestamps?.price_timestamp ?? timestamps?.priceTimestamp ?? null;
+    const fetchedTs =
+      timestamps?.fetched_at ??
+      timestamps?.fetchedAt ??
+      (typeof timestamps === 'string' ||
+      (timestamps && timestamps instanceof Date)
+        ? timestamps
+        : null);
     const primaryTs = priceTs || fetchedTs;
     const clockLevel = computeStalenessLevel(primaryTs);
-    const clockTooltip = primaryTs ? formatExactAge(primaryTs) : 'אין נתוני עדכון';
+    const clockTooltip = primaryTs
+      ? formatExactAge(primaryTs)
+      : 'אין נתוני עדכון';
 
     const state = (marketStatus?.market_state || 'unknown').toUpperCase();
     const label = marketStatus?.display_label || 'חסר נתון';
@@ -161,19 +179,34 @@
     const parts = [];
 
     if (cfg.showMarket !== false) {
-      parts.push(`<span class="staleness-clock-card__cell staleness-clock-card__market staleness-level--${marketLevel}" data-tooltip="${escapeHtml(marketTooltip)}" aria-label="${escapeHtml(marketTooltip)}">${marketIcon}<span class="staleness-clock-card__market-label">${escapeHtml(label)}</span></span>`);
-      parts.push('<span class="staleness-clock-card__divider" aria-hidden="true"></span>');
+      parts.push(
+        `<span class="staleness-clock-card__cell staleness-clock-card__market staleness-level--${marketLevel}" data-tooltip="${escapeHtml(marketTooltip)}" aria-label="${escapeHtml(marketTooltip)}">${marketIcon}<span class="staleness-clock-card__market-label">${escapeHtml(label)}</span></span>`,
+      );
+      parts.push(
+        '<span class="staleness-clock-card__divider" aria-hidden="true"></span>',
+      );
     }
     if (cfg.showClock !== false) {
-      parts.push(`<span class="staleness-clock-card__cell staleness-clock staleness-level--${clockLevel}" data-tooltip="${escapeHtml(clockTooltip)}" aria-label="${escapeHtml(clockTooltip)}">${CLOCK_SVG}</span>`);
-      parts.push('<span class="staleness-clock-card__divider" aria-hidden="true"></span>');
+      parts.push(
+        `<span class="staleness-clock-card__cell staleness-clock staleness-level--${clockLevel}" data-tooltip="${escapeHtml(clockTooltip)}" aria-label="${escapeHtml(clockTooltip)}">${CLOCK_SVG}</span>`,
+      );
+      parts.push(
+        '<span class="staleness-clock-card__divider" aria-hidden="true"></span>',
+      );
     }
     if (cfg.showPriceTime !== false && (priceElapsed || priceTs)) {
-      parts.push(`<span class="staleness-clock-card__time-block"><span class="staleness-clock-card__time-label">${escapeHtml(cfg.priceLabel)}:</span> <span class="staleness-clock-card__time-value" dir="ltr">${escapeHtml(priceElapsed || formatTime(priceTs))}</span></span>`);
-      if (cfg.showFetchedTime !== false && fetchedTs) parts.push('<span class="staleness-clock-card__divider" aria-hidden="true"></span>');
+      parts.push(
+        `<span class="staleness-clock-card__time-block"><span class="staleness-clock-card__time-label">${escapeHtml(cfg.priceLabel)}:</span> <span class="staleness-clock-card__time-value" dir="ltr">${escapeHtml(priceElapsed || formatTime(priceTs))}</span></span>`,
+      );
+      if (cfg.showFetchedTime !== false && fetchedTs)
+        parts.push(
+          '<span class="staleness-clock-card__divider" aria-hidden="true"></span>',
+        );
     }
     if (cfg.showFetchedTime !== false && (fetchedElapsed || fetchedTs)) {
-      parts.push(`<span class="staleness-clock-card__time-block"><span class="staleness-clock-card__time-label">${escapeHtml(cfg.fetchedLabel)}:</span> <span class="staleness-clock-card__time-value" dir="ltr">${escapeHtml(fetchedElapsed || formatTime(fetchedTs))}</span></span>`);
+      parts.push(
+        `<span class="staleness-clock-card__time-block"><span class="staleness-clock-card__time-label">${escapeHtml(cfg.fetchedLabel)}:</span> <span class="staleness-clock-card__time-value" dir="ltr">${escapeHtml(fetchedElapsed || formatTime(fetchedTs))}</span></span>`,
+      );
     }
 
     card.innerHTML = `<div class="staleness-clock-card__inner" role="status">${parts.join('')}</div>`;
@@ -189,10 +222,14 @@
       el.setAttribute('role', 'img');
       el.setAttribute('aria-label', STALENESS_TOOLTIPS.success);
       el.innerHTML = CLOCK_SVG;
-      const summary = document.querySelector('#summaryStats, .info-summary, [id^="summaryStats"]');
+      const summary = document.querySelector(
+        '#summaryStats, .info-summary, [id^="summaryStats"]',
+      );
       const target = summary || document.querySelector('main');
       if (target) {
-        const anchor = target.querySelector('.info-summary__content, .info-summary__row') || target;
+        const anchor =
+          target.querySelector('.info-summary__content, .info-summary__row') ||
+          target;
         anchor.insertBefore(el, anchor.firstChild);
       }
     }
@@ -214,20 +251,35 @@
     return el;
   }
 
-  const TOOLTIPS_LEGACY = { ok: STALENESS_TOOLTIPS.success, warning: STALENESS_TOOLTIPS.info, na: STALENESS_TOOLTIPS.error };
+  const TOOLTIPS_LEGACY = {
+    ok: STALENESS_TOOLTIPS.success,
+    warning: STALENESS_TOOLTIPS.info,
+    na: STALENESS_TOOLTIPS.error,
+  };
 
   function updateInline(staleness, timestamps, marketStatus) {
-    const fetchedTs = timestamps?.fetched_at ?? timestamps?.fetchedAt ?? (typeof timestamps === 'string' ? timestamps : null);
-    const primaryTs = timestamps?.price_timestamp ?? timestamps?.priceTimestamp ?? fetchedTs;
+    const fetchedTs =
+      timestamps?.fetched_at ??
+      timestamps?.fetchedAt ??
+      (typeof timestamps === 'string' ? timestamps : null);
+    const primaryTs =
+      timestamps?.price_timestamp ?? timestamps?.priceTimestamp ?? fetchedTs;
     const level = computeStalenessLevel(primaryTs);
     const el = ensureInlineClock();
     el.className = 'staleness-clock staleness-level--' + level;
-    const ariaLabel = primaryTs ? formatExactAge(primaryTs) : (STALENESS_TOOLTIPS[level] || TOOLTIPS_LEGACY[staleness] || STALENESS_TOOLTIPS.success);
+    const ariaLabel = primaryTs
+      ? formatExactAge(primaryTs)
+      : STALENESS_TOOLTIPS[level] ||
+        TOOLTIPS_LEGACY[staleness] ||
+        STALENESS_TOOLTIPS.success;
     el.setAttribute('aria-label', ariaLabel);
     if (fetchedTs) el.setAttribute('data-timestamp', fetchedTs);
 
     const keyEl = document.getElementById(MARKET_KEY_ID);
-    if (marketStatus && (marketStatus.market_state || marketStatus.display_label)) {
+    if (
+      marketStatus &&
+      (marketStatus.market_state || marketStatus.display_label)
+    ) {
       const mEl = ensureMarketKey();
       const state = (marketStatus.market_state || 'unknown').toUpperCase();
       const label = marketStatus.display_label || '—';

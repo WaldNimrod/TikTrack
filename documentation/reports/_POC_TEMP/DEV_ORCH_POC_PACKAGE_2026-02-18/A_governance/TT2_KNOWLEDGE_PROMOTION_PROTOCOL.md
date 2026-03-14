@@ -222,7 +222,7 @@
 
 ### **5. רשימת תיקיות לניקוי (בהתאם לסריקה)**
 - ✅ Team 10 מבצע סריקה ומגדיר רשימה סופית לכל סשן.
-- ✅ דוגמאות אפשריות: `logs/`, `tmp/`, `documentation/05-REPORTS/artifacts_SESSION_*/` (אם הוגדר זמני).
+- ✅ דוגמאות אפשריות: `logs/`, `tmp/`, `documentation/reports/05-REPORTS/artifacts_SESSION_*/` (אם הוגדר זמני).
 - ✅ **אסור:** לכלול את `_COMMUNICATION/_Architects_Decisions` בסריקה או בניקוי.
 - ✅ הרשימה מתועדת בדוח ה-Consolidation.
 

@@ -30,7 +30,9 @@ def _get_price_table(ticker_status: Optional[str]) -> Optional[str]:
     return "ticker_prices"
 
 
-def _evaluate_condition(current_val: Optional[float], prev_val: Optional[float], operator: str, threshold: float) -> bool:
+def _evaluate_condition(
+    current_val: Optional[float], prev_val: Optional[float], operator: str, threshold: float
+) -> bool:
     """Returns True if condition is met. For crosses: requires both current_val and prev_val."""
     if current_val is None:
         return False
@@ -61,7 +63,9 @@ async def run(db: AsyncSession) -> dict:
     records_updated = 0
     error_count = 0
 
-    result = await db.execute(text("""
+    result = await db.execute(
+        text(
+            """
         SELECT a.id, a.user_id, a.ticker_id, a.condition_field, a.condition_operator, a.condition_value,
                a.title, a.trigger_status, t.status as ticker_status, t.symbol as ticker_symbol
         FROM user_data.alerts a
@@ -69,14 +73,25 @@ async def run(db: AsyncSession) -> dict:
         WHERE a.deleted_at IS NULL AND a.is_active = true
           AND (a.expires_at IS NULL OR a.expires_at > now())
           AND a.condition_field IS NOT NULL AND a.condition_operator IS NOT NULL
-    """))
+    """
+        )
+    )
     rows = result.fetchall()
     records_processed = len(rows)
 
     for row in rows:
-        alert_id, user_id, ticker_id, cond_field, cond_op, cond_val, title, trigger_status, ticker_status, ticker_symbol = (
-            row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9]
-        )
+        (
+            alert_id,
+            user_id,
+            ticker_id,
+            cond_field,
+            cond_op,
+            cond_val,
+            title,
+            trigger_status,
+            ticker_status,
+            ticker_symbol,
+        ) = (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9])
         if not ticker_id or ticker_status == "cancelled":
             continue
         if cond_field not in VALID_CONDITION_FIELDS:
@@ -92,18 +107,28 @@ async def run(db: AsyncSession) -> dict:
             continue
 
         readings = await db.execute(
-            text(f"""
+            text(
+                f"""
                 SELECT {cond_field}
                 FROM market_data.{table}
                 WHERE ticker_id = :tid AND {cond_field} IS NOT NULL
                 ORDER BY price_timestamp DESC
                 LIMIT 2
-            """),
+            """
+            ),
             {"tid": str(ticker_id)},
         )
         reading_rows = readings.fetchall()
-        current_val = float(reading_rows[0][0]) if len(reading_rows) >= 1 and reading_rows[0][0] is not None else None
-        prev_val = float(reading_rows[1][0]) if len(reading_rows) >= 2 and reading_rows[1][0] is not None else None
+        current_val = (
+            float(reading_rows[0][0])
+            if len(reading_rows) >= 1 and reading_rows[0][0] is not None
+            else None
+        )
+        prev_val = (
+            float(reading_rows[1][0])
+            if len(reading_rows) >= 2 and reading_rows[1][0] is not None
+            else None
+        )
 
         if cond_op in ("crosses_above", "crosses_below") and prev_val is None:
             continue
@@ -120,19 +145,23 @@ async def run(db: AsyncSession) -> dict:
         notification_title = f"{sym} {msg}" if len(title or "") < 10 else title
 
         await db.execute(
-            text("""
+            text(
+                """
                 UPDATE user_data.alerts
                 SET trigger_status = 'triggered_unread', triggered_at = :now,
                     is_triggered = true, updated_at = :now
                 WHERE id = :aid
-            """),
+            """
+            ),
             {"aid": str(alert_id), "now": now},
         )
         await db.execute(
-            text("""
+            text(
+                """
                 INSERT INTO user_data.notifications (id, user_id, alert_id, type, title, message)
                 VALUES (:id, :uid, :aid, 'alert_trigger', :title, :msg)
-            """),
+            """
+            ),
             {
                 "id": uuid4(),
                 "uid": str(user_id),

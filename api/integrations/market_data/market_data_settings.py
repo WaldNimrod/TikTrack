@@ -31,7 +31,11 @@ _SSOT = {
     "provider_cooldown_minutes": (5, 120, 15),
     "alpha_quota_cooldown_hours": (6, 48, 24),
     "max_symbols_per_request": (1, 50, 50),
-    "delay_between_symbols_seconds": (0, 30, 1),  # FIX-4: default 1s (was 0) — prevents Yahoo burst 429
+    "delay_between_symbols_seconds": (
+        0,
+        30,
+        1,
+    ),  # FIX-4: default 1s (was 0) — prevents Yahoo burst 429
     "intraday_enabled": (None, None, True),
 }
 
@@ -39,6 +43,7 @@ _SSOT = {
 def _get_sync_db_url() -> Optional[str]:
     """Sync DB URL for scripts/service (psycopg2)."""
     from pathlib import Path
+
     _project = Path(__file__).resolve().parent.parent.parent.parent
     env_file = _project / "api" / ".env"
     url = None
@@ -66,6 +71,7 @@ def _get_from_db(key: str) -> Optional[str]:
         return None
     try:
         import psycopg2
+
         conn = psycopg2.connect(url)
         try:
             cur = conn.cursor()
@@ -149,6 +155,7 @@ def get_current_cadence_minutes() -> int:
         return get_intraday_interval_minutes()
     try:
         from api.services.market_status_service import get_market_status_sync
+
         state = get_market_status_sync()
         if state and (state.upper() == "REGULAR" or "OPEN" in (state or "").upper()):
             return get_intraday_interval_minutes()

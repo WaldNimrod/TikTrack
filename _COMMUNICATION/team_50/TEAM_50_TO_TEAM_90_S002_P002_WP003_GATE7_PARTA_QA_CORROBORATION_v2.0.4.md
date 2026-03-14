@@ -37,9 +37,9 @@
 
 | פריט | ערך |
 |------|------|
-| **log_path** | `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_4.log` |
+| **log_path** | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_4.log` |
 | **run_id** | `v2.0.4-shared-2026-03-12` |
-| Artifact | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
+| Artifact | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
 
 ---
 
@@ -91,8 +91,8 @@ Team 50 מסיים את חלקו — Corroboration v2.0.4 מוגש ל־Team 90 �
 |------|------|
 | Team 60 Evidence Report v2.0.4 | `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_90_S002_P002_WP003_GATE7_PARTA_RUNTIME_EVIDENCE_REPORT_v2.0.4.md` |
 | Team 60 Canonical Handoff | `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_50_S002_P002_WP003_GATE7_PARTA_V2_0_4_CANONICAL_HANDOFF_v1.0.0.md` |
-| G7 Part A JSON | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
-| Log (shared run) | `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_4.log` |
+| G7 Part A JSON | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
+| Log (shared run) | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_4.log` |
 
 ---
 

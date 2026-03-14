@@ -2,11 +2,11 @@
  * PhoenixTableFilterManager - Class לניהול פילטרים של טבלאות
  * ----------------------------------------------------------------
  * Class לניהול פילטרים מקומיים של טבלה עם אינטגרציה לפילטרים גלובליים.
- * 
+ *
  * @description Class לניהול פילטרים מקומיים של טבלה עם שילוב פילטרים גלובליים
  * @standard JS Standards Protocol ✅ | Clean Slate Rule ✅ | Accessibility ✅
  * @legacyReference Legacy.tables.filtering
- * 
+ *
  * @example
  * const filterManager = new PhoenixTableFilterManager(tableElement);
  * // שילוב פילטרים גלובליים + מקומיים
@@ -25,19 +25,22 @@ class PhoenixTableFilterManager {
     this.table = tableElement;
     this.filters = {
       global: {}, // פילטרים גלובליים (מ-header-filters)
-      local: {}   // פילטרים מקומיים (מ-phoenix-table-filters)
+      local: {}, // פילטרים מקומיים (מ-phoenix-table-filters)
     };
     this.init();
   }
 
   /**
    * init - אתחול המנהל
-   * 
+   *
    * @description חיבור event listeners לפילטרים גלובליים ומקומיים
    */
   init() {
     if (!this.table) {
-      window.maskedLog?.('[PhoenixTableFilterManager] Table element not found', {});
+      window.maskedLog?.(
+        '[PhoenixTableFilterManager] Table element not found',
+        {},
+      );
       return;
     }
 
@@ -50,12 +53,14 @@ class PhoenixTableFilterManager {
     // טעינת מצב פילטרים מ-LocalStorage או URL
     this.loadFilterState();
 
-    _log(`[PhoenixTableFilterManager] Initialized for table: ${this.table.id || 'unnamed'}`);
+    _log(
+      `[PhoenixTableFilterManager] Initialized for table: ${this.table.id || 'unnamed'}`,
+    );
   }
 
   /**
    * initGlobalFilters - אתחול פילטרים גלובליים
-   * 
+   *
    * @description האזנה לשינויים בפילטרים גלובליים (מ-header-filters)
    */
   initGlobalFilters() {
@@ -68,8 +73,10 @@ class PhoenixTableFilterManager {
       });
     } else {
       // אלטרנטיבה: האזנה ישירה ל-inputs של header-filters
-      const globalFilterInputs = document.querySelectorAll('.header-filters input, .header-filters select');
-      globalFilterInputs.forEach(input => {
+      const globalFilterInputs = document.querySelectorAll(
+        '.header-filters input, .header-filters select',
+      );
+      globalFilterInputs.forEach((input) => {
         input.addEventListener('change', () => {
           this.updateGlobalFilter(input);
           this.applyFilters();
@@ -80,13 +87,15 @@ class PhoenixTableFilterManager {
 
   /**
    * initLocalFilters - אתחול פילטרים מקומיים
-   * 
+   *
    * @description האזנה לשינויים בפילטרים מקומיים (מ-phoenix-table-filters)
    */
   initLocalFilters() {
-    const localFilters = this.table.querySelectorAll('.phoenix-table-filters input, .phoenix-table-filters select');
-    
-    localFilters.forEach(filter => {
+    const localFilters = this.table.querySelectorAll(
+      '.phoenix-table-filters input, .phoenix-table-filters select',
+    );
+
+    localFilters.forEach((filter) => {
       filter.addEventListener('change', () => {
         this.updateLocalFilter(filter);
         this.applyFilters();
@@ -104,7 +113,7 @@ class PhoenixTableFilterManager {
 
   /**
    * updateGlobalFilter - עדכון פילטר גלובלי
-   * 
+   *
    * @description עדכון פילטר גלובלי לפי input
    * @param {HTMLElement} input - אלמנט input/select של הפילטר הגלובלי
    */
@@ -121,13 +130,13 @@ class PhoenixTableFilterManager {
     _log('[PhoenixTableFilterManager] Global filter updated', {
       key: filterKey,
       value: filterValue,
-      globalFilters: this.filters.global
+      globalFilters: this.filters.global,
     });
   }
 
   /**
    * updateLocalFilter - עדכון פילטר מקומי
-   * 
+   *
    * @description עדכון פילטר מקומי של הטבלה
    * @param {HTMLElement} filter - אלמנט input/select של הפילטר המקומי
    */
@@ -147,13 +156,13 @@ class PhoenixTableFilterManager {
     _log('[PhoenixTableFilterManager] Local filter updated', {
       key: filterKey,
       value: filterValue,
-      localFilters: this.filters.local
+      localFilters: this.filters.local,
     });
   }
 
   /**
    * applyFilters - שילוב פילטרים גלובליים ומקומיים
-   * 
+   *
    * @description שילוב פילטרים גלובליים ומקומיים וסינון שורות הטבלה
    * @param {Object} additionalFilters - פילטרים נוספים (אופציונלי)
    */
@@ -161,19 +170,22 @@ class PhoenixTableFilterManager {
     const combinedFilters = {
       ...this.filters.global,
       ...this.filters.local,
-      ...additionalFilters
+      ...additionalFilters,
     };
 
     const tbody = this.table.querySelector('tbody, .phoenix-table__body');
     if (!tbody) {
-      window.maskedLog?.('[PhoenixTableFilterManager] Table body not found', {});
+      window.maskedLog?.(
+        '[PhoenixTableFilterManager] Table body not found',
+        {},
+      );
       return;
     }
 
     const rows = tbody.querySelectorAll('tr, .phoenix-table__row');
     let visibleCount = 0;
 
-    rows.forEach(row => {
+    rows.forEach((row) => {
       let shouldShow = true;
 
       // בדיקת כל הפילטרים המשולבים
@@ -202,13 +214,13 @@ class PhoenixTableFilterManager {
       additionalFilters,
       combinedFilters,
       visibleRows: visibleCount,
-      totalRows: rows.length
+      totalRows: rows.length,
     });
   }
 
   /**
    * matchesFilter - בדיקה אם שורה תואמת לפילטר
-   * 
+   *
    * @description בדיקה אם שורה תואמת לפילטר מסוים
    * @param {HTMLElement} row - אלמנט השורה
    * @param {string} filterKey - מפתח הפילטר
@@ -226,7 +238,7 @@ class PhoenixTableFilterManager {
     const cell = row.querySelector(`[data-field="${filterKey}"]`);
     if (cell) {
       const cellText = cell.textContent.trim();
-      
+
       // בדיקה מדויקת
       if (cellText === filterValue) {
         return true;
@@ -240,11 +252,13 @@ class PhoenixTableFilterManager {
 
     // פילטר לפי תאריך (date range)
     if (filterKey === 'dateFrom' || filterKey === 'dateTo') {
-      const dateCell = row.querySelector('[data-field="date"], [data-field="updated"]');
+      const dateCell = row.querySelector(
+        '[data-field="date"], [data-field="updated"]',
+      );
       if (dateCell) {
         const cellDate = this.parseDate(dateCell.textContent.trim());
         const filterDate = new Date(filterValue);
-        
+
         if (filterKey === 'dateFrom' && cellDate < filterDate) {
           return false;
         }
@@ -260,7 +274,7 @@ class PhoenixTableFilterManager {
 
   /**
    * parseDate - פרסור תאריך מפורמט DD/MM/YY או DD/MM/YYYY
-   * 
+   *
    * @description המרת תאריך מפורמט DD/MM/YY ל-Date object
    * @param {string} dateString - מחרוזת תאריך בפורמט DD/MM/YY
    * @returns {Date} - אובייקט תאריך
@@ -277,13 +291,15 @@ class PhoenixTableFilterManager {
 
   /**
    * updatePaginationInfo - עדכון מידע pagination
-   * 
+   *
    * @description עדכון מידע pagination עם מספר השורות הנראות
    * @param {number} visibleCount - מספר שורות נראות
    * @param {number} totalCount - מספר שורות כולל
    */
   updatePaginationInfo(visibleCount, totalCount) {
-    const paginationInfo = this.table.closest('.phoenix-table-wrapper')?.nextElementSibling?.querySelector('.phoenix-table-pagination__info');
+    const paginationInfo = this.table
+      .closest('.phoenix-table-wrapper')
+      ?.nextElementSibling?.querySelector('.phoenix-table-pagination__info');
     if (paginationInfo) {
       const infoText = paginationInfo.querySelector('span');
       if (infoText) {
@@ -294,17 +310,20 @@ class PhoenixTableFilterManager {
 
   /**
    * saveFilterState - שמירת מצב פילטרים
-   * 
+   *
    * @description שמירת מצב פילטרים ב-LocalStorage או URL
    */
   saveFilterState() {
     const tableId = this.table.id || 'default';
     const storageKey = `phoenix-table-filters-${tableId}`;
-    
+
     try {
       localStorage.setItem(storageKey, JSON.stringify(this.filters.local));
     } catch (e) {
-      window.maskedLog?.('[PhoenixTableFilterManager] Failed to save filter state', { message: e?.message });
+      window.maskedLog?.(
+        '[PhoenixTableFilterManager] Failed to save filter state',
+        { message: e?.message },
+      );
     }
 
     // עדכון URL (אופציונלי)
@@ -319,7 +338,7 @@ class PhoenixTableFilterManager {
 
   /**
    * loadFilterState - טעינת מצב פילטרים
-   * 
+   *
    * @description טעינת מצב פילטרים מ-LocalStorage או URL
    */
   loadFilterState() {
@@ -333,7 +352,10 @@ class PhoenixTableFilterManager {
         this.filters.local = JSON.parse(savedFilters);
       }
     } catch (e) {
-      window.maskedLog?.('[PhoenixTableFilterManager] Failed to load filter state', { message: e?.message });
+      window.maskedLog?.(
+        '[PhoenixTableFilterManager] Failed to load filter state',
+        { message: e?.message },
+      );
     }
 
     // טעינה מ-URL (אופציונלי)
@@ -355,15 +377,17 @@ class PhoenixTableFilterManager {
 
   /**
    * clearFilters - איפוס כל הפילטרים המקומיים
-   * 
+   *
    * @description איפוס כל הפילטרים המקומיים של הטבלה (לא נוגע בפילטרים גלובליים)
    */
   clearFilters() {
     this.filters.local = {};
-    
+
     // איפוס שדות פילטרים מקומיים
-    const localFilters = this.table.querySelectorAll('.phoenix-table-filters input, .phoenix-table-filters select');
-    localFilters.forEach(filter => {
+    const localFilters = this.table.querySelectorAll(
+      '.phoenix-table-filters input, .phoenix-table-filters select',
+    );
+    localFilters.forEach((filter) => {
       if (filter.type === 'checkbox' || filter.type === 'radio') {
         filter.checked = false;
       } else {
@@ -382,14 +406,14 @@ class PhoenixTableFilterManager {
 
   /**
    * getCombinedFilters - קבלת פילטרים משולבים
-   * 
+   *
    * @description קבלת פילטרים משולבים (גלובלי + מקומי)
    * @returns {Object} פילטרים משולבים
    */
   getCombinedFilters() {
     return {
       ...this.filters.global,
-      ...this.filters.local
+      ...this.filters.local,
     };
   }
 }

@@ -4,6 +4,7 @@ from: Team 61 (Cloud Agent / DevOps Automation)
 to: Team 51 (QA & Functional Acceptance)
 cc: Team 100, Team 10, Team 90
 date: 2026-03-10
+historical_record: true
 status: QA_REQUESTED
 in_response_to: TEAM_100_TO_TEAM_61_AGENTS_OS_UI_WORK_PACKAGE_LOD400_v1.0.0
 ---

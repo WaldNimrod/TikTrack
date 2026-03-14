@@ -309,8 +309,92 @@ print(f'    Updated: {s.last_updated or \"never\"}')
     echo "═══════════════════════════════════════"
     ;;
 
+  phase*)
+    # Phase-advance: regenerate mandates for current gate, then display only Phase N.
+    # Used after Phase N-1 team finishes — run before handing off to the next team.
+    # Usage:
+    #   ./pipeline_run.sh phase2   → show Phase 2 mandate (after Phase 1 complete)
+    #   ./pipeline_run.sh phase3   → show Phase 3 mandate
+    PHASE_NUM="${1#phase}"
+    if ! [[ "$PHASE_NUM" =~ ^[0-9]+$ ]]; then
+      echo "Usage: ./pipeline_run.sh phase<N>  (e.g. phase2, phase3)"
+      exit 1
+    fi
+
+    GATE=$(_get_gate)
+    echo "[pipeline_run] ${DOMAIN_LABEL}Phase ${PHASE_NUM} — regenerating mandates for: $GATE"
+    $CLI --generate-prompt "$GATE" 2>&1 | grep -v "^━"
+
+    # Determine mandate file from gate name
+    case "$GATE" in
+      GATE_8)
+        MANDATE_FILE="$PROMPTS_DIR/gate_8_mandates.md"
+        ;;
+      *)
+        MANDATE_FILE="$PROMPTS_DIR/implementation_mandates.md"
+        ;;
+    esac
+
+    if [ ! -f "$MANDATE_FILE" ]; then
+      echo "[pipeline_run] Mandate file not found: $MANDATE_FILE"
+      echo "[pipeline_run] Run: ./pipeline_run.sh  (to generate first)"
+      exit 1
+    fi
+
+    # Extract Phase N section using Python regex
+    PHASE_CONTENT=$(python3 - "$PHASE_NUM" "$MANDATE_FILE" <<'PYEOF'
+import sys, re
+phase = sys.argv[1]
+mandate_file = sys.argv[2]
+text = open(mandate_file).read()
+# Match from "## ... (Phase N)" header until the next phase header or end-of-file
+pattern = r'## .+\(Phase ' + re.escape(phase) + r'\).*?(?=\n## .+\(Phase \d+\)|\Z)'
+m = re.search(pattern, text, re.DOTALL)
+print(m.group(0).strip() if m else '')
+PYEOF
+)
+
+    if [ -z "$PHASE_CONTENT" ]; then
+      echo "[pipeline_run] Phase ${PHASE_NUM} not found in: $MANDATE_FILE"
+      echo "[pipeline_run] Available phases:"
+      python3 - "$MANDATE_FILE" <<'PYEOF'
+import sys, re
+text = open(sys.argv[1]).read()
+phases = sorted(set(int(m) for m in re.findall(r'\(Phase (\d+)\)', text)))
+print("  " + "  |  ".join(f"phase{p}  →  ./pipeline_run.sh phase{p}" for p in phases))
+PYEOF
+      exit 1
+    fi
+
+    # Get total phase count for footer message
+    TOTAL_PHASES=$(python3 - "$MANDATE_FILE" <<'PYEOF'
+import sys, re
+text = open(sys.argv[1]).read()
+phases = sorted(set(int(m) for m in re.findall(r'\(Phase (\d+)\)', text)))
+print(phases[-1] if phases else 1)
+PYEOF
+)
+    NEXT_PHASE=$((PHASE_NUM + 1))
+
+    echo ""
+    printf '▼%.0s' {1..74}; echo ""
+    printf "  ${DOMAIN_LABEL}PHASE ${PHASE_NUM} MANDATE — paste to team\n"
+    printf '▼%.0s' {1..74}; echo ""
+    echo ""
+    echo "$PHASE_CONTENT"
+    echo ""
+    printf '▲%.0s' {1..74}; echo ""
+    if [[ "$PHASE_NUM" -lt "$TOTAL_PHASES" ]]; then
+      printf "  Phase ${PHASE_NUM} done?  →  ./pipeline_run.sh phase${NEXT_PHASE}\n"
+    else
+      printf "  Final phase done?  →  ./pipeline_run.sh pass\n"
+    fi
+    printf '▲%.0s' {1..74}; echo ""
+    echo ""
+    ;;
+
   *)
-    echo "Usage: ./pipeline_run.sh [--domain tiktrack|agents_os] [next|pass|fail <reason>|approve|status|gate <NAME>|route doc|full [notes]|revise <notes> [file]|store <GATE> <FILE>|domain]"
+    echo "Usage: ./pipeline_run.sh [--domain tiktrack|agents_os] [next|pass|fail <reason>|approve|status|gate <NAME>|route doc|full [notes]|revise <notes> [file]|store <GATE> <FILE>|domain|phase<N>]"
     echo ""
     echo "  next / (no arg)          Generate current gate prompt + display"
     echo "  pass                     Advance current gate → PASS → show next"
@@ -322,6 +406,8 @@ print(f'    Updated: {s.last_updated or \"never\"}')
     echo "  revise <notes> [file]    Generate G3_PLAN revision prompt after G3_5 FAIL"
     echo "  store <GATE> <FILE>      Store artifact file to pipeline state"
     echo "  domain                   Show status of both parallel pipelines"
+    echo "  phase<N>                 Show Phase N mandate (after Phase N-1 complete)"
+    echo "                           e.g. phase2 → Team 90 validation mandate"
     echo ""
     echo "  Domain flags (parallel pipelines):"
     echo "    --domain tiktrack       Use TikTrack pipeline state (default)"

@@ -158,7 +158,7 @@ Use this whenever you're unsure what to do next, or when the auto-refresh doesn'
 
 ## 🗺️ Roadmap & Gate History Page
 
-Open `PIPELINE_ROADMAP.html` (link at bottom of main dashboard) for:
+Open `agents_os/ui/PIPELINE_ROADMAP.html` (link at bottom of main dashboard) for:
 
 - **Portfolio roadmap tree** — stages → programs, with active program highlighted and hierarchy validation
 - **Full gate sequence table** — all 14 gates with status pills
@@ -183,4 +183,4 @@ Then route findings to Team 10 for code fixes → re-run CURSOR_IMPLEMENTATION �
 - Full experiment execution guide: `_COMMUNICATION/team_00/TEAM_00_S001_P002_WP001_EXPERIMENT_EXECUTION_GUIDE_v1.0.0.md`
 - Pipeline CLI source: `agents_os_v2/orchestrator/pipeline.py`
 - Pipeline state: `_COMMUNICATION/agents_os/pipeline_state.json`
-- Roadmap & Gate History: `PIPELINE_ROADMAP.html` (serve with `python3 -m http.server 8090`)
+- Roadmap & Gate History: `agents_os/ui/PIPELINE_ROADMAP.html` (serve from repo root: `./agents_os/scripts/start_ui_server.sh` or `python3 -m http.server 7070`)

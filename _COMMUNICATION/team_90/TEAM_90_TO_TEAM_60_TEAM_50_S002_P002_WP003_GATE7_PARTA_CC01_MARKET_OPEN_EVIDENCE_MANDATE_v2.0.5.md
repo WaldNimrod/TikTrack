@@ -47,7 +47,7 @@ CC-WP003-02 and CC-WP003-04 are accepted PASS in v2.0.5.
 
 1. `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_90_S002_P002_WP003_GATE7_PARTA_RUNTIME_EVIDENCE_REPORT_v2.0.6.md`  
 2. `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_90_S002_P002_WP003_GATE7_PARTA_QA_CORROBORATION_v2.0.6.md`  
-3. `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` (updated with admissible CC-01 run data)
+3. `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` (updated with admissible CC-01 run data)
 
 ---
 

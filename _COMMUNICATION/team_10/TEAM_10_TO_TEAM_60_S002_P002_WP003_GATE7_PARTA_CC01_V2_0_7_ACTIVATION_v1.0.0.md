@@ -37,13 +37,13 @@ python3 scripts/check_market_open_et.py
 
 ```bash
 # התחל backend עם tee ללוג חדש
-uvicorn api.main:app --host 0.0.0.0 --port 8083 2>&1 | tee documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log
+uvicorn api.main:app --host 0.0.0.0 --port 8083 2>&1 | tee documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log
 ```
 
 ### שלב 2 — Verify (רק אחרי Pre-flight PASS)
 
 ```bash
-G7_PART_A_LOG_PATH=documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log \
+G7_PART_A_LOG_PATH=documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log \
 G7_PART_A_MODE=market_open \
 python3 scripts/verify_g7_part_a_runtime.py
 ```
@@ -51,7 +51,7 @@ python3 scripts/verify_g7_part_a_runtime.py
 ### שלב 3 — אימות
 
 ```bash
-grep "mode=market_open" documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log
+grep "mode=market_open" documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log
 ```
 
 **חובה:** יש שורה עם `mode=market_open`. אם מופיע רק `mode=off_hours` — הריצה לא קבילה.
@@ -63,7 +63,7 @@ grep "mode=market_open" documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log
 | ארטיפקט | נתיב |
 |----------|------|
 | Runtime Evidence v2.0.7 | `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_90_..._RUNTIME_EVIDENCE_REPORT_v2.0.7.md` |
-| JSON | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
+| JSON | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
 | Handoff ל־50 | `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_50_..._V2_0_7_CC01_CANONICAL_HANDOFF` |
 
 ---

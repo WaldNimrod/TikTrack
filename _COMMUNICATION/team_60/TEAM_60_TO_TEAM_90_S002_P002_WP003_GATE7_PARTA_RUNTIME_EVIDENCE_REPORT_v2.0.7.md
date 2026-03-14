@@ -49,12 +49,12 @@ python3 scripts/check_market_open_et.py
 ./scripts/run_g7_cc01_v207_market_open.sh
 ```
 
-הסקריפט: מריץ Pre-flight → מפעיל backend עם `tee` ל־`documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log` → מריץ verify (market_open) → בודק `grep "mode=market_open"` בלוג. אם חסר — exit 1 (לא קביל).
+הסקריפט: מריץ Pre-flight → מפעיל backend עם `tee` ל־`documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log` → מריץ verify (market_open) → בודק `grep "mode=market_open"` בלוג. אם חסר — exit 1 (לא קביל).
 
 ### אימות
 
 ```bash
-grep "mode=market_open" documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log
+grep "mode=market_open" documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log
 ```
 
 **חובה:** יש שורה עם `mode=market_open`. אם מופיע רק `mode=off_hours` — הריצה לא קבילה.
@@ -66,7 +66,7 @@ grep "mode=market_open" documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log
 | פריט | ערך |
 |------|-----|
 | Pre-flight בעת הפקה | **SKIP** — US market CLOSED (08:09 ET). |
-| לוג צפוי | `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log` (נוצר בהרצת הסקריפט בשעות השוק). |
+| לוג צפוי | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log` (נוצר בהרצת הסקריפט בשעות השוק). |
 | run_id | v2.0.7-cc01-market-open |
 
 **המשך:** הרץ `./scripts/run_g7_cc01_v207_market_open.sh` **בתוך 09:30–16:00 ET (Mon–Fri)**. לאחר הצלחה — הלוג יכיל `mode=market_open`, ה־JSON יעודכן, ו־Team 50 יוכלו להגיש corroboration v2.0.7 עם אותו log_path ו־timestamp.
@@ -79,8 +79,8 @@ grep "mode=market_open" documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log
 |----------|------|
 | נוהל ריצה | `scripts/run_g7_cc01_v207_market_open.sh` |
 | Pre-flight | `scripts/check_market_open_et.py` |
-| לוג (לאחר הרצה בשעות השוק) | `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log` |
-| JSON | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
+| לוג (לאחר הרצה בשעות השוק) | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log` |
+| JSON | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
 
 ---
 

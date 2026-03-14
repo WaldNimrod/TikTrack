@@ -137,6 +137,46 @@
       "detail": "scripts/ensure-skip-live-data-check.sh (dev/QA bypass)",
       "problemMatcher": [],
       "presentation": { "reveal": "always", "panel": "new" }
+    },
+    {
+      "label": "🚀 Start Agents_OS UI Server (Port 7070)",
+      "type": "shell",
+      "command": "${workspaceFolder}/agents_os/scripts/start_ui_server.sh",
+      "detail": "agents_os/scripts/start_ui_server.sh — Agents_OS Pipeline Dashboard on :7070",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "new", "focus": true, "clear": true },
+      "group": { "kind": "build", "isDefault": false }
+    },
+    {
+      "label": "🛑 Stop Agents_OS UI Server",
+      "type": "shell",
+      "command": "${workspaceFolder}/agents_os/scripts/stop_ui_server.sh",
+      "detail": "agents_os/scripts/stop_ui_server.sh",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "new" }
+    },
+    {
+      "label": "🔧 Init Agents_OS Pipeline (agents_os domain)",
+      "type": "shell",
+      "command": "${workspaceFolder}/agents_os/scripts/init_pipeline.sh agents_os ${input:wpId}",
+      "detail": "init_pipeline.sh — create pipeline state for agents_os domain",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "📊 Check Pipeline Status (both domains)",
+      "type": "shell",
+      "command": "${workspaceFolder}/pipeline_run.sh domain",
+      "detail": "pipeline_run.sh domain — shows tiktrack + agents_os pipeline states",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "new" }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "wpId",
+      "type": "promptString",
+      "description": "Work Package ID (e.g. S002-P005-WP001)"
     }
   ]
 }

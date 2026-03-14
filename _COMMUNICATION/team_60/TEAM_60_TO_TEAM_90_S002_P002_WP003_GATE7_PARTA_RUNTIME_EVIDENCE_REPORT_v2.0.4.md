@@ -37,7 +37,7 @@
 |------|-------|
 | Runtime | Local/dev — backend with stdout capture (tee) |
 | Backend URL | http://127.0.0.1:8083 (dedicated run for evidence) |
-| **log_path** | `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_4.log` |
+| **log_path** | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_4.log` |
 | **run_id** | v2.0.4-shared-2026-03-12 |
 | Execution timestamp (UTC) | 2026-03-12T00:49:10Z |
 | Evidence script | `scripts/verify_g7_part_a_runtime.py` (G7_PART_A_MODE=market_open, off_hours, four_cycle) |
@@ -81,8 +81,8 @@
 
 | Artifact | Path |
 |----------|------|
-| G7 Part A evidence (JSON) | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
-| Shared log (non-empty) | `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_4.log` |
+| G7 Part A evidence (JSON) | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
+| Shared log (non-empty) | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_4.log` |
 
 **JSON fields:** log_path (non-empty), run_id, cc_01_yahoo_call_count=0, cc_02_yahoo_call_count=4, cc_04_yahoo_429_count=8, pass_01=true, pass_02=false, pass_04=false.
 

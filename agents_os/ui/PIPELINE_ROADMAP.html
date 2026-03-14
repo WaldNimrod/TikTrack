@@ -279,16 +279,16 @@ const GATE_CONFIG = {
 };
 
 const CANONICAL_FILES = [
-  {label:"Known Bugs Register",            path:"documentation/docs-governance/01-FOUNDATIONS/KNOWN_BUGS_REGISTER_v1.0.0.md"},
-  {label:"Bugs Remediation Procedure",     path:"documentation/docs-governance/04-PROCEDURES/KNOWN_BUGS_REMEDIATION_GOVERNANCE_PROCEDURE_v1.0.0.md"},
-  {label:"Master Task List (Team 10)",     path:"_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md"},
-  {label:"Level-2 Carryover List",         path:"_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md"},
-  {label:"Level-2 Registry",              path:"_COMMUNICATION/team_10/TEAM_10_LEVEL2_LISTS_REGISTRY.md"},
-  {label:"WSM — Live Operational State",  path:"documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md"},
-  {label:"Portfolio Roadmap",             path:"documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md"},
-  {label:"Program Registry",             path:"documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md"},
-  {label:"SSM (Governance Constitution)", path:"documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md"},
-  {label:"Iron Rules",                   path:"documentation/docs-governance/01-FOUNDATIONS/03_IRON_RULES_AND_GOVERNANCE_CONSTITUTION.md"},
+  {label:"Known Bugs Register",            path:"../../documentation/docs-governance/01-FOUNDATIONS/KNOWN_BUGS_REGISTER_v1.0.0.md"},
+  {label:"Bugs Remediation Procedure",     path:"../../documentation/docs-governance/04-PROCEDURES/KNOWN_BUGS_REMEDIATION_GOVERNANCE_PROCEDURE_v1.0.0.md"},
+  {label:"Master Task List (Team 10)",     path:"../../_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md"},
+  {label:"Level-2 Carryover List",         path:"../../_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md"},
+  {label:"Level-2 Registry",              path:"../../_COMMUNICATION/team_10/TEAM_10_LEVEL2_LISTS_REGISTRY.md"},
+  {label:"WSM — Live Operational State",  path:"../../documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md"},
+  {label:"Portfolio Roadmap",             path:"../../documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md"},
+  {label:"Program Registry",             path:"../../documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md"},
+  {label:"SSM (Governance Constitution)", path:"../../documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md"},
+  {label:"Iron Rules",                   path:"../../documentation/docs-governance/01-FOUNDATIONS/03_IRON_RULES_AND_GOVERNANCE_CONSTITUTION.md"},
 ];
 
 // ── State ──────────────────────────────────────────────────────────────────
@@ -400,7 +400,7 @@ function rmStatusLabel(status) {
 // ── Load pipeline state ────────────────────────────────────────────────────
 async function loadPipelineState() {
   try {
-    const state = await fetchJSON("_COMMUNICATION/agents_os/pipeline_state.json");
+    const state = await fetchJSON("../../_COMMUNICATION/agents_os/pipeline_state.json");
     pipelineState = state;
     document.getElementById("header-sub").textContent =
       `WP: ${state.work_package_id||'—'}  |  Gate: ${state.current_gate||'—'}  |  Stage: ${state.stage_id||'—'}`;
@@ -788,8 +788,8 @@ async function loadAll() {
   let roadmapText = '', registryText = '';
   try {
     const [r1,r2] = await Promise.all([
-      fetch('documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md?t='+Date.now()),
-      fetch('documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md?t='+Date.now()),
+      fetch('../../documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md?t='+Date.now()),
+      fetch('../../documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md?t='+Date.now()),
     ]);
     if (!r1.ok || !r2.ok) throw new Error('fetch');
     [roadmapText, registryText] = await Promise.all([r1.text(), r2.text()]);

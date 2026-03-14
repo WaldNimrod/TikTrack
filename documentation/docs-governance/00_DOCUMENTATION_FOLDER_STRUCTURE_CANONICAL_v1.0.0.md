@@ -64,6 +64,10 @@
 
 **שורש:** `documentation/docs-system/` — ארכיטקטורה, שרת, עיצוב, מוצר (קיים).
 
+### 2.3.1 תעוד Agents_OS (מאורגן)
+
+**שורש:** `documentation/docs-agents-os/` — אינדקס ראשי, סקירה, ארכיטקטורה, CLI, נהלים, תבניות (מקביל ל־docs-system). ראה [00_AGENTS_OS_MASTER_INDEX.md](../../docs-agents-os/00_AGENTS_OS_MASTER_INDEX.md).
+
 ### 2.4 דוחות וארטיפקטים — נתיב קנוני יחיד (מחייב)
 
 **נתיב קבוע:** דוחות וארטיפקטים (Evidence, QA, Gate) — **רק** תחת:

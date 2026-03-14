@@ -11,6 +11,8 @@
 
 ## 1. נקודת כניסה לדומיין
 
+**מקור ראשי מאורגן:** [documentation/docs-agents-os/00_AGENTS_OS_MASTER_INDEX.md](../../documentation/docs-agents-os/00_AGENTS_OS_MASTER_INDEX.md) — אינדקס מלא, Quick Start, ארכיטקטורה, CLI.
+
 ספריית התיעוד של דומיין Agents_OS: מפרטים, קונספטים, פרוטוקולים ותבניות. משילות משותפת (WSM, נהלים, תבניות משותפות) נמצאת ב־`documentation/docs-governance/`.
 
 ---

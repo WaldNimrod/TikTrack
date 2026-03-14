@@ -47,7 +47,7 @@ Forced `mode=market_open` outside this window is **not admissible**.
 
 - הסקריפט מריץ **Pre-flight** (`check_market_open_et.py`). אם exit 1 — נעצר (לא קביל).
 - **אין** שימוש ב־`G7_CC01_EVIDENCE_FORCE_MARKET_OPEN` — הבקאנד מחזיר `mode=market_open` רק כשהשוק באמת פתוח.
-- תוצאה: `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_9.log` עם `mode=market_open`, JSON מעודכן עם timestamp בתוך החלון.
+- תוצאה: `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_9.log` עם `mode=market_open`, JSON מעודכן עם timestamp בתוך החלון.
 
 ---
 
@@ -57,8 +57,8 @@ Forced `mode=market_open` outside this window is **not admissible**.
 |----------|------|
 | Runtime Evidence Report v2.0.9 | _COMMUNICATION/team_60/TEAM_60_TO_TEAM_90_..._RUNTIME_EVIDENCE_REPORT_v2.0.9.md (זה) |
 | QA Corroboration v2.0.9 | _COMMUNICATION/team_50/TEAM_50_TO_TEAM_90_..._QA_CORROBORATION_v2.0.9.md |
-| JSON | documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json |
-| Log | documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_9.log |
+| JSON | documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json |
+| Log | documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_9.log |
 
 ---
 

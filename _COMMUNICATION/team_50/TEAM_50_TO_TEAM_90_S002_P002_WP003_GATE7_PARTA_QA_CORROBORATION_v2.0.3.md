@@ -53,7 +53,7 @@
 
 | פריט | תוצאה |
 |------|--------|
-| log_path | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_2026-03-12_002350.log` |
+| log_path | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_2026-03-12_002350.log` |
 | cc_wp003_04_yahoo_cooldown_activations | **1** |
 | pass_04 | **False** |
 
@@ -84,8 +84,8 @@
 | מסמך | נתיב |
 |------|------|
 | Team 60 Evidence Report | `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_90_S002_P002_WP003_GATE7_PARTA_RUNTIME_EVIDENCE_REPORT_v2.0.3.md` |
-| G7 Part A JSON | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
-| G7-VERIFY log | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_2026-03-12_002350.log` |
+| G7 Part A JSON | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
+| G7-VERIFY log | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_2026-03-12_002350.log` |
 | T-MKTDATA tests | `tests/test_t_mktdata_g7_fix.py` |
 
 ---

@@ -303,9 +303,11 @@ def _generate_mandate_doc(
         if phase_num < max(phases.keys()):
             next_phase   = phase_num + 1
             next_steps   = phases.get(next_phase, [])
-            next_names   = " + ".join(_short(s.label) for s in next_steps)
             order_lines.append(
                 f"             ↓  Phase {next_phase} starts ONLY after Phase {phase_num} completes"
+            )
+            order_lines.append(
+                f"             💻  Phase {phase_num} done?  →  ./pipeline_run.sh phase{next_phase}"
             )
             # Coordination note: which teams provide data to which
             for ns in next_steps:
@@ -385,7 +387,26 @@ def _generate_mandate_doc(
 
         sections.append(body)
 
-    sections_text = ("\n" + SEP + "\n\n").join(sections)
+    # Phase-aware section join: insert a visible transition command between phase boundaries
+    sep_normal = "\n" + SEP + "\n\n"
+    parts: list[str] = []
+    for i, (step, body) in enumerate(zip(steps, sections)):
+        parts.append(body)
+        if i < len(steps) - 1:
+            next_step = steps[i + 1]
+            if next_step.phase > step.phase:
+                next_ph = next_step.phase
+                parts.append(
+                    f"\n{SEP}\n"
+                    f"  ✅  Phase {step.phase} complete?\n"
+                    f"  →  Run in terminal:  ./pipeline_run.sh phase{next_ph}\n"
+                    f"     Regenerates mandates with Phase {step.phase} output injected\n"
+                    f"     + displays Phase {next_ph} section ready to copy.\n"
+                    f"{SEP}\n\n"
+                )
+            else:
+                parts.append(sep_normal)
+    sections_text = "".join(parts)
 
     # ── 3. Assemble final document ────────────────────────────────────────────
     gate_label = f"  ·  {gate}" if gate else ""

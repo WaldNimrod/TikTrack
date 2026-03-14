@@ -771,13 +771,13 @@ python3 -m http.server 8090
     <div><a class="doc-link" href="PIPELINE_ROADMAP.html" target="_blank">PIPELINE_ROADMAP.html</a> — Full pipeline sequence, portfolio roadmap tree, gate history, canonical task files</div>
     <p style="margin-top:8px"><strong>🔍 Progress Check</strong> (button in header or press <code>p</code>): Scans all 14 gates + current artifacts → shows full pipeline overview, current gate guidance with PASS/FAIL paths, FAIL cycle detection.</p>
     <div>
-      <a class="doc-link" href="PIPELINE_HOWTO.md" target="_blank">PIPELINE_HOWTO.md</a>
-      <a class="doc-link" href="_COMMUNICATION/team_00/TEAM_00_S001_P002_WP001_EXPERIMENT_EXECUTION_GUIDE_v1.0.0.md" target="_blank">Experiment Execution Guide</a>
-      <a class="doc-link" href="_COMMUNICATION/agents_os/pipeline_state.json" target="_blank">pipeline_state.json</a>
-      <a class="doc-link" href="_COMMUNICATION/agents_os/prompts/implementation_mandates.md" target="_blank">implementation_mandates.md</a>
-      <a class="doc-link" href="_COMMUNICATION/agents_os/prompts/gate_8_mandates.md" target="_blank">gate_8_mandates.md</a>
-      <a class="doc-link" href="agents_os_v2/orchestrator/pipeline.py" target="_blank">pipeline.py (CLI source)</a>
-      <a class="doc-link" href="pipeline_run.sh" target="_blank">pipeline_run.sh</a>
+      <a class="doc-link" href="../../PIPELINE_HOWTO.md" target="_blank">PIPELINE_HOWTO.md</a>
+      <a class="doc-link" href="../../_COMMUNICATION/team_00/TEAM_00_S001_P002_WP001_EXPERIMENT_EXECUTION_GUIDE_v1.0.0.md" target="_blank">Experiment Execution Guide</a>
+      <a class="doc-link" href="../../_COMMUNICATION/agents_os/pipeline_state.json" target="_blank">pipeline_state.json</a>
+      <a class="doc-link" href="../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md" target="_blank">implementation_mandates.md</a>
+      <a class="doc-link" href="../../_COMMUNICATION/agents_os/prompts/gate_8_mandates.md" target="_blank">gate_8_mandates.md</a>
+      <a class="doc-link" href="../../agents_os_v2/orchestrator/pipeline.py" target="_blank">pipeline.py (CLI source)</a>
+      <a class="doc-link" href="../../pipeline_run.sh" target="_blank">pipeline_run.sh</a>
     </div>
     </div>
     <div class="lang-he" dir="rtl" style="display:none">
@@ -785,13 +785,13 @@ python3 -m http.server 8090
     <div><a class="doc-link" href="PIPELINE_ROADMAP.html" target="_blank">PIPELINE_ROADMAP.html</a> — רצף pipeline מלא, עץ roadmap, היסטוריית שלבים, קבצי משימה קנוניים</div>
     <p style="margin-top:8px"><strong>🔍 Progress Check</strong> (כפתור בכותרת או מקש <code>p</code>): סורק את כל 14 השלבים + ארטיפקטים → מציג סקירת pipeline, הנחיות לשלב נוכחי עם מסלולי PASS/FAIL.</p>
     <div>
-      <a class="doc-link" href="PIPELINE_HOWTO.md" target="_blank">PIPELINE_HOWTO.md</a>
-      <a class="doc-link" href="_COMMUNICATION/team_00/TEAM_00_S001_P002_WP001_EXPERIMENT_EXECUTION_GUIDE_v1.0.0.md" target="_blank">Experiment Execution Guide</a>
-      <a class="doc-link" href="_COMMUNICATION/agents_os/pipeline_state.json" target="_blank">pipeline_state.json</a>
-      <a class="doc-link" href="_COMMUNICATION/agents_os/prompts/implementation_mandates.md" target="_blank">implementation_mandates.md</a>
-      <a class="doc-link" href="_COMMUNICATION/agents_os/prompts/gate_8_mandates.md" target="_blank">gate_8_mandates.md</a>
-      <a class="doc-link" href="agents_os_v2/orchestrator/pipeline.py" target="_blank">pipeline.py (CLI source)</a>
-      <a class="doc-link" href="pipeline_run.sh" target="_blank">pipeline_run.sh</a>
+      <a class="doc-link" href="../../PIPELINE_HOWTO.md" target="_blank">PIPELINE_HOWTO.md</a>
+      <a class="doc-link" href="../../_COMMUNICATION/team_00/TEAM_00_S001_P002_WP001_EXPERIMENT_EXECUTION_GUIDE_v1.0.0.md" target="_blank">Experiment Execution Guide</a>
+      <a class="doc-link" href="../../_COMMUNICATION/agents_os/pipeline_state.json" target="_blank">pipeline_state.json</a>
+      <a class="doc-link" href="../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md" target="_blank">implementation_mandates.md</a>
+      <a class="doc-link" href="../../_COMMUNICATION/agents_os/prompts/gate_8_mandates.md" target="_blank">gate_8_mandates.md</a>
+      <a class="doc-link" href="../../agents_os_v2/orchestrator/pipeline.py" target="_blank">pipeline.py (CLI source)</a>
+      <a class="doc-link" href="../../pipeline_run.sh" target="_blank">pipeline_run.sh</a>
     </div>
     </div>
   </div>
@@ -977,16 +977,16 @@ const GATE_CONFIG = {
 
 // ── Booster team data (compact — mirrors PIPELINE_TEAMS.html TEAMS) ─────────
 const BOOSTER_TEAM_DATA = {
-  "team_10":  { label:"Team 10",  name:"Execution Orchestrator",   writesTo:["_COMMUNICATION/team_10/"],  isoRules:["No gate submission without all artifacts","Work plan must be versioned","Identity header mandatory on all outputs"] },
-  "team_20":  { label:"Team 20",  name:"Backend Implementation",   writesTo:["_COMMUNICATION/team_20/"],  isoRules:["maskedLog mandatory on all server-side logging","NUMERIC(20,8) for financial data","4-state status model (pending/active/inactive/cancelled)"] },
-  "team_30":  { label:"Team 30",  name:"Frontend Implementation",  writesTo:["_COMMUNICATION/team_30/"],  isoRules:["collapsible-container Iron Rule on ALL pages","maskedLog mandatory","Rich text: ONE unified object"] },
-  "team_50":  { label:"Team 50",  name:"QA & Functional Acceptance",writesTo:["_COMMUNICATION/team_50/"],  isoRules:["Team 50 = QA (Iron Rule)","GATE_4 requires PASS evidence: commands + outputs + exit codes"] },
-  "team_70":  { label:"Team 70",  name:"Documentation",            writesTo:["_COMMUNICATION/team_70/"],  isoRules:["All docs require identity header","AS_MADE_REPORT mandatory at GATE_8"] },
-  "team_90":  { label:"Team 90",  name:"Dev Validator",            writesTo:["_COMMUNICATION/team_90/"],  isoRules:["CRITICAL: Every GATE_5 run MUST be a FRESH validation — never repeat prior findings","route_recommendation MANDATORY in every BLOCKING_REPORT","Do NOT return template or placeholder responses"] },
-  "team_100": { label:"Team 100", name:"Strategic Reviewer",       writesTo:["_COMMUNICATION/team_100/"], isoRules:["GATE_6 approval requires explicit evidence review","route_recommendation mandatory if REJECTED"] },
-  "team_170": { label:"Team 170", name:"Spec & Governance",        writesTo:["_COMMUNICATION/team_170/"], isoRules:["DDL is documentation only — production DB is source of truth","Registry updates require Team 00 awareness"] },
-  "team_190": { label:"Team 190", name:"Constitutional Validator", writesTo:["_COMMUNICATION/team_190/"], isoRules:["GATE_0 BLOCK stops all downstream work — absolute rule","route_recommendation mandatory in all BLOCK reports"] },
-  "teams_20+30":{ label:"Teams 20+30", name:"Implementation",      writesTo:["_COMMUNICATION/team_20/","_COMMUNICATION/team_30/"], isoRules:["maskedLog mandatory","NUMERIC(20,8) for financial data","collapsible-container Iron Rule on ALL pages"] },
+  "team_10":  { label:"Team 10",  name:"Execution Orchestrator",   writesTo:["../../_COMMUNICATION/team_10/"],  isoRules:["No gate submission without all artifacts","Work plan must be versioned","Identity header mandatory on all outputs"] },
+  "team_20":  { label:"Team 20",  name:"Backend Implementation",   writesTo:["../../_COMMUNICATION/team_20/"],  isoRules:["maskedLog mandatory on all server-side logging","NUMERIC(20,8) for financial data","4-state status model (pending/active/inactive/cancelled)"] },
+  "team_30":  { label:"Team 30",  name:"Frontend Implementation",  writesTo:["../../_COMMUNICATION/team_30/"],  isoRules:["collapsible-container Iron Rule on ALL pages","maskedLog mandatory","Rich text: ONE unified object"] },
+  "team_50":  { label:"Team 50",  name:"QA & Functional Acceptance",writesTo:["../../_COMMUNICATION/team_50/"],  isoRules:["Team 50 = QA (Iron Rule)","GATE_4 requires PASS evidence: commands + outputs + exit codes"] },
+  "team_70":  { label:"Team 70",  name:"Documentation",            writesTo:["../../_COMMUNICATION/team_70/"],  isoRules:["All docs require identity header","AS_MADE_REPORT mandatory at GATE_8"] },
+  "team_90":  { label:"Team 90",  name:"Dev Validator",            writesTo:["../../_COMMUNICATION/team_90/"],  isoRules:["CRITICAL: Every GATE_5 run MUST be a FRESH validation — never repeat prior findings","route_recommendation MANDATORY in every BLOCKING_REPORT","Do NOT return template or placeholder responses"] },
+  "team_100": { label:"Team 100", name:"Strategic Reviewer",       writesTo:["../../_COMMUNICATION/team_100/"], isoRules:["GATE_6 approval requires explicit evidence review","route_recommendation mandatory if REJECTED"] },
+  "team_170": { label:"Team 170", name:"Spec & Governance",        writesTo:["../../_COMMUNICATION/team_170/"], isoRules:["DDL is documentation only — production DB is source of truth","Registry updates require Team 00 awareness"] },
+  "team_190": { label:"Team 190", name:"Constitutional Validator", writesTo:["../../_COMMUNICATION/team_190/"], isoRules:["GATE_0 BLOCK stops all downstream work — absolute rule","route_recommendation mandatory in all BLOCK reports"] },
+  "teams_20+30":{ label:"Teams 20+30", name:"Implementation",      writesTo:["../../_COMMUNICATION/team_20/","../../_COMMUNICATION/team_30/"], isoRules:["maskedLog mandatory","NUMERIC(20,8) for financial data","collapsible-container Iron Rule on ALL pages"] },
 };
 
 // ── Booster state ────────────────────────────────────────────────────────────
@@ -1046,12 +1046,12 @@ function updateBoosterPreview() {
 }
 
 const EXPECTED_FILES = [
-  {label:"Team 20 API verify",  path:"_COMMUNICATION/team_20/TEAM_20_S001_P002_WP001_API_VERIFY_v1.0.0.md"},
+  {label:"Team 20 API verify",  path:"../../_COMMUNICATION/team_20/TEAM_20_S001_P002_WP001_API_VERIFY_v1.0.0.md"},
   {label:"Team 30 widget JSX",  path:"ui/src/components/AlertsSummaryWidget.jsx"},
   {label:"Team 30 HomePage",    path:"ui/src/components/HomePage.jsx"},
-  {label:"Team 50 QA report",   path:"_COMMUNICATION/team_50/TEAM_50_S001_P002_WP001_QA_REPORT_v1.0.0.md"},
-  {label:"G3_PLAN work plan",   path:"_COMMUNICATION/team_10/TEAM_10_S001_P002_WP001_G3_PLAN_WORK_PLAN_v1.1.0.md"},
-  {label:"Mandates file",       path:"_COMMUNICATION/agents_os/prompts/implementation_mandates.md"},
+  {label:"Team 50 QA report",   path:"../../_COMMUNICATION/team_50/TEAM_50_S001_P002_WP001_QA_REPORT_v1.0.0.md"},
+  {label:"G3_PLAN work plan",   path:"../../_COMMUNICATION/team_10/TEAM_10_S001_P002_WP001_G3_PLAN_WORK_PLAN_v1.1.0.md"},
+  {label:"Mandates file",       path:"../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md"},
 ];
 
 // ── State ─────────────────────────────────────────────────────────────────
@@ -1065,11 +1065,11 @@ let refreshTimer = null;
 let currentDomain = "tiktrack";  // active pipeline domain
 
 const DOMAIN_STATE_FILES = {
-  "tiktrack":  "_COMMUNICATION/agents_os/pipeline_state_tiktrack.json",
-  "agents_os": "_COMMUNICATION/agents_os/pipeline_state_agentsos.json",
+  "tiktrack":  "../../_COMMUNICATION/agents_os/pipeline_state_tiktrack.json",
+  "agents_os": "../../_COMMUNICATION/agents_os/pipeline_state_agentsos.json",
 };
 // Fallback: legacy state file (used when domain-specific file doesn't exist)
-const LEGACY_STATE_FILE = "_COMMUNICATION/agents_os/pipeline_state.json";
+const LEGACY_STATE_FILE = "../../_COMMUNICATION/agents_os/pipeline_state.json";
 
 // Domain-aware gate owner overrides (mirrors config.py DOMAIN_GATE_OWNERS)
 const DOMAIN_GATE_OWNERS_JS = {
@@ -1295,7 +1295,7 @@ function buildCommands(currentGate) {
 // ── Load prompt ───────────────────────────────────────────────────────────
 async function loadPrompt(gate) {
   if (!gate) return;
-  const path = `_COMMUNICATION/agents_os/prompts/${gate}_prompt.md`;
+  const path = `../../_COMMUNICATION/agents_os/prompts/${gate}_prompt.md`;
   document.getElementById("prompt-gate-badge").textContent = gate;
   document.getElementById("prompt-gate-name").textContent  = gate;
   const cfg = GATE_CONFIG[gate] || {};
@@ -1346,10 +1346,10 @@ async function loadPrompt(gate) {
 // ── Mandate file routing — mirrors GATE_MANDATE_FILES in pipeline.py ──────
 // Gate → which prompts/ file holds the per-team mandate tabs
 const GATE_MANDATE_FILES = {
-  'G3_6_MANDATES':         '_COMMUNICATION/agents_os/prompts/implementation_mandates.md',
-  'CURSOR_IMPLEMENTATION': '_COMMUNICATION/agents_os/prompts/implementation_mandates.md',
-  'GATE_4':                '_COMMUNICATION/agents_os/prompts/implementation_mandates.md',
-  'GATE_8':                '_COMMUNICATION/agents_os/prompts/gate_8_mandates.md',
+  'G3_6_MANDATES':         '../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md',
+  'CURSOR_IMPLEMENTATION': '../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md',
+  'GATE_4':                '../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md',
+  'GATE_8':                '../../_COMMUNICATION/agents_os/prompts/gate_8_mandates.md',
 };
 
 // ── Load mandates (gate-aware) ─────────────────────────────────────────────
@@ -1357,13 +1357,13 @@ async function loadMandates() {
   // Pick the mandate file for the current gate; fall back to implementation_mandates.md
   const gate         = pipelineState?.current_gate || '';
   const mandateFile  = GATE_MANDATE_FILES[gate]
-                     || '_COMMUNICATION/agents_os/prompts/implementation_mandates.md';
+                     || '../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md';
 
   let text = await fetchText(mandateFile);
 
   // If the gate-specific file is missing, try the fallback
-  if (!text && mandateFile !== '_COMMUNICATION/agents_os/prompts/implementation_mandates.md') {
-    text = await fetchText('_COMMUNICATION/agents_os/prompts/implementation_mandates.md');
+  if (!text && mandateFile !== '../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md') {
+    text = await fetchText('../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md');
   }
 
   if (!text) {
@@ -1457,15 +1457,23 @@ function showMandate(key) {
   if (meta.hasPrereq) {
     const m    = content.match(/⚠️  PREREQUISITE: \*\*([^*]+)\*\*/);
     const who  = m ? m[1] : "the prior phase";
+    const ph   = meta.phase || 2;
+    const cmd  = `./pipeline_run.sh phase${ph}`;
     prefixHtml = `<div class="prereq-warning">`
-               + `⏳ <strong>Wait for ${escHtml(who)}</strong> — this phase cannot start until `
-               + `that team's mandate is complete and output file exists.</div>`;
+               + `⏳ <strong>Wait for ${escHtml(who)}</strong> — Phase ${ph - 1} must be COMPLETE first. `
+               + `When they're done, run in terminal: `
+               + `<code style="background:rgba(0,0,0,0.3);padding:1px 6px;border-radius:3px;font-size:11px">${escHtml(cmd)}</code>`
+               + ` — injects their output and refreshes this prompt.</div>`;
   }
   if (meta.prereqMissing && meta.hasPrereq) {
-    // Prereq file not found yet — add extra note
+    const ph  = meta.phase || 2;
+    const cmd = `./pipeline_run.sh phase${ph}`;
+    // Prereq file not found yet — strong CTA with exact command
     prefixHtml += `<div class="prereq-warning" style="border-color:rgba(210,153,34,0.3);color:var(--warning);background:rgba(210,153,34,0.05)">`
-                + `📄 Prior team's output file not yet found — generate again after they complete their mandate: `
-                + `<code>./pipeline_run.sh</code> to refresh.</div>`;
+                + `📄 <strong>Prior team's output not yet available.</strong> `
+                + `Once Phase ${ph - 1} is complete, run: `
+                + `<code style="background:rgba(0,0,0,0.2);padding:1px 6px;border-radius:3px;font-size:11px">${escHtml(cmd)}</code>`
+                + ` — injects their output into this section.</div>`;
   }
 
   contentEl.innerHTML = prefixHtml;
@@ -1583,7 +1591,7 @@ const ALL_GATE_DEFS = {
     desc:'Auto-generates per-team mandates deterministically from work plan',
     advice:'Mandates are auto-generated → ./pipeline_run.sh pass to advance',
     failAdvice:'Should not fail. Check pipeline.py error output for issues.',
-    files:['_COMMUNICATION/agents_os/prompts/implementation_mandates.md'],
+    files:['../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md'],
   },
   'CURSOR_IMPLEMENTATION': {
     owner:'teams_20+30', engine:'cursor',
@@ -1593,7 +1601,7 @@ const ALL_GATE_DEFS = {
     substeps:[
       {
         label:'Step A — Team 20 (API Verify)',
-        files:['_COMMUNICATION/team_20/TEAM_20_S001_P002_WP001_API_VERIFY_v1.0.0.md'],
+        files:['../../_COMMUNICATION/team_20/TEAM_20_S001_P002_WP001_API_VERIFY_v1.0.0.md'],
         doneMsg:'✅ API verification done — proceed to Step B (Team 30)',
         pendingMsg:'⏳ Open Cursor Composer → paste Team 20 mandate from implementation_mandates.md',
       },
@@ -1624,7 +1632,7 @@ const ALL_GATE_DEFS = {
     substeps:[
       {
         label:'Team 50 — QA Report',
-        files:['_COMMUNICATION/team_50/TEAM_50_S001_P002_WP001_QA_REPORT_v1.0.0.md'],
+        files:['../../_COMMUNICATION/team_50/TEAM_50_S001_P002_WP001_QA_REPORT_v1.0.0.md'],
         doneMsg:'✅ QA report exists — review findings then use PASS/FAIL builder above',
         pendingMsg:'⏳ Open Cursor Composer → paste Team 50 mandate from implementation_mandates.md',
       },
@@ -1711,7 +1719,7 @@ const ALL_GATE_DEFS = {
     passLabel:'✅ Closure Validated — WP CLOSED',
     failLabel:'❌ Closure Incomplete — Team 70/170 correct',
     verdictTeam:'team_90', verdictGate:'GATE_8',
-    files:['_COMMUNICATION/agents_os/prompts/gate_8_mandates.md'],
+    files:['../../_COMMUNICATION/agents_os/prompts/gate_8_mandates.md'],
     failRoutes:{
       doc:{ cmd:'./pipeline_run.sh route doc GATE_8', label:'📝 Correction → GATE_8', desc:'<strong>Closure issues</strong> — Team 70/170 corrects docs or archive → Team 90 re-validates' },
       full:{ cmd:'./pipeline_run.sh route full GATE_8', label:'🔄 Full Redo → GATE_8', desc:'<strong>Closure rejected</strong> — Team 70/170 full redo of AS_MADE_REPORT + archive' },
@@ -1723,7 +1731,7 @@ const ALL_GATE_DEFS = {
 // Domain-aware: GATE_2 + GATE_6 include both team_00 and team_100 folders
 // (different domains route to different teams; we check both to be safe)
 function getVerdictCandidates(gate, wp) {
-  const d = '_COMMUNICATION/';
+  const d = '../../_COMMUNICATION/';
   const t00  = `${d}team_00/`;
   const t90  = `${d}team_90/`;
   const t190 = `${d}team_190/`;

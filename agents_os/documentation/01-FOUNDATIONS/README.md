@@ -1,5 +1,7 @@
 # Agents_OS Documentation — 01-FOUNDATIONS
 
+**מקור ראשי:** [documentation/docs-agents-os/00_AGENTS_OS_MASTER_INDEX.md](../../../documentation/docs-agents-os/00_AGENTS_OS_MASTER_INDEX.md)
+
 **project_domain:** AGENTS_OS  
 **owner:** Team 170 (תיעוד); Team 100 (אדריכל)  
 **date:** 2026-03-14  

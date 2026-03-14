@@ -114,6 +114,13 @@ Every Team 191 closure note must include:
    - `191 פוש` = `191 push`
    - `191 מארג` = `191 merge`
    - `191 מיזוג` = `191 merge`
+6. Optional message payload syntax (binding):
+   - pattern: `<191-command> ? <free_text>`
+   - purpose: user-provided title/prefix for commit / push / merge messages.
+   - examples:
+     - `191 קומיט ? השינוי שביצענו כרגע הוא מעולה`
+     - `191 פוש ? סבב סגירה לולידציה`
+     - `191 מארג ? איחוד סופי למיין`
 
 ---
 
@@ -124,8 +131,11 @@ Every Team 191 closure note must include:
 3. Menu content is mandatory and stable:
    - `191 status` — show current Git/governance blocker status only.
    - `191 commit` / `191 קומיט` — create context-aware local commit message and commit all intended updates.
+   - `191 commit ? <text>` / `191 קומיט ? <text>` — same flow with user text as message prefix.
    - `191 push` / `191 פוש` — run default `SAFE` push flow (guard checks + deterministic remediation + push).
+   - `191 push ? <text>` / `191 פוש ? <text>` — same flow with user text as push/remediation message prefix.
    - `191 merge` / `191 מארג` / `191 מיזוג` — run canonical merge flow from `codex/team191-integration` to `main` (PR create/check/merge/verify).
+   - `191 merge ? <text>` / `191 מארג ? <text>` / `191 מיזוג ? <text>` — same flow with user text as PR/merge title prefix.
    - `191 push quick` — minimal flow (fast path; lower hygiene).
    - `191 push safe` — default balanced flow (recommended).
    - `191 push strict` — maximal hygiene flow (deep checks, slower).
@@ -138,6 +148,9 @@ Every Team 191 closure note must include:
    - Team 191 must not bypass branch protection by direct push to `main`.
 6. Every `191 ?` response must include short pros/cons per mode to preserve consistent operator guidance.
 7. Every `191 ?` response must include the locked Hebrew↔English command translation map.
+8. Optional payload application rule:
+   - If payload is provided after `?`, Team 191 must use it as a title/prefix when generating commit subject / remediation commit subject / PR title / merge report headline.
+   - If payload is missing, Team 191 uses automatic context-derived naming (current default behavior).
 
 ---
 

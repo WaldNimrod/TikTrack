@@ -135,6 +135,29 @@ Every Team 191 closure note must include:
 
 ---
 
+## 10) Setup Lock (One-Time + Session)
+
+1. One-time repository Git setting (mandatory):
+   - `git config push.default upstream`
+   - target effect: `191 push` can run `git push origin` without branch-name mismatch failures.
+2. Branch lock for Team 191 operation:
+   - local branch: `main`
+   - upstream target: `origin/codex/team191-integration`
+   - no direct push lane to `origin/main`.
+3. Session token loading for GitHub API actions:
+   - token file path: `/tmp/team191_github_token`
+   - loader pattern: `TOKEN="$(cat /tmp/team191_github_token)"`
+4. Mandatory fine-grained PAT permissions for full `191 merge` lane:
+   - `Pull requests: Read and write` (required for create/merge PR)
+   - `Contents: Read and write`
+   - `Metadata: Read-only`
+   - `Administration: Read and write` (required when branch/rules settings changes are in scope)
+5. Merge guard:
+   - if API returns `Resource not accessible by personal access token` or header requires `pull_requests=write`,
+     Team 191 returns `BLOCK` and routes owner to token-scope remediation.
+
+---
+
 **log_entry | TEAM_190 | TEAM_191_INTERNAL_WORK_PROCEDURE | CREATED_AND_ACTIVATED | 2026-03-11**
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | DATE_LINT_RECURRING_PATTERN_POLICY_LOCKED | 2026-03-11**
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | HEBREW_LANGUAGE_LOCK_AND_191_HELP_PROMPT_LOCKED | 2026-03-11**

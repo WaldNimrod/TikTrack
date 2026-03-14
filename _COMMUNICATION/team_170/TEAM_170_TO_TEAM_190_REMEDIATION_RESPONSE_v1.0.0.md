@@ -3,7 +3,7 @@
 
 **From:** Team 170
 **To:** Team 190
-**date:** 2026-02-19
+**date:** 2026-03-14
 **purpose:** תיקונים שבוצעו בתגובה ל־BLOCK_FOR_FIX
 
 ---

@@ -34,8 +34,8 @@ Team 60 השלים evidence v2.0.5. **כל pass_01, pass_02, pass_04 = true.**
 | ארטיפקט | נתיב |
 |----------|------|
 | דוח עדות v2.0.5 | `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_90_S002_P002_WP003_GATE7_PARTA_RUNTIME_EVIDENCE_REPORT_v2.0.5.md` |
-| JSON | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
-| Log | `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_5.log` |
+| JSON | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
+| Log | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_5.log` |
 
 ---
 

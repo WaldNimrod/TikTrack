@@ -109,7 +109,7 @@ tests/test_t_mktdata_g7_fix.py::test_t_mktdata_05_iron_rule_8_401_never_sets_coo
 ### 4.2 verify_g7_part_a_runtime (CC-01, 02, 04 PASS)
 
 ```
-G7_PART_A_LOG_PATH=documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_5.log G7_PART_A_MODE=four_cycle
+G7_PART_A_LOG_PATH=documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_5.log G7_PART_A_MODE=four_cycle
 pass_01: True | pass_02: True | pass_04: True
 Yahoo 429 count: 0
 ```
@@ -141,9 +141,9 @@ AUTO-WP003-4_actions_menu: PASS
 
 | פריט | נתיב |
 |------|------|
-| Log (shared run) | `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_5.log` |
-| JSON evidence | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
-| AUTO-WP003 results | `documentation/05-REPORTS/artifacts/TEAM_50_AUTO_WP003_RUNTIME_RESULTS.json` |
+| Log (shared run) | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_5.log` |
+| JSON evidence | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
+| AUTO-WP003 results | `documentation/reports/05-REPORTS/artifacts/TEAM_50_AUTO_WP003_RUNTIME_RESULTS.json` |
 | T-MKTDATA tests | `tests/test_t_mktdata_g7_fix.py` |
 
 ---

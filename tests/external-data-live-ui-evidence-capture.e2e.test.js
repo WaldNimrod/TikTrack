@@ -206,7 +206,7 @@ ${positionsTable}
 
 ${screenshotRefs}
 
-**נתיב:** \`documentation/05-REPORTS/artifacts/external-data-live-ui/\`
+**נתיב:** \`documentation/reports/05-REPORTS/artifacts/external-data-live-ui/\`
 
 ---
 

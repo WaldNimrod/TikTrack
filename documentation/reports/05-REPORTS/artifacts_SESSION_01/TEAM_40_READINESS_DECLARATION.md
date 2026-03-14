@@ -74,7 +74,7 @@
 **Primary References:**
 - `documentation/03-DESIGN_UX_UI/GIN_004_UI_ALIGNMENT_SPEC.md` - ui_display_config structure
 - `documentation/01-ARCHITECTURE/TT2_MASTER_PALETTE_SPEC.md` - Color palette
-- `documentation/05-REPORTS/artifacts_SESSION_01/PHASE_1_TASK_BREAKDOWN.md` - Task specifications
+- `documentation/reports/05-REPORTS/artifacts_SESSION_01/PHASE_1_TASK_BREAKDOWN.md` - Task specifications
 
 **Supporting References:**
 - `ui/src/layout/global_page_template.jsx` - Current CSS variable patterns

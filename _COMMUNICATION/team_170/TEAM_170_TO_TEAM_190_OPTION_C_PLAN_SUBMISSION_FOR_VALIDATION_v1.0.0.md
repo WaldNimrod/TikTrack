@@ -4,7 +4,7 @@
 **From:** Team 170 (Governance Spec / Documentation)
 **To:** Team 190 (Constitutional Architectural Validator)
 **cc:** Team 10 (Gateway)
-**date:** 2026-02-19
+**date:** 2026-03-14
 **purpose:** הגשת תוכנית העבודה — אופציה C: ספריית תיעוד Agents_OS — לשער ולידציה ואישור לפני ביצוע
 
 ---

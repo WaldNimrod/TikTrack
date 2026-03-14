@@ -270,6 +270,42 @@
       transition: all 0.15s;
     }
     .team-tab.active { background: var(--current); border-color: var(--current); color: #fff; }
+    /* Phase indicator badges inside tabs */
+    .phase-badge {
+      font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 8px;
+      background: rgba(56,139,253,0.14); color: #58a6ff;
+      border: 1px solid rgba(56,139,253,0.25); margin-left: 5px; flex-shrink: 0;
+    }
+    .correction-badge {
+      font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 8px;
+      background: rgba(248,81,73,0.14); color: #f85149;
+      border: 1px solid rgba(248,81,73,0.3); margin-left: 5px; flex-shrink: 0;
+    }
+    /* Tab state: Phase 1 (next to run) */
+    .team-tab.next-phase {
+      border-color: var(--accent); background: rgba(56,139,253,0.07);
+      color: #58a6ff; font-weight: 700;
+    }
+    /* Tab state: Phase 1 with correction data (fail→return cycle) */
+    .team-tab.correction-needed {
+      border-color: var(--warning); background: rgba(210,153,34,0.07);
+      color: var(--warning); font-weight: 700;
+    }
+    /* Prereq warning block shown above mandate content */
+    .prereq-warning {
+      background: rgba(248,81,73,0.06); border: 1px solid rgba(248,81,73,0.25);
+      border-radius: 6px; padding: 8px 12px; margin-bottom: 10px;
+      font-size: 12px; color: #f85149; font-family: var(--sans);
+      white-space: normal; line-height: 1.5;
+    }
+    /* Mandate redirect banner: shown in prompt area when gate uses mandates */
+    .mandate-redirect-banner {
+      background: rgba(56,139,253,0.07); border: 1px solid rgba(56,139,253,0.25);
+      border-radius: 6px; padding: 8px 14px; margin-top: 8px;
+      font-size: 12px; color: #58a6ff; gap: 8px;
+      align-items: center; display: none;
+    }
+    .mandate-redirect-banner.visible { display: flex; }
     .mandate-content {
       background: #010409;
       border: 1px solid var(--border);
@@ -844,6 +880,11 @@ python3 -m http.server 8090
           <button class="btn" id="copy-prompt-btn" onclick="copyPrompt()">📋 Copy Prompt</button>
         </div>
         <div class="prompt-box" id="prompt-content">Loading prompt…</div>
+        <!-- Redirect banner: visible only when current gate uses per-team mandates -->
+        <div class="mandate-redirect-banner" id="mandate-redirect-banner">
+          <span>⚡</span>
+          <span>This gate uses <strong>per-team mandates</strong>. Copy individual team prompts from the <strong>Mandates tab ↓</strong></span>
+        </div>
         <div style="margin-top:8px; font-size:11px; color:var(--text-muted)">
           Full file: <code id="prompt-file-path" style="font-size:10px"></code>
         </div>
@@ -884,7 +925,7 @@ python3 -m http.server 8090
       <div class="accordion-body">
         <div class="team-tabs" id="team-tabs"></div>
         <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
-          <button class="btn" onclick="copyCurrentMandate()">📋 Copy mandate</button>
+          <button class="btn" id="copy-mandate-btn" onclick="copyCurrentMandate()">📋 Copy mandate</button>
         </div>
         <div class="mandate-content" id="mandate-content">Loading…</div>
       </div>
@@ -1127,11 +1168,6 @@ function copyPrompt() {
 
 function copyCmd(text, btn) { copyText(text, btn); }
 
-function copyCurrentMandate() {
-  const el = document.getElementById("mandate-content");
-  copyText(el.textContent, document.querySelector('[onclick="copyCurrentMandate()"]'));
-}
-
 // ── Gate status helper ────────────────────────────────────────────────────
 function gateStatus(gate, state) {
   if (state.current_gate === gate) return "current";
@@ -1282,6 +1318,29 @@ async function loadPrompt(gate) {
   const hintEl = document.getElementById("booster-team-hint");
   if (hintEl) hintEl.textContent = hint;
   if (document.getElementById("booster-toggle")?.checked) updateBoosterPreview();
+
+  // ── Mandate gate: redirect copy button + auto-open mandates accordion ─────
+  const isMandateGate = gate in GATE_MANDATE_FILES;
+  const copyBtn = document.getElementById("copy-prompt-btn");
+  const banner  = document.getElementById("mandate-redirect-banner");
+  if (isMandateGate) {
+    if (copyBtn) {
+      copyBtn.textContent  = "📋 Copy Full Doc";
+      copyBtn.title        = "Per-team prompts are in the Mandates tab below ↓";
+      copyBtn.style.opacity = "0.45";
+    }
+    if (banner) banner.classList.add("visible");
+    // Auto-expand mandates accordion so the tabs are immediately visible
+    const acc = document.getElementById("acc-mandates");
+    if (acc && !acc.classList.contains("open")) acc.classList.add("open");
+  } else {
+    if (copyBtn) {
+      copyBtn.textContent  = "📋 Copy Prompt";
+      copyBtn.title        = "";
+      copyBtn.style.opacity = "";
+    }
+    if (banner) banner.classList.remove("visible");
+  }
 }
 
 // ── Mandate file routing — mirrors GATE_MANDATE_FILES in pipeline.py ──────
@@ -1317,8 +1376,12 @@ async function loadMandates() {
   _parseMandateSections(text);
 }
 
+// Per-section metadata: phase number + flags (populated by _parseMandateSections)
+let mandateMeta = {};   // key → { phase, hasCorrection, hasPrereq }
+
 function _parseMandateSections(text) {
   const sections = {};
+  mandateMeta    = {};
 
   // Detect team sections: ## Team N ... (Phase N) — or any ## Team N ... ( form
   const hasSections = /^## Team \d+/m.test(text);
@@ -1327,10 +1390,22 @@ function _parseMandateSections(text) {
   } else {
     const teamMatches = [...text.matchAll(/^## (Team \d+[^\n]*)/mg)];
     teamMatches.forEach((m, i) => {
-      const key   = m[1].trim().split("(")[0].trim();   // "Team 20 — API Verification"
-      const start = m.index;
-      const end   = i + 1 < teamMatches.length ? teamMatches[i + 1].index : text.length;
-      sections[key] = text.slice(start, end);
+      const key     = m[1].trim().split("(")[0].trim();   // "Team 20 — API Verification"
+      const start   = m.index;
+      const end     = i + 1 < teamMatches.length ? teamMatches[i + 1].index : text.length;
+      const content = text.slice(start, end);
+      sections[key] = content;
+
+      // Extract phase number from "(Phase N)" in header
+      const phaseMatch = m[1].match(/\(Phase (\d+)\)/);
+      const phase = phaseMatch ? parseInt(phaseMatch[1]) : (i + 1);
+
+      mandateMeta[key] = {
+        phase,
+        hasCorrection: content.includes("✅  Auto-loaded:"),
+        hasPrereq:     content.includes("⚠️  PREREQUISITE:"),
+        prereqMissing: content.includes("File not yet available"),
+      };
     });
   }
 
@@ -1340,11 +1415,27 @@ function _parseMandateSections(text) {
   const keys = Object.keys(sections);
   document.getElementById("mandates-badge").textContent = keys.length + " team" + (keys.length !== 1 ? "s" : "");
 
-  // Build tabs
+  // ── Build tabs with phase badges ────────────────────────────────────────
   const tabs = document.getElementById("team-tabs");
-  tabs.innerHTML = keys.map((k, i) =>
-    `<span class="team-tab${i === 0 ? " active" : ""}" onclick="selectTeam(this, ${escAttr(JSON.stringify(k))})">${escHtml(k)}</span>`
-  ).join("");
+  tabs.innerHTML = keys.map((k, i) => {
+    const meta  = mandateMeta[k] || { phase: i + 1, hasCorrection: false, hasPrereq: false };
+
+    // Tab class: first tab = next-phase (or correction-needed if correction data present)
+    let tabClass = "team-tab";
+    if (i === 0) {
+      tabClass += meta.hasCorrection ? " correction-needed" : " next-phase";
+    }
+
+    // Phase badge
+    const phaseBadge = `<span class="phase-badge">P${meta.phase}</span>`;
+
+    // Correction badge on Phase 1 when blockers are injected
+    const corrBadge = (i === 0 && meta.hasCorrection)
+      ? `<span class="correction-badge">⚠ CORRECTION</span>` : "";
+
+    return `<span class="${tabClass}" onclick="selectTeam(this, ${escAttr(JSON.stringify(k))})">`
+         + `${escHtml(k)}${phaseBadge}${corrBadge}</span>`;
+  }).join("");
 
   if (keys.length > 0) { activeTeam = keys[0]; showMandate(keys[0]); }
 }
@@ -1357,7 +1448,45 @@ function selectTeam(el, key) {
 }
 
 function showMandate(key) {
-  document.getElementById("mandate-content").textContent = mandateSections[key] || "(empty)";
+  const content   = mandateSections[key] || "(empty)";
+  const meta      = mandateMeta[key] || {};
+  const contentEl = document.getElementById("mandate-content");
+
+  // Build prereq warning prefix (non-first phases that haven't had their prereq met)
+  let prefixHtml = "";
+  if (meta.hasPrereq) {
+    const m    = content.match(/⚠️  PREREQUISITE: \*\*([^*]+)\*\*/);
+    const who  = m ? m[1] : "the prior phase";
+    prefixHtml = `<div class="prereq-warning">`
+               + `⏳ <strong>Wait for ${escHtml(who)}</strong> — this phase cannot start until `
+               + `that team's mandate is complete and output file exists.</div>`;
+  }
+  if (meta.prereqMissing && meta.hasPrereq) {
+    // Prereq file not found yet — add extra note
+    prefixHtml += `<div class="prereq-warning" style="border-color:rgba(210,153,34,0.3);color:var(--warning);background:rgba(210,153,34,0.05)">`
+                + `📄 Prior team's output file not yet found — generate again after they complete their mandate: `
+                + `<code>./pipeline_run.sh</code> to refresh.</div>`;
+  }
+
+  contentEl.innerHTML = prefixHtml;
+  contentEl.appendChild(document.createTextNode(content));
+}
+
+function copyCurrentMandate() {
+  const content = mandateSections[activeTeam] || "";
+  const btn     = document.getElementById("copy-mandate-btn");
+  const meta    = mandateMeta[activeTeam] || {};
+
+  // Warn if copying a locked phase (prereq file missing) — but still copy
+  if (meta.hasPrereq && meta.prereqMissing) {
+    if (btn) {
+      const orig = btn.textContent;
+      btn.textContent = "⚠️ Copied (prereq missing)";
+      btn.style.background = "var(--warning)";
+      setTimeout(() => { btn.textContent = orig; btn.style.background = ""; }, 2500);
+    }
+  }
+  copyText(content, btn);
 }
 
 // ── Comprehensive gate definitions — all 14 gates ─────────────────────────

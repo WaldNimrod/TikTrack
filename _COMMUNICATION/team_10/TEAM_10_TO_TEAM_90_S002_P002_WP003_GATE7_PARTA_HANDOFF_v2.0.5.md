@@ -60,7 +60,7 @@
 | 1 | Re-QA PASS | `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_S002_P002_WP003_GATE7_PARTA_RE_QA_PASS_v1.0.0.md` |
 | 2 | Re-QA Completion | `_COMMUNICATION/team_50/TEAM_50_S002_P002_WP003_GATE7_PARTA_RE_QA_COMPLETION_v1.0.0.md` |
 | 3 | דוח QA מקיף | `_COMMUNICATION/team_50/TEAM_50_S002_P002_WP003_GATE7_PARTA_COMPREHENSIVE_QA_REPORT_v1.0.0.md` |
-| 4 | G7 evidence | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
+| 4 | G7 evidence | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
 
 ---
 

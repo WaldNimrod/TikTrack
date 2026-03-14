@@ -26,7 +26,7 @@
 | דומיין | נקודת כניסה | תוכן |
 |--------|-------------|------|
 | **TIKTRACK** | [documentation/docs-system/](documentation/docs-system/) | ארכיטקטורה, שרת, עיצוב, מוצר — ראה [00_INDEX (docs-system)](documentation/docs-system/00_INDEX.md). |
-| **AGENTS_OS** | [agents_os/documentation/00_INDEX.md](agents_os/documentation/00_INDEX.md) | ספריית תיעוד Agents_OS: קונספט, workpack, תבניות (קישור ל־06-TEMPLATES). |
+| **AGENTS_OS** | [agents_os/documentation/00_INDEX.md](agents_os/documentation/00_INDEX.md) | ספריית תיעוד Agents_OS: 01-FOUNDATIONS, 02-SPECS, 03-TEMPLATES (קישור ל־06-TEMPLATES). |
 | **משותף (משילות)** | [documentation/docs-governance/00-INDEX/](documentation/docs-governance/00-INDEX/) | WSM, SSM, נהלים, חוזים, תבניות (כולל LLD400, LOD200 ב־06-TEMPLATES). |
 
 **דוחות וארטיפקטים (נתיב קנוני יחיד):** `documentation/reports/05-REPORTS`, `documentation/reports/08-REPORTS` בלבד. אסור ליצור או להשתמש ב־`documentation/05-REPORTS` או `05-REPORTS` בשורש ה־repo.

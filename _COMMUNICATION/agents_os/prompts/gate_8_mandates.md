@@ -1,7 +1,6 @@
 # Mandates — S001-P002-WP001  ·  GATE_8
-date: 2026-03-14
 
-**Spec:** D15.I — Alerts Widget
+**Spec:** S001-P002 WP001: Alerts Summary Widget on D15.I home dashboard. Read-only frontend component. Triggered-unread count badge + list of N=5 most recent, fully hidden when 0. Uses existing GET /api/v1/alerts/ endpoint. Per-alert: ticker symbol · condition label · triggered_at relative time. Click item → D34. Click badge → D34 filtered unread. collapsible-container Iron Rule. maskedLog mandatory. No new backend, no schema changes.
 
 ════════════════════════════════════════════════════════════
   EXECUTION ORDER
@@ -32,7 +31,7 @@ Write to: `_COMMUNICATION/team_70/TEAM_70_S001_P002_WP001_AS_MADE_REPORT_v1.0.0.
 Required sections:
   1. Feature summary — what was built
   2. Files created / modified:
-    - ui/src/components/AlertsSummaryWidget.jsx
+    [list all files created/modified during implementation]
   3. API endpoints added / changed (if any)
   4. Migrations or schema changes applied (if any)
   5. Known limitations / deferred items
@@ -58,6 +57,57 @@ find _COMMUNICATION/team_*/ \( -name '*S001_P002_WP001*' -o -name '*S001-P002-WP
 
 **Output — write to:**
 `_COMMUNICATION/team_70/TEAM_70_S001_P002_WP001_AS_MADE_REPORT_v1.0.0.md`
+
+### Coordination Data — Team 90 validation result (correction cycle — empty on first run)
+
+✅  Auto-loaded: `_COMMUNICATION/team_90/TEAM_90_TO_TEAM_70_S001_P002_WP001_GATE8_CLOSURE_VALIDATION_PHASE2_RESULT_v1.0.0.md`
+
+```
+# Team 90 -> Team 70 | S001-P002-WP001 GATE_8 Closure Validation Phase 2 Result
+
+**project_domain:** TIKTRACK  
+**id:** TEAM_90_TO_TEAM_70_S001_P002_WP001_GATE8_CLOSURE_VALIDATION_PHASE2_RESULT_v1.0.0  
+**from:** Team 90 (Dev Validator)  
+**to:** Team 70 (Documentation Closure)  
+**cc:** Team 10  
+**date:** 2026-03-14  
+**status:** FAIL  
+**gate_id:** GATE_8  
+**program_id:** S001-P002  
+**work_package_id:** S001-P002-WP001  
+
+---
+
+## Mandatory Identity Header
+
+| Field | Value |
+|---|---|
+| roadmap_id | PHOENIX_ROADMAP |
+| stage_id | S001 |
+| program_id | S001-P002 |
+| work_package_id | S001-P002-WP001 |
+| task_id | N/A |
+| gate_id | GATE_8 |
+| phase_owner | Team 90 |
+| required_ssm_version | 1.0.0 |
+| required_active_stage | S001 |
+| project_domain | TIKTRACK |
+
+---
+
+## Validation Checklist Result
+
+| # | Check | Result | Evidence |
+|---|---|---|---|
+| 1 | AS_MADE_REPORT exists at required path | PASS | `_COMMUNICATION/team_70/TEAM_70_S001_P002_WP001_AS_MADE_REPORT_v1.0.0.md` |
+| 2 | AS_MADE_REPORT includes required sections 1-7 | PASS | Sections `1..7` found in report |
+| 3 | Archive directory exists | PASS | `_COMMUNICATION/_ARCHIVE/S001/S001-P002-WP001/` |
+| 4 | Archive contains gate artifacts (verdicts, blocking reports, work plans) | PASS | Archive contains Team 90 verdicts/blocking/work plans |
+| 5 | Archive manifest (Section 7) correctly lists archived files | PASS | Section 7 list matches archive basenames |
+| 6 | No unarchived WP-specific files remain in active team 
+```
+_[… content truncated at 1500 chars]_
+
 
 ### Acceptance
 - AS_MADE_REPORT written at: `_COMMUNICATION/team_70/TEAM_70_S001_P002_WP001_AS_MADE_REPORT_v1.0.0.md`
@@ -88,12 +138,55 @@ Validate that Team 70 has completed all closure requirements for `S001-P002-WP00
 
 ### Coordination Data — Team 70 AS_MADE_REPORT
 
-⚠️  File not yet available. Searched (in order):
-  - `_COMMUNICATION/team_70/TEAM_70_S001_P002_WP001_AS_MADE_REPORT_v1.0.0.md`
-  - `_COMMUNICATION/team_70/TEAM_70_S001_P002_WP001_AS_MADE_REPORT_v1.0.0.md`
+✅  Auto-loaded: `_COMMUNICATION/team_70/TEAM_70_S001_P002_WP001_AS_MADE_REPORT_v1.0.0.md`
 
-→ Complete the prerequisite team's work first.
-→ Re-generate after: `./pipeline_run.sh` injects real data.
+```
+# TEAM_70 | S001-P002-WP001 AS_MADE_REPORT v1.0.0
+
+**project_domain:** TIKTRACK  
+**id:** TEAM_70_S001_P002_WP001_AS_MADE_REPORT_v1.0.0  
+**from:** Team 70 (Documentation)  
+**to:** Team 90 (Phase 2 validation), Team 10 (Gateway)  
+**date:** 2026-03-14  
+**status:** DELIVERABLE  
+**gate_id:** GATE_8  
+**work_package_id:** S001-P002-WP001  
+**stage_id:** S001  
+
+---
+
+## Mandatory Identity Header
+
+| Field | Value |
+|-------|--------|
+| roadmap_id | PHOENIX_ROADMAP |
+| stage_id | S001 |
+| program_id | S001-P002 |
+| work_package_id | S001-P002-WP001 |
+| task_id | N/A |
+| gate_id | GATE_8 |
+| phase_owner | Team 90 |
+| project_domain | TIKTRACK |
+
+---
+
+## 1. Feature summary — what was built
+
+**Alerts Summary Widget** — read-only triggered-unread alerts summary on the D15.I home dashboard.
+
+- **Behavior:** Displays a triggered-unread count badge and a list of the N=5 most recent triggered-unread alerts. Widget is fully hidden when there are 0 unread alerts.
+- **UI:** Collapsible section (collapsible-container Iron Rule) with title "התראות פעילות", link to D34 alerts page (filtered by `trigger_status=triggered_unread`), relative-time formatting (e.g. "לפני 5 דקות"), and maskedLog used for errors (mandatory).
+- **Contracts:** Empty state (total === 0) → component returns null; 401/error → returns null; non-empty → collapsible section with badge and list.
+
+---
+
+## 2. Files created / modified
+
+| Path | Role |
+|------|------|
+| `ui/src/components/AlertsSummaryWidget.jsx` | Created — Aler
+```
+_[… content truncated at 1500 chars]_
 
 
 ### Acceptance

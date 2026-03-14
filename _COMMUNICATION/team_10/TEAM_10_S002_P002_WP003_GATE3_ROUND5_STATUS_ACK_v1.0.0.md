@@ -39,7 +39,7 @@
 
 | Artifact | Update |
 |----------|--------|
-| `05-REPORTS/artifacts_SESSION_WP003_ROUND5/TEAM_10_S002_P002_WP003_GATE3_ROUND5_MANDATES_EVIDENCE.md` | Team 20 + 60 completion; Team 50 IN_PROGRESS |
+| `documentation/reports/05-REPORTS/artifacts_SESSION_WP003_ROUND5/TEAM_10_S002_P002_WP003_GATE3_ROUND5_MANDATES_EVIDENCE.md` | Team 20 + 60 completion; Team 50 IN_PROGRESS |
 | `TEAM_10_S002_P002_WP003_GATE3_REMEDIATION_ROUND5_PLAN_v1.0.0.md` | Status block §6 |
 
 ---

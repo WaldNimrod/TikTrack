@@ -37,7 +37,7 @@
 |------|-------|
 | Runtime | Local/dev — backend with stdout capture (tee) |
 | Backend URL | http://127.0.0.1:8083 |
-| **log_path** | `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_6.log` |
+| **log_path** | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_6.log` |
 | **run_id** | v2.0.6-cc01-market-open |
 | **Run window timestamp (UTC)** | 2026-03-12T11:50:57Z |
 | Evidence script | `scripts/verify_g7_part_a_runtime.py` (G7_PART_A_MODE=market_open) |
@@ -65,8 +65,8 @@ CC-WP003-02 ו־CC-WP003-04 — נשארים PASS (מקובלים ב־v2.0.5).
 
 | Artifact | Path |
 |----------|------|
-| G7 Part A evidence (JSON) | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
-| Shared log (non-empty) | `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_6.log` |
+| G7 Part A evidence (JSON) | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
+| Shared log (non-empty) | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_6.log` |
 
 **JSON:** log_path, run_id, cc_01_yahoo_call_count=0, pass_01=true (וערכי CC-02, CC-04 נשמרים).
 

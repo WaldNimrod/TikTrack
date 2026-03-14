@@ -15,7 +15,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ARTIFACTS_DIR = path.join(__dirname, '..', 'documentation', '05-REPORTS', 'artifacts_SESSION_01');
+const ARTIFACTS_DIR = path.join(__dirname, '..', 'documentation', 'reports', '05-REPORTS', 'artifacts_SESSION_01');
 
 const FRONTEND_URL = process.env.PHASE2_FRONTEND_URL || 'http://localhost:8080';
 const BACKEND_URL = process.env.PHASE2_BACKEND_URL || 'http://localhost:8082';

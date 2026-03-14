@@ -49,7 +49,7 @@ Only open Part A conditions:
 `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_90_S002_P002_WP003_GATE7_PARTA_QA_CORROBORATION_v2.0.3.md`
 
 3. Updated JSON evidence:  
-`documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json`
+`documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json`
 
 Mandatory JSON fields:
 - `log_path` non-empty

@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 PROJECT = Path(__file__).resolve().parent.parent
-ARTIFACTS = PROJECT / "documentation" / "05-REPORTS" / "artifacts"
+ARTIFACTS = PROJECT / "documentation" / "reports" / "05-REPORTS" / "artifacts"
 EVIDENCE_JSON = ARTIFACTS / "TEAM_60_CLEANUP_EVIDENCE.json"
 
 

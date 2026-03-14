@@ -36,10 +36,10 @@
 
 | פריט | ערך |
 |------|------|
-| **log_path** | `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_9.log` |
+| **log_path** | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_9.log` |
 | **run_id** | `v2.0.9-cc01-market-open` |
 | **run window timestamp (UTC)** | ( JSON לאחר הרצה — חייב להיות בתוך 09:30–16:00 ET) |
-| Artifact | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
+| Artifact | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
 
 ---
 

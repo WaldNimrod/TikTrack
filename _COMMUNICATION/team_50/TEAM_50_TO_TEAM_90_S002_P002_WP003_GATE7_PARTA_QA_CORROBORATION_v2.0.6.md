@@ -37,10 +37,10 @@
 
 | פריט | ערך |
 |------|------|
-| **log_path** | `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_6.log` |
+| **log_path** | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_6.log` |
 | **run_id** | `v2.0.6-cc01-market-open` |
 | **run window timestamp (UTC)** | 2026-03-12T11:50:57Z |
-| Artifact | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
+| Artifact | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
 
 ---
 
@@ -50,7 +50,7 @@ Team 50 ביצע אימות ממשי על הלוג:
 
 | בדיקה | תוצאה |
 |-------|--------|
-| **קובץ קיים** | כן — `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_6.log` |
+| **קובץ קיים** | כן — `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_6.log` |
 | **לא ריק** | כן — 4,430 bytes, 41 שורות |
 | **CC-01 — Yahoo HTTP (GATE7_CC_YAHOO_HTTP / query1.finance.yahoo.com)** | 0 (סף ≤5) |
 | **CC-04 — "Yahoo 429 — cooldown" + "Yahoo systemic rate limit"** | 0 (G7-FIX-3) |
@@ -105,8 +105,8 @@ Team 50 מסיים את חלקו — Corroboration v2.0.6 מוגש ל־Team 90 �
 |------|------|
 | Team 60 Canonical Handoff | `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_50_S002_P002_WP003_GATE7_PARTA_V2_0_6_CC01_CANONICAL_HANDOFF_v1.0.0.md` |
 | Team 60 Evidence Report | `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_90_S002_P002_WP003_GATE7_PARTA_RUNTIME_EVIDENCE_REPORT_v2.0.6.md` |
-| G7 Part A JSON | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
-| Log (shared run) | `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_6.log` |
+| G7 Part A JSON | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
+| Log (shared run) | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_6.log` |
 
 ---
 

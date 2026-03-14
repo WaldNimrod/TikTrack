@@ -12,7 +12,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ARTIFACTS_DIR = path.join(__dirname, '..', 'documentation', '05-REPORTS', 'artifacts_SESSION_01', 'batch-2-5-qa-artifacts');
+const ARTIFACTS_DIR = path.join(__dirname, '..', 'documentation', 'reports', '05-REPORTS', 'artifacts_SESSION_01', 'batch-2-5-qa-artifacts');
 if (!fs.existsSync(ARTIFACTS_DIR)) fs.mkdirSync(ARTIFACTS_DIR, { recursive: true });
 
 const logger = new TestLogger();
@@ -175,7 +175,7 @@ ${severeLogs.slice(0, 10).map((l, i) => `| ${i + 1} | ${l.level} | ${(l.message 
     '---',
     '',
     '**Base URL:** ' + TEST_CONFIG.frontendUrl,
-    '**Evidence:** documentation/05-REPORTS/artifacts_SESSION_01/batch-2-5-qa-artifacts/',
+    '**Evidence:** documentation/reports/05-REPORTS/artifacts_SESSION_01/batch-2-5-qa-artifacts/',
     '',
     '**log_entry | TEAM_50 | BATCH_2_5_QA_REPORT | TO_TEAM_10 | 2026-02-13**',
   ].filter(Boolean);

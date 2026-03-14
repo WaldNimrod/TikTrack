@@ -55,7 +55,10 @@
 |--------|------|
 | `agents_os/` | README, AGENTS_OS_FOUNDATION*, כל תוכן ייחודי למערכת האיגנטים |
 | `agents_os/docs-governance/` | Concept Package, MB3A POC Spec, AOS_workpack, כל אפיון/ספק ייחודי ל־Agents_OS |
-| `agents_os/documentation/` | (אופציונלי) תעוד נוסף ייחודי ל־Agents_OS — לא קנון משותף |
+| `agents_os/documentation/` | ספריית תיעוד ייעודית — אינדקס 00_INDEX + תיקיות לוגיות (אופציה C ממומשת): |
+| ↳ `agents_os/documentation/01-FOUNDATIONS/` | מסמכי יסוד: AGENTS_OS_FOUNDATION, חבילת קונספט (Cover, Domain Isolation, Architect) |
+| ↳ `agents_os/documentation/02-SPECS/` | מפרטים: Concept Package, AOS Workpack, קרנטין |
+| ↳ `agents_os/documentation/03-TEMPLATES/` | קישורים לתבניות משותפות (LLD400, LOD200 ב־06-TEMPLATES) |
 
 ### 2.3 תעוד מערכת (TikTrack)
 
@@ -105,7 +108,7 @@
 | אינדקס נהלים | `documentation/docs-governance/00-INDEX/GOVERNANCE_PROCEDURES_INDEX.md` |
 | Source Map | `documentation/docs-governance/00-INDEX/GOVERNANCE_PROCEDURES_SOURCE_MAP.md` |
 | **דוחות וארטיפקטים** | `documentation/reports/05-REPORTS`, `documentation/reports/08-REPORTS` *(נתיב קבוע יחיד; ראה §2.4)* |
-| **ספריית תיעוד Agents_OS** | `agents_os/documentation/00_INDEX.md` |
+| **ספריית תיעוד Agents_OS** | `agents_os/documentation/00_INDEX.md` (01-FOUNDATIONS, 02-SPECS, 03-TEMPLATES) |
 | **תיעוד מערכת TikTrack** | `documentation/docs-system/00_INDEX.md` |
 
 ---
@@ -117,4 +120,4 @@
 
 ---
 
-**log_entry | TEAM_170 | DOCUMENTATION_FOLDER_STRUCTURE_CANONICAL | DELIVERED | 2026-02-22**
+**log_entry | TEAM_170 | DOCUMENTATION_FOLDER_STRUCTURE_CANONICAL | DELIVERED | 2026-03-14**

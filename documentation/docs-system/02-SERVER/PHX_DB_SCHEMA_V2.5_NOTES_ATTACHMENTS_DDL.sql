@@ -3,7 +3,7 @@
 -- ============================================================================
 -- Source: Team 90 Feedback Lock (D35 Notes)
 -- SSOT: _COMMUNICATION/team_10/TEAM_10_NOTES_ALERTS_MINI_BATCH_WORK_PLAN.md §5;
---       documentation/05-REPORTS/artifacts/TEAM_10_D35_RICH_TEXT_ATTACHMENTS_LOCK_EVIDENCE_LOG.md
+--       documentation/reports/05-REPORTS/artifacts/TEAM_10_D35_RICH_TEXT_ATTACHMENTS_LOCK_EVIDENCE_LOG.md
 -- Integration: Append to PHX_DB_SCHEMA_V2.5_FULL_DDL / run as migration
 -- ============================================================================
 -- Rules (LOCKED):

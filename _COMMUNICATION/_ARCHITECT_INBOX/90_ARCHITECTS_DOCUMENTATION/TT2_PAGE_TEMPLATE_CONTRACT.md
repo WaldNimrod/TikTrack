@@ -24,7 +24,7 @@ context: UI Structural Integrity
 ## 4. צבעי ישות (Entity Colors) — חובה
 - **body class:** לכל עמוד חייבת להיות מחלקת `entity-{entity_id}` (למשל `entity-note`, `entity-trading_account`).
 - **tt-section:** לכל קונטיינר `data-entity="{entity_id}"` לקריאת צבע בכותרת ובאבזרים.
-- **מפתח צבעים + מיפוי:** ראו `documentation/05-REPORTS/artifacts_SESSION_01/PAGES_ENTITY_COLOR_MAPPING.md` — לכל עמוד מתועד צבע ישות מוגדר.
+- **מפתח צבעים + מיפוי:** ראו `documentation/reports/05-REPORTS/artifacts_SESSION_01/PAGES_ENTITY_COLOR_MAPPING.md` — לכל עמוד מתועד צבע ישות מוגדר.
 
 ## 5. ולידציה אוטומטית (Scripts)
 - `generate-pages.js`: מרכיב את העמודים מתוך `.content.html`.

@@ -37,9 +37,9 @@
 
 | פריט | ערך |
 |------|------|
-| **log_path** | `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_5.log` |
+| **log_path** | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_5.log` |
 | **run_id** | `v2.0.5-shared-2026-03-12` |
-| Artifact | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
+| Artifact | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
 
 ---
 
@@ -49,7 +49,7 @@ Team 50 ביצע אימות ממשי על הלוג:
 
 | בדיקה | תוצאה |
 |-------|--------|
-| **קובץ קיים** | כן — `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_5.log` |
+| **קובץ קיים** | כן — `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_5.log` |
 | **לא ריק** | כן — 11,785 bytes, 100 שורות |
 | **CC-04 — "Yahoo 429 — cooldown" + "Yahoo systemic rate limit"** | 0 (G7-FIX-3) |
 | **pass_04** | true (cc04 == 0) |
@@ -127,10 +127,10 @@ Team 50 מסיים את חלקו — Corroboration v2.0.5 מוגש ל־Team 90 �
 | מסמך | נתיב |
 |------|------|
 | Team 60 Canonical Handoff | `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_50_S002_P002_WP003_GATE7_PARTA_V2_0_5_CANONICAL_HANDOFF_v1.0.0.md` |
-| G7 Part A JSON | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
-| Log (shared run) | `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_5.log` |
+| G7 Part A JSON | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
+| Log (shared run) | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_5.log` |
 | T-MKTDATA tests | `tests/test_t_mktdata_g7_fix.py` |
-| AUTO-WP003 results | `documentation/05-REPORTS/artifacts/TEAM_50_AUTO_WP003_RUNTIME_RESULTS.json` |
+| AUTO-WP003 results | `documentation/reports/05-REPORTS/artifacts/TEAM_50_AUTO_WP003_RUNTIME_RESULTS.json` |
 
 ---
 

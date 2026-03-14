@@ -35,7 +35,7 @@
 |------|-------|
 | Runtime | Local/dev |
 | Backend URL | http://127.0.0.1:8082 |
-| Certified log path | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_2026-03-11_223911.log` |
+| Certified log path | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_2026-03-11_223911.log` |
 | Execution timestamp (UTC) | 2026-03-11T22:39:11Z |
 | Evidence script | `scripts/run_g7_part_a_evidence.py` (4 consecutive EOD cycles, single log) |
 
@@ -79,8 +79,8 @@
 
 | Artifact | Path |
 |----------|------|
-| G7 Part A evidence (JSON) | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
-| Certified log | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_2026-03-11_223911.log` |
+| G7 Part A evidence (JSON) | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
+| Certified log | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_2026-03-11_223911.log` |
 
 **Artifact fields (v2.0.2):**
 - `log_path`: non-empty ✓

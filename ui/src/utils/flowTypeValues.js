@@ -1,6 +1,6 @@
 /**
  * Flow Type Values — SSOT for cash flow types (D21)
- * Ref: documentation/05-REPORTS/artifacts/CASH_FLOW_TYPES_SSOT.md
+ * Ref: documentation/reports/05-REPORTS/artifacts/CASH_FLOW_TYPES_SSOT.md
  * Team 20: CURRENCY_CONVERSION — identifier for currency conversion (not OTHER)
  *
  * Flow Type → Entity Color Mapping (סוג תנועה → צבע ישות):

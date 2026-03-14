@@ -131,7 +131,7 @@ Team 50 מריץ את הבדיקות **אחרי** שהדוח של Team 20 מפו
 | `_COMMUNICATION/team_10/TEAM_10_GATE7_PARTA_REMEDIATION_OWNERSHIP_CLARIFICATION_v1.0.0.md` | הבהרת אחריות: מי מתקן מה (20/60/50). |
 | `_COMMUNICATION/team_90/TEAM_90_TO_TEAM_60_TEAM_50_S002_P002_WP003_GATE7_PARTA_RERUN_MANDATE_v2.0.1.md` | מנדט Team 90 — דרישות evidence ו־artifacts. |
 | `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_90_S002_P002_WP003_GATE7_PARTA_RUNTIME_EVIDENCE_REPORT_v2.0.1.md` | דוח עדות נוכחי (BLOCK + NOT EVIDENCED). |
-| `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` | ארטיפקט עדות — יעודכן ע״י Team 60 לאחר ריצה חוזרת. |
+| `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` | ארטיפקט עדות — יעודכן ע״י Team 60 לאחר ריצה חוזרת. |
 | `scripts/run_g7_part_a_evidence.py` | ריצת 4 מחזורים, לוג אחד, ספירת 429. |
 
 ---

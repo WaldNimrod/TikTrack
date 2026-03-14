@@ -26,8 +26,8 @@
 | **Handoff** | `_COMMUNICATION/team_10/TEAM_10_TO_TEAM_90_S002_P002_WP003_GATE7_PARTA_HANDOFF_v2.0.7.md` |
 | Evidence 60 | `_COMMUNICATION/team_60/TEAM_60_TO_TEAM_90_S002_P002_WP003_GATE7_PARTA_RUNTIME_EVIDENCE_REPORT_v2.0.7.md` |
 | Corroboration 50 | `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_90_S002_P002_WP003_GATE7_PARTA_QA_CORROBORATION_v2.0.7.md` |
-| JSON | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
-| **לוג משותף** | `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log` |
+| JSON | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
+| **לוג משותף** | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_7.log` |
 
 ---
 

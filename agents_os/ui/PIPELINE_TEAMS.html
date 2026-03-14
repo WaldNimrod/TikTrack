@@ -378,7 +378,7 @@ function escHtml(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"
 
 async function loadState() {
   try {
-    const r = await fetch("_COMMUNICATION/agents_os/pipeline_state.json?t=" + Date.now());
+    const r = await fetch("../../_COMMUNICATION/agents_os/pipeline_state.json?t=" + Date.now());
     if (r.ok) {
       pipelineState = await r.json();
       document.getElementById("state-bar").style.display = "flex";

@@ -79,6 +79,8 @@
 | documentation/docs-agents-os/01-OVERVIEW/AGENTS_OS_OVERVIEW.md |
 | documentation/docs-agents-os/02-ARCHITECTURE/AGENTS_OS_ARCHITECTURE_OVERVIEW.md |
 | documentation/docs-agents-os/03-CLI-REFERENCE/PIPELINE_CLI_REFERENCE.md |
+| documentation/docs-agents-os/04-PROCEDURES/README.md |
+| documentation/docs-agents-os/05-TEMPLATES/README.md |
 | agents_os/ui/PIPELINE_DASHBOARD.html |
 | agents_os/ui/PIPELINE_ROADMAP.html |
 | agents_os/ui/PIPELINE_TEAMS.html |
@@ -119,7 +121,7 @@
 |------|--------|
 | `./agents_os/scripts/start_ui_server.sh` | Starts on :7070; prints 3 URLs |
 | `./agents_os/scripts/stop_ui_server.sh` | Stops server; removes pid file |
-| `./agents_os/scripts/init_pipeline.sh agents_os S002-P005-WP001` | Creates pipeline_state_agents_os.json |
+| `./agents_os/scripts/init_pipeline.sh agents_os S002-P005-WP001` | Creates pipeline_state_agentsos.json |
 | Open http://localhost:7070/agents_os/ui/PIPELINE_DASHBOARD.html | Dashboard loads; fetch to ../../_COMMUNICATION/agents_os/pipeline_state.json succeeds |
 | Cross-links PIPELINE_*.html | Same-directory links work |
 

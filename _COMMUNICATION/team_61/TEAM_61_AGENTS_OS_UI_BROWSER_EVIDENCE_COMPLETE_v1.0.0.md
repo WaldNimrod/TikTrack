@@ -4,6 +4,7 @@ from: Team 61 (Cloud Agent / DevOps Automation)
 to: Team 51, Team 190, Team 100
 cc: Team 10
 date: 2026-03-14
+historical_record: true
 status: EVIDENCE_COMPLETE
 in_response_to: AOUI-IMP-ACT-02
 ---

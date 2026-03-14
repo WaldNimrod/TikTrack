@@ -3,6 +3,7 @@
 **project_domain:** AGENTS_OS  
 **id:** TEAM_10_AOUI_F02_MANDATE_CLOSURE_EVIDENCE_v1.0.0  
 **date:** 2026-03-14  
+**historical_record:** true
 **finding_id:** AOUI-F02  
 **status:** CLOSED  
 

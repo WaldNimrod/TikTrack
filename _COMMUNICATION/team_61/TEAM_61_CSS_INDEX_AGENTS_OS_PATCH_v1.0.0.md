@@ -4,6 +4,7 @@ from: Team 61 (Cloud Agent / DevOps Automation)
 to: Team 10, Team 170 (for CSS_CLASSES_INDEX promotion)
 cc: Team 100, Team 190
 date: 2026-03-14
+historical_record: true
 status: READY_FOR_PROMOTION
 in_response_to: AOUI-IMP-ACT-01, AOUI-F02
 ---

@@ -4,6 +4,7 @@ from: Team 61 (Cloud Agent / DevOps Automation)
 to: Team 51, Nimrod (browser evidence completion)
 cc: Team 100, Team 190
 date: 2026-03-14
+historical_record: true
 status: TEMPLATE_READY
 in_response_to: AOUI-IMP-ACT-02
 ---

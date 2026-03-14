@@ -5,6 +5,7 @@ from: Team 10 (Implementation Coordinator)
 to: Team 100 (Agents_OS Architectural Authority)
 cc: Team 170, Team 190, Team 61
 date: 2026-03-14
+historical_record: true
 status: FULFILLED_APPROVED
 in_response_to: TEAM_100_TO_TEAM_10_AOUI_F02_CSS_INDEX_MANDATE_DIRECTIVE_v1.0.0
 finding_id: AOUI-F02

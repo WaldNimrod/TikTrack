@@ -3,7 +3,7 @@
 
 **From:** Team 170 (Governance Spec / Documentation / UI Spec)
 **To:** Team 00 / Team 100 (Architect / Program Manager); Team 10 (Gateway)
-**date:** 2026-03-19
+**date:** 2026-03-14
 **purpose:** תמונת מצב עדכנית של תיעוד דומיין Agents_OS + אופציות לתוכניות עבודה לספריית תיעוד מסודרת
 
 ---

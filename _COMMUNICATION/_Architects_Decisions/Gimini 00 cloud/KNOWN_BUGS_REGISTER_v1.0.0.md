@@ -6,6 +6,7 @@
 **version:** 1.0.0  
 **owner:** Team 170 (canonical maintenance); Team 190 is validation intake authority  
 **date:** 2026-03-03  
+**historical_record:** true  
 **last_updated:** 2026-03-13 (KB-2026-03-13-25 CLOSED; KB-017 CLOSED; KB-018 CLOSED; KB-015 CLOSED; KB-016 CLOSED; KB-08 count→153)  
 **status:** ACTIVE  
 **purpose:** Single canonical register for validated known bugs that are accepted into a batched remediation cycle or marked as immediate blockers.

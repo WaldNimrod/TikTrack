@@ -1,4 +1,5 @@
 # Mandates — S001-P002-WP001  ·  GATE_8
+date: 2026-03-14
 
 **Spec:** D15.I — Alerts Widget
 

@@ -223,7 +223,7 @@ For STOCK/ETF, `market` is optional and mapping may use the same symbol in both 
 ### 7.2 Evidence (נדרש)
 
 - כל Job חייב לכתוב: `last_run_time`, `rows_updated`, `rows_pruned`.  
-- Evidence לוג יתווסף ב־`documentation/05-REPORTS/artifacts/` לכל סבב סגירה.
+- Evidence לוג יתווסף ב־`documentation/reports/05-REPORTS/artifacts/` לכל סבב סגירה.
 
 ### 7.3 Retention + Archive Policy (Locked)
 

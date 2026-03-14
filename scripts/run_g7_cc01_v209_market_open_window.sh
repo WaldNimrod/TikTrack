@@ -5,7 +5,7 @@
 set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-LOG_REL="documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_9.log"
+LOG_REL="documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_9.log"
 LOG_PATH="$PROJECT_ROOT/$LOG_REL"
 PORT=8083
 cd "$PROJECT_ROOT"
@@ -47,4 +47,4 @@ echo ""
 echo "=== Team 60 v2.0.9 complete. Next: Team 50 corroboration v2.0.9 on same log_path and run_id. ==="
 echo "  log_path: $LOG_REL"
 echo "  run_id:   v2.0.9-cc01-market-open"
-echo "  JSON:     documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json"
+echo "  JSON:     documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json"

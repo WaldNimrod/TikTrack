@@ -2,7 +2,7 @@
 """
 GATE_7 Part A runtime evidence — 4 cycles in one process.
 H4 fix: in-process cycles so cooldown persists between runs (no subprocess).
-Writes log to documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_<date>.log
+Writes log to documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE_<date>.log
 and prints counts for JSON.
 """
 import io
@@ -13,7 +13,7 @@ from pathlib import Path
 
 _project = Path(__file__).parent.parent
 sys.path.insert(0, str(_project))
-log_dir = _project / "documentation" / "05-REPORTS" / "artifacts"
+log_dir = _project / "documentation" / "reports" / "05-REPORTS" / "artifacts"
 log_dir.mkdir(parents=True, exist_ok=True)
 log_path = log_dir / f"G7_PART_A_RUNTIME_EVIDENCE_{datetime.now(timezone.utc).strftime('%Y-%m-%d_%H%M%S')}.log"
 

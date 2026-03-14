@@ -5,7 +5,7 @@
  *
  * Captures screenshots + staleness clock + ticker prices for Evidence doc.
  * Output: _COMMUNICATION/team_30/TEAM_30_EXTERNAL_DATA_LIVE_UI_EVIDENCE.md
- *         + screenshots in documentation/05-REPORTS/artifacts/external-data-live-ui/
+ *         + screenshots in documentation/reports/05-REPORTS/artifacts/external-data-live-ui/
  *
  * Run: cd tests && node external-data-live-ui-evidence-capture.e2e.test.js
  * Requires: Frontend 8080, Backend 8082, DB with tickers + sync data
@@ -20,7 +20,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const ARTIFACTS_DIR = path.join(__dirname, '..', 'documentation', '05-REPORTS', 'artifacts', 'external-data-live-ui');
+const ARTIFACTS_DIR = path.join(__dirname, '..', 'documentation', 'reports', '05-REPORTS', 'artifacts', 'external-data-live-ui');
 const EVIDENCE_PATH = path.join(__dirname, '..', '_COMMUNICATION', 'team_30', 'TEAM_30_EXTERNAL_DATA_LIVE_UI_EVIDENCE.md');
 
 async function login(driver) {

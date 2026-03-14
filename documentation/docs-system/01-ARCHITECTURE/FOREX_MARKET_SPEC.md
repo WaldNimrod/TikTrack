@@ -111,7 +111,7 @@
 | Exchange Rates Field Map | documentation/01-ARCHITECTURE/LOGIC/WP_20_07_FIELD_MAP_EXCHANGE_RATES.md |
 | Market Data Resilience | documentation/01-ARCHITECTURE/LOGIC/TT2_MARKET_DATA_RESILIENCE.md |
 | Roadmap v2.1 | _COMMUNICATION/_Architects_Decisions/PHOENIX_UNIFIED_MODULAR_ROADMAP_V2_1.md |
-| Cash Flow Types SSOT | documentation/05-REPORTS/artifacts/CASH_FLOW_TYPES_SSOT.md |
+| Cash Flow Types SSOT | documentation/reports/05-REPORTS/artifacts/CASH_FLOW_TYPES_SSOT.md |
 
 ---
 

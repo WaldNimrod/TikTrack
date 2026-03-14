@@ -7,7 +7,7 @@ set -e
 BACKEND="${BACKEND_URL:-http://127.0.0.1:8082}"
 NON_ADMIN_USER="${NON_ADMIN_USER:-qa_nonadmin}"
 NON_ADMIN_PASS="${NON_ADMIN_PASS:-qa403test}"
-EVIDENCE_DIR="${EVIDENCE_DIR:-$(dirname "$0")/../documentation/05-REPORTS/artifacts}"
+EVIDENCE_DIR="${EVIDENCE_DIR:-$(dirname "$0")/../documentation/reports/05-REPORTS/artifacts}"
 LOG_FILE="$EVIDENCE_DIR/MD_SETTINGS_403_EVIDENCE_$(date +%Y%m%d_%H%M%S).log"
 
 mkdir -p "$EVIDENCE_DIR"

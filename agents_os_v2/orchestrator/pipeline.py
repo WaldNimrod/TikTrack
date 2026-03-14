@@ -41,24 +41,24 @@ GATE_SEQUENCE = [
 ]
 
 GATE_CONFIG = {
-    "GATE_0":    {"owner": "team_190", "engine": "codex",   "desc": "Team 190 validates LOD200 scope"},
-    "GATE_1":    {"owner": "team_190", "engine": "codex",   "desc": "Team 170 produces LLD400 → Team 190 validates"},
+    "GATE_0":    {"owner": "team_190", "engine": "codex",        "desc": "Team 190 validates LOD200 scope",                        "default_fail_route": "doc"},
+    "GATE_1":    {"owner": "team_190", "engine": "codex",        "desc": "Team 170 produces LLD400 → Team 190 validates",          "default_fail_route": "doc"},
     "GATE_2":    {"owner": "team_100", "engine": "codex+human",  "desc": "Architectural intent review → WAITING_GATE2_APPROVAL (domain-aware owner)"},
     "WAITING_GATE2_APPROVAL": {"owner": "team_00", "engine": "human", "desc": "Nimrod reviews GATE_2 analysis and decides"},
-    "G3_PLAN":   {"owner": "team_10",  "engine": "cursor",  "desc": "Build work plan from approved spec"},
-    "G3_5":      {"owner": "team_90",  "engine": "codex",   "desc": "Team 90 validates work plan"},
+    "G3_PLAN":   {"owner": "team_10",  "engine": "cursor",       "desc": "Build work plan from approved spec"},
+    "G3_5":      {"owner": "team_90",  "engine": "codex",        "desc": "Team 90 validates work plan"},
     "G3_6_MANDATES": {"owner": "team_10", "engine": "orchestrator", "desc": "Generate per-team mandates (deterministic)"},
     "CURSOR_IMPLEMENTATION": {"owner": "teams_20_30", "engine": "cursor", "desc": "Cursor Composer: implement + MCP test"},
-    "GATE_4":    {"owner": "team_10",  "engine": "cursor",  "desc": "QA — Team 10 coordinates, Team 50 executes tests + MCP"},
-    "GATE_5":    {"owner": "team_90",  "engine": "codex",   "desc": "Team 90 dev validation (code vs spec)"},
+    "GATE_4":    {"owner": "team_10",  "engine": "cursor",       "desc": "QA — Team 10 coordinates, Team 50 executes tests + MCP"},
+    "GATE_5":    {"owner": "team_90",  "engine": "codex",        "desc": "Team 90 dev validation (code vs spec)"},
     "G5_DOC_FIX": {
         "owner": "team_10", "engine": "cursor",
         "desc": "Admin block — Team 10 fixes doc/artifact gaps from GATE_5 → direct re-validation (no GATE_4, no impl teams)",
     },
     "GATE_6":    {"owner": "team_100", "engine": "codex+human",  "desc": "Architectural reality review → WAITING_GATE6_APPROVAL (domain-aware owner)"},
     "WAITING_GATE6_APPROVAL": {"owner": "team_00", "engine": "human", "desc": "Nimrod reviews GATE_6 analysis and decides"},
-    "GATE_7":    {"owner": "team_90",  "engine": "human",   "desc": "Team 90 executes; Nimrod (Team 00) human authority"},
-    "GATE_8":    {"owner": "team_90",  "engine": "codex",   "desc": "Team 90 + Team 70 documentation closure"},
+    "GATE_7":    {"owner": "team_90",  "engine": "human",        "desc": "Team 90 executes; Nimrod (Team 00) human authority"},
+    "GATE_8":    {"owner": "team_90",  "engine": "codex",        "desc": "Team 90 + Team 70 documentation closure",               "default_fail_route": "doc"},
     "WAITING_FOR_IMPLEMENTATION_COMMIT": {
         "owner": "team_61", "engine": "cursor",
         "desc": "No commits detected — Team 61 must commit implementation first"
@@ -1107,12 +1107,21 @@ def _generate_gate_8_mandates(state: PipelineState, fresh: bool = False) -> str:
 
     steps = [
         MandateStep(
-            team_id    = doc_team,
-            label      = f"{doc_team_n} — Documentation & Archive",
-            phase      = 1,
-            task       = phase1_task,
-            writes_to  = as_made_path,
-            acceptance = [
+            team_id     = doc_team,
+            label       = f"{doc_team_n} — Documentation & Archive",
+            phase       = 1,
+            task        = phase1_task,
+            writes_to   = as_made_path,
+            # reads_from: Team 90's validation result — auto-injected in correction cycles.
+            # On first run the file doesn't exist yet (Team 90 hasn't validated).
+            # On correction run the file exists and blockers are injected automatically.
+            reads_from  = [
+                f"_COMMUNICATION/team_90/TEAM_90_TO_{doc_team_up}_{wpu}_GATE8_CLOSURE_VALIDATION_PHASE2_RESULT_v1.0.0.md",
+                f"_COMMUNICATION/team_90/TEAM_90_{wpu}_GATE_8_VERDICT_v1.0.0.md",
+                f"_COMMUNICATION/team_90/TEAM_90_TO_{doc_team_up}_{wpu}_GATE8_RESULT_v1.0.0.md",
+            ],
+            reads_label = "Team 90 validation result (correction cycle — empty on first run)",
+            acceptance  = [
                 f"AS_MADE_REPORT written at: `{as_made_path}`",
                 f"All WP files archived to: `{archive_dest}`",
                 "Archive manifest in AS_MADE_REPORT Section 7",
@@ -1648,19 +1657,32 @@ def advance_gate(gate_id: str, status: str, reason: str = ""):
                 _log(f"╚══════════════════════════════════════════════════════════╝")
                 state.current_gate = target_gate
             else:
-                _log(f"")
-                _log(f"╔══ MANUAL ROUTING REQUIRED ════════════════════════════════╗")
-                _log(f"║  Verdict file did not declare route_recommendation.")
-                _log(f"║  The reviewing team MUST include one of:")
-                _log(f"║    route_recommendation: doc   (doc/governance only)")
-                _log(f"║    route_recommendation: full  (code/design issues)")
-                _log(f"║")
-                _log(f"║  Until routing is done, pipeline stays at: {gate_id}")
-                _log(f"║")
-                _log(f"║  To route manually:")
-                _log(f'║    ./pipeline_run.sh route doc  "{(reason or "reason")[:40]}"')
-                _log(f'║    ./pipeline_run.sh route full "{(reason or "reason")[:40]}"')
-                _log(f"╚══════════════════════════════════════════════════════════╝")
+                # ── Self-loop gate: default_fail_route overrides manual routing ─
+                default_route = GATE_CONFIG.get(gate_id, {}).get("default_fail_route")
+                if default_route:
+                    target_gate, desc = FAIL_ROUTING[gate_id][default_route]
+                    _log(f"")
+                    _log(f"╔══ CORRECTION CYCLE (self-loop gate) ══════════════════════╗")
+                    _log(f"║  Gate:          {gate_id}")
+                    _log(f"║  Auto-default:  route={default_route} → {target_gate}")
+                    _log(f"║  (Both doc + full routes return to the same gate)")
+                    _log(f"║  No route_recommendation needed in verdict file.")
+                    _log(f"╚══════════════════════════════════════════════════════════╝")
+                    state.current_gate = target_gate
+                else:
+                    _log(f"")
+                    _log(f"╔══ MANUAL ROUTING REQUIRED ════════════════════════════════╗")
+                    _log(f"║  Verdict file did not declare route_recommendation.")
+                    _log(f"║  The reviewing team MUST include one of:")
+                    _log(f"║    route_recommendation: doc   (doc/governance only)")
+                    _log(f"║    route_recommendation: full  (code/design issues)")
+                    _log(f"║")
+                    _log(f"║  Until routing is done, pipeline stays at: {gate_id}")
+                    _log(f"║")
+                    _log(f"║  To route manually:")
+                    _log(f'║    ./pipeline_run.sh route doc  "{(reason or "reason")[:40]}"')
+                    _log(f'║    ./pipeline_run.sh route full "{(reason or "reason")[:40]}"')
+                    _log(f"╚══════════════════════════════════════════════════════════╝")
 
     state.save()
     _log(f"{gate_id}: {status}")

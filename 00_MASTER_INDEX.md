@@ -21,6 +21,18 @@
 
 ---
 
+## Domain entry points (פיצול לפי דומיין)
+
+| דומיין | נקודת כניסה | תוכן |
+|--------|-------------|------|
+| **TIKTRACK** | [documentation/docs-system/](documentation/docs-system/) | ארכיטקטורה, שרת, עיצוב, מוצר — ראה [00_INDEX (docs-system)](documentation/docs-system/00_INDEX.md). |
+| **AGENTS_OS** | [agents_os/documentation/00_INDEX.md](agents_os/documentation/00_INDEX.md) | ספריית תיעוד Agents_OS: קונספט, workpack, תבניות (קישור ל־06-TEMPLATES). |
+| **משותף (משילות)** | [documentation/docs-governance/00-INDEX/](documentation/docs-governance/00-INDEX/) | WSM, SSM, נהלים, חוזים, תבניות (כולל LLD400, LOD200 ב־06-TEMPLATES). |
+
+**דוחות וארטיפקטים (נתיב קנוני יחיד):** `documentation/reports/05-REPORTS`, `documentation/reports/08-REPORTS` בלבד. אסור ליצור או להשתמש ב־`documentation/05-REPORTS` או `05-REPORTS` בשורש ה־repo.
+
+---
+
 ## Canonical Structure — Model B (Approved)
 
 **Topology decision:** Model B — canonical layers under `documentation/` (per Architect/Team 10 approval, 2026-02-17).
@@ -29,7 +41,7 @@
 |----------|----------|
 | `documentation/docs-system/` | 01-ARCHITECTURE, 02-SERVER, 07-DESIGN, 08-PRODUCT |
 | `documentation/docs-governance/` | 00-INDEX, 01-FOUNDATIONS (SSM/WSM/Gate Model), 02-POLICIES, 04-PROCEDURES, 05-CONTRACTS, 06-TEMPLATES, 07-DIRECTIVES_AND_DECISIONS, 08-WORKING_VALIDATION_RECORDS, AGENTS_OS_GOVERNANCE, 99-archive. **מבנה תיקיות מחייב:** `documentation/docs-governance/00_DOCUMENTATION_FOLDER_STRUCTURE_CANONICAL_v1.0.0.md` |
-| `documentation/reports/` | 05-REPORTS, 08-REPORTS |
+| `documentation/reports/` | 05-REPORTS, 08-REPORTS *(נתיב קבוע לארטיפקטים ודוחות)* |
 | `archive/` | documentation, code |
 | `agents_os_v2/` | V2 Orchestrator (pipeline, config, context/identity, context/governance, mcp/test_scenarios, validators); canonical per Team 61 mandate 2026-03-09 |
 | `_COMMUNICATION/` | _Architects_Decisions, _ARCHITECT_INBOX, 90_Architects_comunication, team_* (כולל team_10, team_61, team_70, team_90, team_100, team_170, team_190, team_191) |

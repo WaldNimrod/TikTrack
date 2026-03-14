@@ -9,8 +9,8 @@ import json
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-LOG_PATH = PROJECT_ROOT / "documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_9.log"
-JSON_PATH = PROJECT_ROOT / "documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json"
+LOG_PATH = PROJECT_ROOT / "documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_9.log"
+JSON_PATH = PROJECT_ROOT / "documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json"
 
 
 def main():

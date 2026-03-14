@@ -160,22 +160,38 @@ case "${1:-next}" in
         _generate_and_show "$NEXT_GATE"
       fi
     else
-      $CLI --status
-      echo ""
-      echo "════════════════════════════════════════════════════════════"
-      echo "  ⚠️  MANUAL ROUTING REQUIRED"
-      echo "  Verdict file missing route_recommendation: doc|full."
-      echo "  Ask the reviewing team to add this field before proceeding."
-      echo ""
-      echo "  Manual override (only if verdict file unavailable):"
-      echo "  Option A — Doc/governance issues ONLY (quick fix):"
-      echo "    ./pipeline_run.sh route doc \"$REASON\""
-      echo "    → Team 10 fixes docs → re-commit → GATE_4 → GATE_5"
-      echo ""
-      echo "  Option B — Substantial/code issues (full cycle):"
-      echo "    ./pipeline_run.sh route full \"$REASON\""
-      echo "    → G3_PLAN → mandates → implementation → QA → GATE_5"
-      echo "════════════════════════════════════════════════════════════"
+      # Gate stayed at same position — check if it's a self-loop gate (e.g. GATE_8)
+      # Self-loop gates always route back to themselves; default_fail_route handles it.
+      IS_SELF_LOOP=$(python3 -c "
+import sys, os; sys.path.insert(0, '.')
+from agents_os_v2.orchestrator.pipeline import GATE_CONFIG
+print('yes' if GATE_CONFIG.get('${GATE}', {}).get('default_fail_route') else 'no')
+" 2>/dev/null || echo "no")
+
+      if [[ "$IS_SELF_LOOP" == "yes" ]]; then
+        echo "════════════════════════════════════════════════════════════"
+        echo "  🔄 CORRECTION CYCLE — $GATE returns to itself"
+        echo "  Generating correction prompt (includes blockers from verdict file)..."
+        echo "════════════════════════════════════════════════════════════"
+        _generate_and_show "$NEXT_GATE"
+      else
+        $CLI --status
+        echo ""
+        echo "════════════════════════════════════════════════════════════"
+        echo "  ⚠️  MANUAL ROUTING REQUIRED"
+        echo "  Verdict file missing route_recommendation: doc|full."
+        echo "  Ask the reviewing team to add this field before proceeding."
+        echo ""
+        echo "  Manual override (only if verdict file unavailable):"
+        echo "  Option A — Doc/governance issues ONLY (quick fix):"
+        echo "    ./pipeline_run.sh route doc \"$REASON\""
+        echo "    → Team 10 fixes docs → re-commit → GATE_4 → GATE_5"
+        echo ""
+        echo "  Option B — Substantial/code issues (full cycle):"
+        echo "    ./pipeline_run.sh route full \"$REASON\""
+        echo "    → G3_PLAN → mandates → implementation → QA → GATE_5"
+        echo "════════════════════════════════════════════════════════════"
+      fi
     fi
     ;;
 

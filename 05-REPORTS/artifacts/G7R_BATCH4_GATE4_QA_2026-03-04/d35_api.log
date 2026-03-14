@@ -1,5 +1,0 @@
-=== Notes D35 QA — Gate-A API ===
-Backend: http://127.0.0.1:8082
-✅ Admin Login OK
-❌ Create note failed
-{"error_code":"VALIDATION_INVALID_FORMAT","detail":"Value error, parent_type must be one of ['account', 'datetime', 'ticker', 'trade', 'trade_plan'], got 'general'","field_errors":[{"field":"parent_type","message":"Value error, parent_type must be one of ['account', 'datetime', 'ticker', 'trade', 't

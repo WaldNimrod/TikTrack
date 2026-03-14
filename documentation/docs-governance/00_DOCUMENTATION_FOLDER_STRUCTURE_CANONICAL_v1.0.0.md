@@ -61,7 +61,15 @@
 
 **שורש:** `documentation/docs-system/` — ארכיטקטורה, שרת, עיצוב, מוצר (קיים).
 
-### 2.4 תקשורת וארכיון
+### 2.4 דוחות וארטיפקטים — נתיב קנוני יחיד (מחייב)
+
+**נתיב קבוע:** דוחות וארטיפקטים (Evidence, QA, Gate) — **רק** תחת:
+- `documentation/reports/05-REPORTS` (ותת־תיקיות: artifacts, artifacts_SESSION_01 וכו')
+- `documentation/reports/08-REPORTS`
+
+**איסור:** אסור ליצור או להשתמש ב־`documentation/05-REPORTS`, `documentation/08-REPORTS` (בשורש documentation), או ב־`05-REPORTS`/`08-REPORTS` בשורש ה־repo. תיקיות כפולות יארכיינו; קוד ונהלים מפנים לנתיב הקנוני בלבד.
+
+### 2.5 תקשורת וארכיון
 
 | נתיב | תוכן |
 |------|------|
@@ -96,6 +104,9 @@
 | FAST_TRACK_EXECUTION_PROTOCOL (active) | `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.2.0.md` |
 | אינדקס נהלים | `documentation/docs-governance/00-INDEX/GOVERNANCE_PROCEDURES_INDEX.md` |
 | Source Map | `documentation/docs-governance/00-INDEX/GOVERNANCE_PROCEDURES_SOURCE_MAP.md` |
+| **דוחות וארטיפקטים** | `documentation/reports/05-REPORTS`, `documentation/reports/08-REPORTS` *(נתיב קבוע יחיד; ראה §2.4)* |
+| **ספריית תיעוד Agents_OS** | `agents_os/documentation/00_INDEX.md` |
+| **תיעוד מערכת TikTrack** | `documentation/docs-system/00_INDEX.md` |
 
 ---
 

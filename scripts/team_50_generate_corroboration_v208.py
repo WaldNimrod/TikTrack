@@ -10,8 +10,8 @@ from pathlib import Path
 from datetime import datetime, timezone
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-LOG_PATH = PROJECT_ROOT / "documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_8.log"
-JSON_PATH = PROJECT_ROOT / "documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json"
+LOG_PATH = PROJECT_ROOT / "documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_8.log"
+JSON_PATH = PROJECT_ROOT / "documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json"
 OUT_PATH = PROJECT_ROOT / "_COMMUNICATION/team_50/TEAM_50_TO_TEAM_90_S002_P002_WP003_GATE7_PARTA_QA_CORROBORATION_v2.0.8.md"
 
 
@@ -91,10 +91,10 @@ def main():
 
 | פריט | ערך |
 |------|------|
-| **log_path** | `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_8.log` |
+| **log_path** | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_8.log` |
 | **run_id** | `{run_id}` |
 | **run window timestamp (UTC)** | {ts_utc} |
-| Artifact | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
+| Artifact | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
 
 ---
 
@@ -146,8 +146,8 @@ Team 50 ביצע אימות ממשי:
 | מסמך | נתיב |
 |------|------|
 | Team 90 Mandate | `_COMMUNICATION/team_90/TEAM_90_TO_TEAM_60_TEAM_50_..._CC01_COMPLETION_MANDATE_v2.0.7.md` |
-| Log | `documentation/05-REPORTS/artifacts/G7_PART_A_V2_0_8.log` |
-| JSON | `documentation/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
+| Log | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_V2_0_8.log` |
+| JSON | `documentation/reports/05-REPORTS/artifacts/G7_PART_A_RUNTIME_EVIDENCE.json` |
 
 ---
 

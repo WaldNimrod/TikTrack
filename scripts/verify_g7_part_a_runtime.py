@@ -39,7 +39,7 @@ BACKEND_URL = os.getenv("BACKEND_URL", os.getenv("PHASE2_BACKEND_URL", "http://1
 LOG_PATH = os.getenv("G7_PART_A_LOG_PATH", "").strip()
 MODE = os.getenv("G7_PART_A_MODE", "single").strip().lower()
 JOB_NAME = "sync_ticker_prices_intraday"
-ARTIFACT_PATH = PROJECT_ROOT / "documentation" / "05-REPORTS" / "artifacts" / "G7_PART_A_RUNTIME_EVIDENCE.json"
+ARTIFACT_PATH = PROJECT_ROOT / "documentation" / "reports" / "05-REPORTS" / "artifacts" / "G7_PART_A_RUNTIME_EVIDENCE.json"
 
 
 def _post(url: str, data: dict = None, headers: dict = None) -> Tuple[int, dict]:

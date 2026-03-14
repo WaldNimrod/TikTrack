@@ -5,7 +5,7 @@
 **id:** TEAM_170_AOUI_F02_CSS_INDEX_MANDATE_COMPLETION_v1.0.0  
 **from:** Team 170 (Spec & Governance Authority)  
 **to:** Team 10, Team 100, Team 190  
-**date:** 2026-03-15  
+**date:** 2026-03-14  
 **status:** COMPLETED  
 **in_response_to:** TEAM_10_TO_TEAM_170_AOUI_F02_CSS_INDEX_MANDATE_v1.0.0  
 **finding_id:** AOUI-F02  

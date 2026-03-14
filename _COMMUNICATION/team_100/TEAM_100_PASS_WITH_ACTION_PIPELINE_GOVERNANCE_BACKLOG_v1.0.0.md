@@ -4,8 +4,8 @@ id: TEAM_100_PASS_WITH_ACTION_PIPELINE_GOVERNANCE_BACKLOG_v1.0.0
 from: Team 100 (Agents_OS Architectural Authority)
 to: BACKLOG (future work package assignment)
 cc: Team 00
-date: 2026-03-15
-status: BACKLOG_PENDING_SCHEDULING
+date: 2026-03-14
+status: SCHEDULED
 priority: MEDIUM
 ---
 
@@ -14,10 +14,13 @@ priority: MEDIUM
 | Field | Value |
 |---|---|
 | roadmap_id | PHOENIX_ROADMAP |
-| stage_id | TBD (S002-P005-WP002 or early S003) |
+| stage_id | S002 |
+| program_id | S002-P005 |
+| work_package_id | **S002-P005-WP002** |
 | decision_origin | Nimrod session 2026-03-15 |
+| scheduling_confirmed | 2026-03-15 — Nimrod approved |
 | design_approved | YES — design locked |
-| implementation_status | NOT YET STARTED |
+| implementation_status | PLANNED — trigger: S002-P005-WP001 GATE_8 PASS |
 
 ---
 
@@ -137,7 +140,7 @@ Total estimated effort: **Small-to-Medium** — no new architecture, no new depe
 | **B — S003 pre-work** | Before S003 programs start | Ensures the governance mechanic is in place before higher-stakes S003 deliveries |
 | **C — Standalone micro-task** | Any available Team 10 slot | Small scope, can be parallelized with other work |
 
-**Team 100 recommendation:** Option A — S002-P005-WP002. Natural continuation of pipeline governance hardening. The `pass_with_actions` command would immediately be usable in S003 QA cycles.
+**Nimrod confirmed (2026-03-15): Option A — S002-P005-WP002. Decision locked.**
 
 ---
 

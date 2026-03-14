@@ -3,7 +3,7 @@ id: TEAM_61_AGENTS_OS_UI_CSS_CLASS_INVENTORY_v1.0.0
 from: Team 61 (Cloud Agent / DevOps Automation)
 to: Team 10, Team 170 (CSS_CLASSES_INDEX input)
 cc: Team 100, Team 190
-date: 2026-03-15
+date: 2026-03-14
 status: INPUT_FOR_AOUI_F02
 in_response_to: AOUI-IMP-ACT-01, AOUI-F02 (TEAM_100_TO_TEAM_10_AOUI_F02_CSS_INDEX_MANDATE_DIRECTIVE)
 ---

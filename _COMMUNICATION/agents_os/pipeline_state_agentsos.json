@@ -1,7 +1,7 @@
 {
-  "pipe_run_id": "42e3a87e",
+  "pipe_run_id": "8b33132f",
   "work_package_id": "S002-P005-WP999",
-  "stage_id": "Test from mandate",
+  "stage_id": "S002",
   "project_domain": "agents_os",
   "spec_brief": "New program",
   "current_gate": "GATE_0",
@@ -14,5 +14,5 @@
   "implementation_endpoints": [],
   "spec_path": "",
   "started_at": "",
-  "last_updated": "2026-03-14T03:28:54.750681+00:00"
+  "last_updated": "2026-03-14T03:36:00.159182+00:00"
 }

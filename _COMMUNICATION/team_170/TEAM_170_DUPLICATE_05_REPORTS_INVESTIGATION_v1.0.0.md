@@ -4,6 +4,7 @@
 **From:** Team 170 (Governance Spec / Documentation)
 **To:** Team 10 (Gateway); Team 190 (Constitutional Validator)
 **date:** 2026-02-19
+**historical_record:** true
 **purpose:** תיעוד חקירה — מי יצר תיקיות דוחות כפולות, מדוע, ומניעת recurrence כחלק מתוכנית אופציה C
 
 ---

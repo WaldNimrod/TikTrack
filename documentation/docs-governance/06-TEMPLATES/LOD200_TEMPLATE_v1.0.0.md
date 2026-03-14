@@ -1,4 +1,5 @@
 # LOD200_TEMPLATE_v1.0.0 — Architectural Concept (LOD 200) template
+date: 2026-03-14
 
 **project_domain:** [REQUIRED — e.g. AGENTS_OS | TIKTRACK]  
 **id:** [REQUIRED — unique document id]  

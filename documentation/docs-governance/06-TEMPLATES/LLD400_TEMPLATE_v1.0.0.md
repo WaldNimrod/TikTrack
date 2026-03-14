@@ -1,4 +1,5 @@
 # LLD400_TEMPLATE_v1.0.0 — Spec Lock (LOD 400) template
+date: 2026-03-14
 
 **project_domain:** [REQUIRED — e.g. AGENTS_OS]  
 **id:** [REQUIRED — unique document id]  

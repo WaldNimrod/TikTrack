@@ -5,6 +5,7 @@
 **To:** Team 100 (Architect Agents_OS — אדריכל מערכת Agents_OS, לקוח מרכזי של התיעוד)
 **cc:** Team 10 (Gateway)
 **date:** 2026-02-19
+**historical_record:** true
 **purpose:** הודעה קנונית — העברת תבניות LLD400 ו־LOD200 לתיקיית המשילות המשותפת; בקשת בחינת השלכות ואישור/תיקונים נדרשים
 
 ---

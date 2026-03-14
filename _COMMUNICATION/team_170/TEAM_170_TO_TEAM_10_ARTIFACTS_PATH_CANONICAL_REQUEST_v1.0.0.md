@@ -4,6 +4,7 @@
 **From:** Team 170 (Governance Spec / Documentation)
 **To:** Team 10 (Gateway)
 **date:** 2026-02-19
+**historical_record:** true
 **purpose:** בקשה למנדט/תיקון — עדכון נתיבי ארטיפקטים ודוחות בקבצי tests וסקריפטים לנתיב הקנוני היחיד
 
 ---

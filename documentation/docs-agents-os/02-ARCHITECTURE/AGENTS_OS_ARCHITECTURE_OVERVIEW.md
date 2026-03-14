@@ -101,7 +101,7 @@ Each `MandateStep` describes one team's work:
 | Aspect | Behavior |
 |--------|----------|
 | Domains | `tiktrack` (default) and `agents_os` — parallel pipelines |
-| State files | `_COMMUNICATION/agents_os/pipeline_state.json` (tiktrack), `pipeline_state_agentsos.json` (agents_os) via `get_state_file(domain)` |
+| State files | `_COMMUNICATION/agents_os/pipeline_state_tiktrack.json` (tiktrack), `pipeline_state_agentsos.json` (agents_os) via `get_state_file(domain)`; legacy fallback `pipeline_state.json` |
 | Resolution | Explicit `--domain` > `PIPELINE_DOMAIN` env > fallback to legacy `pipeline_state.json` |
 | CLI | `./pipeline_run.sh --domain agents_os status`, `./pipeline_run.sh domain` shows both pipelines |
 

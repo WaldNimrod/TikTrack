@@ -139,10 +139,10 @@
       "presentation": { "reveal": "always", "panel": "new" }
     },
     {
-      "label": "🚀 Start Agents_OS UI Server (Port 7070)",
+      "label": "🚀 Start Agents_OS UI Server (Port 8090)",
       "type": "shell",
       "command": "${workspaceFolder}/agents_os/scripts/start_ui_server.sh",
-      "detail": "agents_os/scripts/start_ui_server.sh — Agents_OS Pipeline Dashboard on :7070",
+      "detail": "agents_os/scripts/start_ui_server.sh — Agents_OS Pipeline Dashboard on :8090",
       "problemMatcher": [],
       "presentation": { "reveal": "always", "panel": "new", "focus": true, "clear": true },
       "group": { "kind": "build", "isDefault": false }

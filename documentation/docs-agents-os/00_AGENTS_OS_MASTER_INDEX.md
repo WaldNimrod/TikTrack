@@ -12,7 +12,7 @@
 
 | Task | Link / Command |
 |------|----------------|
-| Start UI server | `./agents_os/scripts/start_ui_server.sh` → open http://localhost:7070/agents_os/ui/PIPELINE_DASHBOARD.html |
+| Start UI server | `./agents_os/scripts/start_ui_server.sh` → open http://localhost:8090/ (redirects to dashboard) or http://localhost:8090/agents_os/ui/PIPELINE_DASHBOARD.html |
 | Run pipeline | `./pipeline_run.sh --domain agents_os` |
 | Check status | `./pipeline_run.sh --domain agents_os status` or `./pipeline_run.sh domain` |
 

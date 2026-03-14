@@ -5,7 +5,7 @@
 
 set -e
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-PORT="${1:-7070}"
+PORT="${1:-8090}"
 PID_FILE="/tmp/agents_os_ui_server.pid"
 
 if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then

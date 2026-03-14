@@ -109,6 +109,11 @@ Every Team 191 closure note must include:
    - `SYNC CHECK` = סנכרון WSM/Registries
    - `SNAPSHOT CHECK` = תקינות snapshot artifacts
 4. Language lock applies to all Team 191 operational summaries, escalation prompts, and closure contracts unless the user explicitly requests another language.
+5. Canonical Hebrew command aliases (binding):
+   - `191 קומיט` = `191 commit`
+   - `191 פוש` = `191 push`
+   - `191 מארג` = `191 merge`
+   - `191 מיזוג` = `191 merge`
 
 ---
 
@@ -118,9 +123,9 @@ Every Team 191 closure note must include:
 2. Required behavior: always return the Team 191 command options menu; do not execute Git actions in this help mode.
 3. Menu content is mandatory and stable:
    - `191 status` — show current Git/governance blocker status only.
-   - `191 commit` — create context-aware local commit message and commit all intended updates.
-   - `191 push` — run default `SAFE` push flow (guard checks + deterministic remediation + push).
-   - `191 merge` — run canonical merge flow from `codex/team191-integration` to `main` (PR create/check/merge/verify).
+   - `191 commit` / `191 קומיט` — create context-aware local commit message and commit all intended updates.
+   - `191 push` / `191 פוש` — run default `SAFE` push flow (guard checks + deterministic remediation + push).
+   - `191 merge` / `191 מארג` / `191 מיזוג` — run canonical merge flow from `codex/team191-integration` to `main` (PR create/check/merge/verify).
    - `191 push quick` — minimal flow (fast path; lower hygiene).
    - `191 push safe` — default balanced flow (recommended).
    - `191 push strict` — maximal hygiene flow (deep checks, slower).
@@ -132,6 +137,7 @@ Every Team 191 closure note must include:
    - If PR write permission is missing (`pull_requests=write`) or merge is blocked by repo rules/checks, return `BLOCK` with exact blocker list and owner action.
    - Team 191 must not bypass branch protection by direct push to `main`.
 6. Every `191 ?` response must include short pros/cons per mode to preserve consistent operator guidance.
+7. Every `191 ?` response must include the locked Hebrew↔English command translation map.
 
 ---
 

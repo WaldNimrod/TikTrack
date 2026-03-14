@@ -18,17 +18,18 @@
   <a class="nav-link" href="PIPELINE_TEAMS.html">👥 Teams</a>
 </nav>
 
-<header>
-  <div>
-    <h1>🗺️ Agents OS — <span>Roadmap &amp; History</span></h1>
-    <div class="header-meta" id="header-sub">Loading…</div>
+<header class="agents-header">
+  <div class="agents-header-left">
+    <h1 class="agents-header-title">🗺️ Agents OS — <span>Roadmap &amp; History</span></h1>
+    <span class="domain-badge" id="domain-badge-header">—</span>
+    <span class="agents-refresh-label" id="header-sub">Loading…</span>
   </div>
-  <div class="header-right">
-    <label class="refresh-label">
-      <input type="checkbox" id="auto-refresh"> Auto (5s)
+  <div class="agents-header-right">
+    <label class="refresh-label" style="display:inline-flex;align-items:center;gap:4px">
+      <input type="checkbox" id="auto-refresh"> <span class="agents-refresh-label" id="refresh-label">Auto (5s)</span>
       <span class="refresh-dot" id="refresh-dot" style="display:none"></span>
     </label>
-    <button class="btn btn-primary" onclick="loadAll()">↺ Refresh</button>
+    <button class="btn agents-refresh-btn btn-primary" id="refresh-btn" onclick="loadAll()">↺ Refresh</button>
   </div>
 </header>
 
@@ -48,28 +49,28 @@
       <button class="domain-btn" id="domain-btn-agentsos" onclick="onDomainSwitchRoadmap('agents_os')">🟢 Agents OS</button>
     </div>
 
-    <!-- Portfolio Roadmap Tree -->
+    <!-- Portfolio Roadmap Tree — AC-08: main column ONLY domain selector + tree -->
     <div class="section-card">
       <div class="section-title">Portfolio Roadmap <span class="badge" id="roadmap-badge">—</span></div>
       <div id="roadmap-tree"><span class="loading">Loading…</span></div>
-    </div>
-
-    <!-- Full Gate Sequence -->
-    <div class="section-card">
-      <div class="section-title">Full Gate Sequence <span class="badge" id="seq-badge">—</span></div>
-      <div id="gate-seq-content"><span class="loading">Loading…</span></div>
-    </div>
-
-    <!-- Gate History -->
-    <div class="section-card">
-      <div class="section-title">Gate History <span class="badge" id="history-badge">—</span></div>
-      <div id="history-content"><span class="loading">Loading…</span></div>
     </div>
 
   </div><!-- /agents-page-main -->
 
   <!-- ── RIGHT: Sidebar ────────────────────────────────────────────── -->
   <aside class="agents-page-sidebar">
+
+    <!-- Full Gate Sequence (moved from main per AC-08 literal) -->
+    <div class="sidebar-section-card">
+      <div class="sidebar-section-title">Full Gate Sequence <span class="badge" id="seq-badge">—</span></div>
+      <div id="gate-seq-content"><span class="loading">Loading…</span></div>
+    </div>
+
+    <!-- Gate History (moved from main per AC-08 literal) -->
+    <div class="sidebar-section-card">
+      <div class="sidebar-section-title">Gate History <span class="badge" id="history-badge">—</span></div>
+      <div id="history-content"><span class="loading">Loading…</span></div>
+    </div>
 
     <!-- Program detail — shown when a program is selected -->
     <div id="prog-detail-sidebar" style="display:none">

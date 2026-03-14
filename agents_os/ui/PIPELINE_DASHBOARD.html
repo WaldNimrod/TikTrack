@@ -19,13 +19,16 @@
   <a class="nav-link" href="PIPELINE_TEAMS.html">👥 Teams</a>
 </nav>
 
-<header>
-  <div>
-    <h1><span id="domain-title">🔷 TikTrack</span> — <span>Pipeline Dashboard</span></h1>
-    <div class="header-meta" id="last-updated">Loading…</div>
+<header class="agents-header">
+  <div class="agents-header-left">
+    <h1 class="agents-header-title">📊 Agents OS — <span>Pipeline Dashboard</span></h1>
+    <span class="domain-badge" id="domain-badge-header">tiktrack</span>
+    <span class="agents-refresh-label" id="last-updated">Loading…</span>
   </div>
-  <div class="header-right">
-    <button class="help-btn" onclick="toggleHelp()" title="Help & Documentation">?</button>
+  <div class="agents-header-right">
+    <span class="agents-refresh-label" id="refresh-label">Auto (5s)</span>
+    <button class="btn agents-refresh-btn btn-primary" id="refresh-btn" onclick="loadAll()">↺ Refresh</button>
+    <button class="btn help-btn" onclick="toggleHelp()" title="Help & Documentation">?</button>
   </div>
 </header>
 
@@ -248,60 +251,10 @@ python3 -m http.server 8090
   </div>
 </div>
 
-<div class="layout">
+<div class="agents-page-layout">
 
-  <!-- ── Sidebar ─────────────────────────────── -->
-  <aside>
-    <!-- Controls: refresh + progress check (moved from header) -->
-    <div class="sidebar-section" style="padding:10px 12px">
-      <button class="btn btn-primary" style="width:100%;margin-bottom:6px;justify-content:center" onclick="loadAll()">↺ Refresh</button>
-      <button class="btn" style="width:100%;margin-bottom:6px;justify-content:center" onclick="runProgressCheck()" title="סרוק ארטיפקטים ודיאגנוז מצב נוכחי">🔍 בדוק התקדמות</button>
-      <label class="refresh-label" style="justify-content:center">
-        <input type="checkbox" id="auto-refresh-toggle"> Auto-refresh (5s)
-        <span class="refresh-dot" id="refresh-dot" style="display:none"></span>
-      </label>
-    </div>
-
-    <div class="sidebar-section">
-      <div class="sidebar-label">Domain <span class="domain-label-badge" id="domain-badge-pill">tiktrack</span></div>
-      <div class="domain-selector">
-        <button class="domain-btn active-tiktrack" id="domain-btn-tiktrack" onclick="onDomainSwitch('tiktrack')">🔵 TikTrack</button>
-        <button class="domain-btn" id="domain-btn-agentsos" onclick="onDomainSwitch('agents_os')">🟢 Agents OS</button>
-      </div>
-    </div>
-
-    <div class="sidebar-section">
-      <div class="sidebar-label">Pipeline Status</div>
-      <div class="info-row"><span class="info-key">WP</span>     <span class="info-val" id="s-wp">—</span></div>
-      <div class="info-row"><span class="info-key">Stage</span>  <span class="info-val" id="s-stage">—</span></div>
-      <div class="info-row"><span class="info-key">Gate</span>   <span id="s-gate-pill">—</span></div>
-      <div class="info-row"><span class="info-key">Owner</span>  <span class="info-val" id="s-owner">—</span></div>
-      <div class="info-row"><span class="info-key">Engine</span> <span class="info-val" id="s-engine">—</span></div>
-    </div>
-
-    <!-- Health Warnings Panel — filled by loadHealthWarnings() -->
-    <div class="sidebar-section" id="health-warnings-panel" style="display:none">
-      <div class="sidebar-label">⚠️ System Health</div>
-      <div id="health-warnings-content"></div>
-    </div>
-
-    <div class="sidebar-section">
-      <div class="sidebar-label">Gate Timeline</div>
-      <ul class="gate-list" id="gate-list">
-        <li class="gate-item"><span class="gate-dot dot-pending"></span><span class="gate-name loading">Loading…</span></li>
-      </ul>
-    </div>
-
-    <div class="sidebar-section">
-      <div class="sidebar-label">Quick Commands</div>
-      <div class="sidebar-cmd-list" id="sidebar-cmd-list">
-        <div class="sidebar-cmd-row"><span class="sidebar-cmd-text loading">Loading…</span></div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- ── Main ──────────────────────────────────── -->
-  <main>
+  <!-- ── Main content column (left) ────────────────────────────────── -->
+  <main class="agents-page-main">
 
     <!-- Spec card -->
     <div class="spec-card">
@@ -392,10 +345,51 @@ python3 -m http.server 8090
       </div>
     </div>
 
-
   </main>
-</div>
 
+  <!-- ── Sidebar (right) ───────────────────────────────────────────── -->
+  <aside class="agents-page-sidebar">
+    <div class="sidebar-section" style="padding:10px 12px">
+      <button class="btn btn-primary" style="width:100%;margin-bottom:6px;justify-content:center" onclick="loadAll()">↺ Refresh</button>
+      <button class="btn" style="width:100%;margin-bottom:6px;justify-content:center" onclick="runProgressCheck()" title="סרוק ארטיפקטים ודיאגנוז מצב נוכחי">🔍 בדוק התקדמות</button>
+      <label class="refresh-label" style="justify-content:center">
+        <input type="checkbox" id="auto-refresh-toggle"> Auto-refresh (5s)
+        <span class="refresh-dot" id="refresh-dot" style="display:none"></span>
+      </label>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Domain <span class="domain-label-badge" id="domain-badge-pill">tiktrack</span></div>
+      <div class="domain-selector">
+        <button class="domain-btn active-tiktrack" id="domain-btn-tiktrack" onclick="onDomainSwitch('tiktrack')">🔵 TikTrack</button>
+        <button class="domain-btn" id="domain-btn-agentsos" onclick="onDomainSwitch('agents_os')">🟢 Agents OS</button>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Pipeline Status</div>
+      <div class="info-row"><span class="info-key">WP</span>     <span class="info-val" id="s-wp">—</span></div>
+      <div class="info-row"><span class="info-key">Stage</span>  <span class="info-val" id="s-stage">—</span></div>
+      <div class="info-row"><span class="info-key">Gate</span>   <span id="s-gate-pill">—</span></div>
+      <div class="info-row"><span class="info-key">Owner</span>  <span class="info-val" id="s-owner">—</span></div>
+      <div class="info-row"><span class="info-key">Engine</span> <span class="info-val" id="s-engine">—</span></div>
+    </div>
+    <div class="sidebar-section" id="health-warnings-panel" style="display:none">
+      <div class="sidebar-label">⚠️ System Health</div>
+      <div id="health-warnings-content"></div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Gate Timeline</div>
+      <ul class="gate-list" id="gate-list">
+        <li class="gate-item"><span class="gate-dot dot-pending"></span><span class="gate-name loading">Loading…</span></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Quick Commands</div>
+      <div class="sidebar-cmd-list" id="sidebar-cmd-list">
+        <div class="sidebar-cmd-row"><span class="sidebar-cmd-text loading">Loading…</span></div>
+      </div>
+    </div>
+  </aside>
+</div>
 
 <script src="js/pipeline-config.js"></script>
 <script src="js/pipeline-state.js"></script>

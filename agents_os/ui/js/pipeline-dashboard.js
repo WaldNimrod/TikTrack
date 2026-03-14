@@ -12,8 +12,11 @@ function toggleAccordion(id) {
 function onDomainSwitch(domain) {
   switchDomain(domain);
   const isTiktrack = domain === "tiktrack";
-  const titleEl = document.getElementById("domain-title");
-  if (titleEl) titleEl.textContent = isTiktrack ? "🔷 TikTrack" : "⚡ Agents OS";
+  const titleEl = document.getElementById("domain-badge-header");
+  if (titleEl) {
+    titleEl.textContent = isTiktrack ? "tiktrack" : "agents_os";
+    titleEl.className = "domain-badge domain-" + (isTiktrack ? "tiktrack" : "agentsos");
+  }
   document.title = isTiktrack ? "TikTrack — Pipeline Dashboard" : "Agents OS — Pipeline Dashboard";
   const btnT = document.getElementById("domain-btn-tiktrack");
   const btnA = document.getElementById("domain-btn-agentsos");

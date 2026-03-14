@@ -548,8 +548,11 @@ function closeFileViewer() {
 function onDomainSwitchRoadmap(domain) {
   switchDomain(domain);
   const isTiktrack = domain === 'tiktrack';
-  const titleEl = document.getElementById('domain-title');
-  if (titleEl) titleEl.textContent = isTiktrack ? '🔷 TikTrack' : '🟢 Agents OS';
+  const titleEl = document.getElementById('domain-badge-header');
+  if (titleEl) {
+    titleEl.textContent = isTiktrack ? 'tiktrack' : 'agents_os';
+    titleEl.className = 'domain-badge domain-' + (isTiktrack ? 'tiktrack' : 'agentsos');
+  }
   const btnT = document.getElementById('domain-btn-tiktrack');
   const btnA = document.getElementById('domain-btn-agentsos');
   if (btnT) btnT.className = 'domain-btn' + (isTiktrack ? ' active-tiktrack' : '');

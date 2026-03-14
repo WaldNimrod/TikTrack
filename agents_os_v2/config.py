@@ -73,3 +73,32 @@ DOMAIN_GATE_OWNERS: dict[str, dict[str, str]] = {
         "WAITING_GATE6_APPROVAL": "team_100",
     },
 }
+
+# ── TikTrack page routes (for GATE_7 scenario generation) ─────────────────
+# Maps page codes (D15, D22, …) to their live URLs on localhost:8080.
+# Routes verified against vite.config.js htmlPagesPlugin mapping.
+TIKTRACK_PAGE_ROUTES: dict[str, str] = {
+    "D15":  "http://localhost:8080/",
+    "D16":  "http://localhost:8080/trading_accounts",
+    "D18":  "http://localhost:8080/brokers_fees",
+    "D21":  "http://localhost:8080/cash_flows",
+    "D22":  "http://localhost:8080/tickers",
+    "D23":  "http://localhost:8080/data_dashboard",
+    "D24":  "http://localhost:8080/trade_plans",
+    "D25":  "http://localhost:8080/ai_analysis",
+    "D29":  "http://localhost:8080/trade_plans",
+    "D31":  "http://localhost:8080/executions",
+    "D33":  "http://localhost:8080/user_tickers",
+    "D34":  "http://localhost:8080/alerts",
+    "D35":  "http://localhost:8080/notes",
+    "D36":  "http://localhost:8080/executions",
+    "D39":  "http://localhost:8080/settings",
+    "D40":  "http://localhost:8080/system_management",
+    "D41":  "http://localhost:8080/system_management",
+}
+
+# Domain-aware doc team (GATE_8 Phase 1)
+DOMAIN_DOC_TEAM: dict[str, str] = {
+    "tiktrack":  "team_70",
+    "agents_os": "team_170",
+}

@@ -182,7 +182,8 @@ case "${1:-next}" in
   approve)
     GATE=$(_get_gate)
     # Map WAITING_ gates to their base gate for --approve
-    BASE_GATE=$(echo "$GATE" | sed 's/WAITING_//; s/_APPROVAL//')
+    # WAITING_GATE6_APPROVAL → GATE6 → GATE_6 (re-add underscore before digit)
+    BASE_GATE=$(echo "$GATE" | sed 's/WAITING_//; s/_APPROVAL//; s/GATE\([0-9]\)/GATE_\1/')
     echo "[pipeline_run] ${DOMAIN_LABEL}Approving: $BASE_GATE"
     $CLI --approve "$BASE_GATE"
     echo ""

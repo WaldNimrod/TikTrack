@@ -157,6 +157,252 @@ def _save_prompt(filename: str, content: str) -> Path:
     return path
 
 
+# ════════════════════════════════════════════════════════════════════════════
+#  GENERIC MANDATE ENGINE
+#  Reusable by any gate (G3_6_MANDATES, GATE_8, future gates).
+#  Each MandateStep describes one team's work, its phase, dependencies,
+#  and coordination data sources (auto-injected from prior team output files).
+# ════════════════════════════════════════════════════════════════════════════
+
+# Per-gate mandate filenames (saved under _COMMUNICATION/agents_os/prompts/)
+GATE_MANDATE_FILES: dict = {
+    "G3_6_MANDATES": "implementation_mandates.md",
+    "GATE_8":        "gate_8_mandates.md",
+}
+
+
+class MandateStep:
+    """One team's mandate within a multi-team gate execution.
+
+    Attributes:
+        team_id:     "team_20", "team_70", etc.
+        label:       Display label, e.g. "Team 20 — API Verification"
+        phase:       Execution phase (1 = first). Steps in the same phase run in parallel.
+        task:        Full task description (markdown, multi-line).
+        writes_to:   Canonical output path — what this team produces.
+        reads_from:  List of file paths to search for coordination data.
+        reads_label: Human-readable description of what to look for.
+        depends_on:  List of team_ids whose phase must complete first.
+        acceptance:  List of acceptance criteria strings.
+        extra:       Additional context injected at the end (conventions, iron rules, etc.).
+    """
+    __slots__ = ("team_id","label","phase","task","writes_to",
+                 "reads_from","reads_label","depends_on","acceptance","extra")
+
+    def __init__(
+        self,
+        team_id:     str,
+        label:       str,
+        phase:       int,
+        task:        str,
+        writes_to:   str  = "",
+        reads_from:  list = None,
+        reads_label: str  = "",
+        depends_on:  list = None,
+        acceptance:  list = None,
+        extra:       str  = "",
+    ):
+        self.team_id     = team_id
+        self.label       = label
+        self.phase       = phase
+        self.task        = task
+        self.writes_to   = writes_to
+        self.reads_from  = reads_from  or []
+        self.reads_label = reads_label
+        self.depends_on  = depends_on  or []
+        self.acceptance  = acceptance  or []
+        self.extra       = extra
+
+
+def _read_coordination_file(paths: list, repo_root: Path) -> tuple:
+    """Search file paths for coordination data, auto-globbing the team folder as fallback.
+
+    Returns (content_str, found_path_str) or ("", "") if not found.
+    Multi-level search mirrors the JS autoLoadVerdictFile approach:
+      1. Try each explicit candidate path.
+      2. Glob the team folder for any file matching the WP pattern.
+    """
+    import re
+
+    for raw_path in paths:
+        full = repo_root / raw_path.lstrip("/")
+        if full.is_file():
+            text = full.read_text(encoding="utf-8").strip()
+            if text:
+                return text, raw_path
+
+    # ── Fallback glob: extract team folder + WP pattern from first candidate ─
+    if paths:
+        team_match = re.search(r'(_COMMUNICATION/team_\d+)', paths[0])
+        wp_match   = re.search(r'(S\d{3}[_-]P\d{3}[_-]WP\d{3})', paths[0])
+        if team_match and wp_match:
+            folder  = repo_root / team_match.group(1).lstrip("/")
+            wp_pat  = wp_match.group(1).replace("-", "_").lower()
+            wp_alt  = wp_match.group(1).lower()
+            if folder.is_dir():
+                for f in sorted(folder.iterdir()):
+                    fname_l = f.name.lower()
+                    if (wp_pat in fname_l or wp_alt in fname_l) and f.suffix in (".md", ".txt"):
+                        text = f.read_text(encoding="utf-8").strip()
+                        if text:
+                            rel = str(f.relative_to(repo_root))
+                            return text, rel
+
+    return "", ""
+
+
+def _generate_mandate_doc(
+    steps:   list,
+    state:   "PipelineState",
+    gate:    str = "",
+    preamble: str = "",
+) -> str:
+    """Generic mandate document generator.
+
+    Produces:
+      1. Header (gate, WP, spec)
+      2. EXECUTION ORDER block — phases, parallel/sequential notation,
+         dependency arrows between phases
+      3. Per-team sections — task, coordination data (auto-injected or
+         guided placeholder), output path, acceptance criteria
+
+    Args:
+        steps:    list[MandateStep] — all teams for this gate, in phase order.
+        state:    PipelineState — for WP, spec_brief, domain context.
+        gate:     Gate identifier shown in header.
+        preamble: Optional block inserted after header (e.g. full work plan).
+    """
+    SEP   = "─" * 60
+    SEP_H = "═" * 60
+    wp    = state.work_package_id
+
+    # ── 1. Execution order block ─────────────────────────────────────────────
+    phases: dict = {}
+    for s in steps:
+        phases.setdefault(s.phase, []).append(s)
+
+    order_lines = []
+    for phase_num in sorted(phases.keys()):
+        phase_steps = phases[phase_num]
+        # Label: short team name (before the em-dash)
+        def _short(label: str) -> str:
+            return label.split("—")[0].strip()
+
+        if len(phase_steps) == 1:
+            order_lines.append(
+                f"  Phase {phase_num}:  {_short(phase_steps[0].label)}"
+                f"   ← runs alone"
+            )
+        else:
+            names = "  ‖  ".join(_short(s.label) for s in phase_steps)
+            order_lines.append(
+                f"  Phase {phase_num}:  {names}"
+                f"   ← PARALLEL (start simultaneously)"
+            )
+        # Dependency arrow to next phase
+        if phase_num < max(phases.keys()):
+            next_phase   = phase_num + 1
+            next_steps   = phases.get(next_phase, [])
+            next_names   = " + ".join(_short(s.label) for s in next_steps)
+            order_lines.append(
+                f"             ↓  Phase {next_phase} starts ONLY after Phase {phase_num} completes"
+            )
+            # Coordination note: which teams provide data to which
+            for ns in next_steps:
+                if ns.reads_from and ns.depends_on:
+                    dep_labels = [_short(s.label) for s in steps if s.team_id in ns.depends_on]
+                    if dep_labels:
+                        order_lines.append(
+                            f"             📄 {_short(ns.label)} reads coordination data"
+                            f" from {' + '.join(dep_labels)}"
+                        )
+        order_lines.append("")
+
+    order_block = "\n".join(order_lines).rstrip()
+
+    # ── 2. Per-team sections ─────────────────────────────────────────────────
+    sections = []
+    for step in steps:
+
+        # Prerequisite banner
+        if step.depends_on:
+            dep_labels = [
+                _short(s.label) for s in steps if s.team_id in step.depends_on
+            ]
+            dep_str  = " + ".join(dep_labels or step.depends_on)
+            prereq   = (
+                f"⚠️  PREREQUISITE: **{dep_str}** must be COMPLETE before starting "
+                f"this mandate.\n\n"
+            )
+        else:
+            prereq = ""
+
+        # Coordination data injection
+        coord_block = ""
+        if step.reads_from:
+            content, found_path = _read_coordination_file(step.reads_from, REPO_ROOT)
+            lbl = step.reads_label or "coordination data from prior team"
+            if content:
+                preview = content[:1500]
+                coord_block = (
+                    f"### Coordination Data — {lbl}\n\n"
+                    f"✅  Auto-loaded: `{found_path}`\n\n"
+                    f"```\n{preview}\n```\n"
+                    + ("_[… content truncated at 1500 chars]_\n" if len(content) > 1500 else "")
+                )
+            else:
+                paths_str = "\n".join(f"  - `{p}`" for p in step.reads_from[:6])
+                coord_block = (
+                    f"### Coordination Data — {lbl}\n\n"
+                    f"⚠️  File not yet available. Searched (in order):\n{paths_str}\n\n"
+                    f"→ Complete the prerequisite team's work first.\n"
+                    f"→ Re-generate after: `./pipeline_run.sh` injects real data.\n"
+                )
+
+        # Output path note
+        writes_note = (
+            f"\n**Output — write to:**\n`{step.writes_to}`\n"
+            if step.writes_to else ""
+        )
+
+        # Acceptance
+        accept_str = (
+            "\n".join(f"- {a}" for a in step.acceptance)
+            if step.acceptance else "- Complete all tasks above"
+        )
+
+        body = (
+            f"## {step.label} (Phase {step.phase})\n\n"
+            f"{prereq}"
+            f"{step.task}\n"
+            f"{writes_note}"
+        )
+        if coord_block:
+            body += f"\n{coord_block}\n"
+        if step.extra:
+            body += f"\n### Additional Context\n{step.extra}\n"
+        body += f"\n### Acceptance\n{accept_str}\n"
+
+        sections.append(body)
+
+    sections_text = ("\n" + SEP + "\n\n").join(sections)
+
+    # ── 3. Assemble final document ────────────────────────────────────────────
+    gate_label = f"  ·  {gate}" if gate else ""
+    header = (
+        f"# Mandates — {wp}{gate_label}\n\n"
+        f"**Spec:** {state.spec_brief}\n\n"
+        f"{SEP_H}\n"
+        f"  EXECUTION ORDER\n"
+        f"{SEP_H}\n\n"
+        f"{order_block}\n\n"
+        f"{SEP_H}\n\n"
+    )
+    preamble_block = f"{preamble}\n\n{SEP}\n\n" if preamble else ""
+
+    return header + preamble_block + sections_text
+
+
 def _print_human_approval_prompt(gate_name: str, analysis: str, summary: str):
     print(f"\n╔══════════════════════════════════════════════════════════╗")
     print(f"║  🛑 HUMAN APPROVAL REQUIRED — {gate_name:<24}  ║")
@@ -497,7 +743,7 @@ def generate_prompt(gate_id: str, force_gate4: bool = False, revision_notes: str
     elif gate_id == "G5_DOC_FIX":
         prompt = _generate_g5_doc_fix_prompt(state)
     elif gate_id == "GATE_8":
-        prompt = _generate_gate_8_prompt(state, fresh)
+        prompt = _generate_gate_8_mandates(state, fresh)
     else:
         print(f"Unknown gate: {gate_id}")
         return
@@ -685,67 +931,219 @@ def _extract_team_task(work_plan: str, team_num: int) -> str:
 
 
 def _generate_mandates(state: PipelineState) -> str:
-    """Generate per-team implementation mandates driven by the approved work plan."""
+    """Generate per-team implementation mandates using the generic mandate engine.
+
+    Teams 20 → 30 → 50 run sequentially.  Team 30 reads Team 20's API verification
+    output (coordination injection).  Document is saved to implementation_mandates.md
+    and also returned for the prompt display in generate_prompt().
+    """
     from ..context.injection import load_conventions
-    backend_conv = load_conventions("backend")
+    backend_conv  = load_conventions("backend")
     frontend_conv = load_conventions("frontend")
 
-    team_20_task = _extract_team_task(state.work_plan, 20)
-    team_30_task = _extract_team_task(state.work_plan, 30)
-    team_50_task = _extract_team_task(state.work_plan, 50)
+    wp  = state.work_package_id
+    wpu = wp.replace("-", "_")
 
-    full_work_plan = state.work_plan if state.work_plan else "[work plan not available — run G3_PLAN first]"
+    # Canonical output paths
+    t20_out = f"_COMMUNICATION/team_20/TEAM_20_{wpu}_API_VERIFY_v1.0.0.md"
+    t50_out = f"_COMMUNICATION/team_50/TEAM_50_{wpu}_QA_REPORT_v1.0.0.md"
 
-    mandates = f"# Implementation Mandates — {state.work_package_id}\n\n"
-    mandates += f"**Spec:** {state.spec_brief}\n"
-    mandates += f"**WP:** {state.work_package_id}\n\n"
-    mandates += f"---\n\n"
-    mandates += f"## Full Work Plan (reference)\n\n{full_work_plan}\n\n"
-    mandates += f"---\n\n"
+    # Extract per-team sections from work plan (falls back to spec_brief)
+    team_20_task = _extract_team_task(state.work_plan, 20) or f"Verify backend APIs required for: {state.spec_brief}"
+    team_30_task = _extract_team_task(state.work_plan, 30) or f"Implement frontend for: {state.spec_brief}"
+    team_50_task = _extract_team_task(state.work_plan, 50) or f"Run QA for: {state.spec_brief}"
 
-    # Team 20 mandate
-    mandates += f"## Team 20 Mandate (API Verification — Cursor Composer)\n\n"
-    mandates += f"### Your Task\n"
-    mandates += (team_20_task if team_20_task else f"Verify backend APIs required for: {state.spec_brief}") + "\n\n"
-    mandates += f"### Backend Conventions\n{backend_conv[:800]}\n\n"
-    mandates += f"### Acceptance\n"
-    mandates += f"- Document API params and response shape in `_COMMUNICATION/team_20/`\n"
-    mandates += f"- Confirm all required endpoints exist and behave as specified\n"
-    mandates += f"- No code changes unless a blocker is found\n\n"
+    # Preamble: full work plan (shown in raw file; not a tab section)
+    preamble = (
+        "## Full Work Plan (reference)\n\n"
+        + (state.work_plan if state.work_plan else "[work plan not available — run G3_PLAN first]")
+    )
 
-    # Team 30 mandate
-    mandates += f"---\n\n## Team 30 Mandate (Frontend Implementation — Cursor Composer + MCP)\n\n"
-    mandates += f"### Your Task\n"
-    mandates += (team_30_task if team_30_task else f"Implement frontend for: {state.spec_brief}") + "\n\n"
-    mandates += f"### Frontend Conventions\n{frontend_conv[:800]}\n\n"
-    mandates += f"### MCP Verification (run after implementation)\n"
-    mandates += f"1. Navigate to the target page and login\n"
-    mandates += f"2. `browser_snapshot` — verify new component renders\n"
-    mandates += f"3. Test visible count badge when alerts exist\n"
-    mandates += f"4. Verify widget is hidden when 0 unread alerts\n"
-    mandates += f"5. Click alert item — confirm navigation to D34\n"
-    mandates += f"6. Click count badge — confirm navigation to D34 (filtered unread)\n"
-    mandates += f"7. `cd ui && npx vite build` — must succeed\n\n"
-    mandates += f"### Acceptance\n"
-    mandates += f"- All files listed in work plan created/modified\n"
-    mandates += f"- collapsible-container Iron Rule applied\n"
-    mandates += f"- maskedLog used for all console output\n"
-    mandates += f"- Vite build passes\n"
-    mandates += f"- MCP scenarios above all pass\n\n"
+    steps = [
+        MandateStep(
+            team_id    = "team_20",
+            label      = "Team 20 — API Verification",
+            phase      = 1,
+            task       = (
+                f"### Your Task\n\n{team_20_task}\n\n"
+                f"**Environment:** Cursor Composer\n\n"
+                f"Verify all backend API endpoints required for this feature.\n"
+                f"No code changes unless a critical blocker is found.\n"
+                f"Document: endpoint paths, params, response shapes, auth requirements."
+            ),
+            writes_to  = t20_out,
+            acceptance = [
+                "All required endpoints confirmed present and behaving as specified",
+                "API params + response shapes documented",
+                "No code changes (unless blocker found — document it)",
+                f"Output saved to: `{t20_out}`",
+            ],
+            extra      = f"### Backend Conventions\n{backend_conv[:800]}",
+        ),
+        MandateStep(
+            team_id     = "team_30",
+            label       = "Team 30 — Frontend Implementation",
+            phase       = 2,
+            task        = (
+                f"### Your Task\n\n{team_30_task}\n\n"
+                f"**Environment:** Cursor Composer + MCP browser tools\n\n"
+                f"Implement the frontend feature per spec. After implementation, run MCP verification:\n"
+                f"1. Navigate to the target page and login\n"
+                f"2. `browser_snapshot` — verify new component renders\n"
+                f"3. Test primary feature (badge/count/list as applicable)\n"
+                f"4. Verify edge case: hidden/empty state when count is 0\n"
+                f"5. Test all navigation flows (Click item/badge → correct page)\n"
+                f"6. `cd ui && npx vite build` — must succeed\n"
+            ),
+            reads_from  = [
+                f"_COMMUNICATION/team_20/TEAM_20_{wpu}_API_VERIFY_v1.0.0.md",
+                f"_COMMUNICATION/team_20/TEAM_20_{wpu}_API_VERIFICATION_v1.0.0.md",
+            ],
+            reads_label = "Team 20 API verification report",
+            depends_on  = ["team_20"],
+            acceptance  = [
+                "All files listed in work plan created/modified",
+                "collapsible-container Iron Rule applied",
+                "maskedLog used for all console output",
+                "Vite build passes (`cd ui && npx vite build`)",
+                "All MCP browser verification steps pass",
+            ],
+            extra       = f"### Frontend Conventions\n{frontend_conv[:800]}",
+        ),
+        MandateStep(
+            team_id    = "team_50",
+            label      = "Team 50 — QA",
+            phase      = 3,
+            task       = (
+                f"### Your Task\n\n{team_50_task}\n\n"
+                f"**Environment:** Cursor Composer + MCP browser tools\n\n"
+                f"Run comprehensive QA on the completed implementation.\n"
+                f"Team 20 API verification AND Team 30 implementation must both be complete first."
+            ),
+            writes_to  = t50_out,
+            depends_on  = ["team_30"],
+            acceptance  = [
+                "All FAST_3 checks pass",
+                "No regressions on adjacent pages",
+                f"QA report saved to: `{t50_out}`",
+            ],
+        ),
+    ]
 
-    # Team 50 mandate
-    mandates += f"---\n\n## Team 50 Mandate (QA — after Team 30 complete)\n\n"
-    mandates += f"### Your Task\n"
-    mandates += (team_50_task if team_50_task else f"Run QA for: {state.spec_brief}") + "\n\n"
-    mandates += f"### Prerequisite\n"
-    mandates += f"Team 20 API verification complete AND Team 30 implementation complete.\n\n"
-    mandates += f"### Acceptance\n"
-    mandates += f"- All FAST_3 checks pass\n"
-    mandates += f"- D34 regression: no regressions\n"
-    mandates += f"- QA report produced to `_COMMUNICATION/team_50/`\n\n"
+    doc = _generate_mandate_doc(steps, state, gate="G3_6_MANDATES", preamble=preamble)
+    _save_prompt("implementation_mandates.md", doc)
+    return doc
 
-    path = _save_prompt("implementation_mandates.md", mandates)
-    return mandates
+
+def _generate_gate_8_mandates(state: PipelineState, fresh: bool = False) -> str:
+    """GATE_8 closure mandates using the generic mandate engine.
+
+    Phase 1: domain doc team writes AS_MADE_REPORT + archives WP communication files.
+    Phase 2: Team 90 validates completeness; if valid → WP CLOSED; if not → back to Phase 1.
+
+    Saved to gate_8_mandates.md (separate from implementation_mandates.md so the
+    Dashboard can load the correct file based on the current gate).
+    """
+    from ..config import DOMAIN_DOC_TEAM
+
+    doc_team     = DOMAIN_DOC_TEAM.get(state.project_domain, "team_70")
+    doc_team_up  = doc_team.upper()                    # "TEAM_70" or "TEAM_170"
+    doc_team_n   = doc_team_up.replace("_", " ").title()  # "Team 70" or "Team 170"
+    wp           = state.work_package_id
+    wpu          = wp.replace("-", "_")
+    stage        = state.stage_id
+    archive_dest = f"_COMMUNICATION/_ARCHIVE/{stage}/{wp}/"
+    as_made_path = f"_COMMUNICATION/{doc_team}/{doc_team_up}_{wpu}_AS_MADE_REPORT_v1.0.0.md"
+
+    # Build impl files block for the AS_MADE_REPORT task description
+    impl_files = state.implementation_files[:20] if state.implementation_files else []
+    impl_block = (
+        "\n".join(f"    - {f}" for f in impl_files)
+        if impl_files
+        else "    [list all files created/modified during implementation]"
+    )
+
+    phase1_task = (
+        f"### Your Task\n\n"
+        f"**Environment:** Cursor Composer (Team 70) / Codex (Team 170)\n\n"
+        f"Complete **two mandatory tasks** for WP `{wp}` closure:\n\n"
+        f"---\n\n"
+        f"**TASK A — Write AS_MADE_REPORT**\n\n"
+        f"Write to: `{as_made_path}`\n\n"
+        f"Required sections:\n"
+        f"  1. Feature summary — what was built\n"
+        f"  2. Files created / modified:\n{impl_block}\n"
+        f"  3. API endpoints added / changed (if any)\n"
+        f"  4. Migrations or schema changes applied (if any)\n"
+        f"  5. Known limitations / deferred items\n"
+        f"  6. Notes for future developers (setup, gotchas, dependencies)\n"
+        f"  7. Archive manifest (populated after Task B — list all archived files)\n\n"
+        f"---\n\n"
+        f"**TASK B — Archive WP Communication Files**\n\n"
+        f"Source: `_COMMUNICATION/team_*/` (files containing `{wpu}` or `{wp}` in name)\n"
+        f"Destination: `{archive_dest}`\n\n"
+        f"```bash\n"
+        f"mkdir -p {archive_dest}\n"
+        f"find _COMMUNICATION/team_*/ \\( -name '*{wpu}*' -o -name '*{wp}*' \\) -type f\n"
+        f"# Copy all matching files to {archive_dest}\n"
+        f"```\n\n"
+        f"**Do NOT archive** (keep active): SSM, WSM, PHOENIX_MASTER_WSM, "
+        f"PHOENIX_PROGRAM_REGISTRY, TEAM_ROSTER_LOCK\n\n"
+        f"→ When BOTH tasks complete, Team 90 can begin Phase 2 validation."
+    )
+
+    phase2_task = (
+        f"### Your Task\n\n"
+        f"**Environment:** Codex\n\n"
+        f"Validate that {doc_team_n} has completed all closure requirements for `{wp}`.\n\n"
+        f"**Validation checklist:**\n"
+        f"□ AS_MADE_REPORT exists at: `{as_made_path}`\n"
+        f"□ AS_MADE_REPORT has all required sections (1–7)\n"
+        f"□ Archive directory exists: `{archive_dest}`\n"
+        f"□ Archive contains gate artifacts (verdicts, blocking reports, work plans)\n"
+        f"□ Archive manifest (Section 7) correctly lists all archived files\n"
+        f"□ No unarchived WP-specific files remain in active team folders\n"
+    )
+
+    steps = [
+        MandateStep(
+            team_id    = doc_team,
+            label      = f"{doc_team_n} — Documentation & Archive",
+            phase      = 1,
+            task       = phase1_task,
+            writes_to  = as_made_path,
+            acceptance = [
+                f"AS_MADE_REPORT written at: `{as_made_path}`",
+                f"All WP files archived to: `{archive_dest}`",
+                "Archive manifest in AS_MADE_REPORT Section 7",
+                "Team 90 notified for Phase 2 validation",
+            ],
+        ),
+        MandateStep(
+            team_id     = "team_90",
+            label       = "Team 90 — Closure Validation",
+            phase       = 2,
+            task        = phase2_task,
+            reads_from  = [
+                as_made_path,
+                f"_COMMUNICATION/{doc_team}/TEAM_70_{wpu}_AS_MADE_REPORT_v1.0.0.md",
+            ],
+            reads_label = f"{doc_team_n} AS_MADE_REPORT",
+            depends_on  = [doc_team],
+            acceptance  = [
+                "All 6 checklist items PASS",
+                "No missing sections in AS_MADE_REPORT",
+                "No unarchived WP files found in active team folders",
+                f"If ALL pass  →  `./pipeline_run.sh pass`  →  WP {wp} CLOSED ✅",
+                f"If ANY fail  →  `./pipeline_run.sh fail \"CLOSURE-001: [specific issue]\"`"
+                f"  →  returns to {doc_team_n} for correction",
+            ],
+        ),
+    ]
+
+    doc = _generate_mandate_doc(steps, state, gate="GATE_8")
+    _save_prompt("gate_8_mandates.md", doc)
+    return doc
 
 
 def _generate_cursor_prompts(state: PipelineState) -> str:
@@ -971,31 +1369,216 @@ def _generate_gate_6_prompt(state: PipelineState, fresh: bool = False, team_id: 
     )
 
 
+def _parse_gate7_scenarios(spec_brief: str, page_routes: dict) -> list:
+    """Derive actionable test scenarios from spec_brief.
+
+    Parses:
+      - Page codes (D15, D22, …) → lookup URL
+      - "Click X → DNN" patterns  → navigation scenarios
+      - Keywords: badge, count, hidden, list, filter → edge-case scenarios
+    """
+    import re
+
+    base = "http://localhost:8080"
+    scenarios: list = []
+
+    # ── 1. Find all D-codes in order of appearance ─────────────────────────
+    codes = list(dict.fromkeys(re.findall(r'\bD(\d+)(?:\.[A-Z]+)?\b', spec_brief)))
+    if not codes:
+        return [{"name": "Verify feature",
+                 "url": base,
+                 "steps": ["Open the application", "Navigate to the new feature", "Test the feature"],
+                 "pass_if": ["Feature works as specified", "No JS errors in console"]}]
+
+    primary_code = f"D{codes[0]}"
+    primary_url  = page_routes.get(primary_code, base)
+    spec_lower   = spec_brief.lower()
+
+    # ── 2. Main scenario: open primary page, verify feature renders ─────────
+    main_steps: list = [f"Open {primary_url}"]
+    main_pass:  list = ["Page loads without errors"]
+
+    if "badge" in spec_lower or "count" in spec_lower:
+        n_match = re.search(r'N=(\d+)', spec_brief)
+        n = n_match.group(1) if n_match else "N"
+        main_steps.append("Verify unread count badge is visible and non-zero")
+        main_pass.append(f"Badge shows correct triggered-unread count")
+        main_steps.append(f"Verify list shows ≤{n} most-recent alerts")
+        main_pass.append(f"List renders ≤{n} items, ordered by recency")
+
+    scenarios.append({
+        "name": f"{primary_code} — Feature renders",
+        "url":  primary_url,
+        "steps": main_steps,
+        "pass_if": main_pass,
+    })
+
+    # ── 3. Edge case: hidden when count is 0 ───────────────────────────────
+    if re.search(r'hidden.{0,30}0|fully hidden|hidden when 0', spec_lower):
+        scenarios.append({
+            "name": f"{primary_code} — Hidden when empty",
+            "url":  primary_url,
+            "steps": [
+                f"Open {primary_url}",
+                "Ensure zero triggered-unread alerts exist (or clear test data)",
+                "Verify widget is fully hidden / not rendered",
+            ],
+            "pass_if": [
+                "Widget element absent or display:none / visibility:hidden",
+                "No empty container or placeholder shown",
+            ],
+        })
+
+    # ── 4. Navigation scenarios from "Click X → DNN [qualifier]" patterns ────
+    # Capture: click_what, target_code, optional qualifier after DNN
+    nav_pattern = re.compile(
+        r'[Cc]lick\s+([^→\n.]{1,40})\s*→\s*D(\d+)([^.\n]{0,50})?'
+    )
+    for m in nav_pattern.finditer(spec_brief):
+        click_what  = m.group(1).strip().rstrip(' ,;')
+        target_num  = m.group(2)
+        qualifier   = (m.group(3) or "").strip()        # e.g. " filtered unread"
+        target_code = f"D{target_num}"
+        target_url  = page_routes.get(target_code, base)
+        # Detect if a filtered/unread view is mentioned in click_what OR qualifier
+        is_filtered = bool(re.search(r'filter|unread', click_what + qualifier, re.I))
+        pass_criteria = [f"Browser navigates to {target_code} ({target_url})"]
+        if is_filtered:
+            pass_criteria.append("Page shows filtered view (triggered_unread alerts only)")
+        qualifier_label = f" [{qualifier.strip()}]" if qualifier.strip() else ""
+        scenarios.append({
+            "name": f"{primary_code} → {target_code}  [click {click_what}{qualifier_label}]",
+            "url":  primary_url,
+            "steps": [
+                f"Open {primary_url}",
+                f"Click: {click_what}",
+                f"Verify browser navigates to {target_url}",
+            ],
+            "pass_if": pass_criteria,
+        })
+
+    return scenarios
+
+
 def _generate_gate_7_prompt(state: PipelineState) -> str:
+    """Human UX sign-off with precise, actionable test scenarios."""
+    from ..config import TIKTRACK_PAGE_ROUTES
+    SEP = "─" * 60
+
+    page_routes = TIKTRACK_PAGE_ROUTES if state.project_domain == "tiktrack" else {}
+    scenarios   = _parse_gate7_scenarios(state.spec_brief, page_routes)
+
+    # ── Build scenario checklist ────────────────────────────────────────────
+    checklist_lines: list = []
+    for i, s in enumerate(scenarios, 1):
+        name   = s["name"]
+        url    = s["url"]
+        steps  = s.get("steps", ["Open the app", "Test the feature"])
+        passes = s.get("pass_if", ["Feature works"])
+
+        steps_str  = "\n         ".join(f"→ {st}" for st in steps)
+        passes_str = "\n         ".join(f"✓ {p}" for p in passes)
+
+        checklist_lines.append(
+            f"  □ {i}. {name}\n"
+            f"       URL:    {url}\n"
+            f"       Steps:  {steps_str}\n"
+            f"       Pass:   {passes_str}"
+        )
+
+    checklist = "\n\n".join(checklist_lines)
+    wp        = state.work_package_id
+
     return (
-        f"# GATE_7 — Human UX Review\n\n"
-        f"**Nimrod — review the application.**\n\n"
+        f"╔══════════════════════════════════════════════════════════════╗\n"
+        f"║  GATE_7 — UX SIGN-OFF              {wp:<27}║\n"
+        f"╚══════════════════════════════════════════════════════════════╝\n\n"
         f"Feature: {state.spec_brief}\n\n"
-        f"1. Open http://localhost:8080\n"
-        f"2. Navigate to the new feature\n"
-        f"3. Test the UX — does it feel right?\n"
-        f"4. Test edge cases\n\n"
-        f"When done:\n"
-        f"  --advance GATE_7 PASS    (approve)\n"
-        f"  --advance GATE_7 FAIL --reason '...'  (reject)"
+        f"{SEP}\n"
+        f"  TEST CHECKLIST  ({len(scenarios)} scenario{'s' if len(scenarios) != 1 else ''})\n"
+        f"{SEP}\n\n"
+        f"{checklist}\n\n"
+        f"{SEP}\n"
+        f"  COMMANDS\n"
+        f"{SEP}\n\n"
+        f"  All scenarios pass:\n"
+        f"    ./pipeline_run.sh pass\n\n"
+        f"  Issues found:\n"
+        f"    ./pipeline_run.sh fail \"UX-001: [describe issue]\"\n"
+        f"    ./pipeline_run.sh fail \"UX-001: badge missing; UX-002: D34 nav broken\"\n"
     )
 
 
 def _generate_gate_8_prompt(state: PipelineState, fresh: bool = False) -> str:
+    """GATE_8 two-phase closure: doc team produces AS_MADE_REPORT + archives WP files;
+    Team 90 validates archiving and documentation before final WP close."""
+    from ..config import DOMAIN_DOC_TEAM
+    SEP = "─" * 60
+
+    doc_team   = DOMAIN_DOC_TEAM.get(state.project_domain, "team_70")
+    doc_team_n = doc_team.replace("_", " ").title()   # "Team 70"
+    wp         = state.work_package_id
+    stage      = state.stage_id
+
+    # WP-id filename pattern: S001-P002-WP001 → S001_P002_WP001
+    wp_file_pattern = wp.replace("-", "_")
+    archive_dest    = f"_COMMUNICATION/_ARCHIVE/{stage}/{wp}/"
+    as_made_path    = f"_COMMUNICATION/{doc_team}/{wp_file_pattern}_AS_MADE_REPORT_v1.0.0.md"
+
+    # List of implementation files (if available)
+    impl_files = state.implementation_files[:20] if state.implementation_files else []
+    impl_block = (
+        "\n".join(f"    - {f}" for f in impl_files)
+        if impl_files
+        else "    [list all files created/modified during implementation]"
+    )
+
     return (
-        f"{_team_header('team_90', 'GATE_8', state, fresh)}"
-        f"# GATE_8 — Documentation Closure\n\n"
-        f"1. Produce AS_MADE_REPORT: what was built, files modified, evidence\n"
-        f"2. Verify documentation indexes are consistent\n"
-        f"3. Clean communication folders\n"
-        f"4. Confirm lifecycle complete\n\n"
-        f"Feature: {state.spec_brief}\n"
-        f"Files: {', '.join(state.implementation_files[:20]) if state.implementation_files else '[list from implementation]'}"
+        f"╔══════════════════════════════════════════════════════════════╗\n"
+        f"║  GATE_8 — CLOSURE: DOCUMENTATION & ARCHIVING                ║\n"
+        f"║  Work Package: {wp:<46}║\n"
+        f"╚══════════════════════════════════════════════════════════════╝\n\n"
+        f"TWO-PHASE GATE:\n"
+        f"  Phase 1 → {doc_team_n}  — Documentation + Archive WP files\n"
+        f"  Phase 2 → Team 90  — Validate → PASS (close) or FAIL (back to {doc_team_n})\n\n"
+        f"{SEP}\n"
+        f"  PHASE 1 — {doc_team_n.upper()}: TWO MANDATORY TASKS\n"
+        f"{SEP}\n\n"
+        f"TASK A — AS_MADE_REPORT\n\n"
+        f"  Write to: {as_made_path}\n\n"
+        f"  Required sections:\n"
+        f"    1. Feature summary — what was built\n"
+        f"    2. Files created / modified:\n"
+        f"{impl_block}\n"
+        f"    3. API endpoints added / changed (if any)\n"
+        f"    4. Migrations or schema changes applied (if any)\n"
+        f"    5. Known limitations / deferred items\n"
+        f"    6. Notes for future developers (setup, gotchas, dependencies)\n\n"
+        f"TASK B — Archive WP communication files\n\n"
+        f"  Source pattern:  _COMMUNICATION/team_*/  (files matching: {wp_file_pattern} OR {wp})\n"
+        f"  Archive to:      {archive_dest}\n\n"
+        f"  Steps:\n"
+        f"    1. mkdir -p {archive_dest}\n"
+        f"    2. Find:  find _COMMUNICATION/team_*/ -name \"*{wp_file_pattern}*\" -o -name \"*{wp}*\"\n"
+        f"    3. Copy all matching files to {archive_dest}\n"
+        f"    4. List archived files in AS_MADE_REPORT (Section 7 — Archive manifest)\n\n"
+        f"  Keep active (do NOT archive):\n"
+        f"    SSM, WSM, PHOENIX_MASTER_WSM, PHOENIX_PROGRAM_REGISTRY, TEAM_ROSTER_LOCK\n\n"
+        f"  → When BOTH tasks complete: inform Team 90 to validate.\n\n"
+        f"{SEP}\n"
+        f"  PHASE 2 — TEAM 90: VALIDATE CLOSURE\n"
+        f"{SEP}\n\n"
+        f"  Validation checklist:\n"
+        f"  □ AS_MADE_REPORT exists at: {as_made_path}\n"
+        f"  □ AS_MADE_REPORT has all required sections (1–6 above)\n"
+        f"  □ WP files archived to: {archive_dest}\n"
+        f"  □ Archive contains gate artifacts (verdicts, blocking reports, work plans)\n"
+        f"  □ No unarchived WP-specific files remain in active team folders\n\n"
+        f"  If ALL pass:\n"
+        f"    ./pipeline_run.sh pass        → WP {wp} CLOSED ✅\n\n"
+        f"  If ANY fail (list specific issues):\n"
+        f"    ./pipeline_run.sh fail \"CLOSURE-001: [specific issue]\"\n"
+        f"    → Returns to {doc_team_n} for correction → re-run GATE_8\n"
     )
 
 

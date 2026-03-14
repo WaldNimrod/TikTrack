@@ -627,8 +627,8 @@ python3 -m http.server 8090
     <div class="step-box"><div class="step-title">GATE_4 — Team 50 (Cursor + MCP)</div>QA: browser tests, 10-point checklist, binary PASS/FAIL report.</div>
     <div class="step-box"><div class="step-title">GATE_5 — Team 90 (Codex)</div>Dev validation: code vs spec.</div>
     <div class="step-box"><div class="step-title">GATE_6 — Team 100 + Nimrod (human)</div>Reality vs intent: does what was built match what we approved?</div>
-    <div class="step-box"><div class="step-title">GATE_7 — Nimrod (browser)</div>Open http://localhost:8080 → UX sign-off → <code>./pipeline_run.sh approve</code></div>
-    <div class="step-box"><div class="step-title">GATE_8 — Team 90 + 70 (Codex)</div>Documentation closure, AS_MADE_REPORT, registry update.</div>
+    <div class="step-box"><div class="step-title">GATE_7 — Nimrod (browser)</div>Scenario checklist: open links, test flows, verify pass criteria → <code>./pipeline_run.sh pass</code></div>
+    <div class="step-box"><div class="step-title">GATE_8 — Team 70 → Team 90 (Codex)</div>Phase 1: Team 70 writes AS_MADE_REPORT + archives WP files. Phase 2: Team 90 validates → WP CLOSED.</div>
     </div>
     <div class="lang-he" dir="rtl" style="display:none">
     <div class="step-box"><div class="step-title">GATE_0 — Team 190 (Codex)</div>ולידציית היקף: בידוד דומיין, אין התנגשויות תוכנית פעילה.</div>
@@ -648,8 +648,8 @@ python3 -m http.server 8090
     <div class="step-box"><div class="step-title">GATE_4 — Team 50 (Cursor + MCP)</div>QA: בדיקות דפדפן, רשימת 10 נקודות, דוח PASS/FAIL.</div>
     <div class="step-box"><div class="step-title">GATE_5 — Team 90 (Codex)</div>ולידציית פיתוח: קוד מול spec.</div>
     <div class="step-box"><div class="step-title">GATE_6 — Team 100 + Nimrod (human)</div>מציאות מול כוונה: האם מה שנבנה תואם לאישור?</div>
-    <div class="step-box"><div class="step-title">GATE_7 — Nimrod (browser)</div>פתח http://localhost:8080 → אישור UX → <code>./pipeline_run.sh approve</code></div>
-    <div class="step-box"><div class="step-title">GATE_8 — Team 90 + 70 (Codex)</div>סגירת תיעוד, AS_MADE_REPORT, עדכון רג'יסטר.</div>
+    <div class="step-box"><div class="step-title">GATE_7 — Nimrod (browser)</div>רשימת תרחישים: פתח קישורים, בדוק תהליכים, אמת קריטריוני הצלחה → <code>./pipeline_run.sh pass</code></div>
+    <div class="step-box"><div class="step-title">GATE_8 — Team 70 → Team 90 (Codex)</div>שלב 1: Team 70 כותב AS_MADE_REPORT + מארכב קבצי WP. שלב 2: Team 90 מאמת → WP סגור.</div>
     </div>
 
     <h3 class="lang-en">👥 How Team Mandates Work (CURSOR_IMPLEMENTATION gate)</h3>
@@ -739,6 +739,7 @@ python3 -m http.server 8090
       <a class="doc-link" href="_COMMUNICATION/team_00/TEAM_00_S001_P002_WP001_EXPERIMENT_EXECUTION_GUIDE_v1.0.0.md" target="_blank">Experiment Execution Guide</a>
       <a class="doc-link" href="_COMMUNICATION/agents_os/pipeline_state.json" target="_blank">pipeline_state.json</a>
       <a class="doc-link" href="_COMMUNICATION/agents_os/prompts/implementation_mandates.md" target="_blank">implementation_mandates.md</a>
+      <a class="doc-link" href="_COMMUNICATION/agents_os/prompts/gate_8_mandates.md" target="_blank">gate_8_mandates.md</a>
       <a class="doc-link" href="agents_os_v2/orchestrator/pipeline.py" target="_blank">pipeline.py (CLI source)</a>
       <a class="doc-link" href="pipeline_run.sh" target="_blank">pipeline_run.sh</a>
     </div>
@@ -752,6 +753,7 @@ python3 -m http.server 8090
       <a class="doc-link" href="_COMMUNICATION/team_00/TEAM_00_S001_P002_WP001_EXPERIMENT_EXECUTION_GUIDE_v1.0.0.md" target="_blank">Experiment Execution Guide</a>
       <a class="doc-link" href="_COMMUNICATION/agents_os/pipeline_state.json" target="_blank">pipeline_state.json</a>
       <a class="doc-link" href="_COMMUNICATION/agents_os/prompts/implementation_mandates.md" target="_blank">implementation_mandates.md</a>
+      <a class="doc-link" href="_COMMUNICATION/agents_os/prompts/gate_8_mandates.md" target="_blank">gate_8_mandates.md</a>
       <a class="doc-link" href="agents_os_v2/orchestrator/pipeline.py" target="_blank">pipeline.py (CLI source)</a>
       <a class="doc-link" href="pipeline_run.sh" target="_blank">pipeline_run.sh</a>
     </div>
@@ -1282,9 +1284,29 @@ async function loadPrompt(gate) {
   if (document.getElementById("booster-toggle")?.checked) updateBoosterPreview();
 }
 
-// ── Load mandates ─────────────────────────────────────────────────────────
+// ── Mandate file routing — mirrors GATE_MANDATE_FILES in pipeline.py ──────
+// Gate → which prompts/ file holds the per-team mandate tabs
+const GATE_MANDATE_FILES = {
+  'G3_6_MANDATES':         '_COMMUNICATION/agents_os/prompts/implementation_mandates.md',
+  'CURSOR_IMPLEMENTATION': '_COMMUNICATION/agents_os/prompts/implementation_mandates.md',
+  'GATE_4':                '_COMMUNICATION/agents_os/prompts/implementation_mandates.md',
+  'GATE_8':                '_COMMUNICATION/agents_os/prompts/gate_8_mandates.md',
+};
+
+// ── Load mandates (gate-aware) ─────────────────────────────────────────────
 async function loadMandates() {
-  const text = await fetchText("_COMMUNICATION/agents_os/prompts/implementation_mandates.md");
+  // Pick the mandate file for the current gate; fall back to implementation_mandates.md
+  const gate         = pipelineState?.current_gate || '';
+  const mandateFile  = GATE_MANDATE_FILES[gate]
+                     || '_COMMUNICATION/agents_os/prompts/implementation_mandates.md';
+
+  let text = await fetchText(mandateFile);
+
+  // If the gate-specific file is missing, try the fallback
+  if (!text && mandateFile !== '_COMMUNICATION/agents_os/prompts/implementation_mandates.md') {
+    text = await fetchText('_COMMUNICATION/agents_os/prompts/implementation_mandates.md');
+  }
+
   if (!text) {
     document.getElementById("mandates-badge").textContent = "not generated";
     document.getElementById("mandate-content").innerHTML =
@@ -1292,19 +1314,22 @@ async function loadMandates() {
     return;
   }
 
-  // Parse sections by team
+  _parseMandateSections(text);
+}
+
+function _parseMandateSections(text) {
   const sections = {};
-  const matches = [...text.matchAll(/## (Team \d+[^(]*)\(/g)];
-  if (matches.length === 0) {
-    // Try simpler split
+
+  // Detect team sections: ## Team N ... (Phase N) — or any ## Team N ... ( form
+  const hasSections = /^## Team \d+/m.test(text);
+  if (!hasSections) {
     sections["Full"] = text;
   } else {
-    let parts = text.split(/^## Team \d+/m);
     const teamMatches = [...text.matchAll(/^## (Team \d+[^\n]*)/mg)];
     teamMatches.forEach((m, i) => {
-      const key = m[1].trim().split("(")[0].trim();
+      const key   = m[1].trim().split("(")[0].trim();   // "Team 20 — API Verification"
       const start = m.index;
-      const end = i+1 < teamMatches.length ? teamMatches[i+1].index : text.length;
+      const end   = i + 1 < teamMatches.length ? teamMatches[i + 1].index : text.length;
       sections[key] = text.slice(start, end);
     });
   }
@@ -1313,12 +1338,12 @@ async function loadMandates() {
 
   mandateSections = sections;
   const keys = Object.keys(sections);
-  document.getElementById("mandates-badge").textContent = keys.length + " teams";
+  document.getElementById("mandates-badge").textContent = keys.length + " team" + (keys.length !== 1 ? "s" : "");
 
   // Build tabs
   const tabs = document.getElementById("team-tabs");
-  tabs.innerHTML = keys.map((k,i) =>
-    `<span class="team-tab${i===0?" active":""}" onclick="selectTeam(this, ${escAttr(JSON.stringify(k))})">${escHtml(k)}</span>`
+  tabs.innerHTML = keys.map((k, i) =>
+    `<span class="team-tab${i === 0 ? " active" : ""}" onclick="selectTeam(this, ${escAttr(JSON.stringify(k))})">${escHtml(k)}</span>`
   ).join("");
 
   if (keys.length > 0) { activeTeam = keys[0]; showMandate(keys[0]); }
@@ -1533,12 +1558,12 @@ const ALL_GATE_DEFS = {
   },
   'GATE_7': {
     owner:'team_00', engine:'human',
-    desc:'Nimrod browser UX sign-off — live review at http://localhost:8080',
-    advice:'Open http://localhost:8080 → review feature UX → ./pipeline_run.sh approve',
-    failAdvice:'Issues found: document findings → ./pipeline_run.sh fail "UX-NNN: ..." → choose routing',
+    desc:'Nimrod browser UX sign-off — scenario checklist + active links',
+    advice:'./pipeline_run.sh  →  paste prompt  →  open links  →  work through checklist  →  ./pipeline_run.sh pass',
+    failAdvice:'Document specific UX issues → ./pipeline_run.sh fail "UX-001: [issue]" → choose routing',
     twoPaths:true,
-    passCmd:'./pipeline_run.sh approve',
-    failCmd:'./pipeline_run.sh fail "UX-NNN: ..."',
+    passCmd:'./pipeline_run.sh pass',
+    failCmd:'./pipeline_run.sh fail "UX-001: [issue description]"',
     passLabel:'✅ UX Approved — Nimrod sign-off',
     failLabel:'❌ UX Issues — document findings',
     failRoutes:{
@@ -1547,27 +1572,35 @@ const ALL_GATE_DEFS = {
     },
   },
   'GATE_8': {
-    owner:'team_90+70', engine:'codex',
-    desc:'Team 90+70 docs closure: AS_MADE_REPORT, registry update, WSM update',
-    advice:'./pipeline_run.sh → paste to Codex → Team 90+70 produce docs → ./pipeline_run.sh pass → program CLOSED',
-    failAdvice:'./pipeline_run.sh fail "DOC-NNN: ..." → Team 70 revises → re-run GATE_8',
+    owner:'team_70 → team_90', engine:'codex',
+    desc:'Team 70 produces AS_MADE_REPORT + archives WP files → Team 90 validates → WP CLOSED',
+    advice:'./pipeline_run.sh  →  paste Phase 1 tab to Team 70/170  →  paste Phase 2 tab to Team 90  →  ./pipeline_run.sh pass',
+    failAdvice:'./pipeline_run.sh fail "CLOSURE-NNN: [issue]"  →  Team 70 corrects  →  re-run GATE_8',
     twoPaths:true,
     passCmd:'./pipeline_run.sh pass',
-    failCmd:'./pipeline_run.sh fail "DOC-NNN: ..."',
-    passLabel:'✅ Docs Complete — program CLOSED',
-    failLabel:'❌ Docs Incomplete — Team 70 revise',
+    failCmd:'./pipeline_run.sh fail "CLOSURE-001: [issue]"',
+    passLabel:'✅ Closure Validated — WP CLOSED',
+    failLabel:'❌ Closure Incomplete — Team 70/170 correct',
     verdictTeam:'team_90', verdictGate:'GATE_8',
+    files:['_COMMUNICATION/agents_os/prompts/gate_8_mandates.md'],
     failRoutes:{
-      doc:{ cmd:'./pipeline_run.sh route doc GATE_8', label:'📝 Doc Revision → GATE_8', desc:'<strong>Doc issues</strong> — Team 70 revises → re-run GATE_8' },
-      full:{ cmd:'./pipeline_run.sh route full GATE_8', label:'🔄 Full Doc Rewrite → GATE_8', desc:'<strong>Docs rejected</strong> — Team 70 full rewrite' },
+      doc:{ cmd:'./pipeline_run.sh route doc GATE_8', label:'📝 Correction → GATE_8', desc:'<strong>Closure issues</strong> — Team 70/170 corrects docs or archive → Team 90 re-validates' },
+      full:{ cmd:'./pipeline_run.sh route full GATE_8', label:'🔄 Full Redo → GATE_8', desc:'<strong>Closure rejected</strong> — Team 70/170 full redo of AS_MADE_REPORT + archive' },
     },
   },
 };
 
 // ── Verdict file candidates per gate (for auto-detection) ─────────────────
+// Domain-aware: GATE_2 + GATE_6 include both team_00 and team_100 folders
+// (different domains route to different teams; we check both to be safe)
 function getVerdictCandidates(gate, wp) {
   const d = '_COMMUNICATION/';
-  const t90 = `${d}team_90/`, t190 = `${d}team_190/`, t100 = `${d}team_100/`, t50 = `${d}team_50/`, t70 = `${d}team_70/`;
+  const t00  = `${d}team_00/`;
+  const t90  = `${d}team_90/`;
+  const t190 = `${d}team_190/`;
+  const t100 = `${d}team_100/`;
+  const t50  = `${d}team_50/`;
+  const t70  = `${d}team_70/`;
   // File naming uses underscores; WP IDs use hyphens — normalise for file lookups.
   const wpu = wp.replace(/-/g, '_');
   const v = {
@@ -1583,10 +1616,13 @@ function getVerdictCandidates(gate, wp) {
       `${t190}TEAM_190_${wpu}_LLD400_VALIDATION_v1.0.0.md`,
       `${t190}TEAM_190_${wp}_GATE_1_VERDICT_v1.0.0.md`,
     ],
+    // GATE_2 — domain-aware: TikTrack → team_00, AgentsOS → team_100 (check both)
     'GATE_2': [
       `${t100}TEAM_100_${wpu}_GATE_2_VERDICT_v1.0.0.md`,
       `${t100}TEAM_100_${wpu}_GATE_2_SPEC_REVIEW_v1.0.0.md`,
       `${t100}TEAM_100_${wp}_GATE_2_VERDICT_v1.0.0.md`,
+      `${t00}TEAM_00_${wpu}_GATE_2_VERDICT_v1.0.0.md`,
+      `${t00}TEAM_00_${wp}_GATE_2_VERDICT_v1.0.0.md`,
     ],
     'G3_5': [
       `${t90}TEAM_90_${wpu}_G3_5_VERDICT_v1.0.0.md`,
@@ -1607,22 +1643,42 @@ function getVerdictCandidates(gate, wp) {
       `${t90}TEAM_90_${wpu}_G5_VALIDATION_v1.0.0.md`,
       `${t90}TEAM_90_${wpu}_GATE_5_REVIEW_v1.0.0.md`,
       `${t90}TEAM_90_TO_TEAM_10_${wpu}_GATE_5_VALIDATION_v1.0.0.md`,
+      `${t90}TEAM_90_TO_TEAM_10_${wpu}_BLOCKING_REPORT.md`,
       `${t90}TEAM_90_${wp}_GATE_5_VALIDATION_v1.0.0.md`,
     ],
+    // GATE_6 — domain-aware: TikTrack → team_00, AgentsOS → team_100 (check both)
     'GATE_6': [
       `${t100}TEAM_100_${wpu}_GATE_6_VERDICT_v1.0.0.md`,
       `${t100}TEAM_100_${wpu}_GATE_6_REVIEW_v1.0.0.md`,
       `${t100}TEAM_100_${wpu}_REALITY_VS_INTENT_v1.0.0.md`,
       `${t100}TEAM_100_${wp}_GATE_6_VERDICT_v1.0.0.md`,
+      `${t00}TEAM_00_${wpu}_GATE_6_VERDICT_v1.0.0.md`,
+      `${t00}TEAM_00_${wpu}_GATE_6_REVIEW_v1.0.0.md`,
+      `${t00}TEAM_00_${wp}_GATE_6_VERDICT_v1.0.0.md`,
     ],
     'GATE_8': [
+      // Team 90 closure validation verdict (canonical)
       `${t90}TEAM_90_${wpu}_GATE_8_VERDICT_v1.0.0.md`,
-      `${t70}TEAM_70_${wpu}_GATE_8_DOCS_v1.0.0.md`,
+      `${t90}TEAM_90_${wpu}_GATE_8_CLOSURE_VALIDATION_v1.0.0.md`,
+      // Team 70 (TikTrack) AS_MADE_REPORT + docs
       `${t70}TEAM_70_${wpu}_AS_MADE_REPORT_v1.0.0.md`,
+      `${t70}TEAM_70_${wpu}_GATE_8_DOCS_v1.0.0.md`,
+      // Team 170 (AgentsOS) equivalents
+      `${d}team_170/TEAM_170_${wpu}_AS_MADE_REPORT_v1.0.0.md`,
+      `${d}team_170/TEAM_170_${wpu}_GATE_8_DOCS_v1.0.0.md`,
+      // Fallback patterns (hyphen WP-id)
       `${t90}TEAM_90_${wp}_GATE_8_VERDICT_v1.0.0.md`,
     ],
   };
   return v[gate] || [];
+}
+
+/** Domain-aware verdictTeam for a gate (used in quick-action bar rendering) */
+function getEffectiveVerdictTeam(gate) {
+  if (gate === 'GATE_2' || gate === 'GATE_6') {
+    return getDomainOwner(gate);
+  }
+  return (ALL_GATE_DEFS[gate] || {}).verdictTeam || null;
 }
 
 // ── Progress Check ─────────────────────────────────────────────────────────
@@ -1704,7 +1760,7 @@ async function runProgressCheck() {
       <div style="font-weight:700;color:var(--danger);margin-bottom:8px">🔄 ${escHtml(gate)} FAIL CYCLE — ${failCount}× failed</div>
       <div style="font-size:12px;margin-bottom:10px">This gate has been rejected <strong>${failCount} time${failCount>1?'s':''}</strong>.</div>`;
 
-    if (def.verdictTeam) {
+    if (getEffectiveVerdictTeam(gate)) {
       html += `
       <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:4px">Step 1 — Build FAIL command from verdict file:</div>
       <div style="font-size:10px;margin-bottom:4px" id="pc-fc-status-${gate}">🔍 Searching for verdict file…</div>
@@ -1830,7 +1886,7 @@ async function runProgressCheck() {
       const failCmd = def.failCmd || './pipeline_run.sh fail "reason"';
       const passLabel = def.passLabel || '✅ PASS';
       const failLabel = def.failLabel || '❌ FAIL';
-      const needsBuilder = !!def.verdictTeam;
+      const needsBuilder = !!getEffectiveVerdictTeam(gate);
 
       html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
         <div style="background:rgba(63,185,80,0.08);border:1px solid var(--success);border-radius:6px;padding:8px">
@@ -1925,7 +1981,7 @@ async function runProgressCheck() {
   content.innerHTML = html;
 
   // ── Post-render: init async auto-loaders for PC findings builders ─────────
-  if (def.twoPaths && def.verdictTeam) {
+  if (def.twoPaths && getEffectiveVerdictTeam(gate)) {
     const _saved = _qbarGate;
     _qbarGate = gate;
     const failCmd = def.failCmd || './pipeline_run.sh fail "reason"';
@@ -2129,7 +2185,7 @@ async function buildQuickActionBar(gate) {
   const passCmd      = def.passCmd || './pipeline_run.sh pass';
   const isHuman      = (def.engine === 'human');
   const isRevise     = (gate === 'G3_5');
-  const needsBuilder = !!def.verdictTeam || isRevise;
+  const needsBuilder = !!getEffectiveVerdictTeam(gate) || isRevise;
   const passLabel    = def.passLabel || '✅ PASS';
   const failLabel    = def.failLabel || '❌ FAIL';
 

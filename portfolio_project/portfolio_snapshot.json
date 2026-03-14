@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-12T23:49:27.510445+00:00",
+  "generated_at_utc": "2026-03-14T01:36:20.288343+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -122,6 +122,14 @@
       "current_gate_mirror": "— (Stage Governance Package; planning marker per integrated roadmap v1.1.0)"
     },
     {
+      "program_id": "S002-P005",
+      "program_name": "Agents_OS v2 Writing Semantics Hardening (ADR-031 Stage A)",
+      "domain": "AGENTS_OS",
+      "stage_id": "S002",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (immediate hotfix lane before next TikTrack execution package; scope lock: parser determinism, desync visual guard, GATE_7 ownership text alignment; authority source: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`; lock package: `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`)"
+    },
+    {
       "program_id": "S003-P001",
       "program_name": "Data Model Validator",
       "domain": "AGENTS_OS",
@@ -168,6 +176,14 @@
       "stage_id": "S003",
       "status": "PLANNED",
       "current_gate_mirror": "— (Stage Governance Package; planning marker per integrated roadmap v1.1.0)"
+    },
+    {
+      "program_id": "S003-P007",
+      "program_name": "Agents_OS Command Bridge Lite (ADR-031 Stage B)",
+      "domain": "AGENTS_OS",
+      "stage_id": "S003",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (next AGENTS_OS stage-3 package; scope lock: approve-path desync block, command bridge copy flow with Task ID + context, model-B path realignment; authority source: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`; lock package: `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`)"
     },
     {
       "program_id": "S004-P001",
@@ -224,6 +240,14 @@
       "stage_id": "S004",
       "status": "PLANNED",
       "current_gate_mirror": "— (canonical slot assigned for registry consistency; architectural alias in directives: S004-PXXX. Deliverables: ticker_indicators table NUMERIC(20,8), indicator_computation_service ATR/MA/CCI, nightly_indicators_calculation APScheduler job, GET /api/v1/tickers/{id}/indicators endpoint)"
+    },
+    {
+      "program_id": "S004-P008",
+      "program_name": "Agents_OS Mediated Reconciliation Engine (ADR-031 Stage C)",
+      "domain": "AGENTS_OS",
+      "stage_id": "S004",
+      "status": "PLANNED",
+      "current_gate_mirror": "— (independent stage-4 package after existing AGENTS_OS stage-4 programs; scope lock: proposed_updates mediator, SSM legality gate, visual evidence diff/capture flow; authority source: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`; lock package: `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`)"
     },
     {
       "program_id": "S005-P001",
@@ -500,6 +524,14 @@
           "status": "PLANNED",
           "current_gate_mirror": "— (Stage Governance Package; planning marker per integrated roadmap v1.1.0)",
           "work_packages": []
+        },
+        {
+          "program_id": "S002-P005",
+          "program_name": "Agents_OS v2 Writing Semantics Hardening (ADR-031 Stage A)",
+          "domain": "AGENTS_OS",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (immediate hotfix lane before next TikTrack execution package; scope lock: parser determinism, desync visual guard, GATE_7 ownership text alignment; authority source: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`; lock package: `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`)",
+          "work_packages": []
         }
       ]
     },
@@ -580,6 +612,14 @@
           "status": "PLANNED",
           "current_gate_mirror": "— (Stage Governance Package; planning marker per integrated roadmap v1.1.0)",
           "work_packages": []
+        },
+        {
+          "program_id": "S003-P007",
+          "program_name": "Agents_OS Command Bridge Lite (ADR-031 Stage B)",
+          "domain": "AGENTS_OS",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (next AGENTS_OS stage-3 package; scope lock: approve-path desync block, command bridge copy flow with Task ID + context, model-B path realignment; authority source: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`; lock package: `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`)",
+          "work_packages": []
         }
       ]
     },
@@ -647,6 +687,14 @@
           "domain": "TIKTRACK",
           "status": "PLANNED",
           "current_gate_mirror": "— (canonical slot assigned for registry consistency; architectural alias in directives: S004-PXXX. Deliverables: ticker_indicators table NUMERIC(20,8), indicator_computation_service ATR/MA/CCI, nightly_indicators_calculation APScheduler job, GET /api/v1/tickers/{id}/indicators endpoint)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S004-P008",
+          "program_name": "Agents_OS Mediated Reconciliation Engine (ADR-031 Stage C)",
+          "domain": "AGENTS_OS",
+          "status": "PLANNED",
+          "current_gate_mirror": "— (independent stage-4 package after existing AGENTS_OS stage-4 programs; scope lock: proposed_updates mediator, SSM legality gate, visual evidence diff/capture flow; authority source: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`; lock package: `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`)",
           "work_packages": []
         }
       ]

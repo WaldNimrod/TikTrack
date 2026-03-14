@@ -109,29 +109,83 @@ Every Team 191 closure note must include:
    - `SYNC CHECK` = סנכרון WSM/Registries
    - `SNAPSHOT CHECK` = תקינות snapshot artifacts
 4. Language lock applies to all Team 191 operational summaries, escalation prompts, and closure contracts unless the user explicitly requests another language.
+5. Canonical Hebrew command aliases (binding):
+   - `191 עזרה` = `191 ?`
+   - `191 קומיט` = `191 commit`
+   - `191 פוש` = `191 push`
+   - `191 מארג` = `191 merge`
+   - `191 מיזוג` = `191 merge`
+   - `191 סטטוס` = `191 status`
+   - `191 בדיקה` = `191 checks`
+   - `191 בדיקות` = `191 checks`
+   - `191 נקי` = `191 clean`
+   - `191 סנכרון` = `191 sync`
+   - `191 בדיקת מיזוג` = `191 merge check`
+   - `191 תיקון` = `191 fix`
+   - `191 פוש מהיר` = `191 push quick`
+   - `191 פוש בטוח` = `191 push safe`
+   - `191 פוש מחמיר` = `191 push strict`
+   - `191 מיזוג מהיר` = `191 merge quick`
+   - `191 מיזוג בטוח` = `191 merge safe`
+   - `191 מיזוג מחמיר` = `191 merge strict`
+6. Optional message payload syntax (binding):
+   - pattern: `<191-command> ? <free_text>`
+   - purpose: user-provided title/prefix for commit / push / merge messages.
+   - examples:
+     - `191 קומיט ? השינוי שביצענו כרגע הוא מעולה`
+     - `191 פוש ? סבב סגירה לולידציה`
+     - `191 מארג ? איחוד סופי למיין`
 
 ---
 
 ## 9) Base Prompt Lock: `191 ?` (Binding)
 
-1. Trigger: exact prompt `191 ?` (or `191?`).
+1. Trigger: exact prompt `191 ?` (or `191?`) or alias `191 עזרה`.
 2. Required behavior: always return the Team 191 command options menu; do not execute Git actions in this help mode.
 3. Menu content is mandatory and stable:
-   - `191 status` — show current Git/governance blocker status only.
-   - `191 commit` — create context-aware local commit message and commit all intended updates.
-   - `191 push` — run default `SAFE` push flow (guard checks + deterministic remediation + push).
-   - `191 merge` — run canonical merge flow from `codex/team191-integration` to `main` (PR create/check/merge/verify).
-   - `191 push quick` — minimal flow (fast path; lower hygiene).
-   - `191 push safe` — default balanced flow (recommended).
-   - `191 push strict` — maximal hygiene flow (deep checks, slower).
-   - `191 merge quick` — verify branch sync + open PR/create PR, without auto-merge attempt.
-   - `191 merge safe` — default merge flow (recommended): create/reuse PR, verify mergeability and required checks, then merge.
-   - `191 merge strict` — safe flow + post-merge verification (`origin/main` SHA, PR merged metadata, rules compliance evidence).
+   - `191 status` / `191 סטטוס` — show current Git/governance blocker status only.
+   - `191 checks` / `191 בדיקות` / `191 בדיקה` — run guard suite only (`DATE-LINT`, `SYNC CHECK`, `SNAPSHOT CHECK`, merge-readiness checks) without push/merge.
+   - `191 clean` / `191 נקי` — normalize to clean working tree via deterministic commit/remediation actions (no push).
+   - `191 sync` / `191 סנכרון` — fetch/rebase synchronization lane for integration branch readiness.
+   - `191 commit` / `191 קומיט` — create context-aware local commit message and commit all intended updates.
+   - `191 commit ? <text>` / `191 קומיט ? <text>` — same flow with user text as message prefix.
+   - `191 push` / `191 פוש` — run default `SAFE` push flow (guard checks + deterministic remediation + push).
+   - `191 push ? <text>` / `191 פוש ? <text>` — same flow with user text as push/remediation message prefix.
+   - `191 merge` / `191 מארג` / `191 מיזוג` — run canonical merge flow from `codex/team191-integration` to `main` (PR create/check/merge/verify).
+   - `191 merge check` / `191 בדיקת מיזוג` — check-only lane (PR/checks/permissions), no merge side-effect.
+   - `191 merge ? <text>` / `191 מארג ? <text>` / `191 מיזוג ? <text>` — same flow with user text as PR/merge title prefix.
+   - `191 fix` / `191 תיקון` — correction loop lane: run `checks` -> remediate deterministic blockers -> re-check until clean/pass or explicit BLOCK.
+   - `191 fix ? <text>` / `191 תיקון ? <text>` — same loop with user text as remediation commit/report prefix.
+   - `191 push quick` / `191 פוש מהיר` — minimal flow (fast path; lower hygiene).
+   - `191 push safe` / `191 פוש בטוח` — default balanced flow (recommended).
+   - `191 push strict` / `191 פוש מחמיר` — maximal hygiene flow (deep checks, slower).
+   - `191 merge quick` / `191 מיזוג מהיר` — verify branch sync + open PR/create PR, without auto-merge attempt.
+   - `191 merge safe` / `191 מיזוג בטוח` — default merge flow (recommended): create/reuse PR, verify mergeability and required checks, then merge.
+   - `191 merge strict` / `191 מיזוג מחמיר` — safe flow + post-merge verification (`origin/main` SHA, PR merged metadata, rules compliance evidence).
 4. If mode is not specified, default mode is `SAFE`.
 5. `191 merge` blocker contract (mandatory):
    - If PR write permission is missing (`pull_requests=write`) or merge is blocked by repo rules/checks, return `BLOCK` with exact blocker list and owner action.
    - Team 191 must not bypass branch protection by direct push to `main`.
 6. Every `191 ?` response must include short pros/cons per mode to preserve consistent operator guidance.
+7. Every `191 ?` response must include the locked Hebrew↔English command translation map.
+8. Optional payload application rule:
+   - If payload is provided after `?`, Team 191 must use it as a title/prefix when generating commit subject / remediation commit subject / PR title / merge report headline.
+   - If payload is missing, Team 191 uses automatic context-derived naming (current default behavior).
+9. `191 fix` loop contract (mandatory):
+   - start with `191 checks`;
+   - apply deterministic non-semantic remediations only (DATE-LINT / SYNC / SNAPSHOT / hook failures);
+   - run `191 checks` again;
+   - repeat until either:
+     - `PASS`: guards pass and working tree is clean, or
+     - `BLOCK`: non-deterministic/permission/policy blocker remains with exact owner routing.
+10. Recommended operation sequence for `191 ?` output (mandatory):
+   - quick diagnosis: `191 status` -> `191 checks`
+   - auto-remediation loop: `191 fix` (or `191 תיקון`)
+   - persist local result: `191 commit` (or `191 קומיט`)
+   - publish integration branch: `191 push` (or `191 פוש`)
+   - complete to `main`: `191 merge` (or `191 מארג` / `191 מיזוג`)
+11. Bilingual lock (mandatory):
+   - every command listed in `191 ?` must be displayed with both English and Hebrew names.
 
 ---
 

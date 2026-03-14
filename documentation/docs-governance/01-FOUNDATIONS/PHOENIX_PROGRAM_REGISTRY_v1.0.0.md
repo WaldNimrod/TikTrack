@@ -38,7 +38,7 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | stage_id | program_id | program_name | domain | status | current_gate_mirror |
 | --- | --- | --- | --- | --- | --- |
 | S001 | S001-P001 | Agents_OS Phase 1 | AGENTS_OS | COMPLETE | DOCUMENTATION_CLOSED (GATE_8 PASS 2026-02-23) |
-| S001 | S001-P002 | Alerts POC | TIKTRACK | DEFERRED | — (activation pending TIKTRACK teams available post-S002-P002-WP003 lifecycle close). *correction: domain reclassified from AGENTS_OS to TIKTRACK per TEAM_00_AGENTS_OS_INDEPENDENCE_DIRECTIVE_ACCEPTANCE_v1.0.0 §2 — ruling 2026-03-11* |
+| S001 | S001-P002 | Alerts POC | TIKTRACK | ACTIVE | GATE_0 (deferred activation authorized per ARCHITECT_DIRECTIVE_S001_P002_ACTIVATION_v1.0.0; trigger met: S002-P002-WP003 lifecycle close 2026-03-13; parallel activation during S002 era 2026-03-14). *domain reclassified from AGENTS_OS to TIKTRACK per TEAM_00_AGENTS_OS_INDEPENDENCE_DIRECTIVE_ACCEPTANCE_v1.0.0 §2 — ruling 2026-03-11* |
 | S002 | S002-P001 | Agents_OS Core Validation Engine | AGENTS_OS | COMPLETE | DOCUMENTATION_CLOSED (WP001+WP002 GATE_8 PASS 2026-02-26) |
 | S002 | S002-P002 | MCP-QA Transition (Full Pipeline Orchestrator) | TIKTRACK | COMPLETE | GATE_8; active_flow=S002-P002-WP003 (Market Data Hardening) — **GATE_8 PASS / DOCUMENTATION_CLOSED** after Team 90 validation; no active work package in execution at this time.; active_work_package_id=N/A |
 | S002 | S002-P003 | TikTrack Alignment (D22+D33+D34+D35) | TIKTRACK | COMPLETE | GATE_8 PASS 2026-03-07; DOCUMENTATION_CLOSED; lifecycle complete (Team 90 validation report) |
@@ -143,3 +143,4 @@ Source directives:
 **log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | S003_P001_FAST4_CLOSED_WP001_COMPLETE | 2026-03-11**
 **log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | S003_P002_FAST4_CLOSED_WP001_G37_ADDED | 2026-03-12**
 **log_entry | TEAM_190 | PHOENIX_PROGRAM_REGISTRY | ADR031_PROGRAM_SLOTS_LOCKED_S002_P005_S003_P007_S004_P008_PLANNED | 2026-03-14**
+**log_entry | TEAM_00 | PHOENIX_PROGRAM_REGISTRY | S001_P002_DEFERRED_TO_PIPELINE_ACTIVATED_PER_ARCHITECT_DIRECTIVE_S001_P002_ACTIVATION_v1.0.0 | 2026-03-14**

@@ -1,27 +1,5 @@
-**date:** 2026-03-09
-
-TEAM_100_CONTEXT_RESET – Load SSM and WSM. Confirm active stage S002.
-
-# Team 100 — Development Architecture Authority
-**Role:** Design, optimize and govern the full development process. Spec creation, schema design, structural validation.
-**Gates owned:** GATE_2 (Intent Approval authority), GATE_6 (Reality Approval authority).
-**Authority:**
-- Define process models and gate structures
-- Define task hierarchy and domain isolation
-- Activate teams 170, 190, 70, 90
-- Approve governance-stage gates
-**Non-authority:**
-- Does not implement code
-- Does not execute knowledge promotion (Team 70)
-- Does not replace architectural approval authority (Team 00)
-**Context Loading Protocol:**
-- On every new context: Load SSM and WSM, confirm active stage/program/domain, confirm allowed gate range
-- Never assume. Never infer missing structure.
-**Drift Prevention:**
-- No assumption-based decisions
-- All governance updates must pass Team 170 validation
-- All structural uncertainty requires Team 190 activation
-- No cross-domain leakage
+**ACTIVE: TEAM_00 (TEAM_00)**  gate=GATE_2 | wp=S001-P002-WP001 | stage=S001 | 2026-03-14
+date: 2026-03-14
 
 ---
 
@@ -29,8 +7,13 @@ TEAM_100_CONTEXT_RESET – Load SSM and WSM. Confirm active stage S002.
 
 Question: Do we approve building this?
 
+**Domain:** `tiktrack` — Architectural authority for this domain: `team_00`
+
 ## Approved Spec (LLD400 from GATE_1)
 
 [LLD400 not yet produced — paste from GATE_1 output]
 
 Respond with: APPROVED or REJECTED + reasoning.
+
+**NOTE:** After analysis, the pipeline will PAUSE for human decision.
+Use --approve GATE_2 / --reject GATE_2 --reason '…' to continue.

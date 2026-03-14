@@ -1,0 +1,198 @@
+/* pipeline-shared.css — Team 61 AOUI LOD400 — shared across all pipeline pages */
+/* canonical header (§5.1), canonical layout (§5.2), nav, status pills, domain, buttons */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:           #0d1117;
+  --surface:      #161b22;
+  --surface2:     #1c2128;
+  --border:       #30363d;
+  --text:         #c9d1d9;
+  --text-muted:   #8b949e;
+  --accent:       #58a6ff;
+  --success:      #3fb950;
+  --warning:      #d29922;
+  --danger:       #f85149;
+  --current:      #1f6feb;
+  --mono:         'SF Mono', 'Fira Code', monospace;
+}
+
+/* TikTrack Light Theme (domain = tiktrack) */
+html.theme-tiktrack {
+  --bg:           #ffffff;
+  --surface:      #f6f8fa;
+  --surface2:     #eaeef2;
+  --border:       #d0d7de;
+  --text:         #1f2328;
+  --text-muted:   #656d76;
+  --accent:       #0969da;
+  --success:      #1a7f37;
+  --warning:      #9a6700;
+  --danger:       #cf222e;
+  --current:      #0550ae;
+}
+html.theme-tiktrack .modal-box code,
+html.theme-tiktrack .modal-box pre {
+  background: #eaeef2;
+  color: #1f2328;
+  border-color: #d0d7de;
+}
+html.theme-tiktrack .prompt-box {
+  background: #eaeef2;
+  color: #1f2328;
+  border-color: #d0d7de;
+}
+html { transition: background 0.25s, color 0.25s; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  min-height: 100vh;
+}
+
+/* ── Top nav ─────────────────────────────── */
+.pipeline-nav {
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 34px;
+  position: sticky;
+  top: 0;
+  z-index: 110;
+}
+.nav-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 12px;
+  padding: 5px 11px;
+  border-radius: 4px;
+  transition: background 0.12s, color 0.12s;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.nav-link:hover { background: rgba(88,166,255,0.08); color: var(--accent); }
+.nav-link.active { background: rgba(31,111,235,0.18); color: var(--accent); font-weight: 600; }
+.nav-sep { width: 1px; height: 16px; background: var(--border); margin: 0 2px; }
+
+/* ── Canonical header (§5.1) ──────────────────────────── */
+.agents-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 34px;
+  z-index: 100;
+}
+.agents-header-left  { display: flex; align-items: center; gap: 10px; }
+.agents-header-right { display: flex; align-items: center; gap: 10px; }
+.agents-header-title { font-size: 15px; font-weight: 600; margin: 0; }
+.agents-header-title span { color: var(--accent); }
+.agents-refresh-label { font-size: 12px; color: var(--text-muted); }
+.agents-refresh-btn { /* inherits .btn below */ }
+
+/* ── Canonical page layout (§5.2) — Dashboard + Roadmap ─── */
+.agents-page-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 16px;
+  padding: 16px 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  align-items: start;
+}
+@media (max-width: 960px) {
+  .agents-page-layout { grid-template-columns: 1fr; }
+}
+.agents-page-main    { min-width: 0; }
+.agents-page-sidebar { min-width: 0; width: 300px; display: flex; flex-direction: column; gap: 12px; }
+
+/* ── Section cards ─────────────────────────────── */
+.section-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; }
+.section-card:last-child { margin-bottom: 0; }
+.section-title { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.sidebar-section-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 8px; }
+.sidebar-section-title { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+
+/* ── Status pills ─────────────────────────────── */
+.status-pill { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+.pill-pass    { background: rgba(63,185,80,0.15);  color: var(--success); border: 1px solid var(--success); }
+.pill-fail    { background: rgba(248,81,73,0.15);  color: var(--danger);  border: 1px solid var(--danger); }
+.pill-current { background: rgba(31,111,235,0.2);  color: var(--accent);  border: 1px solid var(--current); }
+.pill-pending { background: rgba(139,148,158,0.1); color: var(--text-muted); border: 1px solid var(--border); }
+.pill-human   { background: rgba(210,153,34,0.15); color: var(--warning); border: 1px solid var(--warning); }
+
+/* ── SPC-02: LEGACY_FALLBACK badge ─────────────────────── */
+.legacy-fallback-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 5px;
+  background: rgba(248,81,73,0.15);
+  color: var(--danger);
+  border: 1px solid var(--danger);
+}
+
+/* ── Buttons ──────────────────────────────────── */
+button.btn, a.btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: border-color 0.15s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+button.btn:hover, a.btn:hover { border-color: var(--accent); color: var(--accent); }
+button.btn-primary { background: var(--current); border-color: var(--current); color: #fff; }
+button.btn-primary:hover { background: #388bfd; border-color: #388bfd; }
+
+/* ── Domain ───────────────────────────────────── */
+.domain-badge { font-size: 9px; padding: 1px 5px; border-radius: 10px; vertical-align: middle; margin-left: 4px; }
+.domain-tiktrack { background: rgba(88,166,255,0.12); color: var(--accent); }
+.domain-agentsos { background: rgba(63,185,80,0.12); color: var(--success); }
+.domain-selector { display: flex; gap: 4px; margin-bottom: 4px; }
+.domain-btn {
+  flex: 1;
+  padding: 4px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  cursor: pointer;
+  background: var(--surface2);
+  color: var(--text-muted);
+  text-align: center;
+  transition: all 0.12s;
+}
+.domain-btn:hover { border-color: var(--accent); color: var(--text); }
+.domain-btn.active-tiktrack { background: rgba(88,166,255,0.15); border-color: var(--accent); color: var(--accent); }
+.domain-btn.active-agentsos { background: rgba(63,185,80,0.15); border-color: var(--success); color: var(--success); }
+.domain-label-badge { font-size: 9px; padding: 1px 5px; border-radius: 10px; vertical-align: middle; margin-left: 4px; }
+.domain-label-tiktrack { background: rgba(88,166,255,0.12); color: var(--accent); }
+.domain-label-agentsos { background: rgba(63,185,80,0.12); color: var(--success); }
+
+/* ── Badge (generic) ──────────────────────────── */
+.badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); color: var(--text-muted); text-transform: none; letter-spacing: 0; font-weight: 400; }
+
+/* ── Loading / error ─────────────────────────── */
+.loading { color: var(--text-muted); font-style: italic; font-size: 12px; }
+.error-msg { color: var(--danger); font-size: 12px; padding: 8px; background: rgba(248,81,73,0.08); border-radius: 4px; }
+.refresh-label { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); cursor: pointer; }
+.refresh-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }

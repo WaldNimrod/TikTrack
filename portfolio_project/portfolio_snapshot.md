@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-14T01:36:20.288343+00:00`
+- Generated (UTC): `2026-03-14T20:57:31.967757+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -17,7 +17,7 @@
 
 - stages: `6`
 - programs: `31`
-- work_packages: `8`
+- work_packages: `9`
 
 ## Roadmap (hierarchical)
 
@@ -30,7 +30,8 @@
         ├── **WP** `S001-P001-WP001` | CLOSED | gate: GATE_8 (PASS) | domain: **AGENTS_OS**
         └── **WP** `S001-P001-WP002` | CLOSED | gate: GATE_8 (PASS) | domain: **AGENTS_OS**
 
-    └── **Program** `S001-P002` — Alerts POC | DEFERRED | domain: **TIKTRACK**
+    └── **Program** `S001-P002` — Alerts POC | ACTIVE | domain: **TIKTRACK**
+        └── **WP** `S001-P002-WP001` | IN_PROGRESS | gate: GATE_0 | domain: **TIKTRACK**
 
 
 ### S002 — שלב 2 — השלב הפעיל | ACTIVE [SHARED]

@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-14T01:36:20.288343+00:00",
+  "generated_at_utc": "2026-03-14T20:57:31.967757+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -86,8 +86,8 @@
       "program_name": "Alerts POC",
       "domain": "TIKTRACK",
       "stage_id": "S001",
-      "status": "DEFERRED",
-      "current_gate_mirror": "— (activation pending TIKTRACK teams available post-S002-P002-WP003 lifecycle close). *correction: domain reclassified from AGENTS_OS to TIKTRACK per TEAM_00_AGENTS_OS_INDEPENDENCE_DIRECTIVE_ACCEPTANCE_v1.0.0 §2 — ruling 2026-03-11*"
+      "status": "ACTIVE",
+      "current_gate_mirror": "GATE_0 (deferred activation authorized per ARCHITECT_DIRECTIVE_S001_P002_ACTIVATION_v1.0.0; trigger met: S002-P002-WP003 lifecycle close 2026-03-13; parallel activation during S002 era 2026-03-14). *domain reclassified from AGENTS_OS to TIKTRACK per TEAM_00_AGENTS_OS_INDEPENDENCE_DIRECTIVE_ACCEPTANCE_v1.0.0 §2 — ruling 2026-03-11*"
     },
     {
       "program_id": "S002-P001",
@@ -342,6 +342,15 @@
       "active_marker_reason": "Lifecycle complete 2026-02-23"
     },
     {
+      "work_package_id": "S001-P002-WP001",
+      "program_id": "S001-P002",
+      "domain": "TIKTRACK",
+      "status": "IN_PROGRESS",
+      "current_gate": "GATE_0",
+      "is_active": false,
+      "active_marker_reason": "Deferred program activation; GATE_0 spec validation in progress; authorized per ARCHITECT_DIRECTIVE_S001_P002_ACTIVATION_v1.0.0 (2026-03-14)"
+    },
+    {
       "work_package_id": "S002-P001-WP001",
       "program_id": "S002-P001",
       "domain": "AGENTS_OS",
@@ -438,9 +447,19 @@
           "program_id": "S001-P002",
           "program_name": "Alerts POC",
           "domain": "TIKTRACK",
-          "status": "DEFERRED",
-          "current_gate_mirror": "— (activation pending TIKTRACK teams available post-S002-P002-WP003 lifecycle close). *correction: domain reclassified from AGENTS_OS to TIKTRACK per TEAM_00_AGENTS_OS_INDEPENDENCE_DIRECTIVE_ACCEPTANCE_v1.0.0 §2 — ruling 2026-03-11*",
-          "work_packages": []
+          "status": "ACTIVE",
+          "current_gate_mirror": "GATE_0 (deferred activation authorized per ARCHITECT_DIRECTIVE_S001_P002_ACTIVATION_v1.0.0; trigger met: S002-P002-WP003 lifecycle close 2026-03-13; parallel activation during S002 era 2026-03-14). *domain reclassified from AGENTS_OS to TIKTRACK per TEAM_00_AGENTS_OS_INDEPENDENCE_DIRECTIVE_ACCEPTANCE_v1.0.0 §2 — ruling 2026-03-11*",
+          "work_packages": [
+            {
+              "work_package_id": "S001-P002-WP001",
+              "program_id": "S001-P002",
+              "domain": "TIKTRACK",
+              "status": "IN_PROGRESS",
+              "current_gate": "GATE_0",
+              "is_active": false,
+              "active_marker_reason": "Deferred program activation; GATE_0 spec validation in progress; authorized per ARCHITECT_DIRECTIVE_S001_P002_ACTIVATION_v1.0.0 (2026-03-14)"
+            }
+          ]
         }
       ]
     },

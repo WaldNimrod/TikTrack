@@ -5,8 +5,8 @@
 **owner:** Team 40 (UI Assets & Design)  
 **status:** 🔒 **SSOT - MANDATORY**  
 **supersedes:** None (Master document)  
-**last_updated:** 2026-02-02  
-**version:** v1.4
+**last_updated:** 2026-03-15  
+**version:** v1.5
 
 ---
 
@@ -842,6 +842,135 @@
 
 ---
 
+### **11. Agents_OS Pipeline UI** (ITCSS: Components Layer)
+
+**תוקף:** `agents_os/ui/` — Pipeline Dashboard, Roadmap, Teams (domain: AGENTS_OS)  
+**קבצים:** `agents_os/ui/css/pipeline-shared.css`, `pipeline-dashboard.css`, `pipeline-roadmap.css`, `pipeline-teams.css`
+
+**הערה:** Pipeline UI משתמש במחסנית CSS נפרדת (לא phoenix-base/phoenix-components). משתני CSS מקומיים ב-`:root`.
+
+**מקור:** `_COMMUNICATION/team_61/TEAM_61_AGENTS_OS_UI_CSS_CLASS_INVENTORY_v1.0.0.md` (AOUI-F02)  
+**עדכון:** 2026-03-15 — AOUI-F02 mandate (TEAM_10_TO_TEAM_170_AOUI_F02_CSS_INDEX_MANDATE)
+
+---
+
+#### 11.1 pipeline-shared.css (Cross-page: Dashboard, Roadmap, Teams)
+
+| Class | תיאור | הקשר שימוש |
+|-------|--------|------------|
+| `.pipeline-nav` | Top navigation bar | PIPELINE_DASHBOARD.html, PIPELINE_ROADMAP.html, PIPELINE_TEAMS.html — ניווט עליון |
+| `.nav-link` | Navigation link | קישורי ניווט (Dashboard, Roadmap, Teams) |
+| `.nav-link.active` | Active nav link | קישור פעיל נבחר |
+| `.nav-sep` | Separator between nav items | מפריד בין פריטי ניווט |
+| `.agents-header` | Canonical page header (§5.1) | כותרת עמוד בכל העמודים |
+| `.agents-header-left`, `.agents-header-right` | Header columns | עמודות כותרת שמאל/ימין |
+| `.agents-header-title` | Page title in header | כותרת עמוד בכותרת |
+| `.agents-refresh-label` | Refresh / meta label | תווית רענון |
+| `.agents-refresh-btn` | Refresh button | כפתור רענון |
+| `.agents-page-layout` | Canonical grid layout (§5.2) | גריד ראשי 1fr 300px |
+| `.agents-page-main` | Main content column | עמודת תוכן ראשי |
+| `.agents-page-sidebar` | Right sidebar column | סיידבר ימין 300px |
+| `.section-card` | Content section card | כרטיס סקשן תוכן |
+| `.section-title` | Section title | כותרת סקשן |
+| `.sidebar-section-card` | Sidebar section wrapper | ראפר סקשן סיידבר |
+| `.sidebar-section-title` | Sidebar section title | כותרת סקשן סיידבר |
+| `.status-pill` | Status chip base | צ'יפ סטטוס בסיסי |
+| `.pill-pass`, `.pill-fail`, `.pill-current`, `.pill-pending`, `.pill-human` | Status pill variants | וריאנטים: pass, fail, current, pending, human |
+| `.legacy-fallback-badge` | SPC-02 fallback indicator | אינדיקציה ל-fallback |
+| `.btn` | Button base | כפתור בסיסי |
+| `.btn-primary` | Primary button | כפתור ראשי |
+| `.domain-badge` | Domain chip | צ'יפ דומיין |
+| `.domain-tiktrack`, `.domain-agentsos` | Domain badge variants | TikTrack, Agents_OS |
+| `.domain-selector` | Domain button group | קבוצת כפתורי דומיין |
+| `.domain-btn` | Domain toggle button | כפתור מעבר דומיין |
+| `.domain-btn.active-tiktrack`, `.domain-btn.active-agentsos` | Active domain toggle | מצב פעיל לפי דומיין |
+| `.domain-label-badge`, `.domain-label-tiktrack`, `.domain-label-agentsos` | Sidebar domain label | תווית דומיין בסיידבר |
+| `.badge` | Generic badge | תג כללי |
+| `.loading` | Loading text state | מצב טקסט טעינה |
+| `.error-msg` | Error message | הודעת שגיאה |
+| `.refresh-label`, `.refresh-dot` | Auto-refresh controls | שליטה ברענון אוטומטי |
+
+---
+
+#### 11.2 pipeline-dashboard.css (Dashboard only — PIPELINE_DASHBOARD.html)
+
+| Class | תיאור | הקשר שימוש |
+|-------|--------|------------|
+| `.sidebar-section`, `.sidebar-label` | Sidebar grouping | קיבוץ סיידבר, תווית |
+| `.info-row`, `.info-key`, `.info-val` | Info key-value rows | שורות מידע מפתח-ערך |
+| `.gate-list` | Gate timeline list | רשימת שערים |
+| `.gate-item` | Gate row | שורת שער |
+| `.gate-item.is-current` | Current gate | שער נוכחי |
+| `.gate-dot` | Gate status dot | נקודת סטטוס שער |
+| `.dot-pass`, `.dot-fail`, `.dot-current`, `.dot-pending`, `.dot-human` | Gate status dot variants | וריאנטים |
+| `.gate-name`, `.gate-status-text` | Gate row text | שם שער, טקסט סטטוס |
+| `.spec-card`, `.spec-text`, `.spec-wp` | Spec display | תצוגת ספק |
+| `.accordion` | Accordion container | קונטיינר אקורדיון |
+| `.accordion-header`, `.accordion-title`, `.accordion-badge`, `.accordion-chevron` | Accordion header parts | חלקי כותרת אקורדיון |
+| `.accordion-body`, `.accordion.open` | Accordion body/state | גוף ומצב פתוח |
+| `.prompt-toolbar`, `.prompt-meta`, `.prompt-box` | Prompt area | אזור prompt |
+| `.copy-flash` | Copy feedback | משוב העתקה |
+| `.booster-panel`, `.booster-toggle-row`, `.booster-options` | Booster panel | פאנל booster |
+| `.booster-type-tabs`, `.booster-tab`, `.booster-preview`, `.booster-footer`, `.booster-hint` | Booster UI | רכיבי booster |
+| `.mandate-redirect-banner` | Mandate redirect notice | באנר הפניה למנדט |
+| `.mandate-content` | Mandate text area | אזור טקסט מנדט |
+| `.team-tabs`, `.team-tab`, `.phase-badge`, `.correction-badge` | Team mandate tabs | טאבים מנדט צוות |
+| `.file-list`, `.file-row`, `.file-path`, `.file-icon` | Expected files list | רשימת קבצים צפויים |
+| `.health-warn-item` | Health warning row | שורת אזהרת בריאות |
+| `.hw-error`, `.hw-warning`, `.hw-info` | Health warning severity | חומרת אזהרה |
+| `.hw-icon`, `.hw-body`, `.hw-msg`, `.hw-log-row`, `.hw-log`, `.hw-copy-btn` | Health warning detail | פרטי אזהרה |
+| `.sidebar-cmd-list`, `.sidebar-cmd-row`, `.sidebar-cmd-text`, `.sidebar-cmd-btn` | Sidebar commands | פקודות סיידבר |
+| `.modal-overlay`, `.modal-box`, `.modal-close` | Modals | מודלים |
+| `.help-btn`, `.step-box`, `.alert-box`, `.tip-box` | Help modal | מודל עזרה |
+| `.quick-action-bar`, `.qa-btn` | Quick actions | פעולות מהירות |
+| `.findings-builder` | Findings area | אזור ממצאים |
+
+---
+
+#### 11.3 pipeline-roadmap.css (Roadmap only — PIPELINE_ROADMAP.html)
+
+| Class | תיאור | הקשר שימוש |
+|-------|--------|------------|
+| `.rm-stage`, `.rm-stage-active` | Roadmap tree stage | שלב בעץ roadmap |
+| `.rm-stage-header`, `.rm-chevron` | Stage header, chevron | כותרת שלב, חץ |
+| `.rm-stage-id`, `.rm-stage-name`, `.rm-programs` | Stage content | תוכן שלב |
+| `.rm-program` | Program row | שורת תוכנית |
+| `.rm-program-active`, `.rm-program-selected` | Active/selected program | תוכנית פעילה/נבחרת |
+| `.rm-prog-id`, `.rm-prog-name`, `.rm-prog-domain`, `.rm-status` | Program detail | פרטי תוכנית |
+| `.rm-s-active`, `.rm-s-complete`, `.rm-s-planned`, `.rm-s-deferred`, `.rm-s-hold` | Status badges | תגי סטטוס |
+| `.prog-detail-panel` | Program detail in sidebar | פאנל פרטי תוכנית בסיידבר |
+| `.gate-seq-table`, `.gate-name-cell`, `.decision-marker` | Gate sequence table | טבלת רצף שערים |
+| `.gate-history-list`, `.history-item`, `.history-gate`, `.fail-cycle-tag` | Gate history | היסטוריית שערים |
+| `.stat-domain-card`, `.tiktrack-card`, `.agentsos-card`, `.total-card` | Domain stat cards | כרטיסי סטטיסטיקת דומיין |
+| `.stat-domain-title`, `.stat-dot`, `.stat-row`, `.stat-item` | Stat display | תצוגת סטטיסטיקות |
+| `.conflict-banner` | Conflict notice | הודעת קונפליקט |
+| `.state-blocking`, `.state-exception` | Conflict banner states | מצבי באנר (חסימה, חריגה) |
+| `.cf-row`, `.cf-path` | Canonical files list | רשימת קבצים קנונית |
+| `.rm-val-ok`, `.rm-val-err` | Validation status | סטטוס ולידציה |
+
+---
+
+#### 11.4 pipeline-teams.css (Teams only — PIPELINE_TEAMS.html)
+
+| Class | תיאור | הקשר שימוש |
+|-------|--------|------------|
+| `.teams-layout` | Teams grid (220px 1fr) | גריד עמוד Teams |
+| `.team-list`, `.team-list-header` | Team list sidebar | סיידבר רשימת צוותים |
+| `.team-item`, `.team-item.active` | Team row | שורת צוות |
+| `.team-badge`, `.team-item-name`, `.team-engine-dot` | Team row detail | פרטי שורת צוות |
+| `.dot-cursor`, `.dot-codex`, `.dot-human`, `.dot-auto` | Engine indicators | אינדיקטור מנוע (Cursor, Codex, Human, Auto) |
+| `.team-panel`, `.team-panel-empty` | Team detail panel | פאנל פרטי צוות |
+| `.team-header-card`, `.team-id-badge`, `.team-role-text` | Team header | כותרת צוות |
+| `.team-meta-row`, `.team-meta-item`, `.team-meta-lbl`, `.team-meta-val` | Team meta | מטא-נתוני צוות |
+| `.prompt-tabs`, `.prompt-tab` | Prompt type tabs | טאבי prompt |
+| `.prompt-output-card`, `.prompt-output-header`, `.prompt-output-pre` | Prompt output | פלט prompt |
+| `.state-strip` | State display strip | פס מצב |
+| `.pv-panel`, `.pv-title`, `.pv-desc`, `.pv-field`, `.pv-actions`, `.pv-warn` | Validation panel | פאנל ולידציה |
+| `.section-card`, `.section-title` | Section cards | כרטיסי סקשן (shared עם pipeline-shared) |
+| `.copy-flash` | Copy feedback | משוב העתקה (shared) |
+
+---
+
 ## 🎨 לוגיקת הגדרת מחלקות
 
 ### **עקרון 1: BEM Naming Convention**
@@ -999,6 +1128,10 @@ overflow-x: auto;
 - `ui/src/styles/phoenix-header.css` - Unified Header
 - `ui/src/styles/D15_IDENTITY_STYLES.css` - Auth Pages Styles
 - `ui/src/styles/D15_DASHBOARD_STYLES.css` - Dashboard Pages Styles
+- `agents_os/ui/css/pipeline-shared.css` - Agents_OS Pipeline (shared)
+- `agents_os/ui/css/pipeline-dashboard.css` - Agents_OS Dashboard
+- `agents_os/ui/css/pipeline-roadmap.css` - Agents_OS Roadmap
+- `agents_os/ui/css/pipeline-teams.css` - Agents_OS Teams
 - `documentation/08-REPORTS/artifacts_SESSION_01/TEAM_40_CSS_HIERARCHY_AUDIT.md` - CSS Audit Report
 - `documentation/08-REPORTS/artifacts_SESSION_01/TEAM_40_TASK_2.3_EVIDENCE.md` - CSS Refactor Evidence
 
@@ -1008,9 +1141,9 @@ overflow-x: auto;
 **Date:** 2026-02-02 (עודכן עם Fluid Design Mandate, Entity Colors, Media Queries removal)  
 **Status:** ✅ **MANDATORY INDEX - ALL DEVELOPERS MUST USE**
 
-**עדכון אחרון:** 2026-02-02 - Stage 2.4 Completion:
-- ✅ הוספת Entity Colors documentation
-- ✅ הוספת Fluid Design Mandate (clamp(), min(), max())
-- ✅ עדכון Media Queries policy (רק Dark Mode מותר)
-- ✅ עדכון Header Container עם Fluid Design
-- ✅ עדכון ITCSS Layers עם SSOT information
+**עדכון אחרון:** 2026-03-15 - AOUI-F02 (Agents_OS Pipeline UI):
+- ✅ הרחבת §11 Agents_OS Pipeline UI עם אינבנטר מלא (pipeline-shared, pipeline-dashboard, pipeline-roadmap, pipeline-teams)
+- ✅ תיעוד מחלקות עם שם, תיאור, הקשר שימוש (HTML/רכיב) per TEAM_10_TO_TEAM_170_AOUI_F02_CSS_INDEX_MANDATE
+- ✅ קלט: TEAM_61_AGENTS_OS_UI_CSS_CLASS_INVENTORY_v1.0.0
+
+**עדכון קודם:** 2026-02-02 - Stage 2.4 Completion (Entity Colors, Fluid Design, Media Queries)

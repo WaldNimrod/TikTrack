@@ -1,0 +1,89 @@
+/* pipeline-roadmap.css — Team 61 AOUI LOD400 — Roadmap-specific styles */
+
+/* Roadmap tree */
+.rm-stage { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; overflow: hidden; }
+.rm-stage-active { border-color: var(--current) !important; }
+.rm-stage-header { display: flex; align-items: center; gap: 8px; padding: 9px 12px; background: var(--surface); cursor: pointer; transition: background 0.15s; user-select: none; }
+.rm-stage-header:hover { background: var(--surface2); }
+.rm-chevron { color: var(--text-muted); font-size: 10px; transition: transform 0.2s; }
+.rm-stage.rm-open .rm-chevron { transform: rotate(90deg); }
+.rm-stage-id { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--accent); min-width: 42px; }
+.rm-stage-name { font-size: 13px; font-weight: 500; flex: 1; }
+.rm-programs { padding: 6px 12px 10px 22px; display: none; }
+.rm-stage.rm-open .rm-programs { display: block; }
+.rm-program { display: flex; align-items: center; gap: 7px; padding: 4px 6px; border-radius: 4px; font-size: 11px; margin-bottom: 2px; cursor: pointer; transition: background 0.12s; }
+.rm-program:hover { background: rgba(88,166,255,0.07); }
+.rm-program-active { background: rgba(31,111,235,0.12); font-weight: 600; }
+.rm-program-selected { background: rgba(88,166,255,0.14) !important; outline: 1px solid var(--accent); }
+.rm-prog-id { font-family: var(--mono); color: var(--text-muted); min-width: 92px; font-size: 10px; }
+.rm-prog-name { flex: 1; }
+.rm-prog-domain { font-size: 9px; padding: 1px 6px; border-radius: 5px; }
+.rm-status { font-size: 9px; padding: 1px 7px; border-radius: 5px; font-weight: 600; white-space: nowrap; }
+.rm-s-active { background: rgba(31,111,235,0.2); color: #58a6ff; }
+.rm-s-complete { background: rgba(63,185,80,0.15); color: #3fb950; }
+.rm-s-planned { background: rgba(139,148,158,0.1); color: #8b949e; }
+.rm-s-deferred { background: rgba(210,153,34,0.15); color: #d29922; }
+.rm-s-hold { background: rgba(248,81,73,0.1); color: #f85149; }
+
+/* Program detail panel (sidebar) */
+.prog-detail-panel { background: var(--surface2); border: 1px solid var(--accent); border-radius: 8px; padding: 12px 14px; margin-top: 0; margin-bottom: 12px; font-size: 12px; }
+.prog-detail-panel h3 { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--accent); }
+.prog-detail-row { display: flex; gap: 6px; margin-bottom: 4px; }
+.prog-detail-lbl { color: var(--text-muted); min-width: 100px; font-size: 11px; }
+.prog-detail-val { font-size: 11px; }
+.prog-gate-mirror { font-family: var(--mono); font-size: 10px; color: var(--text-muted); margin-top: 6px; padding: 6px 8px; background: var(--surface); border-radius: 4px; word-break: break-word; }
+
+/* Gate sequence table */
+.gate-seq-table { width: 100%; border-collapse: collapse; }
+.gate-seq-table th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--border); }
+.gate-seq-table td { font-size: 11px; padding: 5px 8px; border-bottom: 1px solid var(--border); }
+.gate-seq-table tr:last-child td { border-bottom: none; }
+.gate-seq-table tr.gate-current td { background: rgba(31,111,235,0.08); }
+.gate-name-cell { font-family: var(--mono); }
+.decision-marker { font-size: 9px; color: var(--warning); margin-left: 4px; }
+
+/* Gate history */
+.gate-history-list { list-style: none; }
+.history-item { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+.history-item:last-child { border-bottom: none; }
+.history-gate { font-family: var(--mono); font-size: 11px; flex: 1; }
+.fail-cycle-tag { font-size: 9px; padding: 1px 6px; border-radius: 5px; font-weight: 700; background: rgba(248,81,73,0.18); color: var(--danger); border: 1px solid var(--danger); }
+
+/* Sidebar domain stats */
+.stat-domain-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 8px; }
+.stat-domain-card.tiktrack-card { border-left: 3px solid var(--accent); }
+.stat-domain-card.agentsos-card { border-left: 3px solid var(--success); }
+.stat-domain-card.total-card { border-left: 3px solid var(--warning); }
+.stat-domain-title { font-size: 11px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 7px; }
+.stat-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.stat-dot-tt { background: var(--accent); }
+.stat-dot-aos { background: var(--success); }
+.stat-dot-tot { background: var(--warning); }
+.stat-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.stat-item { text-align: center; }
+.stat-num { font-size: 18px; font-weight: 700; line-height: 1.15; }
+.stat-lbl { font-size: 9px; color: var(--text-muted); }
+.num-tt { color: var(--accent); }
+.num-aos { color: var(--success); }
+.num-tot { color: var(--warning); }
+.num-done { color: var(--success); }
+.num-actv { color: var(--warning); }
+.num-plan { color: var(--text-muted); }
+
+/* Canonical files rows */
+.cf-row { display: flex; align-items: center; gap: 7px; padding: 4px 0; border-bottom: 1px solid var(--border); }
+.cf-row:last-child { border-bottom: none; }
+.cf-row a { color: var(--accent); text-decoration: none; font-size: 11px; flex: 1; }
+.cf-row a:hover { text-decoration: underline; }
+.cf-path { font-family: var(--mono); font-size: 9px; color: var(--text-muted); display: none; }
+
+/* Validation */
+.rm-val-ok { color: var(--success); font-size: 12px; }
+.rm-val-err { color: var(--danger); font-size: 12px; margin-bottom: 4px; }
+
+/* 3-state conflict banner (§4.1) */
+.conflict-banner { border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; font-size: 12px; }
+.conflict-banner strong { display: block; margin-bottom: 4px; }
+.conflict-banner .log-line { font-family: var(--mono); font-size: 10px; color: var(--text-muted); margin-top: 6px; background: rgba(0,0,0,0.3); padding: 3px 6px; border-radius: 3px; }
+.conflict-banner.state-blocking { background: rgba(248,81,73,0.10); border: 1px solid var(--danger); color: var(--danger); }
+.conflict-banner.state-exception { background: rgba(210,153,34,0.10); border: 1px solid var(--warning); color: var(--warning); }

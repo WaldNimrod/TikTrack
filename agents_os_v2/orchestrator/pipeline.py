@@ -594,13 +594,22 @@ def _verdict_candidates(gate_id: str, work_package_id: str) -> list[Path]:
     # "TO_TEAM_10" prefix variant included for teams that use routing-style names.
     patterns: dict[str, list[Path]] = {
         "GATE_0": [
+            # Canonical patterns (underscore naming)
             t190 / f"TEAM_190_{wpu}_GATE_0_VERDICT_v1.0.0.md",
             t190 / f"TEAM_190_{wpu}_GATE_0_VALIDATION_v1.0.0.md",
+            # Routing-prefix variants (TEAM_190_TO_TEAM_*_WP_GATE0_*)
+            t190 / f"TEAM_190_TO_TEAM_10_{wpu}_GATE_0_VALIDATION_RESULT_v1.0.0.md",
+            t190 / f"TEAM_190_TO_TEAM_10_TEAM_90_{wpu}_GATE0_VALIDATION_RESULT_v1.0.0.md",
+            t190 / f"TEAM_190_TO_TEAM_10_TEAM_90_{wpu}_GATE_0_VALIDATION_RESULT_v1.0.0.md",
+            # Hyphen fallback
             t190 / f"TEAM_190_{wp}_GATE_0_VERDICT_v1.0.0.md",
         ],
         "GATE_1": [
             t190 / f"TEAM_190_{wpu}_GATE_1_VERDICT_v1.0.0.md",
             t190 / f"TEAM_190_{wpu}_LLD400_VALIDATION_v1.0.0.md",
+            t190 / f"TEAM_190_TO_TEAM_10_{wpu}_GATE_1_VALIDATION_RESULT_v1.0.0.md",
+            t190 / f"TEAM_190_TO_TEAM_10_TEAM_90_{wpu}_GATE1_VALIDATION_RESULT_v1.0.0.md",
+            t190 / f"TEAM_190_TO_TEAM_10_TEAM_90_{wpu}_GATE_1_VALIDATION_RESULT_v1.0.0.md",
             t190 / f"TEAM_190_{wp}_GATE_1_VERDICT_v1.0.0.md",
         ],
         "GATE_2": [
@@ -656,18 +665,32 @@ def _extract_route_recommendation(gate_id: str, work_package_id: str) -> tuple[s
     """
     import re
     candidates = _verdict_candidates(gate_id, work_package_id)
+    # Alias map: normalize variant names from team output to pipeline-internal values
+    _ROUTE_ALIAS: dict[str, str] = {
+        "doc":          "doc",
+        "full":         "full",
+        "doc_only":     "doc",
+        "doc_only_loop":"doc",
+        "doconly":      "doc",
+        "loop":         "doc",   # GATE_0/1 self-loop = doc route
+        "reject":       "full",
+        "revision":     "full",
+    }
+
     for path in candidates:
         if path.exists():
             text = path.read_text(encoding="utf-8")
-            # Match: route_recommendation: doc  or  route_recommendation: full
-            # Also matches with optional quotes, inline comment, or extra whitespace.
+            # Match: route_recommendation: doc | full | DOC_ONLY_LOOP | etc.
             m = re.search(
-                r'^route_recommendation\s*[:\-]\s*(doc|full)\b',
+                r'^route_recommendation\s*[:\-]\s*([A-Za-z_]+)',
                 text,
                 re.IGNORECASE | re.MULTILINE,
             )
             if m:
-                return m.group(1).lower(), str(path)
+                raw = m.group(1).lower().replace("-", "_")
+                normalized = _ROUTE_ALIAS.get(raw)
+                if normalized:
+                    return normalized, str(path)
     return None, ""
 
 
@@ -813,10 +836,35 @@ def _team_header(team_id: str, gate_name: str, state: "PipelineState", fresh: bo
 def _generate_gate_0_prompt(state: PipelineState, fresh: bool = False) -> str:
     return (
         f"{_team_header('team_190', 'GATE_0', state, fresh)}"
-        f"# GATE_0 — Validate Scope\n\n"
-        f"Validate the following scope brief for constitutional compliance.\n"
-        f"Check: domain isolation, no conflict with active programs, feasibility.\n"
-        f"Respond with: PASS or BLOCK + findings.\n\n"
+        f"# GATE_0 — Validate LOD200 Scope (SPEC_ARC)\n\n"
+        f"Validate the following LOD200 scope brief for constitutional compliance.\n\n"
+        f"**Check:**\n"
+        f"- Identity header consistency (stage_id, program_id, work_package_id all match WSM/registry)\n"
+        f"- Program registration status (program_id must be ACTIVE in PHOENIX_PROGRAM_REGISTRY)\n"
+        f"- Work Package registration (work_package_id must exist in WORK_PACKAGE_REGISTRY)\n"
+        f"- Domain isolation (no TikTrack ↔ Agents_OS boundary violations)\n"
+        f"- No conflict with currently active programs\n"
+        f"- Feasibility and scope clarity\n\n"
+        f"## MANDATORY: Output Format\n\n"
+        f"**Your response MUST include these fields at the top:**\n\n"
+        f"```\n"
+        f"gate_id: GATE_0\n"
+        f"decision: PASS | BLOCK_FOR_FIX\n"
+        f"route_recommendation: doc\n"
+        f"blocking_findings:\n"
+        f"  - BF-01: <description> | evidence: <file:line>\n"
+        f"  - BF-02: <description> | evidence: <file:line>\n"
+        f"next_required_action: <what must happen before resubmission>\n"
+        f"next_responsible_team: <team_id>\n"
+        f"```\n\n"
+        f"**`route_recommendation` values (REQUIRED — drives pipeline auto-routing):**\n"
+        f"```\nroute_recommendation: doc\n```  "
+        f"← any fix required before resubmission (always `doc` for GATE_0 — spec revision)\n\n"
+        f"**`blocking_findings` list (REQUIRED if BLOCK_FOR_FIX — drives remediation flow):**\n"
+        f"- Each entry: `BF-NN: <description> | evidence: <canonical_path:line_number>`\n"
+        f"- Missing or empty findings = invalid BLOCK; pipeline cannot auto-route\n\n"
+        f"**On PASS:** route_recommendation and blocking_findings may be omitted.\n"
+        f"**On BLOCK:** architect (Team 00) is the next responsible team — LOD200 revision required.\n\n"
         f"## Scope Brief\n\n{state.spec_brief}\n\n"
         f"## Current State\n\n{build_state_summary()}"
     )

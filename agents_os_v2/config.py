@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Agents_OS V2 — Configuration
 Loads API keys from environment and defines engine settings.
@@ -36,3 +37,39 @@ AGENTS_OS_OUTPUT_DIR = COMMUNICATION_DIR / "agents_os"
 STATE_SNAPSHOT_PATH = AGENTS_OS_OUTPUT_DIR / "STATE_SNAPSHOT.json"
 
 MAX_RETRIES_PER_GATE = 5
+
+# ── Domain-specific state files ────────────────────────────────────────────
+# Each domain has its own independent pipeline state file, enabling parallel
+# pipelines — one per domain (TikTrack + Agents_OS simultaneously).
+DOMAIN_STATE_FILES = {
+    "tiktrack":  AGENTS_OS_OUTPUT_DIR / "pipeline_state_tiktrack.json",
+    "agents_os": AGENTS_OS_OUTPUT_DIR / "pipeline_state_agentsos.json",
+}
+# Default domain (legacy file kept as symlink/alias for backward compat)
+DEFAULT_DOMAIN = "tiktrack"
+
+
+def get_state_file(domain: str | None = None) -> "Path":  # type: ignore[name-defined]
+    from pathlib import Path
+    d = (domain or DEFAULT_DOMAIN).lower().replace("-", "_").replace(" ", "_")
+    return DOMAIN_STATE_FILES.get(d, AGENTS_OS_OUTPUT_DIR / f"pipeline_state_{d}.json")
+
+
+# ── Domain → gate-ownership overrides ─────────────────────────────────────
+# Gates whose ownership depends on domain:
+#   TIKTRACK:  GATE_2 + GATE_6 → Team 00 (Chief Architect)
+#   AGENTS_OS: GATE_2 + GATE_6 → Team 100 (Strategic Reviewer)
+DOMAIN_GATE_OWNERS: dict[str, dict[str, str]] = {
+    "tiktrack": {
+        "GATE_2":    "team_00",   # TikTrack architect approves intent
+        "WAITING_GATE2_APPROVAL": "team_00",
+        "GATE_6":    "team_00",   # TikTrack architect validates reality
+        "WAITING_GATE6_APPROVAL": "team_00",
+    },
+    "agents_os": {
+        "GATE_2":    "team_100",  # Strategic reviewer approves AgentsOS intent
+        "WAITING_GATE2_APPROVAL": "team_100",
+        "GATE_6":    "team_100",  # Strategic reviewer validates AgentsOS reality
+        "WAITING_GATE6_APPROVAL": "team_100",
+    },
+}

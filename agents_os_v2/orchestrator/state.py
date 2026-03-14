@@ -4,15 +4,17 @@ Pipeline State Manager — tracks gate progress across the pipeline.
 """
 
 import json
+import os
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from dataclasses import dataclass, field, asdict
 from typing import Optional
 
-from ..config import AGENTS_OS_OUTPUT_DIR
+from ..config import AGENTS_OS_OUTPUT_DIR, get_state_file, DEFAULT_DOMAIN
 
 
+# Legacy fallback — backward-compat alias (TikTrack default)
 STATE_FILE = AGENTS_OS_OUTPUT_DIR / "pipeline_state.json"
 
 
@@ -21,6 +23,7 @@ class PipelineState:
     pipe_run_id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
     work_package_id: str = "REQUIRED"
     stage_id: str = "S002"
+    project_domain: str = DEFAULT_DOMAIN   # "tiktrack" | "agents_os"
     spec_brief: str = ""
     current_gate: str = "NOT_STARTED"
     gates_completed: list[str] = field(default_factory=list)
@@ -34,17 +37,48 @@ class PipelineState:
     started_at: str = ""
     last_updated: str = ""
 
+    def _state_file(self) -> Path:
+        return get_state_file(self.project_domain)
+
     def save(self):
-        STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        f = self._state_file()
+        f.parent.mkdir(parents=True, exist_ok=True)
         self.last_updated = datetime.now(timezone.utc).isoformat()
+        f.write_text(json.dumps(asdict(self), indent=2, ensure_ascii=False), encoding="utf-8")
+        # Keep legacy pipeline_state.json in sync for backward compat
         STATE_FILE.write_text(json.dumps(asdict(self), indent=2, ensure_ascii=False), encoding="utf-8")
 
     @classmethod
-    def load(cls) -> "PipelineState":
-        if STATE_FILE.exists():
-            data = json.loads(STATE_FILE.read_text(encoding="utf-8"))
-            return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
+    def load(cls, domain: str | None = None) -> "PipelineState":
+        # Resolve domain: explicit arg > PIPELINE_DOMAIN env > auto-detect
+        if domain is None:
+            domain = os.environ.get("PIPELINE_DOMAIN") or None
+
+        # Try domain-specific file first, fall back to legacy pipeline_state.json
+        candidates = []
+        if domain:
+            candidates.append(get_state_file(domain))
+        # Auto-detect: look for any domain-specific state file
+        for d in ("tiktrack", "agents_os"):
+            candidates.append(get_state_file(d))
+        candidates.append(STATE_FILE)  # legacy fallback
+
+        for path in candidates:
+            if path.exists():
+                data = json.loads(path.read_text(encoding="utf-8"))
+                return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
         return cls()
+
+    @classmethod
+    def load_domain(cls, domain: str) -> "PipelineState":
+        """Load state for a specific domain. Returns new state if not found."""
+        path = get_state_file(domain)
+        if path.exists():
+            data = json.loads(path.read_text(encoding="utf-8"))
+            state = cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
+            state.project_domain = domain
+            return state
+        return cls(project_domain=domain)
 
     def advance_gate(self, gate_id: str, status: str):
         if status in ("PASS", "MANDATES_READY", "PRODUCED", "MANUAL", "CONDITIONAL_PASS"):

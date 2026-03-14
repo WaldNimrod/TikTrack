@@ -3,7 +3,7 @@
   "work_package_id": "S001-P002-WP001",
   "stage_id": "S001",
   "spec_brief": "S001-P002 WP001: Alerts Summary Widget on D15.I home dashboard. Read-only frontend component. Triggered-unread count badge + list of N=5 most recent, fully hidden when 0. Uses existing GET /api/v1/alerts/ endpoint. Per-alert: ticker symbol · condition label · triggered_at relative time. Click item → D34. Click badge → D34 filtered unread. collapsible-container Iron Rule. maskedLog mandatory. No new backend, no schema changes.",
-  "current_gate": "GATE_5",
+  "current_gate": "GATE_6",
   "gates_completed": [
     "GATE_0",
     "GATE_1",
@@ -17,7 +17,9 @@
     "CURSOR_IMPLEMENTATION",
     "GATE_4",
     "CURSOR_IMPLEMENTATION",
-    "GATE_4"
+    "GATE_4",
+    "G5_DOC_FIX",
+    "GATE_5"
   ],
   "gates_failed": [
     "G3_5",
@@ -37,5 +39,5 @@
   "implementation_endpoints": [],
   "spec_path": "",
   "started_at": "2026-03-13T02:10:10.757633+00:00",
-  "last_updated": "2026-03-13T22:14:24.731590+00:00"
+  "last_updated": "2026-03-13T23:54:37.385854+00:00"
 }

@@ -9,6 +9,11 @@
 #   ./pipeline_run.sh status       → show pipeline status only
 #   ./pipeline_run.sh gate NAME    → override: generate prompt for specific gate
 #
+# Domain support (parallel pipelines):
+#   ./pipeline_run.sh --domain tiktrack  pass       → advance TikTrack pipeline
+#   ./pipeline_run.sh --domain agents_os pass       → advance AgentsOS pipeline
+#   PIPELINE_DOMAIN=agents_os ./pipeline_run.sh     → env-var alternative
+#
 # Visual standard: prompt block is marked with ▼▼▼ (start) and ▲▲▲ (end)
 # for instant eye-identification in terminal output.
 
@@ -19,25 +24,60 @@ PROMPTS_DIR="$REPO/_COMMUNICATION/agents_os/prompts"
 
 cd "$REPO"
 
+# ── domain resolution ───────────────────────────────────────────────────────
+# Precedence: --domain flag > PIPELINE_DOMAIN env > auto-detect from state file
+
+DOMAIN="${PIPELINE_DOMAIN:-}"
+
+# Parse --domain flag before subcommand
+if [[ "${1:-}" == "--domain" ]]; then
+  DOMAIN="$2"
+  shift 2
+fi
+
+# Export so Python subprocesses can read it
+if [ -n "$DOMAIN" ]; then
+  export PIPELINE_DOMAIN="$DOMAIN"
+  DOMAIN_LABEL="[${DOMAIN}] "
+else
+  DOMAIN_LABEL=""
+fi
+
 # ── helpers ────────────────────────────────────────────────────────────────
 
 _get_gate() {
   python3 -c "
-import sys
+import sys, os
 sys.path.insert(0, '.')
 from agents_os_v2.orchestrator.state import PipelineState
-print(PipelineState.load().current_gate)
+domain = os.environ.get('PIPELINE_DOMAIN') or None
+print(PipelineState.load(domain).current_gate)
+"
+}
+
+_get_domain() {
+  python3 -c "
+import sys, os
+sys.path.insert(0, '.')
+from agents_os_v2.orchestrator.state import PipelineState
+domain = os.environ.get('PIPELINE_DOMAIN') or None
+print(PipelineState.load(domain).project_domain)
 "
 }
 
 _get_engine() {
+  local gate="$1"
   python3 -c "
-import sys
+import sys, os
 sys.path.insert(0, '.')
-from agents_os_v2.orchestrator.pipeline import GATE_CONFIG
-gate = '$1'
+from agents_os_v2.orchestrator.pipeline import GATE_CONFIG, _domain_gate_owner
+from agents_os_v2.orchestrator.state import PipelineState
+domain = os.environ.get('PIPELINE_DOMAIN') or None
+state = PipelineState.load(domain)
+gate = '${gate}'
 cfg = GATE_CONFIG.get(gate, {})
-print(cfg.get('engine', '?') + '  |  owner: ' + cfg.get('owner', '?'))
+effective_owner = _domain_gate_owner(gate, state.project_domain) or cfg.get('owner', '?')
+print(cfg.get('engine', '?') + '  |  owner: ' + effective_owner + '  [' + state.project_domain + ']')
 "
 }
 
@@ -56,7 +96,7 @@ _show_prompt() {
 
   echo ""
   printf '▼%.0s' {1..74}; echo ""
-  printf "  PASTE INTO AI:  %-20s  →  %s\n" "$gate" "$engine"
+  printf "  ${DOMAIN_LABEL}PASTE INTO AI:  %-20s  →  %s\n" "$gate" "$engine"
   printf "  File: %s\n" "$prompt_file"
   printf '▼%.0s' {1..74}; echo ""
   echo ""
@@ -71,7 +111,7 @@ _show_prompt() {
 _generate_and_show() {
   local gate="$1"
   echo ""
-  echo "[pipeline_run] Generating prompt for: $gate"
+  echo "[pipeline_run] ${DOMAIN_LABEL}Generating prompt for: $gate"
   $CLI --generate-prompt "$gate" 2>&1 | grep -v "^━"
   _show_prompt "$gate"
 }
@@ -88,7 +128,7 @@ case "${1:-next}" in
 
   pass)
     GATE=$(_get_gate)
-    echo "[pipeline_run] Advancing $GATE → PASS"
+    echo "[pipeline_run] ${DOMAIN_LABEL}Advancing $GATE → PASS"
     $CLI --advance "$GATE" PASS
     echo ""
     NEXT_GATE=$(_get_gate)
@@ -103,7 +143,7 @@ case "${1:-next}" in
   fail)
     GATE=$(_get_gate)
     REASON="${2:-no reason given}"
-    echo "[pipeline_run] Advancing $GATE → FAIL: $REASON"
+    echo "[pipeline_run] ${DOMAIN_LABEL}Advancing $GATE → FAIL: $REASON"
     $CLI --advance "$GATE" FAIL --reason "$REASON"
     echo ""
     # Check if auto-routing moved the gate forward (route_recommendation in verdict file)
@@ -143,7 +183,7 @@ case "${1:-next}" in
     GATE=$(_get_gate)
     # Map WAITING_ gates to their base gate for --approve
     BASE_GATE=$(echo "$GATE" | sed 's/WAITING_//; s/_APPROVAL//')
-    echo "[pipeline_run] Approving: $BASE_GATE"
+    echo "[pipeline_run] ${DOMAIN_LABEL}Approving: $BASE_GATE"
     $CLI --approve "$BASE_GATE"
     echo ""
     NEXT_GATE=$(_get_gate)
@@ -163,7 +203,7 @@ case "${1:-next}" in
   route)
     # Route pipeline after a FAIL decision.
     # Usage:
-    #   ./pipeline_run.sh route doc   [notes]   → doc/governance fix → CURSOR_IMPLEMENTATION
+    #   ./pipeline_run.sh route doc   [notes]   → doc/governance fix → G5_DOC_FIX
     #   ./pipeline_run.sh route full  [notes]   → full cycle → G3_PLAN
     #   ./pipeline_run.sh route doc   [notes] GATE_NAME  → override gate (default: current)
     TYPE="${2:?Usage: ./pipeline_run.sh route doc|full [notes]}"
@@ -175,7 +215,7 @@ case "${1:-next}" in
     else
       GATE=$(_get_gate)
     fi
-    echo "[pipeline_run] Routing $GATE FAIL → $TYPE"
+    echo "[pipeline_run] ${DOMAIN_LABEL}Routing $GATE FAIL → $TYPE"
     if [ -n "$NOTES" ]; then
       echo "[pipeline_run] Notes: $NOTES"
     fi
@@ -203,7 +243,7 @@ case "${1:-next}" in
       echo "[pipeline_run] Storing work plan artifact: $3"
       $CLI --store-artifact G3_PLAN "$3"
     fi
-    echo "[pipeline_run] Generating G3_PLAN REVISION prompt..."
+    echo "[pipeline_run] ${DOMAIN_LABEL}Generating G3_PLAN REVISION prompt..."
     $CLI --generate-prompt G3_PLAN --revision-notes "$NOTES" 2>&1 | grep -v "^━"
     _show_prompt "G3_PLAN"
     ;;
@@ -215,8 +255,45 @@ case "${1:-next}" in
     $CLI --store-artifact "$GATE" "$FILE"
     ;;
 
+  domain)
+    # Show current domain info for both pipelines
+    echo ""
+    echo "═══════════════════════════════════════"
+    echo "  Parallel Pipeline — Domain Status"
+    echo "═══════════════════════════════════════"
+    echo ""
+    echo "  TIKTRACK pipeline:"
+    PIPELINE_DOMAIN=tiktrack python3 -c "
+import sys, os
+sys.path.insert(0, '.')
+os.environ['PIPELINE_DOMAIN'] = 'tiktrack'
+from agents_os_v2.orchestrator.state import PipelineState
+s = PipelineState.load('tiktrack')
+print(f'    WP:      {s.work_package_id}')
+print(f'    Gate:    {s.current_gate}')
+print(f'    Updated: {s.last_updated or \"never\"}')
+"
+    echo ""
+    echo "  AGENTS_OS pipeline:"
+    PIPELINE_DOMAIN=agents_os python3 -c "
+import sys, os
+sys.path.insert(0, '.')
+os.environ['PIPELINE_DOMAIN'] = 'agents_os'
+from agents_os_v2.orchestrator.state import PipelineState
+s = PipelineState.load('agents_os')
+print(f'    WP:      {s.work_package_id}')
+print(f'    Gate:    {s.current_gate}')
+print(f'    Updated: {s.last_updated or \"never\"}')
+"
+    echo ""
+    echo "  Commands:"
+    echo "    ./pipeline_run.sh --domain tiktrack  pass"
+    echo "    ./pipeline_run.sh --domain agents_os status"
+    echo "═══════════════════════════════════════"
+    ;;
+
   *)
-    echo "Usage: ./pipeline_run.sh [next|pass|fail <reason>|approve|status|gate <NAME>|route doc|full [notes]|revise <notes> [file]|store <GATE> <FILE>]"
+    echo "Usage: ./pipeline_run.sh [--domain tiktrack|agents_os] [next|pass|fail <reason>|approve|status|gate <NAME>|route doc|full [notes]|revise <notes> [file]|store <GATE> <FILE>|domain]"
     echo ""
     echo "  next / (no arg)          Generate current gate prompt + display"
     echo "  pass                     Advance current gate → PASS → show next"
@@ -227,6 +304,12 @@ case "${1:-next}" in
     echo "  gate <NAME>              Generate prompt for specific gate"
     echo "  revise <notes> [file]    Generate G3_PLAN revision prompt after G3_5 FAIL"
     echo "  store <GATE> <FILE>      Store artifact file to pipeline state"
+    echo "  domain                   Show status of both parallel pipelines"
+    echo ""
+    echo "  Domain flags (parallel pipelines):"
+    echo "    --domain tiktrack       Use TikTrack pipeline state (default)"
+    echo "    --domain agents_os      Use AgentsOS pipeline state"
+    echo "    PIPELINE_DOMAIN=tiktrack ./pipeline_run.sh  (env-var alternative)"
     exit 1
     ;;
 esac

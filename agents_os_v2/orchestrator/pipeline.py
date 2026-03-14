@@ -25,7 +25,7 @@ from pathlib import Path
 
 from .state import PipelineState, STATE_FILE
 from .gate_router import run_data_model_checks
-from ..config import REPO_ROOT, AGENTS_OS_OUTPUT_DIR
+from ..config import REPO_ROOT, AGENTS_OS_OUTPUT_DIR, DOMAIN_GATE_OWNERS
 from ..context.injection import (
     build_full_agent_prompt,
     build_canonical_message,
@@ -43,16 +43,20 @@ GATE_SEQUENCE = [
 GATE_CONFIG = {
     "GATE_0":    {"owner": "team_190", "engine": "codex",   "desc": "Team 190 validates LOD200 scope"},
     "GATE_1":    {"owner": "team_190", "engine": "codex",   "desc": "Team 170 produces LLD400 → Team 190 validates"},
-    "GATE_2":    {"owner": "team_100", "engine": "codex+human",  "desc": "Team 100 analysis → human pause for approval"},
-    "WAITING_GATE2_APPROVAL": {"owner": "team_00", "engine": "human", "desc": "Nimrod reviews Team 100 GATE_2 analysis and decides"},
+    "GATE_2":    {"owner": "team_100", "engine": "codex+human",  "desc": "Architectural intent review → WAITING_GATE2_APPROVAL (domain-aware owner)"},
+    "WAITING_GATE2_APPROVAL": {"owner": "team_00", "engine": "human", "desc": "Nimrod reviews GATE_2 analysis and decides"},
     "G3_PLAN":   {"owner": "team_10",  "engine": "cursor",  "desc": "Build work plan from approved spec"},
     "G3_5":      {"owner": "team_90",  "engine": "codex",   "desc": "Team 90 validates work plan"},
     "G3_6_MANDATES": {"owner": "team_10", "engine": "orchestrator", "desc": "Generate per-team mandates (deterministic)"},
     "CURSOR_IMPLEMENTATION": {"owner": "teams_20_30", "engine": "cursor", "desc": "Cursor Composer: implement + MCP test"},
     "GATE_4":    {"owner": "team_10",  "engine": "cursor",  "desc": "QA — Team 10 coordinates, Team 50 executes tests + MCP"},
     "GATE_5":    {"owner": "team_90",  "engine": "codex",   "desc": "Team 90 dev validation (code vs spec)"},
-    "GATE_6":    {"owner": "team_90",  "engine": "codex+human",   "desc": "Team 90 analysis → human pause for approval"},
-    "WAITING_GATE6_APPROVAL": {"owner": "team_00", "engine": "human", "desc": "Nimrod reviews Team 100 GATE_6 analysis and decides"},
+    "G5_DOC_FIX": {
+        "owner": "team_10", "engine": "cursor",
+        "desc": "Admin block — Team 10 fixes doc/artifact gaps from GATE_5 → direct re-validation (no GATE_4, no impl teams)",
+    },
+    "GATE_6":    {"owner": "team_100", "engine": "codex+human",  "desc": "Architectural reality review → WAITING_GATE6_APPROVAL (domain-aware owner)"},
+    "WAITING_GATE6_APPROVAL": {"owner": "team_00", "engine": "human", "desc": "Nimrod reviews GATE_6 analysis and decides"},
     "GATE_7":    {"owner": "team_90",  "engine": "human",   "desc": "Team 90 executes; Nimrod (Team 00) human authority"},
     "GATE_8":    {"owner": "team_90",  "engine": "codex",   "desc": "Team 90 + Team 70 documentation closure"},
     "WAITING_FOR_IMPLEMENTATION_COMMIT": {
@@ -64,9 +68,12 @@ GATE_CONFIG = {
 # ── Fail routing table ─────────────────────────────────────────────────────
 # For every decision gate: where does the pipeline go after a FAIL?
 #
-#   "doc"  → Documentation / governance issues ONLY.
-#            Quick fix: return to relevant implementation team, no full re-plan.
-#            Pattern: fix specific files → GATE_4 → GATE_5 (no new mandates needed).
+#   "doc"  → Documentation / governance / artifact issues ONLY.
+#            No code changes needed. Team 10 fixes specific files/paths/evidence.
+#
+#            GATE_5 "doc" → G5_DOC_FIX (Team 10 doc-fix sprint) → GATE_5
+#            ⚠️  NEVER routes to CURSOR_IMPLEMENTATION — that activates impl teams.
+#            ⚠️  NEVER routes to GATE_4 — that's a full QA re-run cycle.
 #
 #   "full" → Substantial code or design issues (or unclear/mixed).
 #            Full cycle: return to G3_PLAN for new plan → mandates → implementation.
@@ -98,8 +105,16 @@ FAIL_ROUTING: dict[str, dict[str, tuple[str, str]]] = {
         "full": ("G3_6_MANDATES",         "QA: code failures — new mandates, full re-implementation, re-QA"),
     },
     "GATE_5": {
-        "doc":  ("CURSOR_IMPLEMENTATION", "Team 90: governance/doc issues only — Team 10 fixes files → GATE_4 → GATE_5"),
-        "full": ("G3_PLAN",               "Team 90: code/design issues — full re-plan → mandates → impl → QA → GATE_5"),
+        # ⚠️ "doc" route: admin/artifact block — Team 10 fixes docs DIRECTLY → back to GATE_5
+        # NO CURSOR_IMPLEMENTATION, NO mandates, NO Teams 20/30 activation.
+        "doc":  ("G5_DOC_FIX", "Admin block (doc/artifact only) — Team 10 fixes → GATE_5 direct re-validation"),
+        "full": ("G3_PLAN",    "Code/design issues — full re-plan → mandates → impl → QA → GATE_5"),
+    },
+    "G5_DOC_FIX": {
+        # After Team 10 iterates on the doc fix: re-validate at GATE_5 (PASS → GATE_5).
+        # If doc fix reveals code issues, escalate to full cycle.
+        "doc":  ("G5_DOC_FIX", "Still doc gaps — Team 10 iterates doc fix"),
+        "full": ("G3_PLAN",    "Doc fix revealed code issues — escalate to full cycle"),
     },
     "GATE_6": {
         "doc":  ("CURSOR_IMPLEMENTATION", "Team 100: minor code gaps — Team 10 fixes → re-validate"),
@@ -118,6 +133,15 @@ FAIL_ROUTING: dict[str, dict[str, tuple[str, str]]] = {
         "full": ("GATE_8",  "Doc rejected — Team 70 full rewrite of documentation closure"),
     },
 }
+
+
+def _domain_gate_owner(gate_id: str, domain: str) -> str | None:
+    """Return domain-specific gate owner override, or None to use GATE_CONFIG default.
+
+    TikTrack:  GATE_2 + GATE_6 → team_00  (Chief Architect)
+    AgentsOS:  GATE_2 + GATE_6 → team_100 (Strategic Reviewer)
+    """
+    return DOMAIN_GATE_OWNERS.get(domain, {}).get(gate_id)
 
 
 def _log(msg: str):
@@ -156,6 +180,7 @@ def show_status():
     print(f"  Pipeline Status")
     print(f"═══════════════════════════════════════")
     print(f"  Spec:       {state.spec_brief[:80]}{'...' if len(state.spec_brief) > 80 else ''}")
+    print(f"  Domain:     {state.project_domain}")
     print(f"  Stage:      {state.stage_id}")
     print(f"  WP:         {state.work_package_id}")
     print(f"  Current:    {state.current_gate}")
@@ -167,8 +192,10 @@ def show_status():
 
     if state.current_gate in GATE_CONFIG:
         cfg = GATE_CONFIG[state.current_gate]
+        # Resolve domain-aware owner (GATE_2 / GATE_6 differ by domain)
+        effective_owner = _domain_gate_owner(state.current_gate, state.project_domain) or cfg["owner"]
         print(f"\n  Next action: {cfg['desc']}")
-        print(f"  Owner:       {cfg['owner']}")
+        print(f"  Owner:       {effective_owner}  (domain: {state.project_domain})")
         print(f"  Engine:      {cfg['engine']}")
         print(f"\n  Run: python3 -m agents_os_v2.orchestrator.pipeline --generate-prompt {state.current_gate}")
 
@@ -182,9 +209,10 @@ def show_next(state: PipelineState | None = None):
         return
 
     cfg = GATE_CONFIG[gate]
+    effective_owner = _domain_gate_owner(gate, state.project_domain) or cfg["owner"]
     print(f"\n╔══════════════════════════════════════════════════════════╗")
     print(f"║  NEXT: {gate:<20} ({cfg['desc'][:35]})")
-    print(f"║  Owner: {cfg['owner']:<15}  Engine: {cfg['engine']}")
+    print(f"║  Owner: {effective_owner:<15}  Engine: {cfg['engine']}  [{state.project_domain}]")
     print(f"╠══════════════════════════════════════════════════════════╣")
 
     if cfg["engine"] == "codex":
@@ -332,7 +360,12 @@ def _verdict_candidates(gate_id: str, work_package_id: str) -> list[Path]:
             t90 / f"TEAM_90_{wpu}_G5_VALIDATION_v1.0.0.md",
             t90 / f"TEAM_90_{wpu}_GATE_5_REVIEW_v1.0.0.md",
             t90 / f"TEAM_90_TO_TEAM_10_{wpu}_GATE_5_VALIDATION_v1.0.0.md",
+            t90 / f"TEAM_90_TO_TEAM_10_{wpu}_BLOCKING_REPORT.md",  # blocking report naming variant
             t90 / f"TEAM_90_{wp}_GATE_5_VALIDATION_v1.0.0.md",
+        ],
+        "G5_DOC_FIX": [
+            # G5_DOC_FIX is passed manually — Team 10 confirms all docs fixed, no AI verdict file.
+            # Verdict candidates are unused (no auto-routing from file at this gate).
         ],
         "GATE_6": [
             t100 / f"TEAM_100_{wpu}_GATE_6_VERDICT_v1.0.0.md",
@@ -396,13 +429,15 @@ def generate_prompt(gate_id: str, force_gate4: bool = False, revision_notes: str
             return
         prompt = _generate_gate_1_prompt(state)
     elif gate_id == "GATE_2":
-        prompt = _generate_gate_2_prompt(state, fresh)
+        gate2_owner = _domain_gate_owner("GATE_2", state.project_domain) or "team_100"
+        prompt = _generate_gate_2_prompt(state, fresh, team_id=gate2_owner)
     elif gate_id == "WAITING_GATE2_APPROVAL":
+        gate2_owner = _domain_gate_owner("GATE_2", state.project_domain) or "team_100"
         analysis = state.lld400_content[:500] if state.lld400_content else "(no analysis stored)"
         _print_human_approval_prompt("GATE_2", analysis, state.spec_brief)
         prompt = (
             "# WAITING_GATE2_APPROVAL — Human Decision Required\n\n"
-            "Team 100 has completed GATE_2 analysis.\n"
+            f"{gate2_owner.replace('_', ' ').title()} has completed GATE_2 analysis.\n"
             "Nimrod must review and decide.\n\n"
             "## Actions\n"
             "  --approve GATE_2   → PASS and continue to G3_PLAN\n"
@@ -435,21 +470,22 @@ def generate_prompt(gate_id: str, force_gate4: bool = False, revision_notes: str
         prompt = _generate_gate_4_prompt(state)
     elif gate_id == "GATE_5":
         dm_findings = run_data_model_checks("GATE_5")
-        blocks = [f for f in dm_findings if f.status == "BLOCK"]
-        if blocks:
-            for b in blocks:
-                _log(f"⛔ {b.check_id}: {b.message}")
-            _log("GATE_5 blocked by Data Model Validator. Fix migration and re-run.")
-            return
-        prompt = _generate_gate_5_prompt(state, fresh)
+        dm_blocks = [f for f in dm_findings if f.status == "BLOCK"]
+        if dm_blocks:
+            for b in dm_blocks:
+                _log(f"⚠  DM Validator: {b.check_id}: {b.message}")
+            _log("DM Validator found issues — embedded in prompt for Team 90 to evaluate.")
+        prompt = _generate_gate_5_prompt(state, fresh, dm_blocks=dm_blocks)
     elif gate_id == "GATE_6":
-        prompt = _generate_gate_6_prompt(state, fresh)
+        gate6_owner = _domain_gate_owner("GATE_6", state.project_domain) or "team_100"
+        prompt = _generate_gate_6_prompt(state, fresh, team_id=gate6_owner)
     elif gate_id == "WAITING_GATE6_APPROVAL":
+        gate6_owner = _domain_gate_owner("GATE_6", state.project_domain) or "team_100"
         impl_summary = ", ".join(state.implementation_files[:10]) if state.implementation_files else "(no impl files stored)"
         _print_human_approval_prompt("GATE_6", impl_summary, state.spec_brief)
         prompt = (
             "# WAITING_GATE6_APPROVAL — Human Decision Required\n\n"
-            "Team 100 has completed GATE_6 analysis.\n"
+            f"{gate6_owner.replace('_', ' ').title()} has completed GATE_6 analysis.\n"
             "Nimrod must review and decide.\n\n"
             "## Actions\n"
             "  --approve GATE_6   → PASS and continue to GATE_7\n"
@@ -458,6 +494,8 @@ def generate_prompt(gate_id: str, force_gate4: bool = False, revision_notes: str
         )
     elif gate_id == "GATE_7":
         prompt = _generate_gate_7_prompt(state)
+    elif gate_id == "G5_DOC_FIX":
+        prompt = _generate_g5_doc_fix_prompt(state)
     elif gate_id == "GATE_8":
         prompt = _generate_gate_8_prompt(state, fresh)
     else:
@@ -535,15 +573,19 @@ def _generate_gate_1_prompt(state: PipelineState) -> str:
     )
 
 
-def _generate_gate_2_prompt(state: PipelineState, fresh: bool = False) -> str:
+def _generate_gate_2_prompt(state: PipelineState, fresh: bool = False, team_id: str = "team_100") -> str:
+    domain_note = (
+        f"\n**Domain:** `{state.project_domain}` — Architectural authority for this domain: `{team_id}`\n"
+    )
     return (
-        f"{_team_header('team_100', 'GATE_2', state, fresh)}"
+        f"{_team_header(team_id, 'GATE_2', state, fresh)}"
         f"# GATE_2 — Approve Architectural Intent\n\n"
-        f"Question: Do we approve building this?\n\n"
+        f"Question: Do we approve building this?\n"
+        f"{domain_note}\n"
         f"## Approved Spec (LLD400 from GATE_1)\n\n"
         f"{state.lld400_content[:4000] if state.lld400_content else '[LLD400 not yet produced — paste from GATE_1 output]'}\n\n"
         f"Respond with: APPROVED or REJECTED + reasoning.\n\n"
-        f"**NOTE:** After Team 100 analysis, the pipeline will PAUSE for human decision.\n"
+        f"**NOTE:** After analysis, the pipeline will PAUSE for human decision.\n"
         f"Use --approve GATE_2 / --reject GATE_2 --reason '…' to continue."
     )
 
@@ -589,9 +631,31 @@ def _generate_g3_plan_prompt(state: PipelineState, revision_notes: str = "", fre
 
 
 def _generate_g3_5_prompt(state: PipelineState, fresh: bool = False) -> str:
+    wp         = state.work_package_id
+    wpu        = wp.replace("-", "_")
+    fail_count = state.gates_failed.count("G3_5")
+    is_rerun   = fail_count > 0
+
+    if is_rerun:
+        cycle_banner = (
+            f"╔══════════════════════════════════════════════════════════════╗\n"
+            f"║  ⚠  RE-VALIDATION — G3_5 CYCLE #{fail_count + 1:<3}                        ║\n"
+            f"║  Work plan was revised to address prior blockers.            ║\n"
+            f"║  Perform a FRESH review — do NOT repeat previous findings.   ║\n"
+            f"╚══════════════════════════════════════════════════════════════╝\n\n"
+            f"Previous verdict (read for context, do NOT copy its blockers):\n"
+            f"  `_COMMUNICATION/team_90/TEAM_90_{wpu}_G3_5_VERDICT_v1.0.0.md`\n\n"
+        )
+        title = f"G3.5 — Validate Work Plan  [RE-RUN #{fail_count + 1}]"
+    else:
+        cycle_banner = ""
+        title = "G3.5 — Validate Work Plan  [FIRST RUN]"
+
     return (
         f"{_team_header('team_90', 'G3_5', state, fresh)}"
-        f"# G3.5 — Validate Work Plan\n\n"
+        f"{cycle_banner}"
+        f"# {title}\n\n"
+        f"**WP:** `{wp}`\n\n"
         f"Validate this work plan for implementation readiness.\n"
         f"Check: completeness, team assignments, deliverables, test coverage.\n\n"
         f"## MANDATORY: route_recommendation\n\n"
@@ -720,42 +784,182 @@ def _generate_gate_4_prompt(state: PipelineState) -> str:
     )
 
 
-def _generate_gate_5_prompt(state: PipelineState, fresh: bool = False) -> str:
+def _generate_gate_5_prompt(
+    state: PipelineState,
+    fresh: bool = False,
+    dm_blocks: list | None = None,
+) -> str:
+    wp        = state.work_package_id
+    wpu       = wp.replace("-", "_")
+    fail_count = state.gates_failed.count("GATE_5")
+    is_rerun  = fail_count > 0
+    dm_blocks  = dm_blocks or []
+
+    # ── Cycle banner: printed prominently so the AI agent cannot miss it ──────
+    if is_rerun:
+        cycle_banner = (
+            f"╔══════════════════════════════════════════════════════════════╗\n"
+            f"║  ⚠  RE-VALIDATION — GATE_5 CYCLE #{fail_count + 1:<3}                       ║\n"
+            f"║                                                              ║\n"
+            f"║  GATE_5 was attempted {fail_count}× before this run.                  ║\n"
+            f"║  Teams addressed the previous blockers.                      ║\n"
+            f"║                                                              ║\n"
+            f"║  YOU MUST PERFORM A COMPLETELY FRESH VALIDATION:             ║\n"
+            f"║  • Read the CURRENT state of code and artifacts NOW          ║\n"
+            f"║  • Do NOT copy or repeat findings from previous cycles       ║\n"
+            f"║  • Do NOT return a template or placeholder document          ║\n"
+            f"║  • If prior issues are fixed → do NOT re-raise them          ║\n"
+            f"╚══════════════════════════════════════════════════════════════╝\n\n"
+            f"Previous verdict file (read for context, do NOT copy its blockers):\n"
+            f"  `_COMMUNICATION/team_90/TEAM_90_{wpu}_GATE_5_VALIDATION_v1.0.0.md`\n\n"
+        )
+        title = f"GATE_5 — Dev Validation  [RE-RUN #{fail_count + 1} of {fail_count + 1}]"
+    else:
+        cycle_banner = ""
+        title = "GATE_5 — Dev Validation  [FIRST RUN]"
+
+    # ── Data Model Validator findings (if any) ────────────────────────────────
+    if dm_blocks:
+        dm_section = (
+            f"## ⚠️ Data Model Validator — Pre-flight Findings\n\n"
+            f"The automated data model validator flagged the following issues before generating this prompt.\n"
+            f"Include these in your validation findings — mark PASS if spec declares no schema changes.\n\n"
+        )
+        for b in dm_blocks:
+            dm_section += f"- **{b.check_id}**: {b.message}\n"
+        dm_section += "\n"
+    else:
+        dm_section = ""
+
+    # ── Artifact paths for this specific WP ──────────────────────────────────
+    artifacts = (
+        f"## Artifacts to inspect for `{wp}`\n\n"
+        f"| Artifact | Path |\n"
+        f"|---|---|\n"
+        f"| Work Plan (latest version) | `_COMMUNICATION/team_10/TEAM_10_{wpu}_G3_PLAN_WORK_PLAN_v*.md` |\n"
+        f"| GATE_4 QA report | `_COMMUNICATION/team_50/TEAM_50_{wpu}_QA_REPORT_v*.md` |\n"
+        f"| Team 20 outputs | `_COMMUNICATION/team_20/` |\n"
+        f"| Team 30 outputs | `_COMMUNICATION/team_30/` |\n\n"
+        f"You MUST check these files exist and contain valid content before reporting findings.\n\n"
+    )
+
     return (
         f"{_team_header('team_90', 'GATE_5', state, fresh)}"
-        f"# GATE_5 — Dev Validation\n\n"
-        f"Validate implementation against approved spec.\n\n"
-        f"## Check\n"
-        f"1. All spec requirements implemented\n"
-        f"2. Code follows project conventions (naming, types, patterns)\n"
-        f"3. Tests exist and pass\n"
-        f"4. No architectural violations\n"
-        f"5. GATE_4 QA: PASS\n\n"
-        f"## Spec\n{state.lld400_content[:3000] if state.lld400_content else state.spec_brief}\n\n"
+        f"{cycle_banner}"
+        f"# {title}\n\n"
+        f"**WP under validation:** `{wp}`\n\n"
+        f"## Your Task\n\n"
+        f"Perform a **complete, fresh validation** of the implementation for `{wp}`.\n"
+        f"Read the actual files listed below. Report only findings you observe in the CURRENT run.\n\n"
+        f"## Validation Checklist\n"
+        f"1. All spec requirements are implemented (check every item in §Spec below)\n"
+        f"2. Code follows project conventions (naming, types, patterns, Iron Rules)\n"
+        f"3. Tests exist and pass — GATE_4 PASS is confirmed\n"
+        f"4. No architectural violations (maskedLog, status 4-state, NUMERIC(20,8))\n"
+        f"5. All required artifacts are present and versioned correctly\n\n"
+        f"{dm_section}"
+        f"{artifacts}"
+        f"## Spec\n\n{state.lld400_content[:3000] if state.lld400_content else state.spec_brief}\n\n"
         f"## MANDATORY: route_recommendation\n\n"
-        f"**If BLOCKING_REPORT — you MUST include this field at the top of your response:**\n\n"
-        f"```\n"
-        f"route_recommendation: doc\n"
-        f"```\n"
+        f"**If BLOCKING_REPORT — you MUST include this field at the very top of your response:**\n\n"
+        f"```\nroute_recommendation: doc\n```\n"
         f"OR\n"
-        f"```\n"
-        f"route_recommendation: full\n"
-        f"```\n\n"
+        f"```\nroute_recommendation: full\n```\n\n"
         f"**Classification rules:**\n"
-        f"- `route_recommendation: doc` — ALL blockers are in: documentation, QA contract text,\n"
-        f"  credentials, file paths, governance format, work plan wording. Zero code changes needed.\n"
-        f"- `route_recommendation: full` — ANY blocker requires: code logic changes, architectural\n"
-        f"  redesign, missing feature implementation, data model change, or mixed doc+code issues.\n\n"
+        f"- `route_recommendation: doc` — ALL blockers are doc/text only: credentials, file paths,\n"
+        f"  governance format, work plan wording, QA contract text. Zero code changes needed.\n"
+        f"- `route_recommendation: full` — ANY blocker requires: code changes, architectural fix,\n"
+        f"  missing feature, data model change, or mixed doc+code issues.\n\n"
         f"This field drives automatic pipeline routing. Missing or ambiguous = manual block.\n\n"
         f"Respond with: VALIDATION_RESPONSE — PASS or BLOCKING_REPORT."
     )
 
 
-def _generate_gate_6_prompt(state: PipelineState, fresh: bool = False) -> str:
+def _generate_g5_doc_fix_prompt(state: PipelineState) -> str:
+    """Generate the Team 10 prompt for fixing admin/doc blockers from GATE_5.
+
+    This is the G5_DOC_FIX gate — an administrative sprint.
+    - NO mandate generation
+    - NO CURSOR_IMPLEMENTATION activation
+    - NO Teams 20/30 code implementation
+    - Team 10 fixes docs/artifacts/evidence directly, then ./pipeline_run.sh pass → GATE_5
+    """
+    wp  = state.work_package_id
+    wpu = wp.replace("-", "_")
+
+    # ── Load the GATE_5 blocking report to extract specific blockers ──────────
+    t90         = REPO_ROOT / "_COMMUNICATION" / "team_90"
+    blocking_report_candidates = [
+        t90 / f"TEAM_90_TO_TEAM_10_{wpu}_BLOCKING_REPORT.md",
+        t90 / f"TEAM_90_{wpu}_GATE_5_VALIDATION_v1.0.0.md",
+        t90 / f"TEAM_90_{wpu}_GATE_5_VERDICT_v1.0.0.md",
+    ]
+    blocking_report_content = ""
+    blocking_report_path    = ""
+    for p in blocking_report_candidates:
+        if p.exists():
+            blocking_report_content = p.read_text(encoding="utf-8")
+            blocking_report_path    = str(p.relative_to(REPO_ROOT))
+            break
+
+    blockers_section = (
+        f"## Blocking Report (from Team 90 — GATE_5 FAIL)\n\n"
+        f"Source: `{blocking_report_path}`\n\n"
+        + (
+            f"```\n{blocking_report_content[:3000]}\n```\n\n"
+            if blocking_report_content else
+            f"⚠️  Blocking report not found — check `_COMMUNICATION/team_90/` manually.\n\n"
+        )
+    )
+
     return (
-        f"{_team_header('team_100', 'GATE_6', state, fresh)}"
+        f"{_team_header('team_10', 'G5_DOC_FIX', state, fresh=False)}"
+        f"╔══════════════════════════════════════════════════════════════╗\n"
+        f"║  ⚙  G5_DOC_FIX — ADMINISTRATIVE DOC FIX SPRINT              ║\n"
+        f"║                                                              ║\n"
+        f"║  GATE_5 failed on documentation/artifact gaps.              ║\n"
+        f"║  This is NOT a code issue. You are Team 10.                 ║\n"
+        f"║                                                              ║\n"
+        f"║  ⛔ DO NOT generate new mandates                             ║\n"
+        f"║  ⛔ DO NOT activate Teams 20 or 30 for code implementation   ║\n"
+        f"║  ⛔ DO NOT trigger CURSOR_IMPLEMENTATION                     ║\n"
+        f"║  ⛔ DO NOT run a full GATE_4 QA cycle                        ║\n"
+        f"║                                                              ║\n"
+        f"║  ✅ Fix ONLY the doc/artifact gaps listed in the report      ║\n"
+        f"║  ✅ Coordinate Team 50 for partial QA re-run if needed       ║\n"
+        f"║  ✅ When all fixes are done → ./pipeline_run.sh pass         ║\n"
+        f"╚══════════════════════════════════════════════════════════════╝\n\n"
+        f"# G5_DOC_FIX — Administrative Doc Fix for `{wp}`\n\n"
+        f"**WP:** `{wp}` | **Your role:** Team 10 (Execution Orchestrator)\n\n"
+        f"## Your Mission\n\n"
+        f"GATE_5 returned `route_recommendation: doc` — all blockers are documentation/artifact gaps.\n"
+        f"No code changes are needed. Fix each blocker below and confirm resolution.\n\n"
+        f"## Typical doc-fix tasks (check the blocking report below):\n"
+        f"- Rename or alias mismatched artifact file paths (Team 20, Team 30, Team 50)\n"
+        f"- Write missing completion/closure artifacts for any team that lacks one\n"
+        f"- Coordinate Team 50 for a **targeted partial QA re-run** (specific scenarios only)\n"
+        f"  — NOT a full GATE_4 cycle; just the N/A or missing test scenarios\n"
+        f"- Update work plan artifact references if paths changed\n\n"
+        f"{blockers_section}"
+        f"## When All Fixes Are Done\n\n"
+        f"1. Verify each fix with a quick file-level check\n"
+        f"2. Run: `./pipeline_run.sh pass`\n"
+        f"   → Pipeline advances directly to **GATE_5** (Team 90 re-validates)\n\n"
+        f"⚠️  If during the fix you discover a **code bug** (not a doc gap),\n"
+        f"    do NOT fix it yourself — run: `./pipeline_run.sh fail \"code issue found: [description]\"`\n"
+        f"    and let the pipeline escalate to a full cycle."
+    )
+
+
+def _generate_gate_6_prompt(state: PipelineState, fresh: bool = False, team_id: str = "team_100") -> str:
+    domain_note = (
+        f"\n**Domain:** `{state.project_domain}` — Architectural authority for this domain: `{team_id}`\n"
+    )
+    return (
+        f"{_team_header(team_id, 'GATE_6', state, fresh)}"
         f"# GATE_6 — Reality vs Intent\n\n"
-        f"Does what was built match what we approved at GATE_2?\n\n"
+        f"Does what was built match what we approved at GATE_2?\n"
+        f"{domain_note}\n"
         f"## Approved Spec\n{state.lld400_content[:2000] if state.lld400_content else state.spec_brief}\n\n"
         f"## Implementation Summary\n{', '.join(state.implementation_files[:20]) if state.implementation_files else '[list files created]'}\n\n"
         f"## MANDATORY: route_recommendation\n\n"
@@ -828,6 +1032,10 @@ def advance_gate(gate_id: str, status: str, reason: str = ""):
             state.current_gate = "WAITING_GATE2_APPROVAL"
         elif gate_id == "GATE_6":
             state.current_gate = "WAITING_GATE6_APPROVAL"
+        elif gate_id == "G5_DOC_FIX":
+            # Admin block fixed — go directly to GATE_5 re-validation (no GATE_4, no impl teams)
+            state.current_gate = "GATE_5"
+            _log("G5_DOC_FIX PASS — routing directly to GATE_5 for re-validation")
         else:
             idx = GATE_SEQUENCE.index(gate_id) if gate_id in GATE_SEQUENCE else -1
             if idx >= 0 and idx + 1 < len(GATE_SEQUENCE):

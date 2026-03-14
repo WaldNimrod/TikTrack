@@ -15,8 +15,15 @@
     }
     body { background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,sans-serif; font-size:14px; min-height:100vh; }
 
+    /* ── Top nav ── */
+    .pipeline-nav { background:var(--surface2); border-bottom:1px solid var(--border); padding:0 20px; display:flex; align-items:center; gap:4px; height:34px; position:sticky; top:0; z-index:110; }
+    .nav-link { color:var(--text-muted); text-decoration:none; font-size:12px; padding:5px 11px; border-radius:4px; transition:background 0.12s,color 0.12s; display:inline-flex; align-items:center; gap:5px; white-space:nowrap; }
+    .nav-link:hover { background:rgba(88,166,255,0.08); color:var(--accent); }
+    .nav-link.active { background:rgba(31,111,235,0.18); color:var(--accent); font-weight:600; }
+    .nav-sep { width:1px; height:16px; background:var(--border); margin:0 2px; }
+
     /* ── Header ── */
-    header { background:var(--surface); border-bottom:1px solid var(--border); padding:12px 20px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+    header { background:var(--surface); border-bottom:1px solid var(--border); padding:10px 20px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:34px; z-index:100; }
     header h1 { font-size:15px; font-weight:600; }
     header h1 span { color:var(--accent); }
     .header-meta { color:var(--text-muted); font-size:12px; margin-top:2px; }
@@ -161,6 +168,15 @@
 </head>
 <body>
 
+<!-- ── Top Navigation ── -->
+<nav class="pipeline-nav">
+  <a class="nav-link" href="PIPELINE_DASHBOARD.html">📊 Dashboard</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link active" href="PIPELINE_ROADMAP.html">🗺️ Roadmap</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="PIPELINE_TEAMS.html">👥 Teams</a>
+</nav>
+
 <header>
   <div>
     <h1>🗺️ Agents OS — <span>Roadmap &amp; History</span></h1>
@@ -172,7 +188,6 @@
       <span class="refresh-dot" id="refresh-dot" style="display:none"></span>
     </label>
     <button class="btn btn-primary" onclick="loadAll()">↺ Refresh</button>
-    <a class="btn" href="PIPELINE_DASHBOARD.html">← Pipeline Dashboard</a>
   </div>
 </header>
 

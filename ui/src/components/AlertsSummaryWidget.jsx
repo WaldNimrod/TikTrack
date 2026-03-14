@@ -6,7 +6,7 @@
  * Fully hidden when 0 unread.
  * collapsible-container Iron Rule. maskedLog mandatory.
  *
- * @reference TEAM_20_S001_P002_WP001_ALERTS_WIDGET_API_VERIFICATION
+ * @reference TEAM_20_S001_P002_WP001_API_VERIFY
  * @reference implementation_mandates.md §7.2 (field/empty/error contracts)
  */
 

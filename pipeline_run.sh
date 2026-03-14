@@ -128,6 +128,76 @@ case "${1:-next}" in
 
   pass)
     GATE=$(_get_gate)
+
+    # ── Artifact validation before advancing ─────────────────────────────
+    # Server-side check: required deliverables must exist before advancing.
+    # Bypass with: ./pipeline_run.sh pass --force  (logs a warning, still advances)
+    FORCE_FLAG="${2:-}"
+    VALIDATION_FAILED=0
+    MISSING_ARTIFACTS=""
+
+    _check_state_field() {
+      python3 -c "
+import sys, os, json
+sys.path.insert(0, '.')
+domain = os.environ.get('PIPELINE_DOMAIN') or None
+# Determine state file path
+if domain == 'agents_os':
+    sf = '_COMMUNICATION/agents_os/pipeline_state_agentsos.json'
+elif domain == 'tiktrack':
+    sf = '_COMMUNICATION/agents_os/pipeline_state_tiktrack.json'
+else:
+    sf = '_COMMUNICATION/agents_os/pipeline_state.json'
+try:
+    data = json.loads(open(sf).read())
+    val = data.get(sys.argv[1], '')
+    print(str(val).strip())
+except Exception:
+    print('')
+" "$1" 2>/dev/null || echo ""
+    }
+
+    case "$GATE" in
+      GATE_1)
+        LLD400=$(_check_state_field "lld400_content")
+        if [ -z "$LLD400" ]; then
+          VALIDATION_FAILED=1
+          MISSING_ARTIFACTS="GATE_1: lld400_content is empty — Team 170+190 must write and store the LLD400 spec first"
+        fi
+        ;;
+      G3_PLAN)
+        WORK_PLAN=$(_check_state_field "work_plan")
+        if [ -z "$WORK_PLAN" ]; then
+          VALIDATION_FAILED=1
+          MISSING_ARTIFACTS="G3_PLAN: work_plan is empty — Team 10 must submit a work plan first (./pipeline_run.sh store G3_PLAN <file>)"
+        fi
+        ;;
+    esac
+
+    if [ "$VALIDATION_FAILED" -eq 1 ] && [ "$FORCE_FLAG" != "--force" ]; then
+      echo ""
+      echo "════════════════════════════════════════════════════════════════════"
+      echo "  ⚠️  ADVANCE BLOCKED — Required artifacts are missing:"
+      echo "  $MISSING_ARTIFACTS"
+      echo ""
+      echo "  Complete the gate deliverables first, then retry:"
+      echo "    ./pipeline_run.sh pass"
+      echo ""
+      echo "  Rollback/emergency bypass only:"
+      echo "    ./pipeline_run.sh pass --force"
+      echo "════════════════════════════════════════════════════════════════════"
+      echo ""
+      exit 1
+    fi
+
+    if [ "$VALIDATION_FAILED" -eq 1 ] && [ "$FORCE_FLAG" = "--force" ]; then
+      echo ""
+      echo "  ⚠️  WARNING: --force bypass — advancing without required artifacts"
+      echo "  Missing: $MISSING_ARTIFACTS"
+      echo ""
+    fi
+    # ──────────────────────────────────────────────────────────────────────
+
     echo "[pipeline_run] ${DOMAIN_LABEL}Advancing $GATE → PASS"
     $CLI --advance "$GATE" PASS
     echo ""
@@ -326,7 +396,11 @@ print(f'    Updated: {s.last_updated or \"never\"}')
     $CLI --generate-prompt "$GATE" 2>&1 | grep -v "^━"
 
     # Determine mandate file from gate name
+    # GATE_1 uses GATE_1_mandates.md (same mechanism as GATE_8) — two-phase gate.
     case "$GATE" in
+      GATE_1)
+        MANDATE_FILE="$PROMPTS_DIR/GATE_1_mandates.md"
+        ;;
       GATE_8)
         MANDATE_FILE="$PROMPTS_DIR/gate_8_mandates.md"
         ;;

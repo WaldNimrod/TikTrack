@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="theme-tiktrack">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agents OS — Pipeline Dashboard</title>
+  <title>TikTrack — Pipeline Dashboard</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -21,6 +21,35 @@
       --current:      #1f6feb;
       --mono:         'SF Mono', 'Fira Code', monospace;
     }
+
+    /* ── TikTrack Light Theme (domain = tiktrack) ──────────── */
+    html.theme-tiktrack {
+      --bg:           #ffffff;
+      --surface:      #f6f8fa;
+      --surface2:     #eaeef2;
+      --border:       #d0d7de;
+      --text:         #1f2328;
+      --text-muted:   #656d76;
+      --accent:       #0969da;
+      --success:      #1a7f37;
+      --warning:      #9a6700;
+      --danger:       #cf222e;
+      --current:      #0550ae;
+    }
+    /* code/pre: override hardcoded dark background for light mode */
+    html.theme-tiktrack .modal-box code,
+    html.theme-tiktrack .modal-box pre {
+      background: #eaeef2;
+      color: #1f2328;
+      border-color: #d0d7de;
+    }
+    html.theme-tiktrack .prompt-box {
+      background: #eaeef2;
+      color: #1f2328;
+      border-color: #d0d7de;
+    }
+    /* Transition for smooth theme switch */
+    html { transition: background 0.25s, color 0.25s; }
 
     body {
       background: var(--bg);
@@ -352,6 +381,21 @@
     .loading { color: var(--text-muted); font-style: italic; }
     .error-msg { color: var(--danger); font-size: 12px; }
 
+    /* ── Health warnings panel ───────────────── */
+    .health-warn-item { display:flex; align-items:flex-start; gap:8px; padding:8px 10px;
+      border-radius:6px; margin-bottom:6px; font-size:11px; }
+    .hw-error   { background:rgba(248,81,73,0.1);  border:1px solid rgba(248,81,73,0.35); }
+    .hw-warning { background:rgba(210,153,34,0.1); border:1px solid rgba(210,153,34,0.35); }
+    .hw-info    { background:rgba(88,166,255,0.1); border:1px solid rgba(88,166,255,0.35); }
+    .hw-icon    { font-size:13px; flex-shrink:0; padding-top:1px; }
+    .hw-body    { flex:1; min-width:0; }
+    .hw-msg     { font-weight:600; margin-bottom:3px; color:var(--text); word-break:break-word; }
+    .hw-log-row { display:flex; gap:5px; align-items:flex-start; margin-top:4px; }
+    .hw-log     { flex:1; background:rgba(0,0,0,0.35); padding:3px 6px; border-radius:3px;
+      font-size:9px; word-break:break-all; color:var(--text-muted); font-family:var(--mono);
+      max-height:60px; overflow-y:auto; }
+    .hw-copy-btn { flex-shrink:0; font-size:10px; padding:2px 6px; }
+
     /* ── Auto-refresh indicator ──────────────── */
     .refresh-dot {
       width: 6px; height: 6px;
@@ -579,7 +623,7 @@
 
 <header>
   <div>
-    <h1>⚡ Agents OS — <span>Pipeline Dashboard</span></h1>
+    <h1><span id="domain-title">🔷 TikTrack</span> — <span>Pipeline Dashboard</span></h1>
     <div class="header-meta" id="last-updated">Loading…</div>
   </div>
   <div class="header-right">
@@ -815,7 +859,7 @@ python3 -m http.server 8090
       <button class="btn btn-primary" style="width:100%;margin-bottom:6px;justify-content:center" onclick="loadAll()">↺ Refresh</button>
       <button class="btn" style="width:100%;margin-bottom:6px;justify-content:center" onclick="runProgressCheck()" title="סרוק ארטיפקטים ודיאגנוז מצב נוכחי">🔍 בדוק התקדמות</button>
       <label class="refresh-label" style="justify-content:center">
-        <input type="checkbox" id="auto-refresh-toggle"> Auto-refresh (30s)
+        <input type="checkbox" id="auto-refresh-toggle"> Auto-refresh (5s)
         <span class="refresh-dot" id="refresh-dot" style="display:none"></span>
       </label>
     </div>
@@ -835,6 +879,12 @@ python3 -m http.server 8090
       <div class="info-row"><span class="info-key">Gate</span>   <span id="s-gate-pill">—</span></div>
       <div class="info-row"><span class="info-key">Owner</span>  <span class="info-val" id="s-owner">—</span></div>
       <div class="info-row"><span class="info-key">Engine</span> <span class="info-val" id="s-engine">—</span></div>
+    </div>
+
+    <!-- Health Warnings Panel — filled by loadHealthWarnings() -->
+    <div class="sidebar-section" id="health-warnings-panel" style="display:none">
+      <div class="sidebar-label">⚠️ System Health</div>
+      <div id="health-warnings-content"></div>
     </div>
 
     <div class="sidebar-section">
@@ -862,11 +912,11 @@ python3 -m http.server 8090
       <div class="spec-wp" id="spec-wp">WP: —</div>
     </div>
 
-    <!-- Accordion: Current Prompt — appears BEFORE the response/action bar -->
+    <!-- Accordion: Gate Context — PRIMARY prompt for all gates (always first) -->
     <div class="accordion open" id="acc-prompt">
-      <div class="accordion-header" onclick="toggleAccordion('acc-prompt')">
-        <span>📋</span>
-        <span class="accordion-title">Current Gate Prompt</span>
+      <div class="accordion-header" onclick="toggleAccordion('acc-prompt')" id="acc-prompt-header">
+        <span id="acc-prompt-icon">📋</span>
+        <span class="accordion-title" id="acc-prompt-title">Current Gate Prompt</span>
         <span class="accordion-badge" id="prompt-gate-badge">—</span>
         <span class="accordion-chevron">▶</span>
       </div>
@@ -883,7 +933,7 @@ python3 -m http.server 8090
         <!-- Redirect banner: visible only when current gate uses per-team mandates -->
         <div class="mandate-redirect-banner" id="mandate-redirect-banner">
           <span>⚡</span>
-          <span>This gate uses <strong>per-team mandates</strong>. Copy individual team prompts from the <strong>Mandates tab ↓</strong></span>
+          <span>This gate uses <strong>per-team mandates</strong>. Copy individual team prompts from the <strong>Mandate Tabs ↓</strong></span>
         </div>
         <div style="margin-top:8px; font-size:11px; color:var(--text-muted)">
           Full file: <code id="prompt-file-path" style="font-size:10px"></code>
@@ -911,11 +961,8 @@ python3 -m http.server 8090
       </div>
     </div>
 
-    <!-- Quick Action Bar (PASS/FAIL — team response, appears AFTER the prompt) -->
-    <div id="quick-action-bar"></div>
-
-    <!-- Accordion: Team Mandates -->
-    <div class="accordion" id="acc-mandates">
+    <!-- Accordion: Team Mandates — shown ONLY for mandate gates (GATE_1, G3_6_MANDATES, etc.) -->
+    <div class="accordion" id="acc-mandates" style="display:none">
       <div class="accordion-header" onclick="toggleAccordion('acc-mandates')">
         <span>👥</span>
         <span class="accordion-title">Team Mandates</span>
@@ -930,6 +977,9 @@ python3 -m http.server 8090
         <div class="mandate-content" id="mandate-content">Loading…</div>
       </div>
     </div>
+
+    <!-- Quick Action Bar (PASS/FAIL — team response) -->
+    <div id="quick-action-bar"></div>
 
     <!-- Accordion: Expected Files -->
     <div class="accordion" id="acc-files">
@@ -971,7 +1021,7 @@ const GATE_CONFIG = {
   "G5_DOC_FIX":{owner:"team_10",  engine:"cursor",         desc:"⚙ Admin doc fix — GATE_5 doc blocks → Team 10 → direct GATE_5 re-validation"},
   "GATE_6":    {owner:"team_100", engine:"codex+human",    desc:"Team 100 → reality vs intent"},
   "WAITING_GATE6_APPROVAL":{owner:"team_00",engine:"human",desc:"Nimrod approves GATE_6"},
-  "GATE_7":    {owner:"team_00",  engine:"human",          desc:"Nimrod UX sign-off"},
+  "GATE_7":    {owner:"team_90",  engine:"human",          desc:"Team 90 orchestrates UX review; Nimrod browser sign-off"},
   "GATE_8":    {owner:"team_90",  engine:"codex",          desc:"Docs closure"},
 };
 
@@ -1106,19 +1156,32 @@ function getDomainFlag() {
 /** Switch active domain and reload state */
 function switchDomain(domain) {
   currentDomain = domain;
-  // Update toggle button styles
+  localStorage.setItem("pipeline_domain", domain);
+
+  // ── Theme: tiktrack = Light mode | agents_os = Dark mode ──
+  document.documentElement.classList.toggle("theme-tiktrack", domain === "tiktrack");
+
+  // ── Page title + header ───────────────────────────────────
+  const isTiktrack = domain === "tiktrack";
+  const titleEl = document.getElementById("domain-title");
+  if (titleEl) titleEl.textContent = isTiktrack ? "🔷 TikTrack" : "⚡ Agents OS";
+  document.title = isTiktrack ? "TikTrack — Pipeline Dashboard" : "Agents OS — Pipeline Dashboard";
+
+  // ── Toggle button styles ──────────────────────────────────
   document.getElementById("domain-btn-tiktrack").className =
-    "domain-btn" + (domain === "tiktrack" ? " active-tiktrack" : "");
+    "domain-btn" + (isTiktrack ? " active-tiktrack" : "");
   document.getElementById("domain-btn-agentsos").className =
-    "domain-btn" + (domain === "agents_os" ? " active-agentsos" : "");
-  // Update badge
+    "domain-btn" + (!isTiktrack ? " active-agentsos" : "");
+
+  // ── Domain badge ──────────────────────────────────────────
   const badge = document.getElementById("domain-badge-pill");
   if (badge) {
-    badge.textContent = domain === "agents_os" ? "agents_os" : "tiktrack";
+    badge.textContent = isTiktrack ? "tiktrack" : "agents_os";
     badge.className = "domain-label-badge " +
-      (domain === "agents_os" ? "domain-label-agentsos" : "domain-label-tiktrack");
+      (isTiktrack ? "domain-label-tiktrack" : "domain-label-agentsos");
   }
-  // Reload state for new domain
+
+  // ── Reload state for new domain ───────────────────────────
   loadAll();
 }
 
@@ -1319,57 +1382,78 @@ async function loadPrompt(gate) {
   if (hintEl) hintEl.textContent = hint;
   if (document.getElementById("booster-toggle")?.checked) updateBoosterPreview();
 
-  // ── Mandate gate: redirect copy button + auto-open mandates accordion ─────
+  // ── Mandate gate: INFO mode on prompt section + auto-open mandates accordion ─
   const isMandateGate = gate in GATE_MANDATE_FILES;
-  const copyBtn = document.getElementById("copy-prompt-btn");
-  const banner  = document.getElementById("mandate-redirect-banner");
+  const copyBtn    = document.getElementById("copy-prompt-btn");
+  const banner     = document.getElementById("mandate-redirect-banner");
+  const promptHdr  = document.getElementById("acc-prompt-header");
+  const promptIcon = document.getElementById("acc-prompt-icon");
+  const promptTitle= document.getElementById("acc-prompt-title");
   if (isMandateGate) {
+    // Copy button: fully disabled — copy from Mandate Tabs ↑
     if (copyBtn) {
-      copyBtn.textContent  = "📋 Copy Full Doc";
-      copyBtn.title        = "Per-team prompts are in the Mandates tab below ↓";
-      copyBtn.style.opacity = "0.45";
+      copyBtn.textContent = "📄 Gate Context";
+      copyBtn.title       = "Per-team mandates are in the Mandate Tabs above ↑";
+      copyBtn.disabled    = true;
+      copyBtn.style.opacity = "0.35";
+      copyBtn.style.cursor  = "not-allowed";
     }
     if (banner) banner.classList.add("visible");
-    // Auto-expand mandates accordion so the tabs are immediately visible
+    // Prompt accordion header: muted INFO style
+    if (promptIcon)  promptIcon.textContent = "📄";
+    if (promptTitle) promptTitle.textContent = "Gate Context — Info Only";
+    if (promptHdr)   promptHdr.style.background = "var(--surface2)";
+    // Auto-expand mandates accordion so Phase tabs are immediately visible
     const acc = document.getElementById("acc-mandates");
     if (acc && !acc.classList.contains("open")) acc.classList.add("open");
   } else {
+    // Single-team gate: restore normal prompt section
     if (copyBtn) {
-      copyBtn.textContent  = "📋 Copy Prompt";
-      copyBtn.title        = "";
+      copyBtn.textContent   = "📋 Copy Prompt";
+      copyBtn.title         = "";
+      copyBtn.disabled      = false;
       copyBtn.style.opacity = "";
+      copyBtn.style.cursor  = "";
     }
     if (banner) banner.classList.remove("visible");
+    if (promptIcon)  promptIcon.textContent = "📋";
+    if (promptTitle) promptTitle.textContent = "Current Gate Prompt";
+    if (promptHdr)   promptHdr.style.background = "";
   }
 }
 
 // ── Mandate file routing — mirrors GATE_MANDATE_FILES in pipeline.py ──────
 // Gate → which prompts/ file holds the per-team mandate tabs
+// GATE_1 and GATE_8 have dedicated mandate files. Others share implementation_mandates.md.
 const GATE_MANDATE_FILES = {
+  'GATE_1':                '../../_COMMUNICATION/agents_os/prompts/GATE_1_mandates.md',
   'G3_6_MANDATES':         '../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md',
   'CURSOR_IMPLEMENTATION': '../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md',
   'GATE_4':                '../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md',
   'GATE_8':                '../../_COMMUNICATION/agents_os/prompts/gate_8_mandates.md',
 };
 
-// ── Load mandates (gate-aware) ─────────────────────────────────────────────
+// ── Load mandates (gate-aware — hidden for non-mandate gates) ─────────────
 async function loadMandates() {
-  // Pick the mandate file for the current gate; fall back to implementation_mandates.md
-  const gate         = pipelineState?.current_gate || '';
-  const mandateFile  = GATE_MANDATE_FILES[gate]
-                     || '../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md';
+  const gate        = pipelineState?.current_gate || '';
+  const mandateFile = GATE_MANDATE_FILES[gate];   // undefined if gate has no mandates
+  const accMandates = document.getElementById('acc-mandates');
+
+  // Gates with no mandate file → hide the entire mandate accordion
+  if (!mandateFile) {
+    if (accMandates) accMandates.style.display = 'none';
+    return;
+  }
+
+  // Gate has mandates → show the accordion
+  if (accMandates) accMandates.style.display = '';
 
   let text = await fetchText(mandateFile);
-
-  // If the gate-specific file is missing, try the fallback
-  if (!text && mandateFile !== '../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md') {
-    text = await fetchText('../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md');
-  }
 
   if (!text) {
     document.getElementById("mandates-badge").textContent = "not generated";
     document.getElementById("mandate-content").innerHTML =
-      '<span class="error-msg">Not yet generated — reach G3_6_MANDATES gate</span>';
+      '<span class="error-msg">Not yet generated — run: ./pipeline_run.sh (to generate mandate file)</span>';
     return;
   }
 
@@ -1694,8 +1778,8 @@ const ALL_GATE_DEFS = {
     },
   },
   'GATE_7': {
-    owner:'team_00', engine:'human',
-    desc:'Nimrod browser UX sign-off — scenario checklist + active links',
+    owner:'team_90', engine:'human',
+    desc:'Team 90 orchestrates UX review package → Nimrod browser sign-off (scenario checklist + active links)',
     advice:'./pipeline_run.sh  →  paste prompt  →  open links  →  work through checklist  →  ./pipeline_run.sh pass',
     failAdvice:'Document specific UX issues → ./pipeline_run.sh fail "UX-001: [issue]" → choose routing',
     twoPaths:true,
@@ -2485,6 +2569,10 @@ document.addEventListener("keydown", e => {
 });
 
 // ── Init ──────────────────────────────────────────────────────────────────
+// Restore domain + theme from localStorage on page load
+const _savedDomain = localStorage.getItem("pipeline_domain") || "tiktrack";
+if (_savedDomain !== currentDomain) switchDomain(_savedDomain);
+
 loadAll();
 </script>
 </body>

@@ -166,6 +166,7 @@ def _save_prompt(filename: str, content: str) -> Path:
 
 # Per-gate mandate filenames (saved under _COMMUNICATION/agents_os/prompts/)
 GATE_MANDATE_FILES: dict = {
+    "GATE_1":        "GATE_1_mandates.md",          # Phase 1: Team 170 (spec) | Phase 2: Team 190 (validate)
     "G3_6_MANDATES": "implementation_mandates.md",
     "GATE_8":        "gate_8_mandates.md",
 }
@@ -700,6 +701,27 @@ def generate_prompt(gate_id: str, force_gate4: bool = False, revision_notes: str
         gate_id = "GATE_4"  # Alias: retry GATE_4 after commit
 
     if gate_id == "GATE_0":
+        # ── Pre-flight: governance registry checks (Program + WP registration) ─
+        gov_issues = _check_governance_precheck(state)
+        if gov_issues:
+            _log("")
+            _log("╔══ ⛔ GOVERNANCE PRE-CHECK FAILED ════════════════════════╗")
+            _log("║  GATE_0 cannot proceed until these registry issues are    ║")
+            _log("║  resolved. Fix them, then re-run ./pipeline_run.sh         ║")
+            _log("╠══════════════════════════════════════════════════════════╣")
+            for issue in gov_issues:
+                _log(f"║  {issue}")
+            _log("╠══════════════════════════════════════════════════════════╣")
+            _log("║  Required fixes:                                          ║")
+            _log("║  1. GOVERNANCE-01 → PHOENIX_PROGRAM_REGISTRY_v1.0.0.md   ║")
+            _log("║     Set program status = ACTIVE                           ║")
+            _log("║  2. GOVERNANCE-02 → PHOENIX_WORK_PACKAGE_REGISTRY_v1.0.0 ║")
+            _log("║     Add WP row (status=IN_PROGRESS, current_gate=GATE_0) ║")
+            _log("║  3. Issue ARCHITECT_DIRECTIVE authorizing activation      ║")
+            _log("║     if program was previously DEFERRED                    ║")
+            _log("╚══════════════════════════════════════════════════════════╝")
+            return
+        # ── Data model checks ─────────────────────────────────────────────────
         dm_findings = run_data_model_checks("GATE_0", state.spec_brief, "spec_brief")
         blocks = [f for f in dm_findings if f.status == "BLOCK"]
         if blocks:
@@ -717,7 +739,15 @@ def generate_prompt(gate_id: str, force_gate4: bool = False, revision_notes: str
                 _log(f"⛔ {b.check_id}: {b.message}")
             _log("GATE_1 blocked by Data Model Validator. Fix schema issues and re-run.")
             return
-        prompt = _generate_gate_1_prompt(state)
+        # ── Same pattern as GATE_8: mandate doc IS the gate prompt ──
+        # GATE_1_mandates.md  → phase* extractor (pipeline_run.sh phase1 / phase2)
+        # GATE_1_prompt.md    → full mandate doc (saved by generate_prompt after this block)
+        # Dashboard: mandate-gate mode (mandate tabs shown, copy button disabled)
+        prompt = _generate_gate_1_mandates(state)
+        _log("GATE_1 is a TWO-PHASE mandate gate (same pattern as GATE_8):")
+        _log("  Phase 1 → Team 170 (Gemini)  | ./pipeline_run.sh phase1")
+        _log("  Phase 2 → Team 190 (OpenAI)  | ./pipeline_run.sh phase2")
+        _log("  Mandate tabs in Dashboard show each phase separately.")
     elif gate_id == "GATE_2":
         gate2_owner = _domain_gate_owner("GATE_2", state.project_domain) or "team_100"
         prompt = _generate_gate_2_prompt(state, fresh, team_id=gate2_owner)
@@ -833,6 +863,59 @@ def _team_header(team_id: str, gate_name: str, state: "PipelineState", fresh: bo
     return stamp
 
 
+def _check_governance_precheck(state: "PipelineState") -> list[str]:
+    """Pre-flight governance validation before GATE_0 can generate a prompt.
+
+    Checks that:
+      1. The program is ACTIVE (or explicitly activation-ready) in PHOENIX_PROGRAM_REGISTRY.
+      2. The work_package_id is registered in PHOENIX_WORK_PACKAGE_REGISTRY.
+
+    Returns a list of human-readable warning strings.
+    Empty list = all checks passed.
+    """
+    import re
+
+    warnings: list[str] = []
+    registry_dir = REPO_ROOT / "documentation" / "docs-governance" / "01-FOUNDATIONS"
+    prog_id = "-".join(state.work_package_id.split("-")[:2])  # S001-P002-WP001 → S001-P002
+
+    # ── 1. Program Registry check ─────────────────────────────────────────────
+    prog_reg = registry_dir / "PHOENIX_PROGRAM_REGISTRY_v1.0.0.md"
+    if prog_reg.exists():
+        text = prog_reg.read_text(encoding="utf-8")
+        row_match = re.search(
+            rf"\|\s*\S+\s*\|\s*{re.escape(prog_id)}\s*\|[^|]*\|[^|]*\|\s*([A-Z_]+)\s*\|",
+            text,
+        )
+        if row_match:
+            status = row_match.group(1).strip()
+            allowed = {"ACTIVE", "PIPELINE"}
+            if status not in allowed:
+                warnings.append(
+                    f"GOVERNANCE-01: Program {prog_id} has status='{status}' in "
+                    f"PHOENIX_PROGRAM_REGISTRY (expected: ACTIVE or PIPELINE). "
+                    f"Fix: update program status, then re-run."
+                )
+        else:
+            warnings.append(
+                f"GOVERNANCE-01: Program {prog_id} NOT FOUND in PHOENIX_PROGRAM_REGISTRY. "
+                f"Fix: register the program with status=ACTIVE before GATE_0."
+            )
+
+    # ── 2. Work Package Registry check ────────────────────────────────────────
+    wp_reg = registry_dir / "PHOENIX_WORK_PACKAGE_REGISTRY_v1.0.0.md"
+    if wp_reg.exists():
+        text = wp_reg.read_text(encoding="utf-8")
+        if state.work_package_id not in text:
+            warnings.append(
+                f"GOVERNANCE-02: Work Package {state.work_package_id} NOT FOUND in "
+                f"PHOENIX_WORK_PACKAGE_REGISTRY. "
+                f"Fix: register the WP (even as HOLD/IN_PROGRESS) before GATE_0."
+            )
+
+    return warnings
+
+
 def _generate_gate_0_prompt(state: PipelineState, fresh: bool = False) -> str:
     return (
         f"{_team_header('team_190', 'GATE_0', state, fresh)}"
@@ -866,26 +949,116 @@ def _generate_gate_0_prompt(state: PipelineState, fresh: bool = False) -> str:
         f"**On PASS:** route_recommendation and blocking_findings may be omitted.\n"
         f"**On BLOCK:** architect (Team 00) is the next responsible team — LOD200 revision required.\n\n"
         f"## Scope Brief\n\n{state.spec_brief}\n\n"
-        f"## Current State\n\n{build_state_summary()}"
+        + (
+            f"## Activation Context (for S001 WPs run during S002 era)\n\n"
+            f"**Authorized architectural context:** When `stage_id` on this WP is S001 while WSM "
+            f"`active_stage_id=S002`, this is an AUTHORIZED parallel activation of a DEFERRED S001 "
+            f"program — NOT a stage mismatch error. Check for directive:\n"
+            f"`_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_S001_P002_ACTIVATION_v1.0.0.md`\n"
+            f"If this directive exists and references the WP, the stage context discrepancy is "
+            f"**RESOLVED** — do NOT raise it as a blocking finding.\n\n"
+            if state.stage_id == "S001" else ""
+        )
+        + f"## Current State\n\n{build_state_summary()}"
     )
 
 
-def _generate_gate_1_prompt(state: PipelineState) -> str:
-    identity_170 = load_team_identity("team_170")
-    identity_190 = load_team_identity("team_190")
-    return (
-        f"# GATE_1 — Produce and Validate LLD400\n\n"
-        f"## Step 1: Team 170 produces LLD400\n\n"
-        f"{identity_170}\n\n"
-        f"Produce a complete LLD400 spec for:\n{state.spec_brief}\n\n"
-        f"Include: endpoint contract, DB contract, UI structural contract, "
-        f"DOM anchors, MCP test scenarios, acceptance criteria.\n\n"
-        f"## Step 2: Team 190 validates\n\n"
-        f"{identity_190}\n\n"
-        f"Validate the LLD400 against canonical standards.\n"
-        f"Check all mandatory sections, identity headers, gate compliance.\n"
-        f"Respond with: PASS or BLOCK + corrections."
+def _generate_gate_1_mandates(state: PipelineState) -> str:
+    """GATE_1 two-phase mandate document using the generic mandate engine.
+
+    Phase 1: Team 170 (Gemini) — produces LLD400 spec.
+    Phase 2: Team 190 (OpenAI) — validates LLD400 independently (external validation,
+             different engine — this is architecturally mandatory).
+
+    Saves GATE_1_mandates.md (used by pipeline_run.sh phase* extraction).
+    Returns the full mandate document (also saved as GATE_1_prompt.md by generate_prompt).
+    Same pattern as GATE_8 / _generate_gate_8_mandates.
+    """
+    wp  = state.work_package_id
+    wpu = wp.replace("-", "_")
+    lld400_path  = f"_COMMUNICATION/team_170/TEAM_170_{wpu}_LLD400_v1.0.0.md"
+    verdict_path = f"_COMMUNICATION/team_190/TEAM_190_{wpu}_GATE_1_VERDICT_v1.0.0.md"
+
+    phase1_task = (
+        f"### Your Task\n\n"
+        f"**Environment:** Gemini (Team 170 — Spec-Author)\n\n"
+        f"Produce a complete LLD400 spec for WP `{wp}`.\n\n"
+        f"**Spec Brief:**\n\n{state.spec_brief}\n\n"
+        f"---\n\n"
+        f"**Required sections (all 6 are mandatory):**\n\n"
+        f"1. **Identity Header** — `gate: GATE_1 | wp: {wp} | stage: {state.stage_id} | domain: {state.project_domain} | date: <today>`\n"
+        f"2. **Endpoint Contract** — HTTP method, path, request body schema, response schema\n"
+        f"3. **DB Contract** — tables accessed, columns read/written, query patterns; no new schema unless spec mandates\n"
+        f"4. **UI Structural Contract** — component hierarchy, DOM anchors (`data-testid`), state shape\n"
+        f"5. **MCP Test Scenarios** — each scenario: precondition → action → expected assertion\n"
+        f"6. **Acceptance Criteria** — numbered, each criterion independently pass/fail testable\n\n"
+        f"---\n\n"
+        f"Save LLD400 to: `{lld400_path}`\n\n"
+        f"When done, inform Nimrod. Nimrod runs `./pipeline_run.sh phase2` to activate Team 190 validation.\n\n"
+        f"⛔ **YOUR TASK ENDS WITH SAVING THE LLD400. Do NOT validate your own output.**"
     )
+
+    phase2_task = (
+        f"### Your Task\n\n"
+        f"**Environment:** OpenAI / Codex (Team 190 — Constitutional-Validator)\n\n"
+        f"Validate the LLD400 produced by Team 170. This is **external validation** — "
+        f"you use a different engine from Team 170 by architectural design.\n\n"
+        f"**Read the LLD400 from:** `{lld400_path}`\n\n"
+        f"(If the file is missing, Team 170 has not completed Phase 1. Stop and notify.)\n\n"
+        f"---\n\n"
+        f"**Validation checklist (all 8 items required):**\n\n"
+        f"1. **Identity Header** — gate/wp/stage/domain/date all present and match state\n"
+        f"2. **All 6 sections present** — Identity, Endpoint, DB, UI, MCP Scenarios, Acceptance Criteria\n"
+        f"3. **Endpoint Contract** — method, path, full request/response schema specified\n"
+        f"4. **DB Contract** — no undeclared schema changes; NUMERIC(20,8) Iron Rule for financial data\n"
+        f"5. **UI Contract** — DOM anchors (`data-testid`), component tree, state shape complete\n"
+        f"6. **Acceptance Criteria** — numbered, each criterion independently testable\n"
+        f"7. **Scope compliance** — stays within spec_brief; no undeclared additions\n"
+        f"8. **Iron Rules** — maskedLog mandatory, collapsible-container, no new backend unless spec mandates\n\n"
+        f"**Spec Brief (reference):**\n\n{state.spec_brief}\n\n"
+        f"---\n\n"
+        f"Save verdict to: `{verdict_path}`\n\n"
+        f"- **PASS** → ready for GATE_2\n"
+        f"- **BLOCK** → `BF-XX: description | fix required`\n\n"
+        f"If BLOCK: Team 170 must revise the LLD400. Do NOT fix it yourself.\n\n"
+        f"⛔ **YOU ARE TEAM 190 — VALIDATE ONLY. Do NOT rewrite or fix the LLD400.**"
+    )
+
+    steps = [
+        MandateStep(
+            team_id    = "team_170",
+            label      = "Team 170 — LLD400 Production",
+            phase      = 1,
+            task       = phase1_task,
+            writes_to  = lld400_path,
+            acceptance = [
+                f"LLD400 saved to: `{lld400_path}`",
+                "All 6 required sections present with complete content",
+                "Identity Header matches state (gate/wp/stage/domain/date)",
+                "Scope matches spec_brief — no undeclared additions",
+                "Team 190 notified for Phase 2 validation",
+            ],
+        ),
+        MandateStep(
+            team_id    = "team_190",
+            label      = "Team 190 — LLD400 Validation",
+            phase      = 2,
+            task       = phase2_task,
+            reads_from = [lld400_path],
+            reads_label= "LLD400 produced by Team 170 (Phase 1 output)",
+            depends_on = ["team_170"],
+            writes_to  = verdict_path,
+            acceptance = [
+                "All 8 validation checklist items addressed",
+                f"If PASS  →  `./pipeline_run.sh pass`  (advances to GATE_2)",
+                f"If BLOCK →  `./pipeline_run.sh fail \"BF-XX: [description]\"`  (returns to Team 170)",
+            ],
+        ),
+    ]
+
+    doc = _generate_mandate_doc(steps, state, gate="GATE_1")
+    _save_prompt("GATE_1_mandates.md", doc)
+    return doc
 
 
 def _generate_gate_2_prompt(state: PipelineState, fresh: bool = False, team_id: str = "team_100") -> str:

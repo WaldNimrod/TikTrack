@@ -39,6 +39,7 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | --- | --- | --- | --- | --- | --- |
 | S001-P001 | S001-P001-WP001 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-22 |
 | S001-P001 | S001-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-23 |
+| S001-P002 | S001-P002-WP001 | IN_PROGRESS | GATE_0 | false | Deferred program activation; GATE_0 spec validation in progress; authorized per ARCHITECT_DIRECTIVE_S001_P002_ACTIVATION_v1.0.0 (2026-03-14) |
 | S002-P001 | S002-P001-WP001 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
 | S002-P001 | S002-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
 | S002-P002 | S002-P002-WP003 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-03-13 |
@@ -73,3 +74,4 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 **log_entry | TEAM_10 | PHOENIX_WORK_PACKAGE_REGISTRY | S002_P002_WP003_GATE7_BLOCK_TO_GATE3_REMEDIATION_SYNCED | 2026-03-11**
 **log_entry | TEAM_170 | PHOENIX_WORK_PACKAGE_REGISTRY | S003_P001_WP001_FAST4_CLOSED_ADDED | 2026-03-11**
 **log_entry | TEAM_170 | PHOENIX_WORK_PACKAGE_REGISTRY | S003_P002_WP001_FAST4_CLOSED_ADDED | 2026-03-12**
+**log_entry | TEAM_00 | PHOENIX_WORK_PACKAGE_REGISTRY | S001_P002_WP001_REGISTERED_GATE_0_IN_PROGRESS_PER_ARCHITECT_DIRECTIVE_S001_P002_ACTIVATION_v1.0.0 | 2026-03-14**

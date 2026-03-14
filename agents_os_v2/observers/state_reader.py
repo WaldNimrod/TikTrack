@@ -63,12 +63,16 @@ def read_governance_state() -> dict[str, Any]:
         text = _read_text(p)
         if text:
             result["wsm_path"] = str(p.relative_to(REPO_ROOT))
-            stage_match = re.search(r"current_stage_id[:\s|]+\s*(S\d+)", text)
+            # AD-V2-01 fix: WSM canonical field is active_stage_id (not current_stage_id)
+            stage_match = re.search(r"\|\s*active_stage_id\s*\|\s*(S\d+)\s*\|", text)
             if stage_match:
                 result["active_stage"] = stage_match.group(1)
-            state_match = re.search(r"CURRENT_OPERATIONAL_STATE[:\s|]+\s*(\w+)", text)
-            if state_match:
-                result["operational_state"] = state_match.group(1)
+            # AD-V2-02 fix: CURRENT_OPERATIONAL_STATE is a markdown block header, not a
+            # single-value field — the old regex was matching log entry text (e.g. "upon").
+            # Parse the structured table field active_program_id instead (more reliable).
+            prog_match = re.search(r"\|\s*active_program_id\s*\|\s*(\S+)\s*\|", text)
+            if prog_match:
+                result["active_program"] = prog_match.group(1)
             break
 
     ssm_candidates = [

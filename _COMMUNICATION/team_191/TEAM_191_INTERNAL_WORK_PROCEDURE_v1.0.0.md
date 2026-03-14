@@ -114,6 +114,13 @@ Every Team 191 closure note must include:
    - `191 פוש` = `191 push`
    - `191 מארג` = `191 merge`
    - `191 מיזוג` = `191 merge`
+   - `191 סטטוס` = `191 status`
+   - `191 בדיקה` = `191 checks`
+   - `191 בדיקות` = `191 checks`
+   - `191 נקי` = `191 clean`
+   - `191 סנכרון` = `191 sync`
+   - `191 בדיקת מיזוג` = `191 merge check`
+   - `191 תיקון` = `191 fix`
 6. Optional message payload syntax (binding):
    - pattern: `<191-command> ? <free_text>`
    - purpose: user-provided title/prefix for commit / push / merge messages.
@@ -130,12 +137,18 @@ Every Team 191 closure note must include:
 2. Required behavior: always return the Team 191 command options menu; do not execute Git actions in this help mode.
 3. Menu content is mandatory and stable:
    - `191 status` — show current Git/governance blocker status only.
+   - `191 checks` / `191 בדיקות` / `191 בדיקה` — run guard suite only (`DATE-LINT`, `SYNC CHECK`, `SNAPSHOT CHECK`, merge-readiness checks) without push/merge.
+   - `191 clean` / `191 נקי` — normalize to clean working tree via deterministic commit/remediation actions (no push).
+   - `191 sync` / `191 סנכרון` — fetch/rebase synchronization lane for integration branch readiness.
    - `191 commit` / `191 קומיט` — create context-aware local commit message and commit all intended updates.
    - `191 commit ? <text>` / `191 קומיט ? <text>` — same flow with user text as message prefix.
    - `191 push` / `191 פוש` — run default `SAFE` push flow (guard checks + deterministic remediation + push).
    - `191 push ? <text>` / `191 פוש ? <text>` — same flow with user text as push/remediation message prefix.
    - `191 merge` / `191 מארג` / `191 מיזוג` — run canonical merge flow from `codex/team191-integration` to `main` (PR create/check/merge/verify).
+   - `191 merge check` / `191 בדיקת מיזוג` — check-only lane (PR/checks/permissions), no merge side-effect.
    - `191 merge ? <text>` / `191 מארג ? <text>` / `191 מיזוג ? <text>` — same flow with user text as PR/merge title prefix.
+   - `191 fix` / `191 תיקון` — correction loop lane: run `checks` -> remediate deterministic blockers -> re-check until clean/pass or explicit BLOCK.
+   - `191 fix ? <text>` / `191 תיקון ? <text>` — same loop with user text as remediation commit/report prefix.
    - `191 push quick` — minimal flow (fast path; lower hygiene).
    - `191 push safe` — default balanced flow (recommended).
    - `191 push strict` — maximal hygiene flow (deep checks, slower).
@@ -151,6 +164,19 @@ Every Team 191 closure note must include:
 8. Optional payload application rule:
    - If payload is provided after `?`, Team 191 must use it as a title/prefix when generating commit subject / remediation commit subject / PR title / merge report headline.
    - If payload is missing, Team 191 uses automatic context-derived naming (current default behavior).
+9. `191 fix` loop contract (mandatory):
+   - start with `191 checks`;
+   - apply deterministic non-semantic remediations only (DATE-LINT / SYNC / SNAPSHOT / hook failures);
+   - run `191 checks` again;
+   - repeat until either:
+     - `PASS`: guards pass and working tree is clean, or
+     - `BLOCK`: non-deterministic/permission/policy blocker remains with exact owner routing.
+10. Recommended operation sequence for `191 ?` output (mandatory):
+   - quick diagnosis: `191 status` -> `191 checks`
+   - auto-remediation loop: `191 fix` (or `191 תיקון`)
+   - persist local result: `191 commit` (or `191 קומיט`)
+   - publish integration branch: `191 push` (or `191 פוש`)
+   - complete to `main`: `191 merge` (or `191 מארג` / `191 מיזוג`)
 
 ---
 

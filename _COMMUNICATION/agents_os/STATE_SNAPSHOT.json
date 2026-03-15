@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0.0",
-  "produced_at_iso": "2026-03-15T20:43:06.811456+00:00",
+  "produced_at_iso": "2026-03-15T21:18:41.907489+00:00",
   "agent_role": "POC-1-OBSERVER",
   "read_only": true,
   "governance": {
@@ -21,12 +21,9 @@
       },
       "tiktrack": {
         "gate_state": null,
-        "pending_actions": [
-          "Team 70: AS_MADE docs D22/D33/D34/D35",
-          "Team 90: GATE_8 validation + PASS"
-        ],
+        "pending_actions": [],
         "override_reason": null,
-        "current_gate": "GATE_8",
+        "current_gate": "NONE",
         "project_domain": "tiktrack"
       }
     },

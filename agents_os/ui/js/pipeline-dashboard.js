@@ -56,13 +56,15 @@ async function loadPipelineState() {
     document.getElementById("s-wp").textContent    = state.work_package_id || "—";
     document.getElementById("s-stage").textContent = state.stage_id || "—";
 
+    const isComplete = (state.current_gate === 'COMPLETE' || state.current_gate === 'NONE' || !state.current_gate);
     const currentCfg = GATE_CONFIG[state.current_gate] || {};
-    const st = gateStatus(state.current_gate, state);
-    document.getElementById("s-gate-pill").innerHTML =
-      `<span class="status-pill ${statusPillClass(st)}">${state.current_gate}</span>`;
+    const st = isComplete ? 'pass' : gateStatus(state.current_gate, state);
+    document.getElementById("s-gate-pill").innerHTML = isComplete
+      ? `<span class="status-pill status-pass">✅ WP CLOSED</span>`
+      : `<span class="status-pill ${statusPillClass(st)}">${state.current_gate}</span>`;
     // Domain-aware owner (GATE_2/6 differ by domain)
-    document.getElementById("s-owner").textContent  = getDomainOwner(state.current_gate);
-    document.getElementById("s-engine").textContent = currentCfg.engine || "—";
+    document.getElementById("s-owner").textContent  = isComplete ? '—' : getDomainOwner(state.current_gate);
+    document.getElementById("s-engine").textContent = isComplete ? '—' : (currentCfg.engine || "—");
 
     // Current Step Banner — always shown above gate context accordion
     const stepBannerEl = document.getElementById('current-step-banner');
@@ -95,11 +97,11 @@ async function loadPipelineState() {
     document.getElementById("spec-text").textContent = state.spec_brief || "No spec loaded";
     document.getElementById("spec-wp").textContent   = "WP: " + (state.work_package_id || "—");
 
-    // Gate timeline
+    // Gate timeline — when COMPLETE show all gates as done
     const gateList = document.getElementById("gate-list");
     gateList.innerHTML = GATE_SEQUENCE.map(g => {
-      const s = gateStatus(g, state);
-      const isCurr = g === state.current_gate;
+      const s = isComplete ? 'pass' : gateStatus(g, state);
+      const isCurr = !isComplete && g === state.current_gate;
       const statusIcon = s==="pass"?"✓":s==="fail"?"✗":s==="current"?"←":s==="skipped"?"↷":"";
       return `<li class="gate-item${isCurr?" is-current":""}${s==="skipped"?" is-skipped":""}">
         <span class="gate-dot ${statusDotClass(s)}"></span>
@@ -128,8 +130,8 @@ async function loadPipelineState() {
       : "<li class='loading'>No completed gates yet</li>";
 
     // Quick commands (sidebar) + Quick action bar (main)
-    buildCommands(state.current_gate);
-    buildQuickActionBar(state.current_gate);
+    buildCommands(isComplete ? null : state.current_gate);
+    buildQuickActionBar(isComplete ? null : state.current_gate);
 
     return state;
   } catch(e) {
@@ -180,7 +182,7 @@ async function loadPrompt(gate) {
 // ── Load mandates (always shown — mandate gates use team tabs; others show prompt) ──
 async function loadMandates() {
   const gate        = pipelineState?.current_gate || '';
-  const mandateFile = GATE_MANDATE_FILES[gate];   // undefined if gate has no mandate file
+  const mandateFile = getGateMandatePath(gate, currentDomain);  // domain-scoped path (Iron Rule)
   const def         = ALL_GATE_DEFS[gate] || {};
 
   // Mandate accordion is always visible (never hidden)
@@ -612,20 +614,20 @@ const ALL_GATE_DEFS = {
     },
   },
   'GATE_8': {
-    owner:'team_70/170 → team_90', engine:'codex',
-    desc:'Team 70 (TikTrack) or Team 170 (Agents OS) produces AS_MADE_REPORT + archives WP files → Team 90 validates → WP CLOSED',
-    advice:'./pipeline_run.sh  →  scroll to Team Mandates → Phase 1 tab (Team 70/170)  →  run phase2  →  Phase 2 tab (Team 90)  →  ./pipeline_run.sh pass',
-    failAdvice:'./pipeline_run.sh fail "CLOSURE-NNN: [issue]"  →  Team 70/170 corrects  →  re-run GATE_8',
+    // Iron Rule (locked 2026-03-15): Team 70 is SHARED — handles GATE_8 in ALL domains.
+    owner:'team_70 → team_90', engine:'codex',
+    desc:'Team 70 (shared — all domains) writes AS_MADE_REPORT + archives WP files → Team 90 validates → WP CLOSED',
+    advice:'./pipeline_run.sh  →  scroll to Team Mandates → Phase 1 tab (Team 70)  →  run phase2  →  Phase 2 tab (Team 90)  →  ./pipeline_run.sh pass',
+    failAdvice:'./pipeline_run.sh fail "CLOSURE-NNN: [issue]"  →  Team 70 corrects  →  re-run GATE_8',
     twoPaths:true,
     passCmd:'./pipeline_run.sh pass',
     failCmd:'./pipeline_run.sh fail "CLOSURE-001: [issue]"',
     passLabel:'✅ Closure Validated — WP CLOSED',
-    failLabel:'❌ Closure Incomplete — Team 70/170 correct',
+    failLabel:'❌ Closure Incomplete — Team 70 correct',
     verdictTeam:'team_90', verdictGate:'GATE_8',
-    files:['../../_COMMUNICATION/agents_os/prompts/gate_8_mandates.md'],
     failRoutes:{
-      doc:{ cmd:'./pipeline_run.sh route doc GATE_8', label:'📝 Correction → GATE_8', desc:'<strong>Closure issues</strong> — Team 70/170 corrects docs or archive → Team 90 re-validates' },
-      full:{ cmd:'./pipeline_run.sh route full GATE_8', label:'🔄 Full Redo → GATE_8', desc:'<strong>Closure rejected</strong> — Team 70/170 full redo of AS_MADE_REPORT + archive' },
+      doc:{ cmd:'./pipeline_run.sh route doc GATE_8', label:'📝 Correction → GATE_8', desc:'<strong>Closure issues</strong> — Team 70 corrects docs or archive → Team 90 re-validates' },
+      full:{ cmd:'./pipeline_run.sh route full GATE_8', label:'🔄 Full Redo → GATE_8', desc:'<strong>Closure rejected</strong> — Team 70 full redo of AS_MADE_REPORT + archive' },
     },
   },
 };
@@ -700,14 +702,12 @@ function getVerdictCandidates(gate, wp) {
       // Team 90 closure validation verdict (canonical)
       `${t90}TEAM_90_${wpu}_GATE_8_VERDICT_v1.0.0.md`,
       `${t90}TEAM_90_${wpu}_GATE_8_CLOSURE_VALIDATION_v1.0.0.md`,
-      // Team 70 (TikTrack) AS_MADE_REPORT + docs
+      // Team 70 (shared — all domains) AS_MADE_REPORT + docs (Iron Rule, locked 2026-03-15)
       `${t70}TEAM_70_${wpu}_AS_MADE_REPORT_v1.0.0.md`,
       `${t70}TEAM_70_${wpu}_GATE_8_DOCS_v1.0.0.md`,
-      // Team 170 (AgentsOS) equivalents
-      `${d}team_170/TEAM_170_${wpu}_AS_MADE_REPORT_v1.0.0.md`,
-      `${d}team_170/TEAM_170_${wpu}_GATE_8_DOCS_v1.0.0.md`,
       // Fallback patterns (hyphen WP-id)
       `${t90}TEAM_90_${wp}_GATE_8_VERDICT_v1.0.0.md`,
+      `${t70}TEAM_70_${wp}_AS_MADE_REPORT_v1.0.0.md`,
     ],
   };
   return v[gate] || [];
@@ -1219,6 +1219,39 @@ function isSelfLoopGate(gate) { return gate === 'GATE_1'; }
  */
 function buildCurrentStepBanner(gate, state) {
   if (!gate || !state) return '';
+
+  // ── COMPLETE / NONE: WP closed or no active WP ────────────────────────────
+  if (gate === 'COMPLETE' || gate === 'NONE' || !gate) {
+    const isClosed  = gate === 'COMPLETE';
+    const wp        = (state.work_package_id && state.work_package_id !== 'NONE')
+                        ? state.work_package_id : null;
+    const total     = (state.gates_completed || []).length;
+    const title     = isClosed ? 'Work Package Closed' : 'No Active Work Package';
+    const actorTxt  = isClosed ? `✅ ${wp || '—'}` : '— Idle —';
+    const badgeTxt  = isClosed ? 'CLOSED' : 'NO ACTIVE WP';
+    const phaseTxt  = isClosed ? `${total} gates completed` : 'Awaiting next WP activation';
+    return `<div class="current-step-banner csb-complete">
+      <div class="csb-title">${escHtml(title)}</div>
+      <div class="csb-header">
+        <span class="csb-actor">${escHtml(actorTxt)}</span>
+        <span class="csb-engine-badge">${escHtml(badgeTxt)}</span>
+        <span class="csb-phase-label">${escHtml(phaseTxt)}</span>
+      </div>
+      <div class="csb-steps">
+        <div class="csb-step">
+          <span class="csb-step-num">1</span>
+          <span class="csb-step-text">${isClosed
+            ? 'This work package is fully closed. All gates passed and docs archived.'
+            : 'No work package is currently active in this domain.'}</span>
+        </div>
+        <div class="csb-step">
+          <span class="csb-step-num">2</span>
+          <span class="csb-step-text">To start a new WP, update <code style="background:rgba(0,0,0,0.3);padding:1px 5px;border-radius:3px">pipeline_state_${escHtml(state.project_domain || currentDomain)}.json</code> with the new WP details.</span>
+        </div>
+      </div>
+    </div>`;
+  }
+
   const def       = ALL_GATE_DEFS[gate] || {};
   const cfg       = GATE_CONFIG[gate]   || {};
   const failed    = state.gates_failed  || [];
@@ -1259,14 +1292,11 @@ function buildCurrentStepBanner(gate, state) {
 
   } else if (gate === 'GATE_8') {
     const phase8done = !!(state.phase8_content || '').trim();
-    // Domain-aware doc team: agents_os → Team 170, tiktrack → Team 70
-    const isAOS      = (state.project_domain || currentDomain) === 'agents_os';
-    const docTeam    = isAOS ? 'Team 170' : 'Team 70';
-    const docTeamDir = isAOS ? 'team_170'  : 'team_70';
+    // Iron Rule (locked 2026-03-15): Team 70 is SHARED — handles GATE_8 in ALL domains.
     if (!phase8done) {
-      actor = docTeam; engineLabel = 'Codex'; phaseLabel = 'Phase 1 of 2 — AS_MADE_REPORT'; modCls = '';
+      actor = 'Team 70'; engineLabel = 'Cursor'; phaseLabel = 'Phase 1 of 2 — AS_MADE_REPORT'; modCls = '';
       steps = [
-        `${docTeam} writes AS_MADE_REPORT + archives WP files → _COMMUNICATION/${docTeamDir}/`,
+        'Team 70 writes AS_MADE_REPORT + archives WP files → _COMMUNICATION/team_70/',
         `Run in terminal: ${baseCmd} phase2  (generates Team 90 validation mandate)`,
         'Scroll to "Team Mandates" → "Team 90" tab → copy mandate → paste into Codex → click ✅ PASS',
       ];
@@ -1509,8 +1539,11 @@ async function buildQuickActionBar(gate) {
   const bar = document.getElementById('quick-action-bar');
   if (!bar) return;
 
+  // ── null gate (WP COMPLETE): clear bar ────────────────────────────────────
+  if (!gate) { bar.innerHTML = ''; return; }
+
   // ── GATE_8 Phase 1: show "Task Completed" builder instead of PASS/FAIL ───
-  // When phase8_content is empty, Team 70/170 hasn't yet confirmed Phase 1 done.
+  // When phase8_content is empty, Team 70 hasn't yet confirmed Phase 1 done (all domains).
   // Show a completion builder (mirrors the findings builder, green theme) that
   // generates ./pipeline_run.sh phase2 — activates the Team 90 validation mandate.
   if (gate === 'GATE_8') {
@@ -1521,7 +1554,7 @@ async function buildQuickActionBar(gate) {
       bar.innerHTML = `<div class="completion-builder">
         <div class="completion-builder-title">
           📋 Phase 1 — Confirm Task Complete &amp; Generate Validation Mandate
-          <span style="font-size:10px;font-weight:400;color:var(--text-muted)">Team 70 / Team 170</span>
+          <span style="font-size:10px;font-weight:400;color:var(--text-muted)">Team 70 (shared — all domains)</span>
         </div>
         <div class="completion-builder-desc">
           When the AS_MADE_REPORT and archive are ready, run <code>phase2</code> to generate the Team 90 validation mandate.<br>

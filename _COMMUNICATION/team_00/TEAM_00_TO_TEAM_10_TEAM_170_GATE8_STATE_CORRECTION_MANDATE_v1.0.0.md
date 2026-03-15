@@ -4,12 +4,23 @@ from:          Team 00 — Chief Architect
 to:            Team 10 (WSM + pipeline state), Team 170 (WP registry + snapshot)
 cc:            Team 191 (verification), Team 61 (snapshot check fix)
 date:          2026-03-15
+status:        SUPERSEDED_HISTORICAL
+historical_record: true
+superseded_by: documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md (S002-P003-WP002 GATE_8 PASS 2026-03-07)
+execution_status: VOIDED_DO_NOT_EXECUTE
 authority:     Team 00 constitutional authority + Nimrod approval
-subject:       IMMEDIATE — 3-part state correction for S002-P003-WP002 GATE_8 activation
-               + GATE_8 Closure Reset Protocol implementation
+subject:       SUPERSEDED — historical correction mandate (retained for audit only)
 ---
 
 # IMMEDIATE STATE CORRECTION MANDATE
+
+## SUPERSEDED NOTICE (Do Not Execute)
+
+This mandate is retained for traceability only and must not be executed.
+
+- Canonical runtime/registry state already confirms `S002-P003-WP002` closed at `GATE_8 PASS` on `2026-03-07`.
+- Current SSOT program focus is `S002-P005` (per WSM active program).
+- Any operational update must follow current WSM/registry state and not this historical correction flow.
 
 ## Context
 
@@ -243,3 +254,4 @@ Follow the 6-step sequence from
 ---
 
 **log_entry | TEAM_00 | MANDATE_ISSUED | GATE8_STATE_CORRECTION | TEAM_10_TEAM_170 | IMMEDIATE | 2026-03-15**
+**log_entry | TEAM_00 | MANDATE_STATUS_UPDATE | GATE8_STATE_CORRECTION | SUPERSEDED_HISTORICAL_DO_NOT_EXECUTE | 2026-03-15**

@@ -97,8 +97,10 @@ TIKTRACK_PAGE_ROUTES: dict[str, str] = {
     "D41":  "http://localhost:8080/system_management",
 }
 
-# Domain-aware doc team (GATE_8 Phase 1)
+# GATE_8 doc team — Team 70 is SHARED across ALL domains (Iron Rule, locked 2026-03-15)
+# Team 70 handles AS_MADE_REPORT + archive closure in BOTH tiktrack and agents_os.
+# Team 170 is NOT involved in GATE_8 (they own GATE_1 LLD400 only).
 DOMAIN_DOC_TEAM: dict[str, str] = {
     "tiktrack":  "team_70",
-    "agents_os": "team_170",
+    "agents_os": "team_70",
 }

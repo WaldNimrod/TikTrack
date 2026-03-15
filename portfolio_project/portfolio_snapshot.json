@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-15T11:49:40.556012+00:00",
+  "generated_at_utc": "2026-03-15T21:29:40.465310+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -126,7 +126,7 @@
       "program_name": "Agents_OS v2 Writing Semantics Hardening (ADR-031 Stage A) + UI Optimization",
       "domain": "AGENTS_OS",
       "stage_id": "S002",
-      "status": "ACTIVE",
+      "status": "COMPLETE",
       "current_gate_mirror": "GATE_8; active_flow=S002-P005-WP002 (Pipeline Governance) — **GATE_8 PASS / DOCUMENTATION_CLOSED** after Team 90 revalidation (`TEAM_90_TO_TEAM_170_S002_P005_WP002_GATE8_VALIDATION_RESPONSE_v1.0.1.md`); no active work package in execution at this time.; active_work_package_id=N/A"
     },
     {
@@ -557,7 +557,7 @@
           "program_id": "S002-P005",
           "program_name": "Agents_OS v2 Writing Semantics Hardening (ADR-031 Stage A) + UI Optimization",
           "domain": "AGENTS_OS",
-          "status": "ACTIVE",
+          "status": "COMPLETE",
           "current_gate_mirror": "GATE_8; active_flow=S002-P005-WP002 (Pipeline Governance) — **GATE_8 PASS / DOCUMENTATION_CLOSED** after Team 90 revalidation (`TEAM_90_TO_TEAM_170_S002_P005_WP002_GATE8_VALIDATION_RESPONSE_v1.0.1.md`); no active work package in execution at this time.; active_work_package_id=N/A",
           "work_packages": [
             {

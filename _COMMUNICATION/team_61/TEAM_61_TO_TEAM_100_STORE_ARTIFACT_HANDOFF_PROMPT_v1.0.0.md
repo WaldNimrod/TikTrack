@@ -4,6 +4,7 @@ id: TEAM_61_TO_TEAM_100_STORE_ARTIFACT_HANDOFF_PROMPT_v1.0.0
 from: Team 61
 to: Team 100 (AOS Domain Architects — האדריכלית שלנו)
 date: 2026-03-10
+historical_record: true
 ---
 
 # פרומט קאנוני — Team 100: בקשת התייעצות Store Artifact

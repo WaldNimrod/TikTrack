@@ -5,6 +5,7 @@ from: Team 61 (AOS Local Cursor Implementation)
 to: Team 100 (AOS Domain Architects — האדריכלית שלנו)
 cc: Team 10, Team 190, Team 51, Team 00
 date: 2026-03-10
+historical_record: true
 status: CONSULTATION_REQUEST
 request_type: DOMAIN_COORDINATION_AND_VALIDATION_GATE
 ---

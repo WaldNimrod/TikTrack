@@ -5,6 +5,7 @@ from: Team 61 (AOS Local Cursor Implementation)
 to: Team 190 (Re-Validation), Team 51 (QA optional)
 cc: Team 100, Team 10, Team 00
 date: 2026-03-10
+historical_record: true
 status: PENDING_DOMAIN_COORDINATION
 in_response_to: TEAM_00_TO_TEAM_61_PIPELINE_STORE_ARTIFACT_REMEDIATION_MANDATE_v1.0.0.md
 mandate_type: REMEDIATION_EXECUTION

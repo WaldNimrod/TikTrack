@@ -50,7 +50,7 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | S003 | S003-P004 | User Tickers (D33) | TIKTRACK | PLANNED | — (registered from integrated roadmap v1.1.0) |
 | S003 | S003-P005 | Watch Lists (D26) | TIKTRACK | PLANNED | — (D38 tag_management relocated to S005 per ARCHITECT_DIRECTIVE_ROADMAP_AMENDMENT_v1.0.0 §A1; registered from integrated roadmap v1.1.0) |
 | S003 | S003-P006 | Admin Review S003 | TIKTRACK | PLANNED | — (Stage Governance Package; planning marker per integrated roadmap v1.1.0) |
-| S003 | S003-P007 | Agents_OS Command Bridge Lite (ADR-031 Stage B) | AGENTS_OS | PLANNED | — (next AGENTS_OS stage-3 package; scope lock: approve-path desync block, command bridge copy flow with Task ID + context, model-B path realignment; authority source: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`; lock package: `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`) |
+| S003 | S003-P007 | Agents_OS Command Bridge Lite (ADR-031 Stage B) | AGENTS_OS | PLANNED | — (next AGENTS_OS stage-3 package; scope lock: approve-path desync block, command bridge copy flow with Task ID + context, model-B path realignment; **backlog candidate:** PIPELINE_HELP.html — standalone help page replacing modal, full operator guide searchable/browser-navigable, trigger: WP002 GATE_8 PASS, LOD200 required before GATE_0; authority source: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`; lock package: `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`) |
 | S004 | S004-P001 | Financial Precision Validator | AGENTS_OS | PLANNED | — (placeholder; program number assigned at activation; LOD200 authoring begins when S003 Agents_OS programs complete; scope: float prohibition E-18..E-19, NUMERIC(20,8) enforcement E-20..E-22) |
 | S004 | S004-P002 | Business Logic Validator | AGENTS_OS | PLANNED | — (placeholder; ⚡ ACCELERATED from S005; scope: multi-entity consistency, state machine completeness, business rule coverage; MUST complete before S005 TikTrack begins) |
 | S004 | S004-P003 | Spec Draft Generator | AGENTS_OS | PLANNED | — (placeholder; ⚡ ACCELERATED from S006; scope: LLM-assisted LOD200/LLD400 first draft from product requirements; ~70% reduction in spec authoring token cost; MUST complete before S005 TikTrack begins) |
@@ -92,6 +92,18 @@ Authority: Team 100 (confirms GATE_8 PASS) → Team 00 (activates S005 TikTrack)
 
 ---
 
+## S002-P005 Backlog and Governance
+
+### S002-P005-WP003 candidate
+- **PIPELINE_TEAMS.html Update** — `TEAM_00_TO_TEAM_30_AOS_TEAMS_PAGE_UPDATE_MANDATE_v1.0.0.md`: AOS UI Teams page, Mode 1/2/3 descriptions, Process-Functional separation banner, verdict badges. S002-P005 backlog item / WP003 candidate.
+
+### Standing governance (AGENTS_OS)
+- **AOS Docs Audit** — `TEAM_00_TO_TEAM_170_TEAM_190_AOS_DOCS_AUDIT_MANDATE_v1.0.0.md`: Standing thread (Team 170 + Team 190): code vs docs alignment, activation prompt updates, vision alignment checks. Trigger: every gate completion + every pipeline code change + every Stage activation. Not a WP — ongoing responsibility.
+
+### Pending deliverable (AOS Docs Audit scope)
+- **TEAM_10_MODE1_ROUTING_TABLE_v1.0.0.md** — Deterministic routing table for Team 10 Mode 1 legacy operation. Required by `ARCHITECT_DIRECTIVE_TEAM_ROSTER_LOCK_v2.0.0.md` §Required Actions. Author: Team 170; submit to `_COMMUNICATION/_ARCHITECT_INBOX/` for Team 00 approval.
+
+---
 ## Pending LOD200 Inputs (S003 preparation locks)
 
 - **D39 Preferences (S003-P003):** Canonical field set locked to 23 fields across 6 groups; JSONB settings storage; `default_commission` excluded; trading-hours fields excluded from D39; `primary_currency` included in Group A; Group B contains 6 trading-default fields.
@@ -145,3 +157,4 @@ Source directives:
 **log_entry | TEAM_190 | PHOENIX_PROGRAM_REGISTRY | ADR031_PROGRAM_SLOTS_LOCKED_S002_P005_S003_P007_S004_P008_PLANNED | 2026-03-14**
 **log_entry | TEAM_00 | PHOENIX_PROGRAM_REGISTRY | S001_P002_DEFERRED_TO_PIPELINE_ACTIVATED_PER_ARCHITECT_DIRECTIVE_S001_P002_ACTIVATION_v1.0.0 | 2026-03-14**
 **log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | S002_P005_PLANNED_TO_ACTIVE_WP001_TASK_CLOSED_WP002_PLANNED_PER_TEAM_100_MANDATE | 2026-03-15**
+**log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | S002_P005_BACKLOG_GOVERNANCE_REGISTERED_PER_TEAM_00_ROADMAP_INTEGRATION | 2026-03-15**

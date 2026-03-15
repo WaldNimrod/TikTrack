@@ -14,16 +14,19 @@ async function loadDomainState(domain) {
     const state = await fetchJSON(domainFile);
     stateFallbackMode = false;
     pipelineState = state;
+    window.pipelineState = state;
     return state;
   } catch (e) {
     try {
       const state = await fetchJSON(LEGACY_STATE_FILE);
       stateFallbackMode = true;
       pipelineState = state;
+      window.pipelineState = state;
       return state;
     } catch (e2) {
       stateFallbackMode = true;
       pipelineState = null;
+      window.pipelineState = null;
       throw e2;
     }
   }

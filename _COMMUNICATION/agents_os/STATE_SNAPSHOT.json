@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0.0",
-  "produced_at_iso": "2026-03-15T10:19:48.586296+00:00",
+  "produced_at_iso": "2026-03-15T10:58:18.776551+00:00",
   "agent_role": "POC-1-OBSERVER",
   "read_only": true,
   "governance": {
@@ -15,10 +15,10 @@
       "agents_os": {
         "gate_state": "PASS_WITH_ACTION",
         "pending_actions": [
-          "test-action"
+          "fix-lint"
         ],
         "override_reason": null,
-        "current_gate": "GATE_2",
+        "current_gate": "GATE_7",
         "project_domain": "agents_os"
       },
       "tiktrack": {
@@ -32,10 +32,10 @@
     "legacy": {
       "gate_state": "PASS_WITH_ACTION",
       "pending_actions": [
-        "test-action"
+        "fix-lint"
       ],
       "override_reason": null,
-      "current_gate": "GATE_2"
+      "current_gate": "GATE_7"
     }
   },
   "codebase": {

@@ -19,15 +19,15 @@
 | **Team 20** | Backend Implementation | Server-side: API, logic, DB, services, runtime — TIKTRACK and SHARED programs only. |
 | **Team 30** | Frontend Execution | Client-side: components, pages, API integration — TIKTRACK and SHARED programs only. |
 | **Team 40** | UI Assets & Design | Design, design tokens, UI assets, visual consistency — TIKTRACK and SHARED programs only. |
-| **Team 50** | QA & FAV | Test scripts, E2E suites, regression, final acceptance validation (FAV), SOP-013 seals — TIKTRACK and SHARED programs only. |
-| **Team 51** | Agents_OS QA (child of Team 50) | Inherits Team 50 QA/FAV standards and procedures; executes QA for AGENTS_OS domain only (FAST_2.5 / GATE_5-equivalent). |
+| **Team 50** | QA & FAV | Test scripts, E2E suites, regression, final acceptance validation (FAV), SOP-013 seals — TIKTRACK and SHARED programs only. **Output: test results + verdict only — no routing.** Per ARCHITECT_DIRECTIVE_PROCESS_FUNCTIONAL_SEPARATION_v1.0.0. |
+| **Team 51** | Agents_OS QA (child of Team 50) | Inherits Team 50 QA/FAV standards and procedures; executes QA for AGENTS_OS domain only (FAST_2.5 / GATE_5-equivalent). **Output: test results + verdict only — no routing.** Per ARCHITECT_DIRECTIVE_PROCESS_FUNCTIONAL_SEPARATION_v1.0.0. |
 | **Team 60** | DevOps & Platform | Infrastructure, runtimes, CI/CD, platform — all domains (TIKTRACK + AGENTS_OS + SHARED). |
 | **Team 61** | Cloud Agent / DevOps Automation | CI/CD automation, quality scans, unit-test generation, Agents_OS V2 automation, cloud execution reports — AGENTS_OS domain only. |
 | **Team 70** | Documentation (TIKTRACK + Repository Maintenance) | TIKTRACK documentation lane, release docs, archive/folder hygiene, communication-maintenance operations across repository. |
-| **Team 90** | Validation & Gate Management | GATE_5-GATE_8 validation process, validation packages, quality gate coordination — cross-domain (TIKTRACK + AGENTS_OS + SHARED). |
+| **Team 90** | Validation & Gate Management | GATE_5-GATE_8 validation process, validation packages, quality gate coordination — cross-domain (TIKTRACK + AGENTS_OS + SHARED). **Output: review notes + verdict only — no routing.** Per ARCHITECT_DIRECTIVE_PROCESS_FUNCTIONAL_SEPARATION_v1.0.0. |
 | **Team 100** | Architectural Review | Stage-level architectural authority, GATE_6 architectural review, program authority. |
 | **Team 170** | Spec & Governance (AGENTS_OS + Governance Canonical) | LOD contracts, AGENTS_OS/governance canonical maintenance, registry synchronization, governance procedure locks. |
-| **Team 190** | Constitutional Validation | GATE_0-GATE_2 constitutional integrity and validation authority — cross-domain (TIKTRACK + AGENTS_OS + SHARED). |
+| **Team 190** | Constitutional Validation | GATE_0-GATE_2 constitutional integrity and validation authority — cross-domain (TIKTRACK + AGENTS_OS + SHARED). **Output: structured verdict only — no routing.** Per ARCHITECT_DIRECTIVE_PROCESS_FUNCTIONAL_SEPARATION_v1.0.0. |
 | **Team 191** | Git Governance Operations (child of Team 190) | Commit/push guard operations, date-lint/snapshot/sync remediation, clean-tree enforcement, Git drift triage — cross-domain (TIKTRACK + AGENTS_OS + SHARED). |
 
 ## 1.1) Team 61 registration record (canonical)
@@ -82,7 +82,19 @@ A Work Package must assign implementation **by domain** — Backend→20, Fronte
 
 ---
 
-## 3) Team 10 orchestration
+## 3) Team 10 — Mode-Aware Definition (per ARCHITECT_DIRECTIVE_TEAM_ROSTER_LOCK_v2.0.0)
+
+**Permanent core:** Technical Implementation Authority — architectural depth for implementation decisions.
+
+| Mode | Role | Scope |
+|------|------|-------|
+| **Mode 1** (Legacy, no AOS pipeline) | Process Coordinator + Implementation Authority | Receives verdicts from 190/50/90; routes per `TEAM_10_MODE1_ROUTING_TABLE_v1.0.0.md` (deterministic); activates next team; manages WSM updates. |
+| **Mode 2** (AOS + Dashboard) | Implementation Technical Authority | GATE_3 work plan, GATE_4 build oversight, Team 61 activation. Does NOT route between gates (pipeline does). Does NOT issue owner_next_action. |
+| **Mode 3** (Full-auto AOS) | Technical Consultation Authority | On-demand escalation for complex/risky builds. Pipeline fully replaces process coordination. |
+
+---
+
+## 4) Team 10 orchestration (Mode 1)
 
 Team 10 (Gateway) is owner of GATE_3 (Implementation). For every open Work Package after GATE_3 sub-stage G3.5 (work-plan validation with Team 90) PASS:
 
@@ -94,11 +106,11 @@ Team 10 (Gateway) is owner of GATE_3 (Implementation). For every open Work Packa
 
 ---
 
-## 4) Mirror
+## 5) Mirror
 
 `.cursorrules` may mirror this mapping for tooling; governance SSOT for role and scope is this document.
 
-## 5) Roster Maintenance Rule
+## 6) Roster Maintenance Rule
 
 This document must be updated whenever a new squad is added. Missing squad definition causes operational confusion and invalid routing.
 
@@ -109,3 +121,4 @@ This document must be updated whenever a new squad is added. Missing squad defin
 **log_entry | TEAM_190 | TEAM_DEVELOPMENT_ROLE_MAPPING | TEAM_51_CHILD_QA_MODEL_REGISTERED_WITH_DOMAIN_SPLIT | 2026-03-11**
 **log_entry | TEAM_190 | TEAM_DEVELOPMENT_ROLE_MAPPING | DOMAIN_SPLIT_REINFORCED_10_20_30_40_50__60__90_190__61 | 2026-03-11**
 **log_entry | TEAM_190 | TEAM_DEVELOPMENT_ROLE_MAPPING | TEAM_191_CHILD_GIT_GOVERNANCE_OPERATIONS_REGISTERED | 2026-03-12**
+**log_entry | TEAM_170 | TEAM_DEVELOPMENT_ROLE_MAPPING | ROSTER_V2_PROCESS_FUNCTIONAL_SEPARATION_APPLIED | 2026-03-15**

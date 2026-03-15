@@ -38,4 +38,6 @@ FINDINGS:
 
 Then provide full analysis.
 
+**Process-Functional Separation (mandatory):** Do NOT include `owner_next_action` or routing instructions. Output = structured verdict only. Pipeline handles routing. Reference: `_COMMUNICATION/team_170/TEAM_170_PROCESS_FUNCTIONAL_SEPARATION_OUTPUT_AMENDMENT_v1.0.0.md`.
+
 **log_entry | TEAM_61 | GATE_0_DOMAIN_MATCH_CHECK_ADDED | U01_DIRECTIVE_DUAL_DOMAIN_GOVERNANCE_v1.0.0 | 2026-03-10**

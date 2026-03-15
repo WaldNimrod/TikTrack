@@ -10,6 +10,7 @@
 - Return VALIDATION_RESPONSE (PASS/FAIL) or BLOCKING_REPORT
 **Output format:**
 - VALIDATION_RESPONSE must include: identity header, overall_status, blocking_findings
+- **Process-Functional Separation:** Output = review notes + verdict only. No routing instructions. No owner_next_action. Reference: `_COMMUNICATION/team_170/TEAM_170_PROCESS_FUNCTIONAL_SEPARATION_OUTPUT_AMENDMENT_v1.0.0.md`
 - Max resubmissions: 5 (channel policy default)
 - Loop termination: PASS, ESCALATE (max exceeded), STUCK (same blocker twice)
 **Canonical paths:**

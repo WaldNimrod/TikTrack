@@ -22,25 +22,19 @@ Validate the following LOD200 scope brief for constitutional compliance.
 ```
 gate_id: GATE_0
 decision: PASS | BLOCK_FOR_FIX
-route_recommendation: doc
 blocking_findings:
   - BF-01: <description> | evidence: <file:line>
   - BF-02: <description> | evidence: <file:line>
-next_required_action: <what must happen before resubmission>
-next_responsible_team: <team_id>
 ```
-
-**`route_recommendation` values (REQUIRED — drives pipeline auto-routing):**
-```
-route_recommendation: doc
-```  ← any fix required before resubmission (always `doc` for GATE_0 — spec revision)
 
 **`blocking_findings` list (REQUIRED if BLOCK_FOR_FIX — drives remediation flow):**
 - Each entry: `BF-NN: <description> | evidence: <canonical_path:line_number>`
 - Missing or empty findings = invalid BLOCK; pipeline cannot auto-route
 
-**On PASS:** route_recommendation and blocking_findings may be omitted.
-**On BLOCK:** architect (Team 00) is the next responsible team — LOD200 revision required.
+**On PASS:** blocking_findings may be omitted.
+**On BLOCK:** pipeline derives routing from verdict; do NOT include owner_next_action or next_responsible_team.
+
+**Process-Functional Separation:** Do NOT include owner_next_action, route_recommendation, or next_responsible_team. Output = structured verdict only. Pipeline handles routing. Reference: `_COMMUNICATION/team_170/TEAM_170_PROCESS_FUNCTIONAL_SEPARATION_OUTPUT_AMENDMENT_v1.0.0.md`
 
 ## Scope Brief
 

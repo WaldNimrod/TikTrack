@@ -13,6 +13,14 @@ repos:
         pass_filenames: false
         stages: [pre-commit]
 
+      - id: phoenix-date-lint-staged
+        name: "Phoenix Date-Lint (staged governance/communication) [BLOCKING]"
+        entry: scripts/lint_governance_dates_staged.sh
+        language: system
+        pass_filenames: false
+        files: '^(_COMMUNICATION/|documentation/docs-governance/).+\.md$'
+        stages: [pre-commit]
+
       - id: phoenix-bandit-security
         name: "Phoenix Security Scan - Bandit HIGH [BLOCKING]"
         entry: bash -c "source api/venv/bin/activate 2>/dev/null || true; bandit -r api/ --exclude api/venv -lll"

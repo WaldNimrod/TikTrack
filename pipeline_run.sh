@@ -116,18 +116,161 @@ _generate_and_show() {
   _show_prompt "$gate"
 }
 
+_refresh_state_snapshot() {
+  # Re-read WSM and regenerate STATE_SNAPSHOT.json — silent, non-blocking.
+  # Ensures Dashboard health-warnings panel always reflects current WSM state.
+  # AD-V2-01 prevention: snapshot is always fresh before any pipeline operation.
+  python3 -m agents_os_v2.observers.state_reader 2>/dev/null || \
+    echo "[pipeline_run] ⚠️  state_reader refresh failed (STATE_SNAPSHOT.json may be stale)"
+}
+
+_auto_store_gate1_artifact() {
+  # AC-10 (short-term implementation): at GATE_1, auto-detect the latest
+  # TEAM_170_{WP_ID}_LLD400_v*.md file and store it into lld400_content if
+  # the stored version is stale or empty. Eliminates the hidden manual `store` step.
+  # Called before prompt generation AND before pass validation.
+  local result
+  result=$(python3 -c "
+import sys, os, json, glob
+sys.path.insert(0, '.')
+domain = os.environ.get('PIPELINE_DOMAIN') or None
+if domain == 'agents_os':
+    sf = '_COMMUNICATION/agents_os/pipeline_state_agentsos.json'
+elif domain == 'tiktrack':
+    sf = '_COMMUNICATION/agents_os/pipeline_state_tiktrack.json'
+else:
+    sf = '_COMMUNICATION/agents_os/pipeline_state.json'
+try:
+    state = json.loads(open(sf).read())
+except Exception:
+    sys.exit(0)
+if state.get('current_gate') != 'GATE_1':
+    sys.exit(0)
+wp = state.get('work_package_id', '')
+if not wp:
+    sys.exit(0)
+wp_fs = wp.replace('-', '_')
+pattern = f'_COMMUNICATION/team_170/TEAM_170_{wp_fs}_LLD400_v*.md'
+files = sorted(glob.glob(pattern))
+if not files:
+    print('NO_FILE')
+    sys.exit(0)
+latest = files[-1]
+try:
+    content = open(latest).read()
+except Exception:
+    sys.exit(0)
+current = state.get('lld400_content', '')
+if content.strip() == current.strip():
+    print(f'ALREADY_STORED:{latest}')
+    sys.exit(0)
+print(f'STORE:{latest}')
+" 2>/dev/null)
+
+  if [[ "$result" == STORE:* ]]; then
+    local file="${result#STORE:}"
+    echo ""
+    echo "  ────────────────────────────────────────────────────────────────"
+    echo "  🔄 AC-10 auto-store: ${file}"
+    $CLI --store-artifact GATE_1 "$file" 2>/dev/null && \
+      echo "  ✅ lld400_content updated — Team 190 will see latest spec" || \
+      echo "  ⚠️  auto-store failed — run manually: ./pipeline_run.sh ${DOMAIN_FLAG_STR:-}store GATE_1 ${file}"
+    echo "  ────────────────────────────────────────────────────────────────"
+    echo ""
+  elif [[ "$result" == NO_FILE ]]; then
+    echo ""
+    echo "  ⚠️  GATE_1: No LLD400 file found in _COMMUNICATION/team_170/ for this WP."
+    echo "  Team 170 must produce the LLD400 before this gate can proceed."
+    echo ""
+  fi
+  # ALREADY_STORED: no output — silent pass
+}
+
+_validate_stage_alignment() {
+  # Stage-alignment guard — prevents pipeline ops on a wrong-stage state file.
+  # Reads stage_id from the active pipeline state and compares to WSM active_stage_id.
+  # If mismatch AND no AUTHORIZED_STAGE_EXCEPTIONS entry → BLOCK with error.
+  # AD-V2-05 prevention: catches stale stage_id before any gate advance.
+  python3 -c "
+import sys, os, json, re
+sys.path.insert(0, '.')
+
+domain = os.environ.get('PIPELINE_DOMAIN') or None
+if domain == 'agents_os':
+    sf = '_COMMUNICATION/agents_os/pipeline_state_agentsos.json'
+elif domain == 'tiktrack':
+    sf = '_COMMUNICATION/agents_os/pipeline_state_tiktrack.json'
+else:
+    sf = '_COMMUNICATION/agents_os/pipeline_state.json'
+
+try:
+    state = json.loads(open(sf).read())
+except Exception:
+    sys.exit(0)  # can't read state — let CLI handle it
+
+pipe_stage = state.get('stage_id', '')
+wp_id      = state.get('work_package_id', '')
+
+# No active WP → idle state, no alignment needed
+if not wp_id or not pipe_stage:
+    sys.exit(0)
+
+# Read WSM active_stage_id
+wsm_path = 'documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md'
+try:
+    wsm_text = open(wsm_path).read()
+    m = re.search(r'active_stage_id\s*[|:]\s*(S\d+)', wsm_text)
+    wsm_stage = m.group(1) if m else ''
+except Exception:
+    wsm_stage = ''
+
+if not wsm_stage or pipe_stage == wsm_stage:
+    sys.exit(0)  # match or unknown WSM stage → OK
+
+# Mismatch detected — check for authorized exception
+AUTHORIZED = ['S001']  # mirrors pipeline-config.js AUTHORIZED_STAGE_EXCEPTIONS
+if pipe_stage in AUTHORIZED:
+    print(f'[pipeline_run] ℹ️  AUTHORIZED EXCEPTION: pipeline stage {pipe_stage} ≠ WSM {wsm_stage} — exception registered, continuing')
+    sys.exit(0)
+
+# Unauthorized mismatch → BLOCK
+print('')
+print('════════════════════════════════════════════════════════════════════')
+print(f'  🔴 STAGE MISMATCH — ADVANCE BLOCKED')
+print(f'  pipeline_state.stage_id = {pipe_stage}')
+print(f'  WSM active_stage_id     = {wsm_stage}')
+print('')
+print('  The pipeline state file references a stage that no longer matches')
+print('  the current WSM active stage. This must be resolved before advancing.')
+print('')
+print('  Resolution options:')
+print('  1. Update pipeline_state.stage_id to match WSM active stage')
+print('  2. Register an authorized exception in pipeline-config.js')
+print('  3. Update the WSM if the active stage is incorrect')
+print('════════════════════════════════════════════════════════════════════')
+print('')
+sys.exit(1)
+" 2>/dev/null
+  return $?
+}
+
 # ── main ───────────────────────────────────────────────────────────────────
 
 case "${1:-next}" in
 
   next|"")
+    _refresh_state_snapshot
     GATE=$(_get_gate)
+    _auto_store_gate1_artifact   # AC-10: auto-store latest LLD400 before generating prompt
     $CLI --status
     _generate_and_show "$GATE"
     ;;
 
   pass)
+    _refresh_state_snapshot
+    _validate_stage_alignment || exit 1
     GATE=$(_get_gate)
+    _auto_store_gate1_artifact   # AC-10: ensure latest LLD400 is stored before validation guard runs
 
     # ── Artifact validation before advancing ─────────────────────────────
     # Server-side check: required deliverables must exist before advancing.
@@ -135,6 +278,10 @@ case "${1:-next}" in
     FORCE_FLAG="${2:-}"
     VALIDATION_FAILED=0
     MISSING_ARTIFACTS=""
+    STORE_HINT=""
+    # Build domain-aware command prefix for error message suggestions
+    DOMAIN_FLAG_STR=""
+    if [ -n "$DOMAIN" ]; then DOMAIN_FLAG_STR="--domain $DOMAIN "; fi
 
     _check_state_field() {
       python3 -c "
@@ -162,14 +309,22 @@ except Exception:
         LLD400=$(_check_state_field "lld400_content")
         if [ -z "$LLD400" ]; then
           VALIDATION_FAILED=1
-          MISSING_ARTIFACTS="GATE_1: lld400_content is empty — Team 170+190 must write and store the LLD400 spec first"
+          MISSING_ARTIFACTS="GATE_1: lld400_content is empty — Team 170 must write the LLD400 and it must be stored first"
+          STORE_HINT="  Step 1 — Store the LLD400 file:
+    ./pipeline_run.sh ${DOMAIN_FLAG_STR}store GATE_1 _COMMUNICATION/team_170/<LLD400_FILE>.md
+  Step 2 — If Team 190 returned BLOCK, record it:
+    ./pipeline_run.sh ${DOMAIN_FLAG_STR}fail \"BF-xx: reason\"
+  Step 3 — After Team 190 PASS verdict, retry:"
         fi
         ;;
       G3_PLAN)
         WORK_PLAN=$(_check_state_field "work_plan")
         if [ -z "$WORK_PLAN" ]; then
           VALIDATION_FAILED=1
-          MISSING_ARTIFACTS="G3_PLAN: work_plan is empty — Team 10 must submit a work plan first (./pipeline_run.sh store G3_PLAN <file>)"
+          MISSING_ARTIFACTS="G3_PLAN: work_plan is empty — Team 10 must submit a work plan first"
+          STORE_HINT="  Store the work plan file:
+    ./pipeline_run.sh ${DOMAIN_FLAG_STR}store G3_PLAN <path/to/work_plan.md>
+  Then retry:"
         fi
         ;;
     esac
@@ -180,11 +335,16 @@ except Exception:
       echo "  ⚠️  ADVANCE BLOCKED — Required artifacts are missing:"
       echo "  $MISSING_ARTIFACTS"
       echo ""
-      echo "  Complete the gate deliverables first, then retry:"
-      echo "    ./pipeline_run.sh pass"
+      if [ -n "$STORE_HINT" ]; then
+        echo "$STORE_HINT"
+        echo "    ./pipeline_run.sh ${DOMAIN_FLAG_STR}pass"
+      else
+        echo "  Complete the gate deliverables first, then retry:"
+        echo "    ./pipeline_run.sh ${DOMAIN_FLAG_STR}pass"
+      fi
       echo ""
       echo "  Rollback/emergency bypass only:"
-      echo "    ./pipeline_run.sh pass --force"
+      echo "    ./pipeline_run.sh ${DOMAIN_FLAG_STR}pass --force"
       echo "════════════════════════════════════════════════════════════════════"
       echo ""
       exit 1
@@ -202,19 +362,51 @@ except Exception:
     $CLI --advance "$GATE" PASS
     echo ""
     NEXT_GATE=$(_get_gate)
+    ACTIVE_DOMAIN=$(_get_domain)
     if [[ "$NEXT_GATE" == WAITING_* ]]; then
       echo "[pipeline_run] Human approval gate reached: $NEXT_GATE"
       echo "[pipeline_run] Review and run: ./pipeline_run.sh approve"
     else
       _generate_and_show "$NEXT_GATE"
     fi
+    echo ""
+    echo "  ────────────────────────────────────────────────────────────────"
+    echo "  💡 Dashboard: switch domain selector to '${ACTIVE_DOMAIN}'"
+    echo "     to see updated state (${NEXT_GATE})"
+    echo "  ────────────────────────────────────────────────────────────────"
     ;;
 
   fail)
+    _validate_stage_alignment || exit 1
     GATE=$(_get_gate)
     REASON="${2:-no reason given}"
     echo "[pipeline_run] ${DOMAIN_LABEL}Advancing $GATE → FAIL: $REASON"
     $CLI --advance "$GATE" FAIL --reason "$REASON"
+
+    # GATE_1 FAIL: clear lld400_content so the dashboard reverts to Phase 1
+    # (correction cycle) instead of showing stale Phase 2 state.
+    # BUG-FIX 2026-03-15: lld400_content was not cleared on GATE_1 fail.
+    if [[ "$GATE" == "GATE_1" ]]; then
+      python3 -c "
+import json, os, datetime
+domain = os.environ.get('PIPELINE_DOMAIN') or None
+if domain == 'agents_os':
+    sf = '_COMMUNICATION/agents_os/pipeline_state_agentsos.json'
+elif domain == 'tiktrack':
+    sf = '_COMMUNICATION/agents_os/pipeline_state_tiktrack.json'
+else:
+    sf = '_COMMUNICATION/agents_os/pipeline_state.json'
+try:
+    state = json.loads(open(sf).read())
+    state['lld400_content'] = ''
+    state['last_updated'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    open(sf, 'w').write(json.dumps(state, indent=2, ensure_ascii=False))
+    print('  🔄 GATE_1 FAIL: lld400_content cleared → dashboard shows Phase 1 correction cycle')
+except Exception as e:
+    print(f'  ⚠️  Could not clear lld400_content: {e}')
+" 2>/dev/null || echo "  ⚠️  lld400_content clear failed — dashboard may show stale Phase 2 state"
+    fi
+
     echo ""
     # Check if auto-routing moved the gate forward (route_recommendation in verdict file)
     NEXT_GATE=$(_get_gate)
@@ -266,6 +458,7 @@ print('yes' if GATE_CONFIG.get('${GATE}', {}).get('default_fail_route') else 'no
     ;;
 
   approve)
+    _validate_stage_alignment || exit 1
     GATE=$(_get_gate)
     # Map WAITING_ gates to their base gate for --approve
     # WAITING_GATE6_APPROVAL → GATE6 → GATE_6 (re-add underscore before digit)
@@ -274,10 +467,17 @@ print('yes' if GATE_CONFIG.get('${GATE}', {}).get('default_fail_route') else 'no
     $CLI --approve "$BASE_GATE"
     echo ""
     NEXT_GATE=$(_get_gate)
+    ACTIVE_DOMAIN=$(_get_domain)
     _generate_and_show "$NEXT_GATE"
+    echo ""
+    echo "  ────────────────────────────────────────────────────────────────"
+    echo "  💡 Dashboard: switch domain selector to '${ACTIVE_DOMAIN}'"
+    echo "     to see updated state (${NEXT_GATE})"
+    echo "  ────────────────────────────────────────────────────────────────"
     ;;
 
   status)
+    _refresh_state_snapshot
     $CLI --status
     ;;
 
@@ -342,6 +542,52 @@ print('yes' if GATE_CONFIG.get('${GATE}', {}).get('default_fail_route') else 'no
     $CLI --store-artifact "$GATE" "$FILE"
     ;;
 
+  pass_with_actions)
+    # S002-P005-WP002: Record PASS_WITH_ACTION, hold gate
+    ACTIONS="${2:?Usage: ./pipeline_run.sh pass_with_actions \"a1|a2|a3\"}"
+    _refresh_state_snapshot
+    _validate_stage_alignment || exit 1
+    $CLI --pass-with-actions "$ACTIONS"
+    ;;
+
+  actions_clear)
+    # S002-P005-WP002: All actions resolved — advance gate
+    _refresh_state_snapshot
+    _validate_stage_alignment || exit 1
+    $CLI --actions-clear
+    echo ""
+    NEXT_GATE=$(_get_gate)
+    ACTIVE_DOMAIN=$(_get_domain)
+    echo "  ────────────────────────────────────────────────────────────────"
+    echo "  💡 Dashboard: switch domain selector to '${ACTIVE_DOMAIN}'"
+    echo "     to see updated state (${NEXT_GATE})"
+    echo "  ────────────────────────────────────────────────────────────────"
+    ;;
+
+  override)
+    # S002-P005-WP002: Override & advance — log reason
+    REASON="${2:?Usage: ./pipeline_run.sh override \"reason text\"}"
+    _refresh_state_snapshot
+    _validate_stage_alignment || exit 1
+    $CLI --override "$REASON"
+    echo ""
+    NEXT_GATE=$(_get_gate)
+    ACTIVE_DOMAIN=$(_get_domain)
+    _generate_and_show "$NEXT_GATE"
+    echo ""
+    echo "  ────────────────────────────────────────────────────────────────"
+    echo "  💡 Dashboard: switch domain selector to '${ACTIVE_DOMAIN}'"
+    echo "     to see updated state (${NEXT_GATE})"
+    echo "  ────────────────────────────────────────────────────────────────"
+    ;;
+
+  insist)
+    # S002-P005-WP002: Stay at gate — generate correction prompt
+    _refresh_state_snapshot
+    GATE=$(_get_gate)
+    $CLI --insist
+    ;;
+
   domain)
     # Show current domain info for both pipelines
     echo ""
@@ -392,6 +638,7 @@ print(f'    Updated: {s.last_updated or \"never\"}')
     fi
 
     GATE=$(_get_gate)
+    _auto_store_gate1_artifact   # AC-10: auto-store before phase transition prompt generation
     echo "[pipeline_run] ${DOMAIN_LABEL}Phase ${PHASE_NUM} — regenerating mandates for: $GATE"
     $CLI --generate-prompt "$GATE" 2>&1 | grep -v "^━"
 
@@ -468,7 +715,7 @@ PYEOF
     ;;
 
   *)
-    echo "Usage: ./pipeline_run.sh [--domain tiktrack|agents_os] [next|pass|fail <reason>|approve|status|gate <NAME>|route doc|full [notes]|revise <notes> [file]|store <GATE> <FILE>|domain|phase<N>]"
+    echo "Usage: ./pipeline_run.sh [--domain tiktrack|agents_os] [next|pass|fail <reason>|approve|status|gate <NAME>|route doc|full [notes]|revise <notes> [file]|store <GATE> <FILE>|pass_with_actions <a1|a2>|actions_clear|override <reason>|insist|domain|phase<N>]"
     echo ""
     echo "  next / (no arg)          Generate current gate prompt + display"
     echo "  pass                     Advance current gate → PASS → show next"
@@ -479,6 +726,10 @@ PYEOF
     echo "  gate <NAME>              Generate prompt for specific gate"
     echo "  revise <notes> [file]    Generate G3_PLAN revision prompt after G3_5 FAIL"
     echo "  store <GATE> <FILE>      Store artifact file to pipeline state"
+    echo "  pass_with_actions <a|b>  Record PASS_WITH_ACTION, hold gate (pipe-separated actions)"
+    echo "  actions_clear            All actions resolved — advance gate"
+    echo "  override <reason>        Override & advance — log reason"
+    echo "  insist                   Stay at gate — generate correction prompt"
     echo "  domain                   Show status of both parallel pipelines"
     echo "  phase<N>                 Show Phase N mandate (after Phase N-1 complete)"
     echo "                           e.g. phase2 → Team 90 validation mandate"

@@ -974,9 +974,20 @@ def _generate_gate_1_mandates(state: PipelineState) -> str:
     Returns the full mandate document (also saved as GATE_1_prompt.md by generate_prompt).
     Same pattern as GATE_8 / _generate_gate_8_mandates.
     """
+    import glob as _glob
     wp  = state.work_package_id
     wpu = wp.replace("-", "_")
-    lld400_path  = f"_COMMUNICATION/team_170/TEAM_170_{wpu}_LLD400_v1.0.0.md"
+
+    # ── Resolve latest LLD400 file (AC-10: use newest version, not hardcoded v1.0.0) ─
+    _lld_candidates = sorted(
+        _glob.glob(str(REPO_ROOT / f"_COMMUNICATION/team_170/TEAM_170_{wpu}_LLD400_v*.md"))
+    )
+    lld400_path = (
+        str(Path(_lld_candidates[-1]).relative_to(REPO_ROOT))
+        if _lld_candidates
+        else f"_COMMUNICATION/team_170/TEAM_170_{wpu}_LLD400_v1.0.0.md"
+    )
+
     verdict_path = f"_COMMUNICATION/team_190/TEAM_190_{wpu}_GATE_1_VERDICT_v1.0.0.md"
 
     phase1_task = (
@@ -1857,10 +1868,85 @@ def start_pipeline(spec: str, stage: str = "S002", wp_id: str = ""):
     show_next(state)
 
 
-def advance_gate(gate_id: str, status: str, reason: str = ""):
+def pass_with_actions(actions_str: str) -> None:
+    """S002-P005-WP002: Record PASS_WITH_ACTION, hold gate."""
+    state = PipelineState.load()
+    actions = [a.strip() for a in actions_str.split("|") if a.strip()]
+    state.gate_state = "PASS_WITH_ACTION"
+    state.pending_actions = actions
+    state.override_reason = None
+    state.save()
+    _log(f"PASS_WITH_ACTION recorded — {len(actions)} pending action(s). Gate held at {state.current_gate}.")
+
+
+def actions_clear() -> None:
+    """S002-P005-WP002: All actions resolved — advance gate."""
+    state = PipelineState.load()
+    if state.gate_state != "PASS_WITH_ACTION":
+        _log("Not in PASS_WITH_ACTION state — nothing to clear.")
+        return
+    state.gate_state = None
+    state.pending_actions = []
+    state.override_reason = None
+    gate_id = state.current_gate
+    advance_gate(gate_id, "PASS", "", force=True)
+
+
+def override_gate(reason: str) -> None:
+    """S002-P005-WP002: Nimrod override — advance with logged reason."""
+    state = PipelineState.load()
+    if state.gate_state != "PASS_WITH_ACTION":
+        _log("Not in PASS_WITH_ACTION state — override not applicable.")
+        return
+    state.gate_state = "OVERRIDE"
+    state.override_reason = reason or "Override (no reason given)"
+    state.pending_actions = []
+    state.save()
+    gate_id = state.current_gate
+    advance_gate(gate_id, "PASS", "", force=True)
+    _log(f"Override reason logged: {state.override_reason}")
+
+
+def insist_gate() -> None:
+    """S002-P005-WP002: Nimrod insist — stay at gate, generate correction prompt."""
+    state = PipelineState.load()
+    if state.gate_state != "PASS_WITH_ACTION":
+        _log("Not in PASS_WITH_ACTION state — insist not applicable.")
+        return
+    _log("Staying at gate — generating correction prompt for responsible team...")
+    show_next(state)
+
+
+def advance_gate(gate_id: str, status: str, reason: str = "", force: bool = False):
     state = PipelineState.load()
 
+    # S002-P005-WP002: Block PASS when gate_state=PASS_WITH_ACTION unless --force
+    if status == "PASS" and state.gate_state == "PASS_WITH_ACTION" and not force:
+        _log("")
+        _log("════════════════════════════════════════════════════════════════════")
+        _log("  ⚠️  ADVANCE BLOCKED — Gate is in PASS_WITH_ACTION state")
+        _log("")
+        _log("  Pending actions must be resolved before advancing:")
+        for a in (state.pending_actions or []):
+            _log(f"    • {a}")
+        _log("")
+        _log("  Options:")
+        _log("    1. actions_clear — All actions resolved → advance gate")
+        _log("    2. override     — Advance with logged reason (Nimrod decision)")
+        _log("    3. insist      — Stay at gate, generate correction prompt")
+        _log("")
+        _log("  Commands:")
+        _log("    ./pipeline_run.sh actions_clear")
+        _log('    ./pipeline_run.sh override "reason text"')
+        _log("    ./pipeline_run.sh insist")
+        _log("════════════════════════════════════════════════════════════════════")
+        sys.exit(1)
+
     if status == "PASS":
+        # Clear PWA fields on normal advance (or after actions_clear/override).
+        # S002-P005-WP002 AC-04: override_reason is preserved for audit — do NOT clear.
+        state.gate_state = None
+        state.pending_actions = []
         state.gates_completed.append(gate_id)
         if gate_id == "GATE_2":
             state.current_gate = "WAITING_GATE2_APPROVAL"
@@ -1939,20 +2025,25 @@ def advance_gate(gate_id: str, status: str, reason: str = ""):
         show_next(state)
 
 
-def store_artifact(gate_id: str, file_path: str):
+def store_artifact(gate_id: str, file_path: str) -> bool:
     """Store agent output file content to the appropriate pipeline state field.
 
     Gate → field mapping:
       GATE_1                → state.lld400_content
       G3_PLAN               → state.work_plan
       CURSOR_IMPLEMENTATION → state.implementation_files (one path per line)
+
+    Returns:
+      True  — artifact stored successfully.
+      False — failure (file not found, unsupported gate, or I/O error).
+              Caller should sys.exit(1) when False is returned from CLI context.
     """
     path = Path(file_path)
     if not path.exists():
         path = REPO_ROOT / file_path
     if not path.exists():
         _log(f"ERROR: File not found: {file_path}")
-        return
+        return False
 
     content = path.read_text(encoding="utf-8")
     state = PipelineState.load()
@@ -1967,7 +2058,7 @@ def store_artifact(gate_id: str, file_path: str):
     if not field_name:
         _log(f"ERROR: No state field mapping for gate: {gate_id}")
         _log(f"Supported gates: {', '.join(GATE_TO_FIELD.keys())}")
-        return
+        return False
 
     if field_name == "implementation_files":
         files = [
@@ -1983,6 +2074,7 @@ def store_artifact(gate_id: str, file_path: str):
 
     state.save()
     _log(f"Gate {gate_id} artifact stored successfully.")
+    return True
 
 
 def main():
@@ -1993,7 +2085,7 @@ def main():
     parser.add_argument("--advance", nargs=2, metavar=("GATE", "STATUS"), help="Advance gate: GATE_X PASS|FAIL")
     parser.add_argument("--reason", type=str, default="", help="Failure reason")
     parser.add_argument("--store-artifact", nargs=2, metavar=("GATE", "FILE"),
-                        help="Store agent output file to pipeline state. G3_PLAN→work_plan, G3_5→validation, CURSOR_IMPLEMENTATION→impl_files")
+                        help="Store agent output file to pipeline state. GATE_1→lld400_content, G3_PLAN→work_plan, CURSOR_IMPLEMENTATION→implementation_files")
     parser.add_argument("--generate-prompt", type=str, metavar="GATE", help="Generate prompt for gate")
     parser.add_argument("--revision-notes", type=str, default="",
                         help="Revision notes to include in prompt (for G3_PLAN after G3_5 FAIL). "
@@ -2017,6 +2109,13 @@ def main():
         "--force-gate4", action="store_true", dest="force_gate4",
         help="Override commit freshness check before GATE_4 (use when commits exist on a different branch)"
     )
+    parser.add_argument("--force", action="store_true", help="Bypass PASS_WITH_ACTION gate hold (use with --advance PASS only)")
+    # S002-P005-WP002: PASS_WITH_ACTION governance
+    parser.add_argument("--pass-with-actions", type=str, metavar="ACTIONS",
+                        help="Record PASS_WITH_ACTION; actions pipe-separated (a1|a2|a3); gate held")
+    parser.add_argument("--actions-clear", action="store_true", help="All actions resolved — advance gate")
+    parser.add_argument("--override", type=str, metavar="REASON", help="Override & advance — log reason, advance gate")
+    parser.add_argument("--insist", action="store_true", help="Stay at gate — generate correction prompt")
     args = parser.parse_args()
 
     if args.route:
@@ -2024,15 +2123,24 @@ def main():
         route_after_fail(gate_id, route_type, args.reason)
     elif args.store_artifact:
         gate_id, file_path = args.store_artifact
-        store_artifact(gate_id, file_path)
+        if not store_artifact(gate_id, file_path):
+            sys.exit(1)
     elif args.status:
         show_status()
     elif args.next:
         show_next()
     elif args.spec:
         start_pipeline(args.spec, args.stage, args.wp)
+    elif args.pass_with_actions is not None:
+        pass_with_actions(args.pass_with_actions)
+    elif args.actions_clear:
+        actions_clear()
+    elif args.override is not None:
+        override_gate(args.override)
+    elif args.insist:
+        insist_gate()
     elif args.advance:
-        advance_gate(args.advance[0], args.advance[1], args.reason)
+        advance_gate(args.advance[0], args.advance[1], args.reason, force=args.force)
     elif args.approve:
         gate = args.approve
         approve_map = {

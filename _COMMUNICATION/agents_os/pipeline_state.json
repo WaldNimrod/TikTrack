@@ -1,20 +1,23 @@
 {
-  "pipe_run_id": "b3e7f901",
-  "work_package_id": "S001-P002-WP001",
-  "stage_id": "S001",
+  "pipe_run_id": "65e625b3",
+  "work_package_id": "REQUIRED",
+  "stage_id": "S002",
   "project_domain": "tiktrack",
-  "spec_brief": "S001-P002 WP001: Alerts Summary Widget on D15.I home dashboard. Read-only frontend component. Triggered-unread count badge + list of N=5 most recent, fully hidden when 0. Uses existing GET /api/v1/alerts/ endpoint. Per-alert: ticker symbol · condition label · triggered_at relative time. Click item → D34. Click badge → D34 filtered unread. collapsible-container Iron Rule. maskedLog mandatory. No new backend, no schema changes.",
-  "current_gate": "GATE_1",
-  "gates_completed": [
+  "spec_brief": "",
+  "current_gate": "GATE_0",
+  "gates_completed": [],
+  "gates_failed": [
     "GATE_0"
   ],
-  "gates_failed": [],
   "lld400_content": "",
   "work_plan": "",
   "mandates": "",
   "implementation_files": [],
   "implementation_endpoints": [],
   "spec_path": "",
-  "started_at": "2026-03-14T18:30:00.000000+00:00",
-  "last_updated": "2026-03-14T22:15:00.000000+00:00"
+  "started_at": "",
+  "last_updated": "2026-03-15T11:00:18.123515+00:00",
+  "gate_state": null,
+  "pending_actions": [],
+  "override_reason": null
 }

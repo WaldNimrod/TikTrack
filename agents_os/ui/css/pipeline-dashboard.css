@@ -67,9 +67,9 @@
 .copy-flash { background: var(--success) !important; color: #000 !important; }
 
 .cmd-list { display: flex; flex-direction: column; gap: 8px; }
-.cmd-row { display: flex; align-items: center; gap: 10px; background: #010409; border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; }
-.cmd-text { font-family: var(--mono); font-size: 12px; flex: 1; color: #e6edf3; }
-.cmd-desc { font-size: 11px; color: var(--text-muted); min-width: 160px; }
+.cmd-row { display: flex; align-items: center; gap: 10px; background: #010409; border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; flex-wrap: wrap; }
+.cmd-text { font-family: var(--mono); font-size: 12px; flex: 1; min-width: 0; color: #e6edf3; word-break: break-all; }
+.cmd-desc { font-size: 11px; color: var(--text-muted); min-width: 140px; }
 .cmd-copy { flex-shrink: 0; }
 
 .booster-panel { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; }
@@ -156,8 +156,16 @@
 .qa-btn-fail:hover { background: rgba(248,81,73,0.08); }
 .qa-btn-approve { border-color: var(--warning); color: var(--warning); }
 .qa-btn-approve:hover { background: rgba(210,153,34,0.1); }
+/* Verdict-driven button states — applied by applyVerdictToButtons() */
+.qa-btn-pass.verdict-dimmed { opacity: 0.28; pointer-events: none; cursor: default; }
+.qa-btn-pass.verdict-pass-active { background: rgba(63,185,80,0.14); box-shadow: 0 0 0 2px rgba(63,185,80,0.3); }
+.qa-btn-fail.verdict-active { background: rgba(248,81,73,0.14); box-shadow: 0 0 0 2px rgba(248,81,73,0.35); }
 
 .findings-builder { padding: 12px 14px; background: var(--surface2); border: 2px solid var(--accent); border-radius: 8px; margin-top: 8px; }
+/* Verdict-driven builder states */
+.findings-builder.verdict-block { border-color: var(--danger); background: rgba(248,81,73,0.05); }
+.findings-builder.verdict-block .findings-builder-title { color: var(--danger); }
+.findings-builder.verdict-pass { border-color: var(--success); opacity: 0.6; }
 .findings-builder-title { font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .findings-status { font-size: 10px; font-weight: 400; }
 .findings-textarea { width: 100%; min-height: 70px; font-family: var(--mono); font-size: 11px; border: 1px solid var(--border); border-radius: 4px; padding: 7px 8px; background: #010409; color: #e6edf3; resize: vertical; }
@@ -186,3 +194,157 @@
 .prog-msg { font-size: 11px; margin-top: 6px; }
 .prog-done-banner { background: rgba(63,185,80,0.12); border: 1px solid var(--success); border-radius: 6px; padding: 10px 14px; margin-top: 10px; display: flex; align-items: center; justify-content: space-between; }
 .prog-next-banner { background: rgba(210,153,34,0.1); border: 1px solid var(--warning); border-radius: 6px; padding: 10px 14px; margin-top: 10px; font-size: 12px; }
+
+/* ── Phase Tracker (two-phase gates: GATE_1, GATE_8) ──────────────────────── */
+.phase-tracker { display: flex; align-items: center; gap: 0; margin-bottom: 12px; }
+.phase-step { flex: 1; padding: 8px 12px; border: 1px solid var(--border); font-size: 11px; font-weight: 600; text-align: center; position: relative; }
+.phase-step:first-child { border-radius: 6px 0 0 6px; }
+.phase-step:last-child { border-radius: 0 6px 6px 0; }
+.phase-step.phase-done { background: rgba(63,185,80,0.1); border-color: var(--success); color: var(--success); }
+.phase-step.phase-active { background: rgba(88,166,255,0.1); border-color: var(--accent); color: var(--accent); }
+.phase-step.phase-pending { background: var(--surface); color: var(--text-muted); }
+.phase-arrow { color: var(--text-muted); font-size: 14px; padding: 0 2px; flex-shrink: 0; }
+
+/* ── Next Action Banner ────────────────────────────────────────────────────── */
+.next-action-banner { background: rgba(88,166,255,0.08); border: 2px solid var(--accent); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; }
+.next-action-title { font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.next-action-cmd { font-family: var(--mono); font-size: 11px; background: #010409; padding: 8px 10px; border-radius: 4px; color: #e6edf3; border: 1px solid var(--border); margin-bottom: 8px; word-break: break-all; }
+.next-action-note { font-size: 10px; color: var(--text-muted); line-height: 1.5; }
+
+/* ── Correction Cycle Panel (replaces route selector for self-loop gates) ── */
+.correction-cycle-panel { background: rgba(210,153,34,0.08); border: 2px solid var(--warning); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; }
+.correction-cycle-title { font-size: 12px; font-weight: 700; color: var(--warning); margin-bottom: 8px; }
+.correction-cycle-step { font-size: 11px; margin-bottom: 6px; padding-left: 16px; position: relative; }
+.correction-cycle-step::before { content: attr(data-n); position: absolute; left: 0; color: var(--warning); font-weight: 700; }
+
+/* ── Pass With Action button + banner (WP002) ─────────────────────────────── */
+.qa-btn-pwa { border-color: var(--warning); color: var(--warning); }
+.qa-btn-pwa:hover { background: rgba(210,153,34,0.1); }
+.pwa-badge { background: rgba(210,153,34,0.15); border: 1px solid var(--warning); border-radius: 4px; font-size: 9px; padding: 1px 5px; margin-left: 4px; color: var(--warning); font-weight: 700; vertical-align: middle; }
+
+/* PWA state banner — shown when pipeline gate_state === "PASS_WITH_ACTION" */
+.pwa-banner { background: rgba(210,153,34,0.10); border: 1px solid var(--warning); border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; }
+.pwa-banner-title { font-size: 12px; font-weight: 700; color: var(--warning); margin-bottom: 6px; }
+.pwa-action-item { font-size: 11px; color: var(--text); padding: 3px 0; border-bottom: 1px solid var(--border); }
+.pwa-action-item:last-of-type { border-bottom: none; }
+.pwa-btn-clear { border-color: var(--success); color: var(--success); }
+.pwa-btn-clear:hover { background: rgba(63,185,80,0.1); }
+.pwa-btn-override { border-color: var(--danger); color: var(--danger); }
+.pwa-btn-override:hover { background: rgba(248,81,73,0.1); }
+
+/* ── Current Step Banner — always visible above Gate Context (all gates) ─── */
+.current-step-banner {
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  background: rgba(88,166,255,0.06);
+}
+.current-step-banner.csb-phase2 {
+  border-color: var(--success);
+  background: rgba(63,185,80,0.06);
+}
+.current-step-banner.csb-correction {
+  border-color: var(--warning);
+  background: rgba(210,153,34,0.06);
+}
+.current-step-banner.csb-human {
+  border-color: var(--warning);
+  background: rgba(210,153,34,0.06);
+}
+.current-step-banner.csb-pwa {
+  border-color: var(--warning);
+  background: rgba(210,153,34,0.08);
+}
+.csb-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.csb-actor {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+.csb-engine-badge {
+  font-size: 10px;
+  background: rgba(88,166,255,0.15);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 2px 7px;
+  color: var(--accent);
+  font-weight: 600;
+}
+.csb-phase2 .csb-engine-badge {
+  border-color: var(--success);
+  color: var(--success);
+  background: rgba(63,185,80,0.15);
+}
+.csb-correction .csb-engine-badge,
+.csb-human .csb-engine-badge {
+  border-color: var(--warning);
+  color: var(--warning);
+  background: rgba(210,153,34,0.15);
+}
+.csb-phase-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-left: auto;
+  font-style: italic;
+  white-space: nowrap;
+}
+.csb-steps { display: flex; flex-direction: column; gap: 7px; }
+.csb-step { display: flex; align-items: flex-start; gap: 8px; }
+.csb-step-num {
+  width: 19px; height: 19px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.csb-phase2 .csb-step-num { background: var(--success); }
+.csb-correction .csb-step-num,
+.csb-human .csb-step-num { background: var(--warning); }
+.csb-step-text { font-size: 11px; color: var(--text); line-height: 1.55; }
+
+/* Active-phase indicator badge on Phase 2+ mandate tabs */
+.phase-active-badge {
+  background: rgba(63,185,80,0.2);
+  border: 1px solid var(--success);
+  border-radius: 4px;
+  font-size: 9px;
+  padding: 1px 5px;
+  margin-left: 4px;
+  color: var(--success);
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+/* Help Modal — Tab System (TEAM_00_HELP_MODAL_UPGRADE) */
+.help-tab-bar { display: flex; gap: 4px; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+.help-tab-btn { background: transparent; border: 1px solid var(--border); border-radius: 4px; padding: 4px 12px; font-size: 13px; cursor: pointer; color: var(--text-secondary); }
+.help-tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.help-tab-btn:hover:not(.active) { background: var(--surface-hover); }
+
+.help-tab-content { display: none; }
+.help-tab-content.active { display: block; }
+
+.help-context-banner { background: var(--surface-elevated); border-left: 3px solid var(--accent); padding: 8px 12px; border-radius: 4px; margin-bottom: 12px; font-size: 13px; }
+.help-context-next { margin-top: 4px; color: var(--text-primary); }
+.help-context-cmd { margin-top: 4px; color: var(--text-secondary); font-size: 12px; }
+
+.help-modes-box { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.help-mode-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; }
+.help-mode-badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 3px; white-space: nowrap; }
+.help-mode-badge.mode-1 { background: #555; color: #fff; }
+.help-mode-badge.mode-2 { background: var(--accent); color: #fff; }
+.help-mode-badge.mode-3 { background: var(--success); color: #fff; }
+
+.help-trouble-item { border: 1px solid var(--border); border-radius: 4px; padding: 8px 12px; margin-bottom: 8px; font-size: 13px; }
+.help-trouble-item strong { display: block; margin-bottom: 4px; }

@@ -1,5 +1,46 @@
 /* pipeline-roadmap.css — Team 61 AOUI LOD400 — Roadmap-specific styles */
 
+/* ── Roadmap 3-column layout: sidebar | tree | program details ── */
+.agents-roadmap-layout {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  min-height: calc(100vh - 140px);
+  width: 100%;
+  overflow: visible;
+}
+@media (max-width: 768px) {
+  .agents-roadmap-layout { flex-direction: column; }
+}
+.agents-roadmap-sidebar {
+  flex: 0 0 300px;
+  width: 300px;
+  min-width: 300px;
+  padding: 16px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--bg);
+}
+.agents-roadmap-col1 {
+  flex: 1 1 35%;
+  min-width: 200px;
+  padding: 16px 20px;
+  overflow-y: auto;
+  background: var(--bg);
+  border-right: 1px solid var(--border);
+  align-self: stretch;
+}
+.agents-roadmap-col2 {
+  flex: 1 1 35%;
+  min-width: 200px;
+  padding: 16px 20px;
+  overflow-y: auto;
+  background: var(--bg);
+  align-self: stretch;
+}
+
 /* Roadmap tree */
 .rm-stage { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; overflow: hidden; }
 .rm-stage-active { border-color: var(--current) !important; }

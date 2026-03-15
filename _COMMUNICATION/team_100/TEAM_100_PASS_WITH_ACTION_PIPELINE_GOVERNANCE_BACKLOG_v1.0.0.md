@@ -168,4 +168,19 @@ Suggested trigger: when S002-P005 WP001 GATE_8 is confirmed closed, activate WP0
 
 ---
 
+## 7) WP002 Deliverables Registry (canonical — per TEAM_00_ROADMAP_INTEGRATION)
+
+| Deliverable | Status | Reference |
+|-------------|--------|-----------|
+| `gate_state` / `pending_actions` / `override_reason` schema fields | DELIVERED | state.py; GATE_6 AC-01..AC-08 |
+| `pass_with_actions` command | DELIVERED | GATE_6 AC-01 |
+| `actions_clear` command | DELIVERED | GATE_6 AC-03 |
+| `override` command | DELIVERED | GATE_6 AC-04 |
+| `insist` command | **PENDING** (OBS-02 — Team 61) | GATE_6 decision OBS-02 |
+| PWA dashboard banner (CSS/JS) | STATIC_OK → browser verify GATE_7 | GATE_6 AC-05 |
+| Help modal upgrade (4-tab, Three Modes, context banner) | **IN PROGRESS** (Team 61) | `TEAM_00_TO_TEAM_61_HELP_MODAL_UPGRADE_MANDATE_v1.0.0.md` |
+
+---
+
 **log_entry | TEAM_100 | PASS_WITH_ACTION_BACKLOG | DESIGN_LOCKED | PENDING_SCHEDULING | 2026-03-15**
+**log_entry | TEAM_170 | WP002_DELIVERABLES_REGISTRY | REGISTERED_PER_ROADMAP_INTEGRATION | 2026-03-15**

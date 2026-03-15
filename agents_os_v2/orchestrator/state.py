@@ -36,6 +36,10 @@ class PipelineState:
     spec_path: str = ""  # Path to LLD400 spec file for G3.7 test template generation
     started_at: str = ""
     last_updated: str = ""
+    # S002-P005-WP002: PASS_WITH_ACTION governance
+    gate_state: Optional[str] = None       # null | "PASS_WITH_ACTION" | "OVERRIDE"
+    pending_actions: list[str] = field(default_factory=list)
+    override_reason: Optional[str] = None
 
     def _state_file(self) -> Path:
         return get_state_file(self.project_domain)
@@ -50,23 +54,81 @@ class PipelineState:
 
     @classmethod
     def load(cls, domain: str | None = None) -> "PipelineState":
-        # Resolve domain: explicit arg > PIPELINE_DOMAIN env > auto-detect
-        if domain is None:
-            domain = os.environ.get("PIPELINE_DOMAIN") or None
+        """Load pipeline state.
 
-        # Try domain-specific file first, fall back to legacy pipeline_state.json
-        candidates = []
-        if domain:
-            candidates.append(get_state_file(domain))
-        # Auto-detect: look for any domain-specific state file
-        for d in ("tiktrack", "agents_os"):
-            candidates.append(get_state_file(d))
-        candidates.append(STATE_FILE)  # legacy fallback
+        Priority:  explicit arg  >  PIPELINE_DOMAIN env  >  auto-detect.
 
-        for path in candidates:
+        Auto-detect rules (when no domain is given):
+          - Scan all known domains for "active" WPs (past GATE_0 / NOT_STARTED).
+          - Exactly 1 active  → deterministic auto-select (no warning needed).
+          - 0 active          → legacy pipeline_state.json fallback / empty state.
+          - 2+ active         → print error to stderr and sys.exit(1).
+            The caller MUST add --domain to resolve the ambiguity.
+
+        This ensures domain resolution is uniform across ALL code paths
+        (bash commands, Python CLI, inline helpers) — no silent defaults.
+        """
+        import sys
+
+        # ── 1. Explicit domain (arg or env) → load directly ─────────────────
+        resolved = domain or os.environ.get("PIPELINE_DOMAIN") or None
+        if resolved:
+            path = get_state_file(resolved)
             if path.exists():
                 data = json.loads(path.read_text(encoding="utf-8"))
                 return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
+            return cls(project_domain=resolved)
+
+        # ── 2. No explicit domain → scan known domains for active WPs ────────
+        # "active" = has a real work_package_id AND is past the initial gate.
+        _INACTIVE_GATES = {"", "GATE_0", "NOT_STARTED"}
+        _PLACEHOLDER_WPS = {"", "REQUIRED"}
+        active: list[tuple[str, Path, dict]] = []
+        for d in ("tiktrack", "agents_os"):
+            p = get_state_file(d)
+            if not p.exists():
+                continue
+            try:
+                s = json.loads(p.read_text(encoding="utf-8"))
+                wp   = s.get("work_package_id", "").strip()
+                gate = s.get("current_gate", "").strip()
+                if wp not in _PLACEHOLDER_WPS and gate not in _INACTIVE_GATES:
+                    active.append((d, p, s))
+            except Exception:
+                pass
+
+        if len(active) == 1:
+            # Single active pipeline — deterministic, no ambiguity
+            _d, _p, data = active[0]
+            return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
+
+        if len(active) > 1:
+            # Ambiguous — multiple active pipelines — hard block
+            lines = "\n".join(
+                f"  {d:12s}  WP: {s.get('work_package_id', '?'):30s}"
+                f"  Gate: {s.get('current_gate', '?')}"
+                for d, _, s in active
+            )
+            print(
+                "\n"
+                "════════════════════════════════════════════════════════════════════\n"
+                "  🔴 DOMAIN AMBIGUOUS — operation blocked\n"
+                "\n"
+                "  Multiple active pipelines found. Specify domain explicitly:\n"
+                f"{lines}\n"
+                "\n"
+                "  Fix — add --domain flag:\n"
+                "    ./pipeline_run.sh --domain tiktrack  <command>\n"
+                "    ./pipeline_run.sh --domain agents_os <command>\n"
+                "════════════════════════════════════════════════════════════════════\n",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+
+        # ── 3. No active pipeline → legacy fallback / empty state ────────────
+        if STATE_FILE.exists():
+            data = json.loads(STATE_FILE.read_text(encoding="utf-8"))
+            return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
         return cls()
 
     @classmethod

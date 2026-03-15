@@ -1,10 +1,18 @@
 /* pipeline-teams.css — Team 61 AOUI LOD400 — Teams page specific */
-/* Teams uses grid 220px 1fr (NOT agents-page-layout) */
+/* Per Agents LTR: sidebar 300px left, two central columns 50/50 */
 
-.teams-layout { display: grid; grid-template-columns: 220px 1fr; height: calc(100vh - 88px); overflow: hidden; }
+.teams-layout { display: grid; grid-template-columns: 300px 1fr 1fr; gap: 0; height: calc(100vh - 140px); overflow: hidden; }
+.teams-layout .team-list { padding: 0; }
+.teams-layout .team-panel { padding: 20px; }
+@media (max-width: 960px) {
+  .teams-layout { grid-template-columns: 1fr; }
+  .team-panel { grid-column: 1; grid-template-columns: 1fr; }
+}
 
-.team-list { border-right: 1px solid var(--border); overflow-y: auto; background: var(--surface); }
+.team-list { border-right: 1px solid var(--border); overflow-y: auto; background: var(--surface); min-width: 0; }
 .team-list-header { padding: 12px 14px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); border-bottom: 1px solid var(--border); font-weight: 600; }
+.team-group { margin-bottom: 4px; }
+.team-group-header { padding: 8px 14px 4px; font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); font-weight: 700; border-bottom: 1px solid var(--border); }
 .team-item { display: flex; align-items: center; gap: 8px; padding: 9px 14px; cursor: pointer; border-bottom: 1px solid rgba(48,54,61,0.5); transition: background 0.12s; }
 .team-item:hover { background: rgba(88,166,255,0.06); }
 .team-item.active { background: rgba(31,111,235,0.14); border-left: 3px solid var(--accent); }
@@ -16,8 +24,9 @@
 .dot-human { background: var(--warning); }
 .dot-auto { background: var(--text-muted); }
 
-.team-panel { overflow-y: auto; padding: 20px; }
-.team-panel-empty { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); font-size: 13px; }
+.team-panel { overflow-y: auto; padding: 20px; grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-content: start; }
+.team-panel-col1, .team-panel-col2 { min-width: 0; }
+.team-panel-empty { grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; min-height: 200px; color: var(--text-muted); font-size: 13px; }
 
 .team-header-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin-bottom: 16px; }
 .team-header-card h2 { font-size: 16px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }

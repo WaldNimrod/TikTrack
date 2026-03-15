@@ -1,11 +1,11 @@
 {
   "pipe_run_id": "5ec473cb",
-  "work_package_id": "S002-P005-WP001",
+  "work_package_id": "S002-P005-WP002",
   "stage_id": "S002",
   "project_domain": "agents_os",
-  "spec_brief": "ADR-031 Stage A: Writing Semantics Hardening",
-  "current_gate": "GATE_0",
-  "gates_completed": [],
+  "spec_brief": "Pipeline Governance — PASS_WITH_ACTION micro-cycle",
+  "current_gate": "GATE_8",
+  "gates_completed": ["GATE_0", "GATE_1", "GATE_2", "GATE_3", "GATE_4", "GATE_5", "GATE_6", "GATE_7"],
   "gates_failed": [],
   "lld400_content": "",
   "work_plan": "",
@@ -14,5 +14,8 @@
   "implementation_endpoints": [],
   "spec_path": "",
   "started_at": "",
-  "last_updated": "2026-03-14T18:03:51.184136+00:00"
+  "last_updated": "2026-03-10T14:30:00.000000+00:00",
+  "gate_state": null,
+  "pending_actions": [],
+  "override_reason": null
 }

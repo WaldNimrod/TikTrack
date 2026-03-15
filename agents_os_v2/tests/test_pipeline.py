@@ -1,7 +1,10 @@
 """Tests for Pipeline Orchestrator — state management and routing."""
 
+import os
 import sys
 import json
+import subprocess
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -31,18 +34,23 @@ class TestPipelineState:
         assert "GATE_0" in state.gates_failed
         assert state.gates_completed == []
 
-    def test_save_and_load(self, tmp_path):
+    def test_save_and_load(self, tmp_path, monkeypatch):
         import agents_os_v2.orchestrator.state as state_mod
-        original = state_mod.STATE_FILE
-        state_mod.STATE_FILE = tmp_path / "test_state.json"
-        try:
-            state = PipelineState(work_package_id="S002-P001-WP001", current_gate="GATE_3")
-            state.save()
-            loaded = PipelineState.load()
-            assert loaded.work_package_id == "S002-P001-WP001"
-            assert loaded.current_gate == "GATE_3"
-        finally:
-            state_mod.STATE_FILE = original
+
+        monkeypatch.setattr(state_mod, "STATE_FILE", tmp_path / "legacy_state.json")
+        monkeypatch.setattr(state_mod, "get_state_file",
+                            lambda domain: tmp_path / f"pipeline_state_{domain}.json")
+        monkeypatch.setenv("PIPELINE_DOMAIN", "agents_os")
+
+        state = PipelineState(
+            work_package_id="S002-P001-WP001",
+            current_gate="GATE_3",
+            project_domain="agents_os",
+        )
+        state.save()
+        loaded = PipelineState.load()
+        assert loaded.work_package_id == "S002-P001-WP001"
+        assert loaded.current_gate == "GATE_3"
 
 
 class TestGateRouter:
@@ -78,3 +86,41 @@ class TestGateResult:
         r = GateResult(gate_id="GATE_5", status="FAIL", findings=[{"check": "SC-01", "message": "missing"}])
         assert r.status == "FAIL"
         assert len(r.findings) == 1
+
+
+def test_store_artifact_missing_file_exits_nonzero():
+    """AO2-STORE-001: --store-artifact with missing file must exit non-zero."""
+    result = subprocess.run(
+        [
+            sys.executable, "-m", "agents_os_v2.orchestrator.pipeline",
+            "--store-artifact", "GATE_1", "/tmp/definitely_does_not_exist_ao2_store.md",
+        ],
+        capture_output=True,
+        env={**os.environ, "PIPELINE_DOMAIN": "agents_os"},
+    )
+    assert result.returncode != 0, (
+        f"Expected non-zero exit on missing file, got {result.returncode}. "
+        f"stderr: {result.stderr.decode()}"
+    )
+
+
+def test_store_artifact_unsupported_gate_exits_nonzero():
+    """AO2-STORE-001: --store-artifact with unsupported gate must exit non-zero."""
+    with tempfile.NamedTemporaryFile(suffix=".md", delete=False, mode="w") as f:
+        f.write("# test content\n")
+        tmp_path = f.name
+    try:
+        result = subprocess.run(
+            [
+                sys.executable, "-m", "agents_os_v2.orchestrator.pipeline",
+                "--store-artifact", "GATE_999_UNSUPPORTED", tmp_path,
+            ],
+            capture_output=True,
+            env={**os.environ, "PIPELINE_DOMAIN": "agents_os"},
+        )
+        assert result.returncode != 0, (
+            f"Expected non-zero exit on unsupported gate, got {result.returncode}. "
+            f"stderr: {result.stderr.decode()}"
+        )
+    finally:
+        os.unlink(tmp_path)

@@ -1,16 +1,31 @@
 <!DOCTYPE html>
-<html lang="en" class="theme-tiktrack">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+  (function(){var d=localStorage.getItem("pipeline_domain")||"tiktrack";
+  document.documentElement.classList.toggle("theme-tiktrack",d==="tiktrack");})();
+  </script>
   <title>TikTrack — Pipeline Dashboard</title>
-  <link rel="stylesheet" href="css/pipeline-shared.css" />
-  <link rel="stylesheet" href="css/pipeline-dashboard.css" />
+  <link rel="stylesheet" href="css/pipeline-shared.css?v=2" />
+  <link rel="stylesheet" href="css/pipeline-dashboard.css?v=2" />
   <!-- styles in pipeline-shared.css + pipeline-dashboard.css -->
 </head>
 <body>
 
-<!-- ── Top Navigation ── -->
+<!-- ── Logo + Title (above nav, per Agents LTR) ── -->
+<header class="agents-header">
+  <div class="agents-header-left">
+    <h1 class="agents-header-title">📊 Agents OS — <span>Pipeline Dashboard</span></h1>
+    <span class="domain-badge" id="domain-badge-header">—</span>
+    <span class="agents-refresh-label" id="last-updated">Loading…</span>
+  </div>
+  <div class="agents-header-right">
+    <button class="btn help-btn" onclick="toggleHelp()" title="Help & Documentation">?</button>
+  </div>
+</header>
+
 <nav class="pipeline-nav">
   <a class="nav-link active" href="PIPELINE_DASHBOARD.html">📊 Dashboard</a>
   <span class="nav-sep"></span>
@@ -19,224 +34,152 @@
   <a class="nav-link" href="PIPELINE_TEAMS.html">👥 Teams</a>
 </nav>
 
-<header class="agents-header">
-  <div class="agents-header-left">
-    <h1 class="agents-header-title">📊 Agents OS — <span>Pipeline Dashboard</span></h1>
-    <span class="domain-badge" id="domain-badge-header">tiktrack</span>
-    <span class="agents-refresh-label" id="last-updated">Loading…</span>
-  </div>
-  <div class="agents-header-right">
-    <span class="agents-refresh-label" id="refresh-label">Auto (5s)</span>
-    <button class="btn agents-refresh-btn btn-primary" id="refresh-btn" onclick="loadAll()">↺ Refresh</button>
-    <button class="btn help-btn" onclick="toggleHelp()" title="Help & Documentation">?</button>
-  </div>
-</header>
-
 <!-- ── Help Modal ─────────────────────────────────────────────────────────── -->
 <div class="modal-overlay" id="help-modal" onclick="closeHelpOutside(event)">
   <div class="modal-box">
     <button class="modal-close" onclick="toggleHelp()">✕</button>
     <button id="lang-toggle-btn" class="btn" onclick="toggleLang()" title="Toggle language / החלף שפה">🌐 EN</button>
-    <h2 class="lang-en">⚡ Agents OS — Pipeline System Guide</h2>
-    <h2 class="lang-he" dir="rtl" style="display:none">⚡ Agents OS — מדריך מערכת ה־Pipeline</h2>
+    <h2 class="lang-en">⚡ Pipeline Guide</h2>
+    <h2 class="lang-he" dir="rtl" style="display:none">⚡ מדריך Pipeline</h2>
 
-    <h3 class="lang-en">🚀 Quick Start (30 seconds)</h3>
-    <h3 class="lang-he" dir="rtl" style="display:none">🚀 התחלה מהירה (30 שניות)</h3>
+    <div class="help-tab-bar">
+      <button class="help-tab-btn active" data-tab="start" onclick="showHelpTab('start')">🚀 Start</button>
+      <button class="help-tab-btn" data-tab="gates" onclick="showHelpTab('gates')">🗺️ Gates</button>
+      <button class="help-tab-btn" data-tab="commands" onclick="showHelpTab('commands')">📋 Commands</button>
+      <button class="help-tab-btn" data-tab="help" onclick="showHelpTab('help')">❓ Help</button>
+    </div>
+    <div id="help-context-zone"></div>
+
+    <div id="help-tab-start" class="help-tab-content active">
     <div class="lang-en">
+    <div class="help-modes-box">
+      <div class="help-mode-item"><span class="help-mode-badge mode-1">Mode 1</span><span>Legacy — direct team work. Nimrod + Team 10 coordinate manually. No pipeline automation. For edge cases and special situations.</span></div>
+      <div class="help-mode-item"><span class="help-mode-badge mode-2">Mode 2</span><span>Semi-automatic — AOS + dashboard (current). Pipeline manages routing. You run <code>pipeline_run.sh</code> commands; dashboard shows next step.</span></div>
+      <div class="help-mode-item"><span class="help-mode-badge mode-3">Mode 3</span><span>Fully automatic (future). Pipeline engine orchestrates everything. Human involvement only at GATE_2 (intent) and GATE_7 (UX review).</span></div>
+    </div>
+    <h4>🌐 Domain System</h4>
+    <pre># Two separate pipelines — must specify domain when both are active:
+./pipeline_run.sh --domain agents_os pass
+./pipeline_run.sh --domain tiktrack  fail "reason"
+
+# If you omit --domain and both are active:
+# → 🔴 DOMAIN AMBIGUOUS error — add --domain to resolve
+
+# Current domain shown in dashboard header badge</pre>
+    <h4>Quick Start (3-step cycle)</h4>
     <pre># 1. Start the dashboard server (from repo root):
 python3 -m http.server 8090
-# → Open: http://localhost:8090/PIPELINE_DASHBOARD.html
+# → Open: http://localhost:8090/agents_os/ui/PIPELINE_DASHBOARD.html
 
 # 2. Every gate follows the same 3-step cycle:
-./pipeline_run.sh         # ← generate prompt (shows ▼▼▼ block)
-# → paste ▼▼▼ block into the AI tool shown (Cursor / Codex / Claude)
-# → run the AI, get result
-./pipeline_run.sh pass    # ← advance gate → auto-show next</pre>
+./pipeline_run.sh [--domain agents_os]   # generate prompt (▼▼▼ block)
+# → See "Current Step Banner" above Gate Context — it tells you:
+#   - which AI tool to use (Cursor / Gemini / Codex)
+#   - which team is acting
+#   - exact next 3 steps
+# → Paste ▼▼▼ block into the AI tool shown
+# → Run the AI, get result
+
+./pipeline_run.sh [--domain agents_os] pass   # advance gate</pre>
     </div>
     <div class="lang-he" dir="rtl" style="display:none">
-    <pre># 1. Start the dashboard server (from repo root):
-python3 -m http.server 8090
-# → Open: http://localhost:8090/PIPELINE_DASHBOARD.html
-
-# 2. Every gate follows the same 3-step cycle:
-./pipeline_run.sh         # ← generate prompt (shows ▼▼▼ block)
-# → paste ▼▼▼ block into the AI tool shown (Cursor / Codex / Claude)
-# → run the AI, get result
-./pipeline_run.sh pass    # ← advance gate → auto-show next</pre>
+    <div class="help-modes-box">
+      <div class="help-mode-item"><span class="help-mode-badge mode-1">מצב 1</span><span>Legacy — עבודת צוות ישירה. תיאום ידני.</span></div>
+      <div class="help-mode-item"><span class="help-mode-badge mode-2">מצב 2</span><span>Semi-automatic — AOS + dashboard. Pipeline מנהל ניתוב.</span></div>
+      <div class="help-mode-item"><span class="help-mode-badge mode-3">מצב 3</span><span>אוטומטי מלא (עתידי). התערבות אנושית רק ב-GATE_2 וב-GATE_7.</span></div>
+    </div>
+    <h4>מערכת Domain</h4>
+    <pre>./pipeline_run.sh --domain agents_os pass
+./pipeline_run.sh --domain tiktrack  fail "reason"</pre>
+    <h4>התחלה מהירה</h4>
+    <pre>python3 -m http.server 8090
+./pipeline_run.sh [--domain agents_os]
+./pipeline_run.sh [--domain agents_os] pass</pre>
+    </div>
     </div>
 
-    <h3 class="lang-en">📋 All pipeline_run.sh Commands</h3>
-    <h3 class="lang-he" dir="rtl" style="display:none">📋 כל פקודות pipeline_run.sh</h3>
+    <div id="help-tab-gates" class="help-tab-content">
     <div class="lang-en">
-    <pre>./pipeline_run.sh                    # generate + display current gate prompt
-./pipeline_run.sh pass               # advance PASS → show next gate
-./pipeline_run.sh fail "reason"      # advance FAIL with reason
-./pipeline_run.sh approve            # approve human gate (GATE_2, GATE_6, GATE_7)
-./pipeline_run.sh status             # show current state (no prompt)
-./pipeline_run.sh gate GATE_NAME     # generate prompt for a specific gate
-./pipeline_run.sh store GATE file    # store AI output file into pipeline state
-./pipeline_run.sh revise "notes"     # G3_5 FAIL → generate G3_PLAN revision prompt</pre>
-    </div>
-    <div class="lang-he" dir="rtl" style="display:none">
-    <pre>./pipeline_run.sh                    # generate + display current gate prompt
-./pipeline_run.sh pass               # advance PASS → show next gate
-./pipeline_run.sh fail "reason"      # advance FAIL with reason
-./pipeline_run.sh approve            # approve human gate (GATE_2, GATE_6, GATE_7)
-./pipeline_run.sh status             # show current state (no prompt)
-./pipeline_run.sh gate GATE_NAME     # generate prompt for a specific gate
-./pipeline_run.sh store GATE file    # store AI output file into pipeline state
-./pipeline_run.sh revise "notes"     # G3_5 FAIL → generate G3_PLAN revision prompt</pre>
-    </div>
-
-    <h3 class="lang-en">🗺️ Gate Sequence &amp; Owners</h3>
-    <h3 class="lang-he" dir="rtl" style="display:none">🗺️ רצף השלבים (Gates) ובעלים</h3>
-    <div class="lang-en">
-    <div class="step-box"><div class="step-title">GATE_0 — Team 190 (Codex)</div>Validates scope: domain isolation, no active program conflicts, feasibility.</div>
-    <div class="step-box"><div class="step-title">GATE_1 — Team 170 + 190 (Codex)</div>Team 170 produces LLD400 spec → Team 190 validates structure.</div>
-    <div class="step-box"><div class="step-title">GATE_2 — Team 100 + Nimrod (human)</div>Do we approve building this? → <code>./pipeline_run.sh approve</code></div>
-    <div class="step-box"><div class="step-title">G3_PLAN — Team 10 (Cursor)</div>Build implementation work plan: files, owners, API contract, QA criteria.</div>
-    <div class="step-box"><div class="step-title">G3_5 — Team 90 (Codex)</div>Validate work plan: completeness, contracts, test criteria.</div>
-    <div class="step-box"><div class="step-title">G3_6_MANDATES — Orchestrator (auto)</div>Generates per-team mandates deterministically. Output: <code>implementation_mandates.md</code></div>
-    <div class="step-box" style="border-color:var(--warning)"><div class="step-title" style="color:var(--warning)">CURSOR_IMPLEMENTATION — Teams 20 + 30 (Cursor) ← YOU ARE HERE</div>
-      <strong>This gate has 3 internal sub-steps — no CLI command between them:</strong>
-      <ul style="margin-top:6px">
-        <li><strong>Step A — Team 20</strong>: Paste "Team 20 Mandate" from mandates file → API verification → saves <code>_COMMUNICATION/team_20/TEAM_20_S001_P002_WP001_API_VERIFY_v1.0.0.md</code> ✅ <em>(done)</em></li>
-        <li><strong>Step B — Team 30</strong>: After Team 20 file exists → paste "Team 30 Mandate" → implements widget → <strong>git commit required</strong></li>
-        <li><strong>Advance</strong>: <code>./pipeline_run.sh pass</code> — only after BOTH done + commit exists</li>
-      </ul>
-    </div>
+    <div class="step-box"><div class="step-title">GATE_0 — Team 190 (Codex/OpenAI)</div>Validates scope: domain isolation, no active program conflicts, feasibility.</div>
+    <div class="step-box"><div class="step-title">GATE_1 — Team 170 (Gemini) + Team 190 (Codex) — TWO PHASES</div><strong>Phase 1:</strong> Team 170 authors LLD400 spec (Gemini). Dashboard shows Phase 1 banner.<br><strong>Phase 2:</strong> Team 190 validates LLD400 (Codex). Mandate tab auto-selects ▶ SEND NOW.<br><strong>On BLOCK:</strong> Pipeline auto-clears lld400_content → dashboard returns to Phase 1 correction cycle.</div>
+    <div class="step-box"><div class="step-title">GATE_2 — Team 100 + Nimrod (human approval)</div>Do we approve building this? → <code>./pipeline_run.sh approve</code></div>
+    <div class="step-box"><div class="step-title">GATE_3 / G3_PLAN — Team 10 (Cursor)</div>Technical work plan: files, owners, API contract, QA criteria.</div>
+    <div class="step-box"><div class="step-title">G3_5 — Team 190 (Codex)</div>Validate work plan: completeness, contracts, test criteria.</div>
+    <div class="step-box"><div class="step-title">G3_6_MANDATES — Orchestrator (auto)</div>Generates per-team mandates deterministically.</div>
+    <div class="step-box"><div class="step-title">CURSOR_IMPLEMENTATION — Teams 20 + 30 (Cursor)</div>Team 20 (backend) → Team 30 (frontend) → <code>./pipeline_run.sh pass</code> only when both done.</div>
     <div class="step-box"><div class="step-title">GATE_4 — Team 50 (Cursor + MCP)</div>QA: browser tests, 10-point checklist, binary PASS/FAIL report.</div>
-    <div class="step-box"><div class="step-title">GATE_5 — Team 90 (Codex)</div>Dev validation: code vs spec.</div>
-    <div class="step-box"><div class="step-title">GATE_6 — Team 100 + Nimrod (human)</div>Reality vs intent: does what was built match what we approved?</div>
-    <div class="step-box"><div class="step-title">GATE_7 — Nimrod (browser)</div>Scenario checklist: open links, test flows, verify pass criteria → <code>./pipeline_run.sh pass</code></div>
-    <div class="step-box"><div class="step-title">GATE_8 — Team 70 → Team 90 (Codex)</div>Phase 1: Team 70 writes AS_MADE_REPORT + archives WP files. Phase 2: Team 90 validates → WP CLOSED.</div>
+    <div class="step-box"><div class="step-title">GATE_5 — Team 190 (Codex)</div>Dev validation: code vs spec. Outputs structured verdict only.</div>
+    <div class="step-box"><div class="step-title">GATE_6 — Team 100 + Nimrod (human)</div>Reality vs intent: does what was built match what was approved?</div>
+    <div class="step-box"><div class="step-title">GATE_7 — Nimrod (browser)</div>UX sign-off: scenario checklist, test flows → <code>./pipeline_run.sh approve</code></div>
+    <div class="step-box"><div class="step-title">GATE_8 — Team 170 → Team 190 (Codex)</div>Phase 1: Team 170 writes AS_MADE_REPORT + archives WP files. Phase 2: Team 190 validates → WP CLOSED.</div>
     </div>
     <div class="lang-he" dir="rtl" style="display:none">
-    <div class="step-box"><div class="step-title">GATE_0 — Team 190 (Codex)</div>ולידציית היקף: בידוד דומיין, אין התנגשויות תוכנית פעילה.</div>
-    <div class="step-box"><div class="step-title">GATE_1 — Team 170 + 190 (Codex)</div>Team 170 מייצר LLD400 → Team 190 מאמת מבנה.</div>
-    <div class="step-box"><div class="step-title">GATE_2 — Team 100 + Nimrod (human)</div>האם מאשרים לבנות? → <code>./pipeline_run.sh approve</code></div>
-    <div class="step-box"><div class="step-title">G3_PLAN — Team 10 (Cursor)</div>בניית תוכנית עבודה: קבצים, בעלים, חוזה API, קריטריוני QA.</div>
-    <div class="step-box"><div class="step-title">G3_5 — Team 90 (Codex)</div>ולידציית תוכנית עבודה: שלמות, חוזים, קריטריוני בדיקה.</div>
-    <div class="step-box"><div class="step-title">G3_6_MANDATES — Orchestrator (auto)</div>מייצר מנדטים לצוותים. פלט: <code>implementation_mandates.md</code></div>
-    <div class="step-box" style="border-color:var(--warning)"><div class="step-title" style="color:var(--warning)">CURSOR_IMPLEMENTATION — Teams 20 + 30 (Cursor)</div>
-      <strong>לשלב זה 3 תת־צעדים — בלי פקודת CLI ביניהם:</strong>
-      <ul style="margin-top:6px">
-        <li><strong>Step A — Team 20</strong>: הדבק מנדט Team 20 → אימות API → שומר קובץ ✅</li>
-        <li><strong>Step B — Team 30</strong>: אחרי שקובץ Team 20 קיים → הדבק מנדט Team 30 → מימוש → <strong>נדרש git commit</strong></li>
-        <li><strong>המשך</strong>: <code>./pipeline_run.sh pass</code> — רק אחרי ששניהם הושלמו + commit קיים</li>
-      </ul>
+    <div class="step-box"><div class="step-title">GATE_0 — Team 190 (Codex)</div>ולידציית היקף, בידוד דומיין.</div>
+    <div class="step-box"><div class="step-title">GATE_1 — Team 170 + 190 — שתי פאזות</div>פאזה 1: LLD400. פאזה 2: ולידציה. On BLOCK → correction cycle.</div>
+    <div class="step-box"><div class="step-title">GATE_2 — Team 100 + Nimrod</div>האם מאשרים לבנות? → approve</div>
+    <div class="step-box"><div class="step-title">G3_PLAN — Team 10</div>תוכנית עבודה טכנית.</div>
+    <div class="step-box"><div class="step-title">G3_5 — Team 190</div>ולידציית תוכנית.</div>
+    <div class="step-box"><div class="step-title">G3_6_MANDATES — אוטומטי</div>מייצר מנדטים לצוותים.</div>
+    <div class="step-box"><div class="step-title">CURSOR_IMPLEMENTATION — 20+30</div>Team 20 → Team 30 → pass.</div>
+    <div class="step-box"><div class="step-title">GATE_4 — Team 50</div>QA: בדיקות דפדפן.</div>
+    <div class="step-box"><div class="step-title">GATE_5 — Team 190</div>ולידציית פיתוח.</div>
+    <div class="step-box"><div class="step-title">GATE_6 — Team 100 + Nimrod</div>מציאות מול כוונה.</div>
+    <div class="step-box"><div class="step-title">GATE_7 — Nimrod</div>UX sign-off.</div>
+    <div class="step-box"><div class="step-title">GATE_8 — Team 170 → 190</div>AS_MADE + ארכוב.</div>
     </div>
-    <div class="step-box"><div class="step-title">GATE_4 — Team 50 (Cursor + MCP)</div>QA: בדיקות דפדפן, רשימת 10 נקודות, דוח PASS/FAIL.</div>
-    <div class="step-box"><div class="step-title">GATE_5 — Team 90 (Codex)</div>ולידציית פיתוח: קוד מול spec.</div>
-    <div class="step-box"><div class="step-title">GATE_6 — Team 100 + Nimrod (human)</div>מציאות מול כוונה: האם מה שנבנה תואם לאישור?</div>
-    <div class="step-box"><div class="step-title">GATE_7 — Nimrod (browser)</div>רשימת תרחישים: פתח קישורים, בדוק תהליכים, אמת קריטריוני הצלחה → <code>./pipeline_run.sh pass</code></div>
-    <div class="step-box"><div class="step-title">GATE_8 — Team 70 → Team 90 (Codex)</div>שלב 1: Team 70 כותב AS_MADE_REPORT + מארכב קבצי WP. שלב 2: Team 90 מאמת → WP סגור.</div>
     </div>
 
-    <h3 class="lang-en">👥 How Team Mandates Work (CURSOR_IMPLEMENTATION gate)</h3>
-    <h3 class="lang-he" dir="rtl" style="display:none">👥 כיצד עובדים מנדטים של צוותים</h3>
+    <div id="help-tab-commands" class="help-tab-content">
     <div class="lang-en">
-    <p>The <strong>Team Mandates</strong> accordion in this dashboard shows each team's mandate. The order is enforced:</p>
-    <pre>1. Check "Expected Output Files" panel → Team 20 file: 🔴
-2. Open Cursor Composer → paste Team 20 mandate → AI produces API verify file → 🟢
-3. Open new Cursor Composer → paste Team 30 mandate (reads Team 20 file)
-4. Team 30 implements → git commit
-5. ./pipeline_run.sh pass   ← ONLY NOW advance CURSOR_IMPLEMENTATION</pre>
-    <div class="tip-box">✅ <strong>Signal that Team 20 is done:</strong> The "Expected Output Files" panel shows <strong>🟢 Team 20 API verify</strong>. Press ↺ Refresh to update.</div>
-    <div class="alert-box">⚠️ <strong>If Team 20 finds an API gap</strong> (endpoint missing, wrong params): STOP. Do not start Team 30. Post to Team 00 (architect) for decision before continuing.</div>
+    <pre>./pipeline_run.sh [--domain D]                   # generate current gate prompt
+./pipeline_run.sh [--domain D] pass              # advance PASS → show next gate
+./pipeline_run.sh [--domain D] fail "reason"     # advance FAIL with reason
+./pipeline_run.sh [--domain D] approve           # approve human gate (GATE_2/7)
+./pipeline_run.sh [--domain D] status            # show current state only
+./pipeline_run.sh [--domain D] gate GATE_NAME    # generate prompt for specific gate
+./pipeline_run.sh [--domain D] store GATE file   # store AI output into state
+./pipeline_run.sh [--domain D] revise "notes"   # G3_5 FAIL → revision prompt
+./pipeline_run.sh [--domain D] phase2           # (GATE_1) switch to Phase 2 prompt
+
+# --domain flag:
+./pipeline_run.sh --domain agents_os pass
+./pipeline_run.sh --domain tiktrack  fail "reason"
+# Required when both domains have active pipelines (prevents DOMAIN AMBIGUOUS error)</pre>
+    <div class="tip-box">💡 <strong>AC-10 auto-store:</strong> At GATE_1, pipeline auto-detects and stores the latest LLD400 file. Manual <code>store GATE_1 file</code> still works as override.</div>
     </div>
     <div class="lang-he" dir="rtl" style="display:none">
-    <p>אקורדיון <strong>Team Mandates</strong> מציג את המנדט של כל צוות. הסדר מחייב:</p>
-    <pre>1. Check "Expected Output Files" panel → Team 20 file: 🔴
-2. Open Cursor Composer → paste Team 20 mandate → AI produces API verify file → 🟢
-3. Open new Cursor Composer → paste Team 30 mandate (reads Team 20 file)
-4. Team 30 implements → git commit
-5. ./pipeline_run.sh pass   ← ONLY NOW advance CURSOR_IMPLEMENTATION</pre>
-    <div class="tip-box">✅ <strong>סימן ש־Team 20 הסתיים:</strong> בלוח "Expected Output Files" יופיע 🟢 Team 20 API verify. לחץ ↺ Refresh לעדכון.</div>
-    <div class="alert-box">⚠️ <strong>אם Team 20 מוצא פער API:</strong> עצור. אל תתחיל Team 30. העבר ל־Team 00 להחלטה.</div>
+    <pre>./pipeline_run.sh [--domain D] pass
+./pipeline_run.sh [--domain D] fail "reason"
+./pipeline_run.sh [--domain D] approve
+./pipeline_run.sh [--domain D] status
+./pipeline_run.sh [--domain D] phase2</pre>
+    </div>
     </div>
 
-    <h3 class="lang-en">🔄 Handling FAIL (G3_5 or GATE_4)</h3>
-    <h3 class="lang-he" dir="rtl" style="display:none">🔄 טיפול בכשל (FAIL)</h3>
+    <div id="help-tab-help" class="help-tab-content">
     <div class="lang-en">
-    <pre># After G3_5 FAIL:
-./pipeline_run.sh store G3_PLAN _COMMUNICATION/team_10/TEAM_10_..._v1.1.0.md
-./pipeline_run.sh revise "BLOCKER-1: ... BLOCKER-2: ..."
-# → paste revised G3_PLAN prompt into Cursor → Team 10 fixes → ./pipeline_run.sh pass</pre>
+    <h4>FAQ</h4>
+    <p><strong>Q: I got a DOMAIN AMBIGUOUS error.</strong><br>A: Add <code>--domain</code> to your command: <code>./pipeline_run.sh --domain agents_os pass</code></p>
+    <p><strong>Q: I'm at GATE_1 and dashboard shows Phase 2.</strong><br>A: Team 170 submitted LLD400. Mandate tab shows "▶ SEND NOW" for Team 190 (Codex).</p>
+    <p><strong>Q: Team 190 returned BLOCK at GATE_1 Phase 2.</strong><br>A: Pipeline auto-clears LLD400, resets to Phase 1. Team 170 revises and re-submits.</p>
+    <p><strong>Q: I ran Team 20. What's next?</strong><br>A: Check "Expected Output Files" → 🟢. If green, open new Cursor → paste Team 30 mandate.</p>
+    <p><strong>Q: When do I press ./pipeline_run.sh pass?</strong><br>A: Only when ALL sub-steps are done. For CURSOR_IMPLEMENTATION: Team 20 🟢 + Team 30 🟢 + git commit.</p>
+    <p><strong>Q: I forgot where I am.</strong><br>A: "Current Step Banner" (above Gate Context) shows gate, actor, next 3 steps. Or: <code>./pipeline_run.sh status</code></p>
+    <p><strong>Q: I got a BLOCK from Team 190 (not GATE_1).</strong><br>A: Read findings in Team 190 output. Fix spec or escalate to Team 00.</p>
+    <h4>🔧 Troubleshooting</h4>
+    <div class="help-trouble-item"><strong>Dashboard shows wrong gate after command</strong><p>Press ↺ Refresh. Dashboard reads pipeline_state; it updates after pipeline_run.sh runs.</p></div>
+    <div class="help-trouble-item"><strong>Phase 2 banner after GATE_1 BLOCK</strong><p><code>./pipeline_run.sh --domain agents_os fail "reason"</code> — clears lld400_content. Dashboard resets to Phase 1.</p></div>
+    <div class="help-trouble-item"><strong>store command fails with exit 1</strong><p>Check: (1) file path exists, (2) GATE_ID is GATE_1, G3_PLAN, or CURSOR_IMPLEMENTATION</p></div>
+    <h4>Links</h4>
+    <div><a class="doc-link" href="PIPELINE_ROADMAP.html" target="_blank">PIPELINE_ROADMAP.html</a> · <a class="doc-link" href="PIPELINE_TEAMS.html" target="_blank">PIPELINE_TEAMS.html</a> · <a class="doc-link" href="../../pipeline_run.sh" target="_blank">pipeline_run.sh</a> · <a class="doc-link" href="../../agents_os_v2/orchestrator/pipeline.py" target="_blank">pipeline.py</a></div>
     </div>
     <div class="lang-he" dir="rtl" style="display:none">
-    <pre># After G3_5 FAIL:
-./pipeline_run.sh store G3_PLAN _COMMUNICATION/team_10/TEAM_10_..._v1.1.0.md
-./pipeline_run.sh revise "BLOCKER-1: ... BLOCKER-2: ..."
-# → paste revised G3_PLAN prompt into Cursor → Team 10 fixes → ./pipeline_run.sh pass</pre>
-    </div>
-
-    <h3 class="lang-en">❓ FAQ</h3>
-    <h3 class="lang-he" dir="rtl" style="display:none">❓ שאלות נפוצות</h3>
-    <div class="lang-en">
-    <h4>Q: I ran Team 20. What's the next trigger?</h4>
-    <p>There is no CLI trigger after Team 20. Check that the file exists (see "Expected Files" → 🟢). If 🟢 — open a new Cursor, paste Team 30 mandate.</p>
-    <h4>Q: When do I press ./pipeline_run.sh pass?</h4>
-    <p>Only when <strong>all sub-steps of the current gate are done</strong>. For CURSOR_IMPLEMENTATION: Team 20 🟢 + Team 30 🟢 + git commit exists.</p>
-    <h4>Q: I forgot where I am in the pipeline?</h4>
-    <p>Press ↺ Refresh — "Current Gate" in the sidebar shows where you are. Or press <strong>🔍 בדוק התקדמות</strong> (key <code>p</code>) for full diagnostics.</p>
-    <h4>Q: Team 90 rejected the work plan (G3_5 FAIL). What to do?</h4>
-    <p>Press <strong>🔍 בדוק התקדמות</strong> — the dashboard detects REVISION mode and shows the steps. Then: <code>./pipeline_run.sh fail "BLOCKER-1: ..."</code>, <code>./pipeline_run.sh revise "..."</code>, paste ▼▼▼ into Cursor → Team 10 fixes → <code>./pipeline_run.sh pass</code>.</p>
-    <h4>Q: Team 90 rejected at GATE_5 (dev validation). What to do?</h4>
-    <p>Press <strong>🔍 בדוק התקדמות</strong>. The issue is in code: <code>./pipeline_run.sh fail "FINDING-1: ..."</code> → send findings to Team 10 → re-run CURSOR_IMPLEMENTATION → GATE_4 → GATE_5.</p>
-    <h4>Q: Auto-refresh doesn't detect state change?</h4>
-    <p>The dashboard reads pipeline_state.json. If you haven't run <code>./pipeline_run.sh pass/fail</code>, state won't change. Press <strong>🔍 בדוק התקדמות</strong> for manual check.</p>
-    <h4>Q: I got a BLOCK from Team 190?</h4>
-    <p>Read the BLOCK findings in the file in Team 190's folder. Fix the spec or route to Team 00. Do not proceed in the pipeline.</p>
-    </div>
-    <div class="lang-he" dir="rtl" style="display:none">
-    <h4>שאלה: הרצתי Team 20. מה הטריגר הבא?</h4>
-    <p>אין CLI trigger אחרי Team 20. בדוק שהקובץ <code>_COMMUNICATION/team_20/TEAM_20_S001_P002_WP001_API_VERIFY_v1.0.0.md</code> קיים (ראה "Expected Files" → 🟢). אם 🟢 — פתח Cursor חדש, הדבק מנדט Team 30.</p>
-    <h4>שאלה: מתי אני לוחץ ./pipeline_run.sh pass?</h4>
-    <p>רק כאשר <strong>כל ה-sub-steps של הgate הנוכחי הושלמו</strong>. עבור CURSOR_IMPLEMENTATION: Team 20 🟢 + Team 30 🟢 + git commit קיים.</p>
-    <h4>שאלה: שכחתי איפה אני בפייפליין?</h4>
-    <p>לחץ ↺ Refresh — ה-"Current Gate" בסיידבר מראה בדיוק איפה אתה. ה-accordion "Current Gate Prompt" מראה מה צריך לעשות עכשיו. לחלופין: לחץ <strong>🔍 בדוק התקדמות</strong> (או מקש <code>p</code>) לאבחון מלא.</p>
-    <h4>שאלה: Team 90 פסל את תוכנית העבודה (G3_5 FAIL). מה עושים?</h4>
-    <p>לחץ <strong>🔍 בדוק התקדמות</strong> — הדשבורד יזהה אוטומטית מצב REVISION ויציג את הצעדים. בקצרה:</p>
-    <pre>./pipeline_run.sh fail "BLOCKER-1: ... BLOCKER-2: ..."
-./pipeline_run.sh revise "BLOCKER-1: ... BLOCKER-2: ..."
-# → paste ▼▼▼ block into Cursor → Team 10 fixes → ./pipeline_run.sh pass</pre>
-    <h4>שאלה: Team 90 פסל ב-GATE_5 (dev validation). מה עושים?</h4>
-    <p>לחץ <strong>🔍 בדוק התקדמות</strong>. הבעיה היא בקוד: <code>./pipeline_run.sh fail "FINDING-1: ..."</code> → שלח findings ל-Team 10 לתיקון קוד → CURSOR_IMPLEMENTATION מחדש → GATE_4 → GATE_5.</p>
-    <h4>שאלה: ה-auto-refresh לא מזהה שינוי מצב?</h4>
-    <p>ה-dashboard קורא את pipeline_state.json — אם הסוכן עדיין לא סיים לכתוב את הoutput ולא רצת <code>./pipeline_run.sh pass/fail</code>, המצב לא ישתנה. לחץ <strong>🔍 בדוק התקדמות</strong> לבדיקה ידנית + הנחיות.</p>
-    <h4>שאלה: קיבלתי BLOCK מ-Team 190?</h4>
-    <p>קרא את ה-BLOCK findings בקובץ שנוצר בתיקיית Team 190. תקן את הspec או העבר ל-Team 00 להחלטה אדריכלית. אל תמשיך הלאה ב-pipeline.</p>
-    </div>
-
-    <h3 class="lang-en">📚 Additional Tools</h3>
-    <h3 class="lang-he" dir="rtl" style="display:none">📚 כלים נוספים</h3>
-    <div class="lang-en">
-    <p><strong>🗺️ Roadmap &amp; Gate History page:</strong></p>
-    <div><a class="doc-link" href="PIPELINE_ROADMAP.html" target="_blank">PIPELINE_ROADMAP.html</a> — Full pipeline sequence, portfolio roadmap tree, gate history, canonical task files</div>
-    <p style="margin-top:8px"><strong>🔍 Progress Check</strong> (button in header or press <code>p</code>): Scans all 14 gates + current artifacts → shows full pipeline overview, current gate guidance with PASS/FAIL paths, FAIL cycle detection.</p>
-    <div>
-      <a class="doc-link" href="../../PIPELINE_HOWTO.md" target="_blank">PIPELINE_HOWTO.md</a>
-      <a class="doc-link" href="../../_COMMUNICATION/team_00/TEAM_00_S001_P002_WP001_EXPERIMENT_EXECUTION_GUIDE_v1.0.0.md" target="_blank">Experiment Execution Guide</a>
-      <a class="doc-link" href="../../_COMMUNICATION/agents_os/pipeline_state.json" target="_blank">pipeline_state.json</a>
-      <a class="doc-link" href="../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md" target="_blank">implementation_mandates.md</a>
-      <a class="doc-link" href="../../_COMMUNICATION/agents_os/prompts/gate_8_mandates.md" target="_blank">gate_8_mandates.md</a>
-      <a class="doc-link" href="../../agents_os_v2/orchestrator/pipeline.py" target="_blank">pipeline.py (CLI source)</a>
-      <a class="doc-link" href="../../pipeline_run.sh" target="_blank">pipeline_run.sh</a>
-    </div>
-    </div>
-    <div class="lang-he" dir="rtl" style="display:none">
-    <p><strong>🗺️ דף Roadmap ו־Gate History:</strong></p>
-    <div><a class="doc-link" href="PIPELINE_ROADMAP.html" target="_blank">PIPELINE_ROADMAP.html</a> — רצף pipeline מלא, עץ roadmap, היסטוריית שלבים, קבצי משימה קנוניים</div>
-    <p style="margin-top:8px"><strong>🔍 Progress Check</strong> (כפתור בכותרת או מקש <code>p</code>): סורק את כל 14 השלבים + ארטיפקטים → מציג סקירת pipeline, הנחיות לשלב נוכחי עם מסלולי PASS/FAIL.</p>
-    <div>
-      <a class="doc-link" href="../../PIPELINE_HOWTO.md" target="_blank">PIPELINE_HOWTO.md</a>
-      <a class="doc-link" href="../../_COMMUNICATION/team_00/TEAM_00_S001_P002_WP001_EXPERIMENT_EXECUTION_GUIDE_v1.0.0.md" target="_blank">Experiment Execution Guide</a>
-      <a class="doc-link" href="../../_COMMUNICATION/agents_os/pipeline_state.json" target="_blank">pipeline_state.json</a>
-      <a class="doc-link" href="../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md" target="_blank">implementation_mandates.md</a>
-      <a class="doc-link" href="../../_COMMUNICATION/agents_os/prompts/gate_8_mandates.md" target="_blank">gate_8_mandates.md</a>
-      <a class="doc-link" href="../../agents_os_v2/orchestrator/pipeline.py" target="_blank">pipeline.py (CLI source)</a>
-      <a class="doc-link" href="../../pipeline_run.sh" target="_blank">pipeline_run.sh</a>
+    <h4>שאלות נפוצות</h4>
+    <p><strong>DOMAIN AMBIGUOUS?</strong> הוסף <code>--domain agents_os</code> או <code>--domain tiktrack</code></p>
+    <p><strong>מתי pass?</strong> רק כשכל תת־השלבים הושלמו.</p>
+    <h4>פתרון תקלות</h4>
+    <div class="help-trouble-item"><strong>שער לא נכון</strong><p>לחץ ↺ Refresh</p></div>
+    <div class="help-trouble-item"><strong>store נכשל</strong><p>בדוק נתיב קובץ ו-GATE_ID</p></div>
     </div>
     </div>
   </div>
@@ -253,7 +196,53 @@ python3 -m http.server 8090
 
 <div class="agents-page-layout">
 
-  <!-- ── Main content column (left) ────────────────────────────────── -->
+  <!-- ── LEFT: Sidebar (per Agents LTR) ── -->
+  <aside class="agents-page-sidebar">
+    <div class="agents-domain-bar agents-domain-bar--sidebar">
+      <div class="domain-bar-actions">
+        <button class="btn btn-primary" id="refresh-btn" onclick="loadAll()">↺ Refresh</button>
+        <button class="btn" onclick="runProgressCheck()" title="סרוק ארטיפקטים ודיאגנוז מצב נוכחי">🔍 בדוק התקדמות</button>
+      </div>
+      <label class="refresh-label">
+        <input type="checkbox" id="auto-refresh-toggle"> <span class="agents-refresh-label" id="refresh-label">Auto (5s)</span>
+        <span class="refresh-dot" id="refresh-dot" style="display:none"></span>
+      </label>
+      <div class="domain-selector">
+        <button class="domain-btn" id="domain-btn-tiktrack" onclick="onDomainSwitch('tiktrack')">🔵 TikTrack</button>
+        <button class="domain-btn" id="domain-btn-agentsos" onclick="onDomainSwitch('agents_os')">🟢 Agents OS</button>
+      </div>
+      <span class="domain-badge" id="domain-badge-pill" style="margin-left:4px">—</span>
+    </div>
+    <div class="sidebar-section" id="pwa-banner-sidebar" style="display:none">
+      <!-- S002-P005-WP002: filled by loadPipelineState when gate_state=PASS_WITH_ACTION -->
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Pipeline Status</div>
+      <div class="info-row"><span class="info-key">WP</span>     <span class="info-val" id="s-wp">—</span></div>
+      <div class="info-row"><span class="info-key">Stage</span>  <span class="info-val" id="s-stage">—</span></div>
+      <div class="info-row"><span class="info-key">Gate</span>   <span id="s-gate-pill">—</span></div>
+      <div class="info-row"><span class="info-key">Owner</span>  <span class="info-val" id="s-owner">—</span></div>
+      <div class="info-row"><span class="info-key">Engine</span> <span class="info-val" id="s-engine">—</span></div>
+    </div>
+    <div class="sidebar-section" id="health-warnings-panel" style="display:none">
+      <div class="sidebar-label">⚠️ System Health</div>
+      <div id="health-warnings-content"></div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Gate Timeline</div>
+      <ul class="gate-list" id="gate-list">
+        <li class="gate-item"><span class="gate-dot dot-pending"></span><span class="gate-name loading">Loading…</span></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Quick Commands</div>
+      <div class="sidebar-cmd-list" id="sidebar-cmd-list">
+        <div class="sidebar-cmd-row"><span class="sidebar-cmd-text loading">Loading…</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main content (right) ── -->
   <main class="agents-page-main">
 
     <!-- Spec card -->
@@ -262,6 +251,9 @@ python3 -m http.server 8090
       <div class="spec-text" id="spec-text">Loading…</div>
       <div class="spec-wp" id="spec-wp">WP: —</div>
     </div>
+
+    <!-- Current Step Banner — always visible, all gates, shows active actor + next steps -->
+    <div id="current-step-banner"></div>
 
     <!-- Accordion: Gate Context — PRIMARY prompt for all gates (always first) -->
     <div class="accordion open" id="acc-prompt">
@@ -332,6 +324,19 @@ python3 -m http.server 8090
     <!-- Quick Action Bar (PASS/FAIL — team response) -->
     <div id="quick-action-bar"></div>
 
+    <!-- Accordion: Terminal Commands — copy scripts to run in terminal -->
+    <div class="accordion open" id="acc-terminal-cmds">
+      <div class="accordion-header" onclick="toggleAccordion('acc-terminal-cmds')">
+        <span>⌘</span>
+        <span class="accordion-title">Terminal Commands</span>
+        <span class="accordion-badge" id="terminal-cmds-badge">—</span>
+        <span class="accordion-chevron">▶</span>
+      </div>
+      <div class="accordion-body">
+        <div class="cmd-list" id="main-cmd-list">Loading…</div>
+      </div>
+    </div>
+
     <!-- Accordion: Expected Files -->
     <div class="accordion" id="acc-files">
       <div class="accordion-header" onclick="toggleAccordion('acc-files')">
@@ -346,58 +351,15 @@ python3 -m http.server 8090
     </div>
 
   </main>
-
-  <!-- ── Sidebar (right) ───────────────────────────────────────────── -->
-  <aside class="agents-page-sidebar">
-    <div class="sidebar-section" style="padding:10px 12px">
-      <button class="btn btn-primary" style="width:100%;margin-bottom:6px;justify-content:center" onclick="loadAll()">↺ Refresh</button>
-      <button class="btn" style="width:100%;margin-bottom:6px;justify-content:center" onclick="runProgressCheck()" title="סרוק ארטיפקטים ודיאגנוז מצב נוכחי">🔍 בדוק התקדמות</button>
-      <label class="refresh-label" style="justify-content:center">
-        <input type="checkbox" id="auto-refresh-toggle"> Auto-refresh (5s)
-        <span class="refresh-dot" id="refresh-dot" style="display:none"></span>
-      </label>
-    </div>
-    <div class="sidebar-section">
-      <div class="sidebar-label">Domain <span class="domain-label-badge" id="domain-badge-pill">tiktrack</span></div>
-      <div class="domain-selector">
-        <button class="domain-btn active-tiktrack" id="domain-btn-tiktrack" onclick="onDomainSwitch('tiktrack')">🔵 TikTrack</button>
-        <button class="domain-btn" id="domain-btn-agentsos" onclick="onDomainSwitch('agents_os')">🟢 Agents OS</button>
-      </div>
-    </div>
-    <div class="sidebar-section">
-      <div class="sidebar-label">Pipeline Status</div>
-      <div class="info-row"><span class="info-key">WP</span>     <span class="info-val" id="s-wp">—</span></div>
-      <div class="info-row"><span class="info-key">Stage</span>  <span class="info-val" id="s-stage">—</span></div>
-      <div class="info-row"><span class="info-key">Gate</span>   <span id="s-gate-pill">—</span></div>
-      <div class="info-row"><span class="info-key">Owner</span>  <span class="info-val" id="s-owner">—</span></div>
-      <div class="info-row"><span class="info-key">Engine</span> <span class="info-val" id="s-engine">—</span></div>
-    </div>
-    <div class="sidebar-section" id="health-warnings-panel" style="display:none">
-      <div class="sidebar-label">⚠️ System Health</div>
-      <div id="health-warnings-content"></div>
-    </div>
-    <div class="sidebar-section">
-      <div class="sidebar-label">Gate Timeline</div>
-      <ul class="gate-list" id="gate-list">
-        <li class="gate-item"><span class="gate-dot dot-pending"></span><span class="gate-name loading">Loading…</span></li>
-      </ul>
-    </div>
-    <div class="sidebar-section">
-      <div class="sidebar-label">Quick Commands</div>
-      <div class="sidebar-cmd-list" id="sidebar-cmd-list">
-        <div class="sidebar-cmd-row"><span class="sidebar-cmd-text loading">Loading…</span></div>
-      </div>
-    </div>
-  </aside>
 </div>
 
-<script src="js/pipeline-config.js"></script>
-<script src="js/pipeline-state.js"></script>
-<script src="js/pipeline-dom.js"></script>
-<script src="js/pipeline-commands.js"></script>
-<script src="js/pipeline-booster.js"></script>
-<script src="js/pipeline-help.js"></script>
-<script src="js/pipeline-dashboard.js"></script>
+<script src="js/pipeline-config.js?v=3"></script>
+<script src="js/pipeline-state.js?v=3"></script>
+<script src="js/pipeline-dom.js?v=3"></script>
+<script src="js/pipeline-commands.js?v=3"></script>
+<script src="js/pipeline-booster.js?v=3"></script>
+<script src="js/pipeline-help.js?v=3"></script>
+<script src="js/pipeline-dashboard.js?v=3"></script>
 
 </body>
 </html>

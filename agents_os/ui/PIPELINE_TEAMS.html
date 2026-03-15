@@ -1,15 +1,29 @@
 <!DOCTYPE html>
-<html lang="en" class="theme-tiktrack">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+  (function(){document.documentElement.classList.add("theme-tiktrack");})();
+  </script>
   <title>Agents OS — Team Management</title>
-  <link rel="stylesheet" href="css/pipeline-shared.css" />
-  <link rel="stylesheet" href="css/pipeline-teams.css" />
+  <link rel="stylesheet" href="css/pipeline-shared.css?v=4" />
+  <link rel="stylesheet" href="css/pipeline-teams.css?v=4" />
 </head>
 <body>
 
-<!-- ── Top Navigation ── -->
+<!-- ── Logo + Title (above nav) ── -->
+<header class="agents-header">
+  <div class="agents-header-left">
+    <h1 class="agents-header-title">👥 Agents OS — <span>Team Management</span></h1>
+    <span class="agents-refresh-label">Identity reinforcement · Onboarding · Governance prompts</span>
+  </div>
+  <div class="agents-header-right">
+    <span class="agents-refresh-label agents-header-sub" id="header-sub">← Select a team</span>
+    <button class="btn agents-refresh-btn btn-primary" onclick="loadState()">↺ Refresh State</button>
+  </div>
+</header>
+
 <nav class="pipeline-nav">
   <a class="nav-link" href="PIPELINE_DASHBOARD.html">📊 Dashboard</a>
   <span class="nav-sep"></span>
@@ -18,20 +32,13 @@
   <a class="nav-link active" href="PIPELINE_TEAMS.html">👥 Teams</a>
 </nav>
 
-<header class="agents-header">
-  <div class="agents-header-left">
-    <h1 class="agents-header-title">👥 Agents OS — <span>Team Management</span></h1>
-    <span class="agents-refresh-label">Identity reinforcement · Onboarding · Governance prompts</span>
-  </div>
-  <div class="agents-header-right">
-    <button class="btn agents-refresh-btn btn-primary" onclick="loadState()">↺ Refresh State</button>
-  </div>
-</header>
-
 <div class="teams-layout">
 
   <!-- ── Left: Team List ── -->
   <div class="team-list">
+    <div class="agents-domain-bar agents-domain-bar--sidebar agents-domain-bar--no-domain">
+      <button class="btn btn-primary" onclick="loadState()">↺ Refresh State</button>
+    </div>
     <div class="team-list-header">Teams (from Roster Lock)</div>
     <div id="team-list-content">
       <div style="padding:14px;font-size:11px;color:var(--text-muted)">Loading…</div>
@@ -45,9 +52,9 @@
 
 </div>
 
-<script src="js/pipeline-config.js"></script>
-<script src="js/pipeline-state.js"></script>
-<script src="js/pipeline-dom.js"></script>
-<script src="js/pipeline-teams.js"></script>
+<script src="js/pipeline-config.js?v=4"></script>
+<script src="js/pipeline-state.js?v=4"></script>
+<script src="js/pipeline-dom.js?v=4"></script>
+<script src="js/pipeline-teams.js?v=4"></script>
 </body>
 </html>

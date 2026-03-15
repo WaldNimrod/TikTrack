@@ -9,15 +9,17 @@ let refreshTimer = null;
 function toggleAccordion(id) {
   document.getElementById(id).classList.toggle("open");
 }
-function onDomainSwitch(domain) {
-  switchDomain(domain);
-  const isTiktrack = domain === "tiktrack";
+/** Sync UI (buttons, badges, title, theme) to domain — must stay consistent with currentDomain */
+function syncDomainUIDashboard(domain) {
+  const d = domain || currentDomain;
+  const isTiktrack = d === "tiktrack";
+  document.documentElement.classList.toggle("theme-tiktrack", isTiktrack);
+  document.title = isTiktrack ? "TikTrack — Pipeline Dashboard" : "Agents OS — Pipeline Dashboard";
   const titleEl = document.getElementById("domain-badge-header");
   if (titleEl) {
     titleEl.textContent = isTiktrack ? "tiktrack" : "agents_os";
     titleEl.className = "domain-badge domain-" + (isTiktrack ? "tiktrack" : "agentsos");
   }
-  document.title = isTiktrack ? "TikTrack — Pipeline Dashboard" : "Agents OS — Pipeline Dashboard";
   const btnT = document.getElementById("domain-btn-tiktrack");
   const btnA = document.getElementById("domain-btn-agentsos");
   if (btnT) btnT.className = "domain-btn" + (isTiktrack ? " active-tiktrack" : "");
@@ -27,6 +29,11 @@ function onDomainSwitch(domain) {
     badge.textContent = isTiktrack ? "tiktrack" : "agents_os";
     badge.className = "domain-label-badge " + (isTiktrack ? "domain-label-tiktrack" : "domain-label-agentsos");
   }
+}
+
+function onDomainSwitch(domain) {
+  switchDomain(domain);
+  syncDomainUIDashboard(domain);
   loadAll();
 }
 
@@ -56,6 +63,33 @@ async function loadPipelineState() {
     // Domain-aware owner (GATE_2/6 differ by domain)
     document.getElementById("s-owner").textContent  = getDomainOwner(state.current_gate);
     document.getElementById("s-engine").textContent = currentCfg.engine || "—";
+
+    // Current Step Banner — always shown above gate context accordion
+    const stepBannerEl = document.getElementById('current-step-banner');
+    if (stepBannerEl) stepBannerEl.innerHTML = buildCurrentStepBanner(state.current_gate, state);
+
+    // S002-P005-WP002: PWA banner in sidebar when gate_state=PASS_WITH_ACTION
+    const pwaContainer = document.getElementById('pwa-banner-sidebar');
+    if (pwaContainer) {
+      if (state.gate_state === 'PASS_WITH_ACTION') {
+        const actions = state.pending_actions || [];
+        const domainFlag = (state.project_domain || currentDomain) === 'agents_os' ? '--domain agents_os ' : '';
+        const clearCmd = domainFlag + './pipeline_run.sh actions_clear';
+        pwaContainer.dataset.domainFlag = domainFlag;
+        pwaContainer.innerHTML = `<div class="pwa-banner">
+          <div class="pwa-banner-title">⚡ PASS_WITH_ACTION</div>
+          <div class="pwa-action-list">${actions.length ? actions.map(a => `<div class="pwa-action-item">${escHtml(a)}</div>`).join('') : '<div class="pwa-action-item" style="color:var(--text-muted)">No actions recorded</div>'}</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+            <button class="btn pwa-btn-clear" onclick="copyCmd(${escAttr(JSON.stringify(clearCmd))}, this)">✅ Actions Resolved</button>
+            <button class="btn pwa-btn-override" onclick="copyOverrideWithReason(document.getElementById('pwa-banner-sidebar')?.dataset?.domainFlag||'', this)">⚡ Override &amp; Advance</button>
+          </div>
+        </div>`;
+        pwaContainer.style.display = 'block';
+      } else {
+        pwaContainer.innerHTML = '';
+        pwaContainer.style.display = 'none';
+      }
+    }
 
     // Spec card
     document.getElementById("spec-text").textContent = state.spec_brief || "No spec loaded";
@@ -101,6 +135,12 @@ async function loadPipelineState() {
     document.getElementById("s-wp").textContent = "Error loading state";
     document.getElementById("s-wp").className = "error-msg";
     console.error("State load error:", e);
+    // Still show Quick Commands and basic gate list when state fails
+    buildCommands("GATE_0");
+    const gateList = document.getElementById("gate-list");
+    if (gateList) gateList.innerHTML = GATE_SEQUENCE.map(g =>
+      `<li class="gate-item"><span class="gate-dot dot-pending"></span><span class="gate-name">${g}</span></li>`
+    ).join("");
     return null;
   }
 }
@@ -174,16 +214,7 @@ async function loadPrompt(gate) {
   }
 }
 
-// ── Mandate file routing — mirrors GATE_MANDATE_FILES in pipeline.py ──────
-// Gate → which prompts/ file holds the per-team mandate tabs
-// GATE_1 and GATE_8 have dedicated mandate files. Others share implementation_mandates.md.
-const GATE_MANDATE_FILES = {
-  'GATE_1':                '../../_COMMUNICATION/agents_os/prompts/GATE_1_mandates.md',
-  'G3_6_MANDATES':         '../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md',
-  'CURSOR_IMPLEMENTATION': '../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md',
-  'GATE_4':                '../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md',
-  'GATE_8':                '../../_COMMUNICATION/agents_os/prompts/gate_8_mandates.md',
-};
+// ── Mandate file routing — uses GATE_MANDATE_FILES from pipeline-config.js ──
 
 // ── Load mandates (gate-aware — hidden for non-mandate gates) ─────────────
 async function loadMandates() {
@@ -253,27 +284,52 @@ function _parseMandateSections(text) {
 
   // ── Build tabs with phase badges ────────────────────────────────────────
   const tabs = document.getElementById("team-tabs");
-  tabs.innerHTML = keys.map((k, i) => {
-    const meta  = mandateMeta[k] || { phase: i + 1, hasCorrection: false, hasPrereq: false };
 
-    // Tab class: first tab = next-phase (or correction-needed if correction data present)
+  // Determine which phase number is currently active
+  // For two-phase gates: Phase 2 is active when lld400_content (or phase8_content) is stored
+  const curGate      = pipelineState?.current_gate || '';
+  const lld400Ready  = !!(pipelineState?.lld400_content || '').trim();
+  const phase8Ready  = !!(pipelineState?.phase8_content || '').trim();
+  const activePhase  = (isTwoPhaseGate(curGate) && (lld400Ready || phase8Ready)) ? 2 : 1;
+
+  tabs.innerHTML = keys.map((k, i) => {
+    const meta = mandateMeta[k] || { phase: i + 1, hasCorrection: false, hasPrereq: false };
+    const isActive = meta.phase === activePhase;
+
+    // Tab highlight: active phase tab gets next-phase (or correction-needed) styling
     let tabClass = "team-tab";
-    if (i === 0) {
+    if (isActive) {
       tabClass += meta.hasCorrection ? " correction-needed" : " next-phase";
     }
 
     // Phase badge
     const phaseBadge = `<span class="phase-badge">P${meta.phase}</span>`;
 
-    // Correction badge on Phase 1 when blockers are injected
-    const corrBadge = (i === 0 && meta.hasCorrection)
+    // Correction badge: active phase when correction data is injected
+    const corrBadge = (isActive && meta.hasCorrection)
       ? `<span class="correction-badge">⚠ CORRECTION</span>` : "";
 
+    // "▶ ACTIVE" indicator for Phase 2+ so it's visually obvious
+    const activeBadge = (isActive && meta.phase > 1)
+      ? `<span class="phase-active-badge">▶ SEND NOW</span>` : "";
+
     return `<span class="${tabClass}" onclick="selectTeam(this, ${escAttr(JSON.stringify(k))})">`
-         + `${escHtml(k)}${phaseBadge}${corrBadge}</span>`;
+         + `${escHtml(k)}${phaseBadge}${corrBadge}${activeBadge}</span>`;
   }).join("");
 
-  if (keys.length > 0) { activeTeam = keys[0]; showMandate(keys[0]); }
+  // Auto-select the currently active phase tab
+  const activePhaseKey = keys.find(k => (mandateMeta[k]?.phase || 1) === activePhase) || keys[0];
+  if (activePhaseKey) {
+    activeTeam = activePhaseKey;
+    showMandate(activePhaseKey);
+    // Mark selected tab in DOM (setTimeout so the innerHTML settles first)
+    setTimeout(() => {
+      const allTabs = document.querySelectorAll('.team-tab');
+      allTabs.forEach(t => t.classList.remove('active'));
+      const idx = keys.indexOf(activePhaseKey);
+      if (idx >= 0 && allTabs[idx]) allTabs[idx].classList.add('active');
+    }, 0);
+  }
 }
 
 function selectTeam(el, key) {
@@ -712,68 +768,97 @@ async function runProgressCheck() {
     ${failed.length ? `<div class="info-row"><span class="info-key">FAIL cycles:</span><span style="color:var(--warning);font-size:11px;font-family:var(--mono)">${failed.map(g=>escHtml(g)).join(', ')}</span></div>` : ''}
   </div>`;
 
+  // ── Two-phase gate: phase tracker + next-action banner ─────────────────
+  if (isTwoPhaseGate(gate)) {
+    const lld400 = (state.lld400_content || '').trim();
+    const inCorrection = failed.includes(gate);
+    html += buildPhaseTracker(gate, lld400);
+    html += buildNextActionBanner(gate, lld400, inCorrection);
+  }
+
   // ── G3_PLAN revision mode detection ────────────────────────────────────
   if (gate === 'G3_PLAN' && failed.includes('G3_5')) {
     html += `<div style="background:rgba(210,153,34,0.1);border:1px solid var(--warning);border-radius:6px;padding:10px 14px;margin-bottom:12px">
       <div style="font-weight:600;color:var(--warning);margin-bottom:6px">⚠️ REVISION MODE — G3_5 failed the previous work plan</div>
       <div style="font-size:12px;margin-bottom:8px">Team 90 rejected the work plan. Run revision command with specific blockers:</div>
-      <div style="font-family:var(--mono);font-size:11px;background:#010409;padding:8px;border-radius:4px;margin-bottom:6px">./pipeline_run.sh revise "BLOCKER-1: ... BLOCKER-2: ..."</div>
-      <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Then: paste ▼▼▼ block into Cursor → Team 10 fixes → ./pipeline_run.sh pass</div>
-      <button class="btn" onclick="copyCmd('./pipeline_run.sh revise \\'BLOCKER-1: ...\\'', this)">📋 Copy revise cmd</button>
+      <div style="font-family:var(--mono);font-size:11px;background:#010409;padding:8px;border-radius:4px;margin-bottom:6px">${escHtml(_dfCmd('./pipeline_run.sh revise "BLOCKER-1: ... BLOCKER-2: ..."'))}</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Then: paste ▼▼▼ block into Cursor → Team 10 fixes → ${escHtml(_dfCmd('./pipeline_run.sh pass'))}</div>
+      <button class="btn" onclick="copyCmd(${escAttr(JSON.stringify(_dfCmd('./pipeline_run.sh revise "BLOCKER-1: ..."')))} , this)">📋 Copy revise cmd</button>
     </div>`;
   }
 
   // ── Gate fail cycle detection (currently AT gate, has failed before) ──────
   if (def.twoPaths && failed.includes(gate)) {
     const failCount = failed.filter(g => g === gate).length;
-    const defaultFailCmd = def.failCmd || `./pipeline_run.sh fail "reason"`;
-    const routes = def.failRoutes || null;
+    const defaultFailCmd = _dfCmd(def.failCmd || `./pipeline_run.sh fail "reason"`);
+    const lld400 = (state.lld400_content || '').trim();
 
-    html += `<div style="background:rgba(248,81,73,0.08);border:2px solid var(--danger);border-radius:8px;padding:12px 14px;margin-bottom:12px">
-      <div style="font-weight:700;color:var(--danger);margin-bottom:8px">🔄 ${escHtml(gate)} FAIL CYCLE — ${failCount}× failed</div>
-      <div style="font-size:12px;margin-bottom:10px">This gate has been rejected <strong>${failCount} time${failCount>1?'s':''}</strong>.</div>`;
+    if (isSelfLoopGate(gate)) {
+      // Self-loop gates (GATE_1): show correction cycle panel instead of confusing route selector.
+      // Route selector is hidden — the correction cycle is automatic (self-routing on fail).
+      html += buildCorrectionCyclePanel(gate, lld400, failCount);
 
-    if (getEffectiveVerdictTeam(gate)) {
-      html += `
-      <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:4px">Step 1 — Build FAIL command from verdict file:</div>
-      <div style="font-size:10px;margin-bottom:4px" id="pc-fc-status-${gate}">🔍 Searching for verdict file…</div>
-      <textarea id="pc-fc-ta-${gate}" class="findings-textarea" style="min-height:60px" placeholder="${escAttr(defaultFailCmd.replace('./pipeline_run.sh fail "', '').replace('"', ''))}"
-        oninput="pcUpdateFcCmd('${gate}')"></textarea>
-      <div class="findings-cmd-row">
-        <div class="findings-cmd-text" id="pc-fc-preview-${gate}">${escHtml(defaultFailCmd)}</div>
-        <button class="findings-copy-btn" onclick="copyText(document.getElementById('pc-fc-preview-${gate}').textContent, this)">⎘ Copy → terminal</button>
-      </div>`;
-    }
-
-    if (routes) {
-      const docCmd  = routes.doc  ? routes.doc.cmd  : '';
-      const fullCmd = routes.full ? routes.full.cmd : '';
-      html += `
-      <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-top:12px;margin-bottom:6px">Step 2 — Route pipeline forward:</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px">`;
-
-      if (docCmd) {
-        html += `<div style="background:rgba(210,153,34,0.1);border:1px solid var(--warning);border-radius:6px;padding:8px">
-          <div style="color:var(--warning);font-size:11px;font-weight:700;margin-bottom:4px">${escHtml(routes.doc.label)}</div>
-          <div style="font-size:10px;color:var(--text-muted);margin-bottom:6px">${routes.doc.desc || ''}</div>
-          <div style="font-family:var(--mono);font-size:10px;background:#010409;padding:4px 6px;border-radius:4px;margin-bottom:5px">${escHtml(docCmd)}</div>
-          <button class="btn" style="font-size:10px" onclick="copyCmd(${escAttr(JSON.stringify(docCmd))}, this)">📋 Copy</button>
+      // Still show the verdict file finder so the user can record the FAIL finding correctly
+      if (getEffectiveVerdictTeam(gate)) {
+        html += `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin-bottom:12px">
+          <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:4px">Optional — record FAIL findings from verdict file:</div>
+          <div style="font-size:10px;margin-bottom:4px" id="pc-fc-status-${gate}">🔍 Searching for verdict file…</div>
+          <textarea id="pc-fc-ta-${gate}" class="findings-textarea" style="min-height:50px" placeholder="${escAttr(defaultFailCmd.replace('./pipeline_run.sh fail "', '').replace('"', ''))}"
+            oninput="pcUpdateFcCmd('${gate}')"></textarea>
+          <div class="findings-cmd-row">
+            <div class="findings-cmd-text" id="pc-fc-preview-${gate}">${escHtml(defaultFailCmd)}</div>
+            <button class="findings-copy-btn" onclick="copyText(document.getElementById('pc-fc-preview-${gate}').textContent, this)">⎘ Copy → terminal</button>
+          </div>
         </div>`;
       }
-      if (fullCmd) {
-        html += `<div style="background:rgba(248,81,73,0.08);border:1px solid var(--danger);border-radius:6px;padding:8px">
-          <div style="color:var(--danger);font-size:11px;font-weight:700;margin-bottom:4px">${escHtml(routes.full.label)}</div>
-          <div style="font-size:10px;color:var(--text-muted);margin-bottom:6px">${routes.full.desc || ''}</div>
-          <div style="font-family:var(--mono);font-size:10px;background:#010409;padding:4px 6px;border-radius:4px;margin-bottom:5px">${escHtml(fullCmd)}</div>
-          <button class="btn" style="font-size:10px" onclick="copyCmd(${escAttr(JSON.stringify(fullCmd))}, this)">📋 Copy</button>
-        </div>`;
-      }
-      html += `</div>`;
     } else {
-      html += `<div style="font-size:11px;color:var(--text-muted);margin-top:8px">After recording FAIL → fix issues → re-run the gate.</div>`;
-    }
+      // Non-self-loop gates: show the original route selector (doc/full routing)
+      const routes = def.failRoutes || null;
+      html += `<div style="background:rgba(248,81,73,0.08);border:2px solid var(--danger);border-radius:8px;padding:12px 14px;margin-bottom:12px">
+        <div style="font-weight:700;color:var(--danger);margin-bottom:8px">🔄 ${escHtml(gate)} FAIL CYCLE — ${failCount}× failed</div>
+        <div style="font-size:12px;margin-bottom:10px">This gate has been rejected <strong>${failCount} time${failCount>1?'s':''}</strong>.</div>`;
 
-    html += `</div>`;
+      if (getEffectiveVerdictTeam(gate)) {
+        html += `
+        <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:4px">Step 1 — Build FAIL command from verdict file:</div>
+        <div style="font-size:10px;margin-bottom:4px" id="pc-fc-status-${gate}">🔍 Searching for verdict file…</div>
+        <textarea id="pc-fc-ta-${gate}" class="findings-textarea" style="min-height:60px" placeholder="${escAttr(defaultFailCmd.replace('./pipeline_run.sh fail "', '').replace('"', ''))}"
+          oninput="pcUpdateFcCmd('${gate}')"></textarea>
+        <div class="findings-cmd-row">
+          <div class="findings-cmd-text" id="pc-fc-preview-${gate}">${escHtml(defaultFailCmd)}</div>
+          <button class="findings-copy-btn" onclick="copyText(document.getElementById('pc-fc-preview-${gate}').textContent, this)">⎘ Copy → terminal</button>
+        </div>`;
+      }
+
+      if (routes) {
+        const docCmd  = routes.doc  ? _dfCmd(routes.doc.cmd)  : '';
+        const fullCmd = routes.full ? _dfCmd(routes.full.cmd) : '';
+        html += `
+        <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-top:12px;margin-bottom:6px">Step 2 — Route pipeline forward:</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px">`;
+        if (docCmd) {
+          html += `<div style="background:rgba(210,153,34,0.1);border:1px solid var(--warning);border-radius:6px;padding:8px">
+            <div style="color:var(--warning);font-size:11px;font-weight:700;margin-bottom:4px">${escHtml(routes.doc.label)}</div>
+            <div style="font-size:10px;color:var(--text-muted);margin-bottom:6px">${routes.doc.desc || ''}</div>
+            <div style="font-family:var(--mono);font-size:10px;background:#010409;padding:4px 6px;border-radius:4px;margin-bottom:5px">${escHtml(docCmd)}</div>
+            <button class="btn" style="font-size:10px" onclick="copyCmd(${escAttr(JSON.stringify(docCmd))}, this)">📋 Copy</button>
+          </div>`;
+        }
+        if (fullCmd) {
+          html += `<div style="background:rgba(248,81,73,0.08);border:1px solid var(--danger);border-radius:6px;padding:8px">
+            <div style="color:var(--danger);font-size:11px;font-weight:700;margin-bottom:4px">${escHtml(routes.full.label)}</div>
+            <div style="font-size:10px;color:var(--text-muted);margin-bottom:6px">${routes.full.desc || ''}</div>
+            <div style="font-family:var(--mono);font-size:10px;background:#010409;padding:4px 6px;border-radius:4px;margin-bottom:5px">${escHtml(fullCmd)}</div>
+            <button class="btn" style="font-size:10px" onclick="copyCmd(${escAttr(JSON.stringify(fullCmd))}, this)">📋 Copy</button>
+          </div>`;
+        }
+        html += `</div>`;
+      } else {
+        html += `<div style="font-size:11px;color:var(--text-muted);margin-top:8px">After recording FAIL → fix issues → re-run the gate.</div>`;
+      }
+
+      html += `</div>`;
+    }
   }
 
   // ── GATE_5 re-implementation banner (currently at CURSOR_IMPLEMENTATION after GATE_5 fail) ─
@@ -822,8 +907,8 @@ async function runProgressCheck() {
 
     // For gates with BOTH substeps AND twoPaths (e.g. GATE_4), show the PASS/FAIL section too
     if (def.twoPaths) {
-      const passCmd = def.passCmd || './pipeline_run.sh pass';
-      const failCmd = def.failCmd || './pipeline_run.sh fail "reason"';
+      const passCmd = _dfCmd(def.passCmd || './pipeline_run.sh pass');
+      const failCmd = _dfCmd(def.failCmd || './pipeline_run.sh fail "reason"');
       html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
         <div style="background:rgba(63,185,80,0.08);border:1px solid var(--success);border-radius:6px;padding:8px">
           <div style="color:var(--success);font-weight:600;font-size:12px;margin-bottom:4px">${escHtml(def.passLabel||'✅ PASS')}</div>
@@ -837,11 +922,12 @@ async function runProgressCheck() {
         </div>
       </div>`;
     } else if (allDone) {
+      const _passCmd = _dfCmd('./pipeline_run.sh pass');
       html += `<div class="prog-done-banner">
         <span style="color:var(--success);font-weight:600">✅ All steps complete — gate ready to advance</span>
-        <button class="btn" onclick="copyCmd('./pipeline_run.sh pass', this)">📋 Copy</button>
+        <button class="btn" onclick="copyCmd(${escAttr(JSON.stringify(_passCmd))}, this)">📋 Copy</button>
       </div>
-      <div style="margin-top:6px;font-family:var(--mono);font-size:12px;color:var(--text-muted)">./pipeline_run.sh pass</div>`;
+      <div style="margin-top:6px;font-family:var(--mono);font-size:12px;color:var(--text-muted)">${escHtml(_passCmd)}</div>`;
     } else if (firstPendingMsg) {
       html += `<div class="prog-next-banner"><strong>⏭️ Next action:</strong> ${escHtml(firstPendingMsg)}</div>`;
     }
@@ -855,8 +941,8 @@ async function runProgressCheck() {
       if (def.advice) {
         html += `<div style="font-size:12px;margin-bottom:10px;color:var(--text-muted)">${escHtml(def.advice)}</div>`;
       }
-      const passCmd = def.passCmd || './pipeline_run.sh pass';
-      const failCmd = def.failCmd || './pipeline_run.sh fail "reason"';
+      const passCmd = _dfCmd(def.passCmd || './pipeline_run.sh pass');
+      const failCmd = _dfCmd(def.failCmd || './pipeline_run.sh fail "reason"');
       const passLabel = def.passLabel || '✅ PASS';
       const failLabel = def.failLabel || '❌ FAIL';
       const needsBuilder = !!getEffectiveVerdictTeam(gate);
@@ -890,10 +976,11 @@ async function runProgressCheck() {
       }
 
       if (def.reviseCmd) {
+        const _reviseCmd = _dfCmd(def.reviseCmd);
         html += `<div style="background:rgba(210,153,34,0.08);border:1px solid var(--warning);border-radius:6px;padding:8px;margin-top:8px">
           <div style="color:var(--warning);font-weight:600;font-size:12px;margin-bottom:4px">↩️ After FAIL — generate revision prompt</div>
-          <div style="font-family:var(--mono);font-size:11px;background:#010409;padding:5px 8px;border-radius:4px;margin-bottom:6px">${escHtml(def.reviseCmd)}</div>
-          <button class="btn" style="font-size:10px" onclick="copyCmd(${escAttr(JSON.stringify(def.reviseCmd))}, this)">📋 Copy</button>
+          <div style="font-family:var(--mono);font-size:11px;background:#010409;padding:5px 8px;border-radius:4px;margin-bottom:6px">${escHtml(_reviseCmd)}</div>
+          <button class="btn" style="font-size:10px" onclick="copyCmd(${escAttr(JSON.stringify(_reviseCmd))}, this)">📋 Copy</button>
         </div>`;
       } else if (def.failAdvice) {
         html += `<div style="font-size:11px;color:var(--text-muted);margin-top:4px">${escHtml(def.failAdvice)}</div>`;
@@ -929,11 +1016,12 @@ async function runProgressCheck() {
     // Human gate: highlight approve command
     const isHumanGate = cfg.engine && cfg.engine.includes('human');
     if (isHumanGate && !def.twoPaths) {
+      const _approveCmd = _dfCmd('./pipeline_run.sh approve');
       html += `<div class="tip-box" style="margin-top:10px;display:flex;align-items:center;justify-content:space-between">
         <span><strong>⏸ Human gate</strong> — after review:</span>
         <div style="display:flex;align-items:center;gap:8px">
-          <code>./pipeline_run.sh approve</code>
-          <button class="btn" onclick="copyCmd('./pipeline_run.sh approve', this)">📋 Copy</button>
+          <code>${escHtml(_approveCmd)}</code>
+          <button class="btn" onclick="copyCmd(${escAttr(JSON.stringify(_approveCmd))}, this)">📋 Copy</button>
         </div>
       </div>`;
     }
@@ -990,8 +1078,8 @@ function pcUpdateFcCmd(gate) {
   if (!ta || !pre) return;
   const raw = ta.value.trim();
   const def = ALL_GATE_DEFS[gate] || {};
-  const failCmd = def.failCmd || './pipeline_run.sh fail "reason"';
-  pre.textContent = raw ? `./pipeline_run.sh fail "${raw.replace(/"/g,"'")}"` : failCmd;
+  const failCmd = _dfCmd(def.failCmd || './pipeline_run.sh fail "reason"');
+  pre.textContent = raw ? _dfCmd(`./pipeline_run.sh fail "${raw.replace(/"/g,"'")}"`) : failCmd;
 }
 
 // ── Unified pcUpdateCmd for modal findings builders ───────────────────────
@@ -1001,8 +1089,8 @@ function pcUpdateCmd(gate) {
   if (!ta || !pre) return;
   const raw = ta.value.trim();
   const def = ALL_GATE_DEFS[gate] || {};
-  const failCmd = def.failCmd || './pipeline_run.sh fail "reason"';
-  pre.textContent = raw ? `./pipeline_run.sh fail "${raw.replace(/"/g,"'")}"` : failCmd;
+  const failCmd = _dfCmd(def.failCmd || './pipeline_run.sh fail "reason"');
+  pre.textContent = raw ? _dfCmd(`./pipeline_run.sh fail "${raw.replace(/"/g,"'")}"`) : failCmd;
 }
 
 function closeProgress() {
@@ -1048,7 +1136,9 @@ function logVerdictDrift(gate, event, detail) {
 function extractFindings(text) {
   if (!text) return '';
   const findings = [];
-  const pattern = /^(?:\d+\.\s+)?(BF-G[\w\d._-]+|BLOCK(?:ER)?-[\w\d._-]+|FINDING-[\w\d._-]+|QA-FAIL-[\w\d._-]+|DOC-[\w\d._-]+|GAP-G\d-\w+|CONCERN-[\w\d._-]+|ISSUE-[\w\d._-]+)\s*[—:–\-]+\s*(.+)/im;
+  // FIX-BF-FORMAT: handle both BF-01 (no G) and BF-G01, plus markdown bold **BF-01:** and list markers - **BF-01:**
+  // Pattern handles: "- **BF-01:** desc", "BF-G01 — desc", "1. FINDING-03: desc"
+  const pattern = /^[-*\s]*(?:\d+\.\s+)?\*{0,2}(BF-[\w\d._-]+|BLOCK(?:ER)?-[\w\d._-]+|FINDING-[\w\d._-]+|QA-FAIL-[\w\d._-]+|DOC-[\w\d._-]+|GAP-G\d-\w+|CONCERN-[\w\d._-]+|ISSUE-[\w\d._-]+)\*{0,2}\s*[—:–\-]+\*{0,2}\s*(.+)/im;
   for (const raw of text.split('\n')) {
     const line = raw.trim();
     if (!line) continue;
@@ -1064,6 +1154,236 @@ function extractFindings(text) {
     if (desc) findings.push(`${m[1]}: ${desc}`);
   }
   return findings.join('; ');
+}
+
+// ── Extract overall verdict status (PASS / BLOCK) from verdict file ────────
+function extractVerdictStatus(text) {
+  if (!text) return null;
+  // 1. YAML/markdown header: **status:** BLOCK or **status:** PASS (top of file)
+  const headerM = text.match(/\*{0,2}status\*{0,2}\s*:+\s*\*{0,2}(PASS|BLOCK|APPROVED|REJECTED)\*{0,2}/im);
+  if (headerM) {
+    const v = headerM[1].toUpperCase();
+    return (v === 'PASS' || v === 'APPROVED') ? 'PASS' : 'BLOCK';
+  }
+  // 2. Fallback: look near "## Overall Verdict" section for standalone PASS/BLOCK
+  const sectionIdx = text.search(/##\s+Overall\s+Verdict/i);
+  if (sectionIdx >= 0) {
+    const excerpt = text.slice(sectionIdx, sectionIdx + 400);
+    const sectionM = excerpt.match(/\*{0,2}(PASS|BLOCK)\*{0,2}/im);
+    if (sectionM) return sectionM[1].toUpperCase();
+  }
+  return null;
+}
+
+// ── Apply verdict outcome to PASS/FAIL buttons and findings builder ────────
+// Called after autoLoadVerdictFile detects PASS or BLOCK in a verdict file.
+// Visually highlights the correct action button so the user never clicks the wrong one.
+function applyVerdictToButtons(status) {
+  if (!status) return;
+  // Scope to current quick-action-bar and its findings-builder
+  const passBtn = document.querySelector('.quick-action-bar .qa-btn-pass');
+  const failBtn = document.querySelector('.quick-action-bar .qa-btn-fail');
+  const builder = document.querySelector('.findings-builder');
+  if (status === 'BLOCK') {
+    if (passBtn) passBtn.classList.add('verdict-dimmed');
+    if (failBtn) failBtn.classList.add('verdict-active');
+    if (builder) builder.classList.add('verdict-block');
+  } else if (status === 'PASS') {
+    if (passBtn) passBtn.classList.add('verdict-pass-active');
+    if (builder) builder.classList.add('verdict-pass');
+  }
+}
+
+// ── Phase tracker helpers ───────────────────────────────────────────────────
+/** True for gates that have an explicit two-phase Team A → Team B structure. */
+function isTwoPhaseGate(gate) { return gate === 'GATE_1' || gate === 'GATE_8'; }
+/** True for self-loop correction-cycle gates (auto-route back to themselves on fail). */
+function isSelfLoopGate(gate) { return gate === 'GATE_1'; }
+
+// ── Current Step Banner — universal, all gates ─────────────────────────────
+/**
+ * Build the always-visible "Current Step Banner" shown above Gate Context.
+ * Explains: who is the active actor, what engine, current phase label, numbered next steps.
+ * Works for ALL gate types. Dynamically driven by state (lld400_content, gate_state, etc).
+ */
+function buildCurrentStepBanner(gate, state) {
+  if (!gate || !state) return '';
+  const def       = ALL_GATE_DEFS[gate] || {};
+  const cfg       = GATE_CONFIG[gate]   || {};
+  const failed    = state.gates_failed  || [];
+  const failCount = failed.filter(g => g === gate).length;
+  const lld400    = (state.lld400_content || '').trim();
+  const gateState = state.gate_state || null;
+  const baseCmd   = _dfCmd('./pipeline_run.sh ').trimEnd();
+
+  let actor, engineLabel, phaseLabel, steps, modCls;
+
+  if (gateState === 'PASS_WITH_ACTION') {
+    actor = 'Gate held'; engineLabel = ''; phaseLabel = 'PASS_WITH_ACTION'; modCls = 'csb-pwa';
+    steps = [
+      'Review the pending action items in the PASS_WITH_ACTION banner below',
+      'Responsible team resolves each listed action',
+      'Click "✅ Actions Resolved" to advance, or "⚡ Override & Advance" to proceed with override logged',
+    ];
+
+  } else if (gate === 'GATE_1') {
+    if (!lld400) {
+      actor = 'Team 170'; engineLabel = 'Gemini'; modCls = failCount > 0 ? 'csb-correction' : '';
+      phaseLabel = failCount > 0 ? 'Phase 1 of 2 — correction cycle' : 'Phase 1 of 2 — LLD400 authoring';
+      steps = [
+        failCount > 0
+          ? 'Team 170 saves the corrected LLD400 → _COMMUNICATION/team_170/TEAM_170_..._LLD400_vN.M.md'
+          : 'Team 170 saves the LLD400 spec → _COMMUNICATION/team_170/TEAM_170_..._LLD400_v1.0.0.md',
+        `Run in terminal: ${baseCmd}  (auto-stores LLD400 + generates Team 190 mandate)`,
+        'Paste the ▼▼▼ block into Codex (OpenAI) → Team 190 validates → click ✅ PASS or ❌ FAIL',
+      ];
+    } else {
+      actor = 'Team 190'; engineLabel = 'Codex (OpenAI)'; phaseLabel = 'Phase 2 of 2 — LLD400 validation'; modCls = 'csb-phase2';
+      steps = [
+        'LLD400 stored ✅ — scroll to "Team Mandates" accordion below → click the "Team 190" tab',
+        'Click "📋 Copy mandate" → paste into Codex (OpenAI) → Team 190 validates the LLD400',
+        'Team 190 saves verdict → click ✅ PASS (advance to GATE_2) or ❌ FAIL (return to Team 170 correction)',
+      ];
+    }
+
+  } else if (gate === 'GATE_8') {
+    const phase8done = !!(state.phase8_content || '').trim();
+    if (!phase8done) {
+      actor = 'Team 70'; engineLabel = 'Codex'; phaseLabel = 'Phase 1 of 2 — AS_MADE_REPORT'; modCls = '';
+      steps = [
+        'Team 70 writes AS_MADE_REPORT + archives WP files → _COMMUNICATION/team_70/',
+        `Run in terminal: ${baseCmd} phase2  (generates Team 90 validation mandate)`,
+        'Paste the ▼▼▼ block into Codex → Team 90 validates → click ✅ PASS (WP closes)',
+      ];
+    } else {
+      actor = 'Team 90'; engineLabel = 'Codex'; phaseLabel = 'Phase 2 of 2 — closure validation'; modCls = 'csb-phase2';
+      steps = [
+        'Open "Team Mandates" accordion → click "Team 90" tab → copy mandate → paste into Codex',
+        'Team 90 validates AS_MADE_REPORT completeness',
+        `PASS → WP closes. Run: ${baseCmd} pass`,
+      ];
+    }
+
+  } else if (def.engine === 'human') {
+    actor = 'You (Nimrod)'; engineLabel = 'Browser'; phaseLabel = 'Human approval required'; modCls = 'csb-human';
+    steps = [
+      'Review the spec / output in the "Current Gate Prompt" section above',
+      `Click ✅ PASS to approve and advance, or ❌ FAIL to reject`,
+    ];
+
+  } else if (def.engine === 'cursor') {
+    const ownerName = (def.owner || cfg.owner || 'team').replace('team_', 'Team ');
+    actor = ownerName; engineLabel = 'Cursor'; modCls = failCount > 0 ? 'csb-correction' : '';
+    phaseLabel = failCount > 0 ? 'Correction cycle' : 'Implementation';
+    steps = [
+      'Open the "Team Mandates" accordion below → select the active team tab',
+      'Copy the mandate → paste into Cursor Composer → Cursor implements',
+      failCount > 0
+        ? `After corrections are done + git committed: run ${baseCmd} pass`
+        : `After all teams complete + git commit exists: run ${baseCmd} pass`,
+    ];
+
+  } else {
+    // Standard AI validation gate (codex, codex+human, etc.)
+    const ownerKey  = def.verdictTeam || def.owner || cfg.owner || 'team';
+    const ownerName = ownerKey.replace('team_', 'Team ');
+    const engRaw    = def.engine || cfg.engine || 'codex';
+    const engShow   = engRaw === 'codex' ? 'Codex (OpenAI)' : engRaw === 'cursor' ? 'Cursor' : engRaw;
+    actor = ownerName; engineLabel = engShow; modCls = failCount > 0 ? 'csb-correction' : '';
+    phaseLabel = failCount > 0 ? 'Correction cycle' : 'Validation';
+    steps = [
+      `Run in terminal: ${baseCmd}  (generates the mandate prompt)`,
+      `Paste the ▼▼▼ block into ${engShow}`,
+      `${ownerName} processes → click ✅ PASS or ❌ FAIL based on their verdict`,
+    ];
+  }
+
+  const engineBadge = engineLabel
+    ? `<span class="csb-engine-badge">${escHtml(engineLabel)}</span>`
+    : '';
+
+  const stepsHtml = steps.map((s, i) =>
+    `<div class="csb-step">
+      <span class="csb-step-num">${i + 1}</span>
+      <span class="csb-step-text">${escHtml(s)}</span>
+    </div>`
+  ).join('');
+
+  return `<div class="current-step-banner${modCls ? ' ' + modCls : ''}">
+    <div class="csb-header">
+      <span class="csb-actor">${escHtml(actor)}</span>
+      ${engineBadge}
+      <span class="csb-phase-label">${escHtml(phaseLabel)}</span>
+    </div>
+    <div class="csb-steps">${stepsHtml}</div>
+  </div>`;
+}
+
+/**
+ * Build phase tracker HTML. lld400Content: pipelineState.lld400_content (empty = Phase 1 active).
+ */
+function buildPhaseTracker(gate, lld400Content) {
+  const def = ALL_GATE_DEFS[gate] || {};
+  const phase1Done = !!lld400Content;
+  const owners = (def.owner || '').split('+');
+  const p1Label = owners[0] ? owners[0] : 'Phase 1';
+  const p2Label = owners[1] ? owners[1] : 'Phase 2';
+  const p1Class = phase1Done ? 'phase-done' : 'phase-active';
+  const p2Class = phase1Done ? 'phase-active' : 'phase-pending';
+  const p1Icon  = phase1Done ? '✅' : '📝';
+  const p2Icon  = phase1Done ? '🔍' : '⏳';
+  return `<div class="phase-tracker">
+    <div class="phase-step ${p1Class}">${p1Icon} ${escHtml(p1Label)}</div>
+    <div class="phase-arrow">→</div>
+    <div class="phase-step ${p2Class}">${p2Icon} ${escHtml(p2Label)}</div>
+  </div>`;
+}
+
+/**
+ * Build "Next action" call-to-action banner with exact terminal command.
+ * inCorrectionCycle: gate has been failed at least once.
+ */
+function buildNextActionBanner(gate, lld400Content, inCorrectionCycle) {
+  const baseCmd = _dfCmd('./pipeline_run.sh ').trimEnd();
+  let title, note;
+  if (!lld400Content && inCorrectionCycle) {
+    title = '📝 Correction cycle — waiting for Team 170 revised LLD400';
+    note  = 'Run the command below after Team 170 saves the corrected LLD400. It auto-detects the latest version, stores it, and generates the Team 190 (Codex) validation mandate. No manual store step required.';
+  } else if (!lld400Content) {
+    title = '📝 Phase 1 active — Team 170 (Gemini) writing LLD400';
+    note  = 'Run after Team 170 saves their LLD400. The command auto-stores it and generates the Team 190 (Codex/OpenAI) validation mandate.';
+  } else {
+    title = '✅ LLD400 stored — Team 190 (Codex/OpenAI) validation active';
+    note  = 'Scroll to "Team Mandates" ↓ → click "Team 190" tab → copy mandate → paste into Codex (OpenAI) → await verdict → click ✅ PASS (advance to GATE_2) or ❌ FAIL (correction cycle).';
+  }
+  return `<div class="next-action-banner">
+    <div class="next-action-title">⮕ ${escHtml(title)}</div>
+    <div class="next-action-cmd">${escHtml(baseCmd)}</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <button class="findings-copy-btn" style="font-size:10px" onclick="copyCmd(${escAttr(JSON.stringify(baseCmd))}, this)">⎘ Copy → terminal</button>
+    </div>
+    <div class="next-action-note">${escHtml(note)}</div>
+  </div>`;
+}
+
+/**
+ * Build correction cycle panel for self-loop gates (replaces the confusing route selector).
+ */
+function buildCorrectionCyclePanel(gate, lld400Content, failCount) {
+  const baseCmd = _dfCmd('./pipeline_run.sh ').trimEnd();
+  const lld400Badge = lld400Content
+    ? `<span style="color:var(--success);font-size:10px">✅ LLD400 stored — Team 190 (Codex) mandate active</span>`
+    : `<span style="color:var(--warning);font-size:10px">⏳ Awaiting Team 170 corrected LLD400</span>`;
+  return `<div class="correction-cycle-panel">
+    <div class="correction-cycle-title">🔄 Correction cycle — failed ${failCount}× &nbsp;${lld400Badge}</div>
+    <div class="correction-cycle-step" data-n="1">Team 170 saves corrected LLD400 → <span style="font-family:var(--mono);font-size:10px">_COMMUNICATION/team_170/TEAM_170_..._LLD400_vN.M.md</span></div>
+    <div class="correction-cycle-step" data-n="2">
+      Run in terminal (auto-stores LLD400 + generates Team 190 prompt):
+      <div style="font-family:var(--mono);font-size:10px;background:#010409;padding:5px 8px;border-radius:4px;margin:4px 0">${escHtml(baseCmd)}</div>
+      <button class="btn" style="font-size:10px;margin-top:2px" onclick="copyCmd(${escAttr(JSON.stringify(baseCmd))}, this)">⎘ Copy</button>
+    </div>
+    <div class="correction-cycle-step" data-n="3">Paste the Team 190 ▼▼▼ block into Codex (OpenAI) → await LLD400 validation verdict → click <strong>✅ PASS</strong> (GATE_2) or <strong>❌ FAIL</strong> (another correction cycle)</div>
+  </div>`;
 }
 
 // ── Quick Action Bar state ─────────────────────────────────────────────────
@@ -1097,19 +1417,41 @@ async function autoLoadVerdictFile(gate, statusId, taId, previewId, isRevise) {
   const canonical = candidates[0];
   const isCanonical = (foundPath === canonical);
 
+  // Extract verdict status BEFORE building status HTML so badge can be inline
+  const verdictStatus = extractVerdictStatus(foundText);
+  const verdictBadge = verdictStatus === 'BLOCK'
+    ? ` &nbsp;<span style="color:var(--danger);font-weight:700;background:rgba(248,81,73,0.12);padding:2px 7px;border-radius:4px;font-size:10px">⛔ BLOCK</span>`
+    : verdictStatus === 'PASS'
+    ? ` &nbsp;<span style="color:var(--success);font-weight:700;background:rgba(63,185,80,0.12);padding:2px 7px;border-radius:4px;font-size:10px">✅ PASS</span>`
+    : '';
+
   if (isCanonical) {
-    statusEl.innerHTML = `<span class="findings-status" style="color:var(--success)">🟢 Auto-loaded: ${escHtml(foundPath)}</span>`;
+    statusEl.innerHTML = `<span class="findings-status" style="color:var(--success)">🟢 Auto-loaded: ${escHtml(foundPath)}</span>${verdictBadge}`;
   } else {
     statusEl.innerHTML = `<span class="findings-status" style="color:var(--success)">🟢 Loaded: ${escHtml(foundPath)}</span>
-      <span class="findings-status" style="color:var(--warning)"> ⚠️ Path drift — expected: ${escHtml(canonical)}</span>`;
+      <span class="findings-status" style="color:var(--warning)"> ⚠️ Path drift — expected: ${escHtml(canonical)}</span>${verdictBadge}`;
     logVerdictDrift(gate, 'PATH_B_NON_CANONICAL', { found: foundPath, expected: canonical });
   }
 
-  const findings = extractFindings(foundText);
+  // Apply verdict state to PASS/FAIL buttons
+  applyVerdictToButtons(verdictStatus);
+
   const ta = document.getElementById(taId);
+  if (verdictStatus === 'PASS') {
+    // PASS verdict: no fail findings to populate; clear builder and signal to use PASS button
+    if (ta) {
+      ta.value = '';
+      ta.placeholder = '✅ PASS verdict detected — no fail findings. Click the ✅ PASS button above.';
+      ta.style.borderColor = 'var(--success)';
+    }
+    return;
+  }
+
+  // BLOCK or unknown status: populate findings textarea as before
+  const findings = extractFindings(foundText);
   if (ta && findings) {
     ta.value = findings;
-    ta.style.borderColor = 'var(--success)';
+    ta.style.borderColor = verdictStatus === 'BLOCK' ? 'var(--danger)' : 'var(--success)';
     updateFindingsCmd(gate, taId, previewId, isRevise);
   }
 }
@@ -1154,7 +1496,7 @@ async function buildQuickActionBar(gate) {
   const def = ALL_GATE_DEFS[gate] || {};
   if (!def.twoPaths) { bar.innerHTML = ''; return; }
 
-  const passCmd      = def.passCmd || './pipeline_run.sh pass';
+  const passCmd      = _dfCmd(def.passCmd || './pipeline_run.sh pass');
   const isHuman      = (def.engine === 'human');
   const isRevise     = (gate === 'G3_5');
   const needsBuilder = !!getEffectiveVerdictTeam(gate) || isRevise;
@@ -1166,34 +1508,65 @@ async function buildQuickActionBar(gate) {
   const failCount   = failed.filter(g => g === gate).length;
   const gateStuck   = failCount > 0 && def.failRoutes;
 
-  let html = '';
-
-  // ── Mode A: gate has failed before — show routing selector ───────────────
-  if (gateStuck) {
-    const routes = def.failRoutes;
-    const docCmd  = routes.doc.cmd;
-    const fullCmd = routes.full.cmd;
-
-    html += `<div class="route-selector">
-      <div class="route-selector-title">
-        ⚠️ ${escHtml(gate)} — failed ${failCount}× — choose routing path
-      </div>
-      <div class="route-selector-cycle">current_gate stays at ${escHtml(gate)} until you route it forward</div>
-      <div class="route-btns">
-        <button class="qa-btn-route-doc" onclick="copyCmd(${escAttr(JSON.stringify(docCmd))}, this)" title="${escAttr(docCmd)}">
-          ${escHtml(routes.doc.label)} <span class="terminal-hint">⎘</span>
+  // ── PWA banner (PASS_WITH_ACTION state — WP002) ───────────────────────────
+  const gateState      = pipelineState ? (pipelineState.gate_state || null) : null;
+  const pendingActions = pipelineState ? (pipelineState.pending_actions || []) : [];
+  let pwaBanner = '';
+  if (gateState === 'PASS_WITH_ACTION') {
+    const clearCmd    = _dfCmd('./pipeline_run.sh actions_clear');
+    const overrideCmd = _dfCmd('./pipeline_run.sh override "reason"');
+    const actionItems = pendingActions.length
+      ? pendingActions.map(a => `<div class="pwa-action-item">• ${escHtml(a)}</div>`).join('')
+      : `<div class="pwa-action-item" style="color:var(--text-muted)">No action items recorded</div>`;
+    pwaBanner = `<div class="pwa-banner">
+      <div class="pwa-banner-title">⚡ PASS_WITH_ACTION — gate held pending resolution</div>
+      ${actionItems}
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button class="qa-btn pwa-btn-clear" onclick="copyCmd(${escAttr(JSON.stringify(clearCmd))}, this)">
+          ✅ Actions Resolved &nbsp;<span class="terminal-hint">⎘ copy → terminal</span>
         </button>
-        <button class="qa-btn-route-full" onclick="copyCmd(${escAttr(JSON.stringify(fullCmd))}, this)" title="${escAttr(fullCmd)}">
-          ${escHtml(routes.full.label)} <span class="terminal-hint">⎘</span>
+        <button class="qa-btn pwa-btn-override" onclick="copyCmd(${escAttr(JSON.stringify(overrideCmd))}, this)">
+          ⚡ Override &amp; Advance &nbsp;<span class="terminal-hint">⎘ copy → terminal</span>
         </button>
-      </div>
-      <div class="route-desc-row">
-        <div class="route-desc">${routes.doc.desc || ''}</div>
-        <div class="route-desc">${routes.full.desc || ''}</div>
       </div>
     </div>`;
+  }
 
-    // Also show the PASS button (in case issues are already fixed)
+  let html = '';
+
+  // ── Mode A: gate has failed before ───────────────────────────────────────
+  if (gateStuck) {
+    if (isSelfLoopGate(gate)) {
+      // Self-loop gates: no route selector — correction cycle panel shows the flow
+      const lld400Content = pipelineState ? (pipelineState.lld400_content || '') : '';
+      html += buildCorrectionCyclePanel(gate, lld400Content, failCount);
+    } else {
+      // Non-self-loop gates: route selector
+      const routes = def.failRoutes;
+      const docCmd  = _dfCmd(routes.doc.cmd);
+      const fullCmd = _dfCmd(routes.full.cmd);
+
+      html += `<div class="route-selector">
+        <div class="route-selector-title">
+          ⚠️ ${escHtml(gate)} — failed ${failCount}× — choose routing path
+        </div>
+        <div class="route-selector-cycle">current_gate stays at ${escHtml(gate)} until you route it forward</div>
+        <div class="route-btns">
+          <button class="qa-btn-route-doc" onclick="copyCmd(${escAttr(JSON.stringify(docCmd))}, this)" title="${escAttr(docCmd)}">
+            ${escHtml(routes.doc.label)} <span class="terminal-hint">⎘</span>
+          </button>
+          <button class="qa-btn-route-full" onclick="copyCmd(${escAttr(JSON.stringify(fullCmd))}, this)" title="${escAttr(fullCmd)}">
+            ${escHtml(routes.full.label)} <span class="terminal-hint">⎘</span>
+          </button>
+        </div>
+        <div class="route-desc-row">
+          <div class="route-desc">${routes.doc.desc || ''}</div>
+          <div class="route-desc">${routes.full.desc || ''}</div>
+        </div>
+      </div>`;
+    }
+
+    // Always show the PASS button below (in case corrections are already done)
     html += `<div class="quick-action-bar" style="margin-top:8px">
       <button class="qa-btn qa-btn-pass" onclick="copyCmd(${escAttr(JSON.stringify(passCmd))}, this)">
         ${escHtml(passLabel)} &nbsp;<span class="terminal-hint">⎘ copy → terminal</span>
@@ -1201,10 +1574,14 @@ async function buildQuickActionBar(gate) {
     </div>`;
 
   } else {
-    // ── Mode B: normal (gate not yet failed) — PASS + FAIL buttons ──────────
+    // ── Mode B: normal (gate not yet failed) — PASS + PWA + FAIL buttons ────
+    const pwaCmd = _dfCmd('./pipeline_run.sh pass_with_actions "ACTION-1: [describe]|ACTION-2: [describe]"');
     html += `<div class="quick-action-bar">
       <button class="qa-btn qa-btn-pass" onclick="copyCmd(${escAttr(JSON.stringify(passCmd))}, this)">
         ${escHtml(passLabel)} &nbsp;<span class="terminal-hint">⎘ copy → terminal</span>
+      </button>
+      <button class="qa-btn qa-btn-pwa" onclick="copyCmd(${escAttr(JSON.stringify(pwaCmd))}, this)" title="Pass with follow-up actions required (WP002)">
+        ⚡ Pass w/ Action &nbsp;<span class="pwa-badge">WP002</span><span class="terminal-hint">⎘ copy</span>
       </button>`;
 
     if (needsBuilder) {
@@ -1262,7 +1639,7 @@ async function buildQuickActionBar(gate) {
     </div>`;
   }
 
-  bar.innerHTML = html;
+  bar.innerHTML = pwaBanner + html;
 
   if (needsBuilder) {
     await autoLoadVerdictFile(gate, 'qbar-status', 'qbar-ta', 'qbar-preview', isRevise);
@@ -1299,13 +1676,22 @@ async function loadHealthWarnings() {
     }
 
     // AD-V2-05: pipeline state stage vs WSM active stage mismatch
+    // Checks AUTHORIZED_STAGE_EXCEPTIONS before flagging — authorized parallel activations are INFO not WARNING.
     if (pipelineState && gov.active_stage) {
       const pipeStage = pipelineState.stage_id || '';
       const wsmStage  = gov.active_stage;
       if (pipeStage && pipeStage !== wsmStage) {
-        warnings.push({ sev:'warning',
-          msg:`Stage mismatch: pipeline_state says "${pipeStage}" but WSM active_stage_id is "${wsmStage}"`,
-          log:`AD-V2-05 | pipeline_state.stage_id=${pipeStage} vs WSM active_stage_id=${wsmStage} | Update pipeline_state.json or sync WSM` });
+        const exc = (typeof AUTHORIZED_STAGE_EXCEPTIONS !== 'undefined' && AUTHORIZED_STAGE_EXCEPTIONS)
+          ? AUTHORIZED_STAGE_EXCEPTIONS[pipeStage] : null;
+        if (exc) {
+          warnings.push({ sev:'info',
+            msg:`Stage "${pipeStage}" ≠ WSM active stage "${wsmStage}" — AUTHORIZED EXCEPTION: ${exc.description}`,
+            log:`AD-V2-05 | AUTHORIZED_EXCEPTION | authority: ${exc.authority_ref}` });
+        } else {
+          warnings.push({ sev:'warning',
+            msg:`Stage mismatch: pipeline_state says "${pipeStage}" but WSM active_stage_id is "${wsmStage}"`,
+            log:`AD-V2-05 | pipeline_state.stage_id=${pipeStage} vs WSM active_stage_id=${wsmStage} | Update pipeline_state.json or sync WSM` });
+        }
       }
     }
   } catch(e) {
@@ -1364,8 +1750,10 @@ document.addEventListener("keydown", e => {
 });
 
 // ── Init ──────────────────────────────────────────────────────────────────
-// Restore domain + theme from localStorage on page load
-const _savedDomain = localStorage.getItem("pipeline_domain") || "tiktrack";
-if (_savedDomain !== currentDomain) onDomainSwitch(_savedDomain);
+// Always sync theme + UI to saved domain on load — prevents desync (AOS data + TikTrack skin)
+syncDomainUIDashboard();
+
+// Show Terminal Commands immediately (don't wait for async state load)
+buildCommands(typeof pipelineState?.current_gate === "string" ? pipelineState.current_gate : "GATE_0");
 
 loadAll();

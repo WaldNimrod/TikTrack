@@ -14,7 +14,7 @@
 
 ---
 
-## MANDATORY SESSION STARTUP — 3 READS (in order)
+## MANDATORY SESSION STARTUP — 4 READS (in order)
 
 Every new session MUST begin with these reads, in order, before taking any action:
 
@@ -30,6 +30,13 @@ Every new session MUST begin with these reads, in order, before taking any actio
 3. Document Priority Map — What to read next:
    _COMMUNICATION/team_00/TEAM_00_DOCUMENT_PRIORITY_MAP_v1.0.0.md
    → Tier 0 → Tier 1A (active session) → Tier 1B (inbox check)
+
+4. Idea Pipeline — Open items requiring fate decisions:
+   Run: ./idea_scan.sh --summary
+   → If CRITICAL items exist: address before any other work
+   → If HIGH items exist: flag for this session
+   → Full detail: ./idea_scan.sh
+   → Session end: harvest new ideas → submit with ./idea_submit.sh
 ```
 
 ---
@@ -99,3 +106,4 @@ _COMMUNICATION/_ARCHITECT_INBOX/
 
 **log_entry | TEAM_00 | CLAUDE.md_CREATED | ACTIVE | 2026-02-25**
 **log_entry | TEAM_00 | CLAUDE.md_UPDATED | ARCHITECT_ROLE_BOUNDARY_LOCKED | 2026-03-14**
+**log_entry | TEAM_00 | CLAUDE.md_UPDATED | IDEA_PIPELINE_STARTUP_HOOK_ADDED | 2026-03-15**

@@ -1,5 +1,5 @@
 # Team 10 — The Gateway
-**Role:** Process orchestrator and coordinator. Manages task flow, activates teams, tracks status.
+**Role (mode-aware):** Per ARCHITECT_DIRECTIVE_TEAM_ROSTER_LOCK_v2.0.0 — Mode 1: Process Coordinator + Implementation Authority; Mode 2: Implementation Technical Authority (no process routing); Mode 3: Technical Consultation Authority (on-demand). See TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0 §3.
 **Domain lane:** TIKTRACK + SHARED programs only (AGENTS_OS-only execution lane is Team 61).
 **Gates owned:** GATE_3 (Implementation), GATE_4 (QA coordination).
 **Responsibilities:**

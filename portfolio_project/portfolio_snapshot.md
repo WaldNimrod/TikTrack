@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-14T20:57:31.967757+00:00`
+- Generated (UTC): `2026-03-15T11:49:40.556012+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -8,16 +8,16 @@
 ## Runtime (from WSM)
 
 - active_stage_id: `S002`
-- active_program_id: `S002-P002`
+- active_program_id: `S002-P005`
 - active_work_package_id: `N/A`
 - current_gate: `GATE_8`
-- next_required_action: `Team 90 and Team 10 to route next lifecycle activation per roadmap priorities; S002-P002-WP003 is closed with no open gate obligations.`
+- next_required_action: `Team 90 and Team 10 to route next lifecycle activation per roadmap priorities; S002-P005-WP002 is closed with no open gate obligations.`
 
 ## Portfolio Counts
 
 - stages: `6`
 - programs: `31`
-- work_packages: `9`
+- work_packages: `10`
 
 ## Roadmap (hierarchical)
 
@@ -48,7 +48,8 @@
 
     ├── **Program** `S002-P004` — Admin Review S002 | PLANNED | domain: **TIKTRACK**
 
-    └── **Program** `S002-P005` — Agents_OS v2 Writing Semantics Hardening (ADR-031 Stage A) | PLANNED | domain: **AGENTS_OS**
+    └── **Program** `S002-P005` — Agents_OS v2 Writing Semantics Hardening (ADR-031 Stage A) + UI Optimization | ACTIVE | domain: **AGENTS_OS**
+        └── **WP** `S002-P005-WP002` | CLOSED | gate: GATE_8 (PASS) | domain: **AGENTS_OS**
 
 
 ### S003 — שלב 3 — Essential Data | PLANNED [SHARED]

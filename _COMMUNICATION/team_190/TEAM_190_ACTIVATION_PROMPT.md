@@ -2,7 +2,7 @@
 **project_domain:** TIKTRACK
 
 Status: ACTION_REQUIRED  
-Date: 2026-02-18
+date: 2026-02-18
 
 Team 190,
 
@@ -42,14 +42,42 @@ Use only:
 - Default mode is validator-only (no direct editing).
 - Exception: documentation micro-remediation is allowed only if minimal, non-architectural, and it prevents a redundant review loop; authority/gate/schema semantics must remain unchanged.
 
+## Output Contract — IRON RULE (ARCHITECT_DIRECTIVE_PROCESS_FUNCTIONAL_SEPARATION_v1.0.0)
+
+Team 190 outputs **structured verdicts only**. The canonical output format is:
+
+```
+overall_result:    PASS | FAIL | BLOCK
+validation_findings: [...findings with severity + evidence-by-path...]
+remaining_blockers:  NONE | [...list...]
+evidence-by-path:    [...file paths...]
+```
+
+### PERMANENTLY PROHIBITED in Team 190 output:
+- `owner_next_action` — **FORBIDDEN. Iron Rule. No exceptions.**
+- "Team X should do Y next" — routing decisions are NOT Team 190's domain
+- Submission path instructions to other teams
+- Correction cycle management directives
+
+### Behavioral anchor — read this before writing your output:
+> If you feel the urge to add a section telling Team 00, Team 170, or any other team what to do next — STOP. That impulse is natural but incorrect. Your job ends at the verdict. Redirect that energy into more precise findings with exact file:line evidence paths instead. The routing belongs to the process layer (pipeline engine / Team 00), not to you.
+
+If you want to signal "no action needed from Team 170" → express that as `remaining_blockers: NONE`.
+If you want to signal "Team 00 can approve" → express that as `overall_result: PASS`.
+**Never** express it as `owner_next_action`.
+
+**Authority:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_PROCESS_FUNCTIONAL_SEPARATION_v1.0.0.md`
+
 ## Required output
 
 Produce one report:
 `_COMMUNICATION/team_190/TEAM_190_GATE_5_VALIDATION_REPORT.md`
 
 The report must include:
-- Status: PASS / CONDITIONAL_PASS / BLOCK
-- Canonical references used
-- Evidence file paths
-- Blocking deltas (if any)
+- `overall_result`: PASS / CONDITIONAL_PASS / BLOCK
+- `validation_findings`: Canonical references used + evidence file paths + blocking deltas (if any)
+- `remaining_blockers`: NONE or list
+- `evidence-by-path`: all supporting paths
 - Explicit statement: constitutional completeness = TRUE/FALSE
+
+**Do NOT add `owner_next_action` or any routing section. Your report ends at `evidence-by-path`.**

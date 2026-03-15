@@ -21,6 +21,15 @@ repos:
         files: '^(_COMMUNICATION/|documentation/docs-governance/).+\.md$'
         stages: [pre-commit]
 
+      - id: phoenix-process-functional-separation
+        name: "Phoenix — Process-Functional Separation Guard"
+        language: system
+        entry: bash -c 'scripts/lint_process_functional_separation.sh "$@"; ec=$?; if [ "$ec" -eq 2 ]; then exit 0; fi; exit "$ec"' --
+        pass_filenames: true
+        files: '^_COMMUNICATION/team_(190|90|50|51)/'
+        types: [markdown]
+        stages: [pre-commit]
+
       - id: phoenix-bandit-security
         name: "Phoenix Security Scan - Bandit HIGH [BLOCKING]"
         entry: bash -c "source api/venv/bin/activate 2>/dev/null || true; bandit -r api/ --exclude api/venv -lll"

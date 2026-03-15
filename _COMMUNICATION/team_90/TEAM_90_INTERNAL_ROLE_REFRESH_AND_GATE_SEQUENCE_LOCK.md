@@ -128,13 +128,36 @@ Identity header is mandatory and must include:
 
 ---
 
-## 5) Validation FAIL output contract (mandatory)
+## 5) Validation output contract — ALL gate verdicts (IRON RULE — 2026-03-15)
 
-When validation fails, Team 90 must always issue a canonical remediation prompt in addition to the blocking decision:
+**Authority:** `ARCHITECT_DIRECTIVE_PROCESS_FUNCTIONAL_SEPARATION_v1.0.0.md`
 
-1. Numbered findings only (`B-...-001`, `B-...-002`, ...).
+Team 90 validation result artifacts (VALIDATION_RESPONSE, BLOCKING_REPORT, gate decision documents) contain **findings and verdict only**. The canonical output structure:
+
+```
+verdict:       PASS | FAIL | BLOCK
+gate_id:       <GATE_X>
+wp_id:         <work_package_id>
+findings:      [...findings with severity + exact evidence-by-path...]
+severity_map:  { blocker: N, high: N, medium: N, low: N }
+pass_criteria: [...what was checked, what passed...]
+```
+
+### PERMANENTLY PROHIBITED inside validation result artifacts:
+- `owner_next_action` — **FORBIDDEN. Iron Rule.**
+- "Team X should do Y next" — routing is the pipeline's responsibility
+- Submission path instructions embedded in the verdict document
+
+### Behavioral anchor:
+> If you feel the urge to add a routing section telling another team what to do — STOP. That belongs in a **separate** handoff/activation document (§3.1 above), never inside the validation result artifact. Redirect the impulse into more precise evidence paths.
+
+**This prohibition applies to the verdict document.** Separate activation/handoff prompts remain permitted per §3.1 Mode 1 duty (these are standalone routing documents — distinct from the verdict artifact).
+
+### PASS output contract (mandatory — all gates):
+
+1. Numbered findings only (`B-...-001`, `B-...-002`, ...) for FAIL/BLOCK.
 2. For each finding: severity, exact artifact path, root cause, exact required fix, acceptance check.
-3. Deterministic re-submission checklist (1..N).
+3. Deterministic re-submission checklist (1..N) for BLOCK.
 4. No-guess rule statement.
 5. Expected re-submission artifact names and canonical paths.
 

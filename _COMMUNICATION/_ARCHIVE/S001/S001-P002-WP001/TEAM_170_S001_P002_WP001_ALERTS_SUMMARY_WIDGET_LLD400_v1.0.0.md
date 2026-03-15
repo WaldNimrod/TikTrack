@@ -7,6 +7,7 @@
 **to:** Team 190 (Constitutional Validator)  
 **cc:** Team 10, Team 100  
 **date:** 2026-03-14  
+**historical_record:** true  
 **status:** SUBMITTED_FOR_GATE_1_VALIDATION  
 **gate_id:** GATE_1  
 **architectural_approval_type:** SPEC  

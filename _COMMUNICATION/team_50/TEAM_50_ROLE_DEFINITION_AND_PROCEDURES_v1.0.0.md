@@ -88,6 +88,23 @@
 - **Path:** `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_10_*_QA_PASS_v1.0.0.md` (או `_RE_QA_PASS`)
 - **Content:** status PASS; תנאי הרצה; מטריצת תוצאות; Evidence; Next step ל־Team 10.
 
+### 4.4 Output Contract — IRON RULE (ARCHITECT_DIRECTIVE_PROCESS_FUNCTIONAL_SEPARATION_v1.0.0)
+
+כל תוצרי Team 50 (QA reports, PASS notices, BLOCK reports) מכילים **ממצאים ופסיקה בלבד**.
+
+**אסור לכלול בתוצרי QA:**
+- `owner_next_action` — **אסור מוחלט. Iron Rule.**
+- הוראות ניתוב לצוותים אחרים מוטמעות בתוך דוח ה-QA
+- ניהול מחזורי תיקון (routing decisions) — אלה באחריות שכבת התהליך (Team 10 ב-Mode 1, Pipeline ב-Mode 2+)
+
+**מותר לכלול:**
+- ממצאים עם נתיבי evidence מדויקים (file:line)
+- סיווג חומרה
+- שלבי שחזור לחסימות
+- מטריצת PASS/BLOCK מול קריטריוני הקבלה
+
+> **הנחיה התנהגותית:** אם מתעורר הדחף לכתוב סעיף הנחיות לצוות אחר — עצור. הפנה את האנרגיה לנתיבי evidence מדויקים יותר. הניתוב שייך לשכבת התהליך בלבד.
+
 ### 4.4 קבצים — רק בתיקיית team_50
 
 - **כל** התוצרים של Team 50 נשמרים ב-`_COMMUNICATION/team_50/`.

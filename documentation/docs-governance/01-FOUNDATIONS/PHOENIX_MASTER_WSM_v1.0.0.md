@@ -291,6 +291,8 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 PASS S002-P005-WP002 (Team 00 trigger + Team 51 browser verification); GATE_8 closure execution completed by Team 170 | 2026-03-15**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_8 PASS S002-P005-WP002 (Team 90 revalidation response v1.0.1); DOCUMENTATION_CLOSED; NO_ACTIVE_WORK_PACKAGE confirmed | 2026-03-15**
 **log_entry | TEAM_190 | CONSTITUTIONAL_VALIDATION_UPDATE | S002-P005-WP001 store-artifact scan approved and framed CLOSED; no remaining blockers; organizational locks applied: PipelineState test isolation + store_artifact(bool/no silent failure) | 2026-03-15**
+**log_entry | TEAM_190 | IDEA_PIPELINE_HIERARCHY_REVALIDATION | PASS_WITH_ACTION | BLOCKERS_CLOSED_OPTIONAL_HARDENING_OPEN | IHC-RV-01..04 CLOSED; IHC-RV-NB-01 applied by Team 10 | 2026-03-15**
+**log_entry | TEAM_10 | IDEA_PIPELINE_HIERARCHY_MANDATE | CLOSURE_PACKAGE_SUBMITTED | IHC-RV-NB-01 hardening applied; closure package submitted to Team 100 for final architectural approval | 2026-03-15**
 **log_entry | TEAM_190 | TO_TEAM_170 | REGISTRY_MIRROR_SYNC_REQUIRED | run sync_registry_mirrors_from_wsm.py --write then --check for WP003 baseline standardization | 2026-03-10**
 
 GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:

@@ -25,7 +25,9 @@ Consolidate open items from documents moved to archive, so no task is lost durin
 
 ## Open Carryover Items (HISTORICAL — migrated to IDEA-023..035)
 
-| carryover_id | Source (archived/current) | Open item | Target stage | Owner | Status |
+*Per IHC-RV-NB-01: All legacy `OPEN` status labels have been normalized to `MIGRATED_TO_IDEA_LOG` or `CLOSED` in this archived snapshot. No operational `OPEN` values remain.*
+
+| carryover_id | Source (archived/current) | Item description | Target stage | Owner | Status |
 |---|---|---|---|---|---|
 | CARRY-001 | `archive/documentation_legacy/snapshots/2026-02-18_0200/documentation/docs-system/01-ARCHITECTURE/TT2_PHASE_2_IMPLEMENTATION_PLAN.md:259` | Manual/Visual approval checkpoint requires closure verification | Batch 3 readiness | Team 40 + Team 10 | MIGRATED_TO_IDEA_LOG |
 | CARRY-002 | `archive/documentation_legacy/snapshots/2026-02-18_0200/documentation/docs-system/01-ARCHITECTURE/TT2_PHASE_2_IMPLEMENTATION_PLAN.md:267` | Cash Flows response schema verification status not closed in legacy plan | Batch 3 readiness | Team 20 | MIGRATED_TO_IDEA_LOG |

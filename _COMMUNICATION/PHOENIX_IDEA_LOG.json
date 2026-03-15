@@ -4,8 +4,8 @@
   "description": "Canonical idea incubator — all ideas, bugs, and improvement requests before GATE_0 entry",
   "owner": "team_170",
   "fate_authority": "team_00 + nimrod",
-  "next_id": 15,
-  "last_updated": "2026-03-15T14:00:00Z",
+  "next_id": 16,
+  "last_updated": "2026-03-15T11:54:54Z",
   "urgency_legend": {
     "critical": "Blocking active work — respond today",
     "high": "Decide this sprint / current stage",
@@ -242,6 +242,22 @@
       "fate_decided_by": "team_00",
       "reference_file": "_COMMUNICATION/team_00/TEAM_00_STORE_ARTIFACT_FINAL_APPROVAL_AND_CLOSURE_v1.0.0.md",
       "notes": "APPROVED_FOR_CLOSURE — WP001 fully closed 2026-03-15"
+    },
+    {
+      "id": "IDEA-015",
+      "title": "Team 10 activation notice for WP002 GATE_7 — needs to be written and sent",
+      "domain": "agents_os",
+      "urgency": "high",
+      "submitted_by": "team_00",
+      "created_at": "2026-03-15T11:54:54Z",
+      "status": "open",
+      "fate": null,
+      "fate_target": null,
+      "fate_rationale": null,
+      "fate_decided_at": null,
+      "fate_decided_by": null,
+      "reference_file": "_COMMUNICATION/_Architects_Decisions/ARCHITECT_GATE6_DECISION_S002_P005_WP002_v1.0.0.md",
+      "notes": "GATE_6 APPROVED. Team 10 must: advance WSM to GATE_7, activate Nimrod UX review. Activation document not yet authored. Route: Team 00 writes TEAM_00_TO_TEAM_10_S002_P005_WP002_GATE7_ACTIVATION document."
     }
   ]
 }

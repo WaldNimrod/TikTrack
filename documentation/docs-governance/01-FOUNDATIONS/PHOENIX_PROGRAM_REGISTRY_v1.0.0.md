@@ -94,8 +94,11 @@ Authority: Team 100 (confirms GATE_8 PASS) → Team 00 (activates S005 TikTrack)
 
 ## S002-P005 Backlog and Governance
 
-### S002-P005-WP003 candidate
-- **PIPELINE_TEAMS.html Update** — `TEAM_00_TO_TEAM_30_AOS_TEAMS_PAGE_UPDATE_MANDATE_v1.0.0.md`: AOS UI Teams page, Mode 1/2/3 descriptions, Process-Functional separation banner, verdict badges. S002-P005 backlog item / WP003 candidate.
+### S002-P005-WP003 candidate (revised)
+- **PIPELINE_TEAMS.html Update** — `TEAM_00_TO_TEAM_30_AOS_TEAMS_PAGE_UPDATE_MANDATE_v1.0.0.md`
+
+### S002-P005-WP004 candidate
+- **Idea Pipeline Phase 2** — grooming automation, UI fate-decision interface, dedup detection, registry auto-integration. Trigger: WP002 GATE_8 PASS. LOD200 required before GATE_0. Design authority: `_COMMUNICATION/PHOENIX_IDEA_LOG.json` (IDEA-007).
 
 ### Standing governance (AGENTS_OS)
 - **AOS Docs Audit** — `TEAM_00_TO_TEAM_170_TEAM_190_AOS_DOCS_AUDIT_MANDATE_v1.0.0.md`: Standing thread (Team 170 + Team 190): code vs docs alignment, activation prompt updates, vision alignment checks. Trigger: every gate completion + every pipeline code change + every Stage activation. Not a WP — ongoing responsibility.
@@ -158,3 +161,4 @@ Source directives:
 **log_entry | TEAM_00 | PHOENIX_PROGRAM_REGISTRY | S001_P002_DEFERRED_TO_PIPELINE_ACTIVATED_PER_ARCHITECT_DIRECTIVE_S001_P002_ACTIVATION_v1.0.0 | 2026-03-14**
 **log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | S002_P005_PLANNED_TO_ACTIVE_WP001_TASK_CLOSED_WP002_PLANNED_PER_TEAM_100_MANDATE | 2026-03-15**
 **log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | S002_P005_BACKLOG_GOVERNANCE_REGISTERED_PER_TEAM_00_ROADMAP_INTEGRATION | 2026-03-15**
+**log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | S002_P005_WP003_REVISED_WP004_IDEA_PIPELINE_PHASE2_ADDED | 2026-02-19**

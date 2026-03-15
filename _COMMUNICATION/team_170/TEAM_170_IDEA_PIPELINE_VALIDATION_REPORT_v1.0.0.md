@@ -4,6 +4,7 @@ id: TEAM_170_IDEA_PIPELINE_VALIDATION_REPORT_v1.0.0
 from: Team 170 (Documentation & Governance)
 to: Team 00 (Chief Architect)
 date: 2026-02-19
+historical_record: true
 status: VALIDATION_COMPLETE
 in_response_to: TEAM_00_TO_TEAM_170_IDEA_PIPELINE_VALIDATION_MANDATE_v1.0.0
 ---

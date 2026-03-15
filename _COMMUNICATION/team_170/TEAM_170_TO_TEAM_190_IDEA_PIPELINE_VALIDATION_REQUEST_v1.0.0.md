@@ -5,6 +5,7 @@ from: Team 170 (Documentation & Governance)
 to: Team 190 (Constitutional Validator)
 cc: Team 00, Team 10
 date: 2026-02-19
+historical_record: true
 status: VALIDATION_REQUEST
 in_response_to: TEAM_00_TO_TEAM_170_IDEA_PIPELINE_VALIDATION_MANDATE_v1.0.0
 ---

@@ -1,4 +1,5 @@
 # TEAM_00_TO_TEAM_170_IDEA_PIPELINE_VALIDATION_MANDATE_v1.0.0.md
+date: 2026-03-15
 
 **From:** Team 00 — Chief Architect
 **To:** Team 170 — Documentation & Governance

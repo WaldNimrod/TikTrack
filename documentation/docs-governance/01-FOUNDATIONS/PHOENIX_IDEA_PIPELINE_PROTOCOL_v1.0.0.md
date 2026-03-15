@@ -5,6 +5,7 @@
 **version:** 1.0.0  
 **owner:** Team 170 (Documentation); fate authority: Team 00 + Nimrod  
 **date:** 2026-02-19  
+**historical_record:** true  
 **authority:** TEAM_00_TO_TEAM_170_IDEA_PIPELINE_VALIDATION_MANDATE_v1.0.0
 
 ---

@@ -4,6 +4,7 @@ id: TEAM_00_CONSTITUTION
 version: 1.0.0
 owner: Team 00 (Chief Architect)
 date: 2026-02-19
+historical_record: true
 ---
 
 # Team 00 Constitution

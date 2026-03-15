@@ -16,7 +16,7 @@ authority: TEAM_00_TO_TEAM_170_IDEA_PIPELINE_CANONICAL_HIERARCHY_AND_MIGRATION_M
 A `lod200_pending` idea is one where:
 - Team 00 has decided fate = new_wp (this idea will become a Work Package)
 - But no LOD200 has been authored/approved yet
-- The WP does not yet appear in the Program Registry
+- The WP does not yet appear in the Work Package Registry
 
 This is NOT a blocked state — it is the correct state for any new_wp idea that is not yet ready for LOD400 / GATE_0.
 
@@ -26,7 +26,7 @@ This is NOT a blocked state — it is the correct state for any new_wp idea that
 
 1. Team 00 authors the LOD200 (in a dedicated LOD200 session)
 2. Team 100 reviews and approves it
-3. Team 170 registers the WP in the Program Registry
+3. Team 170 registers the WP in the Work Package Registry
 4. Team 170 updates the IDEA entry: status → decided, delivery_ref → [LOD200 approval doc path]
 
 ---

@@ -17,7 +17,7 @@ All work items in the Phoenix project exist in exactly one of these levels:
 | Level | Container | Tool | Owner |
 |-------|-----------|------|-------|
 | **Level 0 — Idea** | PHOENIX_IDEA_LOG.json | `idea_submit.sh` | Team 00 / submitter |
-| **Level 1 — Work Package** | PHOENIX_PROGRAM_REGISTRY | Gate pipeline | Team 170 |
+| **Level 1 — Work Package** | PHOENIX_WORK_PACKAGE_REGISTRY | Gate pipeline | Team 170 |
 | **Level 2 — Stage** | PHOENIX_PORTFOLIO_ROADMAP + WSM | WSM | Team 10 |
 | **Level 3 — Portfolio** | PHOENIX_MASTER_SSM | SSM | Team 00 |
 
@@ -29,7 +29,7 @@ All work items in the Phoenix project exist in exactly one of these levels:
 
 An idea with `fate = new_wp` CANNOT reach `status = decided` until:
 1. LOD200 has been authored and approved by Team 100
-2. The WP has been registered in the Program Registry (Team 170)
+2. The WP has been registered in the Work Package Registry (Team 170)
 3. `delivery_ref` has been set to the LOD200 approval document path
 
 Until these conditions are met, the idea MUST remain at `status = lod200_pending`.

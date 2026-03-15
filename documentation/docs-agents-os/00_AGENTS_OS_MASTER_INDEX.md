@@ -32,9 +32,20 @@
 
 ---
 
+## UI Component Registry
+
+| Document | Description |
+|----------|-------------|
+| [PIPELINE_DASHBOARD_UI_REGISTRY_v1.0.0.md](../../agents_os/ui/docs/PIPELINE_DASHBOARD_UI_REGISTRY_v1.0.0.md) | buildCurrentStepBanner, mandate tab phase auto-selection, PWA scaffold (DOC-04, DOC-05, DOC-06) |
+
+---
+
 ## CLI Reference
 
-[PIPELINE_CLI_REFERENCE.md](03-CLI-REFERENCE/PIPELINE_CLI_REFERENCE.md) — full reference for `pipeline_run.sh` subcommands.
+| Document | Description |
+|----------|-------------|
+| [PIPELINE_CLI_REFERENCE.md](03-CLI-REFERENCE/PIPELINE_CLI_REFERENCE.md) | Full reference for `pipeline_run.sh` subcommands |
+| [PIPELINE_STATE_AND_BEHAVIOR_v1.0.0.md](03-CLI-REFERENCE/PIPELINE_STATE_AND_BEHAVIOR_v1.0.0.md) | Domain resolution, GATE_1 fail behavior, AC-10 auto-store (DOC-01, DOC-02, DOC-03) |
 
 ---
 

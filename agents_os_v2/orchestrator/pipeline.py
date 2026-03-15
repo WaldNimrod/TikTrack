@@ -1950,20 +1950,25 @@ def advance_gate(gate_id: str, status: str, reason: str = ""):
         show_next(state)
 
 
-def store_artifact(gate_id: str, file_path: str):
+def store_artifact(gate_id: str, file_path: str) -> bool:
     """Store agent output file content to the appropriate pipeline state field.
 
     Gate → field mapping:
       GATE_1                → state.lld400_content
       G3_PLAN               → state.work_plan
       CURSOR_IMPLEMENTATION → state.implementation_files (one path per line)
+
+    Returns:
+      True  — artifact stored successfully.
+      False — failure (file not found, unsupported gate, or I/O error).
+              Caller should sys.exit(1) when False is returned from CLI context.
     """
     path = Path(file_path)
     if not path.exists():
         path = REPO_ROOT / file_path
     if not path.exists():
         _log(f"ERROR: File not found: {file_path}")
-        return
+        return False
 
     content = path.read_text(encoding="utf-8")
     state = PipelineState.load()
@@ -1978,7 +1983,7 @@ def store_artifact(gate_id: str, file_path: str):
     if not field_name:
         _log(f"ERROR: No state field mapping for gate: {gate_id}")
         _log(f"Supported gates: {', '.join(GATE_TO_FIELD.keys())}")
-        return
+        return False
 
     if field_name == "implementation_files":
         files = [
@@ -1994,6 +1999,7 @@ def store_artifact(gate_id: str, file_path: str):
 
     state.save()
     _log(f"Gate {gate_id} artifact stored successfully.")
+    return True
 
 
 def main():
@@ -2004,7 +2010,7 @@ def main():
     parser.add_argument("--advance", nargs=2, metavar=("GATE", "STATUS"), help="Advance gate: GATE_X PASS|FAIL")
     parser.add_argument("--reason", type=str, default="", help="Failure reason")
     parser.add_argument("--store-artifact", nargs=2, metavar=("GATE", "FILE"),
-                        help="Store agent output file to pipeline state. G3_PLAN→work_plan, G3_5→validation, CURSOR_IMPLEMENTATION→impl_files")
+                        help="Store agent output file to pipeline state. GATE_1→lld400_content, G3_PLAN→work_plan, CURSOR_IMPLEMENTATION→implementation_files")
     parser.add_argument("--generate-prompt", type=str, metavar="GATE", help="Generate prompt for gate")
     parser.add_argument("--revision-notes", type=str, default="",
                         help="Revision notes to include in prompt (for G3_PLAN after G3_5 FAIL). "
@@ -2035,7 +2041,8 @@ def main():
         route_after_fail(gate_id, route_type, args.reason)
     elif args.store_artifact:
         gate_id, file_path = args.store_artifact
-        store_artifact(gate_id, file_path)
+        if not store_artifact(gate_id, file_path):
+            sys.exit(1)
     elif args.status:
         show_status()
     elif args.next:

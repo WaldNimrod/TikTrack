@@ -1,23 +1,24 @@
 {
-  "pipe_run_id": "65e625b3",
-  "work_package_id": "REQUIRED",
+  "pipe_run_id": "s002-p003-wp002-g8",
+  "work_package_id": "S002-P003-WP002",
   "stage_id": "S002",
   "project_domain": "tiktrack",
-  "spec_brief": "",
-  "current_gate": "GATE_0",
-  "gates_completed": [],
-  "gates_failed": [
-    "GATE_0"
-  ],
+  "spec_brief": "TikTrack Alignment D22+D33+D34+D35 — GATE_8 DOCUMENTATION_CLOSURE",
+  "current_gate": "GATE_8",
+  "gates_completed": ["GATE_0","GATE_1","GATE_2","GATE_3","GATE_4","GATE_5","GATE_6","GATE_7"],
+  "gates_failed": [],
   "lld400_content": "",
   "work_plan": "",
   "mandates": "",
   "implementation_files": [],
   "implementation_endpoints": [],
-  "spec_path": "",
-  "started_at": "",
-  "last_updated": "2026-03-15T11:00:18.123515+00:00",
+  "spec_path": "_COMMUNICATION/team_00/TEAM_00_TO_TEAM_90_S002_P003_WP002_GATE8_ACTIVATION_v1.0.0.md",
+  "started_at": "2026-03-15T00:00:00Z",
+  "last_updated": "2026-03-15T23:30:00Z",
   "gate_state": null,
-  "pending_actions": [],
+  "pending_actions": [
+    "Team 70: AS_MADE docs D22/D33/D34/D35",
+    "Team 90: GATE_8 validation + PASS"
+  ],
   "override_reason": null
 }

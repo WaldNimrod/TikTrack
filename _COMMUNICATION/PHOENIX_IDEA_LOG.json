@@ -1,15 +1,16 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "schema": "phoenix-idea-log",
   "description": "Canonical idea incubator — all ideas, bugs, and improvement requests before GATE_0 entry",
   "owner": "team_170",
   "fate_authority": "team_00 + nimrod",
-  "next_id": 18,
-  "last_updated": "2026-03-15T17:00:00Z",
+  "next_id": 36,
+  "last_updated": "2026-03-15T17:47:32Z",
   "status_legend": {
     "open": "No fate decision yet — requires Team 00 + Nimrod review",
     "in_execution": "Fate decided AND mandate issued to team; team executing; not yet delivered/confirmed",
-    "decided": "Fully closed — fate executed (immediate done / cancel logged / new_wp registered)"
+    "decided": "Fully closed — fate executed (immediate done / cancel logged / new_wp registered)",
+    "lod200_pending": "Fate decided (new_wp) — LOD200 not yet authored/approved; WP not yet active in roadmap. Idea remains in pipeline until LOD200 approved."
   },
   "urgency_legend": {
     "critical": "Blocking active work — respond today",
@@ -23,6 +24,14 @@
     "immediate": "Executed directly (< 1 session, no new WP)",
     "cancel": "Not pursuing — reason logged to prevent recurrence"
   },
+  "delivery_ref_rule": {
+    "rule": "IRON RULE — delivery_ref must be set before status transitions to decided",
+    "fate_immediate_or_append": "REQUIRED — must reference the deliverable file or WP gate record confirming execution",
+    "fate_new_wp": "REQUIRED — must reference LOD200 approval doc + program registry entry. CANNOT be decided until LOD200 approved. Before LOD200: status=lod200_pending.",
+    "fate_cancel": "Set to 'N/A_CANCEL' — no delivery, reason in fate_rationale",
+    "status_open": "null — no fate yet",
+    "status_in_execution": "null — awaiting team delivery; must be filled before closing"
+  },
   "ideas": [
     {
       "id": "IDEA-001",
@@ -31,14 +40,15 @@
       "urgency": "low",
       "submitted_by": "team_00",
       "created_at": "2026-03-15T14:00:00Z",
-      "status": "decided",
+      "status": "lod200_pending",
       "fate": "new_wp",
       "fate_target": "S003-P007 backlog candidate",
       "fate_rationale": "Option A (modal upgrade) handled immediately. Option B requires dedicated UX design and LOD200 — backlog for S003-P007",
       "fate_decided_at": "2026-03-15T14:00:00Z",
       "fate_decided_by": "team_00 + nimrod",
       "reference_file": "_COMMUNICATION/team_00/TEAM_00_TO_TEAM_61_HELP_MODAL_UPGRADE_MANDATE_v1.0.0.md",
-      "notes": "Registered in program registry. LOD200 required before GATE_0."
+      "delivery_ref": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md — S003-P007 registered as backlog candidate",
+      "notes": "LOD200_PENDING — S003-P007 registered as backlog candidate but LOD200 not yet written. Will move to decided once LOD200 is authored and approved."
     },
     {
       "id": "IDEA-002",
@@ -54,7 +64,8 @@
       "fate_decided_at": "2026-03-15T14:00:00Z",
       "fate_decided_by": "team_00",
       "reference_file": "_COMMUNICATION/team_00/TEAM_00_TO_TEAM_30_AOS_TEAMS_PAGE_UPDATE_MANDATE_v1.0.0.md",
-      "notes": "MANDATE_ISSUED — Team 30 executing. Deliverable: updated PIPELINE_TEAMS.html with Process-Functional separation + Team 10 Mode 1/2/3 table."
+      "delivery_ref": null,
+      "notes": "MANDATE_ISSUED — Team 30 executing. Deliverable: updated PIPELINE_TEAMS.html with Process-Functional separation + Team 10 Mode 1/2/3 table. delivery_ref REQUIRED before closing."
     },
     {
       "id": "IDEA-003",
@@ -70,7 +81,8 @@
       "fate_decided_at": "2026-03-15T14:00:00Z",
       "fate_decided_by": "team_00",
       "reference_file": "_COMMUNICATION/team_00/TEAM_00_TO_TEAM_170_TEAM_190_AOS_DOCS_AUDIT_MANDATE_v1.0.0.md",
-      "notes": "MANDATE_ISSUED — Teams 170+190 executing. 2A: activation prompt updates (immediate). 2B: targeted scan. 2C: monthly. IDEA-005 (Mode 1 Routing Table) is part of this mandate."
+      "delivery_ref": null,
+      "notes": "MANDATE_ISSUED — Teams 170+190 executing. 2A: activation prompt updates (immediate). 2B: targeted scan. 2C: monthly. IDEA-005 (Mode 1 Routing Table) is part of this mandate. delivery_ref REQUIRED before closing."
     },
     {
       "id": "IDEA-004",
@@ -86,6 +98,7 @@
       "fate_decided_at": "2026-03-15T17:00:00Z",
       "fate_decided_by": "team_00",
       "reference_file": "_COMMUNICATION/agents_os/pipeline_state_agentsos.json",
+      "delivery_ref": "N/A_CANCEL",
       "notes": "WP002 GATE_8 PASS confirmed 2026-03-15. OBS-02 part of closed record."
     },
     {
@@ -102,7 +115,8 @@
       "fate_decided_at": "2026-03-15T14:00:00Z",
       "fate_decided_by": "team_00",
       "reference_file": "_COMMUNICATION/team_00/TEAM_00_TO_TEAM_170_TEAM_190_AOS_DOCS_AUDIT_MANDATE_v1.0.0.md",
-      "notes": "MANDATE_ISSUED — part of AOS Docs Audit (IDEA-003). Team 170 executing as sub-deliverable of that mandate."
+      "delivery_ref": null,
+      "notes": "MANDATE_ISSUED — part of AOS Docs Audit (IDEA-003). Team 170 executing as sub-deliverable. delivery_ref REQUIRED before closing."
     },
     {
       "id": "IDEA-006",
@@ -118,6 +132,7 @@
       "fate_decided_at": "2026-03-15T17:00:00Z",
       "fate_decided_by": "team_00",
       "reference_file": "_COMMUNICATION/agents_os/pipeline_state_agentsos.json",
+      "delivery_ref": "N/A_CANCEL",
       "notes": "Verified: override_reason=null in pipeline_state_agentsos.json. Issue self-resolved."
     },
     {
@@ -127,14 +142,15 @@
       "urgency": "low",
       "submitted_by": "team_00",
       "created_at": "2026-03-15T14:00:00Z",
-      "status": "decided",
+      "status": "lod200_pending",
       "fate": "new_wp",
       "fate_target": "S002-P005 backlog — WP004 candidate",
       "fate_rationale": "Phase 1 provides stable base. Phase 2 adds: idea_groom.sh, UI fate decisions in dashboard, dedup warnings, registry auto-integration. WP004 per program registry update.",
       "fate_decided_at": "2026-03-15T14:00:00Z",
       "fate_decided_by": "team_00 + nimrod",
       "reference_file": "_COMMUNICATION/PHOENIX_IDEA_LOG.json",
-      "notes": "Trigger condition MET (WP002 GATE_8 PASS). LOD200 required before GATE_0 entry. Ready to plan when capacity permits."
+      "delivery_ref": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md — S002-P005-WP004 registered",
+      "notes": "LOD200_PENDING — WP004 registered in program registry. LOD200 not yet authored. Will move to decided once LOD200 written + GATE_0 triggered."
     },
     {
       "id": "IDEA-008",
@@ -150,7 +166,8 @@
       "fate_decided_at": "2026-03-15T14:00:00Z",
       "fate_decided_by": "team_00",
       "reference_file": "_COMMUNICATION/team_00/TEAM_00_TO_TEAM_61_HELP_MODAL_UPGRADE_MANDATE_v1.0.0.md",
-      "notes": "MANDATE_ISSUED — Team 61 executing. Deliverable: updated PIPELINE_DASHBOARD.html help modal with 4 tabs (Overview, Three Modes, Domain section, Help)."
+      "delivery_ref": null,
+      "notes": "MANDATE_ISSUED — Team 61 executing. Deliverable: updated PIPELINE_DASHBOARD.html help modal with 4 tabs. delivery_ref REQUIRED before closing."
     },
     {
       "id": "IDEA-009",
@@ -166,7 +183,8 @@
       "fate_decided_at": "2026-03-15T14:00:00Z",
       "fate_decided_by": "team_00 + nimrod",
       "reference_file": "_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_PROCESS_FUNCTIONAL_SEPARATION_v1.0.0.md",
-      "notes": "COMPLETE. ADRs locked. Team 10 Mode 1=Process Coordinator+Impl; Mode 2=Impl Technical Authority only; Mode 3=Tech Consultation on-demand."
+      "delivery_ref": "_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_PROCESS_FUNCTIONAL_SEPARATION_v1.0.0.md + _COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_TEAM_ROSTER_LOCK_v2.0.0.md",
+      "notes": "COMPLETE. ADRs locked. Team 10 Mode 1/2/3 defined. Process-Functional Separation active."
     },
     {
       "id": "IDEA-010",
@@ -182,6 +200,7 @@
       "fate_decided_at": "2026-03-15T14:00:00Z",
       "fate_decided_by": "team_00",
       "reference_file": null,
+      "delivery_ref": "agents_os_v2/orchestrator/state.py — code review COMPLETE 2026-03-15, architecture confirmed correct, no change required",
       "notes": "COMPLETE. Iron Rule: test isolation requires monkeypatch of get_state_file + STATE_FILE + PIPELINE_DOMAIN env."
     },
     {
@@ -198,6 +217,7 @@
       "fate_decided_at": "2026-03-15T16:00:00Z",
       "fate_decided_by": "team_00",
       "reference_file": "_COMMUNICATION/agents_os/pipeline_state_agentsos.json",
+      "delivery_ref": "N/A_CANCEL",
       "notes": "Session-start state was session corruption. Canonical state restored by teams. No investigation needed."
     },
     {
@@ -214,6 +234,7 @@
       "fate_decided_at": "2026-03-15T14:00:00Z",
       "fate_decided_by": "nimrod",
       "reference_file": "_COMMUNICATION/_Architects_Decisions/ARCHITECT_IDEA_PIPELINE_PHASE1_APPROVAL_v1.0.0.md",
+      "delivery_ref": "_COMMUNICATION/_Architects_Decisions/ARCHITECT_IDEA_PIPELINE_PHASE1_APPROVAL_v1.0.0.md",
       "notes": "COMPLETE. Phase 1 operational. Approved: ARCHITECT_IDEA_PIPELINE_PHASE1_APPROVAL_v1.0.0.md."
     },
     {
@@ -230,6 +251,7 @@
       "fate_decided_at": "2026-03-15T17:00:00Z",
       "fate_decided_by": "team_00",
       "reference_file": "_COMMUNICATION/_Architects_Decisions/ARCHITECT_GATE6_DECISION_S002_P005_WP002_v1.0.0.md",
+      "delivery_ref": "N/A_CANCEL",
       "notes": "WP002 GATE_8 PASS confirmed. OBS-03 part of closed record."
     },
     {
@@ -246,7 +268,8 @@
       "fate_decided_at": "2026-03-15T14:00:00Z",
       "fate_decided_by": "team_00",
       "reference_file": "_COMMUNICATION/team_00/TEAM_00_STORE_ARTIFACT_FINAL_APPROVAL_AND_CLOSURE_v1.0.0.md",
-      "notes": "COMPLETE. WP001 fully closed 2026-03-15."
+      "delivery_ref": "_COMMUNICATION/team_00/TEAM_00_STORE_ARTIFACT_FINAL_APPROVAL_AND_CLOSURE_v1.0.0.md",
+      "notes": "COMPLETE. pytest 15/15 PASS. WP001 fully closed 2026-03-15."
     },
     {
       "id": "IDEA-015",
@@ -262,23 +285,25 @@
       "fate_decided_at": "2026-03-15T16:00:00Z",
       "fate_decided_by": "team_00",
       "reference_file": "_COMMUNICATION/team_00/TEAM_00_S002_P005_WP002_GATE7_ACTIVATION_SUPERSEDE_NOTE_v1.0.0.md",
+      "delivery_ref": "N/A_CANCEL",
       "notes": "Supersede note at: TEAM_00_S002_P005_WP002_GATE7_ACTIVATION_SUPERSEDE_NOTE_v1.0.0.md."
     },
     {
       "id": "IDEA-016",
-      "title": "S003-P003 LOD400 authoring — D39/D40/D41 System Settings full spec",
+      "title": "S003-P003 LOD400 authoring — D39/D40/D41 System Settings full spec + implementation WP",
       "domain": "tiktrack",
       "urgency": "high",
       "submitted_by": "team_00",
       "created_at": "2026-03-15T17:00:00Z",
-      "status": "open",
-      "fate": null,
-      "fate_target": null,
-      "fate_rationale": null,
-      "fate_decided_at": null,
-      "fate_decided_by": null,
+      "status": "decided",
+      "fate": "new_wp",
+      "fate_target": "S003-P003 — formal gate pipeline WP (GATE_0→GATE_8) for D39/D40/D41 System Settings implementation",
+      "fate_rationale": "Nimrod decision 2026-03-15: not just LOD400 authoring — this is a FULL WP covering spec authoring (LOD400 by Team 00 as pre-gate work) + full gate pipeline implementation. Scope: D39 Preferences (23 fields, 6 groups, JSONB caching), D40 System Management (7 sections, feature_flags), D41 User Management (SUPERADMIN read-only).",
+      "fate_decided_at": "2026-03-15T21:00:00Z",
+      "fate_decided_by": "nimrod",
       "reference_file": "_COMMUNICATION/team_00/TEAM_00_S003_P003_SYSTEM_SETTINGS_LOD200_v1.0.0.md",
-      "notes": "LOD200 fully locked (2026-03-04). LOD400 (LLD400) NOT yet authored. BLOCKS S003-P003 GATE_0. Scope: D39 Preferences (23 fields, 6 groups), D40 System Management (7 sections), D41 User Management. Next dedicated session required."
+      "delivery_ref": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md — S003-P003 registered (LOD200 locked; LOD400 pending Team 00 authoring before GATE_0)",
+      "notes": "FATE DECIDED: new_wp. LOD400 authoring = pre-gate Team 00 work (one dedicated session). WP enters GATE_0 after LOD400 complete. SETUP-01 (PyJWT) + SETUP-02 (mypy) in preamble."
     },
     {
       "id": "IDEA-017",
@@ -287,14 +312,321 @@
       "urgency": "medium",
       "submitted_by": "team_00",
       "created_at": "2026-03-15T17:00:00Z",
+      "status": "decided",
+      "fate": "immediate",
+      "fate_target": "TEAM_00_TO_TEAM_90_S002_P003_WP002_GATE8_ACTIVATION_v1.0.0.md — GATE_8 mandate issued; S003 activation authorized after GATE_8 PASS",
+      "fate_rationale": "Nimrod confirmed S002-P003-WP002 GATE_7 PASS 2026-03-15. Mandate issued to Team 90 for GATE_8. S003 GATE_0 trigger authorized for P001/P002 immediately after S002-P003-WP002 GATE_8 PASS.",
+      "fate_decided_at": "2026-03-15T22:00:00Z",
+      "fate_decided_by": "nimrod",
+      "reference_file": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
+      "delivery_ref": "_COMMUNICATION/team_00/TEAM_00_TO_TEAM_90_S002_P003_WP002_GATE8_ACTIVATION_v1.0.0.md",
+      "notes": "MANDATE_ISSUED. Team 70→AS_MADE docs, Team 90→GATE_8 PASS, Team 10→WSM, Team 190→S003 GATE_0 trigger. S003-P001/P002 authorized after GATE_8 PASS. S003-P003 waits for LOD400 (IDEA-016)."
+    },
+    {
+      "id": "IDEA-018",
+      "title": "Pipeline stage transitions + roadmap management — completion of scripts and interface",
+      "domain": "agents_os",
+      "urgency": "low",
+      "submitted_by": "nimrod",
+      "created_at": "2026-03-15T21:00:00Z",
+      "status": "lod200_pending",
+      "fate": "new_wp",
+      "fate_target": "S004 candidate WP — stage transition scripts + management UI",
+      "fate_rationale": "Nimrod decision 2026-03-15: definitely a new WP, plan in future. Nominated S004-P0xx. Blocked until S003 completes.",
+      "fate_decided_at": "2026-03-15T22:00:00Z",
+      "fate_decided_by": "nimrod",
+      "reference_file": null,
+      "delivery_ref": null,
+      "notes": "LOD200_PENDING — S004 candidate. Not yet in program registry. delivery_ref will be set when LOD200 authored + WP registered. No action until S003 stable."
+    },
+    {
+      "id": "IDEA-019",
+      "title": "Dashboard map + task lists — define clear role per file, or unified idea→task→WP interface",
+      "domain": "shared",
+      "urgency": "medium",
+      "submitted_by": "nimrod",
+      "created_at": "2026-03-15T21:00:00Z",
+      "status": "decided",
+      "fate": "immediate",
+      "fate_target": "Option C — Canonical Hierarchy ADR + Floating Task File Migration + LOD200_PENDING Usage Guide",
+      "fate_rationale": "Nimrod decision 2026-03-15: Option C (immediate). Iron Rule: no floating task files. IDEA_LOG = pre-GATE_0 container. lod200_pending status enforces no-WP-before-LOD200. Mandate issued to Team 170 for canonical ADR + audit + usage guide.",
+      "fate_decided_at": "2026-03-15T23:30:00Z",
+      "fate_decided_by": "nimrod",
+      "reference_file": null,
+      "delivery_ref": "_COMMUNICATION/team_00/TEAM_00_TO_TEAM_170_IDEA_PIPELINE_CANONICAL_HIERARCHY_AND_MIGRATION_MANDATE_v1.0.0.md",
+      "notes": "MANDATE_ISSUED. Team 170 delivers: (1) ARCHITECT_DIRECTIVE_TASK_HIERARCHY_CANON_v1.0.0.md, (2) floating task audit result, (3) LOD200_PENDING usage guide. lod200_pending status + idea_scan.sh + PIPELINE_ROADMAP.html all updated to enforce the canonical lifecycle."
+    },
+    {
+      "id": "IDEA-020",
+      "title": "ROSTER_LOCK v3 — add Team 31 (Blueprint Maker) missing from v1+v2",
+      "domain": "shared",
+      "urgency": "high",
+      "submitted_by": "team_00",
+      "created_at": "2026-03-15T21:00:00Z",
+      "status": "decided",
+      "fate": "immediate",
+      "fate_target": "ARCHITECT_DIRECTIVE_TEAM_ROSTER_LOCK_v4.0.0.md — Teams 51, 61, 191 added",
+      "fate_rationale": "Nimrod approved 2026-03-15. All three teams fully characterized in pipeline-teams.js. Roster Lock v4 authored and locked with Teams 51, 61, 191. Team 31 was added in v3 (same session).",
+      "fate_decided_at": "2026-03-15T22:00:00Z",
+      "fate_decided_by": "nimrod",
+      "reference_file": "_COMMUNICATION/team_00/TEAM_00_TO_TEAM_31_ACTIVATION_PROMPT_v1.0.0.md",
+      "delivery_ref": "_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_TEAM_ROSTER_LOCK_v4.0.0.md",
+      "notes": "COMPLETE. Roster Lock v4 locked. All 4 missing teams now canonical: Team 31 (v3), Teams 51/61/191 (v4). Roster is now comprehensive."
+    },
+    {
+      "id": "IDEA-021",
+      "title": "Model B file structure definition (Stage B)",
+      "domain": "agents_os",
+      "urgency": "low",
+      "submitted_by": "team_170",
+      "created_at": "2026-03-15T17:47:22Z",
       "status": "open",
       "fate": null,
       "fate_target": null,
       "fate_rationale": null,
       "fate_decided_at": null,
       "fate_decided_by": null,
-      "reference_file": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
-      "notes": "S002 fully complete 2026-03-15. WSM next_governance_event=S003 GATE_0. S003-P001/P002 (AGENTS_OS) have LOD400 complete, ready for FAST_0. S003-P003 (TIKTRACK) needs LOD400 first (see IDEA-016). Fate options: new_wp (formal S003 activation WP) or immediate (direct WSM update + Team 190 GATE_0 trigger)."
+      "reference_file": "_COMMUNICATION/agents_os/AGENTS_OS_ADR031_OPEN_ITEMS_v1.0.0.md",
+      "delivery_ref": null,
+      "notes": "Migrated from: AGENTS_OS_ADR031_OPEN_ITEMS_v1.0.0.md (OI-01). Owner: Team 190. Due: S003-P007 intake."
+    },
+    {
+      "id": "IDEA-022",
+      "title": "Formal D-04 approval confirmation doc (Stage C)",
+      "domain": "agents_os",
+      "urgency": "low",
+      "submitted_by": "team_170",
+      "created_at": "2026-03-15T17:47:23Z",
+      "status": "open",
+      "fate": null,
+      "fate_target": null,
+      "fate_rationale": null,
+      "fate_decided_at": null,
+      "fate_decided_by": null,
+      "reference_file": "_COMMUNICATION/agents_os/AGENTS_OS_ADR031_OPEN_ITEMS_v1.0.0.md",
+      "delivery_ref": null,
+      "notes": "Migrated from: AGENTS_OS_ADR031_OPEN_ITEMS_v1.0.0.md (OI-02). Owner: Team 190. Due: Before S004-P008 activation."
+    },
+    {
+      "id": "IDEA-023",
+      "title": "Manual/Visual approval checkpoint closure verification",
+      "domain": "tiktrack",
+      "urgency": "low",
+      "submitted_by": "team_170",
+      "created_at": "2026-03-15T17:47:25Z",
+      "status": "open",
+      "fate": null,
+      "fate_target": null,
+      "fate_rationale": null,
+      "fate_decided_at": null,
+      "fate_decided_by": null,
+      "reference_file": "_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md",
+      "delivery_ref": null,
+      "notes": "Migrated from: TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST (CARRY-001). Batch 3 readiness. Owner: Team 40+10."
+    },
+    {
+      "id": "IDEA-024",
+      "title": "Cash Flows response schema verification status closure",
+      "domain": "tiktrack",
+      "urgency": "low",
+      "submitted_by": "team_170",
+      "created_at": "2026-03-15T17:47:25Z",
+      "status": "open",
+      "fate": null,
+      "fate_target": null,
+      "fate_rationale": null,
+      "fate_decided_at": null,
+      "fate_decided_by": null,
+      "reference_file": "_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md",
+      "delivery_ref": null,
+      "notes": "Migrated from: TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST (CARRY-002). Batch 3 readiness. Owner: Team 20."
+    },
+    {
+      "id": "IDEA-025",
+      "title": "Data loader update for currency_conversions",
+      "domain": "tiktrack",
+      "urgency": "low",
+      "submitted_by": "team_170",
+      "created_at": "2026-03-15T17:47:26Z",
+      "status": "open",
+      "fate": null,
+      "fate_target": null,
+      "fate_rationale": null,
+      "fate_decided_at": null,
+      "fate_decided_by": null,
+      "reference_file": "_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md",
+      "delivery_ref": null,
+      "notes": "Migrated from: TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST (CARRY-003). Batch 3 readiness. Owner: Team 30."
+    },
+    {
+      "id": "IDEA-026",
+      "title": "D22 Tickers: data-integrity widget + integration completion",
+      "domain": "tiktrack",
+      "urgency": "low",
+      "submitted_by": "team_170",
+      "created_at": "2026-03-15T17:47:27Z",
+      "status": "open",
+      "fate": null,
+      "fate_target": null,
+      "fate_rationale": null,
+      "fate_decided_at": null,
+      "fate_decided_by": null,
+      "reference_file": "_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md",
+      "delivery_ref": null,
+      "notes": "Migrated from: TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST (CARRY-004). Batch 3. Owner: Team 30+20."
+    },
+    {
+      "id": "IDEA-027",
+      "title": "D23 Data Dashboard: template/draft to functional scope",
+      "domain": "tiktrack",
+      "urgency": "low",
+      "submitted_by": "team_170",
+      "created_at": "2026-03-15T17:47:27Z",
+      "status": "open",
+      "fate": null,
+      "fate_target": null,
+      "fate_rationale": null,
+      "fate_decided_at": null,
+      "fate_decided_by": null,
+      "reference_file": "_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md",
+      "delivery_ref": null,
+      "notes": "Migrated from: TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST (CARRY-005). Batch 3. Owner: Team 30."
+    },
+    {
+      "id": "IDEA-028",
+      "title": "D24 Trade Plans: implementation planning and execution gate",
+      "domain": "tiktrack",
+      "urgency": "low",
+      "submitted_by": "team_170",
+      "created_at": "2026-03-15T17:47:31Z",
+      "status": "open",
+      "fate": null,
+      "fate_target": null,
+      "fate_rationale": null,
+      "fate_decided_at": null,
+      "fate_decided_by": null,
+      "reference_file": "_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md",
+      "delivery_ref": null,
+      "notes": "Migrated from: CARRY-006. Batch 5. Owner: Team 31+30+20."
+    },
+    {
+      "id": "IDEA-029",
+      "title": "D25 AI Analysis: detailed spec before build",
+      "domain": "tiktrack",
+      "urgency": "low",
+      "submitted_by": "team_170",
+      "created_at": "2026-03-15T17:47:31Z",
+      "status": "open",
+      "fate": null,
+      "fate_target": null,
+      "fate_rationale": null,
+      "fate_decided_at": null,
+      "fate_decided_by": null,
+      "reference_file": "_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md",
+      "delivery_ref": null,
+      "notes": "Migrated from: CARRY-007. Batch 5/6. Owner: Team 31+30+70."
+    },
+    {
+      "id": "IDEA-030",
+      "title": "D26 Watch Lists: spec + build plan",
+      "domain": "tiktrack",
+      "urgency": "low",
+      "submitted_by": "team_170",
+      "created_at": "2026-03-15T17:47:31Z",
+      "status": "open",
+      "fate": null,
+      "fate_target": null,
+      "fate_rationale": null,
+      "fate_decided_at": null,
+      "fate_decided_by": null,
+      "reference_file": "_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md",
+      "delivery_ref": null,
+      "notes": "Migrated from: CARRY-008. Batch 5. Owner: Team 31+30."
+    },
+    {
+      "id": "IDEA-031",
+      "title": "D27 Ticker Dashboard: spec + historical data dependencies",
+      "domain": "tiktrack",
+      "urgency": "low",
+      "submitted_by": "team_170",
+      "created_at": "2026-03-15T17:47:31Z",
+      "status": "open",
+      "fate": null,
+      "fate_target": null,
+      "fate_rationale": null,
+      "fate_decided_at": null,
+      "fate_decided_by": null,
+      "reference_file": "_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md",
+      "delivery_ref": null,
+      "notes": "Migrated from: CARRY-009. Batch 6. Owner: Team 31+30+20."
+    },
+    {
+      "id": "IDEA-032",
+      "title": "D28 Trading Journal: spec + implementation plan",
+      "domain": "tiktrack",
+      "urgency": "low",
+      "submitted_by": "team_170",
+      "created_at": "2026-03-15T17:47:31Z",
+      "status": "open",
+      "fate": null,
+      "fate_target": null,
+      "fate_rationale": null,
+      "fate_decided_at": null,
+      "fate_decided_by": null,
+      "reference_file": "_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md",
+      "delivery_ref": null,
+      "notes": "Migrated from: CARRY-010. Batch 6. Owner: Team 31+30."
+    },
+    {
+      "id": "IDEA-033",
+      "title": "D30-D32 advanced research pages: full specs",
+      "domain": "tiktrack",
+      "urgency": "low",
+      "submitted_by": "team_170",
+      "created_at": "2026-03-15T17:47:32Z",
+      "status": "open",
+      "fate": null,
+      "fate_target": null,
+      "fate_rationale": null,
+      "fate_decided_at": null,
+      "fate_decided_by": null,
+      "reference_file": "_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md",
+      "delivery_ref": null,
+      "notes": "Migrated from: CARRY-011. Batch 6. Owner: Team 31+30+70."
+    },
+    {
+      "id": "IDEA-034",
+      "title": "D37 Data Import marked urgent",
+      "domain": "tiktrack",
+      "urgency": "medium",
+      "submitted_by": "team_170",
+      "created_at": "2026-03-15T17:47:32Z",
+      "status": "open",
+      "fate": null,
+      "fate_target": null,
+      "fate_rationale": null,
+      "fate_decided_at": null,
+      "fate_decided_by": null,
+      "reference_file": "_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md",
+      "delivery_ref": null,
+      "notes": "Migrated from: CARRY-012. Batch 4. Owner: Team 31+30+20."
+    },
+    {
+      "id": "IDEA-035",
+      "title": "D38-D39 Settings pages: detailed spec required",
+      "domain": "tiktrack",
+      "urgency": "low",
+      "submitted_by": "team_170",
+      "created_at": "2026-03-15T17:47:32Z",
+      "status": "open",
+      "fate": null,
+      "fate_target": null,
+      "fate_rationale": null,
+      "fate_decided_at": null,
+      "fate_decided_by": null,
+      "reference_file": "_COMMUNICATION/team_10/TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md",
+      "delivery_ref": null,
+      "notes": "Migrated from: CARRY-013. Batch 3/5. Owner: Team 31+30+70."
     }
   ]
 }

@@ -154,6 +154,35 @@ python3 -m http.server 8090
 ./pipeline_run.sh [--domain D] status
 ./pipeline_run.sh [--domain D] phase2</pre>
     </div>
+
+    <!-- ── Idea Pipeline Commands ──────────────────────────────────── -->
+    <div style="margin-top:18px;padding-top:12px;border-top:1px solid var(--border)">
+      <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:8px">💡 IDEA PIPELINE — IRON RULE: every idea must be registered here</div>
+      <pre style="font-size:11px">./idea_scan.sh --summary          # session startup check (open + in_exec count)
+./idea_scan.sh                    # full scan: open + in_execution items
+./idea_scan.sh --status all       # full history including decided/closed
+
+# Submit a new idea (any team, any context):
+./idea_submit.sh \
+  --title   "Short title — what, not how" \
+  --domain  agents_os|tiktrack|shared \
+  --urgency critical|high|medium|low \
+  --team    team_XX \
+  [--reference "_COMMUNICATION/path/to/context.md"] \
+  [--notes  "Context: trigger, problem, desired outcome"]
+
+# Urgency guide:
+#   critical — blocking active work today
+#   high     — decide this sprint / stage
+#   medium   — within current stage timeline
+#   low      — backlog (S+ or whenever)</pre>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+        <button class="btn" style="font-size:11px" onclick="copyCmd('./idea_scan.sh --summary', this)">⎘ Scan summary</button>
+        <button class="btn" style="font-size:11px" onclick="copyCmd('./idea_scan.sh', this)">⎘ Full scan</button>
+        <button class="btn" style="font-size:11px;background:var(--accent);color:#fff"
+          onclick="copyCmd('./idea_submit.sh --title &quot;...&quot; --domain agents_os --urgency high --team team_XX', this)">⎘ Copy submit template</button>
+      </div>
+    </div>
     </div>
 
     <div id="help-tab-help" class="help-tab-content">

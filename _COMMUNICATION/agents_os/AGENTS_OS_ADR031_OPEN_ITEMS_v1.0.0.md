@@ -1,3 +1,5 @@
+# ARCHIVED — items migrated to PHOENIX_IDEA_LOG 2026-03-15. See IDEA-021, IDEA-022.
+
 # AGENTS_OS_ADR031_OPEN_ITEMS_v1.0.0
 
 **project_domain:** AGENTS_OS

@@ -8,7 +8,7 @@
   </script>
   <title>Agents OS — Roadmap &amp; Gate History</title>
   <link rel="stylesheet" href="css/pipeline-shared.css?v=2" />
-  <link rel="stylesheet" href="css/pipeline-roadmap.css?v=4" />
+  <link rel="stylesheet" href="css/pipeline-roadmap.css?v=5" />
 </head>
 <body>
 
@@ -61,6 +61,11 @@
       <div class="stat-row"><span class="loading">Loading…</span></div>
     </div>
 
+    <div class="stat-domain-card ideas-card" id="stat-ideas">
+      <div class="stat-domain-title"><span class="stat-dot stat-dot-ideas"></span>💡 Idea Pipeline</div>
+      <div class="stat-row" id="stat-ideas-content"><span class="loading">Loading…</span></div>
+    </div>
+
     <div class="sidebar-section-card">
       <div class="sidebar-section-title">Canonical Task Files <span class="badge" id="cf-badge">—</span></div>
       <div id="cf-content"><span class="loading">Loading…</span></div>
@@ -73,71 +78,93 @@
 
   </aside>
 
-  <!-- ── Center-left: Roadmap tree ── -->
-  <div class="agents-roadmap-col1">
-    <div class="section-card">
-      <div class="section-title">Portfolio Roadmap <span class="badge" id="roadmap-badge">—</span></div>
-      <div id="roadmap-tree"><span class="loading">Loading…</span></div>
-    </div>
-  </div>
-
-  <!-- ── Center-right: Program details (Gate Seq, History, Prog Detail) ── -->
-  <div class="agents-roadmap-col2">
-    <div class="section-card">
-      <div class="section-title">Full Gate Sequence <span class="badge" id="seq-badge">—</span></div>
-      <div id="gate-seq-content"><span class="loading">Loading…</span></div>
-    </div>
-    <div class="section-card">
-      <div class="section-title">Gate History <span class="badge" id="history-badge">—</span></div>
-      <div id="history-content"><span class="loading">Loading…</span></div>
-    </div>
-    <div id="prog-detail-sidebar" style="display:none">
-      <div class="section-card">
-        <div class="section-title">📋 Program Detail</div>
-        <div id="prog-detail-content"></div>
+  <!-- ── Main content: accordion (Map + Idea Pipeline) ── -->
+  <div class="agents-roadmap-main">
+    <!-- Accordion 1: Map + Legend (two columns) -->
+    <div class="accordion open" id="acc-map">
+      <div class="accordion-header" onclick="toggleAccordion('acc-map')">
+        <span class="accordion-icon">🗺️</span>
+        <span class="accordion-title">Map &amp; Legend</span>
+        <span class="accordion-badge" id="map-badge">Portfolio · Gate Seq · History</span>
+        <span class="accordion-chevron">▶</span>
+      </div>
+      <div class="accordion-body">
+        <div class="agents-roadmap-cols">
+          <div class="agents-roadmap-col1">
+            <div class="section-card">
+              <div class="section-title">Portfolio Roadmap <span class="badge" id="roadmap-badge">—</span></div>
+              <div id="roadmap-tree"><span class="loading">Loading…</span></div>
+            </div>
+          </div>
+          <div class="agents-roadmap-col2">
+            <div class="section-card">
+              <div class="section-title">Full Gate Sequence <span class="badge" id="seq-badge">—</span></div>
+              <div id="gate-seq-content"><span class="loading">Loading…</span></div>
+            </div>
+            <div class="section-card">
+              <div class="section-title">Gate History <span class="badge" id="history-badge">—</span></div>
+              <div id="history-content"><span class="loading">Loading…</span></div>
+            </div>
+            <div id="prog-detail-sidebar" style="display:none">
+              <div class="section-card">
+                <div class="section-title">📋 Program Detail</div>
+                <div id="prog-detail-content"></div>
+              </div>
+            </div>
+            <div id="conflict-warnings" style="display:none"></div>
+          </div>
+        </div>
       </div>
     </div>
-    <div id="conflict-warnings" style="display:none"></div>
+
+    <!-- Accordion 2: Idea Pipeline (single column) -->
+    <div class="accordion" id="acc-ideas">
+      <div class="accordion-header" onclick="toggleAccordion('acc-ideas')">
+        <span class="accordion-icon">💡</span>
+        <span class="accordion-title">Idea Pipeline</span>
+        <span class="accordion-badge" id="ideas-badge">—</span>
+        <span class="accordion-chevron">▶</span>
+      </div>
+      <div class="accordion-body">
+        <div class="ideas-accordion-inner">
+          <div class="ideas-filters">
+            <select id="ideas-filter-status" onchange="renderIdeas()">
+              <option value="active">Active (open + in_exec + lod200)</option>
+              <option value="open">Open only</option>
+              <option value="in_execution">In execution</option>
+              <option value="lod200_pending">LOD200 Pending (WP ideas)</option>
+              <option value="">All status</option>
+              <option value="decided">Decided / closed</option>
+            </select>
+            <select id="ideas-filter-urgency" onchange="renderIdeas()">
+              <option value="">All urgency</option>
+              <option value="critical">🔴 Critical</option>
+              <option value="high">🟠 High</option>
+              <option value="medium">🟡 Medium</option>
+              <option value="low">🟢 Low</option>
+            </select>
+            <select id="ideas-filter-domain" onchange="renderIdeas()">
+              <option value="">All domains</option>
+              <option value="agents_os">Agents_OS</option>
+              <option value="tiktrack">TikTrack</option>
+              <option value="shared">Shared</option>
+            </select>
+          </div>
+          <div id="ideas-content" class="ideas-content"><span class="loading">Loading ideas…</span></div>
+        </div>
+      </div>
+    </div>
   </div>
 
 </div><!-- /agents-roadmap-layout -->
-
-<!-- ── Ideas Pipeline Section ─────────────────────────────────────────── -->
-<div style="max-width:1400px;margin:18px auto;padding:0 18px">
-  <div class="section-card">
-    <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-      <span>💡 Idea Pipeline &nbsp;<span class="badge" id="ideas-badge">—</span></span>
-      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-        <select id="ideas-filter-status" onchange="renderIdeas()" style="font-size:11px;padding:2px 6px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px">
-          <option value="active">Active (open + in progress)</option>
-          <option value="open">Open only</option>
-          <option value="in_execution">In execution</option>
-          <option value="">All status</option>
-          <option value="decided">Decided / closed</option>
-        </select>
-        <select id="ideas-filter-urgency" onchange="renderIdeas()" style="font-size:11px;padding:2px 6px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px">
-          <option value="">All urgency</option>
-          <option value="critical">🔴 Critical</option>
-          <option value="high">🟠 High</option>
-          <option value="medium">🟡 Medium</option>
-          <option value="low">🟢 Low</option>
-        </select>
-        <select id="ideas-filter-domain" onchange="renderIdeas()" style="font-size:11px;padding:2px 6px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px">
-          <option value="">All domains</option>
-          <option value="agents_os">Agents_OS</option>
-          <option value="tiktrack">TikTrack</option>
-          <option value="shared">Shared</option>
-        </select>
-      </div>
-    </div>
-    <div id="ideas-content" style="margin-top:10px"><span class="loading">Loading ideas…</span></div>
-  </div>
-</div>
 
 <script src="js/pipeline-config.js"></script>
 <script src="js/pipeline-state.js"></script>
 <script src="js/pipeline-dom.js"></script>
 <script src="js/pipeline-roadmap.js"></script>
+<script>
+(function(){ function t(id){ var e=document.getElementById(id); if(e)e.classList.toggle('open'); } window.toggleAccordion=t; })();
+</script>
 
 <!-- ── Ideas Pipeline Script ──────────────────────────────────────────────── -->
 <script>
@@ -156,9 +183,34 @@
     immediate: '<span style="background:#1a8cff;color:#fff;padding:1px 5px;border-radius:3px;font-size:10px">⚡ IMMEDIATE</span>',
     cancel:    '<span style="background:#888;color:#fff;padding:1px 5px;border-radius:3px;font-size:10px">✗ CANCEL</span>'
   };
-  var STATUS_ORDER = { open:0, in_execution:1, decided:2 };
+  var STATUS_ORDER = { open:0, in_execution:1, lod200_pending:2, decided:3 };
 
   function escH(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+  function updateIdeasSidebarCard() {
+    var el = document.getElementById('stat-ideas-content');
+    if (!el) return;
+    if (!g_ideas.length) {
+      el.innerHTML = '<span style="color:var(--text-muted);font-size:11px">No ideas loaded</span>';
+      return;
+    }
+    var openCount = g_ideas.filter(function(i){ return i.status === 'open'; }).length;
+    var execCount = g_ideas.filter(function(i){ return i.status === 'in_execution'; }).length;
+    var decidedCount = g_ideas.filter(function(i){ return i.status === 'decided'; }).length;
+    var lod200Count = g_ideas.filter(function(i){ return i.status === 'lod200_pending'; }).length;
+    var critCount = g_ideas.filter(function(i){ return i.urgency === 'critical' && (i.status === 'open' || i.status === 'in_execution'); }).length;
+    var html = '<div class="stat-item"><div class="stat-num num-ideas-t">' + g_ideas.length + '</div><div class="stat-lbl">total</div></div>';
+    html += '<div class="stat-item"><div class="stat-num num-ideas-o">' + openCount + '</div><div class="stat-lbl">open</div></div>';
+    html += '<div class="stat-item"><div class="stat-num num-ideas-e">' + execCount + '</div><div class="stat-lbl">in_exec</div></div>';
+    html += '<div class="stat-item"><div class="stat-num num-ideas-d">' + decidedCount + '</div><div class="stat-lbl">decided</div></div>';
+    if (lod200Count > 0) {
+      html += '<div class="stat-item"><div class="stat-num num-ideas-l">' + lod200Count + '</div><div class="stat-lbl">lod200</div></div>';
+    }
+    if (critCount > 0) {
+      html += '<div class="stat-item" style="margin-top:6px"><div class="stat-num" style="color:var(--danger)">🔴 ' + critCount + '</div><div class="stat-lbl">critical</div></div>';
+    }
+    el.innerHTML = html;
+  }
 
   window.loadIdeas = function() {
     fetch('../../_COMMUNICATION/PHOENIX_IDEA_LOG.json?v=' + Date.now())
@@ -166,10 +218,13 @@
       .then(function(data){
         g_ideas = data.ideas || [];
         renderIdeas();
+        updateIdeasSidebarCard();
       })
       .catch(function(){
         document.getElementById('ideas-content').innerHTML =
           '<span style="color:var(--text-muted);font-size:12px">Could not load PHOENIX_IDEA_LOG.json</span>';
+        var el = document.getElementById('stat-ideas-content');
+        if (el) el.innerHTML = '<span style="color:var(--text-muted);font-size:11px">Load failed</span>';
       });
   };
 
@@ -180,7 +235,7 @@
 
     var items = g_ideas.filter(function(i){
       if (fStatus === 'active') {
-        if (i.status !== 'open' && i.status !== 'in_execution') return false;
+        if (i.status !== 'open' && i.status !== 'in_execution' && i.status !== 'lod200_pending') return false;
       } else if (fStatus) {
         if (i.status !== fStatus) return false;
       }
@@ -189,10 +244,19 @@
       return true;
     });
 
-    var openCount  = g_ideas.filter(function(i){ return i.status === 'open'; }).length;
-    var execCount  = g_ideas.filter(function(i){ return i.status === 'in_execution'; }).length;
-    document.getElementById('ideas-badge').textContent =
-      openCount + ' open / ' + execCount + ' in_exec / ' + g_ideas.length + ' total';
+    var openCount    = g_ideas.filter(function(i){ return i.status === 'open'; }).length;
+    var execCount    = g_ideas.filter(function(i){ return i.status === 'in_execution'; }).length;
+    var lod200Count  = g_ideas.filter(function(i){ return i.status === 'lod200_pending'; }).length;
+    var missingDelivery = g_ideas.filter(function(i){
+      return i.status === 'decided'
+        && (i.fate === 'immediate' || i.fate === 'append')
+        && !i.delivery_ref;
+    }).length;
+    var badgeText = openCount + ' open / ' + execCount + ' in_exec';
+    if (lod200Count > 0) badgeText += ' / ' + lod200Count + ' lod200';
+    badgeText += ' / ' + g_ideas.length + ' total';
+    if (missingDelivery > 0) badgeText += ' ⚠️ ' + missingDelivery + ' missing delivery_ref';
+    document.getElementById('ideas-badge').textContent = badgeText;
 
     if (!items.length) {
       document.getElementById('ideas-content').innerHTML =
@@ -214,11 +278,26 @@
       var fateHtml = i.fate ? (FATE_BADGE[i.fate] || escH(i.fate)) : '<span style="color:var(--text-muted);font-size:10px">⏳ pending</span>';
       var targetHtml = i.fate_target
         ? '<div style="font-size:10px;color:var(--text-muted);margin-top:2px">→ '+escH(i.fate_target)+'</div>' : '';
+      // delivery_ref indicator
+      var deliveryHtml = '';
+      if (i.status === 'lod200_pending') {
+        deliveryHtml = '<div style="font-size:10px;color:#8e44ad;margin-top:2px">📋 awaiting LOD200 authoring</div>';
+      } else if (i.status === 'in_execution') {
+        deliveryHtml = '<div style="font-size:10px;color:#f39c12;margin-top:2px">⏳ delivery pending</div>';
+      } else if (i.status === 'decided' && (i.fate === 'immediate' || i.fate === 'append')) {
+        if (i.delivery_ref && i.delivery_ref !== 'N/A_CANCEL') {
+          deliveryHtml = '<div style="font-size:10px;color:#27ae60;margin-top:2px" title="'+escH(i.delivery_ref)+'">✅ delivered</div>';
+        } else if (!i.delivery_ref) {
+          deliveryHtml = '<div style="font-size:10px;color:#c0392b;margin-top:2px">⚠️ delivery_ref missing</div>';
+        }
+      }
       var statusDot = i.status === 'open'
         ? '<span style="color:var(--accent)" title="Open — awaiting fate decision">●</span>'
         : i.status === 'in_execution'
           ? '<span style="color:#f39c12" title="In execution — mandate issued, team working">⚙</span>'
-          : '<span style="color:var(--text-muted)" title="Decided / closed">●</span>';
+          : i.status === 'lod200_pending'
+            ? '<span style="color:#8e44ad" title="LOD200 Pending — WP idea awaiting LOD200 authoring">📋</span>'
+            : '<span style="color:var(--text-muted)" title="Decided / closed">●</span>';
       var domainBadge = '<span style="background:var(--surface2);padding:1px 5px;border-radius:3px;font-size:10px;border:1px solid var(--border)">'+escH(i.domain)+'</span>';
       return '<tr style="font-size:12px">'
         + '<td style="font-family:var(--mono);white-space:nowrap;padding:6px 8px">'+escH(i.id)+'</td>'
@@ -227,7 +306,7 @@
         + '<td style="padding:6px 8px">'+domainBadge+'</td>'
         + '<td style="padding:6px 8px;font-size:10px;color:var(--text-muted)">'+escH(i.submitted_by)+'</td>'
         + '<td style="padding:6px 8px;font-size:10px;color:var(--text-muted);white-space:nowrap">'+(i.created_at||'').slice(0,10)+'</td>'
-        + '<td style="padding:6px 8px">'+fateHtml+targetHtml+'</td>'
+        + '<td style="padding:6px 8px">'+fateHtml+targetHtml+deliveryHtml+'</td>'
         + '<td style="padding:6px 8px;text-align:center">'+refHtml+'</td>'
         + '</tr>';
     }).join('');

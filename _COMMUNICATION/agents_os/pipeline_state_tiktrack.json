@@ -1,5 +1,5 @@
 {
-  "pipe_run_id": "37404941",
+  "pipe_run_id": "dead0122",
   "work_package_id": "REQUIRED",
   "stage_id": "S002",
   "project_domain": "tiktrack",
@@ -16,5 +16,8 @@
   "implementation_endpoints": [],
   "spec_path": "",
   "started_at": "",
-  "last_updated": "2026-03-15T09:27:58.435153+00:00"
+  "last_updated": "2026-03-15T10:30:27.144283+00:00",
+  "gate_state": null,
+  "pending_actions": [],
+  "override_reason": null
 }

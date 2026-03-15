@@ -53,6 +53,50 @@ def _count_lines(path: Path, pattern: str) -> int:
     return sum(1 for line in text.splitlines() if pattern in line)
 
 
+def read_pipeline_state() -> dict[str, Any]:
+    """
+    S002-P005-WP002 AC-08: Parse gate_state, pending_actions, override_reason from pipeline state.
+    Reads domain-specific state files (agents_os, tiktrack) and legacy pipeline_state.json.
+    """
+    result: dict[str, Any] = {"domains": {}}
+    agents_dir = REPO_ROOT / "_COMMUNICATION" / "agents_os"
+
+    for domain, filename in [
+        ("agents_os", "pipeline_state_agentsos.json"),
+        ("tiktrack", "pipeline_state_tiktrack.json"),
+    ]:
+        path = agents_dir / filename
+        if not path.exists():
+            result["domains"][domain] = {"error": "file_not_found"}
+            continue
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            result["domains"][domain] = {
+                "gate_state": data.get("gate_state"),
+                "pending_actions": data.get("pending_actions", []),
+                "override_reason": data.get("override_reason"),
+                "current_gate": data.get("current_gate"),
+                "project_domain": data.get("project_domain"),
+            }
+        except (json.JSONDecodeError, OSError) as e:
+            result["domains"][domain] = {"error": str(e)}
+
+    legacy_path = agents_dir / "pipeline_state.json"
+    if legacy_path.exists():
+        try:
+            data = json.loads(legacy_path.read_text(encoding="utf-8"))
+            result["legacy"] = {
+                "gate_state": data.get("gate_state"),
+                "pending_actions": data.get("pending_actions", []),
+                "override_reason": data.get("override_reason"),
+                "current_gate": data.get("current_gate"),
+            }
+        except (json.JSONDecodeError, OSError):
+            result["legacy"] = {"error": "read_failed"}
+
+    return result
+
+
 def read_governance_state() -> dict[str, Any]:
     result: dict[str, Any] = {}
 
@@ -184,6 +228,7 @@ def build_state_snapshot() -> dict[str, Any]:
         "agent_role": "POC-1-OBSERVER",
         "read_only": True,
         "governance": read_governance_state(),
+        "pipeline": read_pipeline_state(),
         "codebase": read_codebase_state(),
         "quality": read_quality_state(),
         "artifact_checks": read_artifact_checks(),
@@ -202,6 +247,10 @@ def main() -> None:
     print(f"STATE_SNAPSHOT.json written to {output_path.relative_to(REPO_ROOT)}")
     print(f"  Schema: {snapshot['schema_version']}")
     print(f"  Stage: {snapshot['governance'].get('active_stage', 'unknown')}")
+    pipeline = snapshot.get("pipeline", {})
+    for dom, info in pipeline.get("domains", {}).items():
+        if isinstance(info, dict) and "error" not in info and info.get("gate_state"):
+            print(f"  Pipeline [{dom}]: gate_state={info.get('gate_state')}, current_gate={info.get('current_gate')}")
     print(f"  Models: {len(snapshot['codebase']['backend']['models'])}")
     print(f"  Routers: {len(snapshot['codebase']['backend']['routers'])}")
     print(f"  Pages: {len(snapshot['codebase']['frontend']['pages'])}")

@@ -542,6 +542,52 @@ print('yes' if GATE_CONFIG.get('${GATE}', {}).get('default_fail_route') else 'no
     $CLI --store-artifact "$GATE" "$FILE"
     ;;
 
+  pass_with_actions)
+    # S002-P005-WP002: Record PASS_WITH_ACTION, hold gate
+    ACTIONS="${2:?Usage: ./pipeline_run.sh pass_with_actions \"a1|a2|a3\"}"
+    _refresh_state_snapshot
+    _validate_stage_alignment || exit 1
+    $CLI --pass-with-actions "$ACTIONS"
+    ;;
+
+  actions_clear)
+    # S002-P005-WP002: All actions resolved — advance gate
+    _refresh_state_snapshot
+    _validate_stage_alignment || exit 1
+    $CLI --actions-clear
+    echo ""
+    NEXT_GATE=$(_get_gate)
+    ACTIVE_DOMAIN=$(_get_domain)
+    echo "  ────────────────────────────────────────────────────────────────"
+    echo "  💡 Dashboard: switch domain selector to '${ACTIVE_DOMAIN}'"
+    echo "     to see updated state (${NEXT_GATE})"
+    echo "  ────────────────────────────────────────────────────────────────"
+    ;;
+
+  override)
+    # S002-P005-WP002: Override & advance — log reason
+    REASON="${2:?Usage: ./pipeline_run.sh override \"reason text\"}"
+    _refresh_state_snapshot
+    _validate_stage_alignment || exit 1
+    $CLI --override "$REASON"
+    echo ""
+    NEXT_GATE=$(_get_gate)
+    ACTIVE_DOMAIN=$(_get_domain)
+    _generate_and_show "$NEXT_GATE"
+    echo ""
+    echo "  ────────────────────────────────────────────────────────────────"
+    echo "  💡 Dashboard: switch domain selector to '${ACTIVE_DOMAIN}'"
+    echo "     to see updated state (${NEXT_GATE})"
+    echo "  ────────────────────────────────────────────────────────────────"
+    ;;
+
+  insist)
+    # S002-P005-WP002: Stay at gate — generate correction prompt
+    _refresh_state_snapshot
+    GATE=$(_get_gate)
+    $CLI --insist
+    ;;
+
   domain)
     # Show current domain info for both pipelines
     echo ""
@@ -669,7 +715,7 @@ PYEOF
     ;;
 
   *)
-    echo "Usage: ./pipeline_run.sh [--domain tiktrack|agents_os] [next|pass|fail <reason>|approve|status|gate <NAME>|route doc|full [notes]|revise <notes> [file]|store <GATE> <FILE>|domain|phase<N>]"
+    echo "Usage: ./pipeline_run.sh [--domain tiktrack|agents_os] [next|pass|fail <reason>|approve|status|gate <NAME>|route doc|full [notes]|revise <notes> [file]|store <GATE> <FILE>|pass_with_actions <a1|a2>|actions_clear|override <reason>|insist|domain|phase<N>]"
     echo ""
     echo "  next / (no arg)          Generate current gate prompt + display"
     echo "  pass                     Advance current gate → PASS → show next"
@@ -680,6 +726,10 @@ PYEOF
     echo "  gate <NAME>              Generate prompt for specific gate"
     echo "  revise <notes> [file]    Generate G3_PLAN revision prompt after G3_5 FAIL"
     echo "  store <GATE> <FILE>      Store artifact file to pipeline state"
+    echo "  pass_with_actions <a|b>  Record PASS_WITH_ACTION, hold gate (pipe-separated actions)"
+    echo "  actions_clear            All actions resolved — advance gate"
+    echo "  override <reason>        Override & advance — log reason"
+    echo "  insist                   Stay at gate — generate correction prompt"
     echo "  domain                   Show status of both parallel pipelines"
     echo "  phase<N>                 Show Phase N mandate (after Phase N-1 complete)"
     echo "                           e.g. phase2 → Team 90 validation mandate"

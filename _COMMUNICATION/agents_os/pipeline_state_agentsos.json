@@ -4,19 +4,24 @@
   "stage_id": "S002",
   "project_domain": "agents_os",
   "spec_brief": "ADR-031 Stage A: Writing Semantics Hardening",
-  "current_gate": "GATE_1",
+  "current_gate": "WAITING_GATE2_APPROVAL",
   "gates_completed": [
-    "GATE_0"
+    "GATE_0",
+    "GATE_1",
+    "GATE_2"
   ],
   "gates_failed": [
     "GATE_1"
   ],
-  "lld400_content": "# lld400\n",
+  "lld400_content": "# test\n",
   "work_plan": "",
   "mandates": "",
   "implementation_files": [],
   "implementation_endpoints": [],
   "spec_path": "",
   "started_at": "",
-  "last_updated": "2026-03-15T09:27:59.444732+00:00"
+  "last_updated": "2026-03-15T10:19:52.810592+00:00",
+  "gate_state": null,
+  "pending_actions": [],
+  "override_reason": "Nimrod approved expedited close"
 }

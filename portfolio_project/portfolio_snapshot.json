@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-15T07:43:40.685758+00:00",
+  "generated_at_utc": "2026-03-15T10:37:47.158445+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -387,6 +387,15 @@
       "active_marker_reason": "Lifecycle complete 2026-03-07"
     },
     {
+      "work_package_id": "S002-P005-WP002",
+      "program_id": "S002-P005",
+      "domain": "AGENTS_OS",
+      "status": "IN_PROGRESS",
+      "current_gate": "GATE_6 (OPEN)",
+      "is_active": false,
+      "active_marker_reason": "Pipeline Governance; GATE_5 PASS (Team 90 2026-03-15); GATE_6 open — architectural dev validation; design locked TEAM_100_PASS_WITH_ACTION_PIPELINE_GOVERNANCE_BACKLOG_v1.0.0"
+    },
+    {
       "work_package_id": "S003-P001-WP001",
       "program_id": "S003-P001",
       "domain": "AGENTS_OS",
@@ -550,7 +559,17 @@
           "domain": "AGENTS_OS",
           "status": "ACTIVE",
           "current_gate_mirror": "WP001 (ADR-031 Stage A + UI Optimization): TASK_CLOSED 2026-03-15 — Team 100 final approval `TEAM_100_AGENTS_OS_UI_OPTIMIZATION_FINAL_APPROVAL_v1.0.0.md`; 14/14 ACs PASS; CSS/JS extraction complete; validator hardening complete; UI layout canon complete. WP002 (Pipeline Governance — PASS_WITH_ACTION micro-cycle): PLANNED — trigger: WP001 GATE_8 PASS; design locked `TEAM_100_PASS_WITH_ACTION_PIPELINE_GOVERNANCE_BACKLOG_v1.0.0.md`; Nimrod confirmed 2026-03-15.",
-          "work_packages": []
+          "work_packages": [
+            {
+              "work_package_id": "S002-P005-WP002",
+              "program_id": "S002-P005",
+              "domain": "AGENTS_OS",
+              "status": "IN_PROGRESS",
+              "current_gate": "GATE_6 (OPEN)",
+              "is_active": false,
+              "active_marker_reason": "Pipeline Governance; GATE_5 PASS (Team 90 2026-03-15); GATE_6 open — architectural dev validation; design locked TEAM_100_PASS_WITH_ACTION_PIPELINE_GOVERNANCE_BACKLOG_v1.0.0"
+            }
+          ]
         }
       ]
     },

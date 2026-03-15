@@ -44,7 +44,7 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S002-P001 | S002-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
 | S002-P002 | S002-P002-WP003 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-03-13 |
 | S002-P003 | S002-P003-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-03-07 |
-| S002-P005 | S002-P005-WP002 | IN_PROGRESS | GATE_0 | false | Pipeline Governance PASS_WITH_ACTION micro-cycle; trigger met (WP001 TASK_CLOSED 2026-03-15); design locked TEAM_100_PASS_WITH_ACTION_PIPELINE_GOVERNANCE_BACKLOG_v1.0.0; BF-01 registry binding 2026-03-15; GATE_0 scope validation prerequisite before GATE_1 |
+| S002-P005 | S002-P005-WP002 | IN_PROGRESS | GATE_6 (OPEN) | false | Pipeline Governance; GATE_5 PASS (Team 90 2026-03-15); GATE_6 open — architectural dev validation; design locked TEAM_100_PASS_WITH_ACTION_PIPELINE_GOVERNANCE_BACKLOG_v1.0.0 |
 | S003-P001 | S003-P001-WP001 | CLOSED | FAST_4 (PASS) | false | Data Model Validator deployed; FAST_4 CLOSED 2026-03-11 (Team 170 closure) |
 | S003-P002 | S003-P002-WP001 | CLOSED | FAST_4 (PASS) | false | Test Template Generator deployed; G3.7 in gate chain; FAST_4 CLOSED 2026-03-12 (Team 170 closure) |
 
@@ -76,3 +76,4 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 **log_entry | TEAM_170 | PHOENIX_WORK_PACKAGE_REGISTRY | S003_P001_WP001_FAST4_CLOSED_ADDED | 2026-03-11**
 **log_entry | TEAM_170 | PHOENIX_WORK_PACKAGE_REGISTRY | S003_P002_WP001_FAST4_CLOSED_ADDED | 2026-03-12**
 **log_entry | TEAM_00 | PHOENIX_WORK_PACKAGE_REGISTRY | S001_P002_WP001_REGISTERED_GATE_0_IN_PROGRESS_PER_ARCHITECT_DIRECTIVE_S001_P002_ACTIVATION_v1.0.0 | 2026-03-14**
+**log_entry | TEAM_170 | PHOENIX_WORK_PACKAGE_REGISTRY | S002_P005_WP002_GATE1_PASS_MIRROR_SYNC_PER_WP002_FV_ACT01 | 2026-03-15**

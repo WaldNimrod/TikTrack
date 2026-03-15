@@ -4,8 +4,8 @@ id: TEAM_61_TO_TEAM_190_STORE_ARTIFACT_REVALIDATION_REQUEST_v1.0.0
 from: Team 61 (AOS Local Cursor Implementation)
 to: Team 190 (Constitutional Architectural Validator)
 cc: Team 00, Team 10, Team 100, Team 51
-date: 2026-03-10
-status: REVALIDATION_REQUEST
+date: 2026-03-15
+status: REVALIDATION_COMPLETE — PASS (per TEAM_190_TO_TEAM_61_STORE_ARTIFACT_REVALIDATION_RESULT_v1.0.0)
 scope: ולידציה חוזרת לפי §7 UNIFIED_SCAN — AO2-STORE-001, AO2-STORE-002
 trigger: TEAM_51_STORE_ARTIFACT_QA_RESULT_v1.0.0 — QA_PASS
 work_package_id: S002-P005-WP001
@@ -34,7 +34,7 @@ work_package_id: S002-P005-WP001
 | Mandate | Team 00 | APPROVE_EXECUTION | TEAM_00_TO_TEAM_61_PIPELINE_STORE_ARTIFACT_REMEDIATION_MANDATE |
 | REMED | Team 61 | ✅ COMPLETE | R-01, R-02, R-03, test_save_and_load fix |
 | QA | Team 51 | ✅ PASS | TEAM_51_STORE_ARTIFACT_QA_RESULT_v1.0.0 |
-| VAL v2 | Team 190 | ⏳ **ממתין** | **בקשת re-validation זו** |
+| VAL v2 | Team 190 | ✅ PASS | `TEAM_190_TO_TEAM_61_STORE_ARTIFACT_REVALIDATION_RESULT_v1.0.0` |
 
 ---
 
@@ -84,4 +84,10 @@ work_package_id: S002-P005-WP001
 
 ---
 
-**log_entry | TEAM_61 | STORE_ARTIFACT_REVALIDATION_REQUEST | TO_TEAM_190 | 2026-03-10**
+**log_entry | TEAM_61 | STORE_ARTIFACT_REVALIDATION_REQUEST | TO_TEAM_190 | 2026-03-15 | PASS_RECEIVED**
+
+---
+
+## 6) Post-PASS — תיקון AO2-STORE-NB-01 (תאריך)
+
+*תוקן 2026-03-15:* תאריך הבקשה עודכן מ-2026-03-10 ל-2026-03-15 — יישור ל-QA evidence stamp. אין השפעה על פסיקת המימוש.

@@ -105,7 +105,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
-| agents_os_parallel_track | S003-P001 WP001 + S003-P002 WP001 FAST_4 CLOSED (2026-03-11 / 2026-03-12). ADR-031 sequence lock: S002-P005 (Stage A immediate hotfix) -> S003-P007 (Stage B command bridge lite) -> S004-P008 (Stage C mediated reconciliation). Existing S004 AGENTS_OS baseline programs S004-P001/S004-P002/S004-P003 remain PLANNED and are not overridden by ADR-031. S003-P003 is TIKTRACK (normal GATE_0..GATE_8); G3.7 available for Team 10 at GATE_3. Governed per TEAM_00_AGENTS_OS_INDEPENDENT_ADVANCEMENT_DIRECTIVE_v1.0.0; applies to both domains for Gate-6 desync blocking policy (pending formal signer-chain lock). Sources: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`, `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`. |
+| agents_os_parallel_track | S003-P001 WP001 + S003-P002 WP001 FAST_4 CLOSED (2026-03-11 / 2026-03-12). S002-P005-WP002 (Pipeline Governance): GATE_5 PASS (2026-03-15, Team 90); routed to GATE_6 (architectural dev validation). ADR-031 sequence lock: S002-P005 (Stage A immediate hotfix) -> S003-P007 (Stage B command bridge lite) -> S004-P008 (Stage C mediated reconciliation). Existing S004 AGENTS_OS baseline programs S004-P001/S004-P002/S004-P003 remain PLANNED and are not overridden by ADR-031. S003-P003 is TIKTRACK (normal GATE_0..GATE_8); G3.7 available for Team 10 at GATE_3. Governed per TEAM_00_AGENTS_OS_INDEPENDENT_ADVANCEMENT_DIRECTIVE_v1.0.0; applies to both domains for Gate-6 desync blocking policy (pending formal signer-chain lock). Sources: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`, `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`. |
 | active_program_id | S002-P002 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 90 (GATE_8 owner; closure validated) |
@@ -281,6 +281,13 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_8 PASS S002-P002-WP003; Team 70 closure package validated; DOCUMENTATION_CLOSED and lifecycle complete | 2026-03-13**
 **log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | GATE_0 PASS for S002-P005-WP002; BF-02 closed; advanced to GATE_1_PENDING | 2026-03-15**
 **log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | BF-02 closure execution confirmed: canonical GATE_0 decision artifact issued for S002-P005-WP002 and GATE_1 reopen authorized | 2026-03-15**
+**log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_1 PASS S002-P005-WP002 (internal LOD400 revalidation v1.0.3); blocker set BF-01/BF-02 closed; routed to GATE_2 intake preparation | 2026-03-15**
+**log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | S002-P005-WP001 Store Artifact remediation CLOSED; architect approval TEAM_00_STORE_ARTIFACT_FINAL_APPROVAL_AND_CLOSURE_v1.0.0; AO2-STORE-001/002/R-03 all CLOSED | 2026-03-15**
+**log_entry | TEAM_00 | ARCHITECT_GATE2_S002_P005_WP002 | APPROVED_PER_SUPREME_AUTHORITY | design lock + assessment approved; GATE_3 intake authorized for Team 61 | 2026-03-15**
+**log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | S002-P005-WP002 GATE_2 PASS; GATE_3 intake handoff to Team 61; development authorized | 2026-03-15**
+**log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_4 PASS S002-P005-WP002 (Team 51 QA_PASS 2026-03-15); routed to GATE_5 (Team 90); agents_os_parallel_track updated | 2026-03-15**
+**log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_5 PASS S002-P005-WP002 (Team 90 2026-03-15); GATE_6 open; Team 90 may proceed with architectural dev validation submission | 2026-03-15**
+**log_entry | TEAM_190 | CONSTITUTIONAL_VALIDATION_UPDATE | S002-P005-WP001 store-artifact scan approved and framed CLOSED; no remaining blockers; organizational locks applied: PipelineState test isolation + store_artifact(bool/no silent failure) | 2026-03-15**
 **log_entry | TEAM_190 | TO_TEAM_170 | REGISTRY_MIRROR_SYNC_REQUIRED | run sync_registry_mirrors_from_wsm.py --write then --check for WP003 baseline standardization | 2026-03-10**
 
 GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:

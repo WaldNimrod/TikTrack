@@ -68,6 +68,29 @@ async function loadPipelineState() {
     const stepBannerEl = document.getElementById('current-step-banner');
     if (stepBannerEl) stepBannerEl.innerHTML = buildCurrentStepBanner(state.current_gate, state);
 
+    // S002-P005-WP002: PWA banner in sidebar when gate_state=PASS_WITH_ACTION
+    const pwaContainer = document.getElementById('pwa-banner-sidebar');
+    if (pwaContainer) {
+      if (state.gate_state === 'PASS_WITH_ACTION') {
+        const actions = state.pending_actions || [];
+        const domainFlag = (state.project_domain || currentDomain) === 'agents_os' ? '--domain agents_os ' : '';
+        const clearCmd = domainFlag + './pipeline_run.sh actions_clear';
+        pwaContainer.dataset.domainFlag = domainFlag;
+        pwaContainer.innerHTML = `<div class="pwa-banner">
+          <div class="pwa-banner-title">⚡ PASS_WITH_ACTION</div>
+          <div class="pwa-action-list">${actions.length ? actions.map(a => `<div class="pwa-action-item">${escHtml(a)}</div>`).join('') : '<div class="pwa-action-item" style="color:var(--text-muted)">No actions recorded</div>'}</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+            <button class="btn pwa-btn-clear" onclick="copyCmd(${escAttr(JSON.stringify(clearCmd))}, this)">✅ Actions Resolved</button>
+            <button class="btn pwa-btn-override" onclick="copyOverrideWithReason(document.getElementById('pwa-banner-sidebar')?.dataset?.domainFlag||'', this)">⚡ Override &amp; Advance</button>
+          </div>
+        </div>`;
+        pwaContainer.style.display = 'block';
+      } else {
+        pwaContainer.innerHTML = '';
+        pwaContainer.style.display = 'none';
+      }
+    }
+
     // Spec card
     document.getElementById("spec-text").textContent = state.spec_brief || "No spec loaded";
     document.getElementById("spec-wp").textContent   = "WP: " + (state.work_package_id || "—");

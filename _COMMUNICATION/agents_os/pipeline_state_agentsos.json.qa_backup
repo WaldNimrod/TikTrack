@@ -1,0 +1,22 @@
+{
+  "pipe_run_id": "5ec473cb",
+  "work_package_id": "S002-P005-WP001",
+  "stage_id": "S002",
+  "project_domain": "agents_os",
+  "spec_brief": "ADR-031 Stage A: Writing Semantics Hardening",
+  "current_gate": "GATE_1",
+  "gates_completed": [
+    "GATE_0"
+  ],
+  "gates_failed": [
+    "GATE_1"
+  ],
+  "lld400_content": "# test\n",
+  "work_plan": "",
+  "mandates": "",
+  "implementation_files": [],
+  "implementation_endpoints": [],
+  "spec_path": "",
+  "started_at": "",
+  "last_updated": "2026-03-15T09:47:13.945852+00:00"
+}

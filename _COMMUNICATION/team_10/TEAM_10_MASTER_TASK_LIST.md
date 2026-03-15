@@ -98,6 +98,20 @@
 
 ---
 
+## STAGE_2_PROGRAM_05 — דומיין Agents_OS (S002-P005) Pipeline Governance
+
+**היררכיה:** Stage S002 → Program **S002-P005** (Pipeline Governance — PASS_WITH_ACTION).  
+**מצב שוטף (SSOT):** WSM בלבד — `agents_os_parallel_track` בלוק CURRENT_OPERATIONAL_STATE.
+
+| # | שם | תיאור | סטטוס | שלב | דומיין | צוות מוביל | קובץ תיעוד | תאריך יצירה | תאריך עדכון | תאריך סגירה |
+|---|-----|------|--------|-----|--------|------------|------------|------------|------------|------------|
+| S002-P005-WP002 | Pipeline Governance (PASS_WITH_ACTION) | pipeline_state.json + pipeline_run.sh + dashboard PWA banner; AC-01..AC-08. GATE_5 PASS (Team 90); GATE_6 open. | IN_PROGRESS (GATE_6_OPEN) | Stage S002 / Program S002-P005 | AGENTS_OS | Team 90 (GATE_6) | TEAM_100_PASS_WITH_ACTION_PIPELINE_GOVERNANCE_BACKLOG_v1.0.0.md | 2026-03-15 | 2026-03-15 | — |
+
+**log_entry | TEAM_10 | MASTER_TASK_LIST | S002_P005_WP002_GATE5_PASS_GATE6_OPEN | 2026-03-15** — GATE_5 PASS (Team 90 TEAM_90_TO_TEAM_10_S002_P005_WP002_GATE5_VALIDATION_RESPONSE); WSM עודכן; GATE_6 פתוח; Team 90 ממשיך להגשת חבילת architectural dev validation.
+**log_entry | TEAM_10 | MASTER_TASK_LIST | S002_P005_WP002_GATE4_PASS_GATE5_ROUTED | 2026-03-15** — GATE_4 PASS (Team 51 QA_PASS); WSM עודכן; חבילת GATE_5 הוגשה ל-Team 90: TEAM_10_TO_TEAM_90_S002_P005_WP002_GATE5_SUBMISSION_v1.0.0.md; WP Registry + agents_os_parallel_track מסונכרנים.
+
+---
+
 ## מטריצת משימות
 
 | # | שם | תיאור | סטטוס | שלב | צוות מוביל | קובץ תיעוד | תאריך יצירה | תאריך עדכון | תאריך סגירה |

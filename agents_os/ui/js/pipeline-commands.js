@@ -30,6 +30,14 @@ function copyCmd(text, btn) {
   copyText(text, btn);
 }
 
+/** S002-P005-WP002: Prompt for override reason, then copy override command to clipboard */
+function copyOverrideWithReason(domainFlag, btn) {
+  const r = prompt("Override reason (required):");
+  if (!r || !r.trim()) return;
+  const cmd = (domainFlag || "") + './pipeline_run.sh override "' + r.trim().replace(/"/g, '\\"') + '"';
+  copyCmd(cmd, btn);
+}
+
 function buildCommands(currentGate) {
   const df = typeof getDomainFlag === "function" ? getDomainFlag() : "";
   const cmds = [

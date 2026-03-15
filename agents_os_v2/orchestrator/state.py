@@ -36,6 +36,10 @@ class PipelineState:
     spec_path: str = ""  # Path to LLD400 spec file for G3.7 test template generation
     started_at: str = ""
     last_updated: str = ""
+    # S002-P005-WP002: PASS_WITH_ACTION governance
+    gate_state: Optional[str] = None       # null | "PASS_WITH_ACTION" | "OVERRIDE"
+    pending_actions: list[str] = field(default_factory=list)
+    override_reason: Optional[str] = None
 
     def _state_file(self) -> Path:
         return get_state_file(self.project_domain)

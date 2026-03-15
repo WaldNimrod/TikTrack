@@ -1,12 +1,14 @@
 {
-  "pipe_run_id": "b7d7d54c",
+  "pipe_run_id": "37404941",
   "work_package_id": "REQUIRED",
   "stage_id": "S002",
   "project_domain": "tiktrack",
   "spec_brief": "",
-  "current_gate": "NOT_STARTED",
+  "current_gate": "GATE_0",
   "gates_completed": [],
-  "gates_failed": [],
+  "gates_failed": [
+    "GATE_0"
+  ],
   "lld400_content": "",
   "work_plan": "",
   "mandates": "",
@@ -14,5 +16,5 @@
   "implementation_endpoints": [],
   "spec_path": "",
   "started_at": "",
-  "last_updated": "2026-03-15T09:30:00.000000+00:00"
+  "last_updated": "2026-03-15T09:27:58.435153+00:00"
 }

@@ -279,6 +279,8 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 Part A PASS accepted for S002-P002-WP003 per revalidation response v2.1.0; Part B final activation issued to Nimrod; GATE_8 pending final GATE_7 PASS | 2026-03-13**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 PASS confirmed for S002-P002-WP003 (Part A + Part B); GATE_8 activated and Team 70 execution requested via canonical activation package v1.0.0 | 2026-03-13**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_8 PASS S002-P002-WP003; Team 70 closure package validated; DOCUMENTATION_CLOSED and lifecycle complete | 2026-03-13**
+**log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | GATE_0 PASS for S002-P005-WP002; BF-02 closed; advanced to GATE_1_PENDING | 2026-03-15**
+**log_entry | TEAM_190 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | BF-02 closure execution confirmed: canonical GATE_0 decision artifact issued for S002-P005-WP002 and GATE_1 reopen authorized | 2026-03-15**
 **log_entry | TEAM_190 | TO_TEAM_170 | REGISTRY_MIRROR_SYNC_REQUIRED | run sync_registry_mirrors_from_wsm.py --write then --check for WP003 baseline standardization | 2026-03-10**
 
 GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:

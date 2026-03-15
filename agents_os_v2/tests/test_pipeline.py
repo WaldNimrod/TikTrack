@@ -34,18 +34,23 @@ class TestPipelineState:
         assert "GATE_0" in state.gates_failed
         assert state.gates_completed == []
 
-    def test_save_and_load(self, tmp_path):
+    def test_save_and_load(self, tmp_path, monkeypatch):
         import agents_os_v2.orchestrator.state as state_mod
-        original = state_mod.STATE_FILE
-        state_mod.STATE_FILE = tmp_path / "test_state.json"
-        try:
-            state = PipelineState(work_package_id="S002-P001-WP001", current_gate="GATE_3")
-            state.save()
-            loaded = PipelineState.load()
-            assert loaded.work_package_id == "S002-P001-WP001"
-            assert loaded.current_gate == "GATE_3"
-        finally:
-            state_mod.STATE_FILE = original
+
+        monkeypatch.setattr(state_mod, "STATE_FILE", tmp_path / "legacy_state.json")
+        monkeypatch.setattr(state_mod, "get_state_file",
+                            lambda domain: tmp_path / f"pipeline_state_{domain}.json")
+        monkeypatch.setenv("PIPELINE_DOMAIN", "agents_os")
+
+        state = PipelineState(
+            work_package_id="S002-P001-WP001",
+            current_gate="GATE_3",
+            project_domain="agents_os",
+        )
+        state.save()
+        loaded = PipelineState.load()
+        assert loaded.work_package_id == "S002-P001-WP001"
+        assert loaded.current_gate == "GATE_3"
 
 
 class TestGateRouter:

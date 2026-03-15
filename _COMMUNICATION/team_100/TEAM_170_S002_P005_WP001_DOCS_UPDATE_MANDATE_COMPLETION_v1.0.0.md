@@ -8,7 +8,7 @@
 **date:** 2026-03-15  
 **status:** VALIDATED  
 **in_response_to:** TEAM_00_TO_TEAM_170_S002_P005_WP001_DOCS_UPDATE_MANDATE_v1.0.0  
-**validation_result:** TEAM_190_TO_TEAM_170_S002_P005_WP001_DOCS_UPDATE_VALIDATION_RESULT_v1.0.0 — PASS  
+**validation_result:** TEAM_190_TO_TEAM_170_S002_P005_WP001_DOCS_UPDATE_VALIDATION_RESULT_v1.0.0.md — PASS  
 
 ---
 
@@ -21,7 +21,7 @@
 | program_id | S002-P005 |
 | work_package_id | S002-P005-WP001 |
 | mandate_type | DOCS_UPDATE |
-| validation_request | Team 190 |
+| validation_result | Team 190 PASS 2026-03-15 |
 
 ---
 
@@ -52,6 +52,9 @@
 
 All 6 mandatory documentation items (DOC-01 through DOC-06) have been implemented. Pipeline behavior docs reside in `documentation/docs-agents-os/03-CLI-REFERENCE/`. UI component docs reside in `agents_os/ui/docs/`. Master index updated with references.
 
+**Mirror:** This file is placed in `_COMMUNICATION/team_100/` per mandate §3 (completion deliverable) and Team 190 ND-01 (path alignment). Canonical copy remains in `_COMMUNICATION/team_170/`.
+
 ---
 
-**log_entry | TEAM_170 | DOCS_UPDATE_MANDATE | COMPLETION | 2026-03-15**
+**log_entry | TEAM_170 | DOCS_UPDATE_MANDATE | COMPLETION_VALIDATED | 2026-03-15**
+**log_entry | TEAM_190 | VALIDATION_PASS | ND01_PATH_ALIGNMENT_APPLIED | 2026-03-15**

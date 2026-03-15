@@ -6,7 +6,7 @@ to: Team 51 (AOS QA & Functional Acceptance)
 cc: Team 190, Team 100, Team 10
 date: 2026-03-10
 historical_record: true
-status: ON_HOLD_PENDING_COORDINATION
+status: SUPERSEDED_BY_HANDOFF_PROMPT
 ---
 
 ## Mandatory Identity Header
@@ -17,13 +17,18 @@ status: ON_HOLD_PENDING_COORDINATION
 | stage_id | S002 |
 | program_id | S002-P005 |
 | work_package_id | S002-P005-WP001 |
-| related_completion | TEAM_61_PIPELINE_STORE_ARTIFACT_REMEDIATION_COMPLETION_v1.0.0 |
+| related_completion | TEAM_61_STORE_ARTIFACT_COMPLETION_v1.0.0 |
+| canonical_handoff | TEAM_61_TO_TEAM_51_STORE_ARTIFACT_QA_HANDOFF_PROMPT_v1.0.0 |
 
 ---
 
 ## 0) הערת סטטוס
 
-**בקשה זו מושהית** — ממתינה להנחיות מ-Team 100 בעקבות `TEAM_61_TO_TEAM_100_STORE_ARTIFACT_CONSULTATION_REQUEST_v1.0.0.md`. לא להגיש ל-QA עד לקבלת תאום והנחיות.
+**בקשה זו הוחלפה בפרומט קאנוני.** השתמש ב:
+
+`_COMMUNICATION/team_61/TEAM_61_TO_TEAM_51_STORE_ARTIFACT_QA_HANDOFF_PROMPT_v1.0.0.md`
+
+לסקופ מלא, דרישות QA, ורשימת בדיקות מפורטת.
 
 ---
 

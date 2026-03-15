@@ -1468,7 +1468,7 @@ async function buildQuickActionBar(gate) {
     </div>`;
   }
 
-  bar.innerHTML = html;
+  bar.innerHTML = pwaBanner + html;
 
   if (needsBuilder) {
     await autoLoadVerdictFile(gate, 'qbar-status', 'qbar-ta', 'qbar-preview', isRevise);

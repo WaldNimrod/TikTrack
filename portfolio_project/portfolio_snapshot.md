@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-14T20:57:31.967757+00:00`
+- Generated (UTC): `2026-03-15T07:43:40.685758+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -48,7 +48,7 @@
 
     ├── **Program** `S002-P004` — Admin Review S002 | PLANNED | domain: **TIKTRACK**
 
-    └── **Program** `S002-P005` — Agents_OS v2 Writing Semantics Hardening (ADR-031 Stage A) | PLANNED | domain: **AGENTS_OS**
+    └── **Program** `S002-P005` — Agents_OS v2 Writing Semantics Hardening (ADR-031 Stage A) + UI Optimization | ACTIVE | domain: **AGENTS_OS**
 
 
 ### S003 — שלב 3 — Essential Data | PLANNED [SHARED]

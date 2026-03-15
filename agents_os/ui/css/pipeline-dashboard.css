@@ -217,7 +217,17 @@
 .correction-cycle-step { font-size: 11px; margin-bottom: 6px; padding-left: 16px; position: relative; }
 .correction-cycle-step::before { content: attr(data-n); position: absolute; left: 0; color: var(--warning); font-weight: 700; }
 
-/* ── Pass With Action button ──────────────────────────────────────────────── */
+/* ── Pass With Action button + banner (WP002) ─────────────────────────────── */
 .qa-btn-pwa { border-color: var(--warning); color: var(--warning); }
 .qa-btn-pwa:hover { background: rgba(210,153,34,0.1); }
 .pwa-badge { background: rgba(210,153,34,0.15); border: 1px solid var(--warning); border-radius: 4px; font-size: 9px; padding: 1px 5px; margin-left: 4px; color: var(--warning); font-weight: 700; vertical-align: middle; }
+
+/* PWA state banner — shown when pipeline gate_state === "PASS_WITH_ACTION" */
+.pwa-banner { background: rgba(210,153,34,0.10); border: 1px solid var(--warning); border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; }
+.pwa-banner-title { font-size: 12px; font-weight: 700; color: var(--warning); margin-bottom: 6px; }
+.pwa-action-item { font-size: 11px; color: var(--text); padding: 3px 0; border-bottom: 1px solid var(--border); }
+.pwa-action-item:last-of-type { border-bottom: none; }
+.pwa-btn-clear { border-color: var(--success); color: var(--success); }
+.pwa-btn-clear:hover { background: rgba(63,185,80,0.1); }
+.pwa-btn-override { border-color: var(--danger); color: var(--danger); }
+.pwa-btn-override:hover { background: rgba(248,81,73,0.1); }

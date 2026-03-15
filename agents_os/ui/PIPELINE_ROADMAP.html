@@ -137,6 +137,110 @@
 <script src="js/pipeline-dom.js"></script>
 <script src="js/pipeline-roadmap.js"></script>
 
+<!-- ── Ideas Pipeline Script ──────────────────────────────────────────────── -->
+<script>
+(function(){
+  var g_ideas = [];
+  var URGENCY_ORDER = { critical:0, high:1, medium:2, low:3 };
+  var URGENCY_BADGE = {
+    critical: '<span style="background:#c0392b;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px">🔴 CRITICAL</span>',
+    high:     '<span style="background:#e67e22;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px">🟠 HIGH</span>',
+    medium:   '<span style="background:#f39c12;color:#111;padding:1px 6px;border-radius:3px;font-size:10px">🟡 MEDIUM</span>',
+    low:      '<span style="background:#27ae60;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px">🟢 LOW</span>'
+  };
+  var FATE_BADGE = {
+    new_wp:    '<span style="background:var(--accent);color:#fff;padding:1px 5px;border-radius:3px;font-size:10px">🆕 NEW_WP</span>',
+    append:    '<span style="background:#555;color:#fff;padding:1px 5px;border-radius:3px;font-size:10px">📎 APPEND</span>',
+    immediate: '<span style="background:#1a8cff;color:#fff;padding:1px 5px;border-radius:3px;font-size:10px">⚡ IMMEDIATE</span>',
+    cancel:    '<span style="background:#888;color:#fff;padding:1px 5px;border-radius:3px;font-size:10px">✗ CANCEL</span>'
+  };
+
+  function escH(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+  window.loadIdeas = function() {
+    fetch('../../_COMMUNICATION/PHOENIX_IDEA_LOG.json?v=' + Date.now())
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        g_ideas = data.ideas || [];
+        renderIdeas();
+      })
+      .catch(function(){
+        document.getElementById('ideas-content').innerHTML =
+          '<span style="color:var(--text-muted);font-size:12px">Could not load PHOENIX_IDEA_LOG.json</span>';
+      });
+  };
+
+  window.renderIdeas = function() {
+    var fStatus  = document.getElementById('ideas-filter-status').value;
+    var fUrgency = document.getElementById('ideas-filter-urgency').value;
+    var fDomain  = document.getElementById('ideas-filter-domain').value;
+
+    var items = g_ideas.filter(function(i){
+      if (fStatus  && i.status  !== fStatus)  return false;
+      if (fUrgency && i.urgency !== fUrgency) return false;
+      if (fDomain  && i.domain  !== fDomain)  return false;
+      return true;
+    });
+
+    var openCount = g_ideas.filter(function(i){ return i.status === 'open'; }).length;
+    document.getElementById('ideas-badge').textContent =
+      openCount + ' open / ' + g_ideas.length + ' total';
+
+    if (!items.length) {
+      document.getElementById('ideas-content').innerHTML =
+        '<span style="color:var(--text-muted);font-size:12px">No ideas match current filter.</span>';
+      return;
+    }
+
+    items.sort(function(a,b){
+      if (a.status !== b.status) return a.status === 'open' ? -1 : 1;
+      return (URGENCY_ORDER[a.urgency]||9) - (URGENCY_ORDER[b.urgency]||9);
+    });
+
+    var rows = items.map(function(i){
+      var refHtml = i.reference_file
+        ? '<button class="btn" style="font-size:10px;padding:2px 6px" onclick="openFileViewer(\''+escH(i.reference_file)+'\',\''+escH(i.id)+'\')">📄</button>'
+        : '—';
+      var fateHtml = i.fate ? (FATE_BADGE[i.fate] || escH(i.fate)) : '<span style="color:var(--text-muted);font-size:10px">⏳ pending</span>';
+      var targetHtml = i.fate_target
+        ? '<div style="font-size:10px;color:var(--text-muted);margin-top:2px">→ '+escH(i.fate_target)+'</div>' : '';
+      var statusDot = i.status === 'open'
+        ? '<span style="color:var(--accent)">●</span>' : '<span style="color:var(--text-muted)">●</span>';
+      var domainBadge = '<span style="background:var(--surface2);padding:1px 5px;border-radius:3px;font-size:10px;border:1px solid var(--border)">'+escH(i.domain)+'</span>';
+      return '<tr style="font-size:12px">'
+        + '<td style="font-family:var(--mono);white-space:nowrap;padding:6px 8px">'+escH(i.id)+'</td>'
+        + '<td style="padding:6px 8px">'+statusDot+' '+escH(i.title)+'</td>'
+        + '<td style="padding:6px 8px;white-space:nowrap">'+(URGENCY_BADGE[i.urgency]||escH(i.urgency))+'</td>'
+        + '<td style="padding:6px 8px">'+domainBadge+'</td>'
+        + '<td style="padding:6px 8px;font-size:10px;color:var(--text-muted)">'+escH(i.submitted_by)+'</td>'
+        + '<td style="padding:6px 8px;font-size:10px;color:var(--text-muted);white-space:nowrap">'+(i.created_at||'').slice(0,10)+'</td>'
+        + '<td style="padding:6px 8px">'+fateHtml+targetHtml+'</td>'
+        + '<td style="padding:6px 8px;text-align:center">'+refHtml+'</td>'
+        + '</tr>';
+    }).join('');
+
+    document.getElementById('ideas-content').innerHTML =
+      '<div style="overflow-x:auto">'
+      + '<table style="width:100%;border-collapse:collapse">'
+      + '<thead><tr style="font-size:10px;color:var(--text-muted);border-bottom:1px solid var(--border)">'
+      + '<th style="padding:4px 8px;text-align:left">ID</th>'
+      + '<th style="padding:4px 8px;text-align:left">Title</th>'
+      + '<th style="padding:4px 8px;text-align:left">Urgency</th>'
+      + '<th style="padding:4px 8px;text-align:left">Domain</th>'
+      + '<th style="padding:4px 8px;text-align:left">By</th>'
+      + '<th style="padding:4px 8px;text-align:left">Created</th>'
+      + '<th style="padding:4px 8px;text-align:left">Fate / Target</th>'
+      + '<th style="padding:4px 8px;text-align:left">Ref</th>'
+      + '</tr></thead>'
+      + '<tbody>' + rows + '</tbody>'
+      + '</table></div>'
+      + '<div style="margin-top:8px;font-size:10px;color:var(--text-muted)">Submit idea: <code>./idea_submit.sh --title "..." --domain X --urgency Y --team Z</code></div>';
+  };
+
+  window.addEventListener('load', function(){ loadIdeas(); });
+})();
+</script>
+
 <!-- ── Inline File Viewer Modal ───────────────────────────────────────────── -->
 <div id="file-viewer-modal"
      style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;padding:24px;overflow:auto"

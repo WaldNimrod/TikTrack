@@ -187,6 +187,7 @@ function loadProgramDetail(programId) {
   const mirror = (prog['current_gate_mirror'] || '—').replace(/\*\*/g, '');
   const domCls = domain.includes('AGENTS') ? 'domain-agentsos' : 'domain-tiktrack';
   const isActive = pipelineState && (pipelineState.work_package_id || '').startsWith(programId);
+  const vs = makeVirtualState(programId);
 
   contentEl.innerHTML = `
     <div class="prog-detail-panel">
@@ -210,7 +211,6 @@ function loadProgramDetail(programId) {
   sidebarEl.style.display = 'block';
 
   highlightRoadmapProgram(programId);
-  const vs = makeVirtualState(programId);
   renderGateSequence(vs, programId);
   renderGateHistory(vs, programId);
   updateHeaderFromSelection(programId);

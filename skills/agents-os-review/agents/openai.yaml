@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agents OS Review"
+  short_description: "Deep review workflow for Agents OS"
+  default_prompt: "Use $agents-os-review to run a deep Agents OS review and produce a dated report pack."

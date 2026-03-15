@@ -7,6 +7,7 @@
 **to:** Team 190 (Constitutional Architectural Validator)  
 **cc:** Team 61, Team 100, Team 10, Team 00, Team 51, Team 170  
 **date:** 2026-03-14  
+**historical_record:** true  
 **status:** INTERNAL_PLAN_SUBMITTED_FOR_GATE_1_VALIDATION  
 **gate_id:** GATE_1  
 **architectural_approval_type:** SPEC  

@@ -1,4 +1,5 @@
 # Team 31 → Team 00: חבילת Handoff — הפעלת צוות 31 החדש
+date: 2026-03-15
 
 **from:** Team 31 (Blueprint)  
 **to:** Team 00 (האדריכלית הראשית)  

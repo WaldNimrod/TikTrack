@@ -1,3 +1,4 @@
+date: 2026-03-15
 # Cursor Composer Prompt
 
 **Paste this entire content into a Cursor Composer session.**

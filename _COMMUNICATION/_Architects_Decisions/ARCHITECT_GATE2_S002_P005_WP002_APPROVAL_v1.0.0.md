@@ -9,6 +9,7 @@ work_package_id: S002-P005-WP002
 decision: APPROVED
 sv: 1.0.0
 effective_date: 2026-03-15
+date: 2026-03-15
 project_domain: AGENTS_OS
 authority: SUPREME_ARCHITECTURAL
 in_response_to: TEAM_10_S002_P005_WP002_GATE2_INTAKE_ASSESSMENT_v1.0.0

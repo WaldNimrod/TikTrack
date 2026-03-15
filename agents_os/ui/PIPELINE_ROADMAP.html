@@ -102,6 +102,36 @@
 
 </div><!-- /agents-roadmap-layout -->
 
+<!-- ── Ideas Pipeline Section ─────────────────────────────────────────── -->
+<div style="max-width:1400px;margin:18px auto;padding:0 18px">
+  <div class="section-card">
+    <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <span>💡 Idea Pipeline &nbsp;<span class="badge" id="ideas-badge">—</span></span>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+        <select id="ideas-filter-status" onchange="renderIdeas()" style="font-size:11px;padding:2px 6px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px">
+          <option value="open">Open only</option>
+          <option value="">All status</option>
+          <option value="decided">Decided</option>
+        </select>
+        <select id="ideas-filter-urgency" onchange="renderIdeas()" style="font-size:11px;padding:2px 6px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px">
+          <option value="">All urgency</option>
+          <option value="critical">🔴 Critical</option>
+          <option value="high">🟠 High</option>
+          <option value="medium">🟡 Medium</option>
+          <option value="low">🟢 Low</option>
+        </select>
+        <select id="ideas-filter-domain" onchange="renderIdeas()" style="font-size:11px;padding:2px 6px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px">
+          <option value="">All domains</option>
+          <option value="agents_os">Agents_OS</option>
+          <option value="tiktrack">TikTrack</option>
+          <option value="shared">Shared</option>
+        </select>
+      </div>
+    </div>
+    <div id="ideas-content" style="margin-top:10px"><span class="loading">Loading ideas…</span></div>
+  </div>
+</div>
+
 <script src="js/pipeline-config.js"></script>
 <script src="js/pipeline-state.js"></script>
 <script src="js/pipeline-dom.js"></script>

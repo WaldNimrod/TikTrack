@@ -1,6 +1,6 @@
 /* pipeline-roadmap.css — Team 61 AOUI LOD400 — Roadmap-specific styles */
 
-/* ── Roadmap 3-column layout: sidebar | tree | program details ── */
+/* ── Layout: sidebar | main (accordions). Sidebar full height ── */
 .agents-roadmap-layout {
   display: flex;
   flex-direction: row;
@@ -22,24 +22,105 @@
   flex-direction: column;
   gap: 12px;
   background: var(--bg);
+  align-self: stretch;
+}
+/* Main content: flex column, scrollable, accordions */
+.agents-roadmap-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--bg);
+}
+/* Accordion (same pattern as Dashboard) */
+.accordion { margin-bottom: 12px; }
+.accordion-header {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+  transition: border-color 0.15s;
+}
+.accordion-header:hover { border-color: var(--accent); }
+.accordion.open .accordion-header {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-color: var(--accent);
+}
+.accordion-icon { font-size: 14px; }
+.accordion-title { font-weight: 600; font-size: 13px; flex: 1; }
+.accordion-badge {
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 10px;
+  background: var(--surface2);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+.accordion-chevron { color: var(--text-muted); transition: transform 0.2s; font-size: 11px; }
+.accordion.open .accordion-chevron { transform: rotate(90deg); }
+.accordion-body {
+  background: var(--surface2);
+  border: 1px solid var(--accent);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  padding: 16px;
+  display: none;
+}
+.accordion.open .accordion-body { display: block; }
+/* Two-column container for Map accordion body */
+.agents-roadmap-cols {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 0;
+  width: 100%;
+}
+@media (max-width: 900px) {
+  .agents-roadmap-cols { flex-direction: column; }
 }
 .agents-roadmap-col1 {
   flex: 1 1 35%;
   min-width: 200px;
-  padding: 16px 20px;
+  padding: 16px 20px 16px 0;
   overflow-y: auto;
-  background: var(--bg);
   border-right: 1px solid var(--border);
-  align-self: stretch;
+}
+@media (max-width: 900px) {
+  .agents-roadmap-col1 { border-right: none; border-bottom: 1px solid var(--border); padding-right: 0; padding-bottom: 16px; }
 }
 .agents-roadmap-col2 {
   flex: 1 1 35%;
   min-width: 200px;
   padding: 16px 20px;
   overflow-y: auto;
-  background: var(--bg);
-  align-self: stretch;
 }
+/* Idea Pipeline accordion inner */
+.ideas-accordion-inner { width: 100%; }
+.ideas-filters {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.ideas-filters select {
+  font-size: 11px;
+  padding: 4px 8px;
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.ideas-content { margin-top: 4px; }
 
 /* Roadmap tree */
 .rm-stage { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; overflow: hidden; }
@@ -95,6 +176,8 @@
 .stat-domain-card.tiktrack-card { border-left: 3px solid var(--accent); }
 .stat-domain-card.agentsos-card { border-left: 3px solid var(--success); }
 .stat-domain-card.total-card { border-left: 3px solid var(--warning); }
+.stat-domain-card.ideas-card { border-left: 3px solid #a371f7; }
+.stat-dot-ideas { background: #a371f7; }
 .stat-domain-title { font-size: 11px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 7px; }
 .stat-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 .stat-dot-tt { background: var(--accent); }
@@ -110,6 +193,12 @@
 .num-done { color: var(--success); }
 .num-actv { color: var(--warning); }
 .num-plan { color: var(--text-muted); }
+/* Idea Pipeline sidebar card */
+.num-ideas-t { color: #a371f7; }
+.num-ideas-o { color: var(--accent); }
+.num-ideas-e { color: var(--warning); }
+.num-ideas-d { color: var(--success); }
+.num-ideas-l { color: var(--text-muted); }
 
 /* Canonical files rows */
 .cf-row { display: flex; align-items: center; gap: 7px; padding: 4px 0; border-bottom: 1px solid var(--border); }

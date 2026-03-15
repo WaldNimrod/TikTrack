@@ -4,6 +4,13 @@
 /* Globals from state: pipelineState, currentDomain, stateFallbackMode, loadDomainState, switchDomain, fetchJSON, fetchText, fileExists */
 /* Globals from dom: escHtml, escAttr, gateStatus, statusPillClass, statusLabel */
 
+// ── Accordion (per Dashboard pattern) ────────────────────────────────────────
+function toggleAccordion(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('open');
+}
+window.toggleAccordion = toggleAccordion;
+
 // ── State ──────────────────────────────────────────────────────────────────
 let allPrograms = [];
 let allStages = [];
@@ -539,6 +546,7 @@ async function loadAll() {
   if (selEl && selEl.value) onProgSelect(selEl.value);
 
   await loadCanonicalFiles();
+  if (typeof window.loadIdeas === 'function') window.loadIdeas();
 }
 
 // ── Inline file viewer ─────────────────────────────────────────────────────

@@ -114,6 +114,7 @@ NEW_ENTRY=$(jq -n \
     fate_decided_at: null,
     fate_decided_by: null,
     reference_file:  $ref,
+    delivery_ref:    null,
     notes:           $notes
   }')
 

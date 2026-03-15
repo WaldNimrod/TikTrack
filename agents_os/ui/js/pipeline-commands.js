@@ -52,6 +52,8 @@ function buildCommands(currentGate) {
     { icon: "🗂️", label: "Regen prompt",     desc: "Prompt for specific gate",      text: `./pipeline_run.sh ${df}gate ${currentGate || "GATE_X"}` },
     { icon: "↩️", label: "G3_5 revise",       desc: "Revise work plan (blockers)",     text: `./pipeline_run.sh ${df}revise "BLOCKER-1: ..."` },
     { icon: "🌐", label: "Both pipelines",    desc: "Domain overview",              text: "./pipeline_run.sh domain" },
+    { icon: "💡", label: "Submit idea",       desc: "Register new idea in pipeline", text: './idea_submit.sh --title "..." --domain agents_os --urgency high --team team_XX\n# Optional: --reference "path/to/context.md" --notes "Context..."' },
+    { icon: "🔍", label: "Scan ideas",        desc: "Idea pipeline startup check",   text: "./idea_scan.sh --summary" },
   ];
   // Sidebar compact list
   const sidebarEl = document.getElementById("sidebar-cmd-list");

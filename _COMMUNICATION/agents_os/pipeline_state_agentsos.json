@@ -19,7 +19,8 @@
     "GATE_6",
     "WAITING_GATE6_APPROVAL",
     "GATE_7",
-    "GATE_8"
+    "GATE_8",
+    "COMPLETE"
   ],
   "gates_failed": [
     "GATE_8"
@@ -31,7 +32,7 @@
   "implementation_endpoints": [],
   "spec_path": "",
   "started_at": "",
-  "last_updated": "2026-03-15T20:34:45.930995+00:00",
+  "last_updated": "2026-03-15T20:43:06.930621+00:00",
   "gate_state": null,
   "pending_actions": [],
   "override_reason": null,

@@ -31,6 +31,26 @@
 
 ## 2C — Submission Process (any team)
 
+### 2C.1 Human Trigger Command (uniform across all teams)
+
+When Nimrod sends a plain-language trigger, teams MUST use this exact envelope:
+
+```text
+**רעיון חדש**
+<human explanation of the idea and desired outcome>
+**סוף רעיון חדש**
+```
+
+Team handling contract:
+1. Translate the text into a structured draft (`title`, `domain`, `urgency`, `reference`, `notes`).
+2. Return the draft to Nimrod for explicit approval.
+3. Only after approval, execute `idea_submit.sh` and return the generated `IDEA-XXX`.
+4. If domain/environment is unclear, stop and ask Nimrod before submit.
+
+---
+
+### 2C.2 Canonical submit command
+
 ```bash
 ./idea_submit.sh \
   --title "Short descriptive title" \

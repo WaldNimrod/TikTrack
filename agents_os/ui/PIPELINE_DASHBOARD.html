@@ -176,6 +176,14 @@ python3 -m http.server 8090
 #   high     — decide this sprint / stage
 #   medium   — within current stage timeline
 #   low      — backlog (S+ or whenever)</pre>
+      <div class="tip-box" style="margin-top:8px">
+        <strong>NEW UNIFORM HUMAN TRIGGER:</strong>
+        <pre style="margin-top:6px">**רעיון חדש**
+&lt;human explanation of the idea and desired outcome&gt;
+**סוף רעיון חדש**</pre>
+        Team flow: translate → return draft for Nimrod approval → submit via <code>idea_submit.sh</code> only after approval.<br>
+        If domain/environment is unclear: stop and ask Nimrod before submit.
+      </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
         <button class="btn" style="font-size:11px" onclick="copyCmd('./idea_scan.sh --summary', this)">⎘ Scan summary</button>
         <button class="btn" style="font-size:11px" onclick="copyCmd('./idea_scan.sh', this)">⎘ Full scan</button>

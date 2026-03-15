@@ -4,8 +4,8 @@
   "description": "Canonical idea incubator — all ideas, bugs, and improvement requests before GATE_0 entry",
   "owner": "team_170",
   "fate_authority": "team_00 + nimrod",
-  "next_id": 37,
-  "last_updated": "2026-03-15T18:30:00Z",
+  "next_id": 38,
+  "last_updated": "2026-03-15T20:44:03Z",
   "status_legend": {
     "open": "No fate decision yet — requires Team 00 + Nimrod review",
     "in_execution": "Fate decided AND mandate issued to team; team executing; not yet delivered/confirmed",
@@ -644,6 +644,23 @@
       "reference_file": "_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_TEAM_100_DATE_GOVERNANCE_STABILIZATION_PROPOSAL_v1.0.0.md",
       "delivery_ref": null,
       "notes": "P0 already executed (commit-time date guard, UTC injection, GATE_1 template fix). Decisions needed: P1 (canonical date -u +%F in all prompts, placeholder lint, Team 170 template hardening) + P2 (CI date-lint on PR, drift dashboard widget, auto-fix generator). Also: team ownership lock (Team 191 = push-guard lane; Team 190 = constitutional validation only)."
+    },
+    {
+      "id": "IDEA-037",
+      "title": "Cross-Team Skills Set Program",
+      "domain": "shared",
+      "urgency": "high",
+      "submitted_by": "team_190",
+      "created_at": "2026-03-15T20:44:03Z",
+      "status": "open",
+      "fate": null,
+      "fate_target": null,
+      "fate_rationale": null,
+      "fate_decided_at": null,
+      "fate_decided_by": null,
+      "reference_file": "_COMMUNICATION/team_190/TEAM_190_IDEA_CONTEXT_SKILLS_SET_ALL_TEAMS_v1.0.0.md",
+      "delivery_ref": null,
+      "notes": "fate_suggestion=new_wp; batch reference: S002_P005_TEAM_SKILLS_ALIGNMENT"
     }
   ]
 }

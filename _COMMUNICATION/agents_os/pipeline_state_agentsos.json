@@ -4,9 +4,13 @@
   "stage_id": "S002",
   "project_domain": "agents_os",
   "spec_brief": "ADR-031 Stage A: Writing Semantics Hardening",
-  "current_gate": "GATE_0",
-  "gates_completed": [],
-  "gates_failed": [],
+  "current_gate": "GATE_1",
+  "gates_completed": [
+    "GATE_0"
+  ],
+  "gates_failed": [
+    "GATE_1"
+  ],
   "lld400_content": "",
   "work_plan": "",
   "mandates": "",
@@ -14,5 +18,5 @@
   "implementation_endpoints": [],
   "spec_path": "",
   "started_at": "",
-  "last_updated": "2026-03-14T18:03:51.184136+00:00"
+  "last_updated": "2026-03-15T02:03:12.463008+00:00"
 }

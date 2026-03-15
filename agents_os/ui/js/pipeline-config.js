@@ -46,13 +46,18 @@ const BOOSTER_TEAM_DATA = {
   "team_10":   { label: "Team 10",   name: "Execution Orchestrator",    writesTo: ["../../_COMMUNICATION/team_10/"],   isoRules: ["No gate submission without all artifacts", "Work plan must be versioned", "Identity header mandatory on all outputs"] },
   "team_20":   { label: "Team 20",   name: "Backend Implementation",    writesTo: ["../../_COMMUNICATION/team_20/"],   isoRules: ["maskedLog mandatory on all server-side logging", "NUMERIC(20,8) for financial data", "4-state status model (pending/active/inactive/cancelled)"] },
   "team_30":   { label: "Team 30",   name: "Frontend Implementation",    writesTo: ["../../_COMMUNICATION/team_30/"],   isoRules: ["collapsible-container Iron Rule on ALL pages", "maskedLog mandatory", "Rich text: ONE unified object"] },
+  "team_31":   { label: "Team 31",   name: "Blueprint Maker",            writesTo: ["../../staging/blueprints/"],        isoRules: ["OUTSIDE gate pipeline — no gate submissions", "Blueprint files are staging artifacts only — not production code"] },
   "team_50":   { label: "Team 50",   name: "QA & Functional Acceptance", writesTo: ["../../_COMMUNICATION/team_50/"],   isoRules: ["Team 50 = QA (Iron Rule)", "GATE_4 requires PASS evidence: commands + outputs + exit codes"] },
   "team_70":   { label: "Team 70",   name: "Documentation",               writesTo: ["../../_COMMUNICATION/team_70/"],   isoRules: ["All docs require identity header", "AS_MADE_REPORT mandatory at GATE_8"] },
   "team_90":   { label: "Team 90",   name: "Dev Validator",              writesTo: ["../../_COMMUNICATION/team_90/"],   isoRules: ["CRITICAL: Every GATE_5 run MUST be a FRESH validation", "route_recommendation MANDATORY in every BLOCKING_REPORT", "Do NOT return template or placeholder responses"] },
-  "team_100":  { label: "Team 100",  name: "Strategic Reviewer",          writesTo: ["../../_COMMUNICATION/team_100/"],  isoRules: ["GATE_6 approval requires explicit evidence review", "route_recommendation mandatory if REJECTED"] },
+  "team_100":  { label: "Team 100",  name: "AOS Domain Architects",        writesTo: ["../../_COMMUNICATION/team_100/"],  isoRules: ["GATE_6 approval requires explicit evidence review", "route_recommendation mandatory if REJECTED", "LOD400 must be fully specified before issuing to Team 61"] },
   "team_170":  { label: "Team 170",  name: "Spec & Governance",           writesTo: ["../../_COMMUNICATION/team_170/"], isoRules: ["DDL is documentation only", "Registry updates require Team 00 awareness"] },
   "team_190":  { label: "Team 190",  name: "Constitutional Validator",     writesTo: ["../../_COMMUNICATION/team_190/"], isoRules: ["GATE_0 BLOCK stops all downstream work", "route_recommendation mandatory in all BLOCK reports"] },
   "teams_20+30": { label: "Teams 20+30", name: "Implementation",        writesTo: ["../../_COMMUNICATION/team_20/", "../../_COMMUNICATION/team_30/"], isoRules: ["maskedLog mandatory", "NUMERIC(20,8) for financial data", "collapsible-container Iron Rule on ALL pages"] },
+  // AOS-domain teams (registered 2026-03-15)
+  "team_51":   { label: "Team 51",   name: "AOS QA & Functional Acceptance", writesTo: ["../../_COMMUNICATION/team_51/"], isoRules: ["Team 51 = QA for AOS domain (Iron Rule)", "Every QA run must be FRESH — no repeating prior findings without re-execution"] },
+  "team_61":   { label: "Team 61",   name: "AOS Local Cursor Implementation", writesTo: ["../../_COMMUNICATION/team_61/"], isoRules: ["Classic <script src> only — no ES modules", "agents-page-layout + agents-header mandatory on all AOS HTML pages", "Preflight URL test before QA submission"] },
+  "team_191":  { label: "Team 191",  name: "Git-Governance Lane",            writesTo: ["../../_COMMUNICATION/team_191/"], isoRules: ["No constitutional verdicts (Team 190 only)", "No architectural rulings (Team 00/100 only)", "No business-logic changes under Git fix mandate"] },
 };
 
 const DOMAIN_GATE_OWNERS_JS = {

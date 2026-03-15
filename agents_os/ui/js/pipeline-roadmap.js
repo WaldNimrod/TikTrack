@@ -65,17 +65,32 @@ function rmStatusLabel(status) {
   return (status || '?').slice(0, 14);
 }
 
+// ── Header: WP | Gate | Stage (updates from selected program in map) ───────
+function updateHeaderFromSelection(pid) {
+  const headerSub = document.getElementById('header-sub');
+  if (!headerSub) return;
+  const badge = typeof stateFallbackMode !== 'undefined' && stateFallbackMode
+    ? ' <span class="legacy-fallback-badge">⚠ LEGACY_FALLBACK</span>'
+    : '';
+  if (!pid) {
+    const s = pipelineState;
+    headerSub.innerHTML = `WP: ${escHtml(s?.work_package_id || '—')}  |  Gate: ${escHtml(s?.current_gate || '—')}  |  Stage: ${escHtml(s?.stage_id || '—')}${badge}`;
+    return;
+  }
+  const prog = allPrograms.find(p => p['program_id'] === pid);
+  const vs = makeVirtualState(pid);
+  const wp = vs ? (vs.work_package_id || pid) : pid;
+  const gate = vs?.current_gate || prog?.current_gate_mirror || '—';
+  const stage = prog?.['stage_id'] || '—';
+  headerSub.innerHTML = `WP: ${escHtml(wp)}  |  Gate: ${escHtml(gate)}  |  Stage: ${escHtml(stage)}${badge}`;
+}
+
 // ── Load pipeline state (domain-aware) ──────────────────────────────────────
 async function loadPipelineState() {
   try {
     const state = await loadDomainState(currentDomain);
-    const headerSub = document.getElementById('header-sub');
-    if (headerSub) {
-      const badge = typeof stateFallbackMode !== 'undefined' && stateFallbackMode
-        ? ' <span class="legacy-fallback-badge">⚠ LEGACY_FALLBACK</span>'
-        : '';
-      headerSub.innerHTML = `WP: ${escHtml(state?.work_package_id || '—')}  |  Gate: ${escHtml(state?.current_gate || '—')}  |  Stage: ${escHtml(state?.stage_id || '—')}${badge}`;
-    }
+    pipelineState = state;
+    updateHeaderFromSelection(null);
     return state;
   } catch (e) {
     const headerSub = document.getElementById('header-sub');
@@ -157,6 +172,7 @@ function loadProgramDetail(programId) {
   const vs = makeVirtualState(programId);
   renderGateSequence(vs, programId);
   renderGateHistory(vs, programId);
+  updateHeaderFromSelection(programId);
 }
 
 // ── Clear program detail (hide sidebar) ────────────────────────────────────
@@ -166,6 +182,7 @@ function clearProgramDetail() {
   highlightRoadmapProgram(null);
   renderGateSequence(pipelineState, null);
   renderGateHistory(pipelineState, null);
+  updateHeaderFromSelection(null);
 }
 
 // ── Program selection handler ──────────────────────────────────────────────
@@ -544,24 +561,14 @@ function closeFileViewer() {
   if (modal) modal.style.display = 'none';
 }
 
-// ── Domain switch (Roadmap) ────────────────────────────────────────────────
+/** Sync UI — Roadmap uses light mode + no domain selector (general-info page) */
+function syncDomainUIRoadmap(domain) {
+  document.documentElement.classList.add('theme-tiktrack');
+}
+
 function onDomainSwitchRoadmap(domain) {
   switchDomain(domain);
-  const isTiktrack = domain === 'tiktrack';
-  const titleEl = document.getElementById('domain-badge-header');
-  if (titleEl) {
-    titleEl.textContent = isTiktrack ? 'tiktrack' : 'agents_os';
-    titleEl.className = 'domain-badge domain-' + (isTiktrack ? 'tiktrack' : 'agentsos');
-  }
-  const btnT = document.getElementById('domain-btn-tiktrack');
-  const btnA = document.getElementById('domain-btn-agentsos');
-  if (btnT) btnT.className = 'domain-btn' + (isTiktrack ? ' active-tiktrack' : '');
-  if (btnA) btnA.className = 'domain-btn' + (!isTiktrack ? ' active-agentsos' : '');
-  const badge = document.getElementById('domain-badge-pill');
-  if (badge) {
-    badge.textContent = domain;
-    badge.className = 'domain-label-badge ' + (isTiktrack ? 'domain-label-tiktrack' : 'domain-label-agentsos');
-  }
+  syncDomainUIRoadmap(domain);
   loadAll();
 }
 
@@ -585,10 +592,6 @@ function onDomainSwitchRoadmap(domain) {
     });
   }
 
-  const d = typeof currentDomain !== 'undefined' ? currentDomain : 'tiktrack';
-  const btnT = document.getElementById('domain-btn-tiktrack');
-  const btnA = document.getElementById('domain-btn-agentsos');
-  if (btnT) btnT.className = 'domain-btn' + (d === 'tiktrack' ? ' active-tiktrack' : '');
-  if (btnA) btnA.className = 'domain-btn' + (d !== 'tiktrack' ? ' active-agentsos' : '');
+  syncDomainUIRoadmap();
   loadAll();
 })();

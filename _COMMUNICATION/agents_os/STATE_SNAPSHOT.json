@@ -1,11 +1,12 @@
 {
   "schema_version": "2.0.0",
-  "produced_at_iso": "2026-03-13T02:10:10.754599+00:00",
+  "produced_at_iso": "2026-03-15T01:58:40.520731+00:00",
   "agent_role": "POC-1-OBSERVER",
   "read_only": true,
   "governance": {
     "wsm_path": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
-    "operational_state": "upon",
+    "active_stage": "S002",
+    "active_program": "S002-P002",
     "ssm_path": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md",
     "master_index_path": "00_MASTER_INDEX.md"
   },
@@ -154,7 +155,7 @@
     "has_eslint_config": true,
     "has_mypy_config": true,
     "has_ci_pipeline": true,
-    "python_dependencies": 23
+    "python_dependencies": 22
   },
   "artifact_checks": [
     {

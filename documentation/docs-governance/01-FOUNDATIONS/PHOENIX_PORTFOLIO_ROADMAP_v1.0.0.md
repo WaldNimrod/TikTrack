@@ -93,7 +93,7 @@ D32 (portfolio_state) מחייב אפיון ארכיטקטוני ייעודי ו
 ### Agents_OS Evolution Lock (ADR-031)
 
 - רצף קנוני נעול לפיתוח Agents_OS v2:
-  - S002-P005: Writing Semantics Hardening (Stage A, immediate).
+  - S002-P005: Writing Semantics Hardening (Stage A) + UI Optimization [WP001 TASK_CLOSED 2026-03-15] + Pipeline Governance PASS_WITH_ACTION [WP002 PLANNED — trigger: WP001 GATE_8].
   - S003-P007: Command Bridge Lite (Stage B, next AGENTS_OS package in Stage 3).
   - S004-P008: Mediated Reconciliation Engine (Stage C, independent Stage 4 package after existing AGENTS_OS Stage 4 programs).
 - שיוך ותזמון מפורטים נשמרים ב-`PHOENIX_PROGRAM_REGISTRY_v1.0.0.md`.
@@ -182,3 +182,4 @@ D38 (tag registry management) ב-S005 הוא ממשק ניהול רישום הת
 **log_entry | TEAM_170 | ROADMAP_AMENDMENTS_COMPLETE_v1+v2 | 2026-03-03**
 **log_entry | TEAM_170 | ROADMAP_ID_UPDATE | INDICATORS_PROGRAM_ID_CANONICALIZED_TO_S004-P007 | per_TEAM_00_RATIFICATION | 2026-03-03**
 **log_entry | TEAM_190 | PHOENIX_PORTFOLIO_ROADMAP | S002_SCOPE_NOTE_UPDATED_FOR_MCP_QA_TRANSITION_PACKAGING | 2026-03-06**
+**log_entry | TEAM_170 | PHOENIX_PORTFOLIO_ROADMAP | ADR031_S002_P005_ANNOTATION_WP001_WP002_PER_TEAM_100_MANDATE | 2026-03-15**

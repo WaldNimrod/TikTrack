@@ -1,15 +1,27 @@
 <!DOCTYPE html>
-<html lang="en" class="theme-tiktrack">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+  (function(){document.documentElement.classList.add("theme-tiktrack");})();
+  </script>
   <title>Agents OS — Roadmap &amp; Gate History</title>
-  <link rel="stylesheet" href="css/pipeline-shared.css" />
-  <link rel="stylesheet" href="css/pipeline-roadmap.css" />
+  <link rel="stylesheet" href="css/pipeline-shared.css?v=2" />
+  <link rel="stylesheet" href="css/pipeline-roadmap.css?v=4" />
 </head>
 <body>
 
-<!-- ── Top Navigation ── -->
+<!-- ── Logo + Title (above nav) ── -->
+<header class="agents-header">
+  <div class="agents-header-left">
+    <h1 class="agents-header-title">🗺️ Agents OS — <span>Roadmap &amp; History</span></h1>
+  </div>
+  <div class="agents-header-right">
+    <span class="agents-refresh-label agents-header-sub" id="header-sub">Loading…</span>
+  </div>
+</header>
+
 <nav class="pipeline-nav">
   <a class="nav-link" href="PIPELINE_DASHBOARD.html">📊 Dashboard</a>
   <span class="nav-sep"></span>
@@ -18,104 +30,77 @@
   <a class="nav-link" href="PIPELINE_TEAMS.html">👥 Teams</a>
 </nav>
 
-<header class="agents-header">
-  <div class="agents-header-left">
-    <h1 class="agents-header-title">🗺️ Agents OS — <span>Roadmap &amp; History</span></h1>
-    <span class="domain-badge" id="domain-badge-header">—</span>
-    <span class="agents-refresh-label" id="header-sub">Loading…</span>
-  </div>
-  <div class="agents-header-right">
-    <label class="refresh-label" style="display:inline-flex;align-items:center;gap:4px">
-      <input type="checkbox" id="auto-refresh"> <span class="agents-refresh-label" id="refresh-label">Auto (5s)</span>
-      <span class="refresh-dot" id="refresh-dot" style="display:none"></span>
-    </label>
-    <button class="btn agents-refresh-btn btn-primary" id="refresh-btn" onclick="loadAll()">↺ Refresh</button>
-  </div>
-</header>
-
 <!-- Hidden select kept for programmatic use by onProgSelect / buildProgramSelector -->
 <select id="prog-select" style="display:none" onchange="onProgSelect(this.value)">
   <option value="">— All programs —</option>
 </select>
 
-<div class="agents-page-layout">
+<div class="agents-roadmap-layout">
 
-  <!-- ── LEFT: Main content column ────────────────────────────────── -->
-  <div class="agents-page-main">
-
-    <!-- Domain selector -->
-    <div class="domain-selector" style="margin-bottom:12px">
-      <button class="domain-btn active-tiktrack" id="domain-btn-tiktrack" onclick="onDomainSwitchRoadmap('tiktrack')">🔵 TikTrack</button>
-      <button class="domain-btn" id="domain-btn-agentsos" onclick="onDomainSwitchRoadmap('agents_os')">🟢 Agents OS</button>
+  <!-- ── LEFT: Fixed sidebar — Stats, Canonical, Validation ── -->
+  <aside class="agents-page-sidebar agents-roadmap-sidebar">
+    <div class="agents-domain-bar agents-domain-bar--sidebar agents-domain-bar--no-domain">
+      <button class="btn btn-primary" id="refresh-btn" onclick="loadAll()">↺ Refresh</button>
+      <label class="refresh-label">
+        <input type="checkbox" id="auto-refresh"> <span class="agents-refresh-label" id="refresh-label">Auto (5s)</span>
+        <span class="refresh-dot" id="refresh-dot" style="display:none"></span>
+      </label>
     </div>
-
-    <!-- Portfolio Roadmap Tree — AC-08: main column ONLY domain selector + tree -->
-    <div class="section-card">
-      <div class="section-title">Portfolio Roadmap <span class="badge" id="roadmap-badge">—</span></div>
-      <div id="roadmap-tree"><span class="loading">Loading…</span></div>
-    </div>
-
-  </div><!-- /agents-page-main -->
-
-  <!-- ── RIGHT: Sidebar ────────────────────────────────────────────── -->
-  <aside class="agents-page-sidebar">
-
-    <!-- Full Gate Sequence (moved from main per AC-08 literal) -->
-    <div class="sidebar-section-card">
-      <div class="sidebar-section-title">Full Gate Sequence <span class="badge" id="seq-badge">—</span></div>
-      <div id="gate-seq-content"><span class="loading">Loading…</span></div>
-    </div>
-
-    <!-- Gate History (moved from main per AC-08 literal) -->
-    <div class="sidebar-section-card">
-      <div class="sidebar-section-title">Gate History <span class="badge" id="history-badge">—</span></div>
-      <div id="history-content"><span class="loading">Loading…</span></div>
-    </div>
-
-    <!-- Program detail — shown when a program is selected -->
-    <div id="prog-detail-sidebar" style="display:none">
-      <div class="sidebar-section-card">
-        <div class="sidebar-section-title">📋 Program Detail</div>
-        <div id="prog-detail-content"></div>
-      </div>
-    </div>
-
-    <!-- Stage / Domain Conflict Warnings — filled by checkStageConflict() -->
-    <div id="conflict-warnings" style="display:none"></div>
-
-    <!-- TikTrack Stats -->
     <div class="stat-domain-card tiktrack-card" id="stat-tiktrack">
       <div class="stat-domain-title"><span class="stat-dot stat-dot-tt"></span>TikTrack</div>
       <div class="stat-row"><span class="loading">Loading…</span></div>
     </div>
 
-    <!-- Agents_OS Stats -->
     <div class="stat-domain-card agentsos-card" id="stat-agentsos">
       <div class="stat-domain-title"><span class="stat-dot stat-dot-aos"></span>Agents_OS</div>
       <div class="stat-row"><span class="loading">Loading…</span></div>
     </div>
 
-    <!-- Total Stats -->
     <div class="stat-domain-card total-card" id="stat-total">
       <div class="stat-domain-title"><span class="stat-dot stat-dot-tot"></span>Portfolio Total</div>
       <div class="stat-row"><span class="loading">Loading…</span></div>
     </div>
 
-    <!-- Canonical Task Files -->
     <div class="sidebar-section-card">
       <div class="sidebar-section-title">Canonical Task Files <span class="badge" id="cf-badge">—</span></div>
       <div id="cf-content"><span class="loading">Loading…</span></div>
     </div>
 
-    <!-- Hierarchy Validation -->
     <div class="sidebar-section-card">
       <div class="sidebar-section-title">Hierarchy Validation <span class="badge" id="val-badge">—</span></div>
       <div id="val-content"><span class="loading">Loading…</span></div>
     </div>
 
-  </aside><!-- /agents-page-sidebar -->
+  </aside>
 
-</div><!-- /agents-page-layout -->
+  <!-- ── Center-left: Roadmap tree ── -->
+  <div class="agents-roadmap-col1">
+    <div class="section-card">
+      <div class="section-title">Portfolio Roadmap <span class="badge" id="roadmap-badge">—</span></div>
+      <div id="roadmap-tree"><span class="loading">Loading…</span></div>
+    </div>
+  </div>
+
+  <!-- ── Center-right: Program details (Gate Seq, History, Prog Detail) ── -->
+  <div class="agents-roadmap-col2">
+    <div class="section-card">
+      <div class="section-title">Full Gate Sequence <span class="badge" id="seq-badge">—</span></div>
+      <div id="gate-seq-content"><span class="loading">Loading…</span></div>
+    </div>
+    <div class="section-card">
+      <div class="section-title">Gate History <span class="badge" id="history-badge">—</span></div>
+      <div id="history-content"><span class="loading">Loading…</span></div>
+    </div>
+    <div id="prog-detail-sidebar" style="display:none">
+      <div class="section-card">
+        <div class="section-title">📋 Program Detail</div>
+        <div id="prog-detail-content"></div>
+      </div>
+    </div>
+    <div id="conflict-warnings" style="display:none"></div>
+  </div>
+
+</div><!-- /agents-roadmap-layout -->
 
 <script src="js/pipeline-config.js"></script>
 <script src="js/pipeline-state.js"></script>

@@ -1,16 +1,31 @@
 <!DOCTYPE html>
-<html lang="en" class="theme-tiktrack">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+  (function(){var d=localStorage.getItem("pipeline_domain")||"tiktrack";
+  document.documentElement.classList.toggle("theme-tiktrack",d==="tiktrack");})();
+  </script>
   <title>TikTrack — Pipeline Dashboard</title>
-  <link rel="stylesheet" href="css/pipeline-shared.css" />
-  <link rel="stylesheet" href="css/pipeline-dashboard.css" />
+  <link rel="stylesheet" href="css/pipeline-shared.css?v=2" />
+  <link rel="stylesheet" href="css/pipeline-dashboard.css?v=2" />
   <!-- styles in pipeline-shared.css + pipeline-dashboard.css -->
 </head>
 <body>
 
-<!-- ── Top Navigation ── -->
+<!-- ── Logo + Title (above nav, per Agents LTR) ── -->
+<header class="agents-header">
+  <div class="agents-header-left">
+    <h1 class="agents-header-title">📊 Agents OS — <span>Pipeline Dashboard</span></h1>
+    <span class="domain-badge" id="domain-badge-header">—</span>
+    <span class="agents-refresh-label" id="last-updated">Loading…</span>
+  </div>
+  <div class="agents-header-right">
+    <button class="btn help-btn" onclick="toggleHelp()" title="Help & Documentation">?</button>
+  </div>
+</header>
+
 <nav class="pipeline-nav">
   <a class="nav-link active" href="PIPELINE_DASHBOARD.html">📊 Dashboard</a>
   <span class="nav-sep"></span>
@@ -18,19 +33,6 @@
   <span class="nav-sep"></span>
   <a class="nav-link" href="PIPELINE_TEAMS.html">👥 Teams</a>
 </nav>
-
-<header class="agents-header">
-  <div class="agents-header-left">
-    <h1 class="agents-header-title">📊 Agents OS — <span>Pipeline Dashboard</span></h1>
-    <span class="domain-badge" id="domain-badge-header">tiktrack</span>
-    <span class="agents-refresh-label" id="last-updated">Loading…</span>
-  </div>
-  <div class="agents-header-right">
-    <span class="agents-refresh-label" id="refresh-label">Auto (5s)</span>
-    <button class="btn agents-refresh-btn btn-primary" id="refresh-btn" onclick="loadAll()">↺ Refresh</button>
-    <button class="btn help-btn" onclick="toggleHelp()" title="Help & Documentation">?</button>
-  </div>
-</header>
 
 <!-- ── Help Modal ─────────────────────────────────────────────────────────── -->
 <div class="modal-overlay" id="help-modal" onclick="closeHelpOutside(event)">
@@ -253,7 +255,50 @@ python3 -m http.server 8090
 
 <div class="agents-page-layout">
 
-  <!-- ── Main content column (left) ────────────────────────────────── -->
+  <!-- ── LEFT: Sidebar (per Agents LTR) ── -->
+  <aside class="agents-page-sidebar">
+    <div class="agents-domain-bar agents-domain-bar--sidebar">
+      <div class="domain-bar-actions">
+        <button class="btn btn-primary" id="refresh-btn" onclick="loadAll()">↺ Refresh</button>
+        <button class="btn" onclick="runProgressCheck()" title="סרוק ארטיפקטים ודיאגנוז מצב נוכחי">🔍 בדוק התקדמות</button>
+      </div>
+      <label class="refresh-label">
+        <input type="checkbox" id="auto-refresh-toggle"> <span class="agents-refresh-label" id="refresh-label">Auto (5s)</span>
+        <span class="refresh-dot" id="refresh-dot" style="display:none"></span>
+      </label>
+      <div class="domain-selector">
+        <button class="domain-btn" id="domain-btn-tiktrack" onclick="onDomainSwitch('tiktrack')">🔵 TikTrack</button>
+        <button class="domain-btn" id="domain-btn-agentsos" onclick="onDomainSwitch('agents_os')">🟢 Agents OS</button>
+      </div>
+      <span class="domain-badge" id="domain-badge-pill" style="margin-left:4px">—</span>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Pipeline Status</div>
+      <div class="info-row"><span class="info-key">WP</span>     <span class="info-val" id="s-wp">—</span></div>
+      <div class="info-row"><span class="info-key">Stage</span>  <span class="info-val" id="s-stage">—</span></div>
+      <div class="info-row"><span class="info-key">Gate</span>   <span id="s-gate-pill">—</span></div>
+      <div class="info-row"><span class="info-key">Owner</span>  <span class="info-val" id="s-owner">—</span></div>
+      <div class="info-row"><span class="info-key">Engine</span> <span class="info-val" id="s-engine">—</span></div>
+    </div>
+    <div class="sidebar-section" id="health-warnings-panel" style="display:none">
+      <div class="sidebar-label">⚠️ System Health</div>
+      <div id="health-warnings-content"></div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Gate Timeline</div>
+      <ul class="gate-list" id="gate-list">
+        <li class="gate-item"><span class="gate-dot dot-pending"></span><span class="gate-name loading">Loading…</span></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Quick Commands</div>
+      <div class="sidebar-cmd-list" id="sidebar-cmd-list">
+        <div class="sidebar-cmd-row"><span class="sidebar-cmd-text loading">Loading…</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main content (right) ── -->
   <main class="agents-page-main">
 
     <!-- Spec card -->
@@ -332,6 +377,19 @@ python3 -m http.server 8090
     <!-- Quick Action Bar (PASS/FAIL — team response) -->
     <div id="quick-action-bar"></div>
 
+    <!-- Accordion: Terminal Commands — copy scripts to run in terminal -->
+    <div class="accordion open" id="acc-terminal-cmds">
+      <div class="accordion-header" onclick="toggleAccordion('acc-terminal-cmds')">
+        <span>⌘</span>
+        <span class="accordion-title">Terminal Commands</span>
+        <span class="accordion-badge" id="terminal-cmds-badge">—</span>
+        <span class="accordion-chevron">▶</span>
+      </div>
+      <div class="accordion-body">
+        <div class="cmd-list" id="main-cmd-list">Loading…</div>
+      </div>
+    </div>
+
     <!-- Accordion: Expected Files -->
     <div class="accordion" id="acc-files">
       <div class="accordion-header" onclick="toggleAccordion('acc-files')">
@@ -346,58 +404,15 @@ python3 -m http.server 8090
     </div>
 
   </main>
-
-  <!-- ── Sidebar (right) ───────────────────────────────────────────── -->
-  <aside class="agents-page-sidebar">
-    <div class="sidebar-section" style="padding:10px 12px">
-      <button class="btn btn-primary" style="width:100%;margin-bottom:6px;justify-content:center" onclick="loadAll()">↺ Refresh</button>
-      <button class="btn" style="width:100%;margin-bottom:6px;justify-content:center" onclick="runProgressCheck()" title="סרוק ארטיפקטים ודיאגנוז מצב נוכחי">🔍 בדוק התקדמות</button>
-      <label class="refresh-label" style="justify-content:center">
-        <input type="checkbox" id="auto-refresh-toggle"> Auto-refresh (5s)
-        <span class="refresh-dot" id="refresh-dot" style="display:none"></span>
-      </label>
-    </div>
-    <div class="sidebar-section">
-      <div class="sidebar-label">Domain <span class="domain-label-badge" id="domain-badge-pill">tiktrack</span></div>
-      <div class="domain-selector">
-        <button class="domain-btn active-tiktrack" id="domain-btn-tiktrack" onclick="onDomainSwitch('tiktrack')">🔵 TikTrack</button>
-        <button class="domain-btn" id="domain-btn-agentsos" onclick="onDomainSwitch('agents_os')">🟢 Agents OS</button>
-      </div>
-    </div>
-    <div class="sidebar-section">
-      <div class="sidebar-label">Pipeline Status</div>
-      <div class="info-row"><span class="info-key">WP</span>     <span class="info-val" id="s-wp">—</span></div>
-      <div class="info-row"><span class="info-key">Stage</span>  <span class="info-val" id="s-stage">—</span></div>
-      <div class="info-row"><span class="info-key">Gate</span>   <span id="s-gate-pill">—</span></div>
-      <div class="info-row"><span class="info-key">Owner</span>  <span class="info-val" id="s-owner">—</span></div>
-      <div class="info-row"><span class="info-key">Engine</span> <span class="info-val" id="s-engine">—</span></div>
-    </div>
-    <div class="sidebar-section" id="health-warnings-panel" style="display:none">
-      <div class="sidebar-label">⚠️ System Health</div>
-      <div id="health-warnings-content"></div>
-    </div>
-    <div class="sidebar-section">
-      <div class="sidebar-label">Gate Timeline</div>
-      <ul class="gate-list" id="gate-list">
-        <li class="gate-item"><span class="gate-dot dot-pending"></span><span class="gate-name loading">Loading…</span></li>
-      </ul>
-    </div>
-    <div class="sidebar-section">
-      <div class="sidebar-label">Quick Commands</div>
-      <div class="sidebar-cmd-list" id="sidebar-cmd-list">
-        <div class="sidebar-cmd-row"><span class="sidebar-cmd-text loading">Loading…</span></div>
-      </div>
-    </div>
-  </aside>
 </div>
 
-<script src="js/pipeline-config.js"></script>
-<script src="js/pipeline-state.js"></script>
-<script src="js/pipeline-dom.js"></script>
-<script src="js/pipeline-commands.js"></script>
-<script src="js/pipeline-booster.js"></script>
-<script src="js/pipeline-help.js"></script>
-<script src="js/pipeline-dashboard.js"></script>
+<script src="js/pipeline-config.js?v=3"></script>
+<script src="js/pipeline-state.js?v=3"></script>
+<script src="js/pipeline-dom.js?v=3"></script>
+<script src="js/pipeline-commands.js?v=3"></script>
+<script src="js/pipeline-booster.js?v=3"></script>
+<script src="js/pipeline-help.js?v=3"></script>
+<script src="js/pipeline-dashboard.js?v=3"></script>
 
 </body>
 </html>

@@ -49,6 +49,17 @@ function getDomainFlag() {
   return currentDomain !== "tiktrack" ? `--domain ${currentDomain} ` : "";
 }
 
+/** Inject the current domain flag into any ./pipeline_run.sh command string.
+ *  BUG-DOMAIN-01: All dashboard command buttons must use this so that clicking
+ *  "PASS" on agents_os domain does NOT advance the tiktrack pipeline.
+ *  Usage: _dfCmd('./pipeline_run.sh pass') → './pipeline_run.sh --domain agents_os pass'
+ */
+function _dfCmd(cmd) {
+  const df = getDomainFlag();
+  if (!df) return cmd;
+  return cmd.replace('./pipeline_run.sh ', `./pipeline_run.sh ${df}`);
+}
+
 async function fetchJSON(path) {
   const r = await fetch(path + "?t=" + Date.now());
   if (!r.ok) throw new Error(r.status + " " + r.statusText);

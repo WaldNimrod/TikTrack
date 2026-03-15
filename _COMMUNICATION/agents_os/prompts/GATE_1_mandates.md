@@ -1,6 +1,6 @@
-# Mandates — S001-P002-WP001  ·  GATE_1
+# Mandates — S002-P005-WP001  ·  GATE_1
 
-**Spec:** S001-P002 WP001: Alerts Summary Widget on D15.I home dashboard. Read-only frontend component. Triggered-unread count badge + list of N=5 most recent, fully hidden when 0. Uses existing GET /api/v1/alerts/ endpoint. Per-alert: ticker symbol · condition label · triggered_at relative time. Click item → D34. Click badge → D34 filtered unread. collapsible-container Iron Rule. maskedLog mandatory. No new backend, no schema changes.
+**Spec:** ADR-031 Stage A: Writing Semantics Hardening
 
 ════════════════════════════════════════════════════════════
   EXECUTION ORDER
@@ -21,17 +21,17 @@
 
 **Environment:** Gemini (Team 170 — Spec-Author)
 
-Produce a complete LLD400 spec for WP `S001-P002-WP001`.
+Produce a complete LLD400 spec for WP `S002-P005-WP001`.
 
 **Spec Brief:**
 
-S001-P002 WP001: Alerts Summary Widget on D15.I home dashboard. Read-only frontend component. Triggered-unread count badge + list of N=5 most recent, fully hidden when 0. Uses existing GET /api/v1/alerts/ endpoint. Per-alert: ticker symbol · condition label · triggered_at relative time. Click item → D34. Click badge → D34 filtered unread. collapsible-container Iron Rule. maskedLog mandatory. No new backend, no schema changes.
+ADR-031 Stage A: Writing Semantics Hardening
 
 ---
 
 **Required sections (all 6 are mandatory):**
 
-1. **Identity Header** — `gate: GATE_1 | wp: S001-P002-WP001 | stage: S001 | domain: tiktrack | date: <today>`
+1. **Identity Header** — `gate: GATE_1 | wp: S002-P005-WP001 | stage: S002 | domain: agents_os | date: <today>`
 2. **Endpoint Contract** — HTTP method, path, request body schema, response schema
 3. **DB Contract** — tables accessed, columns read/written, query patterns; no new schema unless spec mandates
 4. **UI Structural Contract** — component hierarchy, DOM anchors (`data-testid`), state shape
@@ -40,17 +40,17 @@ S001-P002 WP001: Alerts Summary Widget on D15.I home dashboard. Read-only fronte
 
 ---
 
-Save LLD400 to: `_COMMUNICATION/team_170/TEAM_170_S001_P002_WP001_LLD400_v1.0.0.md`
+Save LLD400 to: `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP001_LLD400_v1.0.0.md`
 
 When done, inform Nimrod. Nimrod runs `./pipeline_run.sh phase2` to activate Team 190 validation.
 
 ⛔ **YOUR TASK ENDS WITH SAVING THE LLD400. Do NOT validate your own output.**
 
 **Output — write to:**
-`_COMMUNICATION/team_170/TEAM_170_S001_P002_WP001_LLD400_v1.0.0.md`
+`_COMMUNICATION/team_170/TEAM_170_S002_P005_WP001_LLD400_v1.0.0.md`
 
 ### Acceptance
-- LLD400 saved to: `_COMMUNICATION/team_170/TEAM_170_S001_P002_WP001_LLD400_v1.0.0.md`
+- LLD400 saved to: `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP001_LLD400_v1.0.0.md`
 - All 6 required sections present with complete content
 - Identity Header matches state (gate/wp/stage/domain/date)
 - Scope matches spec_brief — no undeclared additions
@@ -73,7 +73,7 @@ When done, inform Nimrod. Nimrod runs `./pipeline_run.sh phase2` to activate Tea
 
 Validate the LLD400 produced by Team 170. This is **external validation** — you use a different engine from Team 170 by architectural design.
 
-**Read the LLD400 from:** `_COMMUNICATION/team_170/TEAM_170_S001_P002_WP001_LLD400_v1.0.0.md`
+**Read the LLD400 from:** `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP001_LLD400_v1.0.0.md`
 
 (If the file is missing, Team 170 has not completed Phase 1. Stop and notify.)
 
@@ -92,11 +92,11 @@ Validate the LLD400 produced by Team 170. This is **external validation** — yo
 
 **Spec Brief (reference):**
 
-S001-P002 WP001: Alerts Summary Widget on D15.I home dashboard. Read-only frontend component. Triggered-unread count badge + list of N=5 most recent, fully hidden when 0. Uses existing GET /api/v1/alerts/ endpoint. Per-alert: ticker symbol · condition label · triggered_at relative time. Click item → D34. Click badge → D34 filtered unread. collapsible-container Iron Rule. maskedLog mandatory. No new backend, no schema changes.
+ADR-031 Stage A: Writing Semantics Hardening
 
 ---
 
-Save verdict to: `_COMMUNICATION/team_190/TEAM_190_S001_P002_WP001_GATE_1_VERDICT_v1.0.0.md`
+Save verdict to: `_COMMUNICATION/team_190/TEAM_190_S002_P005_WP001_GATE_1_VERDICT_v1.0.0.md`
 
 - **PASS** → ready for GATE_2
 - **BLOCK** → `BF-XX: description | fix required`
@@ -106,27 +106,27 @@ If BLOCK: Team 170 must revise the LLD400. Do NOT fix it yourself.
 ⛔ **YOU ARE TEAM 190 — VALIDATE ONLY. Do NOT rewrite or fix the LLD400.**
 
 **Output — write to:**
-`_COMMUNICATION/team_190/TEAM_190_S001_P002_WP001_GATE_1_VERDICT_v1.0.0.md`
+`_COMMUNICATION/team_190/TEAM_190_S002_P005_WP001_GATE_1_VERDICT_v1.0.0.md`
 
 ### Coordination Data — LLD400 produced by Team 170 (Phase 1 output)
 
-✅  Auto-loaded: `_COMMUNICATION/team_170/TEAM_170_S001_P002_WP001_ALERTS_SUMMARY_WIDGET_LLD400_v1.0.0.md`
+✅  Auto-loaded: `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP001_LLD400_v1.0.0.md`
 
 ```
-# Team 170 — LLD400 | S001-P002-WP001 Alerts Summary Widget
-## TEAM_170_S001_P002_WP001_ALERTS_SUMMARY_WIDGET_LLD400_v1.0.0.md
+# Team 170 — LLD400 | S002-P005-WP001 ADR-031 Stage A: Writing Semantics Hardening
+## TEAM_170_S002_P005_WP001_LLD400_v1.0.0.md
 
-**project_domain:** TIKTRACK  
-**id:** TEAM_170_S001_P002_WP001_ALERTS_SUMMARY_WIDGET_LLD400_v1.0.0  
-**from:** Team 170 (Spec & Governance)  
+**project_domain:** AGENTS_OS  
+**id:** TEAM_170_S002_P005_WP001_LLD400_v1.0.0  
+**from:** Team 170 (Spec & Governance Authority)  
 **to:** Team 190 (Constitutional Validator)  
-**cc:** Team 10, Team 100  
-**date:** 2026-03-14  
+**cc:** Team 10, Team 100, Team 00  
+**date:** 2026-03-19  
 **status:** SUBMITTED_FOR_GATE_1_VALIDATION  
 **gate_id:** GATE_1  
 **architectural_approval_type:** SPEC  
 **spec_version:** 1.0.0  
-**source:** GATE_0 scope brief; TEAM_00_AGENTS_OS_CONTINUATION_STRATEGIC_DECISIONS; ARCHITECT_DIRECTIVE_S001_P002_ACTIVATION  
+**source:** TEAM_00_S002_P005_LOD200_v1.0.0.md; ADR-031; AGENTS_OS_ADR031_OPEN_ITEMS_v1.0.0  
 **required_ssm_version:** 1.0.0  
 **required_wsm_version:** 1.0.0  
 **required_active_stage:** S002  
@@ -139,15 +139,15 @@ If BLOCK: Team 170 must revise the LLD400. Do NOT fix it yourself.
 | Field | Value |
 |-------|-------|
 | roadmap_id | PHOENIX_ROADMAP |
-| stage_id | S001 |
-| program_id | S001-P002 |
-| work_package_id | S001-P002-WP001 |
-| task_id | N/A |
+| stage_id | S002 |
+| program_id | S002-P005 |
+| work_package_id | S002-P005-WP001 |
+| task_id | ADR_031_STAGE_A |
 | gate_id | GATE_1 |
 | architectural_approval_type | SPEC |
 | spec_version | 1.0.0 |
-| date | 2026-03-14 |
-| source | GATE_0 scope; ARCHITECT_DIRECTIVE_S001_P002_ACTIVATION |
+| date | 2026-03-19 |
+| source | TEAM_00_S002_P005_LOD200; ADR-031; AGENTS_OS_ADR031_OPEN_ITEMS |
 | required_ssm_version | 1.0.0 |
 | required_wsm_version | 1.0.0 |
 | required_active_stage | S002 |
@@ -157,13 +157,7 @@ If BLOCK: Team 170 must revise the LLD400. Do NOT fix it yourself.
 
 ## §2 Scope
 
-Alerts Summary Widget on D15.I (home dashboard). Read-only frontend component. Uses existing GET /api/v1/alerts/ endpoint. No new backend, no schema changes.
-
----
-
-## §3 endpoint_contract
-
-**Endpoint:** GET /api/v1/alerts/
+ADR-031 Stage A: Writing Semantics Hardening — parser determinism, gate sequence integrity, WSM stage watch, and program lifecycle `new` command. All work in `agents_os_v2/`, `pipeline_run.sh`, and `agents_os/ui/`. No new features visib
 ```
 _[… content truncated at 1500 chars]_
 

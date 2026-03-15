@@ -67,9 +67,9 @@
 .copy-flash { background: var(--success) !important; color: #000 !important; }
 
 .cmd-list { display: flex; flex-direction: column; gap: 8px; }
-.cmd-row { display: flex; align-items: center; gap: 10px; background: #010409; border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; }
-.cmd-text { font-family: var(--mono); font-size: 12px; flex: 1; color: #e6edf3; }
-.cmd-desc { font-size: 11px; color: var(--text-muted); min-width: 160px; }
+.cmd-row { display: flex; align-items: center; gap: 10px; background: #010409; border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; flex-wrap: wrap; }
+.cmd-text { font-family: var(--mono); font-size: 12px; flex: 1; min-width: 0; color: #e6edf3; word-break: break-all; }
+.cmd-desc { font-size: 11px; color: var(--text-muted); min-width: 140px; }
 .cmd-copy { flex-shrink: 0; }
 
 .booster-panel { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; }
@@ -156,8 +156,16 @@
 .qa-btn-fail:hover { background: rgba(248,81,73,0.08); }
 .qa-btn-approve { border-color: var(--warning); color: var(--warning); }
 .qa-btn-approve:hover { background: rgba(210,153,34,0.1); }
+/* Verdict-driven button states — applied by applyVerdictToButtons() */
+.qa-btn-pass.verdict-dimmed { opacity: 0.28; pointer-events: none; cursor: default; }
+.qa-btn-pass.verdict-pass-active { background: rgba(63,185,80,0.14); box-shadow: 0 0 0 2px rgba(63,185,80,0.3); }
+.qa-btn-fail.verdict-active { background: rgba(248,81,73,0.14); box-shadow: 0 0 0 2px rgba(248,81,73,0.35); }
 
 .findings-builder { padding: 12px 14px; background: var(--surface2); border: 2px solid var(--accent); border-radius: 8px; margin-top: 8px; }
+/* Verdict-driven builder states */
+.findings-builder.verdict-block { border-color: var(--danger); background: rgba(248,81,73,0.05); }
+.findings-builder.verdict-block .findings-builder-title { color: var(--danger); }
+.findings-builder.verdict-pass { border-color: var(--success); opacity: 0.6; }
 .findings-builder-title { font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .findings-status { font-size: 10px; font-weight: 400; }
 .findings-textarea { width: 100%; min-height: 70px; font-family: var(--mono); font-size: 11px; border: 1px solid var(--border); border-radius: 4px; padding: 7px 8px; background: #010409; color: #e6edf3; resize: vertical; }
@@ -186,3 +194,30 @@
 .prog-msg { font-size: 11px; margin-top: 6px; }
 .prog-done-banner { background: rgba(63,185,80,0.12); border: 1px solid var(--success); border-radius: 6px; padding: 10px 14px; margin-top: 10px; display: flex; align-items: center; justify-content: space-between; }
 .prog-next-banner { background: rgba(210,153,34,0.1); border: 1px solid var(--warning); border-radius: 6px; padding: 10px 14px; margin-top: 10px; font-size: 12px; }
+
+/* ── Phase Tracker (two-phase gates: GATE_1, GATE_8) ──────────────────────── */
+.phase-tracker { display: flex; align-items: center; gap: 0; margin-bottom: 12px; }
+.phase-step { flex: 1; padding: 8px 12px; border: 1px solid var(--border); font-size: 11px; font-weight: 600; text-align: center; position: relative; }
+.phase-step:first-child { border-radius: 6px 0 0 6px; }
+.phase-step:last-child { border-radius: 0 6px 6px 0; }
+.phase-step.phase-done { background: rgba(63,185,80,0.1); border-color: var(--success); color: var(--success); }
+.phase-step.phase-active { background: rgba(88,166,255,0.1); border-color: var(--accent); color: var(--accent); }
+.phase-step.phase-pending { background: var(--surface); color: var(--text-muted); }
+.phase-arrow { color: var(--text-muted); font-size: 14px; padding: 0 2px; flex-shrink: 0; }
+
+/* ── Next Action Banner ────────────────────────────────────────────────────── */
+.next-action-banner { background: rgba(88,166,255,0.08); border: 2px solid var(--accent); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; }
+.next-action-title { font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.next-action-cmd { font-family: var(--mono); font-size: 11px; background: #010409; padding: 8px 10px; border-radius: 4px; color: #e6edf3; border: 1px solid var(--border); margin-bottom: 8px; word-break: break-all; }
+.next-action-note { font-size: 10px; color: var(--text-muted); line-height: 1.5; }
+
+/* ── Correction Cycle Panel (replaces route selector for self-loop gates) ── */
+.correction-cycle-panel { background: rgba(210,153,34,0.08); border: 2px solid var(--warning); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; }
+.correction-cycle-title { font-size: 12px; font-weight: 700; color: var(--warning); margin-bottom: 8px; }
+.correction-cycle-step { font-size: 11px; margin-bottom: 6px; padding-left: 16px; position: relative; }
+.correction-cycle-step::before { content: attr(data-n); position: absolute; left: 0; color: var(--warning); font-weight: 700; }
+
+/* ── Pass With Action button ──────────────────────────────────────────────── */
+.qa-btn-pwa { border-color: var(--warning); color: var(--warning); }
+.qa-btn-pwa:hover { background: rgba(210,153,34,0.1); }
+.pwa-badge { background: rgba(210,153,34,0.15); border: 1px solid var(--warning); border-radius: 4px; font-size: 9px; padding: 1px 5px; margin-left: 4px; color: var(--warning); font-weight: 700; vertical-align: middle; }

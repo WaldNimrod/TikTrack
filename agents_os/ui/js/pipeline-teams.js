@@ -1,7 +1,12 @@
 /* pipeline-teams.js — Team 61 AOUI LOD400 — Teams page logic (uses pipeline-state, pipeline-dom) */
 
-// ── Canonical team roster (source: ARCHITECT_DIRECTIVE_TEAM_ROSTER_LOCK_v1.0.0.md) ─────
+// ── Canonical team roster (source: TEAMS_ROSTER_v1.0.0.json + ARCHITECT_DIRECTIVE_TEAM_ROSTER_LOCK_v1.0.0.md) ─────
 const TEAMS = [
+  { id: "team_00", label: "Team 00", name: "Principal & Chief Architect", engine: "claude-code", domain: "multi",
+    role: "Dual-nature: (A) Product Principal — defines WHAT and WHY, gives requirements; (B) Constitutional Architect — sets all Iron Rules, holds final approval at GATE_7",
+    responsibilities: ["Define product vision and requirements — WHAT and WHY", "Set all Iron Rules (constitutional layer, cannot delegate)", "GATE_7: Personal browser sign-off on UX/product vision", "Override power at any gate if constitutional issue detected", "Maintain team constitution and document priority map"],
+    writesTo: ["../../_COMMUNICATION/team_00/", "../../_COMMUNICATION/_Architects_Decisions/"], governedBy: ["CLAUDE.md", "PHOENIX_MASTER_SSM_v1.0.0.md", "03_IRON_RULES_AND_GOVERNANCE_CONSTITUTION.md"],
+    isoRules: ["No guessing — read the file first", "GATE_7 requires personal Nimrod browser approval — cannot delegate", "All Iron Rules are set by Team 00 — no other team can modify them", "Writing authority: team_00/ and _Architects_Decisions/ ONLY", "Advisory role: present alternatives and well-founded opinions — NOT sycophancy, NOT unfounded assumptions"] },
   { id: "team_10", label: "Team 10", name: "Execution Orchestrator", engine: "cursor", domain: "tiktrack",
     role: "Gateway — Execution lead, team activation, gate submissions, WSM updates",
     responsibilities: ["Produce and maintain the Work Plan (G3_PLAN)", "Activate and coordinate Teams 20, 30, 40, 50", "Submit gate artifacts to Team 90 for validation", "Update WSM after each gate pass", "Manage carryover lists and level-2 registries"],
@@ -17,6 +22,11 @@ const TEAMS = [
     responsibilities: ["Implement frontend pages and components (port 8080)", "Integrate with backend APIs per LLD400 contract", "Apply collapsible-container Iron Rule to all pages", "Run MCP browser verification after implementation"],
     writesTo: ["../../_COMMUNICATION/team_30/"], governedBy: ["SSM v1.0.0", "TEAM_ROSTER_LOCK"],
     isoRules: ["collapsible-container Iron Rule on ALL pages", "maskedLog mandatory", "Rich text: ONE unified object (no per-entity customization)"] },
+  { id: "team_31", label: "Team 31", name: "Blueprint Maker", engine: "cursor", domain: "tiktrack",
+    role: "Receives designs → produces blueprint/mockup files in staging — NOT in gate process; operates outside the gate pipeline",
+    responsibilities: ["Receive design specifications or wireframes from Team 40 or Team 00", "Produce blueprint/mockup HTML+CSS files in the staging area", "Create visual reference artifacts for Team 30 implementation", "Maintain own SOP for blueprint versioning and handoff"],
+    writesTo: ["../../staging/blueprints/"], governedBy: ["Team 31 Internal SOP", "TEAM_ROSTER_LOCK"],
+    isoRules: ["OUTSIDE gate pipeline — Team 31 does NOT submit to GATE_0 or any gate", "Blueprint files are staging artifacts only — not production code", "Handoff to Team 30 is visual reference only (not spec authority)", "Has own internal SOP — does not follow main SSM gate sequence"] },
   { id: "team_40", label: "Team 40", name: "UI Assets & Design", engine: "cursor", domain: "tiktrack",
     role: "Design tokens, CSS, visual consistency, UI assets — NO QA, NO testing",
     responsibilities: ["Maintain design tokens and CSS variables", "Ensure visual consistency across pages", "Produce UI asset specifications"],
@@ -42,11 +52,11 @@ const TEAMS = [
     responsibilities: ["Perform fresh validation at GATE_5, G3_5, GATE_6, GATE_8", "Produce BLOCKING_REPORT with BF-Gx-NNN format findings", "Declare route_recommendation: doc or full in every BLOCKING_REPORT", "Verify previous blockers are resolved before re-run"],
     writesTo: ["../../_COMMUNICATION/team_90/"], governedBy: ["SSM v1.0.0", "TEAM_ROSTER_LOCK"],
     isoRules: ["CRITICAL: Every GATE_5 run MUST be a FRESH validation — never repeat prior findings", "route_recommendation MANDATORY in every BLOCKING_REPORT", "Do NOT return template or placeholder responses", "Identity header mandatory on all outputs"] },
-  { id: "team_100", label: "Team 100", name: "Strategic Reviewer", engine: "codex", domain: "multi",
-    role: "Stage-level architectural decisions, GATE_2, GATE_6 approval",
-    responsibilities: ["GATE_2: Approve or reject architectural intent", "GATE_6: Reality vs intent — does built match approved?", "Strategic review of programs and roadmap"],
-    writesTo: ["../../_COMMUNICATION/team_100/"], governedBy: ["SSM v1.0.0", "TEAM_ROSTER_LOCK"],
-    isoRules: ["GATE_6 approval requires explicit evidence review", "route_recommendation mandatory if REJECTED"] },
+  { id: "team_100", label: "Team 100", name: "AOS Domain Architects", engine: "codex", domain: "agents_os",
+    role: "Primary architectural authority for Agents_OS domain — under Team 00 authority; hands-on direction to Team 61",
+    responsibilities: ["GATE_2: Approve or reject architectural intent for AOS domain (delegated from Team 00)", "GATE_6: Reality vs intent — does built match approved? (AOS domain)", "Author LOD200 and LOD400 for all AOS programs", "Issue mandates to Team 61 (implementation) and Team 51 (QA)", "Route decisions upward to Team 00 for constitutional-level rulings"],
+    writesTo: ["../../_COMMUNICATION/team_100/"], governedBy: ["SSM v1.0.0", "TEAM_ROSTER_LOCK", "CLAUDE.md Team 00 authority"],
+    isoRules: ["GATE_6 approval requires explicit evidence review", "route_recommendation mandatory if REJECTED", "LOD400 must be fully specified before issuing to Team 61", "Never issue mandates without Nimrod context or Team 00 strategic alignment"] },
   { id: "team_170", label: "Team 170", name: "Spec & Governance", engine: "codex", domain: "multi",
     role: "Canonical document maintenance, LOD200/LOD400, registry updates",
     responsibilities: ["Produce LLD400 (GATE_1)", "Maintain PROGRAM_REGISTRY and PORTFOLIO_ROADMAP", "DDL V2.x updates (KB-001..016)", "SSOT corrections and roadmap amendments"],
@@ -57,6 +67,25 @@ const TEAMS = [
     responsibilities: ["GATE_0: Scope validation — constitutional compliance check", "GATE_1: LLD400 validation — all mandatory sections present", "Constitutional integrity guard for all gate entries"],
     writesTo: ["../../_COMMUNICATION/team_190/"], governedBy: ["SSM v1.0.0", "TEAM_ROSTER_LOCK"],
     isoRules: ["GATE_0 BLOCK stops all downstream work — absolute rule", "Identity header mandatory", "route_recommendation mandatory in all BLOCK reports"] },
+
+  // ── Agents_OS–domain teams (registered 2026-03-15) ──────────────────────
+  { id: "team_51", label: "Team 51", name: "AOS QA & Functional Acceptance", engine: "cursor", domain: "agents_os",
+    role: "QA & FAV for Agents_OS domain — mirrors Team 50 but scoped to AOS work",
+    responsibilities: ["Write and execute QA test plans for AOS UI and pipeline tooling changes", "Produce QA reports with pass/fail evidence", "Submit to Team 190 for architectural re-validation after QA pass", "Functional acceptance verification for AOS deliverables"],
+    writesTo: ["../../_COMMUNICATION/team_51/"], governedBy: ["SSM v1.0.0", "TEAM_ROSTER_LOCK", "SOP-013"],
+    isoRules: ["Team 51 = QA for AOS domain (Iron Rule)", "Every QA run must be a FRESH test — never repeat prior findings without re-execution", "GATE_4 QA evidence required: commands + outputs + exit codes"] },
+
+  { id: "team_61", label: "Team 61", name: "AOS Local Cursor Implementation", engine: "cursor", domain: "agents_os",
+    role: "Local cursor-driven implementation of Agents_OS UI and pipeline tooling",
+    responsibilities: ["Implement AOS UI pages (PIPELINE_DASHBOARD, PIPELINE_ROADMAP, PIPELINE_TEAMS)", "CSS/JS extraction and modularization per LOD400 work packages", "Run preflight URL tests and browser evidence checks before submitting", "Submit completed work to Team 51 for QA"],
+    writesTo: ["../../_COMMUNICATION/team_61/"], governedBy: ["SSM v1.0.0", "TEAM_ROSTER_LOCK"],
+    isoRules: ["Classic <script src> only — no ES modules (Iron Rule)", "All HTML pages must use agents-page-layout + agents-header contract", "No inline <style> or <script> blocks in final deliverables", "Preflight URL test mandatory before QA submission"] },
+
+  { id: "team_191", label: "Team 191", name: "Git-Governance Lane", engine: "cursor", domain: "multi",
+    role: "Operational git-governance — pre-push guard triage, header normalization, registry sync. Child of Team 190.",
+    responsibilities: ["Pre-push guard triage and remediation (DATE-LINT, SYNC CHECK, SNAPSHOT CHECK)", "Date/header normalization for governance/communication markdown", "Registry/WSM mirror standardization via canonical sync scripts", "Snapshot refresh and re-check sequencing", "Clean-tree enforcement and drift reporting"],
+    writesTo: ["../../_COMMUNICATION/team_191/"], governedBy: ["SSM v1.0.0", "TEAM_ROSTER_LOCK", "TEAM_191_INTERNAL_WORK_PROCEDURE_v1.0.0"],
+    isoRules: ["No constitutional gate verdicts — that is Team 190", "No architectural rulings — that is Team 00/100", "No business-logic changes under a Git fix mandate", "No policy semantic overrides without explicit ruling from Team 00"] },
 ];
 
 const PROMPT_TYPES = [
@@ -106,12 +135,24 @@ function buildTeamList() {
     </div>`).join("");
 }
 
+function updateHeaderFromTeam(team) {
+  const el = document.getElementById("header-sub");
+  if (!el) return;
+  if (!team) {
+    el.textContent = "← Select a team";
+    return;
+  }
+  const domain = (team.domain || "—").replace(/_/g, "");
+  el.textContent = `Team: ${team.label} | ${team.name} | ${domain}`;
+}
+
 function selectTeam(teamId) {
   _ctxOverride = {};
   selectedTeam = TEAMS.find(t => t.id === teamId);
   document.querySelectorAll(".team-item").forEach(el => el.classList.remove("active"));
   const li = document.getElementById("tli-" + teamId);
   if (li) li.classList.add("active");
+  updateHeaderFromTeam(selectedTeam);
   renderTeamPanel(selectedTeam);
 }
 
@@ -123,6 +164,7 @@ function renderTeamPanel(team) {
   const eColor = engineColors[team.engine] || "var(--text-muted)";
 
   panel.innerHTML = `
+    <div class="team-panel-col1">
     <div class="state-strip" id="state-bar">
       <span>⚡ Active pipeline: <strong id="sb-wp">${escHtml(pipelineState?.work_package_id || "—")}</strong></span>
       <span>Gate: <strong id="sb-gate">${escHtml(pipelineState?.current_gate || "—")}</strong></span>
@@ -150,6 +192,8 @@ function renderTeamPanel(team) {
         </ul>
       </div>` : ""}
     </div>
+    </div>
+    <div class="team-panel-col2">
     <div class="prompt-tabs">
       ${PROMPT_TYPES.map(pt => `
         <button class="prompt-tab${selectedPromptType === pt.id ? " active" : ""}"
@@ -167,6 +211,7 @@ function renderTeamPanel(team) {
         </div>
       </div>
       <pre class="prompt-output-pre" id="prompt-output">Generating…</pre>
+    </div>
     </div>`;
   renderPrompt();
 }

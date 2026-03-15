@@ -974,9 +974,20 @@ def _generate_gate_1_mandates(state: PipelineState) -> str:
     Returns the full mandate document (also saved as GATE_1_prompt.md by generate_prompt).
     Same pattern as GATE_8 / _generate_gate_8_mandates.
     """
+    import glob as _glob
     wp  = state.work_package_id
     wpu = wp.replace("-", "_")
-    lld400_path  = f"_COMMUNICATION/team_170/TEAM_170_{wpu}_LLD400_v1.0.0.md"
+
+    # ── Resolve latest LLD400 file (AC-10: use newest version, not hardcoded v1.0.0) ─
+    _lld_candidates = sorted(
+        _glob.glob(str(REPO_ROOT / f"_COMMUNICATION/team_170/TEAM_170_{wpu}_LLD400_v*.md"))
+    )
+    lld400_path = (
+        str(Path(_lld_candidates[-1]).relative_to(REPO_ROOT))
+        if _lld_candidates
+        else f"_COMMUNICATION/team_170/TEAM_170_{wpu}_LLD400_v1.0.0.md"
+    )
+
     verdict_path = f"_COMMUNICATION/team_190/TEAM_190_{wpu}_GATE_1_VERDICT_v1.0.0.md"
 
     phase1_task = (

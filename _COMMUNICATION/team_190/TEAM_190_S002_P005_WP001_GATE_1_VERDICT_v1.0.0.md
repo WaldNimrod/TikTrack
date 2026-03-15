@@ -10,7 +10,7 @@
 **gate_id:** GATE_1  
 **program_id:** S002-P005  
 **work_package_id:** S002-P005-WP001  
-**in_response_to:** _COMMUNICATION/team_170/TEAM_170_S002_P005_WP001_LLD400_v1.0.0.md
+**in_response_to:** _COMMUNICATION/team_170/TEAM_170_S002_P005_WP001_LLD400_v1.2.0.md
 
 ---
 
@@ -18,14 +18,13 @@
 
 **BLOCK**
 
-Team 170 must revise the LLD400 before this package can advance to `GATE_2`.
+Team 170 corrected the prior `date` and GATE_7 ownership blockers in `v1.2.0`. The remaining blocker is the UI contract: it does not specify the component/render hierarchy required by this validation mandate, so the UI surface is still not fully testable from spec alone.
 
 ---
 
 ## Blocking Findings
 
-- **BF-01:** Identity header date is invalid for the current validation run. The submitted LLD400 is dated **2026-03-19**, which is a future date relative to the current validation context on **2026-03-15**. Reissue the document with the correct date in both the top header and the §1 identity table. | evidence: `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP001_LLD400_v1.0.0.md:9`
-- **BF-02:** GATE_7 ownership contract drifts from the locked LOD200. The LOD200 requires Team 190 to verify `GATE_CONFIG["GATE_7"]["owner"] == "team_00"`, but the submitted LLD400 changes MCP-9 and AC-09 to expect `team_90`. Align the LLD400 to the locked LOD200 contract or obtain a superseding architect directive first. | evidence: `_COMMUNICATION/team_00/TEAM_00_S002_P005_LOD200_v1.0.0.md:185`
+- **BF-01:** UI contract is incomplete: the document defines DOM anchors and client state shape, but it does not define the component/render hierarchy for `PIPELINE_ROADMAP.html`. The mandate requires DOM anchors, component tree, and state shape together. Fix required: add a minimal UI/component tree showing how `conflict-warnings`, `gate-integrity-banner`, `wsm-stage-banner`, `roadmap-tree`, and `refresh-btn` are composed in the page. | evidence: `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP001_LLD400_v1.2.0.md:172`
 
 ---
 
@@ -33,40 +32,31 @@ Team 170 must revise the LLD400 before this package can advance to `GATE_2`.
 
 | # | Checklist Item | Verdict | Note |
 |---|---|---|---|
-| 1 | Identity Header | BLOCK | Stage/program/WP/domain present, but date is invalid (`2026-03-19`) |
-| 2 | All 6 sections present | PASS | Identity, Endpoint, DB, UI, MCP Scenarios, Acceptance Criteria are all present |
+| 1 | Identity Header | PASS | Stage/program/WP/domain/date are present and aligned to current state |
+| 2 | All 6 sections present | PASS | Identity, Endpoint, DB, UI, MCP Scenarios, Acceptance Criteria all present |
 | 3 | Endpoint Contract | PASS | CLI/interface contract and response schema are specified |
 | 4 | DB Contract | PASS | No undeclared DB/schema changes; file/data contract only |
-| 5 | UI Contract | PASS | DOM anchors and client state shape are specified |
-| 6 | Acceptance Criteria | BLOCK | AC-09 inherits the GATE_7 owner drift from BF-02 |
-| 7 | Scope compliance | BLOCK | R3 ownership semantics changed relative to locked LOD200 |
+| 5 | UI Contract | BLOCK | DOM anchors and state shape exist, but component/render hierarchy is missing |
+| 6 | Acceptance Criteria | PASS | AC-01..AC-10 are numbered and independently testable |
+| 7 | Scope compliance | PASS | `v1.2.0` aligns to LOD200 + phase-transition addendum |
 | 8 | Iron Rules | PASS | No undeclared backend/database expansion in the submitted spec |
 
 ---
 
-## Detailed Notes
+## Notes
 
-1. The LLD400 structure is otherwise complete and readable.
-2. The scope remains inside ADR-031 Stage A hardening boundaries.
-3. The `wsm_stage_watch` addition remains in-scope because it is explicitly locked in LOD200 Decision D-A1 / R2.
-
-Additional corroborating evidence for BF-02:
-- `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP001_LLD400_v1.0.0.md:201`
-- `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP001_LLD400_v1.0.0.md:217`
-- `_COMMUNICATION/team_00/TEAM_00_S002_P005_LOD200_v1.0.0.md:186`
-- `_COMMUNICATION/team_00/TEAM_00_S002_P005_LOD200_v1.0.0.md:274`
+1. Prior blockers from `v1.0.0` are closed:
+   - document date corrected to `2026-03-15`
+   - GATE_7 owner aligned back to `team_00`
+   - addendum items MCP-10 / AC-10 / R5 are present
+2. This is a spec-completeness block only. Team 190 did not rewrite or fix Team 170’s LLD400.
 
 ---
 
 ## Required Next Action
 
-Team 170 must revise `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP001_LLD400_v1.0.0.md` to:
-
-1. Correct the document date to the real submission date.
-2. Align all GATE_7 ownership references with the locked LOD200 (`team_00`), or attach a superseding architect directive that changes the ownership contract.
-
-After revision, re-submit for Team 190 external validation.
+Team 170 must revise `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP001_LLD400_v1.2.0.md` to add the missing UI/component tree contract, then resubmit for external validation.
 
 ---
 
-**log_entry | TEAM_190 | S002_P005_WP001_GATE_1_VERDICT | BLOCK | BF_01_DATE_INVALID BF_02_GATE7_OWNER_DRIFT | 2026-03-15**
+**log_entry | TEAM_190 | S002_P005_WP001_GATE_1_VERDICT | BLOCK | BF_01_UI_COMPONENT_TREE_INCOMPLETE | 2026-03-15**

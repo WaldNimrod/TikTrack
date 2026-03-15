@@ -231,3 +231,97 @@
 .pwa-btn-clear:hover { background: rgba(63,185,80,0.1); }
 .pwa-btn-override { border-color: var(--danger); color: var(--danger); }
 .pwa-btn-override:hover { background: rgba(248,81,73,0.1); }
+
+/* ── Current Step Banner — always visible above Gate Context (all gates) ─── */
+.current-step-banner {
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  background: rgba(88,166,255,0.06);
+}
+.current-step-banner.csb-phase2 {
+  border-color: var(--success);
+  background: rgba(63,185,80,0.06);
+}
+.current-step-banner.csb-correction {
+  border-color: var(--warning);
+  background: rgba(210,153,34,0.06);
+}
+.current-step-banner.csb-human {
+  border-color: var(--warning);
+  background: rgba(210,153,34,0.06);
+}
+.current-step-banner.csb-pwa {
+  border-color: var(--warning);
+  background: rgba(210,153,34,0.08);
+}
+.csb-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.csb-actor {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+.csb-engine-badge {
+  font-size: 10px;
+  background: rgba(88,166,255,0.15);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 2px 7px;
+  color: var(--accent);
+  font-weight: 600;
+}
+.csb-phase2 .csb-engine-badge {
+  border-color: var(--success);
+  color: var(--success);
+  background: rgba(63,185,80,0.15);
+}
+.csb-correction .csb-engine-badge,
+.csb-human .csb-engine-badge {
+  border-color: var(--warning);
+  color: var(--warning);
+  background: rgba(210,153,34,0.15);
+}
+.csb-phase-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-left: auto;
+  font-style: italic;
+  white-space: nowrap;
+}
+.csb-steps { display: flex; flex-direction: column; gap: 7px; }
+.csb-step { display: flex; align-items: flex-start; gap: 8px; }
+.csb-step-num {
+  width: 19px; height: 19px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.csb-phase2 .csb-step-num { background: var(--success); }
+.csb-correction .csb-step-num,
+.csb-human .csb-step-num { background: var(--warning); }
+.csb-step-text { font-size: 11px; color: var(--text); line-height: 1.55; }
+
+/* Active-phase indicator badge on Phase 2+ mandate tabs */
+.phase-active-badge {
+  background: rgba(63,185,80,0.2);
+  border: 1px solid var(--success);
+  border-radius: 4px;
+  font-size: 9px;
+  padding: 1px 5px;
+  margin-left: 4px;
+  color: var(--success);
+  font-weight: 700;
+  vertical-align: middle;
+}

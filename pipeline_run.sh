@@ -382,6 +382,31 @@ except Exception:
     REASON="${2:-no reason given}"
     echo "[pipeline_run] ${DOMAIN_LABEL}Advancing $GATE → FAIL: $REASON"
     $CLI --advance "$GATE" FAIL --reason "$REASON"
+
+    # GATE_1 FAIL: clear lld400_content so the dashboard reverts to Phase 1
+    # (correction cycle) instead of showing stale Phase 2 state.
+    # BUG-FIX 2026-03-15: lld400_content was not cleared on GATE_1 fail.
+    if [[ "$GATE" == "GATE_1" ]]; then
+      python3 -c "
+import json, os, datetime
+domain = os.environ.get('PIPELINE_DOMAIN') or None
+if domain == 'agents_os':
+    sf = '_COMMUNICATION/agents_os/pipeline_state_agentsos.json'
+elif domain == 'tiktrack':
+    sf = '_COMMUNICATION/agents_os/pipeline_state_tiktrack.json'
+else:
+    sf = '_COMMUNICATION/agents_os/pipeline_state.json'
+try:
+    state = json.loads(open(sf).read())
+    state['lld400_content'] = ''
+    state['last_updated'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    open(sf, 'w').write(json.dumps(state, indent=2, ensure_ascii=False))
+    print('  🔄 GATE_1 FAIL: lld400_content cleared → dashboard shows Phase 1 correction cycle')
+except Exception as e:
+    print(f'  ⚠️  Could not clear lld400_content: {e}')
+" 2>/dev/null || echo "  ⚠️  lld400_content clear failed — dashboard may show stale Phase 2 state"
+    fi
+
     echo ""
     # Check if auto-routing moved the gate forward (route_recommendation in verdict file)
     NEXT_GATE=$(_get_gate)

@@ -40,17 +40,17 @@ ADR-031 Stage A: Writing Semantics Hardening
 
 ---
 
-Save LLD400 to: `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP001_LLD400_v1.0.0.md`
+Save LLD400 to: `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP001_LLD400_v1.2.0.md`
 
 When done, inform Nimrod. Nimrod runs `./pipeline_run.sh phase2` to activate Team 190 validation.
 
 ⛔ **YOUR TASK ENDS WITH SAVING THE LLD400. Do NOT validate your own output.**
 
 **Output — write to:**
-`_COMMUNICATION/team_170/TEAM_170_S002_P005_WP001_LLD400_v1.0.0.md`
+`_COMMUNICATION/team_170/TEAM_170_S002_P005_WP001_LLD400_v1.2.0.md`
 
 ### Acceptance
-- LLD400 saved to: `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP001_LLD400_v1.0.0.md`
+- LLD400 saved to: `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP001_LLD400_v1.2.0.md`
 - All 6 required sections present with complete content
 - Identity Header matches state (gate/wp/stage/domain/date)
 - Scope matches spec_brief — no undeclared additions
@@ -73,7 +73,7 @@ When done, inform Nimrod. Nimrod runs `./pipeline_run.sh phase2` to activate Tea
 
 Validate the LLD400 produced by Team 170. This is **external validation** — you use a different engine from Team 170 by architectural design.
 
-**Read the LLD400 from:** `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP001_LLD400_v1.0.0.md`
+**Read the LLD400 from:** `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP001_LLD400_v1.2.0.md`
 
 (If the file is missing, Team 170 has not completed Phase 1. Stop and notify.)
 
@@ -110,23 +110,23 @@ If BLOCK: Team 170 must revise the LLD400. Do NOT fix it yourself.
 
 ### Coordination Data — LLD400 produced by Team 170 (Phase 1 output)
 
-✅  Auto-loaded: `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP001_LLD400_v1.0.0.md`
+✅  Auto-loaded: `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP001_LLD400_v1.2.0.md`
 
 ```
 # Team 170 — LLD400 | S002-P005-WP001 ADR-031 Stage A: Writing Semantics Hardening
-## TEAM_170_S002_P005_WP001_LLD400_v1.0.0.md
+## TEAM_170_S002_P005_WP001_LLD400_v1.2.0.md
 
 **project_domain:** AGENTS_OS  
-**id:** TEAM_170_S002_P005_WP001_LLD400_v1.0.0  
+**id:** TEAM_170_S002_P005_WP001_LLD400_v1.2.0  
 **from:** Team 170 (Spec & Governance Authority)  
 **to:** Team 190 (Constitutional Validator)  
 **cc:** Team 10, Team 100, Team 00  
-**date:** 2026-03-19  
+**date:** 2026-03-15  
 **status:** SUBMITTED_FOR_GATE_1_VALIDATION  
 **gate_id:** GATE_1  
 **architectural_approval_type:** SPEC  
-**spec_version:** 1.0.0  
-**source:** TEAM_00_S002_P005_LOD200_v1.0.0.md; ADR-031; AGENTS_OS_ADR031_OPEN_ITEMS_v1.0.0  
+**spec_version:** 1.2.0  
+**source:** TEAM_00_S002_P005_LOD200_v1.0.0.md; ADR-031; AGENTS_OS_ADR031_OPEN_ITEMS_v1.0.0; TEAM_00_TO_TEAM_170_S002_P005_WP001_PHASE_TRANSITION_ADDENDUM_v1.0.0  
 **required_ssm_version:** 1.0.0  
 **required_wsm_version:** 1.0.0  
 **required_active_stage:** S002  
@@ -145,9 +145,9 @@ If BLOCK: Team 170 must revise the LLD400. Do NOT fix it yourself.
 | task_id | ADR_031_STAGE_A |
 | gate_id | GATE_1 |
 | architectural_approval_type | SPEC |
-| spec_version | 1.0.0 |
-| date | 2026-03-19 |
-| source | TEAM_00_S002_P005_LOD200; ADR-031; AGENTS_OS_ADR031_OPEN_ITEMS |
+| spec_version | 1.2.0 |
+| date | 2026-03-15 |
+| source | TEAM_00_S002_P005_LOD200; ADR-031; AGENTS_OS_ADR031_OPEN_ITEMS; PHASE_TRANSITION_ADDENDUM |
 | required_ssm_version | 1.0.0 |
 | required_wsm_version | 1.0.0 |
 | required_active_stage | S002 |
@@ -157,7 +157,7 @@ If BLOCK: Team 170 must revise the LLD400. Do NOT fix it yourself.
 
 ## §2 Scope
 
-ADR-031 Stage A: Writing Semantics Hardening — parser determinism, gate sequence integrity, WSM stage watch, and program lifecycle `new` command. All work in `agents_os_v2/`, `pipeline_run.sh`, and `agents_os/ui/`. No new features visib
+ADR-031 Stage A: Writing Semantics Hardening — parser determinism, gate sequence integrity, WSM stage watch, and program lifecycle `new` co
 ```
 _[… content truncated at 1500 chars]_
 

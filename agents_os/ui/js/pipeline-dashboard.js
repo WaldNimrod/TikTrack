@@ -64,6 +64,10 @@ async function loadPipelineState() {
     document.getElementById("s-owner").textContent  = getDomainOwner(state.current_gate);
     document.getElementById("s-engine").textContent = currentCfg.engine || "—";
 
+    // Current Step Banner — always shown above gate context accordion
+    const stepBannerEl = document.getElementById('current-step-banner');
+    if (stepBannerEl) stepBannerEl.innerHTML = buildCurrentStepBanner(state.current_gate, state);
+
     // Spec card
     document.getElementById("spec-text").textContent = state.spec_brief || "No spec loaded";
     document.getElementById("spec-wp").textContent   = "WP: " + (state.work_package_id || "—");
@@ -257,27 +261,52 @@ function _parseMandateSections(text) {
 
   // ── Build tabs with phase badges ────────────────────────────────────────
   const tabs = document.getElementById("team-tabs");
-  tabs.innerHTML = keys.map((k, i) => {
-    const meta  = mandateMeta[k] || { phase: i + 1, hasCorrection: false, hasPrereq: false };
 
-    // Tab class: first tab = next-phase (or correction-needed if correction data present)
+  // Determine which phase number is currently active
+  // For two-phase gates: Phase 2 is active when lld400_content (or phase8_content) is stored
+  const curGate      = pipelineState?.current_gate || '';
+  const lld400Ready  = !!(pipelineState?.lld400_content || '').trim();
+  const phase8Ready  = !!(pipelineState?.phase8_content || '').trim();
+  const activePhase  = (isTwoPhaseGate(curGate) && (lld400Ready || phase8Ready)) ? 2 : 1;
+
+  tabs.innerHTML = keys.map((k, i) => {
+    const meta = mandateMeta[k] || { phase: i + 1, hasCorrection: false, hasPrereq: false };
+    const isActive = meta.phase === activePhase;
+
+    // Tab highlight: active phase tab gets next-phase (or correction-needed) styling
     let tabClass = "team-tab";
-    if (i === 0) {
+    if (isActive) {
       tabClass += meta.hasCorrection ? " correction-needed" : " next-phase";
     }
 
     // Phase badge
     const phaseBadge = `<span class="phase-badge">P${meta.phase}</span>`;
 
-    // Correction badge on Phase 1 when blockers are injected
-    const corrBadge = (i === 0 && meta.hasCorrection)
+    // Correction badge: active phase when correction data is injected
+    const corrBadge = (isActive && meta.hasCorrection)
       ? `<span class="correction-badge">⚠ CORRECTION</span>` : "";
 
+    // "▶ ACTIVE" indicator for Phase 2+ so it's visually obvious
+    const activeBadge = (isActive && meta.phase > 1)
+      ? `<span class="phase-active-badge">▶ SEND NOW</span>` : "";
+
     return `<span class="${tabClass}" onclick="selectTeam(this, ${escAttr(JSON.stringify(k))})">`
-         + `${escHtml(k)}${phaseBadge}${corrBadge}</span>`;
+         + `${escHtml(k)}${phaseBadge}${corrBadge}${activeBadge}</span>`;
   }).join("");
 
-  if (keys.length > 0) { activeTeam = keys[0]; showMandate(keys[0]); }
+  // Auto-select the currently active phase tab
+  const activePhaseKey = keys.find(k => (mandateMeta[k]?.phase || 1) === activePhase) || keys[0];
+  if (activePhaseKey) {
+    activeTeam = activePhaseKey;
+    showMandate(activePhaseKey);
+    // Mark selected tab in DOM (setTimeout so the innerHTML settles first)
+    setTimeout(() => {
+      const allTabs = document.querySelectorAll('.team-tab');
+      allTabs.forEach(t => t.classList.remove('active'));
+      const idx = keys.indexOf(activePhaseKey);
+      if (idx >= 0 && allTabs[idx]) allTabs[idx].classList.add('active');
+    }, 0);
+  }
 }
 
 function selectTeam(el, key) {
@@ -1148,6 +1177,125 @@ function isTwoPhaseGate(gate) { return gate === 'GATE_1' || gate === 'GATE_8'; }
 /** True for self-loop correction-cycle gates (auto-route back to themselves on fail). */
 function isSelfLoopGate(gate) { return gate === 'GATE_1'; }
 
+// ── Current Step Banner — universal, all gates ─────────────────────────────
+/**
+ * Build the always-visible "Current Step Banner" shown above Gate Context.
+ * Explains: who is the active actor, what engine, current phase label, numbered next steps.
+ * Works for ALL gate types. Dynamically driven by state (lld400_content, gate_state, etc).
+ */
+function buildCurrentStepBanner(gate, state) {
+  if (!gate || !state) return '';
+  const def       = ALL_GATE_DEFS[gate] || {};
+  const cfg       = GATE_CONFIG[gate]   || {};
+  const failed    = state.gates_failed  || [];
+  const failCount = failed.filter(g => g === gate).length;
+  const lld400    = (state.lld400_content || '').trim();
+  const gateState = state.gate_state || null;
+  const baseCmd   = _dfCmd('./pipeline_run.sh ').trimEnd();
+
+  let actor, engineLabel, phaseLabel, steps, modCls;
+
+  if (gateState === 'PASS_WITH_ACTION') {
+    actor = 'Gate held'; engineLabel = ''; phaseLabel = 'PASS_WITH_ACTION'; modCls = 'csb-pwa';
+    steps = [
+      'Review the pending action items in the PASS_WITH_ACTION banner below',
+      'Responsible team resolves each listed action',
+      'Click "✅ Actions Resolved" to advance, or "⚡ Override & Advance" to proceed with override logged',
+    ];
+
+  } else if (gate === 'GATE_1') {
+    if (!lld400) {
+      actor = 'Team 170'; engineLabel = 'Gemini'; modCls = failCount > 0 ? 'csb-correction' : '';
+      phaseLabel = failCount > 0 ? 'Phase 1 of 2 — correction cycle' : 'Phase 1 of 2 — LLD400 authoring';
+      steps = [
+        failCount > 0
+          ? 'Team 170 saves the corrected LLD400 → _COMMUNICATION/team_170/TEAM_170_..._LLD400_vN.M.md'
+          : 'Team 170 saves the LLD400 spec → _COMMUNICATION/team_170/TEAM_170_..._LLD400_v1.0.0.md',
+        `Run in terminal: ${baseCmd}  (auto-stores LLD400 + generates Team 190 mandate)`,
+        'Paste the ▼▼▼ block into Codex (OpenAI) → Team 190 validates → click ✅ PASS or ❌ FAIL',
+      ];
+    } else {
+      actor = 'Team 190'; engineLabel = 'Codex (OpenAI)'; phaseLabel = 'Phase 2 of 2 — LLD400 validation'; modCls = 'csb-phase2';
+      steps = [
+        'LLD400 stored ✅ — scroll to "Team Mandates" accordion below → click the "Team 190" tab',
+        'Click "📋 Copy mandate" → paste into Codex (OpenAI) → Team 190 validates the LLD400',
+        'Team 190 saves verdict → click ✅ PASS (advance to GATE_2) or ❌ FAIL (return to Team 170 correction)',
+      ];
+    }
+
+  } else if (gate === 'GATE_8') {
+    const phase8done = !!(state.phase8_content || '').trim();
+    if (!phase8done) {
+      actor = 'Team 70'; engineLabel = 'Codex'; phaseLabel = 'Phase 1 of 2 — AS_MADE_REPORT'; modCls = '';
+      steps = [
+        'Team 70 writes AS_MADE_REPORT + archives WP files → _COMMUNICATION/team_70/',
+        `Run in terminal: ${baseCmd} phase2  (generates Team 90 validation mandate)`,
+        'Paste the ▼▼▼ block into Codex → Team 90 validates → click ✅ PASS (WP closes)',
+      ];
+    } else {
+      actor = 'Team 90'; engineLabel = 'Codex'; phaseLabel = 'Phase 2 of 2 — closure validation'; modCls = 'csb-phase2';
+      steps = [
+        'Open "Team Mandates" accordion → click "Team 90" tab → copy mandate → paste into Codex',
+        'Team 90 validates AS_MADE_REPORT completeness',
+        `PASS → WP closes. Run: ${baseCmd} pass`,
+      ];
+    }
+
+  } else if (def.engine === 'human') {
+    actor = 'You (Nimrod)'; engineLabel = 'Browser'; phaseLabel = 'Human approval required'; modCls = 'csb-human';
+    steps = [
+      'Review the spec / output in the "Current Gate Prompt" section above',
+      `Click ✅ PASS to approve and advance, or ❌ FAIL to reject`,
+    ];
+
+  } else if (def.engine === 'cursor') {
+    const ownerName = (def.owner || cfg.owner || 'team').replace('team_', 'Team ');
+    actor = ownerName; engineLabel = 'Cursor'; modCls = failCount > 0 ? 'csb-correction' : '';
+    phaseLabel = failCount > 0 ? 'Correction cycle' : 'Implementation';
+    steps = [
+      'Open the "Team Mandates" accordion below → select the active team tab',
+      'Copy the mandate → paste into Cursor Composer → Cursor implements',
+      failCount > 0
+        ? `After corrections are done + git committed: run ${baseCmd} pass`
+        : `After all teams complete + git commit exists: run ${baseCmd} pass`,
+    ];
+
+  } else {
+    // Standard AI validation gate (codex, codex+human, etc.)
+    const ownerKey  = def.verdictTeam || def.owner || cfg.owner || 'team';
+    const ownerName = ownerKey.replace('team_', 'Team ');
+    const engRaw    = def.engine || cfg.engine || 'codex';
+    const engShow   = engRaw === 'codex' ? 'Codex (OpenAI)' : engRaw === 'cursor' ? 'Cursor' : engRaw;
+    actor = ownerName; engineLabel = engShow; modCls = failCount > 0 ? 'csb-correction' : '';
+    phaseLabel = failCount > 0 ? 'Correction cycle' : 'Validation';
+    steps = [
+      `Run in terminal: ${baseCmd}  (generates the mandate prompt)`,
+      `Paste the ▼▼▼ block into ${engShow}`,
+      `${ownerName} processes → click ✅ PASS or ❌ FAIL based on their verdict`,
+    ];
+  }
+
+  const engineBadge = engineLabel
+    ? `<span class="csb-engine-badge">${escHtml(engineLabel)}</span>`
+    : '';
+
+  const stepsHtml = steps.map((s, i) =>
+    `<div class="csb-step">
+      <span class="csb-step-num">${i + 1}</span>
+      <span class="csb-step-text">${escHtml(s)}</span>
+    </div>`
+  ).join('');
+
+  return `<div class="current-step-banner${modCls ? ' ' + modCls : ''}">
+    <div class="csb-header">
+      <span class="csb-actor">${escHtml(actor)}</span>
+      ${engineBadge}
+      <span class="csb-phase-label">${escHtml(phaseLabel)}</span>
+    </div>
+    <div class="csb-steps">${stepsHtml}</div>
+  </div>`;
+}
+
 /**
  * Build phase tracker HTML. lld400Content: pipelineState.lld400_content (empty = Phase 1 active).
  */
@@ -1176,14 +1324,14 @@ function buildNextActionBanner(gate, lld400Content, inCorrectionCycle) {
   const baseCmd = _dfCmd('./pipeline_run.sh ').trimEnd();
   let title, note;
   if (!lld400Content && inCorrectionCycle) {
-    title = '📝 Correction cycle — Team 170 revised the spec';
-    note  = 'Run the command below — it auto-detects the latest LLD400, stores it, and generates the Team 190 validation prompt. No manual store step required.';
+    title = '📝 Correction cycle — waiting for Team 170 revised LLD400';
+    note  = 'Run the command below after Team 170 saves the corrected LLD400. It auto-detects the latest version, stores it, and generates the Team 190 (Codex) validation mandate. No manual store step required.';
   } else if (!lld400Content) {
-    title = '📝 Phase 1 — Waiting for Team 170 to write LLD400';
-    note  = 'Run after Team 170 saves their LLD400. The command auto-stores it and generates the Team 190 prompt.';
+    title = '📝 Phase 1 active — Team 170 (Gemini) writing LLD400';
+    note  = 'Run after Team 170 saves their LLD400. The command auto-stores it and generates the Team 190 (Codex/OpenAI) validation mandate.';
   } else {
-    title = '✅ Phase 1 complete — Team 190 validation ready';
-    note  = 'Send the prompt from the terminal output to Team 190. Then click ✅ PASS or ❌ FAIL based on their verdict.';
+    title = '✅ LLD400 stored — Team 190 (Codex/OpenAI) validation active';
+    note  = 'Scroll to "Team Mandates" ↓ → click "Team 190" tab → copy mandate → paste into Codex (OpenAI) → await verdict → click ✅ PASS (advance to GATE_2) or ❌ FAIL (correction cycle).';
   }
   return `<div class="next-action-banner">
     <div class="next-action-title">⮕ ${escHtml(title)}</div>
@@ -1201,7 +1349,7 @@ function buildNextActionBanner(gate, lld400Content, inCorrectionCycle) {
 function buildCorrectionCyclePanel(gate, lld400Content, failCount) {
   const baseCmd = _dfCmd('./pipeline_run.sh ').trimEnd();
   const lld400Badge = lld400Content
-    ? `<span style="color:var(--success);font-size:10px">✅ LLD400 stored — Phase 2 ready</span>`
+    ? `<span style="color:var(--success);font-size:10px">✅ LLD400 stored — Team 190 (Codex) mandate active</span>`
     : `<span style="color:var(--warning);font-size:10px">⏳ Awaiting Team 170 corrected LLD400</span>`;
   return `<div class="correction-cycle-panel">
     <div class="correction-cycle-title">🔄 Correction cycle — failed ${failCount}× &nbsp;${lld400Badge}</div>
@@ -1211,7 +1359,7 @@ function buildCorrectionCyclePanel(gate, lld400Content, failCount) {
       <div style="font-family:var(--mono);font-size:10px;background:#010409;padding:5px 8px;border-radius:4px;margin:4px 0">${escHtml(baseCmd)}</div>
       <button class="btn" style="font-size:10px;margin-top:2px" onclick="copyCmd(${escAttr(JSON.stringify(baseCmd))}, this)">⎘ Copy</button>
     </div>
-    <div class="correction-cycle-step" data-n="3">Send Team 190 prompt → click <strong>✅ PASS</strong> or <strong>❌ FAIL</strong> based on their verdict</div>
+    <div class="correction-cycle-step" data-n="3">Paste the Team 190 ▼▼▼ block into Codex (OpenAI) → await LLD400 validation verdict → click <strong>✅ PASS</strong> (GATE_2) or <strong>❌ FAIL</strong> (another correction cycle)</div>
   </div>`;
 }
 

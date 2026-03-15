@@ -1,3 +1,5 @@
+# ARCHIVED — items migrated to PHOENIX_IDEA_LOG 2026-03-15. See IDEA-023 through IDEA-035.
+
 # Team 10 — Level 2 Completion Carryover List
 **project_domain:** TIKTRACK
 **date:** 2026-03-13

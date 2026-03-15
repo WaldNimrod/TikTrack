@@ -977,6 +977,7 @@ def _generate_gate_1_mandates(state: PipelineState) -> str:
     import glob as _glob
     wp  = state.work_package_id
     wpu = wp.replace("-", "_")
+    today_utc = datetime.now(timezone.utc).date().isoformat()
 
     # ── Resolve latest LLD400 file (AC-10: use newest version, not hardcoded v1.0.0) ─
     _lld_candidates = sorted(
@@ -997,7 +998,7 @@ def _generate_gate_1_mandates(state: PipelineState) -> str:
         f"**Spec Brief:**\n\n{state.spec_brief}\n\n"
         f"---\n\n"
         f"**Required sections (all 6 are mandatory):**\n\n"
-        f"1. **Identity Header** — `gate: GATE_1 | wp: {wp} | stage: {state.stage_id} | domain: {state.project_domain} | date: <today>`\n"
+        f"1. **Identity Header** — `gate: GATE_1 | wp: {wp} | stage: {state.stage_id} | domain: {state.project_domain} | date: {today_utc}`\n"
         f"2. **Endpoint Contract** — HTTP method, path, request body schema, response schema\n"
         f"3. **DB Contract** — tables accessed, columns read/written, query patterns; no new schema unless spec mandates\n"
         f"4. **UI Structural Contract** — component hierarchy, DOM anchors (`data-testid`), state shape\n"

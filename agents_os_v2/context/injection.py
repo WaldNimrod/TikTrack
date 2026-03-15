@@ -16,7 +16,7 @@ Based on:
 """
 
 import json
-from datetime import datetime, timezone, date
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -70,6 +70,11 @@ _TEAM_ROLES = {
 }
 
 
+def _today_utc_iso() -> str:
+    """Canonical date source for generated communication artifacts."""
+    return datetime.now(timezone.utc).date().isoformat()
+
+
 def build_identity_stamp(
     team_id: str,
     gate_id: str,
@@ -84,10 +89,10 @@ def build_identity_stamp(
     Use fresh=True in build_full_agent_prompt() to additionally prepend the full identity.
     """
     role = _TEAM_ROLES.get(team_id, team_id.upper())
-    today = date.today().isoformat()
+    today = _today_utc_iso()
     return (
         f"**ACTIVE: {team_id.upper()} ({role})**  "
-        f"gate={gate_id} | wp={work_package_id} | stage={stage_id} | {today}"
+        f"gate={gate_id} | wp={work_package_id} | stage={stage_id} | date={today}"
     )
 
 
@@ -173,7 +178,7 @@ def build_canonical_message(
     Build a full canonical message per TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK_v1.0.0.
     This is the message sent TO the team agent.
     """
-    today = date.today().isoformat()
+    today = _today_utc_iso()
     from_label = team_from.replace("_", " ").title()
     to_label = team_to.replace("_", " ").title()
 

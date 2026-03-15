@@ -241,7 +241,25 @@ Every Team 191 closure note must include:
 
 ---
 
+## 12) Concurrent Changes Lock (Binding)
+
+1. In this repository, parallel incoming changes during Team 191 execution are a normal operating condition.
+2. Team 191 must not auto-stop solely because new non-overlapping local changes appeared while running commit/push/merge lanes.
+3. Default behavior is continuity:
+   - keep current remediation/publish cycle active,
+   - include newly arrived non-conflicting artifacts in the next deterministic commit cycle.
+4. Stop/escalate only when one of the following is true:
+   - same-file overlap that creates overwrite risk,
+   - canonical authority collision (`WSM`, registries, roadmap/contracts) that can produce semantic ambiguity.
+5. Mixed-scope classification in pre-push guard is informational by default and not a blocker on its own.
+6. Clean-tree target remains mandatory:
+   - if concurrent changes arrive after a merge/pull, Team 191 starts the immediate next closure mini-cycle until tree is clean again.
+7. This lock is permanent unless superseded by explicit Team 190/Team 00 ruling.
+
+---
+
 **log_entry | TEAM_190 | TEAM_191_INTERNAL_WORK_PROCEDURE | CREATED_AND_ACTIVATED | 2026-03-11**
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | DATE_LINT_RECURRING_PATTERN_POLICY_LOCKED | 2026-03-11**
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | HEBREW_LANGUAGE_LOCK_AND_191_HELP_PROMPT_LOCKED | 2026-03-11**
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | PROCESS_ID_TITLE_LOCK_ADDED_v1_0_1 | 2026-03-15**
+**log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | CONCURRENT_CHANGES_ARE_NORMAL_LOCK_ADDED | 2026-03-15**

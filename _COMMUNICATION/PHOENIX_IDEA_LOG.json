@@ -5,7 +5,7 @@
   "owner": "team_170",
   "fate_authority": "team_00 + nimrod",
   "next_id": 16,
-  "last_updated": "2026-03-15T11:54:54Z",
+  "last_updated": "2026-03-15T16:00:00Z",
   "urgency_legend": {
     "critical": "Blocking active work — respond today",
     "high": "Decide this sprint / current stage",
@@ -124,8 +124,8 @@
       "created_at": "2026-03-15T14:00:00Z",
       "status": "decided",
       "fate": "new_wp",
-      "fate_target": "S002-P005 backlog — WP003 candidate",
-      "fate_rationale": "Phase 1 (this session) provides stable base. Phase 2 adds: idea_groom.sh, UI fate decisions in dashboard, dedup warnings, registry auto-integration.",
+      "fate_target": "S002-P005 backlog — WP004 candidate",
+      "fate_rationale": "Phase 1 (this session) provides stable base. Phase 2 adds: idea_groom.sh, UI fate decisions in dashboard, dedup warnings, registry auto-integration. WP004 (not WP003) per program registry update — WP003 slot taken by PIPELINE_TEAMS.html update mandate.",
       "fate_decided_at": "2026-03-15T14:00:00Z",
       "fate_decided_by": "team_00 + nimrod",
       "reference_file": "_COMMUNICATION/PHOENIX_IDEA_LOG.json",
@@ -186,14 +186,14 @@
       "urgency": "medium",
       "submitted_by": "team_00",
       "created_at": "2026-03-15T14:00:00Z",
-      "status": "open",
-      "fate": null,
-      "fate_target": null,
-      "fate_rationale": null,
-      "fate_decided_at": null,
-      "fate_decided_by": null,
+      "status": "decided",
+      "fate": "cancel",
+      "fate_target": "N/A — state anomaly self-resolved",
+      "fate_rationale": "WP001 state anomaly (WAITING_GATE2_APPROVAL vs GATE_2 in gates_completed) is moot. Canonical pipeline state confirmed restored to S002-P005-WP002 at GATE_8 (last_updated: 2026-03-10 — the March 10 expedited close). WP002 is GATE_8 PASS / DOCUMENTATION_CLOSED per program registry. WP001 is fully superseded. No investigation needed.",
+      "fate_decided_at": "2026-03-15T16:00:00Z",
+      "fate_decided_by": "team_00",
       "reference_file": "_COMMUNICATION/agents_os/pipeline_state_agentsos.json",
-      "notes": "pipeline_state_agentsos.json shows work_package_id=S002-P005-WP001, current_gate=WAITING_GATE2_APPROVAL, gates_completed=[GATE_0,GATE_1,GATE_2]. Inconsistency. Needs Team 61 investigation before WP002 GATE_0 formal entry."
+      "notes": "State at session discovery: WP001/WAITING_GATE2_APPROVAL/override_reason set. State after team restoration: WP002/GATE_8/override_reason=null. Canonical state confirmed. Anomaly was residual from session-start corruption, not a real inconsistency in the canonical record."
     },
     {
       "id": "IDEA-012",
@@ -257,7 +257,7 @@
       "fate_decided_at": "2026-03-15T12:00:00Z",
       "fate_decided_by": "team_00 (via team_100 delegation)",
       "reference_file": "_COMMUNICATION/team_00/TEAM_00_TO_TEAM_10_S002_P005_WP002_GATE7_ACTIVATION_v1.0.0.md",
-      "notes": "GATE_7 entry authorized. Nimrod browser review pending. OBS-02/03 Team 61 scope."
+      "notes": "⚠️ SUPERSEDED: GATE_7 activation doc was written based on session-start state showing WP002 at GATE_6. Canonical state (restored 2026-03-10) shows WP002 already at GATE_8 PASS DOCUMENTATION_CLOSED. Activation doc superseded by ARCHITECT_IDEA_PIPELINE_PHASE1_APPROVAL_v1.0.0.md context note. GATE_7 was completed in the March 10 expedited close cycle."
     }
   ]
 }

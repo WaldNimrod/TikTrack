@@ -5,6 +5,7 @@
 **to:** Team 10 (Execution Orchestrator), Team 90 (Gate Owner 5-8 / WSM update owner in active range)
 **cc:** Team 00, Team 100, Team 170
 **date:** 2026-03-14
+**historical_record:** true
 **status:** BLOCK
 **stage_id:** S001
 **program_id:** S001-P002

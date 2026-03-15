@@ -109,9 +109,11 @@
       <span>💡 Idea Pipeline &nbsp;<span class="badge" id="ideas-badge">—</span></span>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
         <select id="ideas-filter-status" onchange="renderIdeas()" style="font-size:11px;padding:2px 6px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px">
+          <option value="active">Active (open + in progress)</option>
           <option value="open">Open only</option>
+          <option value="in_execution">In execution</option>
           <option value="">All status</option>
-          <option value="decided">Decided</option>
+          <option value="decided">Decided / closed</option>
         </select>
         <select id="ideas-filter-urgency" onchange="renderIdeas()" style="font-size:11px;padding:2px 6px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px">
           <option value="">All urgency</option>
@@ -154,6 +156,7 @@
     immediate: '<span style="background:#1a8cff;color:#fff;padding:1px 5px;border-radius:3px;font-size:10px">⚡ IMMEDIATE</span>',
     cancel:    '<span style="background:#888;color:#fff;padding:1px 5px;border-radius:3px;font-size:10px">✗ CANCEL</span>'
   };
+  var STATUS_ORDER = { open:0, in_execution:1, decided:2 };
 
   function escH(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
 
@@ -176,15 +179,20 @@
     var fDomain  = document.getElementById('ideas-filter-domain').value;
 
     var items = g_ideas.filter(function(i){
-      if (fStatus  && i.status  !== fStatus)  return false;
+      if (fStatus === 'active') {
+        if (i.status !== 'open' && i.status !== 'in_execution') return false;
+      } else if (fStatus) {
+        if (i.status !== fStatus) return false;
+      }
       if (fUrgency && i.urgency !== fUrgency) return false;
       if (fDomain  && i.domain  !== fDomain)  return false;
       return true;
     });
 
-    var openCount = g_ideas.filter(function(i){ return i.status === 'open'; }).length;
+    var openCount  = g_ideas.filter(function(i){ return i.status === 'open'; }).length;
+    var execCount  = g_ideas.filter(function(i){ return i.status === 'in_execution'; }).length;
     document.getElementById('ideas-badge').textContent =
-      openCount + ' open / ' + g_ideas.length + ' total';
+      openCount + ' open / ' + execCount + ' in_exec / ' + g_ideas.length + ' total';
 
     if (!items.length) {
       document.getElementById('ideas-content').innerHTML =
@@ -193,7 +201,9 @@
     }
 
     items.sort(function(a,b){
-      if (a.status !== b.status) return a.status === 'open' ? -1 : 1;
+      var sA = STATUS_ORDER[a.status] !== undefined ? STATUS_ORDER[a.status] : 9;
+      var sB = STATUS_ORDER[b.status] !== undefined ? STATUS_ORDER[b.status] : 9;
+      if (sA !== sB) return sA - sB;
       return (URGENCY_ORDER[a.urgency]||9) - (URGENCY_ORDER[b.urgency]||9);
     });
 
@@ -205,7 +215,10 @@
       var targetHtml = i.fate_target
         ? '<div style="font-size:10px;color:var(--text-muted);margin-top:2px">→ '+escH(i.fate_target)+'</div>' : '';
       var statusDot = i.status === 'open'
-        ? '<span style="color:var(--accent)">●</span>' : '<span style="color:var(--text-muted)">●</span>';
+        ? '<span style="color:var(--accent)" title="Open — awaiting fate decision">●</span>'
+        : i.status === 'in_execution'
+          ? '<span style="color:#f39c12" title="In execution — mandate issued, team working">⚙</span>'
+          : '<span style="color:var(--text-muted)" title="Decided / closed">●</span>';
       var domainBadge = '<span style="background:var(--surface2);padding:1px 5px;border-radius:3px;font-size:10px;border:1px solid var(--border)">'+escH(i.domain)+'</span>';
       return '<tr style="font-size:12px">'
         + '<td style="font-family:var(--mono);white-space:nowrap;padding:6px 8px">'+escH(i.id)+'</td>'

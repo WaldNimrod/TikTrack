@@ -258,8 +258,38 @@ Every Team 191 closure note must include:
 
 ---
 
+## 13) Continuous-Flow Default (Binding)
+
+1. Default mode for Team 191 is `CONTINUOUS_FLOW` (not stop-and-wait).
+2. At the beginning of each cycle, Team 191 defines a **cycle anchor**:
+   - `cycle_anchor_sha = HEAD`
+   - all remediation/commit/push/merge actions are executed against this cycle scope.
+3. If new changes arrive during the cycle and are non-conflicting:
+   - do not stop,
+   - include them in the same cycle when deterministic and safe,
+   - otherwise mark them as `NEXT_CYCLE_QUEUE` and continue closing current cycle.
+4. End-of-cycle rule (loop breaker):
+   - after successful merge to `main`, Team 191 reports `CYCLE_CLOSED` immediately,
+   - Team 191 does **not** auto-expand the just-closed report with fresh post-merge deltas.
+5. Post-merge deltas handling:
+   - any new local/remote deltas after `CYCLE_CLOSED` open a new explicit cycle id (`CYCLE+1`),
+   - new cycle starts from a new anchor and follows the same flow.
+6. Pull discipline for deterministic closure:
+   - perform `fetch/rebase/pull` only inside an active cycle where publication is still pending,
+   - avoid extra `pull` after closure report unless user explicitly asks to start next cycle now.
+7. Runtime-generated evidence/log files are valid carry-forward inputs:
+   - they are not considered anomalies,
+   - they are committed in the next available deterministic cycle unless policy says otherwise.
+8. Success definition under continuous flow:
+   - cycle checks PASS,
+   - push/PR/merge for the cycle completed,
+   - local tree clean at cycle close checkpoint.
+
+---
+
 **log_entry | TEAM_190 | TEAM_191_INTERNAL_WORK_PROCEDURE | CREATED_AND_ACTIVATED | 2026-03-11**
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | DATE_LINT_RECURRING_PATTERN_POLICY_LOCKED | 2026-03-11**
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | HEBREW_LANGUAGE_LOCK_AND_191_HELP_PROMPT_LOCKED | 2026-03-11**
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | PROCESS_ID_TITLE_LOCK_ADDED_v1_0_1 | 2026-03-15**
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | CONCURRENT_CHANGES_ARE_NORMAL_LOCK_ADDED | 2026-03-15**
+**log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | CONTINUOUS_FLOW_DEFAULT_LOCK_ADDED | 2026-03-15**

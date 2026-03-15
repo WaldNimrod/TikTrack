@@ -838,7 +838,7 @@ def generate_prompt(gate_id: str, force_gate4: bool = False, revision_notes: str
         print(f"Unknown gate: {gate_id}")
         return
 
-    path = _save_prompt(f"{gate_id}_prompt.md", prompt)
+    path = _save_prompt(f"{gate_id}_prompt.md", prompt, domain=state.project_domain)
     _log(f"Prompt saved to: {path}")
     _log(f"Paste into: {GATE_CONFIG.get(gate_id, {}).get('engine', '?')} session")
     print(f"\n{'='*60}\n{prompt[:500]}...\n{'='*60}")

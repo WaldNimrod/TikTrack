@@ -150,12 +150,27 @@ async function loadPipelineState() {
 
 // buildCommands in pipeline-commands.js
 
+// ── Domain-aware prompt path resolver ─────────────────────────────────────
+// Transforms paths inside the prompts/ directory to include domain slug prefix
+// so tiktrack and agents_os files never collide.
+// e.g. "...prompts/implementation_mandates.md" → "...prompts/agentsos_implementation_mandates.md"
+function resolvePromptPath(path) {
+  const domainSlug = (pipelineState.project_domain || 'agents_os').toLowerCase().replace(/_/g, '').replace(/-/g, '');
+  const marker = '/_COMMUNICATION/agents_os/prompts/';
+  const idx = path.indexOf(marker);
+  if (idx === -1) return path;
+  const filename = path.slice(idx + marker.length);
+  if (/^(agentsos|tiktrack)_/.test(filename)) return path; // already prefixed
+  return path.slice(0, idx + marker.length) + domainSlug + '_' + filename;
+}
+
 // ── Load prompt ───────────────────────────────────────────────────────────
 // Gate Context accordion: executive summary only. Full prompt is stored in
 // currentPromptText for the Mandate fallback (non-mandate single-team gates).
 async function loadPrompt(gate) {
   if (!gate) return;
-  const path = `../../_COMMUNICATION/agents_os/prompts/${gate}_prompt.md`;
+  const domainSlug = (pipelineState.project_domain || 'agents_os').toLowerCase().replace(/_/g, '').replace(/-/g, '');
+  const path = `../../_COMMUNICATION/agents_os/prompts/${domainSlug}_${gate}_prompt.md`;
   const def  = ALL_GATE_DEFS[gate] || {};
   const cfg  = GATE_CONFIG[gate]   || {};
 
@@ -891,7 +906,7 @@ async function runProgressCheck() {
 
     for (const step of substeps) {
       const blocked    = step.requiresPrev && !prevDone;
-      const fileChecks = await Promise.all(step.files.map(async f => ({path:f, exists:await fileExists(f)})));
+      const fileChecks = await Promise.all(step.files.map(resolvePromptPath).map(async f => ({path:f, exists:await fileExists(f)})));
       const stepDone   = !blocked && fileChecks.every(f => f.exists);
       const borderColor = stepDone ? 'var(--success)' : blocked ? 'var(--border)' : 'var(--warning)';
       const icon        = stepDone ? '✅' : blocked ? '⏸️' : '⏳';
@@ -1015,7 +1030,7 @@ async function runProgressCheck() {
 
     // Gate-specific expected files
     if (def.files && def.files.length > 0) {
-      const fileChecks = await Promise.all(def.files.map(async f => ({path:f, exists:await fileExists(f)})));
+      const fileChecks = await Promise.all(def.files.map(resolvePromptPath).map(async f => ({path:f, exists:await fileExists(f)})));
       html += `<div style="margin-top:8px">`;
       fileChecks.forEach(f => {
         html += `<div class="prog-file-item" style="color:${f.exists?'var(--success)':'var(--danger)'}">

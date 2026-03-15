@@ -1,0 +1,32 @@
+.....................................F...F.............................. [ 72%]
+............................                                             [100%]
+=================================== FAILURES ===================================
+__________________ TestContextReset.test_context_reset_format __________________
+
+self = <agents_os_v2.tests.test_injection.TestContextReset object at 0x107e055b0>
+
+    def test_context_reset_format(self):
+        reset = build_context_reset("team_90")
+>       assert "TEAM 90" in reset
+E       AssertionError: assert 'TEAM 90' in '**ACTIVE: TEAM_90 (Dev-Validator)**  gate=N/A | wp=N/A | stage=S002 | date=2026-03-15'
+
+agents_os_v2/tests/test_injection.py:68: AssertionError
+_____________ TestFullAgentPrompt.test_full_prompt_has_all_layers ______________
+
+self = <agents_os_v2.tests.test_injection.TestFullAgentPrompt object at 0x107e14fa0>
+
+    def test_full_prompt_has_all_layers(self):
+        prompt = build_full_agent_prompt(
+            team_id="team_90",
+            gate_id="GATE_5",
+            task_message="Validate the strategies implementation.",
+            work_package_id="S002-P002-WP001",
+        )
+>       assert "CONTEXT_RESET" in prompt
+E       AssertionError: assert 'CONTEXT_RESET' in '**ACTIVE: TEAM_90 (Dev-Validator)**  gate=GATE_5 | wp=S002-P002-WP001 | stage=S002 | date=2026-03-15\n\n# Current Pro...** 5\n- **CI pipeline:** yes\n\ngate=GATE_5 | wp=S002-P002-WP001 | no-assumption-decisions | no-cross-domain-leakage\n'
+
+agents_os_v2/tests/test_injection.py:123: AssertionError
+=========================== short test summary info ============================
+FAILED agents_os_v2/tests/test_injection.py::TestContextReset::test_context_reset_format
+FAILED agents_os_v2/tests/test_injection.py::TestFullAgentPrompt::test_full_prompt_has_all_layers
+2 failed, 98 passed, 8 deselected in 0.22s

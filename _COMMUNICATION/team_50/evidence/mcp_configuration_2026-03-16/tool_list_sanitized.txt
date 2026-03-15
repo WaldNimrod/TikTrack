@@ -1,0 +1,36 @@
+# cursor-ide-browser MCP tools (sanitized list)
+# Source: ~/.cursor/projects/.../mcps/cursor-ide-browser/tools/
+# No schemas, no secrets
+
+browser_navigate
+browser_snapshot
+browser_click
+browser_fill
+browser_type
+browser_select_option
+browser_reload
+browser_tabs
+browser_lock
+browser_unlock
+browser_console_messages
+browser_wait_for
+browser_hover
+browser_scroll
+browser_press_key
+browser_navigate_forward
+browser_navigate_back
+browser_handle_dialog
+browser_fill_form
+browser_highlight
+browser_take_screenshot
+browser_resize
+browser_search
+browser_profile_start
+browser_profile_stop
+browser_get_bounding_box
+browser_get_input_value
+browser_get_attribute
+browser_is_checked
+browser_is_enabled
+browser_is_visible
+browser_drag

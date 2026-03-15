@@ -1,29 +1,14 @@
 {
-  "pipe_run_id": "5ec473cb",
-  "work_package_id": "S002-P005-WP002",
+  "pipe_run_id": "a4bc11a5",
+  "work_package_id": "REQUIRED",
   "stage_id": "S002",
-  "project_domain": "agents_os",
-  "spec_brief": "Pipeline Governance — PASS_WITH_ACTION micro-cycle",
-  "current_gate": "COMPLETE",
-  "gates_completed": [
-    "GATE_0",
-    "GATE_1",
-    "GATE_2",
-    "WAITING_GATE2_APPROVAL",
-    "G3_PLAN",
-    "G3_5",
-    "G3_6_MANDATES",
-    "CURSOR_IMPLEMENTATION",
-    "GATE_4",
-    "GATE_5",
-    "GATE_6",
-    "WAITING_GATE6_APPROVAL",
-    "GATE_7",
-    "GATE_8",
-    "COMPLETE"
-  ],
+  "project_domain": "tiktrack",
+  "spec_brief": "",
+  "current_gate": "GATE_0",
+  "gates_completed": [],
   "gates_failed": [
-    "GATE_8"
+    "GATE_0",
+    "GATE_0"
   ],
   "lld400_content": "",
   "work_plan": "",
@@ -32,9 +17,9 @@
   "implementation_endpoints": [],
   "spec_path": "",
   "started_at": "",
-  "last_updated": "2026-03-15T20:43:06.930621+00:00",
+  "last_updated": "2026-03-15T22:53:07.281583+00:00",
   "gate_state": null,
   "pending_actions": [],
   "override_reason": null,
-  "phase8_content": "PHASE2_ACTIVE"
+  "phase8_content": ""
 }

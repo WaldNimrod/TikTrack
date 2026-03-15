@@ -1,85 +1,77 @@
 ---
 name: agents-os-review
-description: [TODO: Complete and informative explanation of what the skill does and when to use it. Include WHEN to use this skill - specific scenarios, file types, or tasks that trigger it.]
+description: Deep review workflow for Agents OS and its TikTrack proving-ground integration. Use when Codex needs to audit pipeline mechanics and gate flow, governance/server scripts and canonical documents, dashboard or roadmap or teams UI, MCP and E2E coverage, documentation-to-code drift, or architectural coherence across agents_os, agents_os_v2, _COMMUNICATION, and governance sources; produce a dated multi-document review pack with findings, gap analysis, and urgent action items.
 ---
 
-# Agents Os Review
+# Agents OS Review
 
 ## Overview
 
-[TODO: 1-2 sentences explaining what this skill enables]
+Review Agents OS as an operating system for a professional one-human software house, not as an isolated code module. Start at concept and governance, descend through pipeline behavior, documents, interfaces, architecture, modules, and individual functions, then end with a dated evidence pack and an action-oriented conclusion.
 
-## Structuring This Skill
+## Quick Start
 
-[TODO: Choose the structure that best fits this skill's purpose. Common patterns:
+1. Read the mandatory canon before scanning code:
+   - `.cursorrules`
+   - `00_MASTER_INDEX.md`
+   - `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md`
+   - `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md`
+   - `documentation/docs-governance/04-PROCEDURES/AGENTS_OS_V2_OPERATING_PROCEDURES_v1.0.0.md`
+2. Scaffold the review bundle:
+   - `python3 skills/agents-os-review/scripts/init_review_bundle.py --team-id 61 --review-slug pipeline-governance`
+3. Load the reference files only when needed:
+   - `references/review-method.md` for the end-to-end workflow
+   - `references/source-map.md` for canonical paths and code surfaces
+   - `references/report-pack.md` for the deliverable set and writing rules
 
-**1. Workflow-Based** (best for sequential processes)
-- Works well when there are clear step-by-step procedures
-- Example: DOCX skill with "Workflow Decision Tree" -> "Reading" -> "Creating" -> "Editing"
-- Structure: ## Overview -> ## Workflow Decision Tree -> ## Step 1 -> ## Step 2...
+## Review Lens
 
-**2. Task-Based** (best for tool collections)
-- Works well when the skill offers different operations/capabilities
-- Example: PDF skill with "Quick Start" -> "Merge PDFs" -> "Split PDFs" -> "Extract Text"
-- Structure: ## Overview -> ## Quick Start -> ## Task Category 1 -> ## Task Category 2...
+Judge the system against the core promise: Agents OS should let one human operate a professional software house with deterministic process control, explicit authority boundaries, and low coordination overhead.
 
-**3. Reference/Guidelines** (best for standards or specifications)
-- Works well for brand guidelines, coding standards, or requirements
-- Example: Brand styling with "Brand Guidelines" -> "Colors" -> "Typography" -> "Features"
-- Structure: ## Overview -> ## Guidelines -> ## Specifications -> ## Usage...
+Use this layered ladder in every review:
+- `L0 Concept`: single-human leverage, domain isolation, source-of-truth discipline, role clarity
+- `L1 Capabilities`: pipeline orchestration, governance/document flow, review surfaces, evidence handling
+- `L2 Processes`: gate transitions, mandate generation, document promotion, QA/E2E flow, escalation paths
+- `L3 Interfaces`: dashboard, roadmap, teams page, command affordances, copy paths
+- `L4 Architecture`: orchestrator, state model, validators, injection layer, scenario registry, scripts
+- `L5 Modules`: file-level ownership, cohesion, dead paths, legacy/V2 overlap
+- `L6 Functions`: concrete bugs, drift, broken assumptions, missing validations, stale scaffolds
 
-**4. Capabilities-Based** (best for integrated systems)
-- Works well when the skill provides multiple interrelated features
-- Example: Product Management with "Core Capabilities" -> numbered capability list
-- Structure: ## Overview -> ## Core Capabilities -> ### 1. Feature -> ### 2. Feature...
+## Workflow
 
-Patterns can be mixed and matched as needed. Most skills combine patterns (e.g., start with task-based, add workflow for complex operations).
+1. Establish operational truth from WSM and V2 procedures before trusting any UI or local script.
+2. Map the active system surfaces across `agents_os_v2/`, `agents_os/`, `_COMMUNICATION/agents_os/`, and governance canon.
+3. Review the pipeline and gates first, because they define authority, routing, and lifecycle correctness.
+4. Review the server-side and governance side next: scripts, validators, state handling, evidence validators, canonical docs, future plans.
+5. Review the UI surfaces as operational tooling, not as cosmetics: dashboard, roadmap, teams page, registry docs, command copy paths.
+6. Compare documentation to code and to runtime behavior. Treat scaffolds, placeholders, and future-plan text as risk if the UI presents them like active features.
+7. Run tests and browser checks where feasible. Use MCP/browser tooling when available; otherwise document the gap explicitly.
+8. Write findings first, then gap analysis, then architectural conclusions and urgent actions.
 
-Delete this entire "Structuring This Skill" section when done - it's just guidance.]
+## Mandatory Checks
 
-## [TODO: Replace with the first main section based on chosen structure]
+- Compare gate owners, gate engines, fail routes, and current state fields across canon, Python, shell helpers, and UI copy.
+- Compare dashboard registry claims to `agents_os/ui/js/*.js`, HTML pages, CSS, and command scaffolds.
+- Compare MCP scenario claims and counts in docs to `agents_os_v2/mcp/test_scenarios.py` and related tests.
+- Compare report and governance expectations to actual output paths and promotion rules.
+- Check both `agents_os_v2/` and legacy `agents_os/` for overlap, contradiction, or silent drift.
+- Review future-plan artifacts and partially implemented features as first-class drift candidates, not as harmless documentation.
 
-[TODO: Add content here. See examples in existing skills:
-- Code samples for technical skills
-- Decision trees for complex workflows
-- Concrete examples with realistic user requests
-- References to scripts/templates/references as needed]
+## Output Rules
 
-## Resources (optional)
+- Write the review pack under `_COMMUNICATION/team_<reviewer_team>/agents_os_review/<YYYY-MM-DD>_<slug>/`.
+- Keep raw evidence inside the bundle under `evidence/`, `logs/`, `screenshots/`, and `notes/`.
+- Treat the review pack as operational output. Do not write directly into canonical `documentation/` unless the active reviewing team is authorized to promote canon.
+- Cite concrete file paths, commands, tests, or screenshots for every material finding.
+- End with architectural and conceptual conclusions plus an immediate action list ordered by urgency.
 
-Create only the resource directories this skill actually needs. Delete this section if no resources are required.
+## Resources
 
-### scripts/
-Executable code (Python/Bash/etc.) that can be run directly to perform specific operations.
-
-**Examples from other skills:**
-- PDF skill: `fill_fillable_fields.py`, `extract_form_field_info.py` - utilities for PDF manipulation
-- DOCX skill: `document.py`, `utilities.py` - Python modules for document processing
-
-**Appropriate for:** Python scripts, shell scripts, or any executable code that performs automation, data processing, or specific operations.
-
-**Note:** Scripts may be executed without loading into context, but can still be read by Codex for patching or environment adjustments.
-
-### references/
-Documentation and reference material intended to be loaded into context to inform Codex's process and thinking.
-
-**Examples from other skills:**
-- Product management: `communication.md`, `context_building.md` - detailed workflow guides
-- BigQuery: API reference documentation and query examples
-- Finance: Schema documentation, company policies
-
-**Appropriate for:** In-depth documentation, API references, database schemas, comprehensive guides, or any detailed information that Codex should reference while working.
-
-### assets/
-Files not intended to be loaded into context, but rather used within the output Codex produces.
-
-**Examples from other skills:**
-- Brand styling: PowerPoint template files (.pptx), logo files
-- Frontend builder: HTML/React boilerplate project directories
-- Typography: Font files (.ttf, .woff2)
-
-**Appropriate for:** Templates, boilerplate code, document templates, images, icons, fonts, or any files meant to be copied or used in the final output.
-
----
-
-**Not every skill requires all three types of resources.**
+- `scripts/init_review_bundle.py`
+  - Create the dated review pack structure and seed the required report files.
+- `references/review-method.md`
+  - Define the full review sequence, checks, and command set.
+- `references/source-map.md`
+  - List the primary code, documentation, UI, and evidence surfaces to inspect.
+- `references/report-pack.md`
+  - Define the file layout and expected content for the final report set.

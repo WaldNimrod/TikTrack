@@ -3,7 +3,7 @@
 
 **project_domain:** AGENTS_OS  
 **owner:** Team 170 (Governance Documentation)  
-**date:** 2026-03-14  
+**date:** 2026-03-16  
 **status:** Active — canonical entry point per TEAM_00_TO_TEAM_170_AGENTS_OS_DOCS_MANDATE_v2.0.0
 
 ---
@@ -15,6 +15,23 @@
 | Start UI server | `./agents_os/scripts/start_ui_server.sh` → open http://localhost:8090/ (redirects to dashboard) or http://localhost:8090/agents_os/ui/PIPELINE_DASHBOARD.html |
 | Run pipeline | `./pipeline_run.sh --domain agents_os` |
 | Check status | `./pipeline_run.sh --domain agents_os status` or `./pipeline_run.sh domain` |
+
+---
+
+## Review Tooling
+
+| Tool | Location | Purpose |
+|------|----------|---------|
+| Agents OS review skill | `skills/agents-os-review/` | Structured deep review workflow for pipeline, governance/server surfaces, UI, doc-code drift, and architectural conclusions |
+| Review bundle scaffold | `skills/agents-os-review/scripts/init_review_bundle.py` | Creates a dated review pack under `_COMMUNICATION/team_<id>/agents_os_review/<YYYY-MM-DD>_<slug>/` |
+
+**Example:**
+
+```bash
+python3 skills/agents-os-review/scripts/init_review_bundle.py --team-id 61 --review-slug pipeline-governance
+```
+
+Use this tooling when running a full Agents OS audit that must produce a multi-document report pack with evidence, gap analysis, and urgent actions.
 
 ---
 
@@ -118,3 +135,4 @@ Per [TEAM_170_AGENTS_OS_DOCUMENTATION_STATE_AND_WORK_PLAN_OPTIONS §2](../../_CO
 ---
 
 **log_entry | TEAM_170 | AGENTS_OS_MASTER_INDEX | DELIVERED | 2026-03-14**
+**log_entry | TEAM_170 | AGENTS_OS_MASTER_INDEX | REVIEW_TOOLING_ADDED_AGENTS_OS_REVIEW_SKILL | 2026-03-16**

@@ -661,6 +661,41 @@
       "reference_file": "_COMMUNICATION/team_190/TEAM_190_IDEA_CONTEXT_SKILLS_SET_ALL_TEAMS_v1.0.0.md",
       "delivery_ref": null,
       "notes": "fate_suggestion=new_wp; batch reference: S002_P005_TEAM_SKILLS_ALIGNMENT"
+    },
+    {
+      "id": "IDEA-038",
+      "title": "Gate Prompt Lifecycle Management — Archive + Cleanup on Gate Advance",
+      "domain": "agents_os",
+      "urgency": "medium",
+      "submitted_by": "team_100",
+      "created_at": "2026-03-16T00:00:00Z",
+      "status": "open",
+      "fate": null,
+      "fate_target": null,
+      "fate_rationale": null,
+      "fate_decided_at": null,
+      "fate_decided_by": null,
+      "reference_file": null,
+      "delivery_ref": null,
+      "notes": "Current state: gate prompt files (agentsos_GATE_0_prompt.md etc.) are written once and never cleaned up. After gate advance, the file is stale but remains indefinitely — no expiry, no archive, no deletion. Risk: operator reads a stale prompt from a previous run. Proposal: on gate PASS/FAIL transition (pipeline.py advance logic), move the outgoing gate's prompt file to a timestamped archive subdirectory (e.g. prompts/archive/{pipe_run_id}/). Deferred to future WP — complexity is low but touches gate transition logic which must be regression-tested. fate_suggestion=future_wp; relate_to=WP003 scope (consider adding as P2 item or standalone micro-WP)."
+    },
+    {
+      "id": "IDEA-039",
+      "title": "test_cursor_prompt Accumulation Cap + Cleanup",
+      "domain": "agents_os",
+      "urgency": "low",
+      "submitted_by": "team_100",
+      "created_at": "2026-03-16T00:00:00Z",
+      "status": "open",
+      "fate": null,
+      "fate_target": null,
+      "fate_decided_at": null,
+      "fate_decided_by": null,
+      "fate_target": null,
+      "fate_rationale": null,
+      "reference_file": null,
+      "delivery_ref": null,
+      "notes": "Current state: every pipeline_run.sh invocation writes test_cursor_prompt_{timestamp}.md — 20+ files already accumulated with no cap or cleanup. Stale test prompts are noise, not signal. Proposal: (A) cap at last N=5 timestamped files (rotate oldest on write), or (B) store only test_cursor_prompt_latest.md symlink + single canonical file. Deferred — no operational impact. fate_suggestion=future_wp; bundle with IDEA-038 (prompt lifecycle WP)."
     }
   ]
 }

@@ -49,6 +49,8 @@ route_recommendation: doc
 **to:** Team 10 (Execution Orchestrator)  
 **cc:** Team 00, Team 20, Team 30, Team 50, Team 100, Team 170, Team 190  
 **date:** 2026-03-14  
+
+**historical_record:** true
 **status:** BLOCK  
 **gate_id:** GATE_5  
 **program_id:** S001-P002  

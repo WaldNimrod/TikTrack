@@ -1,6 +1,8 @@
 **ACTIVE: TEAM_90 (Dev-Validator)**  gate=G3_5 | wp=S001-P002-WP001 | stage=S001 | 2026-03-13
 **date:** 2026-03-13
 
+**historical_record:** true
+
 ---
 
 # G3.5 — Validate Work Plan

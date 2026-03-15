@@ -1,0 +1,18 @@
+scenario_count= 18
+entity_count= 9
+entities=
+- alerts
+- alerts_widget
+- auth
+- cash_flows
+- data_dashboard
+- notes
+- tickers
+- trading_accounts
+- user_tickers
+categories=
+- auth
+- crud
+- display
+- navigation
+- validation

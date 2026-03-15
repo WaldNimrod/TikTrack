@@ -83,7 +83,11 @@ print(cfg.get('engine', '?') + '  |  owner: ' + effective_owner + '  [' + state.
 
 _show_prompt() {
   local gate="$1"
-  local prompt_file="$PROMPTS_DIR/${gate}_prompt.md"
+  local domain_raw
+  domain_raw=$(_get_domain)
+  local domain_slug
+  domain_slug=$(echo "$domain_raw" | tr '[:upper:]' '[:lower:]' | tr -d '_-')
+  local prompt_file="$PROMPTS_DIR/${domain_slug}_${gate}_prompt.md"
 
   if [ ! -f "$prompt_file" ]; then
     echo "[pipeline_run] Prompt file not found: $prompt_file"

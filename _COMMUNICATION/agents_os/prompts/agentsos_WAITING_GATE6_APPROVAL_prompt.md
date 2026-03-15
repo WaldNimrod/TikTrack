@@ -1,5 +1,6 @@
 # WAITING_GATE6_APPROVAL — Human Decision Required
 date: 2026-03-14
+historical_record: true
 
 Team 00 has completed GATE_6 analysis.
 Nimrod must review and decide.

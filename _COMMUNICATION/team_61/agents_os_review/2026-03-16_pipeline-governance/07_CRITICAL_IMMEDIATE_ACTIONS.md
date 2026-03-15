@@ -1,0 +1,14 @@
+**date:** 2026-03-15
+
+# Critical Immediate Actions
+
+| Priority | Owner team | Problem statement | Why immediate | Minimal completion condition |
+| --- | --- | --- | --- | --- |
+| P0 | Team 170 + Team 100 + Team 61 | Decide and lock the real AGENTS_OS execution model for `G3_6/CURSOR_IMPLEMENTATION`, `GATE_4`, and `GATE_8` | The system currently encodes conflicting team ownership across canon, runtime, and UI | A single signed decision updates procedures if needed, then all runtime/UI/config/conversation files match that decision |
+| P0 | Team 61 | Remove legacy Team 20/30/50 hard-coding from AGENTS_OS mandate generation and dashboard flows | The dashboard currently routes AGENTS_OS work through the wrong teams, which is an operational integrity breach | `pipeline.py`, `pipeline-config.js`, and `pipeline-dashboard.js` no longer generate or display Team 20/30/50 flows for AGENTS_OS domain |
+| P0 | Team 170 + Team 61 | Resolve AGENTS_OS `GATE_8` closure ownership between Team 170 and Team 70 | Documentation closure is split-brained between canonical docs and runtime/UI | Team 70 and Team 170 responsibilities are unambiguous in canon, config, conversations, mandates, and UI copy |
+| P1 | Team 61 | Repair the V2 prompt-injection test suite or restore the missing compatibility contract explicitly | The prompt layer is a core dependency for every gate, yet its tests currently fail on the main branch | `agents_os_v2/tests/test_injection.py` passes or is intentionally rewritten to validate the new lean-stamp contract |
+| P1 | Team 61 | Make state auto-detection robust to placeholder values like `NONE` | Placeholder values can cause false “active domain” detection and block status operations | `PipelineState.load()` ignores all placeholder/idle states consistently across domains |
+| P1 | Team 61 | Harden UI server start/stop scripts with port health checks | Operator tooling must not report “started” or “stopped” without verifying reality | `start_ui_server.sh` verifies the listener after startup and `stop_ui_server.sh` verifies listener removal or explicitly reports another process is still bound |
+| P1 | Team 170 | Update stale AGENTS_OS operator documentation, especially `PHASE_6_LOCAL_SETUP_GUIDE.md` | The setup guide still directs AGENTS_OS users through outdated role assignments | The guide reflects Team 61 and Team 51 usage for AGENTS_OS lane and the resolved `GATE_8` executor |
+| P2 | Team 61 + Team 170 | Decide whether legacy `agents_os/` code remains operator-supported and enforce interpreter expectations explicitly | Legacy code currently fails under default `python3 3.9.6`, which creates hidden portability risk | Either legacy code is retired from operator flows, or scripts/docs enforce Python `3.12+`, or compatibility is restored |

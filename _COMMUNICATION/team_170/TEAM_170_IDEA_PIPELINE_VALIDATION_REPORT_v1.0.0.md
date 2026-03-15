@@ -3,8 +3,7 @@ project_domain: AGENTS_OS
 id: TEAM_170_IDEA_PIPELINE_VALIDATION_REPORT_v1.0.0
 from: Team 170 (Documentation & Governance)
 to: Team 00 (Chief Architect)
-date: 2026-02-19
-historical_record: true
+date: 2026-03-15
 status: VALIDATION_COMPLETE
 in_response_to: TEAM_00_TO_TEAM_170_IDEA_PIPELINE_VALIDATION_MANDATE_v1.0.0
 ---
@@ -25,7 +24,7 @@ in_response_to: TEAM_00_TO_TEAM_170_IDEA_PIPELINE_VALIDATION_MANDATE_v1.0.0
 | Check | Result | Evidence |
 |-------|--------|----------|
 | File exists | PASS | `_COMMUNICATION/PHOENIX_IDEA_LOG.json` |
-| JSON valid | PASS | Valid schema; 15 ideas (IDEA-001 to IDEA-015) |
+| JSON valid | PASS | Valid schema; 15 ideas (IDEA-001 to IDEA-015). *Lineage:* 14 seeded by Team 00 (mandate); +1 added in-cycle → 15 total. |
 | Schema fields | PASS | version, schema, ideas, urgency_legend, fate_legend, next_id |
 
 ### 2. idea_submit.sh
@@ -68,6 +67,9 @@ in_response_to: TEAM_00_TO_TEAM_170_IDEA_PIPELINE_VALIDATION_MANDATE_v1.0.0
 - [x] `./idea_scan.sh --summary` executes without errors
 - [x] `./idea_scan.sh` produces formatted output for all 15 ideas (2 open shown by default)
 
+### IPP1-06 lineage note
+**Seeded ideas count:** Mandate stated 14 seeded. Current log has 15. *Rationale:* 14 seeded by Team 00 at Phase 1 creation; +1 added in-cycle per normal submission flow. Total 15 is correct.
+
 ---
 
 ## Evidence-by-path
@@ -80,4 +82,4 @@ in_response_to: TEAM_00_TO_TEAM_170_IDEA_PIPELINE_VALIDATION_MANDATE_v1.0.0
 
 ---
 
-**log_entry | TEAM_170 | IDEA_PIPELINE_VALIDATION | DOC1_COMPLETE | 2026-02-19**
+**log_entry | TEAM_170 | IDEA_PIPELINE_VALIDATION | DOC1_COMPLETE | 2026-03-15**

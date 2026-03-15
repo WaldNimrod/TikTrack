@@ -4,8 +4,8 @@
   "description": "Canonical idea incubator — all ideas, bugs, and improvement requests before GATE_0 entry",
   "owner": "team_170",
   "fate_authority": "team_00 + nimrod",
-  "next_id": 16,
-  "last_updated": "2026-03-15T16:00:00Z",
+  "next_id": 17,
+  "last_updated": "2026-03-15T12:32:50Z",
   "urgency_legend": {
     "critical": "Blocking active work — respond today",
     "high": "Decide this sprint / current stage",
@@ -258,6 +258,22 @@
       "fate_decided_by": "team_00 (via team_100 delegation)",
       "reference_file": "_COMMUNICATION/team_00/TEAM_00_TO_TEAM_10_S002_P005_WP002_GATE7_ACTIVATION_v1.0.0.md",
       "notes": "⚠️ SUPERSEDED: GATE_7 activation doc was written based on session-start state showing WP002 at GATE_6. Canonical state (restored 2026-03-10) shows WP002 already at GATE_8 PASS DOCUMENTATION_CLOSED. Activation doc superseded by ARCHITECT_IDEA_PIPELINE_PHASE1_APPROVAL_v1.0.0.md context note. GATE_7 was completed in the March 10 expedited close cycle."
+    },
+    {
+      "id": "IDEA-016",
+      "title": "TEST - verify submit works",
+      "domain": "agents_os",
+      "urgency": "low",
+      "submitted_by": "team_00",
+      "created_at": "2026-03-15T12:32:50Z",
+      "status": "open",
+      "fate": null,
+      "fate_target": null,
+      "fate_rationale": null,
+      "fate_decided_at": null,
+      "fate_decided_by": null,
+      "reference_file": null,
+      "notes": null
     }
   ]
 }

@@ -2,12 +2,19 @@
 # idea_scan.sh — Phoenix Idea Pipeline: scan idea log for architectural review
 #
 # Usage:
-#   ./idea_scan.sh                          → show all OPEN ideas (default)
-#   ./idea_scan.sh --status open            → open ideas only
-#   ./idea_scan.sh --status all             → all ideas
+#   ./idea_scan.sh                          → show all ACTIVE ideas (open + in_execution)
+#   ./idea_scan.sh --status open            → open ideas only (no fate decision yet)
+#   ./idea_scan.sh --status in_execution    → in_execution ideas only (mandate issued, team working)
+#   ./idea_scan.sh --status decided         → decided/closed ideas
+#   ./idea_scan.sh --status all             → all ideas (all statuses)
 #   ./idea_scan.sh --urgency critical,high  → filter by urgency (comma-separated)
 #   ./idea_scan.sh --domain agents_os       → filter by domain
 #   ./idea_scan.sh --summary                → one-line summary only (for session startup)
+#
+# Status meanings:
+#   open          → no fate decision yet — needs Team 00 + Nimrod review
+#   in_execution  → mandate/fate decided AND issued to team; team is working; not yet delivered
+#   decided       → fully closed (fate executed or cancelled)
 #
 # Output: Formatted list for architectural team review
 #         Use --summary at session startup for quick awareness
@@ -28,7 +35,7 @@ if [[ ! -f "$LOG_FILE" ]]; then
 fi
 
 # ── Arg parsing ───────────────────────────────────────────────────────────
-FILTER_STATUS="open"
+FILTER_STATUS="active"   # default: show open + in_execution
 FILTER_URGENCY=""
 FILTER_DOMAIN=""
 SUMMARY_ONLY=false
@@ -47,28 +54,50 @@ done
 if $SUMMARY_ONLY; then
   TOTAL=$(jq '.ideas | length' "$LOG_FILE")
   OPEN=$(jq '[.ideas[] | select(.status == "open")] | length' "$LOG_FILE")
-  CRITICAL=$(jq '[.ideas[] | select(.status == "open" and .urgency == "critical")] | length' "$LOG_FILE")
-  HIGH=$(jq '[.ideas[] | select(.status == "open" and .urgency == "high")] | length' "$LOG_FILE")
-  MEDIUM=$(jq '[.ideas[] | select(.status == "open" and .urgency == "medium")] | length' "$LOG_FILE")
-  LOW=$(jq '[.ideas[] | select(.status == "open" and .urgency == "low")] | length' "$LOG_FILE")
+  IN_EXEC=$(jq '[.ideas[] | select(.status == "in_execution")] | length' "$LOG_FILE")
+  ACTIVE=$((OPEN + IN_EXEC))
 
-  echo "💡 IDEA_LOG: $OPEN open / $TOTAL total"
-  if [[ "$CRITICAL" -gt 0 ]]; then
-    echo "   🔴 CRITICAL: $CRITICAL — REVIEW NOW"
+  CRIT_OPEN=$(jq '[.ideas[] | select(.status == "open" and .urgency == "critical")] | length' "$LOG_FILE")
+  HIGH_OPEN=$(jq '[.ideas[] | select(.status == "open" and .urgency == "high")] | length' "$LOG_FILE")
+  MED_OPEN=$(jq '[.ideas[] | select(.status == "open" and .urgency == "medium")] | length' "$LOG_FILE")
+  LOW_OPEN=$(jq '[.ideas[] | select(.status == "open" and .urgency == "low")] | length' "$LOG_FILE")
+
+  CRIT_EXEC=$(jq '[.ideas[] | select(.status == "in_execution" and .urgency == "critical")] | length' "$LOG_FILE")
+  HIGH_EXEC=$(jq '[.ideas[] | select(.status == "in_execution" and .urgency == "high")] | length' "$LOG_FILE")
+
+  echo "💡 IDEA_LOG: $OPEN open / $IN_EXEC in_exec / $TOTAL total"
+
+  # Open items (need fate decision) — always flag
+  if [[ "$CRIT_OPEN" -gt 0 ]]; then
+    echo "   🔴 CRITICAL (open): $CRIT_OPEN — REVIEW NOW"
   fi
-  if [[ "$HIGH" -gt 0 ]]; then
-    echo "   🟠 HIGH: $HIGH — review this session"
+  if [[ "$HIGH_OPEN" -gt 0 ]]; then
+    echo "   🟠 HIGH (open): $HIGH_OPEN — review this session"
   fi
-  [[ "$MEDIUM" -gt 0 ]] && echo "   🟡 MEDIUM: $MEDIUM"
-  [[ "$LOW"    -gt 0 ]] && echo "   🟢 LOW: $LOW"
+  [[ "$MED_OPEN" -gt 0 ]] && echo "   🟡 MEDIUM (open): $MED_OPEN"
+  [[ "$LOW_OPEN" -gt 0 ]] && echo "   🟢 LOW (open): $LOW_OPEN"
+
+  # In-execution items (awaiting team delivery)
+  if [[ "$CRIT_EXEC" -gt 0 ]]; then
+    echo "   🔴 CRITICAL (in_exec): $CRIT_EXEC — check team status"
+  fi
+  if [[ "$HIGH_EXEC" -gt 0 ]]; then
+    echo "   🟠 HIGH (in_exec): $HIGH_EXEC — verify team progress"
+  fi
+
+  if [[ "$ACTIVE" -eq 0 ]]; then
+    echo "   ✅ Clean — no open or in-execution items"
+  fi
   exit 0
 fi
 
 # ── Build jq filter ───────────────────────────────────────────────────────
-JQ_FILTER=".ideas[]"
-
-if [[ "$FILTER_STATUS" != "all" ]]; then
-  JQ_FILTER="$JQ_FILTER | select(.status == \"$FILTER_STATUS\")"
+if [[ "$FILTER_STATUS" == "active" ]]; then
+  JQ_FILTER='.ideas[] | select(.status == "open" or .status == "in_execution")'
+elif [[ "$FILTER_STATUS" == "all" ]]; then
+  JQ_FILTER=".ideas[]"
+else
+  JQ_FILTER=".ideas[] | select(.status == \"$FILTER_STATUS\")"
 fi
 
 if [[ -n "$FILTER_DOMAIN" ]]; then
@@ -94,14 +123,24 @@ urgency_icon() {
   esac
 }
 
+status_label() {
+  case "$1" in
+    open)         echo "📬 OPEN" ;;
+    in_execution) echo "⚙️  IN_EXEC" ;;
+    decided)      echo "✅ DECIDED" ;;
+    *)            echo "   $1" ;;
+  esac
+}
+
 # ── Output ────────────────────────────────────────────────────────────────
 TOTAL=$(jq '.ideas | length' "$LOG_FILE")
 OPEN=$(jq '[.ideas[] | select(.status == "open")] | length' "$LOG_FILE")
+IN_EXEC=$(jq '[.ideas[] | select(.status == "in_execution")] | length' "$LOG_FILE")
 LAST_UPDATED=$(jq -r '.last_updated' "$LOG_FILE")
 
 echo "═══════════════════════════════════════════════════════════════"
 echo "  💡 PHOENIX IDEA PIPELINE SCAN"
-echo "  log: $OPEN open / $TOTAL total | updated: ${LAST_UPDATED:0:10}"
+echo "  log: $OPEN open / $IN_EXEC in_exec / $TOTAL total | updated: ${LAST_UPDATED:0:10}"
 echo "═══════════════════════════════════════════════════════════════"
 echo ""
 
@@ -119,7 +158,7 @@ while IFS= read -r line; do
   NOTES=$(echo "$line" | jq -r '.notes // ""')
 
   COUNT=$((COUNT + 1))
-  echo "  [$ID] $(urgency_icon "$URGENCY") | $DOMAIN | $STATUS"
+  echo "  [$ID] $(urgency_icon "$URGENCY") | $DOMAIN | $(status_label "$STATUS")"
   echo "  📌 $TITLE"
   echo "  by: $SUBMITTED | created: $CREATED"
   if [[ "$FATE" != "⏳ pending" ]]; then
@@ -131,7 +170,10 @@ while IFS= read -r line; do
   [[ -n "$NOTES" ]] && [[ "$NOTES" != "null" ]] && echo "  note: $NOTES"
   echo "───────────────────────────────────────────────────────────────"
 
-done < <(jq -c "[$JQ_FILTER] | sort_by(if .urgency == \"critical\" then 0 elif .urgency == \"high\" then 1 elif .urgency == \"medium\" then 2 else 3 end)[]" "$LOG_FILE" 2>/dev/null || echo "")
+done < <(jq -c "[$JQ_FILTER] | sort_by(
+  (if .status == \"open\" then 0 else 1 end),
+  (if .urgency == \"critical\" then 0 elif .urgency == \"high\" then 1 elif .urgency == \"medium\" then 2 else 3 end)
+)[]" "$LOG_FILE" 2>/dev/null || echo "")
 
 if [[ $COUNT -eq 0 ]]; then
   echo "  (no ideas match current filter)"
@@ -142,6 +184,9 @@ echo ""
 echo "  Total shown: $COUNT"
 echo ""
 echo "  Next actions:"
-echo "    Submit idea:    ./idea_submit.sh --title \"...\" --domain X --urgency Y --team Z"
-echo "    Quick summary:  ./idea_scan.sh --summary"
-echo "    Full scan:      ./idea_scan.sh --status all"
+echo "    Submit idea:       ./idea_submit.sh --title \"...\" --domain X --urgency Y --team Z"
+echo "    Quick summary:     ./idea_scan.sh --summary"
+echo "    Active only:       ./idea_scan.sh                (open + in_execution)"
+echo "    Open only:         ./idea_scan.sh --status open"
+echo "    In execution:      ./idea_scan.sh --status in_execution"
+echo "    Full history:      ./idea_scan.sh --status all"

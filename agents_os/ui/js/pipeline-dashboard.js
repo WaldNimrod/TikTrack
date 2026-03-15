@@ -149,99 +149,97 @@ async function loadPipelineState() {
 // buildCommands in pipeline-commands.js
 
 // ── Load prompt ───────────────────────────────────────────────────────────
+// Gate Context accordion: executive summary only. Full prompt is stored in
+// currentPromptText for the Mandate fallback (non-mandate single-team gates).
 async function loadPrompt(gate) {
   if (!gate) return;
   const path = `../../_COMMUNICATION/agents_os/prompts/${gate}_prompt.md`;
+  const def  = ALL_GATE_DEFS[gate] || {};
+  const cfg  = GATE_CONFIG[gate]   || {};
+
+  // Update accordion badge + meta
   document.getElementById("prompt-gate-badge").textContent = gate;
   document.getElementById("prompt-gate-name").textContent  = gate;
-  const cfg = GATE_CONFIG[gate] || {};
-  document.getElementById("prompt-owner").textContent  = getDomainOwner(gate);
-  document.getElementById("prompt-engine").textContent = cfg.engine || "—";
-  document.getElementById("prompt-file-path").textContent = path;
+  document.getElementById("prompt-owner").textContent      = getDomainOwner(gate);
+  document.getElementById("prompt-engine").textContent     = cfg.engine || "—";
+  document.getElementById("prompt-file-path").textContent  = path;
 
+  // Executive summary: desc + advice from gate definition
+  const descEl   = document.getElementById("gate-summary-desc");
+  const adviceEl = document.getElementById("gate-summary-advice");
+  if (descEl)   descEl.textContent   = def.desc   || "—";
+  if (adviceEl) adviceEl.textContent = def.advice  || "";
+
+  // Still fetch & store the prompt text — used by loadMandates as fallback for single-team gates
   const text = await fetchText(path);
-  if (text) {
-    currentPromptText = text;
-    document.getElementById("prompt-content").textContent = text;
-  } else {
-    currentPromptText = "";
-    document.getElementById("prompt-content").innerHTML =
-      `<span class="error-msg">Prompt not generated yet — run ./pipeline_run.sh to generate</span>`;
-  }
-  // Update booster hint with new gate's team, refresh preview if open
-  const team = _getBoosterTeam();
-  const hint = team ? `(${team.label} — ${team.name})` : "";
-  const hintEl = document.getElementById("booster-team-hint");
-  if (hintEl) hintEl.textContent = hint;
-  if (document.getElementById("booster-toggle")?.checked) updateBoosterPreview();
-
-  // ── Mandate gate: INFO mode on prompt section + auto-open mandates accordion ─
-  const isMandateGate = gate in GATE_MANDATE_FILES;
-  const copyBtn    = document.getElementById("copy-prompt-btn");
-  const banner     = document.getElementById("mandate-redirect-banner");
-  const promptHdr  = document.getElementById("acc-prompt-header");
-  const promptIcon = document.getElementById("acc-prompt-icon");
-  const promptTitle= document.getElementById("acc-prompt-title");
-  if (isMandateGate) {
-    // Copy button: fully disabled — copy from Mandate Tabs ↓ (below)
-    if (copyBtn) {
-      copyBtn.textContent = "📄 Gate Context";
-      copyBtn.title       = "Per-team mandates are in the Mandate Tabs below ↓";
-      copyBtn.disabled    = true;
-      copyBtn.style.opacity = "0.35";
-      copyBtn.style.cursor  = "not-allowed";
-    }
-    if (banner) banner.classList.add("visible");
-    // Prompt accordion header: muted INFO style
-    if (promptIcon)  promptIcon.textContent = "📄";
-    if (promptTitle) promptTitle.textContent = "Gate Context — Info Only";
-    if (promptHdr)   promptHdr.style.background = "var(--surface2)";
-    // Auto-expand mandates accordion so Phase tabs are immediately visible
-    const acc = document.getElementById("acc-mandates");
-    if (acc && !acc.classList.contains("open")) acc.classList.add("open");
-  } else {
-    // Single-team gate: restore normal prompt section
-    if (copyBtn) {
-      copyBtn.textContent   = "📋 Copy Prompt";
-      copyBtn.title         = "";
-      copyBtn.disabled      = false;
-      copyBtn.style.opacity = "";
-      copyBtn.style.cursor  = "";
-    }
-    if (banner) banner.classList.remove("visible");
-    if (promptIcon)  promptIcon.textContent = "📋";
-    if (promptTitle) promptTitle.textContent = "Current Gate Prompt";
-    if (promptHdr)   promptHdr.style.background = "";
-  }
+  currentPromptText = text || "";
 }
 
 // ── Mandate file routing — uses GATE_MANDATE_FILES from pipeline-config.js ──
 
-// ── Load mandates (gate-aware — hidden for non-mandate gates) ─────────────
+// ── Load mandates (always shown — mandate gates use team tabs; others show prompt) ──
 async function loadMandates() {
   const gate        = pipelineState?.current_gate || '';
-  const mandateFile = GATE_MANDATE_FILES[gate];   // undefined if gate has no mandates
+  const mandateFile = GATE_MANDATE_FILES[gate];   // undefined if gate has no mandate file
+  const def         = ALL_GATE_DEFS[gate] || {};
+
+  // Mandate accordion is always visible (never hidden)
   const accMandates = document.getElementById('acc-mandates');
-
-  // Gates with no mandate file → hide the entire mandate accordion
-  if (!mandateFile) {
-    if (accMandates) accMandates.style.display = 'none';
-    return;
-  }
-
-  // Gate has mandates → show the accordion
   if (accMandates) accMandates.style.display = '';
 
-  let text = await fetchText(mandateFile);
+  if (mandateFile) {
+    // ── Gate has a mandate file: load + parse team sections ─────────────
+    let text = await fetchText(mandateFile);
+    if (!text) {
+      document.getElementById("mandates-badge").textContent = "not generated";
+      document.getElementById("mandate-content").innerHTML =
+        '<span class="error-msg">Not yet generated — run: ./pipeline_run.sh (to generate mandate file)</span>';
+      _updateBoosterHint();
+      return;
+    }
+    _parseMandateSections(text);
 
-  if (!text) {
-    document.getElementById("mandates-badge").textContent = "not generated";
-    document.getElementById("mandate-content").innerHTML =
-      '<span class="error-msg">Not yet generated — run: ./pipeline_run.sh (to generate mandate file)</span>';
-    return;
+  } else {
+    // ── Single-team gate: show the main gate prompt as the one mandate tab ─
+    const ownerRaw   = getDomainOwner(gate) || (def.verdictTeam || def.owner || 'team');
+    const ownerLabel = ownerRaw.replace(/^team_/, 'Team ').replace(/\b(\d)/g, ' $1').trim()
+                       .replace(/\bteam\b/i, 'Team');
+    const tabLabel   = ownerLabel.match(/^Team /) ? ownerLabel : 'Team ' + ownerLabel;
+
+    const promptText = currentPromptText || '';
+    if (!promptText) {
+      document.getElementById("mandates-badge").textContent = "1 team";
+      document.getElementById("mandate-content").innerHTML =
+        '<span class="error-msg">Prompt not yet generated — run: ./pipeline_run.sh</span>';
+      mandateSections = {};
+      activeTeam      = tabLabel;
+      mandateMeta     = { [tabLabel]: { phase: 1 } };
+    } else {
+      mandateSections = { [tabLabel]: promptText };
+      mandateMeta     = { [tabLabel]: { phase: 1 } };
+      activeTeam      = tabLabel;
+
+      document.getElementById("mandates-badge").textContent = "1 team";
+
+      // Build single tab
+      const tabs = document.getElementById("team-tabs");
+      if (tabs) {
+        tabs.innerHTML = `<span class="team-tab next-phase active" onclick="selectTeam(this, ${escAttr(JSON.stringify(tabLabel))})">`
+          + `${escHtml(tabLabel)}<span class="phase-badge">P1</span></span>`;
+      }
+      showMandate(tabLabel);
+    }
+    _updateBoosterHint();
   }
+}
 
-  _parseMandateSections(text);
+// Update booster team hint to match the currently active mandate tab
+function _updateBoosterHint() {
+  const team   = _getBoosterTeam();
+  const hint   = team ? `(${team.label} — ${team.name})` : "";
+  const hintEl = document.getElementById("booster-team-hint");
+  if (hintEl) hintEl.textContent = hint;
+  if (document.getElementById("booster-toggle")?.checked) updateBoosterPreview();
 }
 
 // Per-section metadata: phase number + flags (populated by _parseMandateSections)
@@ -331,6 +329,8 @@ function _parseMandateSections(text) {
       if (idx >= 0 && allTabs[idx]) allTabs[idx].classList.add('active');
     }, 0);
   }
+  // Update booster hint to reflect the active mandate tab's team
+  _updateBoosterHint();
 }
 
 function selectTeam(el, key) {
@@ -338,6 +338,8 @@ function selectTeam(el, key) {
   document.querySelectorAll(".team-tab").forEach(t => t.classList.remove("active"));
   el.classList.add("active");
   showMandate(key);
+  // Update booster hint to reflect the newly selected tab's team
+  _updateBoosterHint();
 }
 
 function showMandate(key) {
@@ -374,9 +376,17 @@ function showMandate(key) {
 }
 
 function copyCurrentMandate() {
-  const content = mandateSections[activeTeam] || "";
-  const btn     = document.getElementById("copy-mandate-btn");
-  const meta    = mandateMeta[activeTeam] || {};
+  let content = mandateSections[activeTeam] || "";
+  const btn   = document.getElementById("copy-mandate-btn");
+  const meta  = mandateMeta[activeTeam] || {};
+
+  // Append governance booster if toggle is active
+  const boosterOn = document.getElementById("booster-toggle")?.checked;
+  if (boosterOn && typeof _getBoosterTeam === "function" && typeof buildBoosterText === "function" && typeof boosterType !== "undefined") {
+    const team    = _getBoosterTeam();
+    const booster = buildBoosterText(team, boosterType);
+    if (booster) content = content + "\n\n---\n\n" + booster;
+  }
 
   // Warn if copying a locked phase (prereq file missing) — but still copy
   if (meta.hasPrereq && meta.prereqMissing) {
@@ -602,10 +612,10 @@ const ALL_GATE_DEFS = {
     },
   },
   'GATE_8': {
-    owner:'team_70 → team_90', engine:'codex',
-    desc:'Team 70 produces AS_MADE_REPORT + archives WP files → Team 90 validates → WP CLOSED',
-    advice:'./pipeline_run.sh  →  paste Phase 1 tab to Team 70/170  →  paste Phase 2 tab to Team 90  →  ./pipeline_run.sh pass',
-    failAdvice:'./pipeline_run.sh fail "CLOSURE-NNN: [issue]"  →  Team 70 corrects  →  re-run GATE_8',
+    owner:'team_70/170 → team_90', engine:'codex',
+    desc:'Team 70 (TikTrack) or Team 170 (Agents OS) produces AS_MADE_REPORT + archives WP files → Team 90 validates → WP CLOSED',
+    advice:'./pipeline_run.sh  →  scroll to Team Mandates → Phase 1 tab (Team 70/170)  →  run phase2  →  Phase 2 tab (Team 90)  →  ./pipeline_run.sh pass',
+    failAdvice:'./pipeline_run.sh fail "CLOSURE-NNN: [issue]"  →  Team 70/170 corrects  →  re-run GATE_8',
     twoPaths:true,
     passCmd:'./pipeline_run.sh pass',
     failCmd:'./pipeline_run.sh fail "CLOSURE-001: [issue]"',
@@ -1249,17 +1259,21 @@ function buildCurrentStepBanner(gate, state) {
 
   } else if (gate === 'GATE_8') {
     const phase8done = !!(state.phase8_content || '').trim();
+    // Domain-aware doc team: agents_os → Team 170, tiktrack → Team 70
+    const isAOS      = (state.project_domain || currentDomain) === 'agents_os';
+    const docTeam    = isAOS ? 'Team 170' : 'Team 70';
+    const docTeamDir = isAOS ? 'team_170'  : 'team_70';
     if (!phase8done) {
-      actor = 'Team 70'; engineLabel = 'Codex'; phaseLabel = 'Phase 1 of 2 — AS_MADE_REPORT'; modCls = '';
+      actor = docTeam; engineLabel = 'Codex'; phaseLabel = 'Phase 1 of 2 — AS_MADE_REPORT'; modCls = '';
       steps = [
-        'Team 70 writes AS_MADE_REPORT + archives WP files → _COMMUNICATION/team_70/',
+        `${docTeam} writes AS_MADE_REPORT + archives WP files → _COMMUNICATION/${docTeamDir}/`,
         `Run in terminal: ${baseCmd} phase2  (generates Team 90 validation mandate)`,
-        'Paste the ▼▼▼ block into Codex → Team 90 validates → click ✅ PASS (WP closes)',
+        'Scroll to "Team Mandates" → "Team 90" tab → copy mandate → paste into Codex → click ✅ PASS',
       ];
     } else {
       actor = 'Team 90'; engineLabel = 'Codex'; phaseLabel = 'Phase 2 of 2 — closure validation'; modCls = 'csb-phase2';
       steps = [
-        'Open "Team Mandates" accordion → click "Team 90" tab → copy mandate → paste into Codex',
+        'Scroll to "Team Mandates" → click "Team 90" tab → copy mandate → paste into Codex',
         'Team 90 validates AS_MADE_REPORT completeness',
         `PASS → WP closes. Run: ${baseCmd} pass`,
       ];
@@ -1311,6 +1325,7 @@ function buildCurrentStepBanner(gate, state) {
   ).join('');
 
   return `<div class="current-step-banner${modCls ? ' ' + modCls : ''}">
+    <div class="csb-title">Next Step — What to do now?</div>
     <div class="csb-header">
       <span class="csb-actor">${escHtml(actor)}</span>
       ${engineBadge}
@@ -1580,15 +1595,15 @@ async function buildQuickActionBar(gate) {
 
       html += `<div class="route-selector">
         <div class="route-selector-title">
-          ⚠️ ${escHtml(gate)} — failed ${failCount}× — choose routing path
+          ⚠️ ${escHtml(gate)} FAIL (${failCount}×) — Select Status
         </div>
-        <div class="route-selector-cycle">current_gate stays at ${escHtml(gate)} until you route it forward</div>
+        <div class="route-selector-cycle">3-status model: PASS | FAIL — Correction | FAIL — Rejection</div>
         <div class="route-btns">
           <button class="qa-btn-route-doc" onclick="copyCmd(${escAttr(JSON.stringify(docCmd))}, this)" title="${escAttr(docCmd)}">
-            ${escHtml(routes.doc.label)} <span class="terminal-hint">⎘</span>
+            ⚠️ FAIL — Correction <span class="terminal-hint">⎘</span>
           </button>
           <button class="qa-btn-route-full" onclick="copyCmd(${escAttr(JSON.stringify(fullCmd))}, this)" title="${escAttr(fullCmd)}">
-            ${escHtml(routes.full.label)} <span class="terminal-hint">⎘</span>
+            ❌ FAIL — Rejection <span class="terminal-hint">⎘</span>
           </button>
         </div>
         <div class="route-desc-row">
@@ -1776,6 +1791,7 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape") {
     document.getElementById("help-modal").classList.remove("open");
     document.getElementById("progress-modal").classList.remove("open");
+    if (typeof closeCmdHelp === "function") closeCmdHelp();
   }
   if (e.key === "?" && !e.target.matches("input,textarea")) toggleHelp();
   if (e.key === "p" && !e.target.matches("input,textarea")) runProgressCheck();

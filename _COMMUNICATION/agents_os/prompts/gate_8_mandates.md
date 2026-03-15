@@ -61,18 +61,20 @@ find _COMMUNICATION/team_*/ \( -name '*S002_P005_WP002*' -o -name '*S002-P005-WP
 
 ### Coordination Data — Team 90 validation result (correction cycle — empty on first run)
 
-✅  Auto-loaded: `_COMMUNICATION/team_90/S002_P005_WP002_G6_TRACEABILITY_MATRIX_v1.0.0.md`
+✅  Auto-loaded: `_COMMUNICATION/team_90/TEAM_90_TO_TEAM_170_S002_P005_WP002_GATE8_CLOSURE_VALIDATION_PHASE2_RESULT_v1.0.0.md`
 
 ```
-# S002-P005-WP002 | GATE_6 Traceability Matrix v1.0.0
-
-**project_domain:** AGENTS_OS  
-**owner:** Team 90 (Dev Validation)  
-**date:** 2026-03-15  
-**gate_id:** GATE_6  
-**program_id:** S002-P005  
-**work_package_id:** S002-P005-WP002  
-
+---
+project_domain: AGENTS_OS
+id: TEAM_90_TO_TEAM_170_S002_P005_WP002_GATE8_CLOSURE_VALIDATION_PHASE2_RESULT_v1.0.0
+from: Team 90 (GATE_8 validation authority)
+to: Team 170 (Spec & Governance — GATE_8 executor)
+cc: Team 10, Team 00, Team 100
+date: 2026-03-15
+status: FAIL
+gate_id: GATE_8
+work_package_id: S002-P005-WP002
+phase: CLOSURE_VALIDATION_PHASE_2
 ---
 
 ## Mandatory Identity Header
@@ -83,23 +85,25 @@ find _COMMUNICATION/team_*/ \( -name '*S002_P005_WP002*' -o -name '*S002-P005-WP
 | stage_id | S002 |
 | program_id | S002-P005 |
 | work_package_id | S002-P005-WP002 |
-| task_id | PIPELINE_GOVERNANCE_PASS_WITH_ACTION |
-| gate_id | GATE_6 |
+| task_id | CLOSURE_VALIDATION_PHASE_2 |
+| gate_id | GATE_8 |
 | phase_owner | Team 90 |
-| required_ssm_version | 1.0.0 |
-| required_active_stage | S002 |
 | project_domain | AGENTS_OS |
 
----
+## Overall Result
 
-## Traceability (Design -> Implementation -> Verification)
+- overall_status: **FAIL**
+- verdict: **CLOSURE-001**
+- lifecycle_state: **RETURN_TO_TEAM_170_FOR_CORRECTION**
 
-| AC | Design requirement | Implementation evidence | Verification evidence | G6 verdict |
-|---|---|---|---|---|
-| AC-01 | `pass_with_actions` records actions and holds gate | `agents_os_v2/orchestrator/pipeline.py` (`pass_with_actions`) + `pipeline_run.sh` command | Team 51 QA result v1.0.0 | MATCH |
-| AC-02 | `pass` blocked when `gate_state=PASS_WITH_ACTION` | `agents_os_v2/orchestrator/pipeline.py` guard and blocked message | Team 51 QA result v1.0.0 | MATCH |
-| AC-03 | `actions_clear` advances and clears actions | `agents_os_v2/orchestrator/pipeline.py` (`actions_clear`) + `pipeline_run.sh` command | Team 51 QA result v1.0.0 | MATCH |
-| AC-04 | `override` advances and persists reason | `agents_os_v2/orchestrator/pipeline.py` (`override`) with preserved `override_reason` | Team 51 QA result v1.0.0 (re-QA) 
+## Validation Checklist Result
+
+| Check | Result | Basis |
+|---|---|---|
+| AS_MADE_REPORT exists at `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP002_AS_MADE_REPORT_v1.0.0.md` | FAIL | Versioned file missing; only unversioned file exists. |
+| AS_MADE_REPORT has required sections (1–7) | FAIL | Current file has section `1` and `2` only (`TEAM_170_S002_P005_WP002_AS_MADE_REPORT.md:28`, `TEAM_170_S002_P005_WP002_AS_MADE_REPORT.md:68`). |
+| Archive dir exists at `_COMMUNICATION/_ARCHIVE/S002/S002-P005-WP002/` | FAIL | Directory not present; Team 170 archive report points to `_COMMUNICATION/99-ARCHIVE/2026-02-19/S002_P005_WP002/` (`TEAM_170_S002_P005_WP002_ARCHIVE_REPORT.md:31`). |
+| Archive contains gate art
 ```
 _[… content truncated at 1500 chars]_
 
@@ -138,63 +142,46 @@ Validate that Team 170 has completed all closure requirements for `S002-P005-WP0
 
 ### Coordination Data — Team 170 AS_MADE_REPORT
 
-✅  Auto-loaded: `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP002_ARCHIVE_REPORT.md`
+✅  Auto-loaded: `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP002_AS_MADE_REPORT_v1.0.0.md`
 
 ```
----
-project_domain: AGENTS_OS
-id: TEAM_170_S002_P005_WP002_ARCHIVE_REPORT
-from: Team 170 (Spec & Governance — GATE_8 executor)
-to: Team 90 (GATE_8 validation), Team 00, Team 100
-date: 2026-02-19
-historical_record: true
-status: GATE_8_SUBMISSION
-gate_id: GATE_8
-work_package_id: S002-P005-WP002
+# TEAM_170 | S002-P005-WP002 AS_MADE_REPORT v1.0.0
+
+**project_domain:** AGENTS_OS  
+**id:** TEAM_170_S002_P005_WP002_AS_MADE_REPORT_v1.0.0  
+**from:** Team 170 (Spec & Governance — GATE_8 executor)  
+**to:** Team 90 (GATE_8 validation), Team 00, Team 100  
+**cc:** Team 10, Team 61, Team 51  
+**date:** 2026-03-15  
+**status:** GATE_8_SUBMISSION  
+**gate_id:** GATE_8  
+**work_package_id:** S002-P005-WP002  
+**in_response_to:** TEAM_00_GATE8_ACTIVATION_DIRECTIVE_S002_P005_WP002_v1.0.0, TEAM_90_TO_TEAM_170_S002_P005_WP002_GATE8_CLOSURE_VALIDATION_PHASE2_RESULT_v1.0.0 (CLOSURE-001 remediation)
+
 ---
 
 ## Mandatory Identity Header
 
 | Field | Value |
-|-------|-------|
+|-------|--------|
 | roadmap_id | PHOENIX_ROADMAP |
 | stage_id | S002 |
 | program_id | S002-P005 |
 | work_package_id | S002-P005-WP002 |
+| task_id | N/A |
 | gate_id | GATE_8 |
 | phase_owner | Team 90 |
 | project_domain | AGENTS_OS |
 
 ---
 
-## 1) Archive Execution Summary
+## 1. Feature summary — what was built
 
-### Archive root created
+**S002-P005-WP002 — Pipeline Governance (AGENTS_OS):** Pipeline state model, CLI commands, and PWA dashboard for agents_os domain.
 
-`_COMMUNICATION/99-ARCHIVE/2026-02-19/S002_P005_WP002/`
-
-### Contents
-
-| File | Description |
-|------|-------------|
-| `ARCHIVE_MANIFEST.md` | Closure references for one-off evidence from team_10, team_51, team_61, team_90, team_190, team_191, team_00 |
-
-### Policy applied
-
-Per TEAM_00_GATE8_ACTIVATION_DIRECTIVE §3: "Do not archive canonical structural/governance sources that must remain active."
-
-- **Reference-based closure:** Manifest lists canonical paths to one-off cycle evidence. Originals remain in team folders.
-- **Not archived:** Backlog, directives, agent identity files, prompts, registry files — these stay active.
-
----
-
-## 2) Closure References Scope
-
-| Team | Count | Scope |
-|------|-------|-------|
-| Team 10 | 6 | GATE_2 intake, GATE_4/5/6 handoffs |
-| Team 51 | 3 | QA result, GATE_7 browser verification |
-| Team 61 | 4 | Kickoff ACK, GATE_4/5, QA ha
+- **State model:** `gate_state`, `pending_actions`, `override_reason` in `agents_os_v2/orchestrator/state.py`.
+- **CLI:** `pass_with_actions`, `actions_clear`, `override` in `pipeline_run.sh` (GATE_6 AC-01, AC-03, AC-04); `--domain` support. `insist` command pending (OBS-02; Team 61).
+- **PWA dashboard:** Banner, sidebar, gate timeline; Help modal (4 tabs: Start, Gates, Commands, Help); Three Modes and domain examples; context banner “
 ```
 _[… content truncated at 1500 chars]_
 

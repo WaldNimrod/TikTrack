@@ -40,6 +40,8 @@ class PipelineState:
     gate_state: Optional[str] = None       # null | "PASS_WITH_ACTION" | "OVERRIDE"
     pending_actions: list[str] = field(default_factory=list)
     override_reason: Optional[str] = None
+    # GATE_8 two-phase tracking: empty = Phase 1 active; "PHASE2_ACTIVE" = Phase 2 active
+    phase8_content: str = ""
 
     def _state_file(self) -> Path:
         return get_state_file(self.project_domain)

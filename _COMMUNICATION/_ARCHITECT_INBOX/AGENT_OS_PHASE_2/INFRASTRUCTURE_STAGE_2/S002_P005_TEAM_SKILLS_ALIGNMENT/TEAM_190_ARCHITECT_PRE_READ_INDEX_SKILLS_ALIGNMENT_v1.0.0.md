@@ -29,31 +29,32 @@ scope: Indexed intake and triage map for team skill-set recommendations batch
 
 | Metric | Value |
 |---|---|
-| Expected team reports | 14 (10,20,30,40,50,51,60,61,70,90,100,170,190,191) |
-| Received reports | 12 |
+| Expected team reports | 15 (00,10,20,30,40,50,51,60,61,70,90,100,170,190,191) |
+| Received reports | 13 |
 | Missing reports | Team 61, Team 100 |
-| Structural compliance (received 12) | 12/12 include Team Context, Skill Table, Top 3, Return Contract |
-| Date header consistency | 12/12 = `2026-03-15` |
+| Structural compliance (received 13) | 13/13 include Team Context, Skill Table, Top 3, Return Contract |
+| Date header consistency | 13/13 compliant |
 
 ## 3) Received Reports Index
 
-1. `TEAM_10_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
-2. `TEAM_20_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
-3. `TEAM_30_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
-4. `TEAM_40_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
-5. `TEAM_50_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
-6. `TEAM_51_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
-7. `TEAM_60_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
-8. `TEAM_70_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
-9. `TEAM_90_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
-10. `TEAM_170_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
-11. `TEAM_190_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
-12. `TEAM_191_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
+1. `TEAM_00_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
+2. `TEAM_10_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
+3. `TEAM_20_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
+4. `TEAM_30_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
+5. `TEAM_40_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
+6. `TEAM_50_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
+7. `TEAM_51_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
+8. `TEAM_60_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
+9. `TEAM_70_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
+10. `TEAM_90_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
+11. `TEAM_170_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
+12. `TEAM_190_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
+13. `TEAM_191_SKILLS_RECOMMENDATIONS_REPORT_v1.0.0.md`
 
 ## 4) Fast-Read Triage Buckets
 
 ### A) Governance/Contract enforcement proposals
-Teams: 10, 170, 190, 90, 191
+Teams: 00, 10, 170, 190, 90, 191
 
 ### B) Evidence quality + deterministic proof proposals
 Teams: 10, 170, 190, 50, 60, 70, 90

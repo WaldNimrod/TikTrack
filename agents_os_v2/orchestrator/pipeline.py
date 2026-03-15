@@ -550,6 +550,9 @@ def route_after_fail(gate_id: str, route_type: str, notes: str = ""):
     _log(f"")
 
     state.current_gate = target_gate
+    # GATE_8 two-phase: reset phase8_content so dashboard returns to Phase 1 display
+    if gate_id == "GATE_8" or target_gate == "GATE_8":
+        state.phase8_content = ""
     state.save()
     _log(f"Pipeline advanced → {target_gate}")
 

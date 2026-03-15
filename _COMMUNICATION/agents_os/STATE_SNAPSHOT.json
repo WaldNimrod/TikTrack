@@ -1,41 +1,40 @@
 {
   "schema_version": "2.0.0",
-  "produced_at_iso": "2026-03-15T10:58:18.776551+00:00",
+  "produced_at_iso": "2026-03-15T20:34:45.809775+00:00",
   "agent_role": "POC-1-OBSERVER",
   "read_only": true,
   "governance": {
     "wsm_path": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "active_stage": "S002",
-    "active_program": "S002-P002",
+    "active_program": "S002-P005",
     "ssm_path": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md",
     "master_index_path": "00_MASTER_INDEX.md"
   },
   "pipeline": {
     "domains": {
       "agents_os": {
-        "gate_state": "PASS_WITH_ACTION",
-        "pending_actions": [
-          "fix-lint"
-        ],
+        "gate_state": null,
+        "pending_actions": [],
         "override_reason": null,
-        "current_gate": "GATE_7",
+        "current_gate": "GATE_8",
         "project_domain": "agents_os"
       },
       "tiktrack": {
         "gate_state": null,
-        "pending_actions": [],
+        "pending_actions": [
+          "Team 70: AS_MADE docs D22/D33/D34/D35",
+          "Team 90: GATE_8 validation + PASS"
+        ],
         "override_reason": null,
-        "current_gate": "GATE_0",
+        "current_gate": "GATE_8",
         "project_domain": "tiktrack"
       }
     },
     "legacy": {
-      "gate_state": "PASS_WITH_ACTION",
-      "pending_actions": [
-        "fix-lint"
-      ],
+      "gate_state": null,
+      "pending_actions": [],
       "override_reason": null,
-      "current_gate": "GATE_7"
+      "current_gate": "GATE_8"
     }
   },
   "codebase": {

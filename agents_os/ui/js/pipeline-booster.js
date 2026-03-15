@@ -3,6 +3,16 @@
 let boosterType = "reinforce";
 
 function _getBoosterTeam() {
+  // 1. Try to derive team from the active mandate tab label (e.g. "Team 170 (Phase 1)" → "team_170")
+  if (typeof activeTeam === "string" && activeTeam) {
+    const m = activeTeam.match(/\bTeam\s+(\d+)/i);
+    if (m) {
+      const key  = 'team_' + m[1];
+      const data = BOOSTER_TEAM_DATA[key];
+      if (data) return data;
+    }
+  }
+  // 2. Fallback: gate owner
   if (!pipelineState) return null;
   const owner = getDomainOwner(pipelineState.current_gate);
   return BOOSTER_TEAM_DATA[owner] || null;

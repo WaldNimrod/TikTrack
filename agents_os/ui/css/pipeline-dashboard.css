@@ -120,6 +120,9 @@
 .sidebar-cmd-list { display: flex; flex-direction: column; }
 .sidebar-cmd-row { display: flex; align-items: center; gap: 5px; padding: 4px 0; border-bottom: 1px solid var(--border); }
 .sidebar-cmd-row:last-child { border-bottom: none; }
+.sidebar-cmd-help-btn { min-width: 22px; padding: 2px 6px; font-size: 11px; font-weight: 700; }
+.cmd-help-pre { font-family: var(--mono); font-size: 11px; line-height: 1.5; white-space: pre-wrap; word-break: break-all; background: #010409; border: 1px solid var(--border); border-radius: 6px; padding: 12px; margin: 8px 0 12px; max-height: 200px; overflow-y: auto; }
+.cmd-help-detail { font-size: 13px; line-height: 1.6; color: var(--text); }
 .sidebar-cmd-text { font-family: var(--mono); font-size: 9.5px; flex: 1; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 .sidebar-cmd-btn { font-size: 10px !important; padding: 2px 6px !important; flex-shrink: 0; border-radius: 4px; }
 .sidebar-cmd-icon { font-size: 13px; flex-shrink: 0; line-height: 1; }
@@ -241,6 +244,28 @@
 .pwa-btn-override { border-color: var(--danger); color: var(--danger); }
 .pwa-btn-override:hover { background: rgba(248,81,73,0.1); }
 
+/* ── Gate Context summary boxes (executive summary — no full prompt shown) ── */
+.gate-summary-box {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+  margin: 8px 0 6px;
+  padding: 8px 10px;
+  background: var(--surface2);
+  border-radius: 5px;
+  border-left: 3px solid var(--accent);
+}
+.gate-advice-box {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: var(--font-mono, monospace);
+  white-space: pre-wrap;
+  padding: 6px 10px;
+  background: rgba(0,0,0,0.15);
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
 /* ── Current Step Banner — always visible above Gate Context (all gates) ─── */
 .current-step-banner {
   border: 2px solid var(--accent);
@@ -249,6 +274,32 @@
   margin-bottom: 14px;
   background: rgba(88,166,255,0.06);
 }
+.csb-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: white;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.csb-title::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 12px;
+  background: var(--accent);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.csb-phase2 .csb-title { color: var(--success); }
+.csb-phase2 .csb-title::before { background: var(--success); }
+.csb-correction .csb-title,
+.csb-human .csb-title { color: var(--warning); }
+.csb-correction .csb-title::before,
+.csb-human .csb-title::before { background: var(--warning); }
 .current-step-banner.csb-phase2 {
   border-color: var(--success);
   background: rgba(63,185,80,0.06);

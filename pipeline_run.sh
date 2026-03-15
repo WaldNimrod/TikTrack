@@ -712,6 +712,22 @@ PYEOF
     fi
     printf '▲%.0s' {1..74}; echo ""
     echo ""
+
+    # ── State update: mark phase transition in pipeline_state ─────────────
+    # When phase2 is run on GATE_8, Phase 1 (Team 70/170) is confirmed done.
+    # Write phase8_content to state so the dashboard detects the transition.
+    if [[ "$GATE" == "GATE_8" && "$PHASE_NUM" == "2" ]]; then
+      python3 -c "
+import sys, os
+sys.path.insert(0, '.')
+from agents_os_v2.orchestrator.state import PipelineState
+domain = os.environ.get('PIPELINE_DOMAIN') or None
+state = PipelineState.load(domain)
+state.phase8_content = 'PHASE2_ACTIVE'
+state.save()
+print('[pipeline_run] ✅ State updated — phase8_content=PHASE2_ACTIVE. Dashboard will reflect Phase 2.')
+"
+    fi
     ;;
 
   *)

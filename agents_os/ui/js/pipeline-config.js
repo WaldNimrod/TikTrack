@@ -24,16 +24,32 @@ const GATE_CONFIG = {
   "GATE_6":                 { owner: "team_100",    engine: "codex+human",     desc: "Team 100 → reality vs intent", twoPaths: true },
   "WAITING_GATE6_APPROVAL": { owner: "team_00",     engine: "human",          desc: "Nimrod approves GATE_6", twoPaths: true },
   "GATE_7":                 { owner: "team_90",     engine: "human",          desc: "Team 90 orchestrates UX review; Nimrod browser sign-off", twoPaths: true },
-  "GATE_8":                 { owner: "team_90",     engine: "codex",           desc: "Docs closure", twoPaths: true },
+  "GATE_8":                 { owner: "team_90",     engine: "codex",           desc: "Team 70 (shared — all domains) writes AS_MADE_REPORT + archives WP → Team 90 validates → WP CLOSED", twoPaths: true },
 };
 
-const GATE_MANDATE_FILES = {
-  "GATE_1":                 "../../_COMMUNICATION/agents_os/prompts/GATE_1_mandates.md",
-  "G3_6_MANDATES":          "../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md",
-  "CURSOR_IMPLEMENTATION":  "../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md",
-  "GATE_4":                 "../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md",
-  "GATE_8":                 "../../_COMMUNICATION/agents_os/prompts/gate_8_mandates.md",
+// Domain-aware mandate path resolver (Iron Rule, locked 2026-03-15)
+// All mandate files are saved with domain prefix by pipeline.py:
+//   tiktrack_gate_8_mandates.md  |  agentsos_gate_8_mandates.md
+// Use getGateMandatePath(gate, domain) everywhere — never read GATE_MANDATE_FILES_BASE directly.
+const GATE_MANDATE_FILES_BASE = {
+  "GATE_1":                "GATE_1_mandates.md",
+  "G3_6_MANDATES":         "implementation_mandates.md",
+  "CURSOR_IMPLEMENTATION": "implementation_mandates.md",
+  "GATE_4":                "implementation_mandates.md",
+  "GATE_8":                "gate_8_mandates.md",
 };
+
+function getGateMandatePath(gate, domain) {
+  const base = GATE_MANDATE_FILES_BASE[gate];
+  if (!base) return null;
+  // domain slug: "tiktrack" → "tiktrack", "agents_os" → "agentsos"
+  const slug = (domain || currentDomain || 'tiktrack').toLowerCase()
+                .replace(/_/g, '').replace(/-/g, '');
+  return `../../_COMMUNICATION/agents_os/prompts/${slug}_${base}`;
+}
+
+// Legacy alias kept for backward-compat checks (do NOT use for file loading)
+const GATE_MANDATE_FILES = GATE_MANDATE_FILES_BASE;
 
 const DOMAIN_STATE_FILES = {
   "tiktrack":  "../../_COMMUNICATION/agents_os/pipeline_state_tiktrack.json",

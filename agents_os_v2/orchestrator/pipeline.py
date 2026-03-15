@@ -149,9 +149,19 @@ def _log(msg: str):
     print(f"[{ts}] {msg}")
 
 
-def _save_prompt(filename: str, content: str) -> Path:
+def _save_prompt(filename: str, content: str, domain: str | None = None) -> Path:
+    """Save prompt/mandate file to the prompts directory.
+
+    When ``domain`` is provided the file is prefixed with the domain slug so
+    that tiktrack and agents_os mandate files never overwrite each other:
+      tiktrack  →  tiktrack_gate_8_mandates.md
+      agents_os →  agentsos_gate_8_mandates.md
+    """
     prompts_dir = AGENTS_OS_OUTPUT_DIR / "prompts"
     prompts_dir.mkdir(parents=True, exist_ok=True)
+    if domain:
+        slug = domain.lower().replace("_", "").replace("-", "")  # "agentsos" | "tiktrack"
+        filename = f"{slug}_{filename}"
     path = prompts_dir / filename
     path.write_text(content, encoding="utf-8")
     return path
@@ -164,11 +174,14 @@ def _save_prompt(filename: str, content: str) -> Path:
 #  and coordination data sources (auto-injected from prior team output files).
 # ════════════════════════════════════════════════════════════════════════════
 
-# Per-gate mandate filenames (saved under _COMMUNICATION/agents_os/prompts/)
+# Per-gate mandate base filenames (saved under _COMMUNICATION/agents_os/prompts/)
+# All files are saved with domain prefix: {domain}_{filename}
+#   e.g.  tiktrack_gate_8_mandates.md  |  agentsos_gate_8_mandates.md
+# The JS dashboard reads the domain-prefixed paths via getGateMandatePath(gate, domain).
 GATE_MANDATE_FILES: dict = {
     "GATE_1":        "GATE_1_mandates.md",          # Phase 1: Team 170 (spec) | Phase 2: Team 190 (validate)
     "G3_6_MANDATES": "implementation_mandates.md",
-    "GATE_8":        "gate_8_mandates.md",
+    "GATE_8":        "gate_8_mandates.md",          # Phase 1: Team 70 (shared) | Phase 2: Team 90 (validate)
 }
 
 
@@ -550,6 +563,9 @@ def route_after_fail(gate_id: str, route_type: str, notes: str = ""):
     _log(f"")
 
     state.current_gate = target_gate
+    # GATE_8 two-phase: reset phase8_content so dashboard returns to Phase 1 display
+    if gate_id == "GATE_8" or target_gate == "GATE_8":
+        state.phase8_content = ""
     state.save()
     _log(f"Pipeline advanced → {target_gate}")
 
@@ -1069,7 +1085,7 @@ def _generate_gate_1_mandates(state: PipelineState) -> str:
     ]
 
     doc = _generate_mandate_doc(steps, state, gate="GATE_1")
-    _save_prompt("GATE_1_mandates.md", doc)
+    _save_prompt("GATE_1_mandates.md", doc, domain=state.project_domain)
     return doc
 
 
@@ -1285,7 +1301,7 @@ def _generate_mandates(state: PipelineState) -> str:
     ]
 
     doc = _generate_mandate_doc(steps, state, gate="G3_6_MANDATES", preamble=preamble)
-    _save_prompt("implementation_mandates.md", doc)
+    _save_prompt("implementation_mandates.md", doc, domain=state.project_domain)
     return doc
 
 
@@ -1319,7 +1335,7 @@ def _generate_gate_8_mandates(state: PipelineState, fresh: bool = False) -> str:
 
     phase1_task = (
         f"### Your Task\n\n"
-        f"**Environment:** Cursor Composer (Team 70) / Codex (Team 170)\n\n"
+        f"**Environment:** Cursor Composer — {doc_team_n}\n\n"
         f"Complete **two mandatory tasks** for WP `{wp}` closure:\n\n"
         f"---\n\n"
         f"**TASK A — Write AS_MADE_REPORT**\n\n"
@@ -1389,7 +1405,7 @@ def _generate_gate_8_mandates(state: PipelineState, fresh: bool = False) -> str:
             task        = phase2_task,
             reads_from  = [
                 as_made_path,
-                f"_COMMUNICATION/{doc_team}/TEAM_70_{wpu}_AS_MADE_REPORT_v1.0.0.md",
+                f"_COMMUNICATION/{doc_team}/{doc_team_up}_{wpu}_AS_MADE_REPORT_v1.0.0.md",
             ],
             reads_label = f"{doc_team_n} AS_MADE_REPORT",
             depends_on  = [doc_team],
@@ -1405,7 +1421,7 @@ def _generate_gate_8_mandates(state: PipelineState, fresh: bool = False) -> str:
     ]
 
     doc = _generate_mandate_doc(steps, state, gate="GATE_8")
-    _save_prompt("gate_8_mandates.md", doc)
+    _save_prompt("gate_8_mandates.md", doc, domain=state.project_domain)
     return doc
 
 

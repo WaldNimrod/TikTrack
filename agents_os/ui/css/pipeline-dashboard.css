@@ -22,14 +22,17 @@
 .gate-list { list-style: none; }
 .gate-item { display: flex; align-items: center; gap: 8px; padding: 4px 6px; border-radius: 4px; font-size: 11px; margin-bottom: 2px; cursor: default; }
 .gate-item.is-current { background: rgba(31,111,235,0.15); }
+.gate-item.is-skipped { opacity: 0.45; }
 .gate-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .dot-pass { background: var(--success); }
 .dot-fail { background: var(--danger); }
 .dot-current { background: var(--accent); box-shadow: 0 0 0 2px rgba(88,166,255,0.3); }
 .dot-pending { background: var(--border); }
 .dot-human { background: var(--warning); }
+.dot-skipped { background: transparent; border: 1.5px solid var(--border); }
 .gate-name { font-family: var(--mono); flex: 1; }
 .gate-status-text { font-size: 10px; color: var(--text-muted); }
+.pill-skipped { background: transparent; color: var(--text-muted); border: 1px solid var(--border); font-size: 10px; }
 
 .spec-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 16px; }
 .spec-card h3 { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -117,6 +120,9 @@
 .sidebar-cmd-list { display: flex; flex-direction: column; }
 .sidebar-cmd-row { display: flex; align-items: center; gap: 5px; padding: 4px 0; border-bottom: 1px solid var(--border); }
 .sidebar-cmd-row:last-child { border-bottom: none; }
+.sidebar-cmd-help-btn { min-width: 22px; padding: 2px 6px; font-size: 11px; font-weight: 700; }
+.cmd-help-pre { font-family: var(--mono); font-size: 11px; line-height: 1.5; white-space: pre-wrap; word-break: break-all; background: #010409; border: 1px solid var(--border); border-radius: 6px; padding: 12px; margin: 8px 0 12px; max-height: 200px; overflow-y: auto; }
+.cmd-help-detail { font-size: 13px; line-height: 1.6; color: var(--text); }
 .sidebar-cmd-text { font-family: var(--mono); font-size: 9.5px; flex: 1; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 .sidebar-cmd-btn { font-size: 10px !important; padding: 2px 6px !important; flex-shrink: 0; border-radius: 4px; }
 .sidebar-cmd-icon { font-size: 13px; flex-shrink: 0; line-height: 1; }
@@ -175,6 +181,12 @@
 .findings-copy-btn { flex-shrink: 0; background: var(--accent); border: 1px solid var(--accent); color: #fff; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; }
 .findings-copy-btn:hover { background: #388bfd; }
 
+/* ── Phase 1 Completion Builder (mirrors findings-builder, success theme) ── */
+.completion-builder { padding: 12px 14px; background: rgba(63,185,80,0.05); border: 2px solid var(--success); border-radius: 8px; }
+.completion-builder-title { font-size: 11px; font-weight: 700; color: var(--success); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.completion-builder-desc { font-size: 10px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.5; }
+.completion-builder code { font-family: var(--mono); background: rgba(255,255,255,0.06); padding: 1px 4px; border-radius: 3px; }
+
 .route-selector { background: rgba(248,81,73,0.06); border: 2px solid var(--danger); border-radius: 8px; padding: 12px 14px; margin-top: 8px; }
 .route-selector-title { font-size: 12px; font-weight: 700; color: var(--danger); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
 .route-selector-cycle { font-size: 10px; color: var(--text-muted); margin-bottom: 10px; font-family: var(--mono); }
@@ -232,6 +244,28 @@
 .pwa-btn-override { border-color: var(--danger); color: var(--danger); }
 .pwa-btn-override:hover { background: rgba(248,81,73,0.1); }
 
+/* ── Gate Context summary boxes (executive summary — no full prompt shown) ── */
+.gate-summary-box {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+  margin: 8px 0 6px;
+  padding: 8px 10px;
+  background: var(--surface2);
+  border-radius: 5px;
+  border-left: 3px solid var(--accent);
+}
+.gate-advice-box {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: var(--font-mono, monospace);
+  white-space: pre-wrap;
+  padding: 6px 10px;
+  background: rgba(0,0,0,0.15);
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
 /* ── Current Step Banner — always visible above Gate Context (all gates) ─── */
 .current-step-banner {
   border: 2px solid var(--accent);
@@ -240,10 +274,44 @@
   margin-bottom: 14px;
   background: rgba(88,166,255,0.06);
 }
+.csb-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: white;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.csb-title::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 12px;
+  background: var(--accent);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.csb-phase2 .csb-title { color: var(--success); }
+.csb-phase2 .csb-title::before { background: var(--success); }
+.csb-correction .csb-title,
+.csb-human .csb-title { color: var(--warning); }
+.csb-correction .csb-title::before,
+.csb-human .csb-title::before { background: var(--warning); }
 .current-step-banner.csb-phase2 {
   border-color: var(--success);
   background: rgba(63,185,80,0.06);
 }
+/* WP COMPLETE state — no active work package */
+.current-step-banner.csb-complete {
+  border-color: var(--success);
+  background: rgba(63,185,80,0.04);
+  opacity: 0.85;
+}
+.csb-complete .csb-title { color: var(--success); }
+.csb-complete .csb-title::before { background: var(--success); }
 .current-step-banner.csb-correction {
   border-color: var(--warning);
   background: rgba(210,153,34,0.06);

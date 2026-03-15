@@ -1,0 +1,171 @@
+# TEAM_170 | S002-P005-WP002 AS_MADE_REPORT v1.0.0
+
+**project_domain:** AGENTS_OS  
+**id:** TEAM_170_S002_P005_WP002_AS_MADE_REPORT_v1.0.0  
+**from:** Team 170 (Spec & Governance — GATE_8 executor)  
+**to:** Team 90 (GATE_8 validation), Team 00, Team 100  
+**cc:** Team 10, Team 61, Team 51  
+**date:** 2026-03-15  
+**status:** GATE_8_SUBMISSION  
+**gate_id:** GATE_8  
+**work_package_id:** S002-P005-WP002  
+**in_response_to:** TEAM_00_GATE8_ACTIVATION_DIRECTIVE_S002_P005_WP002_v1.0.0, TEAM_90_TO_TEAM_170_S002_P005_WP002_GATE8_CLOSURE_VALIDATION_PHASE2_RESULT_v1.0.0 (CLOSURE-001 remediation)
+
+---
+
+## Mandatory Identity Header
+
+| Field | Value |
+|-------|--------|
+| roadmap_id | PHOENIX_ROADMAP |
+| stage_id | S002 |
+| program_id | S002-P005 |
+| work_package_id | S002-P005-WP002 |
+| task_id | N/A |
+| gate_id | GATE_8 |
+| phase_owner | Team 90 |
+| project_domain | AGENTS_OS |
+
+---
+
+## 1. Feature summary — what was built
+
+**S002-P005-WP002 — Pipeline Governance (AGENTS_OS):** Pipeline state model, CLI commands, and PWA dashboard for agents_os domain.
+
+- **State model:** `gate_state`, `pending_actions`, `override_reason` in `agents_os_v2/orchestrator/state.py`.
+- **CLI:** `pass_with_actions`, `actions_clear`, `override` in `pipeline_run.sh` (GATE_6 AC-01, AC-03, AC-04); `--domain` support. `insist` command pending (OBS-02; Team 61).
+- **PWA dashboard:** Banner, sidebar, gate timeline; Help modal (4 tabs: Start, Gates, Commands, Help); Three Modes and domain examples; context banner “You are at: {gate}”; domain switch (TIKTRACK / AGENTS_OS); Hebrew/English toggle (lang-he / lang-en, dir="rtl").
+- **Runtime state:** `_COMMUNICATION/agents_os/pipeline_state_agentsos.json` (current_gate, work_package_id, domain).
+
+---
+
+## 2. Files created / modified
+
+| Path | Description |
+|------|-------------|
+| `agents_os_v2/orchestrator/state.py` | PipelineState; gate_state, pending_actions, override_reason |
+| `agents_os_v2/orchestrator/pipeline.py` | CLI commands; gate advance logic |
+| `pipeline_run.sh` | pass_with_actions, actions_clear, override; --domain support |
+| `agents_os/ui/PIPELINE_DASHBOARD.html` | Dashboard UI; Help modal; domain switch |
+| `agents_os/ui/js/pipeline-dashboard.js` | PWA banner; sidebar; gate timeline |
+| `agents_os/ui/js/pipeline-help.js` | 4-tab Help modal; context banner |
+| `agents_os/ui/js/pipeline-state.js` | State fetch; domain display |
+| `_COMMUNICATION/agents_os/pipeline_state_agentsos.json` | Runtime state (current_gate, work_package_id, domain) |
+
+---
+
+## 3. API endpoints added / changed
+
+None. CLI and UI only; no HTTP API changes.
+
+---
+
+## 4. Migrations or schema changes applied
+
+None.
+
+---
+
+## 5. Known limitations / deferred items
+
+- **OBS-02:** `insist` command — Team 61 resolution in progress; design locked in backlog.
+- **HELP-TAB:** Tab persistence across reload (localStorage) — SKIP at GATE_7; non-blocking.
+
+---
+
+## 6. Notes for future developers
+
+- **Setup:** Run dashboard via agents_os UI (PIPELINE_DASHBOARD.html); state from `pipeline_state_agentsos.json`. Use `pipeline_run.sh` with `--domain agents_os` or default for TIKTRACK.
+- **Gotchas:** Domain switch toggles which state file is shown; ensure state file exists and is writable for pass/fail updates.
+- **Dependencies:** pipeline_run.sh, agents_os_v2 orchestrator, agents_os UI JS; GATE_7 browser verification in team_51 report.
+
+---
+
+## 7. Archive manifest
+
+All WP communication files archived to:  
+`_COMMUNICATION/_ARCHIVE/S002/S002-P005-WP002/`
+
+| # | Archived file (basename) |
+|---|---------------------------|
+| 1 | S002_P005_WP002_G6_TRACEABILITY_MATRIX_v1.0.0.md |
+| 2 | TEAM_00_S002_P005_WP002_GATE7_ACTIVATION_SUPERSEDE_NOTE_v1.0.0.md |
+| 3 | TEAM_00_TO_TEAM_10_S002_P005_WP002_GATE7_ACTIVATION_v1.0.0.md |
+| 4 | TEAM_00_TO_TEAM_170_S002_P005_WP002_ROADMAP_INTEGRATION_v1.0.0.md |
+| 5 | TEAM_00_TO_TEAM_51_S002_P005_WP002_GATE7_BROWSER_DELEGATION_MANDATE_v1.0.0.md |
+| 6 | TEAM_00_TO_TEAM_90_S002_P005_WP002_GATE6_DECISION_NOTIFICATION_v1.0.0.md |
+| 7 | TEAM_00_TO_TEAM_90_S002_P005_WP002_GATE7_PASS_AND_GATE8_ACTIVATION_TRIGGER_v1.0.0.md |
+| 8 | TEAM_10_S002_P005_WP002_GATE2_INTAKE_ASSESSMENT_v1.0.0.md |
+| 9 | TEAM_10_S002_P005_WP002_GATE2_INTAKE_PACKAGE_v1.0.0.md |
+| 10 | TEAM_10_TO_TEAM_191_S002_P005_WP002_GATE0_INTAKE_VALIDATION_v1.0.0.md |
+| 11 | TEAM_10_TO_TEAM_61_S002_P005_WP002_DEVELOPMENT_AUTHORIZATION_v1.0.0.md |
+| 12 | TEAM_10_TO_TEAM_61_S002_P005_WP002_GATE4_ACK_AND_GATE5_ROUTING_RESPONSE_v1.0.0.md |
+| 13 | TEAM_10_TO_TEAM_90_S002_P005_WP002_GATE5_SUBMISSION_v1.0.0.md |
+| 14 | TEAM_10_TO_TEAM_90_S002_P005_WP002_GATE6_ACTIVATION_v1.0.0.md |
+| 15 | TEAM_170_S002_P005_WP002_ARCHIVE_REPORT.md |
+| 16 | TEAM_170_S002_P005_WP002_AS_MADE_REPORT.md |
+| 17 | TEAM_170_S002_P005_WP002_CANONICAL_EVIDENCE_CLOSURE_CHECK.md |
+| 18 | TEAM_170_S002_P005_WP002_COMMUNICATION_CLEANUP_REPORT.md |
+| 19 | TEAM_170_S002_P005_WP002_DEVELOPER_GUIDES_UPDATE_REPORT.md |
+| 20 | TEAM_170_S002_P005_WP002_GATE8_FINAL_SEAL_v1.0.0.md |
+| 21 | TEAM_170_S002_P005_WP002_ROADMAP_INTEGRATION_COMPLETION_v1.0.0.md |
+| 22 | TEAM_170_TO_TEAM_191_S002_P005_WP002_DOCUMENTATION_UPDATE_RESPONSE_v1.0.0.md |
+| 23 | TEAM_170_TO_TEAM_191_S002_P005_WP002_REGISTRY_BINDING_RESPONSE_v1.0.0.md |
+| 24 | TEAM_170_TO_TEAM_90_S002_P005_WP002_GATE8_REMEDIATION_COMPLETE_v1.0.0.md |
+| 25 | TEAM_170_TO_TEAM_90_S002_P005_WP002_GATE8_VALIDATION_REQUEST.md |
+| 26 | TEAM_190_S002_P005_WP002_GATE_0_VALIDATION_v1.0.0.md |
+| 27 | TEAM_190_TO_TEAM_191_S002_P005_WP002_FINAL_VALIDATION_RESULT_v1.0.0.md |
+| 28 | TEAM_190_TO_TEAM_191_S002_P005_WP002_INTERNAL_LOD400_REVALIDATION_RESULT_v1.0.0.md |
+| 29 | TEAM_190_TO_TEAM_191_S002_P005_WP002_INTERNAL_LOD400_VALIDATION_RESULT_v1.0.0.md |
+| 30 | TEAM_190_TO_TEAM_191_TEAM_10_S002_P005_WP002_BF02_CLOSURE_RESULT_v1.0.0.md |
+| 31 | TEAM_190_TO_TEAM_191_TEAM_10_S002_P005_WP002_GATE0_INTAKE_RESPONSE_v1.0.0.md |
+| 32 | TEAM_190_TO_TEAM_191_TEAM_10_S002_P005_WP002_GATE0_VALIDATION_RESULT_v1.0.0.md |
+| 33 | TEAM_191_INTERNAL_S002_P005_WP002_GITHUB_OPERATIONS_EXECUTION_CONTINUATION_PLAN_v1.0.0.md |
+| 34 | TEAM_191_INTERNAL_S002_P005_WP002_GITHUB_OPERATIONS_EXECUTION_CONTINUATION_PLAN_v1.0.1.md |
+| 35 | TEAM_191_INTERNAL_S002_P005_WP002_GITHUB_OPERATIONS_EXECUTION_CONTINUATION_PLAN_v1.0.2.md |
+| 36 | TEAM_191_INTERNAL_S002_P005_WP002_GITHUB_OPERATIONS_LOD400_v1.0.0.md |
+| 37 | TEAM_191_INTERNAL_S002_P005_WP002_GITHUB_OPERATIONS_LOD400_v1.0.1.md |
+| 38 | TEAM_191_INTERNAL_S002_P005_WP002_RESTART_COMPLETION_TRIGGER_PLAN_v1.0.0.md |
+| 39 | TEAM_191_INTERNAL_S002_P005_WP002_TRG19102_EXECUTION_RESULT_AND_TRG19103_v1.0.0.md |
+| 40 | TEAM_191_S002_P005_WP002_DATE_LINT_FIXLIST_v1.0.0.md |
+| 41 | TEAM_191_TO_TEAM_10_TEAM_100_S002_P005_WP002_GATE2_INTAKE_PACKAGING_REQUEST_v1.0.0.md |
+| 42 | TEAM_191_TO_TEAM_10_TEAM_190_S002_P005_WP002_GATE0_SCOPE_INTAKE_PACKAGE_v1.0.0.md |
+| 43 | TEAM_191_TO_TEAM_170_S002_P005_WP002_DOCUMENTATION_UPDATE_REQUEST_v1.0.0.md |
+| 44 | TEAM_191_TO_TEAM_170_S002_P005_WP002_DOCUMENTATION_UPDATE_REQUEST_v1.0.1.md |
+| 45 | TEAM_191_TO_TEAM_170_S002_P005_WP002_DOCUMENTATION_UPDATE_REQUEST_v1.0.2.md |
+| 46 | TEAM_191_TO_TEAM_170_S002_P005_WP002_REGISTRY_BINDING_REQUEST_v1.0.0.md |
+| 47 | TEAM_191_TO_TEAM_190_S002_P005_WP002_FINAL_VALIDATION_REQUEST_v1.0.0.md |
+| 48 | TEAM_191_TO_TEAM_190_S002_P005_WP002_FINAL_VALIDATION_REQUEST_v1.0.1.md |
+| 49 | TEAM_191_TO_TEAM_190_S002_P005_WP002_FINAL_VALIDATION_REQUEST_v1.0.2.md |
+| 50 | TEAM_191_TO_TEAM_190_S002_P005_WP002_INTERNAL_LOD400_REVALIDATION_REQUEST_ERRATA_v1.0.0.md |
+| 51 | TEAM_191_TO_TEAM_190_S002_P005_WP002_INTERNAL_LOD400_REVALIDATION_REQUEST_v1.0.1.md |
+| 52 | TEAM_191_TO_TEAM_190_S002_P005_WP002_INTERNAL_LOD400_REVALIDATION_REQUEST_v1.0.2.md |
+| 53 | TEAM_191_TO_TEAM_190_S002_P005_WP002_INTERNAL_LOD400_REVALIDATION_REQUEST_v1.0.3.md |
+| 54 | TEAM_191_TO_TEAM_190_S002_P005_WP002_INTERNAL_LOD400_VALIDATION_REQUEST_v1.0.0.md |
+| 55 | TEAM_191_TO_TEAM_190_TEAM_10_S002_P005_WP002_GATE0_INTAKE_REQUEST_v1.0.0.md |
+| 56 | TEAM_191_TO_TEAM_51_S002_P005_WP002_QA_HANDOFF_PROMPT_v1.0.0.md |
+| 57 | TEAM_191_TO_TEAM_51_S002_P005_WP002_QA_HANDOFF_PROMPT_v1.0.1.md |
+| 58 | TEAM_191_TO_TEAM_51_S002_P005_WP002_QA_REQUEST_v1.0.0.md |
+| 59 | TEAM_191_TO_TEAM_51_S002_P005_WP002_QA_REQUEST_v1.0.1.md |
+| 60 | TEAM_191_TO_TEAM_61_S002_P005_WP002_FAST2_IMPLEMENTATION_MANDATE_v1.0.0.md |
+| 61 | TEAM_191_TO_TEAM_90_S002_P005_WP002_GATE8_WSM_LOCK_TRIGGER_v1.0.0.md |
+| 62 | TEAM_51_S002_P005_WP002_GATE7_BROWSER_VERIFICATION_v1.0.0.md |
+| 63 | TEAM_51_S002_P005_WP002_QA_RESULT_v1.0.0.md |
+| 64 | TEAM_51_TO_TEAM_191_TEAM_190_S002_P005_WP002_QA_RESULT_v1.0.0.md |
+| 65 | TEAM_61_S002_P005_WP002_IMPLEMENTATION_KICKOFF_ACK_v1.0.0.md |
+| 66 | TEAM_61_TO_TEAM_10_S002_P005_WP002_GATE4_PASS_AND_GATE5_ROUTING_REQUEST_v1.0.0.md |
+| 67 | TEAM_61_TO_TEAM_51_S002_P005_WP002_QA_HANDOFF_PROMPT_v1.0.0.md |
+| 68 | TEAM_90_TO_TEAM_00_TEAM_100_S002_P005_WP002_GATE6_EXECUTION_SUBMISSION_v1.0.0.md |
+| 69 | TEAM_90_TO_TEAM_10_S002_P005_WP002_GATE5_VALIDATION_RESPONSE.md |
+| 70 | TEAM_90_TO_TEAM_10_S002_P005_WP002_GATE6_APPROVED_AND_GATE7_ACTIVE_v1.0.0.md |
+| 71 | TEAM_90_TO_TEAM_10_S002_P005_WP002_GATE6_SUBMISSION_SENT_v1.0.0.md |
+| 72 | TEAM_90_TO_TEAM_170_S002_P005_WP002_GATE8_BLOCKING_REPORT_v1.0.0.md |
+| 73 | TEAM_90_TO_TEAM_170_S002_P005_WP002_GATE8_CLOSURE_VALIDATION_PHASE2_RESULT_v1.0.0.md |
+| 74 | TEAM_90_TO_TEAM_170_S002_P005_WP002_GATE8_VALIDATION_RESPONSE_v1.0.1.md |
+| 75 | TEAM_90_TO_TEAM_191_S002_P005_WP002_GATE8_WSM_LOCK_RESPONSE_v1.0.0.md |
+
+**Note:** SSM, WSM, PHOENIX_MASTER_WSM, PHOENIX_PROGRAM_REGISTRY, and TEAM_ROSTER_LOCK were not archived (remain active).
+
+---
+
+**log_entry | TEAM_170 | S002_P005_WP002_AS_MADE_REPORT | v1.0.0 | GATE_8 | CLOSURE-001_REMEDIATION | 2026-03-15**

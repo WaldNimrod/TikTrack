@@ -181,4 +181,34 @@ Prompt blocks use:
 
 ---
 
+## Idea Pipeline Intake (Human Command)
+
+Uniform trigger accepted by all teams:
+
+```text
+**רעיון חדש**
+<human explanation of the idea and desired outcome>
+**סוף רעיון חדש**
+```
+
+Required team flow:
+1. Create a structured draft from the text (`title`, `domain`, `urgency`, `reference`, `notes`).
+2. Return the draft to Nimrod for approval.
+3. After approval only, run:
+
+```bash
+./idea_submit.sh \
+  --title "..." \
+  --domain agents_os|tiktrack|shared \
+  --urgency critical|high|medium|low \
+  --team team_XX \
+  --reference "_COMMUNICATION/path/to/context.md" \
+  --notes "..."
+```
+
+4. Return `IDEA-XXX` and the reference path.
+5. If environment or domain is unclear, stop and ask Nimrod before submission.
+
+---
+
 **log_entry | TEAM_170 | PIPELINE_CLI_REFERENCE | DELIVERED | 2026-03-14**

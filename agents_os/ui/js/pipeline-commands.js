@@ -38,6 +38,46 @@ function copyOverrideWithReason(domainFlag, btn) {
   copyCmd(cmd, btn);
 }
 
+/* Command help text for ? modal */
+const CMD_HELP = {
+  "cd to repo": "Changes working directory to the repository root. Run this first in a new terminal before any pipeline commands.",
+  "Generate prompt": "Outputs the 4-layer prompt for the current gate. Paste the ▼▼▼ block into the AI tool shown in the Current Step Banner (Cursor/Gemini/Codex).",
+  "Advance → PASS": "Marks the current gate as passed and advances to the next gate. Run only after the gate actor has completed their work.",
+  "Advance → FAIL": "Marks the current gate as failed with a reason. Use when blocking issues require remediation before re-validation.",
+  "Route → doc fix": "Routes to a doc-only fix path: document governance or format issues that do not require code changes.",
+  "Route → full cycle": "Routes to full revision: code or design issues that require rework and re-QA.",
+  "Approve gate": "Human approval for GATE_2 (intent), GATE_6 (architectural), or GATE_7 (UX). Confirms \"yes, proceed\".",
+  "Show status": "Displays current pipeline state only: WP, gate, domain. No side effects.",
+  "Regen prompt": "Generates prompt for a specific gate (e.g. GATE_4, G3_PLAN). Use when you need a different gate's prompt.",
+  "G3_5 revise": "Revise work plan after G3_5 BLOCK. Include blocker IDs and descriptions. Pipeline clears lld400 if needed.",
+  "Both pipelines": "Shows domain overview when both agents_os and tiktrack pipelines are active. Helps resolve DOMAIN AMBIGUOUS.",
+  "Submit idea": "Registers a new idea in PHOENIX_IDEA_LOG. Required: --title, --domain, --urgency, --team. Optional: --reference, --notes.",
+  "Scan ideas": "Startup check for Idea Pipeline: validates log, counts by status, flags missing delivery_ref.",
+};
+
+var _lastBuiltCmds = [];
+
+function showCmdHelp(idx) {
+  const cmd = _lastBuiltCmds[idx];
+  if (!cmd) return;
+  const modal = document.getElementById("cmd-help-modal");
+  const title = document.getElementById("cmd-help-title");
+  const pre = document.getElementById("cmd-help-command");
+  const detail = document.getElementById("cmd-help-detail");
+  if (!modal || !title || !pre || !detail) return;
+  title.textContent = cmd.icon + " " + cmd.label;
+  pre.textContent = cmd.text;
+  detail.textContent = CMD_HELP[cmd.label] || cmd.desc;
+  modal.classList.add("open");
+}
+
+function closeCmdHelp() {
+  const modal = document.getElementById("cmd-help-modal");
+  if (modal) modal.classList.remove("open");
+}
+
+window.closeCmdHelp = closeCmdHelp;
+
 function buildCommands(currentGate) {
   const df = typeof getDomainFlag === "function" ? getDomainFlag() : "";
   const cmds = [
@@ -55,28 +95,17 @@ function buildCommands(currentGate) {
     { icon: "💡", label: "Submit idea",       desc: "Register new idea in pipeline", text: './idea_submit.sh --title "..." --domain agents_os --urgency high --team team_XX\n# Optional: --reference "path/to/context.md" --notes "Context..."' },
     { icon: "🔍", label: "Scan ideas",        desc: "Idea pipeline startup check",   text: "./idea_scan.sh --summary" },
   ];
-  // Sidebar compact list
+  _lastBuiltCmds = cmds;
+  // Sidebar: Quick Commands — all commands with copy, tooltip (title), and ? help
   const sidebarEl = document.getElementById("sidebar-cmd-list");
   if (sidebarEl) {
-    sidebarEl.innerHTML = cmds.map(c =>
-      `<div class="sidebar-cmd-row" title="${escHtml(c.text)}">
+    sidebarEl.innerHTML = cmds.map((c, i) =>
+      `<div class="sidebar-cmd-row" title="${escHtml(c.text.replace(/\n/g, " "))}">
         <span class="sidebar-cmd-icon">${c.icon}</span>
         <span class="sidebar-cmd-label">${escHtml(c.label)}</span>
-        <button class="btn sidebar-cmd-btn" onclick="copyCmd(${escAttr(JSON.stringify(c.text))}, this)">⎘</button>
+        <button class="btn sidebar-cmd-btn" onclick="copyCmd(${escAttr(JSON.stringify(c.text))}, this)" title="Copy command">⎘</button>
+        <button class="btn sidebar-cmd-help-btn" onclick="showCmdHelp(${i})" title="Command help">?</button>
       </div>`
     ).join("");
   }
-  // Main content: rich command list with full script visible
-  const mainEl = document.getElementById("main-cmd-list");
-  if (mainEl) {
-    mainEl.innerHTML = cmds.map(c =>
-      `<div class="cmd-row">
-        <span class="cmd-desc">${c.icon} ${escHtml(c.label)}</span>
-        <span class="cmd-text">${escHtml(c.text)}</span>
-        <button class="btn cmd-copy" onclick="copyCmd(${escAttr(JSON.stringify(c.text))}, this)">⎘ Copy → terminal</button>
-      </div>`
-    ).join("");
-  }
-  const badge = document.getElementById("terminal-cmds-badge");
-  if (badge) badge.textContent = cmds.length + " commands";
 }

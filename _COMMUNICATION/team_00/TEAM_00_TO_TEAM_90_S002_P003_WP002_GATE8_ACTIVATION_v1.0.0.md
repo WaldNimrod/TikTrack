@@ -4,11 +4,24 @@ from:          Team 00 — Chief Architect
 to:            Team 90 (Validation Lead)
 cc:            Team 10 (WSM update), Team 70 (AS_MADE docs), Team 170 (registry)
 date:          2026-03-15
+status:        SUPERSEDED_HISTORICAL
+historical_record: true
+superseded_by: documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md (GATE_8 PASS logged 2026-03-07)
 authority:     Team 00 constitutional authority + Nimrod explicit approval
-subject:       S002-P003-WP002 GATE_7 PASS confirmed — GATE_8 activation
+subject:       SUPERSEDED — S002-P003-WP002 GATE_8 activation request (historical only)
 ---
 
 # GATE_8 ACTIVATION — S002-P003-WP002 (D22 / D33 / D34 / D35)
+
+## SUPERSEDED NOTICE (Do Not Execute)
+
+This activation document is retained as historical evidence only.
+
+- Canonical lifecycle status for `S002-P003-WP002` is already closed:
+  - `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` (`2026-03-07` GATE_8 PASS)
+  - `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_WORK_PACKAGE_REGISTRY_v1.0.0.md` (`CLOSED`, `GATE_8 (PASS)`, `is_active=false`)
+  - `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md` (`S002-P003` complete)
+- Execution status for this document: `VOIDED_DO_NOT_EXECUTE`.
 
 ## GATE_7 PASS — Confirmed by Nimrod
 
@@ -96,3 +109,4 @@ S003-P003 GATE_0 waits for LOD400 (IDEA-016 → new_wp).
 ---
 
 **log_entry | TEAM_00 | GATE8_ACTIVATION | S002-P003-WP002 | GATE_7_PASS_CONFIRMED_NIMROD | 2026-03-15**
+**log_entry | TEAM_00 | GATE8_ACTIVATION | S002-P003-WP002 | SUPERSEDED_HISTORICAL_DO_NOT_EXECUTE | 2026-03-15**

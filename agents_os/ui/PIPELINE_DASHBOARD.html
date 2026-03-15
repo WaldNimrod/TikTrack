@@ -9,7 +9,7 @@
   </script>
   <title>TikTrack — Pipeline Dashboard</title>
   <link rel="stylesheet" href="css/pipeline-shared.css?v=2" />
-  <link rel="stylesheet" href="css/pipeline-dashboard.css?v=2" />
+  <link rel="stylesheet" href="css/pipeline-dashboard.css?v=7" />
   <!-- styles in pipeline-shared.css + pipeline-dashboard.css -->
 </head>
 <body>
@@ -111,7 +111,7 @@ python3 -m http.server 8090
     <div class="step-box"><div class="step-title">GATE_5 — Team 190 (Codex)</div>Dev validation: code vs spec. Outputs structured verdict only.</div>
     <div class="step-box"><div class="step-title">GATE_6 — Team 100 + Nimrod (human)</div>Reality vs intent: does what was built match what was approved?</div>
     <div class="step-box"><div class="step-title">GATE_7 — Nimrod (browser)</div>UX sign-off: scenario checklist, test flows → <code>./pipeline_run.sh approve</code></div>
-    <div class="step-box"><div class="step-title">GATE_8 — Team 170 → Team 190 (Codex)</div>Phase 1: Team 170 writes AS_MADE_REPORT + archives WP files. Phase 2: Team 190 validates → WP CLOSED.</div>
+    <div class="step-box"><div class="step-title">GATE_8 — Team 70/170 → Team 90 (Codex)</div>Phase 1: Team 70 (TikTrack) or Team 170 (Agents OS) writes AS_MADE_REPORT + archives WP files. Phase 2: Team 90 validates → WP CLOSED.</div>
     </div>
     <div class="lang-he" dir="rtl" style="display:none">
     <div class="step-box"><div class="step-title">GATE_0 — Team 190 (Codex)</div>ולידציית היקף, בידוד דומיין.</div>
@@ -125,7 +125,7 @@ python3 -m http.server 8090
     <div class="step-box"><div class="step-title">GATE_5 — Team 190</div>ולידציית פיתוח.</div>
     <div class="step-box"><div class="step-title">GATE_6 — Team 100 + Nimrod</div>מציאות מול כוונה.</div>
     <div class="step-box"><div class="step-title">GATE_7 — Nimrod</div>UX sign-off.</div>
-    <div class="step-box"><div class="step-title">GATE_8 — Team 170 → 190</div>AS_MADE + ארכוב.</div>
+    <div class="step-box"><div class="step-title">GATE_8 — Team 70/170 → Team 90</div>AS_MADE + ארכוב.</div>
     </div>
     </div>
 
@@ -176,6 +176,14 @@ python3 -m http.server 8090
 #   high     — decide this sprint / stage
 #   medium   — within current stage timeline
 #   low      — backlog (S+ or whenever)</pre>
+      <div class="tip-box" style="margin-top:8px">
+        <strong>NEW UNIFORM HUMAN TRIGGER:</strong>
+        <pre style="margin-top:6px">**רעיון חדש**
+&lt;human explanation of the idea and desired outcome&gt;
+**סוף רעיון חדש**</pre>
+        Team flow: translate → return draft for Nimrod approval → submit via <code>idea_submit.sh</code> only after approval.<br>
+        If domain/environment is unclear: stop and ask Nimrod before submit.
+      </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
         <button class="btn" style="font-size:11px" onclick="copyCmd('./idea_scan.sh --summary', this)">⎘ Scan summary</button>
         <button class="btn" style="font-size:11px" onclick="copyCmd('./idea_scan.sh', this)">⎘ Full scan</button>
@@ -220,6 +228,16 @@ python3 -m http.server 8090
     <button class="modal-close" onclick="closeProgress()">✕</button>
     <h2>🔍 בדוק התקדמות — Progress Diagnostics</h2>
     <div id="progress-content"><span class="loading">Scanning…</span></div>
+  </div>
+</div>
+
+<!-- ── Command Help Modal ───────────────────────────────────────────────────── -->
+<div class="modal-overlay" id="cmd-help-modal" onclick="if(event.target===this)closeCmdHelp()">
+  <div class="modal-box cmd-help-modal-box">
+    <button class="modal-close" onclick="closeCmdHelp()">✕</button>
+    <h3 id="cmd-help-title" style="margin-bottom:8px">—</h3>
+    <pre id="cmd-help-command" class="cmd-help-pre"></pre>
+    <div id="cmd-help-detail" class="cmd-help-detail"></div>
   </div>
 </div>
 
@@ -284,38 +302,44 @@ python3 -m http.server 8090
     <!-- Current Step Banner — always visible, all gates, shows active actor + next steps -->
     <div id="current-step-banner"></div>
 
-    <!-- Accordion: Gate Context — PRIMARY prompt for all gates (always first) -->
-    <div class="accordion open" id="acc-prompt">
+    <!-- Accordion: Gate Context — executive summary only (no prompt, no copy) — starts CLOSED -->
+    <div class="accordion" id="acc-prompt">
       <div class="accordion-header" onclick="toggleAccordion('acc-prompt')" id="acc-prompt-header">
         <span id="acc-prompt-icon">📋</span>
-        <span class="accordion-title" id="acc-prompt-title">Current Gate Prompt</span>
+        <span class="accordion-title" id="acc-prompt-title">Gate Context</span>
         <span class="accordion-badge" id="prompt-gate-badge">—</span>
         <span class="accordion-chevron">▶</span>
       </div>
       <div class="accordion-body">
-        <div class="prompt-toolbar">
-          <div class="prompt-meta">
-            Gate: <span id="prompt-gate-name">—</span> &nbsp;·&nbsp;
-            Owner: <span id="prompt-owner">—</span> &nbsp;·&nbsp;
-            Engine: <span id="prompt-engine">—</span>
-          </div>
-          <button class="btn" id="copy-prompt-btn" onclick="copyPrompt()">📋 Copy Prompt</button>
+        <div class="prompt-meta">
+          Gate: <span id="prompt-gate-name">—</span> &nbsp;·&nbsp;
+          Owner: <span id="prompt-owner">—</span> &nbsp;·&nbsp;
+          Engine: <span id="prompt-engine">—</span>
         </div>
-        <div class="prompt-box" id="prompt-content">Loading prompt…</div>
-        <!-- Redirect banner: visible only when current gate uses per-team mandates -->
-        <div class="mandate-redirect-banner" id="mandate-redirect-banner">
-          <span>⚡</span>
-          <span>This gate uses <strong>per-team mandates</strong>. Copy individual team prompts from the <strong>Mandate Tabs ↓</strong></span>
-        </div>
+        <div class="gate-summary-box" id="gate-summary-desc">—</div>
+        <div class="gate-advice-box" id="gate-summary-advice"></div>
         <div style="margin-top:8px; font-size:11px; color:var(--text-muted)">
-          Full file: <code id="prompt-file-path" style="font-size:10px"></code>
+          Raw prompt file: <code id="prompt-file-path" style="font-size:10px"></code>
         </div>
+      </div>
+    </div>
 
-        <!-- ── Governance Booster Panel ── -->
+    <!-- Accordion: Team Mandates — ALWAYS visible, starts OPEN — the primary action area -->
+    <div class="accordion open" id="acc-mandates">
+      <div class="accordion-header" onclick="toggleAccordion('acc-mandates')">
+        <span>👥</span>
+        <span class="accordion-title">Team Mandates</span>
+        <span class="accordion-badge" id="mandates-badge">—</span>
+        <span class="accordion-chevron">▶</span>
+      </div>
+      <div class="accordion-body">
+        <div class="team-tabs" id="team-tabs"></div>
+
+        <!-- Governance Booster Panel — now lives in Mandates, applies per mandate tab -->
         <div class="booster-panel">
           <label class="booster-toggle-row">
             <input type="checkbox" id="booster-toggle" onchange="toggleBooster(this.checked)">
-            🛡️ Add governance booster to copied prompt
+            🛡️ Add governance booster to copied mandate
             <span id="booster-team-hint" style="margin-left:4px;font-size:10px;color:var(--text-muted)"></span>
           </label>
           <div id="booster-options" class="booster-options" style="display:none">
@@ -326,25 +350,13 @@ python3 -m http.server 8090
             </div>
             <div class="booster-preview" id="booster-preview">(select a type to preview)</div>
             <div class="booster-footer">
-              <span class="booster-hint">⬆ This block will be appended after the gate prompt when you copy.</span>
+              <span class="booster-hint">⬆ This block will be appended after the mandate when you copy.</span>
             </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Accordion: Team Mandates — shown ONLY for mandate gates (GATE_1, G3_6_MANDATES, etc.) -->
-    <div class="accordion" id="acc-mandates" style="display:none">
-      <div class="accordion-header" onclick="toggleAccordion('acc-mandates')">
-        <span>👥</span>
-        <span class="accordion-title">Team Mandates</span>
-        <span class="accordion-badge" id="mandates-badge">—</span>
-        <span class="accordion-chevron">▶</span>
-      </div>
-      <div class="accordion-body">
-        <div class="team-tabs" id="team-tabs"></div>
         <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
-          <button class="btn" id="copy-mandate-btn" onclick="copyCurrentMandate()">📋 Copy mandate</button>
+          <button class="btn btn-primary" id="copy-mandate-btn" onclick="copyCurrentMandate()">📋 Copy mandate</button>
         </div>
         <div class="mandate-content" id="mandate-content">Loading…</div>
       </div>
@@ -352,19 +364,6 @@ python3 -m http.server 8090
 
     <!-- Quick Action Bar (PASS/FAIL — team response) -->
     <div id="quick-action-bar"></div>
-
-    <!-- Accordion: Terminal Commands — copy scripts to run in terminal -->
-    <div class="accordion open" id="acc-terminal-cmds">
-      <div class="accordion-header" onclick="toggleAccordion('acc-terminal-cmds')">
-        <span>⌘</span>
-        <span class="accordion-title">Terminal Commands</span>
-        <span class="accordion-badge" id="terminal-cmds-badge">—</span>
-        <span class="accordion-chevron">▶</span>
-      </div>
-      <div class="accordion-body">
-        <div class="cmd-list" id="main-cmd-list">Loading…</div>
-      </div>
-    </div>
 
     <!-- Accordion: Expected Files -->
     <div class="accordion" id="acc-files">
@@ -382,13 +381,13 @@ python3 -m http.server 8090
   </main>
 </div>
 
-<script src="js/pipeline-config.js?v=3"></script>
+<script src="js/pipeline-config.js?v=4"></script>
 <script src="js/pipeline-state.js?v=3"></script>
 <script src="js/pipeline-dom.js?v=3"></script>
-<script src="js/pipeline-commands.js?v=3"></script>
-<script src="js/pipeline-booster.js?v=3"></script>
+<script src="js/pipeline-commands.js?v=4"></script>
+<script src="js/pipeline-booster.js?v=5"></script>
 <script src="js/pipeline-help.js?v=3"></script>
-<script src="js/pipeline-dashboard.js?v=3"></script>
+<script src="js/pipeline-dashboard.js?v=6"></script>
 
 </body>
 </html>

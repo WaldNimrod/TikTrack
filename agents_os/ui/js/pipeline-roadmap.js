@@ -16,6 +16,39 @@ let allPrograms = [];
 let allStages = [];
 let refreshTimer = null;
 
+// Cache of live pipeline states for ALL domains — used to cross-reference
+// actual completion status vs. static registry markdown.
+// Loaded fresh on every loadAll() call.
+let allDomainStatesCache = {};
+
+async function refreshAllDomainStates() {
+  allDomainStatesCache = {};
+  for (const [domain, path] of Object.entries(DOMAIN_STATE_FILES)) {
+    try {
+      const r = await fetch(path + '?t=' + Date.now());
+      if (r.ok) allDomainStatesCache[domain] = await r.json();
+    } catch { /* ignore — domain may not have a state file yet */ }
+  }
+}
+
+// ── Live program status override ──────────────────────────────────────────
+// Returns a live status string for a program based on allDomainStatesCache,
+// or null if no live match exists.
+// Priority: domain state JSON > registry markdown (prevents stale-registry display bugs).
+// Special case: work_package_id "NONE" is never treated as a WP for any program.
+function getLiveProgramStatusOverride(pid) {
+  for (const [domain, ds] of Object.entries(allDomainStatesCache)) {
+    if (!ds) continue;
+    const dsWp = ds.work_package_id || '';
+    if (!dsWp || dsWp === 'NONE') continue;
+    const dsProg = dsWp.replace(/-WP\d+.*$/, '');
+    if (dsProg !== pid) continue;
+    if (ds.current_gate === 'COMPLETE') return 'COMPLETE';
+    if (ds.current_gate && ds.current_gate !== 'NONE') return 'ACTIVE';
+  }
+  return null; // no live match — caller uses registry value
+}
+
 // ── Markdown table parser ──────────────────────────────────────────────────
 function extractTable(mdText, firstColName) {
   const rows = [];
@@ -171,6 +204,7 @@ function loadProgramDetail(programId) {
         <span class="prog-detail-val"><span class="rm-status ${rmStatusClass(prog['status'])}">${status}</span></span>
       </div>
       ${isActive ? `<div class="prog-detail-row"><span class="prog-detail-lbl">⚡ Pipeline:</span><span class="prog-detail-val" style="color:var(--accent)">ACTIVE — WP: ${escHtml(pipelineState.work_package_id)}</span></div>` : ''}
+      ${vs && vs._isLiveDomain && vs.current_gate === 'COMPLETE' ? `<div class="prog-detail-row"><span class="prog-detail-lbl">✅ Live status:</span><span class="prog-detail-val" style="color:var(--success)">COMPLETE (from ${escHtml(vs._isLiveDomain)} state)</span></div>` : ''}
       <div class="prog-gate-mirror">Gate mirror: ${escHtml(mirror)}</div>
     </div>`;
   sidebarEl.style.display = 'block';
@@ -214,24 +248,49 @@ function highlightRoadmapProgram(pid) {
 }
 
 // ── Virtual state for non-active programs ─────────────────────────────────
+// Priority: (1) live pipelineState for active domain WP  →  (2) any domain's
+// live state JSON  →  (3) registry markdown status as fallback.
+// This ensures the roadmap always shows the TRUE live completion status even
+// when the static registry hasn't been updated yet.
 function makeVirtualState(pid) {
   if (!pid) return pipelineState;
-  const activeWp = pipelineState ? (pipelineState.work_package_id || '') : '';
+  const activeWp   = pipelineState ? (pipelineState.work_package_id || '') : '';
   const activeProg = activeWp ? activeWp.replace(/-WP\d+.*$/, '') : '';
   if (pid === activeProg) return Object.assign({}, pipelineState, { _isLive: true });
 
+  // ── Check all domain state files for a live match ─────────────────────────
+  for (const [domain, ds] of Object.entries(allDomainStatesCache)) {
+    if (!ds) continue;
+    const dsWp   = ds.work_package_id || '';
+    const dsProg = dsWp ? dsWp.replace(/-WP\d+.*$/, '') : '';
+    if (dsProg !== pid) continue;
+    // Live match found — use state from this domain file
+    const isComplete = ds.current_gate === 'COMPLETE';
+    return {
+      _isVirtual:     true,
+      _isLiveDomain:  domain,
+      work_package_id: dsWp,
+      current_gate:   ds.current_gate,
+      gates_completed: isComplete
+        ? GATE_SEQUENCE.slice().concat(['COMPLETE'])
+        : (ds.gates_completed || []),
+      gates_failed:   ds.gates_failed || [],
+    };
+  }
+
+  // ── Fallback: use registry status ─────────────────────────────────────────
   const prog = allPrograms.find(p => p['program_id'] === pid);
   if (!prog) return { _isVirtual: true, work_package_id: pid, current_gate: null, gates_completed: [], gates_failed: [] };
 
   const status = rmStatusLabel(prog['status']);
   const isDone = (status === 'COMPLETE' || status === 'CLOSED');
   return {
-    _isVirtual: true,
-    _progStatus: status,
+    _isVirtual:      true,
+    _progStatus:     status,
     work_package_id: pid,
-    current_gate: null,
+    current_gate:    null,
     gates_completed: isDone ? GATE_SEQUENCE.slice() : [],
-    gates_failed: [],
+    gates_failed:    [],
   };
 }
 
@@ -241,10 +300,10 @@ function renderDomainStats(programs, state) {
     const ps = programs.filter(p => (p['domain'] || '').includes(keyword));
     return {
       total: ps.length,
-      complete: ps.filter(p => ['COMPLETE', 'CLOSED'].includes(rmStatusLabel(p['status']))).length,
-      active: ps.filter(p => rmStatusLabel(p['status']) === 'ACTIVE').length,
-      planned: ps.filter(p => rmStatusLabel(p['status']) === 'PLANNED').length,
-      deferred: ps.filter(p => ['DEFERRED', 'HOLD', 'FROZEN'].includes(rmStatusLabel(p['status']))).length,
+      complete: ps.filter(p => { const live = getLiveProgramStatusOverride(p['program_id']); return ['COMPLETE', 'CLOSED'].includes(live || rmStatusLabel(p['status'])); }).length,
+      active: ps.filter(p => { const live = getLiveProgramStatusOverride(p['program_id']); return (live || rmStatusLabel(p['status'])) === 'ACTIVE'; }).length,
+      planned: ps.filter(p => { const live = getLiveProgramStatusOverride(p['program_id']); return (live || rmStatusLabel(p['status'])) === 'PLANNED'; }).length,
+      deferred: ps.filter(p => { const live = getLiveProgramStatusOverride(p['program_id']); return ['DEFERRED', 'HOLD', 'FROZEN'].includes(live || rmStatusLabel(p['status'])); }).length,
     };
   }
 
@@ -403,8 +462,10 @@ function renderRoadmapTree(stages, programs, state) {
         const domain = (prog['domain'] || '').replace(/[^A-Z_]/g, '');
         const domCls = domain.includes('AGENTS') ? 'domain-agentsos' : 'domain-tiktrack';
         const domShort = domain.includes('AGENTS') ? 'AOS' : 'TT';
-        const psc = rmStatusClass(prog['status']);
-        const psl = rmStatusLabel(prog['status']);
+        const liveStatus = getLiveProgramStatusOverride(pid);
+        const effectiveStatus = liveStatus || prog['status'];
+        const psc = rmStatusClass(effectiveStatus);
+        const psl = rmStatusLabel(effectiveStatus);
         html += `<div class="rm-program${isActive ? ' rm-program-active' : ''}" data-pid="${escAttr(pid)}"
           onclick="document.getElementById('prog-select').value='${escAttr(pid)}';onProgSelect('${escAttr(pid)}')">
           <span style="font-size:9px;color:${isActive ? 'var(--accent)' : 'transparent'};width:10px">▶</span>
@@ -510,6 +571,9 @@ async function loadCanonicalFiles() {
 
 // ── Main load ──────────────────────────────────────────────────────────────
 async function loadAll() {
+  // Load all domain states in parallel so makeVirtualState() has live completion data
+  await refreshAllDomainStates();
+
   const state = await loadPipelineState();
 
   let roadmapText = '';

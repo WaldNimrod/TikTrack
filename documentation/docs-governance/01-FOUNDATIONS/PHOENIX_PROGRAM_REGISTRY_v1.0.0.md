@@ -43,7 +43,7 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | S002 | S002-P002 | MCP-QA Transition (Full Pipeline Orchestrator) | TIKTRACK | COMPLETE | GATE_8; active_flow=S002-P002-WP003 (Market Data Hardening) — **GATE_8 PASS / DOCUMENTATION_CLOSED** after Team 90 validation; no active work package in execution at this time.; active_work_package_id=N/A |
 | S002 | S002-P003 | TikTrack Alignment (D22+D33+D34+D35) | TIKTRACK | COMPLETE | GATE_8 PASS 2026-03-07; DOCUMENTATION_CLOSED; lifecycle complete (Team 90 validation report) |
 | S002 | S002-P004 | Admin Review S002 | TIKTRACK | PLANNED | — (Stage Governance Package; planning marker per integrated roadmap v1.1.0) |
-| S002 | S002-P005 | Agents_OS v2 Writing Semantics Hardening (ADR-031 Stage A) + UI Optimization | AGENTS_OS | ACTIVE | WP001 (ADR-031 Stage A + UI Optimization): TASK_CLOSED 2026-03-15 — Team 100 final approval `TEAM_100_AGENTS_OS_UI_OPTIMIZATION_FINAL_APPROVAL_v1.0.0.md`; 14/14 ACs PASS; CSS/JS extraction complete; validator hardening complete; UI layout canon complete. WP002 (Pipeline Governance — PASS_WITH_ACTION micro-cycle): PLANNED — trigger: WP001 GATE_8 PASS; design locked `TEAM_100_PASS_WITH_ACTION_PIPELINE_GOVERNANCE_BACKLOG_v1.0.0.md`; Nimrod confirmed 2026-03-15. |
+| S002 | S002-P005 | Agents_OS v2 Writing Semantics Hardening (ADR-031 Stage A) + UI Optimization | AGENTS_OS | ACTIVE | GATE_8; active_flow=S002-P005-WP002 (Pipeline Governance) — **GATE_8 PASS / DOCUMENTATION_CLOSED** after Team 90 revalidation (`TEAM_90_TO_TEAM_170_S002_P005_WP002_GATE8_VALIDATION_RESPONSE_v1.0.1.md`); no active work package in execution at this time.; active_work_package_id=N/A |
 | S003 | S003-P001 | Data Model Validator | AGENTS_OS | COMPLETE | FAST_4 CLOSED (WP001) 2026-03-11 — Data Model Validator deployed; FAST_0..FAST_3 completed; Team 170 closure per TEAM_61_TO_TEAM_170_S003_P001_WP001_FAST4_HANDOFF_PROMPT_v1.0.0 |
 | S003 | S003-P002 | Test Template Generator | AGENTS_OS | COMPLETE | FAST_4 CLOSED (WP001) 2026-03-12 — Test Template Generator deployed; G3.7 added; agents_os_v2/requirements.txt canonical |
 | S003 | S003-P003 | System Settings (D39+D40+D41) | TIKTRACK | PLANNED | — (scope updated per ROADMAP_AMENDMENT_v2 §B3; D41 user_management companion) |
@@ -119,9 +119,9 @@ Source directives:
 
 ---
 
-**current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-13). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
+**current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-15). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
 
-**WSM mirror (2026-03-13):** active_stage_id=S002; active_program_id=S002-P002; current_gate=GATE_8; active_work_package_id=N/A; active_flow=S002-P002-WP003 (Market Data Hardening) — **GATE_8 PASS / DOCUMENTATION_CLOSED** after Team 90 validation; no active work package in execution at this time..
+**WSM mirror (2026-03-15):** active_stage_id=S002; active_program_id=S002-P005; current_gate=GATE_8; active_work_package_id=N/A; active_flow=S002-P005-WP002 (Pipeline Governance) — **GATE_8 PASS / DOCUMENTATION_CLOSED** after Team 90 revalidation (`TEAM_90_TO_TEAM_170_S002_P005_WP002_GATE8_VALIDATION_RESPONSE_v1.0.1.md`); no active work package in execution at this time..
 
 ---
 

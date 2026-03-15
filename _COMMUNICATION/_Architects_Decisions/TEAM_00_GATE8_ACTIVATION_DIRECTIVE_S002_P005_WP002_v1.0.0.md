@@ -5,6 +5,7 @@ from: Team 00 (Chief Architect)
 to: Team 170 (GATE_8 executor — AGENTS_OS)
 cc: Team 90, Team 10, Team 61, Team 51, Team 100, Team 190
 date: 2026-03-10
+historical_record: true
 status: ACTION_REQUIRED
 gate_id: GATE_8
 work_package_id: S002-P005-WP002

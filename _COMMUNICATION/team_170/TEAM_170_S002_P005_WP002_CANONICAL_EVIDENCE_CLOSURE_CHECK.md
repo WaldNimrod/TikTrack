@@ -4,6 +4,7 @@ id: TEAM_170_S002_P005_WP002_CANONICAL_EVIDENCE_CLOSURE_CHECK
 from: Team 170 (Spec & Governance — GATE_8 executor)
 to: Team 90 (GATE_8 validation), Team 00, Team 100
 date: 2026-02-19
+historical_record: true
 status: GATE_8_SUBMISSION
 gate_id: GATE_8
 work_package_id: S002-P005-WP002

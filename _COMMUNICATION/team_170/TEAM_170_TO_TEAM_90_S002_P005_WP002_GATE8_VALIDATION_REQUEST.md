@@ -5,6 +5,7 @@ from: Team 170 (Spec & Governance — GATE_8 executor)
 to: Team 90 (GATE_8 validation authority)
 cc: Team 00, Team 10, Team 100
 date: 2026-02-19
+historical_record: true
 status: VALIDATION_REQUEST
 gate_id: GATE_8
 work_package_id: S002-P005-WP002

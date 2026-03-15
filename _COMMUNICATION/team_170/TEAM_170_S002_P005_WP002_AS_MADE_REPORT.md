@@ -49,7 +49,7 @@ in_response_to: TEAM_00_GATE8_ACTIVATION_DIRECTIVE_S002_P005_WP002_v1.0.0
 |------|-------------|
 | `agents_os_v2/orchestrator/state.py` | PipelineState; gate_state, pending_actions, override_reason |
 | `agents_os_v2/orchestrator/pipeline.py` | CLI commands; gate advance logic |
-| `scripts/pipeline_run.sh` | pass_with_actions, actions_clear, override; --domain support |
+| `pipeline_run.sh` | pass_with_actions, actions_clear, override; --domain support |
 | `agents_os/ui/PIPELINE_DASHBOARD.html` | Dashboard UI; Help modal; domain switch |
 | `agents_os/ui/js/pipeline-dashboard.js` | PWA banner; sidebar; gate timeline |
 | `agents_os/ui/js/pipeline-help.js` | 4-tab Help modal; context banner |

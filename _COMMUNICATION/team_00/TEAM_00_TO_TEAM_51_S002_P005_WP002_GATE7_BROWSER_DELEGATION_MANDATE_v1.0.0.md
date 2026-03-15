@@ -5,6 +5,7 @@ from: Team 00 (Chief Architect / Nimrod)
 to: Team 51 (AOS QA & Functional Acceptance)
 cc: Team 10, Team 61
 date: 2026-03-10
+historical_record: true
 status: MANDATE_ACTIVE
 gate_id: GATE_7
 work_package_id: S002-P005-WP002

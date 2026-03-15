@@ -44,15 +44,15 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S002-P001 | S002-P001-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-02-26 |
 | S002-P002 | S002-P002-WP003 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-03-13 |
 | S002-P003 | S002-P003-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-03-07 |
-| S002-P005 | S002-P005-WP002 | IN_PROGRESS | GATE_6 (OPEN) | false | Pipeline Governance; GATE_5 PASS (Team 90 2026-03-15); GATE_6 open — architectural dev validation; design locked TEAM_100_PASS_WITH_ACTION_PIPELINE_GOVERNANCE_BACKLOG_v1.0.0 |
+| S002-P005 | S002-P005-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-03-15 |
 | S003-P001 | S003-P001-WP001 | CLOSED | FAST_4 (PASS) | false | Data Model Validator deployed; FAST_4 CLOSED 2026-03-11 (Team 170 closure) |
 | S003-P002 | S003-P002-WP001 | CLOSED | FAST_4 (PASS) | false | Test Template Generator deployed; G3.7 in gate chain; FAST_4 CLOSED 2026-03-12 (Team 170 closure) |
 
 
 
-**Current active WP state (mirror from WSM):** **NO_ACTIVE_WORK_PACKAGE** — WSM `active_stage_id=S002`, `active_program_id=S002-P002`, `current_gate=GATE_8`, `active_work_package_id=N/A`.
+**Current active WP state (mirror from WSM):** **NO_ACTIVE_WORK_PACKAGE** — WSM `active_stage_id=S002`, `active_program_id=S002-P005`, `current_gate=GATE_8`, `active_work_package_id=N/A`.
 
-**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-13). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
+**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-15). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
 
 ---
 

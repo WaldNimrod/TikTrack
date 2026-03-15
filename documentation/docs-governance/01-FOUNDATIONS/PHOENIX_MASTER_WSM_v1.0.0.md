@@ -87,30 +87,30 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-13** by **Team 90** — GATE_8 PASS validated from Team 70 closure package; `S002-P002-WP003` lifecycle is DOCUMENTATION_CLOSED.
+**Gate-owner update evidence:** This block was updated **2026-03-15** by **Team 90** — GATE_8 PASS validated for `S002-P005-WP002`; lifecycle is DOCUMENTATION_CLOSED and no active work package remains.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P002-WP003 (Market Data Hardening) — **GATE_8 PASS / DOCUMENTATION_CLOSED** after Team 90 validation; no active work package in execution at this time. |
-| active_project_domain | TIKTRACK |
+| active_flow | S002-P005-WP002 (Pipeline Governance) — **GATE_8 PASS / DOCUMENTATION_CLOSED** after Team 90 revalidation (`TEAM_90_TO_TEAM_170_S002_P005_WP002_GATE8_VALIDATION_RESPONSE_v1.0.1.md`); no active work package in execution at this time. |
+| active_project_domain | AGENTS_OS |
 | active_work_package_id | N/A |
 | in_progress_work_package_id | N/A |
-| last_closed_work_package_id | S002-P002-WP003 (GATE_8 PASS 2026-03-13; DOCUMENTATION_CLOSED) |
-| last_closed_program_id | S002-P002 (GATE_8 PASS 2026-03-13; DOCUMENTATION_CLOSED with WP003) |
+| last_closed_work_package_id | S002-P005-WP002 (GATE_8 PASS 2026-03-15; DOCUMENTATION_CLOSED) |
+| last_closed_program_id | S002-P005 (GATE_8 PASS 2026-03-15; DOCUMENTATION_CLOSED with WP002) |
 | last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
 | allowed_gate_range | GATE_0_TO_GATE_8 (normal execution lifecycle) |
 | current_gate | GATE_8 |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
-| agents_os_parallel_track | S003-P001 WP001 + S003-P002 WP001 FAST_4 CLOSED (2026-03-11 / 2026-03-12). S002-P005-WP002 (Pipeline Governance): GATE_6 PASS (2026-03-15, Team 00 decision); GATE_7 ACTIVE — Nimrod UX browser review (HUMAN_BROWSER_APPROVAL_ACTIVE). Pending: Team 61 state prep + OBS-02 insist resolution. Help modal upgrade in progress (Team 61). ADR-031 sequence lock: S002-P005 (Stage A immediate hotfix) -> S003-P007 (Stage B command bridge lite) -> S004-P008 (Stage C mediated reconciliation). Existing S004 AGENTS_OS baseline programs S004-P001/S004-P002/S004-P003 remain PLANNED and are not overridden by ADR-031. S003-P003 is TIKTRACK (normal GATE_0..GATE_8); G3.7 available for Team 10 at GATE_3. Governed per TEAM_00_AGENTS_OS_INDEPENDENT_ADVANCEMENT_DIRECTIVE_v1.0.0; applies to both domains for Gate-6 desync blocking policy (pending formal signer-chain lock). Sources: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`, `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`. |
-| active_program_id | S002-P002 |
+| agents_os_parallel_track | S003-P001 WP001 + S003-P002 WP001 FAST_4 CLOSED (2026-03-11 / 2026-03-12). S002-P005-WP002 (Pipeline Governance): GATE_8 PASS (2026-03-15, Team 90 revalidation v1.0.1); DOCUMENTATION_CLOSED; NO_ACTIVE_WORK_PACKAGE confirmed. ADR-031 sequence lock: S002-P005 (Stage A immediate hotfix) -> S003-P007 (Stage B command bridge lite) -> S004-P008 (Stage C mediated reconciliation). Existing S004 AGENTS_OS baseline programs S004-P001/S004-P002/S004-P003 remain PLANNED and are not overridden by ADR-031. S003-P003 is TIKTRACK (normal GATE_0..GATE_8); G3.7 available for Team 10 at GATE_3. Governed per TEAM_00_AGENTS_OS_INDEPENDENT_ADVANCEMENT_DIRECTIVE_v1.0.0; applies to both domains for Gate-6 desync blocking policy (pending formal signer-chain lock). Sources: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`, `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`. |
+| active_program_id | S002-P005 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 90 (GATE_8 owner; closure validated) |
-| last_gate_event | GATE_8_PASS_DOCUMENTATION_CLOSED; 2026-03-13; Team 90 validated Team 70 GATE_8 package and issued PASS (`TEAM_90_TO_TEAM_70_S002_P002_WP003_GATE8_VALIDATION_RESPONSE_v1.0.0.md`). |
-| next_required_action | Team 90 and Team 10 to route next lifecycle activation per roadmap priorities; S002-P002-WP003 is closed with no open gate obligations. |
+| last_gate_event | GATE_8_PASS_DOCUMENTATION_CLOSED; 2026-03-15; Team 90 validated Team 170 GATE_8 package and issued PASS (`TEAM_90_TO_TEAM_170_S002_P005_WP002_GATE8_VALIDATION_RESPONSE_v1.0.1.md`). |
+| next_required_action | Team 90 and Team 10 to route next lifecycle activation per roadmap priorities; S002-P005-WP002 is closed with no open gate obligations. |
 | next_responsible_team | Team 90 (state governance), Team 10 (next execution intake when activated) |
 
 ---
@@ -288,6 +288,8 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_4 PASS S002-P005-WP002 (Team 51 QA_PASS 2026-03-15); routed to GATE_5 (Team 90); agents_os_parallel_track updated | 2026-03-15**
 **log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_5 PASS S002-P005-WP002 (Team 90 2026-03-15); GATE_6 open; Team 90 may proceed with architectural dev validation submission | 2026-03-15**
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_6 PASS S002-P005-WP002 (Team 00 decision 2026-03-15); GATE_7 ACTIVE — HUMAN_BROWSER_APPROVAL_ACTIVE; Nimrod UX review | 2026-03-15**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_7 PASS S002-P005-WP002 (Team 00 trigger + Team 51 browser verification); GATE_8 closure execution completed by Team 170 | 2026-03-15**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_8 PASS S002-P005-WP002 (Team 90 revalidation response v1.0.1); DOCUMENTATION_CLOSED; NO_ACTIVE_WORK_PACKAGE confirmed | 2026-03-15**
 **log_entry | TEAM_190 | CONSTITUTIONAL_VALIDATION_UPDATE | S002-P005-WP001 store-artifact scan approved and framed CLOSED; no remaining blockers; organizational locks applied: PipelineState test isolation + store_artifact(bool/no silent failure) | 2026-03-15**
 **log_entry | TEAM_190 | TO_TEAM_170 | REGISTRY_MIRROR_SYNC_REQUIRED | run sync_registry_mirrors_from_wsm.py --write then --check for WP003 baseline standardization | 2026-03-10**
 

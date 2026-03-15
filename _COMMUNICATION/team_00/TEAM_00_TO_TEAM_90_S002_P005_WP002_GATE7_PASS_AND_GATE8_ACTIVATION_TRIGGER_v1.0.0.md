@@ -5,6 +5,7 @@ from: Team 00 (Chief Architect / Nimrod)
 to: Team 90 (GATE_7/GATE_8 owner)
 cc: Team 10, Team 61, Team 51, Team 170, Team 100, Team 190
 date: 2026-03-10
+historical_record: true
 status: ACTION_REQUIRED
 gate_id: GATE_7 → GATE_8
 work_package_id: S002-P005-WP002

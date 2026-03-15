@@ -32,6 +32,13 @@ scope: Team 90 skill recommendations for gate validation acceleration and qualit
   4. Date/version drift between artifacts and runtime state.
   5. Mixed routing semantics inside reports (verdict vs routing ownership ambiguity).
 
+### Concrete examples from current execution
+
+1. `BF-G8-001`: wildcard rows in archive manifest required explicit path remediation.
+2. `BF-G8-002`: broken evidence-by-path references in cleanup report blocked closure.
+3. `BF-G8-003`: implementation path mismatch (`scripts/pipeline_run.sh` vs `pipeline_run.sh`) blocked GATE_8 pass.
+4. S002-P005-WP002 state-lock cycle required Team 90 WSM lock confirmation after final PASS artifact.
+
 ## 2) Skill Options Table
 
 | Option | What it solves | Benefits | Risks / tradeoffs | Impact | Effort | Token saving | Suggested owner |

@@ -5,7 +5,7 @@
   "project_domain": "agents_os",
   "spec_brief": "Pipeline Governance — PASS_WITH_ACTION micro-cycle",
   "current_gate": "GATE_8",
-  "gates_completed": ["GATE_0", "GATE_1", "GATE_2", "GATE_3", "GATE_4", "GATE_5", "GATE_6", "GATE_7"],
+  "gates_completed": ["GATE_0", "GATE_1", "GATE_2", "WAITING_GATE2_APPROVAL", "G3_PLAN", "G3_5", "G3_6_MANDATES", "CURSOR_IMPLEMENTATION", "GATE_4", "GATE_5", "GATE_6", "WAITING_GATE6_APPROVAL", "GATE_7"],
   "gates_failed": [],
   "lld400_content": "",
   "work_plan": "",

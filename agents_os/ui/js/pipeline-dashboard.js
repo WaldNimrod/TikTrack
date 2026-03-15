@@ -100,10 +100,11 @@ async function loadPipelineState() {
     gateList.innerHTML = GATE_SEQUENCE.map(g => {
       const s = gateStatus(g, state);
       const isCurr = g === state.current_gate;
-      return `<li class="gate-item${isCurr?" is-current":""}">
+      const statusIcon = s==="pass"?"✓":s==="fail"?"✗":s==="current"?"←":s==="skipped"?"↷":"";
+      return `<li class="gate-item${isCurr?" is-current":""}${s==="skipped"?" is-skipped":""}">
         <span class="gate-dot ${statusDotClass(s)}"></span>
         <span class="gate-name">${g}</span>
-        <span class="gate-status-text">${s==="pass"?"✓":s==="fail"?"✗":s==="current"?"←":""}</span>
+        <span class="gate-status-text">${statusIcon}</span>
       </li>`;
     }).join("");
 
@@ -747,8 +748,8 @@ async function runProgressCheck() {
     const s    = gateStatus(g, state);
     const gcfg = GATE_CONFIG[g] || {};
     const isCur = g === gate;
-    const icon  = s==='pass'?'✓':s==='fail'?'✗':s==='current'?'▶':s==='human'?'⏸':'○';
-    const color = s==='pass'?'var(--success)':s==='fail'?'var(--danger)':s==='current'?'var(--accent)':s==='human'?'var(--warning)':'var(--border)';
+    const icon  = s==='pass'?'✓':s==='fail'?'✗':s==='current'?'▶':s==='human'?'⏸':s==='skipped'?'↷':'○';
+    const color = s==='pass'?'var(--success)':s==='fail'?'var(--danger)':s==='current'?'var(--accent)':s==='human'?'var(--warning)':s==='skipped'?'var(--text-muted)':'var(--border)';
     html += `<tr style="${isCur?'background:rgba(31,111,235,0.08);':''}">
       <td style="padding:3px 6px;font-family:var(--mono);font-size:10px;color:${color}">${icon} ${escHtml(g)}</td>
       <td style="padding:3px 6px;color:var(--text-muted);font-size:10px">${escHtml(getDomainOwner(g))}</td>
@@ -1492,6 +1493,37 @@ async function buildQuickActionBar(gate) {
   _qbarGate = gate;
   const bar = document.getElementById('quick-action-bar');
   if (!bar) return;
+
+  // ── GATE_8 Phase 1: show "Task Completed" builder instead of PASS/FAIL ───
+  // When phase8_content is empty, Team 70/170 hasn't yet confirmed Phase 1 done.
+  // Show a completion builder (mirrors the findings builder, green theme) that
+  // generates ./pipeline_run.sh phase2 — activates the Team 90 validation mandate.
+  if (gate === 'GATE_8') {
+    const phase8done = !!(pipelineState && (pipelineState.phase8_content || '').trim());
+    if (!phase8done) {
+      const phase2Cmd = _dfCmd('./pipeline_run.sh phase2');
+      _qbarCopyMap['phase1-ctx-preview'] = phase2Cmd;
+      bar.innerHTML = `<div class="completion-builder">
+        <div class="completion-builder-title">
+          📋 Phase 1 — Confirm Task Complete &amp; Generate Validation Mandate
+          <span style="font-size:10px;font-weight:400;color:var(--text-muted)">Team 70 / Team 170</span>
+        </div>
+        <div class="completion-builder-desc">
+          When the AS_MADE_REPORT and archive are ready, run <code>phase2</code> to generate the Team 90 validation mandate.<br>
+          Optional: add completion notes below for your reference (not included in the command).
+        </div>
+        <textarea id="phase1-ctx-ta" class="findings-textarea"
+          placeholder="AS_MADE_REPORT.md ✓  |  Archive manifest complete ✓  |  Cleanup report ✓  |  Path: _COMMUNICATION/team_70/ …"
+        ></textarea>
+        <div class="findings-cmd-row">
+          <div class="findings-cmd-text" id="phase1-ctx-preview">${escHtml(phase2Cmd)}</div>
+          <button class="findings-copy-btn" onclick="copyFindingsCmd('phase1-ctx-preview', this)">⎘ Copy → terminal</button>
+        </div>
+      </div>`;
+      return;
+    }
+    // Phase 2 active (phase8_content set): fall through to normal PASS/FAIL display
+  }
 
   const def = ALL_GATE_DEFS[gate] || {};
   if (!def.twoPaths) { bar.innerHTML = ''; return; }

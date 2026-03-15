@@ -250,14 +250,14 @@
       "urgency": "high",
       "submitted_by": "team_00",
       "created_at": "2026-03-15T11:54:54Z",
-      "status": "open",
-      "fate": null,
-      "fate_target": null,
-      "fate_rationale": null,
-      "fate_decided_at": null,
-      "fate_decided_by": null,
-      "reference_file": "_COMMUNICATION/_Architects_Decisions/ARCHITECT_GATE6_DECISION_S002_P005_WP002_v1.0.0.md",
-      "notes": "GATE_6 APPROVED. Team 10 must: advance WSM to GATE_7, activate Nimrod UX review. Activation document not yet authored. Route: Team 00 writes TEAM_00_TO_TEAM_10_S002_P005_WP002_GATE7_ACTIVATION document."
+      "status": "decided",
+      "fate": "immediate",
+      "fate_target": "TEAM_00_TO_TEAM_10_S002_P005_WP002_GATE7_ACTIVATION_v1.0.0.md — SENT",
+      "fate_rationale": "Activation document authored by Team 100 (delegated by Nimrod). Team 10 directed to advance WSM to GATE_7 + activate Nimrod UX review.",
+      "fate_decided_at": "2026-03-15T12:00:00Z",
+      "fate_decided_by": "team_00 (via team_100 delegation)",
+      "reference_file": "_COMMUNICATION/team_00/TEAM_00_TO_TEAM_10_S002_P005_WP002_GATE7_ACTIVATION_v1.0.0.md",
+      "notes": "GATE_7 entry authorized. Nimrod browser review pending. OBS-02/03 Team 61 scope."
     }
   ]
 }

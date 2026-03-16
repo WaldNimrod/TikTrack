@@ -2,7 +2,7 @@
 
 // ── Team groups (display order + labels) — reusable for filtering, reports, etc. ──
 const TEAM_GROUPS = [
-  { id: "architects",    label: "Architects",    teamIds: ["team_00", "team_100"] },
+  { id: "architects",    label: "Architects",    teamIds: ["team_00", "team_100", "team_101"] },
   { id: "validation",    label: "Validation",    teamIds: ["team_90", "team_190"] },
   { id: "execution",     label: "Execution",     teamIds: ["team_10", "team_20", "team_30", "team_40", "team_50", "team_60", "team_51", "team_61"] },
   { id: "documentation", label: "Documentation",  teamIds: ["team_70", "team_170"] },
@@ -85,6 +85,11 @@ const TEAMS = [
     responsibilities: ["GATE_2: Approve or reject architectural intent for AOS domain (delegated from Team 00)", "GATE_6: Reality vs intent — does built match approved? (AOS domain)", "Author LOD200 and LOD400 for all AOS programs", "Issue mandates to Team 61 (implementation) and Team 51 (QA)", "Route decisions upward to Team 00 for constitutional-level rulings"],
     writesTo: ["../../_COMMUNICATION/team_100/"], governedBy: ["SSM v1.0.0", "TEAM_ROSTER_LOCK", "CLAUDE.md Team 00 authority"],
     isoRules: ["GATE_6 approval requires explicit evidence review", "route_recommendation mandatory if REJECTED", "LOD400 must be fully specified before issuing to Team 61", "Never issue mandates without Nimrod context or Team 00 strategic alignment"] },
+  { id: "team_101", group: "architects", label: "Team 101", name: "IDE Architecture Authority", engine: "cursor", domain: "multi",
+    role: "Planner, Spec-Writer, and Approver for IDE parallel tracks.",
+    responsibilities: ["Analyze local codebase", "Generate canonical Specs (LOD400)", "Validate Team 61 work post-execution"],
+    writesTo: ["../../_COMMUNICATION/team_101/"], governedBy: ["team_101.md", "SSM v1.0.0"],
+    isoRules: ["LOD400 must be fully specified before issuing to Team 61", "IDE spec authority under Team 00/100 oversight"] },
   { id: "team_170", group: "documentation", label: "Team 170", name: "Spec & Governance", engine: "codex", domain: "multi",
     role: "Canonical document maintenance, LOD200/LOD400, registry updates",
     responsibilities: ["Produce LLD400 (GATE_1)", "Maintain PROGRAM_REGISTRY and PORTFOLIO_ROADMAP", "DDL V2.x updates (KB-001..016)", "SSOT corrections and roadmap amendments"],
@@ -247,7 +252,8 @@ function renderTeamPanel(team) {
         <span class="prompt-output-title" id="pt-title">${escHtml(PROMPT_TYPES.find(p => p.id === selectedPromptType)?.label || "")}</span>
         <div class="prompt-output-actions">
           <span class="prompt-state-badge" id="pt-badge">${escHtml(team.label)}</span>
-          <button class="btn" onclick="copyPrompt()" id="copy-btn">📋 Copy to clipboard</button>
+          <button class="btn btn-primary" onclick="copyPrompt('rag')" id="copy-rag-btn">📋 Copy RAG Prompt (Mentions)</button>
+          <button class="btn" onclick="copyPrompt('hard')" id="copy-hard-btn">📋 Copy Hard-Injection Prompt</button>
         </div>
       </div>
       <pre class="prompt-output-pre" id="prompt-output">Generating…</pre>
@@ -285,7 +291,15 @@ function _missingSystemVars() {
   return missing;
 }
 
-function buildPrompt(team, typeId) {
+function buildPrompt(team, typeId, injectionMode) {
+  injectionMode = injectionMode || "hard";
+  if (injectionMode === "rag") {
+    return `@${team.id}.md @STATE_SNAPSHOT.json @PHOENIX_MASTER_WSM_v1.0.0.md
+
+You are ${team.name}. Read your identity file and establish your rules.
+Current state is in @STATE_SNAPSHOT.json.
+Operational state is in @PHOENIX_MASTER_WSM_v1.0.0.md.`;
+  }
   const ctx = _resolveCtx();
   const today = ctx.today;
   const wp = ctx.wp || "—";
@@ -516,18 +530,26 @@ function renderPrompt() {
     _showValidationPanel(missing);
     return;
   }
-  out.textContent = buildPrompt(selectedTeam, selectedPromptType);
+  out.textContent = buildPrompt(selectedTeam, selectedPromptType, "rag");
 }
 
-function copyPrompt() {
-  const out = document.getElementById("prompt-output");
-  const btn = document.getElementById("copy-btn");
-  if (!out || !btn) return;
-  const text = out.textContent || out.innerText || "";
+function copyPrompt(injectionMode) {
+  injectionMode = injectionMode || "rag";
+  const missing = _missingSystemVars();
+  const text = injectionMode === "rag"
+    ? buildPrompt(selectedTeam, selectedPromptType, "rag")
+    : (missing.length > 0 ? null : buildPrompt(selectedTeam, selectedPromptType, "hard"));
   if (!text || text.startsWith("⛔") || text.includes("pv-panel")) {
-    alert("Cannot copy — prompt has unresolved system variables. Fill in the required fields first.");
+    if (injectionMode === "hard" && missing.length > 0) {
+      alert("Cannot copy Hard-Injection — prompt has unresolved system variables. Fill in the required fields first.");
+    } else {
+      alert("Cannot copy — prompt has unresolved system variables. Fill in the required fields first.");
+    }
     return;
   }
+  const btnId = injectionMode === "rag" ? "copy-rag-btn" : "copy-hard-btn";
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
   navigator.clipboard.writeText(text).then(() => {
     btn.classList.add("copy-flash");
     const orig = btn.textContent;

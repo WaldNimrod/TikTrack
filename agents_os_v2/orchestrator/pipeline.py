@@ -817,7 +817,7 @@ def generate_prompt(gate_id: str, force_gate4: bool = False, revision_notes: str
             "  --query   GATE_2 --question '…' → Ask follow-up\n"
         )
     elif gate_id == "G3_PLAN":
-        prompt = _generate_g3_plan_prompt(state, revision_notes=revision_notes, fresh=fresh)
+        prompt = _generate_g3_plan_mandates(state, revision_notes=revision_notes, fresh=fresh)
     elif gate_id == "G3_5":
         prompt = _generate_g3_5_prompt(state, fresh)
     elif gate_id == "G3_6_MANDATES":
@@ -1217,44 +1217,121 @@ def _generate_gate_2_prompt(state: PipelineState, fresh: bool = False, team_id: 
     )
 
 
-def _generate_g3_plan_prompt(state: PipelineState, revision_notes: str = "", fresh: bool = False) -> str:
-    header = _team_header("team_10", "G3_PLAN", state, fresh)
+def _generate_g3_plan_mandates(state: PipelineState, revision_notes: str = "", fresh: bool = False) -> str:
+    """G3_PLAN two-phase mandate document.
+
+    Phase 1: Team 10 (Cursor) — produces work plan from approved spec.
+    Phase 2: Operator confirmation — work plan auto-stored; Nimrod runs pass → advances to G3_5.
+
+    Saves G3_PLAN_mandates.md (used by pipeline_run.sh phase* extraction).
+    Same pattern as GATE_1 / GATE_8.
+    """
+    import glob as _glob
+    wp  = state.work_package_id
+    wpu = wp.replace("-", "_")
+    today_utc = datetime.now(timezone.utc).date().isoformat()
+
+    # ── Resolve latest work plan file (AC-11: use newest version) ─────────
+    _plan_candidates = sorted(
+        _glob.glob(str(REPO_ROOT / f"_COMMUNICATION/team_10/TEAM_10_{wpu}_G3_PLAN_WORK_PLAN_v*.md"))
+    )
+    plan_path = (
+        str(Path(_plan_candidates[-1]).relative_to(REPO_ROOT))
+        if _plan_candidates
+        else f"_COMMUNICATION/team_10/TEAM_10_{wpu}_G3_PLAN_WORK_PLAN_v1.0.0.md"
+    )
+
     spec = state.lld400_content[:4000] if state.lld400_content else state.spec_brief
+    work_plan_stored = bool(state.work_plan and state.work_plan.strip())
 
     if revision_notes:
-        # Revision mode: G3_5 failed — ask Team 10 to fix the existing plan
-        existing_plan_ref = "_COMMUNICATION/team_10/" if not state.work_plan else ""
-        return (
-            f"{header}"
-            f"# G3_PLAN REVISION — Fix Work Plan per G3_5 Blockers\n\n"
+        phase1_task = (
+            f"### Your Task (REVISION)\n\n"
+            f"**Environment:** Cursor (Team 10 — Execution Orchestrator)\n\n"
             f"Your work plan was reviewed by Team 90 (G3_5) and **FAILED**.\n"
-            f"Do NOT produce a new plan from scratch — update the existing plan to address the blockers below.\n\n"
-            f"## G3_5 Blockers to Fix\n\n{revision_notes}\n\n"
-            f"## Existing Work Plan\n\n"
-            f"{state.work_plan[:4000] if state.work_plan else '[work plan not in state — check _COMMUNICATION/team_10/ for your prior output]'}\n\n"
-            f"## Spec (for reference)\n\n{spec}\n\n"
-            f"## Required Output\n\n"
-            f"Produce an updated work plan that resolves every blocker above.\n"
-            f"For each blocker, confirm how you fixed it.\n"
-            f"Save to: `_COMMUNICATION/team_10/TEAM_10_S001_P002_WP001_G3_PLAN_WORK_PLAN_v1.1.0.md`\n\n"
-            f"## Pipeline State\n\n{build_state_summary()}"
+            f"Do NOT produce a new plan from scratch — fix the existing plan to address the blockers.\n\n"
+            f"**G3_5 Blockers to Fix:**\n\n{revision_notes}\n\n"
+            f"**Existing Work Plan:**\n\n"
+            f"{state.work_plan[:4000] if state.work_plan else '[plan not in state — check _COMMUNICATION/team_10/]'}\n\n"
+            f"**Spec (reference):**\n\n{spec}\n\n"
+            f"---\n\n"
+            f"For each blocker, confirm how you fixed it in the revised plan.\n\n"
+            f"Save revised plan to: `{plan_path}` (increment version)\n\n"
+            f"When done, inform Nimrod. Nimrod runs `./pipeline_run.sh --domain {state.project_domain} phase2`"
+            f" to auto-store the revised plan.\n\n"
+            f"⛔ **YOUR TASK ENDS WITH SAVING THE REVISED PLAN.**"
+        )
+    else:
+        phase1_task = (
+            f"### Your Task\n\n"
+            f"**Environment:** Cursor (Team 10 — Execution Orchestrator)\n\n"
+            f"Produce a complete implementation work plan for WP `{wp}`.\n\n"
+            f"**Approved Spec (from GATE_1 LLD400):**\n\n{spec}\n\n"
+            f"---\n\n"
+            f"**Required output — all 4 sections mandatory:**\n\n"
+            f"1. **§2 Files per team** (canonical paths):\n"
+            f"   - Team 61 Contract Verify → `_COMMUNICATION/team_61/TEAM_61_{wpu}_CONTRACT_VERIFY_v1.0.0.md`\n"
+            f"   - Team 61 Implementation → `agents_os/ui/js/*.js`, `agents_os_v2/orchestrator/*.py`\n"
+            f"   - Team 51 QA → `_COMMUNICATION/team_51/TEAM_51_{wpu}_QA_REPORT_v1.0.0.md`\n\n"
+            f"2. **§3 Execution order** with dependencies\n\n"
+            f"3. **§6 Per-team acceptance criteria** — field, empty state, error contracts for UI\n\n"
+            f"4. **§4 API/contract** — CLI commands, JSON paths, Python entry points, schema\n\n"
+            f"---\n\n"
+            f"**Domain adaptation:** AGENTS_OS — Team 61 (implementation + contract verify) + Team 51 (QA)."
+            f" No Team 20/30 for this domain.\n\n"
+            f"Identity header required: `gate: G3_PLAN | wp: {wp} | stage: {state.stage_id} | domain: {state.project_domain} | date: {today_utc}`\n\n"
+            f"Save to: `{plan_path}`\n\n"
+            f"When done, inform Nimrod. Nimrod runs `./pipeline_run.sh --domain {state.project_domain} phase2`"
+            f" to auto-store the plan and confirm readiness for G3_5.\n\n"
+            f"⛔ **YOUR TASK ENDS WITH SAVING THE WORK PLAN.**"
         )
 
-    # Fresh mode: first run of G3_PLAN
-    return (
-        f"{header}"
-        f"# G3_PLAN — Build Work Plan from Approved Spec\n\n"
-        f"## Approved Spec\n\n{spec}\n\n"
-        f"## Required Output\n\n"
-        f"1. Files to create/modify per team (canonical paths):\n"
-        f"   - Team 20 (API verify only): confirm existing API endpoints — no code changes\n"
-        f"   - Team 30 (Frontend): exact file paths to create/modify in `ui/src/`\n"
-        f"   - Team 50 (QA): test scenarios + run commands + PASS criteria\n"
-        f"2. Execution order with dependencies\n"
-        f"3. Per-team acceptance criteria (field contract, empty state, error state for UI)\n"
-        f"4. API contract: endpoint, params, response shape\n\n"
-        f"## Pipeline State\n\n{build_state_summary()}"
+    phase2_task = (
+        f"### Phase 2 — Work Plan Auto-Storage & Advance\n\n"
+        f"**This phase is operator-run, not a team task.**\n\n"
+        f"Running `./pipeline_run.sh --domain {state.project_domain} phase2` will:\n\n"
+        f"1. Auto-scan `_COMMUNICATION/team_10/` for latest `TEAM_10_{wpu}_G3_PLAN_WORK_PLAN_v*.md`\n"
+        f"2. Store content → `pipeline_state.work_plan`\n"
+        f"3. Confirm storage + print next step\n\n"
+        f"**Current storage status:** "
+        f"{'✅ Stored (' + str(len(state.work_plan)) + ' chars) — ready to pass' if work_plan_stored else '⏳ Not yet stored — Team 10 must save work plan first'}\n\n"
+        f"---\n\n"
+        f"**After storage confirmed:**\n\n"
+        f"`./pipeline_run.sh --domain {state.project_domain} pass` → advances G3_PLAN → G3_5 (Team 90 validates plan)"
     )
+
+    steps = [
+        MandateStep(
+            team_id    = "team_10",
+            label      = "Team 10 — Work Plan Author",
+            phase      = 1,
+            task       = phase1_task,
+            writes_to  = plan_path,
+            acceptance = [
+                f"Work plan saved to: `{plan_path}`",
+                "All 4 sections present: §2 files per team, §3 execution order, §6 AC, §4 API contract",
+                "Domain adaptation: Team 61 + Team 51 (no Team 20/30 for agents_os)",
+                "Identity header present (gate/wp/stage/domain/date)",
+                f"When done: Nimrod runs `./pipeline_run.sh --domain {state.project_domain} phase2`",
+            ],
+        ),
+        MandateStep(
+            team_id    = "team_00",
+            label      = "Operator — Work Plan Storage Confirmation",
+            phase      = 2,
+            task       = phase2_task,
+            depends_on = ["team_10"],
+            acceptance = [
+                "work_plan field populated in pipeline state (non-empty)",
+                f"If PASS  →  `./pipeline_run.sh --domain {state.project_domain} pass`  (advances to G3_5)",
+                f"If plan missing  →  check Team 10 saved `TEAM_10_{wpu}_G3_PLAN_WORK_PLAN_v*.md`",
+            ],
+        ),
+    ]
+
+    doc = _generate_mandate_doc(steps, state, gate="G3_PLAN")
+    _save_prompt("G3_PLAN_mandates.md", doc, domain=state.project_domain)
+    return doc
 
 
 def _generate_g3_5_prompt(state: PipelineState, fresh: bool = False) -> str:
@@ -2368,7 +2445,11 @@ def main():
         revision_notes = ""
         if args.revision_notes:
             rn_path = Path(args.revision_notes)
-            if rn_path.exists():
+            try:
+                rn_file_exists = rn_path.exists() and rn_path.is_file()
+            except (OSError, ValueError):
+                rn_file_exists = False  # string too long to be a valid path (e.g. inline notes)
+            if rn_file_exists:
                 revision_notes = rn_path.read_text(encoding="utf-8")
             else:
                 revision_notes = args.revision_notes

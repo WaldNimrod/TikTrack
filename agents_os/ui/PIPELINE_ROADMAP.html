@@ -117,7 +117,35 @@
       </div>
     </div>
 
-    <!-- Accordion 2: Idea Pipeline (single column) -->
+    <!-- Accordion 2: Event Log (per program default, optional system-wide) -->
+    <div class="accordion" id="acc-event-log">
+      <div class="accordion-header" onclick="toggleAccordion('acc-event-log')">
+        <span class="accordion-icon">📋</span>
+        <span class="accordion-title">Event Log</span>
+        <span class="accordion-badge" id="event-log-roadmap-badge">—</span>
+        <span class="accordion-chevron">▶</span>
+      </div>
+      <div class="accordion-body">
+        <div id="event-log-roadmap-panel" data-testid="event-log-panel">
+          <div class="event-log-filters" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
+            <label><input type="checkbox" id="event-log-system-wide" onchange="window.eventLogRoadmapRefresh&&window.eventLogRoadmapRefresh()"> System-wide (all programs)</label>
+            <select id="event-log-roadmap-domain" onchange="window.eventLogRoadmapRefresh&&window.eventLogRoadmapRefresh()">
+              <option value="">All domains</option>
+              <option value="agents_os">Agents OS</option>
+              <option value="tiktrack">TikTrack</option>
+            </select>
+            <select id="event-log-roadmap-limit" onchange="window.eventLogRoadmapRefresh&&window.eventLogRoadmapRefresh()">
+              <option value="20">20</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+          <div class="event-log-list event-log-roadmap" id="event-log-roadmap-list" style="max-height:360px;overflow-y:auto;font-size:11px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);padding:8px">Loading…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Accordion 3: Idea Pipeline (single column) -->
     <div class="accordion" id="acc-ideas">
       <div class="accordion-header" onclick="toggleAccordion('acc-ideas')">
         <span class="accordion-icon">💡</span>
@@ -162,6 +190,7 @@
 <script src="js/pipeline-state.js?v=3"></script>
 <script src="js/pipeline-dom.js?v=3"></script>
 <script src="js/pipeline-roadmap.js?v=3"></script>
+<script src="js/event-log-roadmap.js?v=1"></script>
 <script>
 (function(){ function t(id){ var e=document.getElementById(id); if(e)e.classList.toggle('open'); } window.toggleAccordion=t; })();
 </script>

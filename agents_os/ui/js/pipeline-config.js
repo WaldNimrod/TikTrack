@@ -14,7 +14,7 @@ const GATE_CONFIG = {
   "GATE_1":                 { owner: "team_190",    engine: "codex",         desc: "Team 170 + 190: LLD400", twoPaths: true },
   "GATE_2":                 { owner: "team_100",    engine: "codex+human",   desc: "Team 100 → approve spec", twoPaths: true },
   "WAITING_GATE2_APPROVAL": { owner: "team_00",     engine: "human",         desc: "Nimrod approves GATE_2", twoPaths: true },
-  "G3_PLAN":                { owner: "team_10",      engine: "cursor",        desc: "Build work plan", twoPaths: false },
+  "G3_PLAN":                { owner: "team_10",      engine: "cursor",        desc: "Build work plan", twoPaths: true },
   "G3_5":                   { owner: "team_90",     engine: "codex",         desc: "Validate work plan", twoPaths: true },
   "G3_6_MANDATES":          { owner: "team_10",     engine: "orchestrator",   desc: "Generate team mandates", twoPaths: false },
   "CURSOR_IMPLEMENTATION":  { owner: "teams_20+30", engine: "cursor",         desc: "Implement (Teams 20+30)", twoPaths: false },
@@ -33,6 +33,7 @@ const GATE_CONFIG = {
 // Use getGateMandatePath(gate, domain) everywhere — never read GATE_MANDATE_FILES_BASE directly.
 const GATE_MANDATE_FILES_BASE = {
   "GATE_1":                "GATE_1_mandates.md",
+  "G3_PLAN":               "G3_PLAN_mandates.md",
   "G3_6_MANDATES":         "implementation_mandates.md",
   "CURSOR_IMPLEMENTATION": "implementation_mandates.md",
   "GATE_4":                "implementation_mandates.md",

@@ -1,6 +1,6 @@
 /* event-log.js — AOS Event Log Panel — Phase 2
- * Fetches from GET /api/log/events, renders in sidebar. Auto-refresh 10s.
- * Classic script — no ES modules. Uses existing pipeline-config / DOM patterns.
+ * Dashboard: main panel, always shows active program in displayed domain.
+ * Fetches from GET /api/log/events with domain + work_package_id. Auto-refresh 10s.
  */
 (function () {
   'use strict';
@@ -53,6 +53,13 @@
     return div.innerHTML;
   }
 
+  function formatTickerEvent(evt) {
+    var t = String(evt.event_type || '').toUpperCase();
+    var cls = eventTypeColor(evt.event_type);
+    var time = formatTime(evt.timestamp);
+    return '<span class="event-badge ' + cls + '" style="margin-right:4px">' + escapeHtml(t) + '</span>' + escapeHtml(time);
+  }
+
   var TYPE_CATEGORIES = {
     Gate: ['GATE_PASS', 'GATE_FAIL', 'GATE_BLOCK', 'GATE_ADVANCE_BLOCKED', 'PIPELINE_APPROVE', 'PASS_WITH_ACTION', 'OVERRIDE'],
     State: ['SNAPSHOT_GENERATED', 'DRIFT_DETECTED', 'DRIFT_RESOLVED', 'WSM_UPDATE'],
@@ -69,23 +76,64 @@
     });
   }
 
+  function getWorkPackageFilter() {
+    var ps = (typeof window !== 'undefined' && window.pipelineState) ? window.pipelineState : null;
+    var wp = ps && ps.work_package_id ? String(ps.work_package_id).trim() : '';
+    if (!wp || wp === 'NONE') return '';
+    var parts = wp.split('-');
+    if (parts.length >= 2) return parts[0] + '-' + parts[1];
+    return wp;
+  }
+
+  function getDomain() {
+    return (typeof currentDomain !== 'undefined') ? currentDomain : '';
+  }
+
+  function updateTickerAndBadge(arr) {
+    var tickerEl = document.getElementById('event-log-ticker-events');
+    var countEl = document.getElementById('event-log-ticker-count');
+    var badgeEl = document.getElementById('event-log-count-badge');
+    var recent = (arr || []).slice(0, 3);
+    var tickerHtml = recent.length
+      ? recent.map(formatTickerEvent).join(' · ')
+      : '—';
+    if (tickerEl) tickerEl.innerHTML = tickerHtml;
+    if (countEl) countEl.textContent = (arr || []).length;
+    if (badgeEl) badgeEl.textContent = (arr || []).length + ' events';
+  }
+
   function fetchEvents() {
     var panel = document.getElementById('event-log-panel');
     if (!panel) return;
     var listEl = document.getElementById('event-log-list');
-    var domainSelect = document.getElementById('event-log-filter-domain');
     var typeSelect = document.getElementById('event-log-filter-type');
     var limitSelect = document.getElementById('event-log-filter-limit');
-    if (!listEl || !domainSelect || !typeSelect || !limitSelect) return;
+    if (!listEl || !typeSelect || !limitSelect) return;
 
-    var domain = domainSelect.value || '';
+    var domain = getDomain();
+    var workPackage = getWorkPackageFilter();
     var typeCategory = typeSelect.value || '';
     var limit = parseInt(limitSelect.value || '20', 10) || 20;
 
     var params = [];
     if (domain) params.push('domain=' + encodeURIComponent(domain));
+    if (workPackage) params.push('work_package_id=' + encodeURIComponent(workPackage));
     params.push('limit=' + encodeURIComponent(Math.min(limit * 2, 100)));
     var url = EVENT_LOG_API + '?' + params.join('&');
+
+    function renderResult(data, isFallback) {
+      var arr = Array.isArray(data) ? data : [];
+      arr = filterByCategory(arr, typeCategory);
+      arr = arr.slice(0, limit);
+      if (arr.length === 0) {
+        listEl.innerHTML = '<div class="event-log-empty">No events for this program in ' + escapeHtml(domain || 'domain') + '.</div>';
+      } else {
+        var html = arr.map(renderEvent).join('');
+        if (isFallback) html = '<div class="event-log-empty" style="margin-bottom:8px;font-size:10px">Showing system-wide (domain had no events)</div>' + html;
+        listEl.innerHTML = html;
+      }
+      updateTickerAndBadge(arr);
+    }
 
     fetch(url, { method: 'GET' })
       .then(function (res) {
@@ -95,30 +143,26 @@
       .then(function (data) {
         var arr = Array.isArray(data) ? data : [];
         arr = filterByCategory(arr, typeCategory);
-        arr = arr.slice(0, limit);
-        if (arr.length === 0) {
-          listEl.innerHTML = '<div class="event-log-empty">No events yet</div>';
+        if (arr.length > 0) {
+          renderResult(data, false);
+          return;
+        }
+        if (domain || workPackage) {
+          var fallbackUrl = EVENT_LOG_API + '?limit=' + encodeURIComponent(Math.min(limit * 2, 100));
+          fetch(fallbackUrl, { method: 'GET' })
+            .then(function (r) { return r.ok ? r.json() : []; })
+            .then(function (fallbackData) {
+              renderResult(fallbackData, true);
+            })
+            .catch(function () { renderResult([], false); });
         } else {
-          listEl.innerHTML = arr.map(renderEvent).join('');
+          renderResult([], false);
         }
       })
       .catch(function (err) {
-        listEl.innerHTML = '<div class="event-log-empty event-log-error">Events unavailable</div>';
+        listEl.innerHTML = '<div class="event-log-empty event-log-error">Events unavailable (start AOS server?)</div>';
+        updateTickerAndBadge([]);
       });
-  }
-
-  function syncDomainFilter() {
-    var domainSelect = document.getElementById('event-log-filter-domain');
-    var current = (typeof currentDomain !== 'undefined') ? currentDomain : '';
-    if (domainSelect && current) {
-      var optAll = domainSelect.querySelector('option[value=""]');
-      var optAgents = domainSelect.querySelector('option[value="agents_os"]');
-      var optTiktrack = domainSelect.querySelector('option[value="tiktrack"]');
-      if (optAgents && optTiktrack) {
-        if (current === 'agents_os') domainSelect.value = 'agents_os';
-        else if (current === 'tiktrack') domainSelect.value = 'tiktrack';
-      }
-    }
   }
 
   function startAutoRefresh() {
@@ -134,15 +178,12 @@
     var panel = document.getElementById('event-log-panel');
     if (!panel) return;
 
-    var domainSel = document.getElementById('event-log-filter-domain');
     var typeSel = document.getElementById('event-log-filter-type');
     var limitSel = document.getElementById('event-log-filter-limit');
 
-    if (domainSel) domainSel.addEventListener('change', onFiltersChange);
     if (typeSel) typeSel.addEventListener('change', onFiltersChange);
     if (limitSel) limitSel.addEventListener('change', onFiltersChange);
 
-    syncDomainFilter();
     fetchEvents();
     startAutoRefresh();
 
@@ -152,6 +193,8 @@
         setTimeout(fetchEvents, 300);
       });
     }
+
+    window.eventLogRefresh = fetchEvents;
   }
 
   if (document.readyState === 'loading') {

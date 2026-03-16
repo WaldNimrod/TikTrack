@@ -124,4 +124,20 @@ When a gate fails, routing is determined by `FAIL_ROUTING` and `default_fail_rou
 
 ---
 
+## 6. Event Log
+
+**Source:** [EVENT_LOG_REFERENCE_v1.0.0.md](EVENT_LOG_REFERENCE_v1.0.0.md)
+
+Append-only audit trail of pipeline events (gate passes, init, snapshot, server start). Consumed by Dashboard and Roadmap UIs.
+
+| Aspect | Value |
+|--------|-------|
+| Storage | `_COMMUNICATION/agents_os/logs/pipeline_events.jsonl` |
+| API | `GET /api/log/events`, `POST /api/log/event` |
+| UI | Event Log accordion (Dashboard, Roadmap) |
+| Seed | `python3 agents_os/scripts/seed_event_log.py` |
+
+---
+
 **log_entry | TEAM_170 | AGENTS_OS_ARCHITECTURE_OVERVIEW | DELIVERED | 2026-03-14**
+**log_entry | TEAM_170 | AGENTS_OS_ARCHITECTURE_OVERVIEW | EVENT_LOG_SECTION_ADDED | 2026-03-10**

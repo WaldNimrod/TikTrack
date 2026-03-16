@@ -251,8 +251,8 @@ python3 -m http.server 8090
         <button class="btn" onclick="runProgressCheck()" title="סרוק ארטיפקטים ודיאגנוז מצב נוכחי">🔍 בדוק התקדמות</button>
       </div>
       <label class="refresh-label">
-        <input type="checkbox" id="auto-refresh-toggle"> <span class="agents-refresh-label" id="refresh-label">Auto (5s)</span>
-        <span class="refresh-dot" id="refresh-dot" style="display:none"></span>
+        <input type="checkbox" id="auto-refresh-toggle" checked> <span class="agents-refresh-label" id="refresh-label">Auto (5s)</span>
+        <span class="refresh-dot" id="refresh-dot"></span>
       </label>
       <div class="domain-selector">
         <button class="domain-btn" id="domain-btn-tiktrack" onclick="onDomainSwitch('tiktrack')">🔵 TikTrack</button>
@@ -286,28 +286,6 @@ python3 -m http.server 8090
       <div class="sidebar-cmd-list" id="sidebar-cmd-list">
         <div class="sidebar-cmd-row"><span class="sidebar-cmd-text loading">Loading…</span></div>
       </div>
-    </div>
-    <div class="sidebar-section" id="event-log-panel" data-testid="event-log-panel">
-      <div class="sidebar-label">Event Log</div>
-      <div class="event-log-filters">
-        <select id="event-log-filter-domain" data-testid="event-log-filter-domain" class="event-log-select">
-          <option value="">All</option>
-          <option value="agents_os">Agents OS</option>
-          <option value="tiktrack">TikTrack</option>
-        </select>
-        <select id="event-log-filter-type" data-testid="event-log-filter-type" class="event-log-select">
-          <option value="">All</option>
-          <option value="Gate">Gate</option>
-          <option value="State">State</option>
-          <option value="System">System</option>
-        </select>
-        <select id="event-log-filter-limit" class="event-log-select">
-          <option value="20">20</option>
-          <option value="50">50</option>
-          <option value="100">100</option>
-        </select>
-      </div>
-      <div class="event-log-list" id="event-log-list" data-testid="event-log-list">Loading…</div>
     </div>
   </aside>
 
@@ -397,6 +375,34 @@ python3 -m http.server 8090
       </div>
       <div class="accordion-body">
         <div class="file-list" id="file-list">Loading…</div>
+      </div>
+    </div>
+
+    <!-- Event Log — main panel, always shows active program in displayed domain -->
+    <div class="accordion open" id="acc-event-log">
+      <div class="accordion-header" onclick="toggleAccordion('acc-event-log')">
+        <span>📋</span>
+        <span class="accordion-title">Event Log</span>
+        <span class="accordion-badge" id="event-log-count-badge">—</span>
+        <span class="accordion-chevron">▶</span>
+      </div>
+      <div class="accordion-body">
+        <div id="event-log-panel" data-testid="event-log-panel">
+          <div class="event-log-filters">
+            <select id="event-log-filter-type" data-testid="event-log-filter-type" class="event-log-select">
+              <option value="">All</option>
+              <option value="Gate">Gate</option>
+              <option value="State">State</option>
+              <option value="System">System</option>
+            </select>
+            <select id="event-log-filter-limit" class="event-log-select">
+              <option value="20">20</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+          <div class="event-log-list event-log-main" id="event-log-list" data-testid="event-log-list">Loading…</div>
+        </div>
       </div>
     </div>
 

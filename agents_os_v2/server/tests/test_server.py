@@ -77,6 +77,15 @@ def test_log_events_respects_limit(client, preserve_log_file):
     assert len(data) <= 5
 
 
+def test_log_events_work_package_filter(client, preserve_log_file):
+    client.post("/api/log/event", json={**VALID_EVENT, "work_package_id": "S002-P005-WP003"})
+    client.post("/api/log/event", json={**VALID_EVENT, "pipe_run_id": "other", "work_package_id": "S001-P001-WP001"})
+    r = client.get("/api/log/events?work_package_id=S002-P005")
+    assert r.status_code == 200
+    data = r.json()
+    assert all(e.get("work_package_id", "").startswith("S002-P005") for e in data)
+
+
 def test_stub_returns_501(client):
     r = client.get("/api/state/agents_os")
     assert r.status_code == 501

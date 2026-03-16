@@ -33,9 +33,10 @@ Agents_OS is the automation and governance layer that drives TikTrack developmen
 | Gate engine | agents_os_v2/orchestrator/pipeline.py | GATE_CONFIG, mandate generation, routing logic |
 | State | agents_os_v2/orchestrator/state.py | PipelineState dataclass, save/load, domain resolution |
 | STATE_SNAPSHOT producer | agents_os_v2/observers/state_reader.py | Reads WSM/docs, produces STATE_SNAPSHOT.json |
-| Dashboard UI | agents_os/ui/PIPELINE_DASHBOARD.html | Gate management UI — load state, show prompt, mandates |
-| Roadmap UI | agents_os/ui/PIPELINE_ROADMAP.html | Portfolio map — programs, stages, gate history |
-| Runtime output | _COMMUNICATION/agents_os/ | pipeline_state.json, pipeline_state_agentsos.json, STATE_SNAPSHOT.json, prompts, mandates |
+| Event Log | _COMMUNICATION/agents_os/logs/pipeline_events.jsonl | Append-only audit trail; GET/POST /api/log/events; Dashboard & Roadmap panels |
+| Dashboard UI | agents_os/ui/PIPELINE_DASHBOARD.html | Gate management UI — load state, show prompt, mandates, Event Log |
+| Roadmap UI | agents_os/ui/PIPELINE_ROADMAP.html | Portfolio map — programs, stages, gate history, Event Log |
+| Runtime output | _COMMUNICATION/agents_os/ | pipeline_state*.json, pipeline_events.jsonl, STATE_SNAPSHOT.json, prompts, mandates |
 
 ---
 

@@ -66,9 +66,21 @@ async function loadPipelineState() {
     document.getElementById("s-owner").textContent  = isComplete ? '—' : getDomainOwner(state.current_gate);
     document.getElementById("s-engine").textContent = isComplete ? '—' : (currentCfg.engine || "—");
 
-    // Current Step Banner — always shown above gate context accordion
+    // Current Step Banner — rebuild only when loadPipelineState is called,
+    // which only happens on genuine state changes (see loadAll change-detection).
+    // Safety net: if a panel is open during a genuine state transition, preserve it.
     const stepBannerEl = document.getElementById('current-step-banner');
-    if (stepBannerEl) stepBannerEl.innerHTML = buildCurrentStepBanner(state.current_gate, state);
+    if (stepBannerEl) {
+      const _pasteOpen  = document.getElementById('csb-fd-paste-row')?.style.display !== 'none';
+      const _pasteText  = document.getElementById('csb-fd-paste-input')?.value || '';
+      const _manualOpen = document.getElementById('csb-fd-manual-row')?.style.display === 'flex';
+      const _manualVal  = document.getElementById('csb-fd-path-input')?.value || '';
+      stepBannerEl.innerHTML = buildCurrentStepBanner(state.current_gate, state);
+      if (_pasteOpen)  { const e = document.getElementById('csb-fd-paste-row');  if (e) e.style.display = 'block'; }
+      if (_pasteText)  { const e = document.getElementById('csb-fd-paste-input'); if (e) e.value = _pasteText; }
+      if (_manualOpen) { const e = document.getElementById('csb-fd-manual-row');  if (e) e.style.display = 'flex'; }
+      if (_manualVal)  { const e = document.getElementById('csb-fd-path-input');  if (e) e.value = _manualVal; }
+    }
 
     // Layer A: Feedback Detection auto-scan — fires immediately after banner renders.
     // Independent of quick-action-bar; covers page load, domain switch, auto-refresh.
@@ -497,7 +509,7 @@ const ALL_GATE_DEFS = {
     owner:'team_90', engine:'codex',
     desc:'Team 90 validates work plan: completeness, API contracts, test criteria, no spec gaps',
     advice:'./pipeline_run.sh → paste to Codex → Team 90 reviews → Team 90 produces verdict',
-    failAdvice:'./pipeline_run.sh fail "BLOCKER-1: ..." → ./pipeline_run.sh revise "BLOCKER-1: ..." → paste revised G3_PLAN prompt into Cursor → Team 10 fixes → ./pipeline_run.sh pass',
+    failAdvice:'./pipeline_run.sh revise "BLOCKER-1: ..." → (records G3_5 FAIL + generates revision prompt) → paste ▼▼▼ into Cursor → Team 10 fixes → ./pipeline_run.sh pass',
     twoPaths:true,
     passCmd:'./pipeline_run.sh pass',
     failCmd:'./pipeline_run.sh fail "BLOCKER-1: ..."',
@@ -1088,7 +1100,7 @@ async function runProgressCheck() {
       if (fcTa) fcTa.oninput = () => {
         const raw = fcTa.value.trim();
         const pre = document.getElementById(`pc-fc-preview-${gate}`);
-        if (pre) pre.textContent = raw ? `./pipeline_run.sh fail "${raw.replace(/"/g,"'")}"` : failCmd;
+        if (pre) pre.textContent = raw ? _dfCmd(`./pipeline_run.sh fail "${raw.replace(/"/g,"'")}"`) : failCmd;
       };
     }
 
@@ -1098,7 +1110,7 @@ async function runProgressCheck() {
     if (ta) ta.oninput = () => {
       const raw = ta.value.trim();
       const pre = document.getElementById(`pc-preview-${gate}`);
-      if (pre) pre.textContent = raw ? `./pipeline_run.sh fail "${raw.replace(/"/g,"'")}"` : failCmd;
+      if (pre) pre.textContent = raw ? _dfCmd(`./pipeline_run.sh fail "${raw.replace(/"/g,"'")}"`) : failCmd;
     };
 
     _qbarGate = _saved;
@@ -1206,6 +1218,12 @@ function extractVerdictStatus(text) {
     const sectionM = excerpt.match(/\*{0,2}(PASS|BLOCK)\*{0,2}/im);
     if (sectionM) return sectionM[1].toUpperCase();
   }
+  // 3. Structural inference: BF-* / BLOCKER-* findings present → infer BLOCK
+  //    Teams often paste raw blocker lists without an explicit status header.
+  const bfCount = (text.match(/\bBF-[\w\d._-]+[\s(:—]/g) || []).length;
+  if (bfCount >= 1) return 'BLOCK';
+  // 4. Explicit PASS phrase as last resort
+  if (/\b(VERDICT|RESULT|DECISION)\s*[:\-—]+\s*PASS\b/i.test(text)) return 'PASS';
   return null;
 }
 
@@ -1317,12 +1335,13 @@ function _processFdVerdict(gate, foundText, foundPath) {
   // Propagate into the quick-action-bar findings builder if present
   const ta = document.getElementById('qbar-ta');
   if (ta) {
+    const isReviseGate = (gate === 'G3_5');
     if (verdictStatus === 'BLOCK') {
       const findings = extractFindings(foundText);
       if (findings) {
         ta.value = findings;
         ta.style.borderColor = 'var(--danger)';
-        updateFindingsCmd(gate, 'qbar-ta', 'qbar-preview', false);
+        updateFindingsCmd(gate, 'qbar-ta', 'qbar-preview', isReviseGate);
       }
     } else if (verdictStatus === 'PASS') {
       ta.value = '';
@@ -1422,8 +1441,64 @@ function fdToggleManual() {
   const opening = row.style.display === 'none' || row.style.display === '';
   row.style.display = opening ? 'flex' : 'none';
   if (opening) {
+    // Close paste row if open
+    const pasteRow = document.getElementById('csb-fd-paste-row');
+    if (pasteRow) pasteRow.style.display = 'none';
     const inp = document.getElementById('csb-fd-path-input');
     if (inp) { inp.focus(); inp.select(); }
+  }
+}
+
+/** Layer D — Toggle the verdict-text paste row (no file needed). */
+function fdTogglePaste() {
+  const pasteRow = document.getElementById('csb-fd-paste-row');
+  if (!pasteRow) return;
+  const opening = pasteRow.style.display === 'none' || pasteRow.style.display === '';
+  pasteRow.style.display = opening ? 'block' : 'none';
+  if (opening) {
+    // Close manual row if open
+    const manualRow = document.getElementById('csb-fd-manual-row');
+    if (manualRow) manualRow.style.display = 'none';
+    const ta = document.getElementById('csb-fd-paste-input');
+    if (ta) ta.focus();
+  }
+}
+
+/** Layer D — process pasted verdict text directly (no file needed). */
+function fdProcessPasted() {
+  const gate = pipelineState ? pipelineState.current_gate : null;
+  if (!gate) return;
+  const ta = document.getElementById('csb-fd-paste-input');
+  const statusEl = document.getElementById('csb-fd-status');
+  const resultEl = document.getElementById('csb-fd-paste-result');
+  if (!ta || !ta.value.trim()) {
+    if (statusEl) statusEl.innerHTML = `<span style="color:var(--warning)">⚠️ Paste verdict text above first</span>`;
+    return;
+  }
+  const text = ta.value.trim();
+  _processFdVerdict(gate, text, null);
+  // DON'T close panel — show result feedback so user sees what happened
+  if (resultEl) {
+    const verdictStatus = extractVerdictStatus(text);
+    const findings = extractFindings(text);
+    const findingCount = findings ? findings.split(';').filter(s => s.trim()).length : 0;
+    if (verdictStatus === 'BLOCK') {
+      resultEl.innerHTML = `
+        <div style="color:var(--danger);font-weight:600;margin-bottom:4px">⛔ BLOCK — ${findingCount} finding${findingCount !== 1 ? 's' : ''} extracted</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-bottom:6px">Findings pre-loaded into the Revision Builder below ↓</div>
+        <div style="font-size:10px;background:rgba(248,81,73,0.08);border:1px solid var(--danger);border-radius:4px;padding:6px 8px">
+          <strong>Next step:</strong> scroll down to the Revision Builder → copy the generated <code>revise "..."</code> command → paste into terminal.<br>
+          This will record G3_5 FAIL + generate revised G3_PLAN mandate for Team 10.
+        </div>`;
+    } else if (verdictStatus === 'PASS') {
+      resultEl.innerHTML = `
+        <div style="color:var(--success);font-weight:600;margin-bottom:4px">✅ PASS detected</div>
+        <div style="font-size:10px;color:var(--text-muted)">Click the ✅ PASS button above to advance the pipeline.</div>`;
+    } else {
+      resultEl.innerHTML = `
+        <div style="color:var(--warning);font-weight:600;margin-bottom:4px">⚠️ Could not parse status</div>
+        <div style="font-size:10px;color:var(--text-muted)">No status header, no BF-* findings found. Check the pasted text — ensure it contains "BF-XXXX:" blockers or a "status: BLOCK/PASS" header.</div>`;
+    }
   }
 }
 
@@ -1458,6 +1533,10 @@ function buildCurrentStepBanner(gate, state) {
     const actorTxt  = isClosed ? `✅ ${wp || '—'}` : '— Idle —';
     const badgeTxt  = isClosed ? 'CLOSED' : 'NO ACTIVE WP';
     const phaseTxt  = isClosed ? `${total} gates completed` : 'Awaiting next WP activation';
+    const eventTickerComplete = `<div class="csb-event-ticker" id="event-log-ticker" style="margin-top:8px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.07);font-size:11px">
+      <span class="ticker-label" style="color:var(--text-muted)">Recent:</span> <span id="event-log-ticker-events" style="color:var(--text-muted)">—</span>
+      <span class="ticker-count" style="margin-left:8px;color:var(--accent)">(<span id="event-log-ticker-count">0</span> events)</span>
+    </div>`;
     return `<div class="current-step-banner csb-complete">
       <div class="csb-title">${escHtml(title)}</div>
       <div class="csb-header">
@@ -1477,6 +1556,7 @@ function buildCurrentStepBanner(gate, state) {
           <span class="csb-step-text">To start a new WP, update <code style="background:rgba(0,0,0,0.3);padding:1px 5px;border-radius:3px">pipeline_state_${escHtml(state.project_domain || currentDomain)}.json</code> with the new WP details.</span>
         </div>
       </div>
+      ${eventTickerComplete}
     </div>`;
   }
 
@@ -1489,7 +1569,8 @@ function buildCurrentStepBanner(gate, state) {
   const baseCmd   = _dfCmd('./pipeline_run.sh ').trimEnd();
 
   let actor, engineLabel, phaseLabel, steps, modCls;
-  let cmdFlowBlock = ''; // Populated for multi-phase gates (GATE_1, future GATE_8)
+  let cmdFlowBlock    = ''; // Populated for multi-phase gates (GATE_1, G3_PLAN)
+  let artifactScanBlock = ''; // Populated for artifact-detection gates (G3_PLAN phase 1)
 
   if (gateState === 'PASS_WITH_ACTION') {
     actor = 'Gate held'; engineLabel = ''; phaseLabel = 'PASS_WITH_ACTION'; modCls = 'csb-pwa';
@@ -1542,6 +1623,69 @@ function buildCurrentStepBanner(gate, state) {
         'LLD400 stored ✅ — scroll to "Team Mandates" accordion below → click the "Team 190" tab',
         'Click "📋 Copy mandate" → paste into Codex (OpenAI) → Team 190 validates the LLD400',
         `Team 190 saves verdict → click ✅ PASS (run: ${_pscmd}) or ❌ FAIL (return to Team 170 correction)`,
+      ];
+    }
+
+  } else if (gate === 'G3_PLAN') {
+    const workPlan  = (state.work_plan || '').trim();
+    const _gp1cmd   = _dfCmd('./pipeline_run.sh phase1');
+    const _gp2cmd   = _dfCmd('./pipeline_run.sh phase2');
+    const _gpcmd    = _dfCmd('./pipeline_run.sh pass');
+    // Command-flow box for G3_PLAN (all 3 steps always visible).
+    cmdFlowBlock = `<div class="gate1-cmd-flow">
+  <div class="gcf-title">🔁 G3_PLAN — Full Command Sequence</div>
+  <div class="gcf-row gcf-done">
+    <span class="gcf-num">1</span>
+    <code class="gcf-cmd">${escHtml(_gp1cmd)}</code>
+    <span class="gcf-note">← generate Team 10 work plan mandate</span>
+    <button class="gcf-copy" onclick="copyCmd(${escAttr(JSON.stringify(_gp1cmd))}, this)">⎘</button>
+  </div>
+  <div class="gcf-row ${!workPlan ? 'gcf-next' : 'gcf-done'}">
+    <span class="gcf-num">2</span>
+    <code class="gcf-cmd">${escHtml(_gp2cmd)}</code>
+    <span class="gcf-note">← after Team 10 saves work plan (auto-store)</span>
+    <button class="gcf-copy" onclick="copyCmd(${escAttr(JSON.stringify(_gp2cmd))}, this)">⎘</button>
+  </div>
+  <div class="gcf-row ${workPlan ? 'gcf-next' : 'gcf-pending'}">
+    <span class="gcf-num">3</span>
+    <code class="gcf-cmd">${escHtml(_gpcmd)}</code>
+    <span class="gcf-note">← advance G3_PLAN → G3_5 (Team 90)</span>
+    <button class="gcf-copy" onclick="copyCmd(${escAttr(JSON.stringify(_gpcmd))}, this)">⎘</button>
+  </div>
+</div>`;
+    // Artifact scan panel (Phase 1 only): let operator scan/rescan for Team 10 work plan file
+    if (!workPlan) {
+      const wp = (state.work_package_id || '').replace(/-/g, '_');
+      artifactScanBlock = `<div class="artifact-scan-panel" id="g3plan-artifact-scan">
+  <div class="asp-title">📂 Work Plan Detection — Team 10 Output</div>
+  <div class="asp-status" id="asp-status">🔍 Checking <code>_COMMUNICATION/team_10/TEAM_10_${escHtml(wp)}_G3_PLAN_WORK_PLAN_v*.md</code>…</div>
+  <div class="asp-actions">
+    <button class="asp-btn" onclick="g3planRescan()">↩️ Rescan</button>
+    <button class="asp-btn" onclick="g3planToggleManual()">✏️ Paste path</button>
+  </div>
+  <div class="asp-manual-row" id="asp-manual-row" style="display:none">
+    <input id="asp-path-input" class="asp-input" placeholder="_COMMUNICATION/team_10/TEAM_10_…_G3_PLAN_WORK_PLAN_v1.0.0.md"
+      onkeydown="if(event.key==='Enter')g3planStoreManual()">
+    <button class="asp-btn" onclick="g3planStoreManual()">Store ↵</button>
+  </div>
+</div>`;
+    }
+    if (!workPlan) {
+      actor = 'Team 10'; engineLabel = 'Cursor'; modCls = failCount > 0 ? 'csb-correction' : '';
+      phaseLabel = failCount > 0 ? 'Phase 1 of 2 — revision cycle' : 'Phase 1 of 2 — work plan authoring';
+      steps = [
+        failCount > 0
+          ? 'Team 10 saves revised work plan → _COMMUNICATION/team_10/TEAM_10_..._G3_PLAN_WORK_PLAN_vN.M.md'
+          : 'Team 10 saves work plan → _COMMUNICATION/team_10/TEAM_10_..._G3_PLAN_WORK_PLAN_v1.0.0.md',
+        `Run in terminal: ${_gp2cmd}  (auto-stores plan + confirms readiness)`,
+        `Plan confirmed stored → run: ${_gpcmd}  (advances to G3_5 for Team 90 validation)`,
+      ];
+    } else {
+      actor = 'Nimrod'; engineLabel = 'Terminal'; phaseLabel = 'Phase 2 of 2 — plan stored, advance ready'; modCls = 'csb-phase2';
+      steps = [
+        `Work plan stored ✅ (${String(workPlan.length).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} chars) — Team 10 output confirmed`,
+        `Run: ${_gpcmd}  (advances G3_PLAN → G3_5 where Team 90 validates the work plan)`,
+        'At G3_5: scroll to "Team Mandates" → copy Team 90 mandate → paste into Codex',
       ];
     }
 
@@ -1619,6 +1763,7 @@ function buildCurrentStepBanner(gate, state) {
           <span id="csb-fd-status" class="csb-fd-status">🔍 Scanning for verdict…</span>
           <button class="csb-fd-btn" onclick="fdRescan()" title="Rescan all candidate paths for new verdict file">↩️ Rescan</button>
           <button class="csb-fd-btn" onclick="fdToggleManual()" title="Enter verdict file path manually (Layer C bypass)">✏️ Manual</button>
+          <button class="csb-fd-btn" onclick="fdTogglePaste()" title="Paste verdict text directly — use when team didn't save a file (Layer D)">📋 Paste</button>
         </div>
         <div class="csb-fd-manual-row" id="csb-fd-manual-row" style="display:none">
           <input id="csb-fd-path-input" class="csb-fd-input"
@@ -1626,9 +1771,41 @@ function buildCurrentStepBanner(gate, state) {
             onkeydown="if(event.key==='Enter')fdLoadManual()">
           <button class="csb-fd-btn" onclick="fdLoadManual()">Load ↵</button>
         </div>
+        <div class="csb-fd-paste-row" id="csb-fd-paste-row" style="display:none">
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">Paste full verdict text from team output (Layer D — no file required):</div>
+          <textarea id="csb-fd-paste-input" class="csb-fd-paste-textarea"
+            placeholder="Paste Team 90 / Team 190 / Team 100 verdict text here…" rows="5"></textarea>
+          <button class="csb-fd-btn" onclick="fdProcessPasted()" style="margin-top:4px;width:100%">⚡ Process verdict ↵</button>
+          <div id="csb-fd-paste-result" style="margin-top:6px;font-size:11px;"></div>
+        </div>
         <div class="csb-fd-candidates" id="csb-fd-candidates"></div>
       </div>`
     : `<div class="csb-last-action" style="font-style:italic;font-size:11px;color:var(--text-muted);margin-top:8px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.07);min-height:14px"></div>`;
+  const eventTickerHtml = `<div class="csb-event-ticker" id="event-log-ticker" style="margin-top:8px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.07);font-size:11px">
+    <span class="ticker-label" style="color:var(--text-muted)">Recent:</span> <span id="event-log-ticker-events" style="color:var(--text-muted)">—</span>
+    <span class="ticker-count" style="margin-left:8px;color:var(--accent)">(<span id="event-log-ticker-count">0</span> events)</span>
+  </div>`;
+
+  // ── Universal bypass panel — shown at ALL non-complete gates ──────────
+  // Requirement (2026-03-16): every gate must have a manual bypass path + logging.
+  const bypassCmd = _dfCmd(`./pipeline_run.sh override "reason"`);
+  const bypassHtml = `<div class="bypass-panel" id="bypass-panel-${escHtml(gate)}">
+    <button class="bypass-toggle" onclick="bypassToggle(${escAttr(JSON.stringify(gate))})">
+      ⚡ Emergency Bypass
+    </button>
+    <div class="bypass-body" id="bypass-body-${escHtml(gate)}" style="display:none">
+      <div class="bypass-warning">⚠️ Bypass is logged. Every override is recorded in the pipeline event log for audit and optimization.</div>
+      <div class="bypass-row">
+        <textarea id="bypass-reason-${escHtml(gate)}" class="bypass-textarea"
+          placeholder="Required: reason for bypassing this gate (e.g. 'Team 90 unreachable — continuing with known good plan')"
+          oninput="bypassUpdateCmd(${escAttr(JSON.stringify(gate))})"></textarea>
+      </div>
+      <div class="bypass-cmd-row">
+        <code class="bypass-cmd" id="bypass-cmd-${escHtml(gate)}">${escHtml(bypassCmd)}</code>
+        <button class="bypass-copy-btn" onclick="bypassCopy(${escAttr(JSON.stringify(gate))}, this)">⎘ Copy → terminal</button>
+      </div>
+    </div>
+  </div>`;
 
   return `<div class="current-step-banner${modCls ? ' ' + modCls : ''}">
     <div class="csb-title">Next Step — What to do now?</div>
@@ -1639,7 +1816,10 @@ function buildCurrentStepBanner(gate, state) {
     </div>
     <div class="csb-steps">${stepsHtml}</div>
     ${cmdFlowBlock}
+    ${artifactScanBlock}
     ${footerHtml}
+    ${eventTickerHtml}
+    ${bypassHtml}
   </div>`;
 }
 
@@ -1737,6 +1917,83 @@ function buildCorrectionCyclePanel(gate, lld400Content, failCount) {
   </div>`;
 }
 
+// ── Universal Bypass Panel helpers ────────────────────────────────────────
+// Requirement (2026-03-16): every gate must offer a manual bypass path.
+// All bypasses must be logged (override command emits OVERRIDE event to event log).
+
+function bypassToggle(gate) {
+  const body = document.getElementById(`bypass-body-${gate}`);
+  if (!body) return;
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+}
+
+function bypassUpdateCmd(gate) {
+  const ta  = document.getElementById(`bypass-reason-${gate}`);
+  const pre = document.getElementById(`bypass-cmd-${gate}`);
+  if (!ta || !pre) return;
+  const reason = (ta.value || '').trim() || 'reason';
+  pre.textContent = _dfCmd(`./pipeline_run.sh override "${reason.replace(/"/g, "'")}"`);
+}
+
+function bypassCopy(gate, btn) {
+  const pre = document.getElementById(`bypass-cmd-${gate}`);
+  if (!pre) return;
+  const cmd = pre.textContent.trim();
+  if (!cmd) return;
+  copyCmd(cmd, btn);
+}
+
+// ── G3_PLAN Artifact Scan helpers (AC-11 UI layer) ────────────────────────
+// Allows operator to rescan for Team 10 work plan + store via paste path.
+
+async function g3planRescan() {
+  const statusEl = document.getElementById('asp-status');
+  if (statusEl) statusEl.textContent = '🔍 Rescanning…';
+  if (!pipelineState) { if (statusEl) statusEl.textContent = '⚠️ No pipeline state loaded'; return; }
+  const wp  = (pipelineState.work_package_id || '').replace(/-/g, '_');
+  const candidates = [
+    `../../_COMMUNICATION/team_10/TEAM_10_${wp}_G3_PLAN_WORK_PLAN_v1.0.0.md`,
+    `../../_COMMUNICATION/team_10/TEAM_10_${wp}_G3_PLAN_WORK_PLAN_v1.1.0.md`,
+    `../../_COMMUNICATION/team_10/TEAM_10_${wp}_G3_PLAN_WORK_PLAN_v2.0.0.md`,
+  ];
+  let found = null;
+  for (const p of candidates) {
+    try {
+      const r = await fetch(p + '?t=' + Date.now());
+      if (r.ok) { found = p; break; }
+    } catch (_) {}
+  }
+  if (found) {
+    if (statusEl) statusEl.innerHTML = `✅ Found: <code>${found.split('/').pop()}</code> — run <code>${_dfCmd('./pipeline_run.sh phase2')}</code> to auto-store`;
+  } else {
+    if (statusEl) statusEl.innerHTML = `⚠️ Not found in <code>_COMMUNICATION/team_10/</code> — Team 10 must save the work plan file first`;
+  }
+}
+
+function g3planToggleManual() {
+  const row = document.getElementById('asp-manual-row');
+  if (row) row.style.display = row.style.display === 'none' ? 'flex' : 'none';
+}
+
+async function g3planStoreManual() {
+  const input = document.getElementById('asp-path-input');
+  const statusEl = document.getElementById('asp-status');
+  if (!input || !input.value.trim()) return;
+  const path = input.value.trim();
+  if (statusEl) statusEl.innerHTML = `🔄 Checking <code>${path.split('/').pop()}</code>…`;
+  try {
+    const r = await fetch(`../../${path}?t=` + Date.now());
+    if (r.ok) {
+      if (statusEl) statusEl.innerHTML = `✅ File found — run <code>${_dfCmd(`./pipeline_run.sh --store-artifact G3_PLAN ${path}`)}</code> to store`;
+    } else {
+      if (statusEl) statusEl.innerHTML = `❌ File not found at path: <code>${path}</code> — check the path and try again`;
+    }
+  } catch (e) {
+    if (statusEl) statusEl.innerHTML = `❌ Fetch error: ${e.message}`;
+  }
+}
+
 // ── Quick Action Bar state ─────────────────────────────────────────────────
 let _qbarGate = null;
 let _qbarCopyMap = {};
@@ -1820,15 +2077,14 @@ function updateFindingsCmd(gate, taId, previewId, isRevise) {
   let cmd;
   if (!raw) {
     cmd = isRevise
-      ? `./pipeline_run.sh revise "BLOCKER-1: [paste findings]"`
-      : (def.failCmd || `./pipeline_run.sh fail "reason"`);
+      ? _dfCmd(`./pipeline_run.sh revise "BLOCKER-1: [paste findings]"`)
+      : _dfCmd(def.failCmd || `./pipeline_run.sh fail "reason"`);
   } else {
-    // Replace " with ' (already done), and replace backticks with ' to prevent
-    // bash subcommand substitution when the command is pasted into a terminal.
+    // Replace " with ' and backticks with ' to prevent bash subcommand substitution.
     const safe = raw.replace(/"/g, "'").replace(/`/g, "'");
     cmd = isRevise
-      ? `./pipeline_run.sh revise "${safe}"`
-      : `./pipeline_run.sh fail "${safe}"`;
+      ? _dfCmd(`./pipeline_run.sh revise "${safe}"`)
+      : _dfCmd(`./pipeline_run.sh fail "${safe}"`);
   }
 
   preview.textContent = cmd;
@@ -1917,6 +2173,36 @@ async function buildQuickActionBar(gate) {
 
   // ── null gate (WP COMPLETE): clear bar ────────────────────────────────────
   if (!gate) { bar.innerHTML = ''; return; }
+
+  // ── G3_PLAN Phase 1: show work plan ready builder instead of PASS/FAIL ──
+  // When work_plan is empty, Team 10 hasn't yet saved their plan.
+  // Show a completion builder: operator runs phase2 to auto-store.
+  if (gate === 'G3_PLAN') {
+    const workPlan = !!(pipelineState && (pipelineState.work_plan || '').trim());
+    if (!workPlan) {
+      const phase2Cmd = _dfCmd('./pipeline_run.sh phase2');
+      _qbarCopyMap['g3plan-phase2-preview'] = phase2Cmd;
+      bar.innerHTML = `<div class="completion-builder">
+        <div class="completion-builder-title">
+          📋 Phase 1 — Confirm Team 10 Work Plan Ready &amp; Auto-Store
+          <span style="font-size:10px;font-weight:400;color:var(--text-muted)">Team 10 (Cursor)</span>
+        </div>
+        <div class="completion-builder-desc">
+          When Team 10 saves <code>TEAM_10_*_G3_PLAN_WORK_PLAN_v*.md</code>, run <code>phase2</code> to auto-store it.<br>
+          <em>Optional: add notes below (not included in command).</em>
+        </div>
+        <textarea id="g3plan-phase2-ta" class="findings-textarea"
+          placeholder="Work plan saved to _COMMUNICATION/team_10/ ✓  |  §2 files present ✓  |  §3 execution order present ✓  …"
+        ></textarea>
+        <div class="findings-cmd-row">
+          <div class="findings-cmd-text" id="g3plan-phase2-preview">${escHtml(phase2Cmd)}</div>
+          <button class="findings-copy-btn" onclick="copyFindingsCmd('g3plan-phase2-preview', this)">⎘ Copy → terminal</button>
+        </div>
+      </div>`;
+      return;
+    }
+    // Phase 2 active (work_plan stored): fall through to normal PASS/FAIL display
+  }
 
   // ── GATE_8 Phase 1: show "Task Completed" builder instead of PASS/FAIL ───
   // When phase8_content is empty, Team 70 hasn't yet confirmed Phase 1 done (all domains).
@@ -2045,7 +2331,7 @@ async function buildQuickActionBar(gate) {
         ${escHtml(failLabel)} &nbsp;<span style="font-size:10px;font-weight:400">↓ use builder</span>
       </button>`;
     } else {
-      const failCmdDef = def.failCmd || './pipeline_run.sh fail "reason"';
+      const failCmdDef = _dfCmd(def.failCmd || './pipeline_run.sh fail "reason"');
       html += `<button class="qa-btn qa-btn-fail" onclick="copyCmd(${escAttr(JSON.stringify(failCmdDef))}, this)">
         ${escHtml(failLabel)} &nbsp;<span class="terminal-hint">⎘ copy → terminal</span>
       </button>`;
@@ -2057,12 +2343,18 @@ async function buildQuickActionBar(gate) {
   // ── Findings builder for AI-verdict gates (always shown when verdictTeam set) ──
   if (needsBuilder) {
     const defaultCmd = isRevise
-      ? `./pipeline_run.sh revise "BLOCKER-1: [paste findings]"`
-      : (def.failCmd || `./pipeline_run.sh fail "reason"`);
+      ? _dfCmd(`./pipeline_run.sh revise "BLOCKER-1: [paste findings]"`)
+      : _dfCmd(def.failCmd || `./pipeline_run.sh fail "reason"`);
 
-    const builderTitle = gateStuck
+    const builderTitle = isRevise
+      ? `↩️ Revision Builder — records G3_5 FAIL + generates revision prompt`
+      : gateStuck
       ? `✏️ FAIL Command Builder (record findings before routing)`
       : `✏️ FAIL Command Builder`;
+
+    const builderDesc = isRevise
+      ? `Paste Team 90 blockers below. The <code style="font-size:10px">revise</code> command automatically records G3_5 FAIL then generates the G3_PLAN revision prompt in one step:`
+      : `Paste blocking findings from verdict file (auto-detect tries first):`;
 
     html += `<div class="findings-builder">
       <div class="findings-builder-title">
@@ -2070,13 +2362,13 @@ async function buildQuickActionBar(gate) {
         <span id="qbar-status"></span>
       </div>
       <div style="font-size:10px;color:var(--text-muted);margin-bottom:6px">
-        Paste blocking findings from verdict file (auto-detect tries first):
+        ${builderDesc}
       </div>
       <textarea id="qbar-ta" class="findings-textarea"
-        placeholder="BF-G5-001: missing validation; BF-G5-002: wrong endpoint…"
+        placeholder="${isRevise ? 'BF-G3_5-001: missing contract; BF-G3_5-002: no test criteria…' : 'BF-G5-001: missing validation; BF-G5-002: wrong endpoint…'}"
         oninput="updateFindingsCmd(${escAttr(JSON.stringify(gate))}, 'qbar-ta', 'qbar-preview', ${isRevise})"
       ></textarea>
-      ${isRevise ? `<input id="qbar-filepath" class="findings-filepath" placeholder="Path to Team 10 revised work plan (for revise command)" oninput="updateFindingsCmd(${escAttr(JSON.stringify(gate))}, 'qbar-ta', 'qbar-preview', true)">` : ''}
+      ${isRevise ? `<input id="qbar-filepath" class="findings-filepath" placeholder="Optional: path to Team 10 revised work plan file (passes to revise as $3)" oninput="updateFindingsCmd(${escAttr(JSON.stringify(gate))}, 'qbar-ta', 'qbar-preview', true)">` : ''}
       <div class="findings-cmd-row">
         <div class="findings-cmd-text" id="qbar-preview">${escHtml(defaultCmd)}</div>
         <button class="findings-copy-btn" onclick="copyFindingsCmd('qbar-preview', this)">⎘ Copy → terminal</button>
@@ -2086,8 +2378,8 @@ async function buildQuickActionBar(gate) {
     setTimeout(() => autoLoadVerdictFile(gate, 'qbar-status', 'qbar-ta', 'qbar-preview', isRevise), 50);
   }
 
-  // ── Revise hint for G3_5 ────────────────────────────────────────────────
-  if (isRevise && def.reviseCmd) {
+  // ── Revise hint for G3_5 — removed: revise now records FAIL automatically ──
+  if (false && isRevise && def.reviseCmd) {
     html += `<div style="margin-top:6px;padding:8px 12px;background:rgba(210,153,34,0.08);border:1px solid var(--warning);border-radius:6px;font-size:11px">
       <span style="color:var(--warning);font-weight:600">↩️ After FAIL</span> — generate revision prompt:
       <span style="font-family:var(--mono);font-size:10px"> ./pipeline_run.sh revise "..."</span>
@@ -2176,11 +2468,63 @@ async function loadHealthWarnings() {
     </div>`).join('');
 }
 
+// ── Background refresh — change-detection key ─────────────────────────────
+// Render key captures every field that would cause a visible DOM change.
+// If the key hasn't changed since last render, the banner is NOT touched.
+let _lastRenderKey = null;
+
+function _stateRenderKey(s) {
+  if (!s) return '';
+  return [
+    s.current_gate,
+    s.gate_state,
+    s.last_updated,
+    s.work_package_id,
+    (s.work_plan         || '').length,
+    (s.lld400_content    || '').length,
+    (s.revision_notes    || '').length,
+    (s.gates_completed   || []).join(','),
+    (s.gates_failed      || []).join(','),
+  ].join('|');
+}
+
 // ── Main load ─────────────────────────────────────────────────────────────
+// Phase 1: pre-fetch state silently in background (zero DOM writes).
+// Phase 2a (state changed): full re-render — pipeline advanced, new data available.
+// Phase 2b (no change): passive update only — timestamp + event log. Banner untouched.
 async function loadAll() {
-  const state = await loadPipelineState();
-  if (state) await loadPrompt(state.current_gate);
-  await Promise.all([loadMandates(), checkExpectedFiles(), loadHealthWarnings()]);
+  // ── Phase 1: background fetch ──────────────────────────────────────────
+  let freshState;
+  try {
+    freshState = await loadDomainState(currentDomain);
+  } catch(e) {
+    console.error('[loadAll] background fetch failed:', e);
+    return;
+  }
+  if (!freshState) return;
+
+  const newKey = _stateRenderKey(freshState);
+  const stateChanged = (newKey !== _lastRenderKey);
+
+  if (stateChanged) {
+    // ── Phase 2a: full render — state actually changed ─────────────────
+    _lastRenderKey = newKey;
+    const state = await loadPipelineState();   // fetches again + renders all DOM
+    if (state) await loadPrompt(state.current_gate);
+    await Promise.all([loadMandates(), checkExpectedFiles(), loadHealthWarnings()]);
+  } else {
+    // ── Phase 2b: passive update — only timestamp (safe, non-interactive) ─
+    const lastEl = document.getElementById('last-updated');
+    if (lastEl) {
+      const base = '[' + (freshState.project_domain || currentDomain) + '] Last updated: ' +
+        (freshState.last_updated ? new Date(freshState.last_updated).toLocaleTimeString() : 'unknown');
+      lastEl.innerHTML = base +
+        (stateFallbackMode ? ' <span class="legacy-fallback-badge">⚠ LEGACY_FALLBACK</span>' : '');
+    }
+  }
+
+  // Event log always refreshes — it's append-only and never conflicts with user input
+  if (typeof window.eventLogRefresh === 'function') window.eventLogRefresh();
 }
 
 // ── Auto-refresh ──────────────────────────────────────────────────────────
@@ -2214,3 +2558,10 @@ syncDomainUIDashboard();
 buildCommands(typeof pipelineState?.current_gate === "string" ? pipelineState.current_gate : "GATE_0");
 
 loadAll();
+
+// Auto-refresh ON by default — checkbox is pre-checked in HTML; start timer here.
+(function() {
+  const dot = document.getElementById("refresh-dot");
+  if (dot) dot.style.display = "inline-block";
+  refreshTimer = setInterval(loadAll, 5000);
+})();

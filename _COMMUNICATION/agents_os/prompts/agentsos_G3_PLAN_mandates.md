@@ -1,3 +1,6 @@
+**date:** 2026-03-16
+
+---
 # Mandates — S002-P005-WP003  ·  G3_PLAN
 
 **Spec:** AOS State Alignment & Governance Integrity

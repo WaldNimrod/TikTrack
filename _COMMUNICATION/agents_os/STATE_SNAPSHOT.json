@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0.0",
-  "produced_at_iso": "2026-03-16T16:44:59.366428+00:00",
+  "produced_at_iso": "2026-03-16T17:47:46.344944+00:00",
   "agent_role": "POC-1-OBSERVER",
   "read_only": true,
   "governance": {
@@ -21,20 +21,26 @@
         "gate_state": null,
         "pending_actions": [],
         "override_reason": null,
-        "current_gate": "GATE_1",
+        "current_gate": "G3_5",
         "project_domain": "agents_os",
         "work_package_id": "S002-P005-WP003",
         "stage_id": "S002"
       },
       "tiktrack": {
-        "error": "file_not_found"
+        "gate_state": null,
+        "pending_actions": [],
+        "override_reason": null,
+        "current_gate": "G3_6_MANDATES",
+        "project_domain": "tiktrack",
+        "work_package_id": "S002-P002-WP001",
+        "stage_id": ""
       }
     },
     "legacy": {
       "gate_state": null,
       "pending_actions": [],
       "override_reason": null,
-      "current_gate": "GATE_1"
+      "current_gate": "G3_6_MANDATES"
     }
   },
   "codebase": {

@@ -37,7 +37,13 @@ async def post_log_event(request: Request) -> JSONResponse:
     return JSONResponse({"status": "ok", "received": evt.event_type})
 
 
-def _read_events(domain: Optional[str], gate: Optional[str], event_type: Optional[str], limit: int) -> List[dict]:
+def _read_events(
+    domain: Optional[str],
+    gate: Optional[str],
+    event_type: Optional[str],
+    work_package_id: Optional[str],
+    limit: int,
+) -> List[dict]:
     """Read last N events from JSONL, optionally filtered."""
     if not LOG_FILE.exists():
         return []
@@ -57,6 +63,11 @@ def _read_events(domain: Optional[str], gate: Optional[str], event_type: Optiona
                 continue
             if event_type and evt.get("event_type") != event_type:
                 continue
+            if work_package_id:
+                evt_wp = (evt.get("work_package_id") or "").strip()
+                wp_filter = work_package_id.strip()
+                if not evt_wp or not (evt_wp == wp_filter or evt_wp.startswith(wp_filter + "-")):
+                    continue
             events.append(evt)
     # Most recent last in file — reverse for chronological (newest first)
     events.reverse()
@@ -64,14 +75,15 @@ def _read_events(domain: Optional[str], gate: Optional[str], event_type: Optiona
 
 
 async def get_log_events(request: Request) -> JSONResponse:
-    """GET /api/log/events — query events with filters."""
+    """GET /api/log/events — query events with filters. work_package_id: prefix match (e.g. S002-P005)."""
     domain = request.query_params.get("domain")
     gate = request.query_params.get("gate")
     event_type = request.query_params.get("event_type")
+    work_package_id = request.query_params.get("work_package_id")
     try:
         limit = int(request.query_params.get("limit", "20"))
     except ValueError:
         limit = 20
     limit = max(1, min(limit, 100))
-    events = _read_events(domain, gate, event_type, limit)
+    events = _read_events(domain, gate, event_type, work_package_id, limit)
     return JSONResponse(events)

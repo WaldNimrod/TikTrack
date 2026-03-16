@@ -206,6 +206,68 @@ print(f'STORE:{latest}')
   # ALREADY_STORED: no output — silent pass
 }
 
+_auto_store_g3plan_artifact() {
+  # AC-11: at G3_PLAN gate, auto-detect the latest
+  # TEAM_10_{WP_ID}_G3_PLAN_WORK_PLAN_v*.md and store it into work_plan if
+  # the stored version is stale or empty. Mirrors the AC-10 pattern for GATE_1.
+  # Called before phase2 prompt generation at G3_PLAN.
+  local result
+  result=$(python3 -c "
+import sys, os, json, glob
+sys.path.insert(0, '.')
+domain = os.environ.get('PIPELINE_DOMAIN') or None
+if domain == 'agents_os':
+    sf = '_COMMUNICATION/agents_os/pipeline_state_agentsos.json'
+elif domain == 'tiktrack':
+    sf = '_COMMUNICATION/agents_os/pipeline_state_tiktrack.json'
+else:
+    sf = '_COMMUNICATION/agents_os/pipeline_state.json'
+try:
+    state = json.loads(open(sf).read())
+except Exception:
+    sys.exit(0)
+if state.get('current_gate') != 'G3_PLAN':
+    sys.exit(0)
+wp = state.get('work_package_id', '')
+if not wp:
+    sys.exit(0)
+wp_fs = wp.replace('-', '_')
+pattern = f'_COMMUNICATION/team_10/TEAM_10_{wp_fs}_G3_PLAN_WORK_PLAN_v*.md'
+files = sorted(glob.glob(pattern))
+if not files:
+    print('NO_FILE')
+    sys.exit(0)
+latest = files[-1]
+try:
+    content = open(latest).read()
+except Exception:
+    sys.exit(0)
+current = state.get('work_plan', '')
+if content.strip() == current.strip():
+    print(f'ALREADY_STORED:{latest}')
+    sys.exit(0)
+print(f'STORE:{latest}')
+" 2>/dev/null)
+
+  if [[ "$result" == STORE:* ]]; then
+    local file="${result#STORE:}"
+    echo ""
+    echo "  ────────────────────────────────────────────────────────────────"
+    echo "  🔄 AC-11 G3_PLAN auto-store: ${file}"
+    $CLI --store-artifact G3_PLAN "$file" 2>/dev/null && \
+      echo "  ✅ work_plan updated — G3_5 mandate will include latest plan" || \
+      echo "  ⚠️  auto-store failed — run manually: ./pipeline_run.sh ${DOMAIN_FLAG_STR:-}store G3_PLAN ${file}"
+    echo "  ────────────────────────────────────────────────────────────────"
+    echo ""
+  elif [[ "$result" == NO_FILE ]]; then
+    echo ""
+    echo "  ⚠️  G3_PLAN: No work plan found in _COMMUNICATION/team_10/ for WP."
+    echo "  Team 10 must save TEAM_10_*_G3_PLAN_WORK_PLAN_v*.md before phase2 can proceed."
+    echo ""
+  fi
+  # ALREADY_STORED: no output — silent pass
+}
+
 _validate_stage_alignment() {
   # Stage-alignment guard — prevents pipeline ops on a wrong-stage state file.
   # Reads stage_id from the active pipeline state and compares to WSM active_stage_id.
@@ -569,8 +631,17 @@ print('yes' if GATE_CONFIG.get('${GATE}', {}).get('default_fail_route') else 'no
   revise)
     # Revision mode after G3_5 FAIL.
     # Usage: ./pipeline_run.sh revise "BLOCKER-1: ... BLOCKER-2: ..."
-    # Step 1: store current work plan artifact (if file path given as $3)
+    # If currently at G3_5, records FAIL first; then generates G3_PLAN revision prompt.
     NOTES="${2:?Usage: ./pipeline_run.sh revise \"blocker notes\" [optional: work_plan_file_path]}"
+    # Step 0: if currently at G3_5, advance it to FAIL before generating revision
+    CURRENT_GATE=$(_get_gate)
+    if [[ "$CURRENT_GATE" == "G3_5" ]]; then
+      echo "[pipeline_run] ${DOMAIN_LABEL}Recording G3_5 FAIL (revision triggered)..."
+      FAIL_REASON="${NOTES:0:200}"
+      $CLI --advance G3_5 FAIL --reason "$FAIL_REASON" 2>&1 | grep -v "^━"
+      echo "[pipeline_run] G3_5 FAIL recorded → gate now: $(_get_gate)"
+    fi
+    # Step 1: store current work plan artifact (if file path given as $3)
     if [ -n "$3" ]; then
       echo "[pipeline_run] Storing work plan artifact: $3"
       $CLI --store-artifact G3_PLAN "$3"
@@ -683,7 +754,8 @@ print(f'    Updated: {s.last_updated or \"never\"}')
     fi
 
     GATE=$(_get_gate)
-    _auto_store_gate1_artifact   # AC-10: auto-store before phase transition prompt generation
+    _auto_store_gate1_artifact   # AC-10: auto-store latest LLD400 before phase transition
+    _auto_store_g3plan_artifact  # AC-11: auto-store G3_PLAN work plan before phase transition
     echo "[pipeline_run] ${DOMAIN_LABEL}Phase ${PHASE_NUM} — regenerating mandates for: $GATE"
     $CLI --generate-prompt "$GATE" 2>&1 | grep -v "^━"
 
@@ -694,6 +766,9 @@ print(f'    Updated: {s.last_updated or \"never\"}')
     case "$GATE" in
       GATE_1)
         MANDATE_FILE="$PROMPTS_DIR/${_dm_slug}_GATE_1_mandates.md"
+        ;;
+      G3_PLAN)
+        MANDATE_FILE="$PROMPTS_DIR/${_dm_slug}_G3_PLAN_mandates.md"
         ;;
       GATE_8)
         MANDATE_FILE="$PROMPTS_DIR/${_dm_slug}_gate_8_mandates.md"
@@ -759,6 +834,21 @@ PYEOF
     fi
     printf '▲%.0s' {1..74}; echo ""
     echo ""
+
+    # ── State update: G3_PLAN phase2 — confirm work plan stored ──────────
+    if [[ "$GATE" == "G3_PLAN" && "$PHASE_NUM" == "2" ]]; then
+      python3 -c "
+import sys, os
+sys.path.insert(0, '.')
+from agents_os_v2.orchestrator.state import PipelineState
+domain = os.environ.get('PIPELINE_DOMAIN') or None
+state = PipelineState.load(domain)
+if state.work_plan and state.work_plan.strip():
+    print('[pipeline_run] ✅ work_plan confirmed stored (' + str(len(state.work_plan)) + ' chars). Run: ./pipeline_run.sh ${DOMAIN_FLAG_STR:-}pass to advance to G3_5.')
+else:
+    print('[pipeline_run] ⚠️  work_plan is EMPTY. Ensure Team 10 saved TEAM_10_*_G3_PLAN_WORK_PLAN_v*.md')
+"
+    fi
 
     # ── State update: mark phase transition in pipeline_state ─────────────
     # When phase2 is run on GATE_8, Phase 1 (Team 70/170) is confirmed done.

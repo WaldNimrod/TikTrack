@@ -2507,7 +2507,13 @@ async function loadAll() {
   const stateChanged = (newKey !== _lastRenderKey);
 
   if (stateChanged) {
-    // ── Phase 2a: full render — state actually changed ─────────────────
+    // ── Phase 2a: full render — but only if user is not actively typing ─
+    const focused = document.activeElement;
+    const userIsTyping = focused && (focused.tagName === 'TEXTAREA' || focused.tagName === 'INPUT');
+    if (userIsTyping) {
+      // Defer: skip this cycle — next cycle will still detect the change and render
+      return;
+    }
     _lastRenderKey = newKey;
     const state = await loadPipelineState();   // fetches again + renders all DOM
     if (state) await loadPrompt(state.current_gate);

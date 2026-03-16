@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0.0",
-  "produced_at_iso": "2026-03-16T17:47:46.344944+00:00",
+  "produced_at_iso": "2026-03-16T21:46:17.883840+00:00",
   "agent_role": "POC-1-OBSERVER",
   "read_only": true,
   "governance": {
@@ -40,7 +40,7 @@
       "gate_state": null,
       "pending_actions": [],
       "override_reason": null,
-      "current_gate": "G3_6_MANDATES"
+      "current_gate": "G3_5"
     }
   },
   "codebase": {

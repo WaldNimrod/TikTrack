@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import json
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent.parent
@@ -32,7 +32,7 @@ def main():
     written = 0
     with open(LOG_FILE, "a", encoding="utf-8") as f:
         for i, evt in enumerate(SEED_EVENTS):
-            ts = (base.replace(second=base.second + i * 2) if i else base).strftime("%Y-%m-%dT%H:%M:%SZ")
+            ts = (base + timedelta(seconds=i * 2)).strftime("%Y-%m-%dT%H:%M:%SZ")
             evt = dict(evt)
             evt["timestamp"] = ts
             f.write(json.dumps(evt, ensure_ascii=False) + "\n")

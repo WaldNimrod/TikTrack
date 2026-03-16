@@ -631,15 +631,18 @@ print('yes' if GATE_CONFIG.get('${GATE}', {}).get('default_fail_route') else 'no
   revise)
     # Revision mode after G3_5 FAIL.
     # Usage: ./pipeline_run.sh revise "BLOCKER-1: ... BLOCKER-2: ..."
-    # If currently at G3_5, records FAIL first; then generates G3_PLAN revision prompt.
+    # If currently at G3_5, records FAIL + routes full (BF = structural) → advances to G3_PLAN.
     NOTES="${2:?Usage: ./pipeline_run.sh revise \"blocker notes\" [optional: work_plan_file_path]}"
-    # Step 0: if currently at G3_5, advance it to FAIL before generating revision
+    # Step 0: if currently at G3_5, advance it to FAIL + route full → G3_PLAN
     CURRENT_GATE=$(_get_gate)
     if [[ "$CURRENT_GATE" == "G3_5" ]]; then
       echo "[pipeline_run] ${DOMAIN_LABEL}Recording G3_5 FAIL (revision triggered)..."
       FAIL_REASON="${NOTES:0:200}"
       $CLI --advance G3_5 FAIL --reason "$FAIL_REASON" 2>&1 | grep -v "^━"
-      echo "[pipeline_run] G3_5 FAIL recorded → gate now: $(_get_gate)"
+      # BF (Blocking Findings) = structural issues → always route full for G3_5
+      echo "[pipeline_run] ${DOMAIN_LABEL}Routing G3_5 → G3_PLAN (full — structural work plan blockers)..."
+      $CLI --route full G3_5 --reason "$FAIL_REASON" 2>&1 | grep -v "^━"
+      echo "[pipeline_run] G3_5 routed → gate now: $(_get_gate)"
     fi
     # Step 1: store current work plan artifact (if file path given as $3)
     if [ -n "$3" ]; then

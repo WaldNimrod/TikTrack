@@ -294,11 +294,13 @@ function _missingSystemVars() {
 function buildPrompt(team, typeId, injectionMode) {
   injectionMode = injectionMode || "hard";
   if (injectionMode === "rag") {
+    const modeLabels = { reset: "Full Reset", reinforce: "Identity Reinforcement", handoff: "Handoff / Onboard", governance: "Governance Reminder" };
     return `@${team.id}.md @STATE_SNAPSHOT.json @PHOENIX_MASTER_WSM_v1.0.0.md
 
 You are ${team.name}. Read your identity file and establish your rules.
 Current state is in @STATE_SNAPSHOT.json.
-Operational state is in @PHOENIX_MASTER_WSM_v1.0.0.md.`;
+Operational state is in @PHOENIX_MASTER_WSM_v1.0.0.md.
+Task Focus: [${modeLabels[typeId] || "Pending Task"}]`;
   }
   const ctx = _resolveCtx();
   const today = ctx.today;
@@ -525,11 +527,7 @@ function _clearValidation() {
 function renderPrompt() {
   const out = document.getElementById("prompt-output");
   if (!out || !selectedTeam) return;
-  const missing = _missingSystemVars();
-  if (missing.length > 0) {
-    _showValidationPanel(missing);
-    return;
-  }
+  // Always show RAG prompt in preview as it requires no dynamic system variables
   out.textContent = buildPrompt(selectedTeam, selectedPromptType, "rag");
 }
 
@@ -539,12 +537,10 @@ function copyPrompt(injectionMode) {
   const text = injectionMode === "rag"
     ? buildPrompt(selectedTeam, selectedPromptType, "rag")
     : (missing.length > 0 ? null : buildPrompt(selectedTeam, selectedPromptType, "hard"));
-  if (!text || text.startsWith("⛔") || text.includes("pv-panel")) {
-    if (injectionMode === "hard" && missing.length > 0) {
-      alert("Cannot copy Hard-Injection — prompt has unresolved system variables. Fill in the required fields first.");
-    } else {
-      alert("Cannot copy — prompt has unresolved system variables. Fill in the required fields first.");
-    }
+    
+  if (injectionMode === "hard" && missing.length > 0) {
+    _showValidationPanel(missing);
+    alert("Cannot copy Hard-Injection — prompt has unresolved system variables. Fill them in below.");
     return;
   }
   const btnId = injectionMode === "rag" ? "copy-rag-btn" : "copy-hard-btn";

@@ -282,14 +282,16 @@ function _parseMandateSections(text) {
   const sections = {};
   mandateMeta    = {};
 
-  // Detect team sections: ## Team N ... (Phase N) — or any ## Team N ... ( form
-  const hasSections = /^## Team \d+/m.test(text);
+  // Detect team sections: ## Team N ... (Phase N) — or ## Operator ... (Phase N)
+  // Pattern covers both "## Team 10 — ..." and "## Operator — ..." section headers.
+  const SECTION_RE = /^## ((?:Team \d+|Operator)[^\n]*)/mg;
+  const hasSections = /^## (?:Team \d+|Operator)/m.test(text);
   if (!hasSections) {
     sections["Full"] = text;
   } else {
-    const teamMatches = [...text.matchAll(/^## (Team \d+[^\n]*)/mg)];
+    const teamMatches = [...text.matchAll(SECTION_RE)];
     teamMatches.forEach((m, i) => {
-      const key     = m[1].trim().split("(")[0].trim();   // "Team 20 — API Verification"
+      const key     = m[1].trim().split("(")[0].trim();   // "Team 10 — Work Plan Author" or "Operator"
       const start   = m.index;
       const end     = i + 1 < teamMatches.length ? teamMatches[i + 1].index : text.length;
       const content = text.slice(start, end);
@@ -317,12 +319,16 @@ function _parseMandateSections(text) {
   // ── Build tabs with phase badges ────────────────────────────────────────
   const tabs = document.getElementById("team-tabs");
 
-  // Determine which phase number is currently active
-  // For two-phase gates: Phase 2 is active when lld400_content (or phase8_content) is stored
-  const curGate      = pipelineState?.current_gate || '';
-  const lld400Ready  = !!(pipelineState?.lld400_content || '').trim();
-  const phase8Ready  = !!(pipelineState?.phase8_content || '').trim();
-  const activePhase  = (isTwoPhaseGate(curGate) && (lld400Ready || phase8Ready)) ? 2 : 1;
+  // Determine which phase number is currently active.
+  // Phase 2 is active when the executor team's artifact has been stored:
+  //   GATE_1  → lld400_content   (Team 170 LLD400)
+  //   G3_PLAN → work_plan        (Team 10 work plan)
+  //   GATE_8  → phase8_content   (Team 70 closure doc)
+  const curGate        = pipelineState?.current_gate || '';
+  const lld400Ready    = !!(pipelineState?.lld400_content || '').trim();
+  const phase8Ready    = !!(pipelineState?.phase8_content || '').trim();
+  const workPlanReady  = !!(pipelineState?.work_plan      || '').trim();
+  const activePhase    = (isTwoPhaseGate(curGate) && (lld400Ready || phase8Ready || workPlanReady)) ? 2 : 1;
 
   tabs.innerHTML = keys.map((k, i) => {
     const meta = mandateMeta[k] || { phase: i + 1, hasCorrection: false, hasPrereq: false };
@@ -380,28 +386,43 @@ function showMandate(key) {
   const meta      = mandateMeta[key] || {};
   const contentEl = document.getElementById("mandate-content");
 
-  // Build prereq warning prefix (non-first phases that haven't had their prereq met)
+  // Build prereq / ready prefix for Operator / Phase-2 tabs
   let prefixHtml = "";
   if (meta.hasPrereq) {
-    const m    = content.match(/⚠️  PREREQUISITE: \*\*([^*]+)\*\*/);
-    const who  = m ? m[1] : "the prior phase";
     const ph   = meta.phase || 2;
-    const cmd  = `./pipeline_run.sh phase${ph}`;
-    prefixHtml = `<div class="prereq-warning">`
-               + `⏳ <strong>Wait for ${escHtml(who)}</strong> — Phase ${ph - 1} must be COMPLETE first. `
-               + `When they're done, run in terminal: `
-               + `<code style="background:rgba(0,0,0,0.3);padding:1px 6px;border-radius:3px;font-size:11px">${escHtml(cmd)}</code>`
-               + ` — injects their output and refreshes this prompt.</div>`;
-  }
-  if (meta.prereqMissing && meta.hasPrereq) {
-    const ph  = meta.phase || 2;
-    const cmd = `./pipeline_run.sh phase${ph}`;
-    // Prereq file not found yet — strong CTA with exact command
-    prefixHtml += `<div class="prereq-warning" style="border-color:rgba(210,153,34,0.3);color:var(--warning);background:rgba(210,153,34,0.05)">`
-                + `📄 <strong>Prior team's output not yet available.</strong> `
-                + `Once Phase ${ph - 1} is complete, run: `
-                + `<code style="background:rgba(0,0,0,0.2);padding:1px 6px;border-radius:3px;font-size:11px">${escHtml(cmd)}</code>`
-                + ` — injects their output into this section.</div>`;
+    const gate = pipelineState?.current_gate || '';
+
+    // Check if the prereq artifact is already stored for this gate/phase
+    const prereqDone = (gate === 'G3_PLAN' && !!(pipelineState?.work_plan || '').trim())
+                    || (gate === 'GATE_1'  && !!(pipelineState?.lld400_content || '').trim())
+                    || (gate === 'GATE_8'  && !!(pipelineState?.phase8_content || '').trim());
+
+    if (prereqDone) {
+      // Phase 1 artifact stored — show ready banner, suppress waiting message
+      const passCmd = _dfCmd('./pipeline_run.sh pass');
+      prefixHtml = `<div class="prereq-warning" style="background:rgba(63,185,80,0.08);border-color:rgba(63,185,80,0.4);color:var(--success)">`
+                 + `✅ <strong>Phase ${ph - 1} complete — artifact stored.</strong> `
+                 + `Run: <code style="background:rgba(0,0,0,0.3);padding:1px 6px;border-radius:3px;font-size:11px">${escHtml(passCmd)}</code>`
+                 + ` to advance to the next gate.</div>`;
+    } else {
+      // Phase 1 not yet done — show waiting message
+      const m    = content.match(/⚠️  PREREQUISITE: \*\*([^*]+)\*\*/);
+      const who  = m ? m[1] : "the prior phase";
+      const cmd  = _dfCmd(`./pipeline_run.sh phase${ph}`);
+      prefixHtml = `<div class="prereq-warning">`
+                 + `⏳ <strong>Wait for ${escHtml(who)}</strong> — Phase ${ph - 1} must be COMPLETE first. `
+                 + `When they're done, run in terminal: `
+                 + `<code style="background:rgba(0,0,0,0.3);padding:1px 6px;border-radius:3px;font-size:11px">${escHtml(cmd)}</code>`
+                 + ` — injects their output and refreshes this prompt.</div>`;
+
+      if (meta.prereqMissing) {
+        prefixHtml += `<div class="prereq-warning" style="border-color:rgba(210,153,34,0.3);color:var(--warning);background:rgba(210,153,34,0.05)">`
+                    + `📄 <strong>Prior team's output not yet available.</strong> `
+                    + `Once Phase ${ph - 1} is complete, run: `
+                    + `<code style="background:rgba(0,0,0,0.2);padding:1px 6px;border-radius:3px;font-size:11px">${escHtml(cmd)}</code>`
+                    + ` — injects their output into this section.</div>`;
+      }
+    }
   }
 
   contentEl.innerHTML = prefixHtml;

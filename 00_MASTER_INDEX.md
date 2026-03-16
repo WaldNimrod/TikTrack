@@ -6,6 +6,13 @@
 **last_updated:** 2026-03-14
 **deprecated_alias_notice:** Legacy prefix `documentation/docs-governance/PHOENIX_CANONICAL/` is deprecated for active authority routing; use `documentation/docs-governance/01-FOUNDATIONS/` canonical paths.
 
+### חזון ועיקרון הפעלה: 3 מצבי העבודה (3 Modes of Operation)
+**תובנת יסוד מחייבת:** תיעוד המשילות (Governance) שלנו מהווה ציר מרכזי ונקודת אמת (SSOT) יחידה לכל המערכת, בכל שלושת מצבי העבודה:
+1. **Chat Mode (ישיר):** עבודה ישירה מול איגנטים/צוותים בעלי קונטקסט ותפקיד ברור בצ'אט (כמו בסביבת Cursor IDE).
+2. **Semi-Auto Mode (חצי-אוטומטי):** ניהול ותפעול דרך ה-AOS Dashboard וממשקי ה-UI של הפייפליין.
+3. **Auto Mode (אוטומטי מלא):** הרצה אוטומטית לחלוטין של הפייפליין והמערכת מול מנועי ה-API.
+**החוקה והנהלים חלים באופן זהה והרמוני על כל המצבים.** איגנט לא יכול לחרוג מנוהל או לדלג על שער רק בגלל שהוא עובד במצב "צ'אט".
+
 ### Active agent context (all agents — single source of truth)
 
 **כל האיגנטים (Cursor, Cloud Agent, וכל רץ אחר) מחויבים להשתמש רק במסמכים הבאים.** אין שימוש פעיל בנתיבי נוהל legacy.

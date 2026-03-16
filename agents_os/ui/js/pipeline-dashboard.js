@@ -70,6 +70,10 @@ async function loadPipelineState() {
     const stepBannerEl = document.getElementById('current-step-banner');
     if (stepBannerEl) stepBannerEl.innerHTML = buildCurrentStepBanner(state.current_gate, state);
 
+    // Layer A: Feedback Detection auto-scan — fires immediately after banner renders.
+    // Independent of quick-action-bar; covers page load, domain switch, auto-refresh.
+    if (!isComplete) initFeedbackDetection(state.current_gate);
+
     // S002-P005-WP002: PWA banner in sidebar when gate_state=PASS_WITH_ACTION
     const pwaContainer = document.getElementById('pwa-banner-sidebar');
     if (pwaContainer) {
@@ -662,12 +666,16 @@ function getVerdictCandidates(gate, wp) {
   const wpu = wp.replace(/-/g, '_');
   const v = {
     'GATE_0': [
+      // REVALIDATION first — correction-cycle superseding verdict takes priority over original
+      `${t190}TEAM_190_${wpu}_GATE_0_REVALIDATION_v1.0.0.md`,
       `${t190}TEAM_190_${wpu}_GATE_0_VERDICT_v1.0.0.md`,
       `${t190}TEAM_190_${wpu}_GATE_0_VALIDATION_v1.0.0.md`,
       `${t190}TEAM_190_${wpu}_SCOPE_VALIDATION_v1.0.0.md`,
       `${t190}TEAM_190_${wp}_GATE_0_VERDICT_v1.0.0.md`,
     ],
     'GATE_1': [
+      // REVALIDATION first — correction-cycle superseding verdict takes priority over original
+      `${t190}TEAM_190_${wpu}_GATE_1_REVALIDATION_v1.0.0.md`,
       `${t190}TEAM_190_${wpu}_GATE_1_VERDICT_v1.0.0.md`,
       `${t190}TEAM_190_${wpu}_GATE_1_VALIDATION_v1.0.0.md`,
       `${t190}TEAM_190_${wpu}_LLD400_VALIDATION_v1.0.0.md`,
@@ -1224,7 +1232,212 @@ function applyVerdictToButtons(status) {
 /** True for gates that have an explicit two-phase Team A → Team B structure. */
 function isTwoPhaseGate(gate) { return gate === 'GATE_1' || gate === 'GATE_8'; }
 /** True for self-loop correction-cycle gates (auto-route back to themselves on fail). */
-function isSelfLoopGate(gate) { return gate === 'GATE_1'; }
+function isSelfLoopGate(gate) { return gate === 'GATE_1' || gate === 'GATE_0'; }
+
+// ── 3-Layer Feedback Detection System ─────────────────────────────────────
+/**
+ * Iron Rule: universal behavior for all AI-verdict gate types.
+ *
+ * Layer A — initFeedbackDetection(gate)
+ *   Auto-scan: fires on every page load and state refresh (called from
+ *   loadPipelineState after banner renders). No user gesture required.
+ *
+ * Layer B — fdRescan()
+ *   Guided rescan: scans all candidates in parallel, shows existence-checked
+ *   list. User selects the file to load. Auto-loads if only one found.
+ *
+ * Layer C — fdLoadManual() / fdLoadPath(path)
+ *   Manual bypass: operator pastes exact file path, system fetches and processes.
+ *
+ * All 3 layers funnel into _processFdVerdict(gate, text, path) which calls:
+ *   extractVerdictStatus → applyVerdictToButtons → updateBannerForVerdict
+ *   → populate findings builder (if BLOCK).
+ */
+
+/** Layer A — called from loadPipelineState() after banner renders. */
+async function initFeedbackDetection(gate) {
+  if (!pipelineState) return;
+  const verdictTeam = getEffectiveVerdictTeam ? getEffectiveVerdictTeam(gate) : null;
+  if (!verdictTeam) return; // Not an AI-verdict gate — no FD panel
+
+  const statusEl = document.getElementById('csb-fd-status');
+  if (!statusEl) return;
+
+  statusEl.innerHTML = `<span style="color:var(--text-muted)">🔍 Scanning…</span>`;
+
+  const wp = pipelineState.work_package_id || '';
+  const candidates = getVerdictCandidates(gate, wp);
+  if (!candidates.length) {
+    statusEl.textContent = 'No candidates defined for this gate.';
+    return;
+  }
+
+  let foundText = null, foundPath = '';
+  for (const cand of candidates) {
+    const t = await fetchText(cand);
+    if (t) { foundText = t; foundPath = cand; break; }
+  }
+
+  _processFdVerdict(gate, foundText, foundPath);
+}
+
+/**
+ * Shared verdict processing pipeline — called by all 3 layers.
+ * Updates the FD status line, applies verdict to buttons and banner,
+ * and populates the findings builder when BLOCK.
+ */
+function _processFdVerdict(gate, foundText, foundPath) {
+  const statusEl = document.getElementById('csb-fd-status');
+
+  if (!foundText) {
+    if (statusEl) {
+      statusEl.innerHTML =
+        `<span style="color:var(--text-muted)">🔍 No verdict file found — team is still working</span>`;
+    }
+    return;
+  }
+
+  const verdictStatus = extractVerdictStatus(foundText);
+  const fileName = foundPath ? foundPath.split('/').pop() : 'verdict file';
+  const badge = verdictStatus === 'PASS'
+    ? `<span style="color:var(--success);font-weight:700">✅ PASS</span>`
+    : verdictStatus === 'BLOCK'
+    ? `<span style="color:var(--danger);font-weight:700">⛔ BLOCK</span>`
+    : `<span style="color:var(--text-muted)">${escHtml(verdictStatus || 'unknown')}</span>`;
+
+  if (statusEl) {
+    statusEl.innerHTML =
+      `🟢 <span style="font-family:var(--mono);font-size:10px">${escHtml(fileName)}</span> — ${badge}`;
+  }
+
+  // Apply verdict to buttons and rewrite the Next Step banner
+  applyVerdictToButtons(verdictStatus);
+  updateBannerForVerdict(gate, verdictStatus, foundPath);
+
+  // Propagate into the quick-action-bar findings builder if present
+  const ta = document.getElementById('qbar-ta');
+  if (ta) {
+    if (verdictStatus === 'BLOCK') {
+      const findings = extractFindings(foundText);
+      if (findings) {
+        ta.value = findings;
+        ta.style.borderColor = 'var(--danger)';
+        updateFindingsCmd(gate, 'qbar-ta', 'qbar-preview', false);
+      }
+    } else if (verdictStatus === 'PASS') {
+      ta.value = '';
+      ta.placeholder = '✅ PASS verdict detected — click the ✅ PASS button above.';
+      ta.style.borderColor = 'var(--success)';
+    }
+  }
+}
+
+/** Layer B — Rescan all candidates; show list if multiple found. */
+async function fdRescan() {
+  const gate = pipelineState ? pipelineState.current_gate : null;
+  if (!gate) return;
+
+  const statusEl  = document.getElementById('csb-fd-status');
+  const candEl    = document.getElementById('csb-fd-candidates');
+  if (statusEl) statusEl.innerHTML = `<span style="color:var(--text-muted)">🔍 Scanning all candidates…</span>`;
+  if (candEl)   { candEl.innerHTML = ''; candEl.style.display = 'none'; }
+
+  const wp = (pipelineState && pipelineState.work_package_id) || '';
+  const candidates = getVerdictCandidates(gate, wp);
+  if (!candidates.length) {
+    if (statusEl) statusEl.textContent = 'No candidates defined for this gate.';
+    return;
+  }
+
+  // Parallel existence check (Layer B — shows all discoverable files)
+  const results = await Promise.all(
+    candidates.map(async path => {
+      const t = await fetchText(path);
+      return { path, text: t, exists: !!t };
+    })
+  );
+  const found = results.filter(r => r.exists);
+
+  if (found.length === 0) {
+    if (statusEl) {
+      const names = candidates.map(p => escHtml(p.split('/').pop())).join(', ');
+      statusEl.innerHTML =
+        `<span style="color:var(--text-muted)">🔍 Nothing found (${candidates.length} paths checked)</span>`;
+    }
+    return;
+  }
+
+  if (found.length === 1) {
+    // Single match — auto-load (same as Layer A)
+    _processFdVerdict(gate, found[0].text, found[0].path);
+    return;
+  }
+
+  // Multiple matches — show selection list so operator can choose
+  if (statusEl) {
+    statusEl.innerHTML =
+      `<span style="color:var(--warning)">⚠️ ${found.length} files found — select one to load:</span>`;
+  }
+  if (candEl) {
+    candEl.style.display = 'flex';
+    candEl.innerHTML = found.map((f, i) => {
+      const fname  = f.path.split('/').pop();
+      const status = extractVerdictStatus(f.text);
+      const badge  = status === 'PASS' ? ' ✅' : status === 'BLOCK' ? ' ⛔' : '';
+      const isPri  = i === 0; // first = highest-priority by candidate ordering
+      return `<button class="csb-fd-cand-btn${isPri ? ' csb-fd-cand-primary' : ''}"
+        onclick="fdLoadPath(${escAttr(JSON.stringify(f.path))})"
+        title="${escAttr(f.path)}">
+        ${isPri ? '★ ' : ''}${escHtml(fname)}${badge}
+      </button>`;
+    }).join('');
+  }
+}
+
+/** Load a specific path — used by Layer B selection and Layer C manual input. */
+async function fdLoadPath(path) {
+  const gate = pipelineState ? pipelineState.current_gate : null;
+  if (!gate || !path) return;
+
+  const statusEl = document.getElementById('csb-fd-status');
+  const candEl   = document.getElementById('csb-fd-candidates');
+  if (statusEl) statusEl.innerHTML = `<span style="color:var(--text-muted)">🔍 Loading…</span>`;
+  if (candEl)   { candEl.innerHTML = ''; candEl.style.display = 'none'; }
+
+  const t = await fetchText(path);
+  if (!t) {
+    if (statusEl) {
+      statusEl.innerHTML =
+        `<span style="color:var(--danger)">❌ Could not load: ${escHtml(path.split('/').pop())}</span>`;
+    }
+    return;
+  }
+  _processFdVerdict(gate, t, path);
+}
+
+/** Toggle the Layer C manual path input row. */
+function fdToggleManual() {
+  const row = document.getElementById('csb-fd-manual-row');
+  if (!row) return;
+  const opening = row.style.display === 'none' || row.style.display === '';
+  row.style.display = opening ? 'flex' : 'none';
+  if (opening) {
+    const inp = document.getElementById('csb-fd-path-input');
+    if (inp) { inp.focus(); inp.select(); }
+  }
+}
+
+/** Layer C — load the manually entered path. */
+async function fdLoadManual() {
+  const input = document.getElementById('csb-fd-path-input');
+  if (!input) return;
+  const path = input.value.trim();
+  if (!path) return;
+  await fdLoadPath(path);
+  // Collapse manual row after load
+  const row = document.getElementById('csb-fd-manual-row');
+  if (row) row.style.display = 'none';
+}
 
 // ── Current Step Banner — universal, all gates ─────────────────────────────
 /**
@@ -1369,6 +1582,27 @@ function buildCurrentStepBanner(gate, state) {
     </div>`
   ).join('');
 
+  // 3-Layer Feedback Detection Panel — shown for all AI-verdict gates.
+  // Layer A fires on page load; Layer B on user-triggered Rescan; Layer C on manual path input.
+  // Iron Rule: every gate with a verdictTeam gets this panel.
+  const hasFeedbackDetection = !!(getEffectiveVerdictTeam && getEffectiveVerdictTeam(gate));
+  const footerHtml = hasFeedbackDetection
+    ? `<div class="csb-fd" id="csb-fd">
+        <div class="csb-fd-row">
+          <span id="csb-fd-status" class="csb-fd-status">🔍 Scanning for verdict…</span>
+          <button class="csb-fd-btn" onclick="fdRescan()" title="Rescan all candidate paths for new verdict file">↩️ Rescan</button>
+          <button class="csb-fd-btn" onclick="fdToggleManual()" title="Enter verdict file path manually (Layer C bypass)">✏️ Manual</button>
+        </div>
+        <div class="csb-fd-manual-row" id="csb-fd-manual-row" style="display:none">
+          <input id="csb-fd-path-input" class="csb-fd-input"
+            placeholder="../../_COMMUNICATION/team_190/TEAM_190_…_v1.0.0.md"
+            onkeydown="if(event.key==='Enter')fdLoadManual()">
+          <button class="csb-fd-btn" onclick="fdLoadManual()">Load ↵</button>
+        </div>
+        <div class="csb-fd-candidates" id="csb-fd-candidates"></div>
+      </div>`
+    : `<div class="csb-last-action" style="font-style:italic;font-size:11px;color:var(--text-muted);margin-top:8px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.07);min-height:14px"></div>`;
+
   return `<div class="current-step-banner${modCls ? ' ' + modCls : ''}">
     <div class="csb-title">Next Step — What to do now?</div>
     <div class="csb-header">
@@ -1377,6 +1611,7 @@ function buildCurrentStepBanner(gate, state) {
       <span class="csb-phase-label">${escHtml(phaseLabel)}</span>
     </div>
     <div class="csb-steps">${stepsHtml}</div>
+    ${footerHtml}
   </div>`;
 }
 
@@ -1432,6 +1667,29 @@ function buildNextActionBanner(gate, lld400Content, inCorrectionCycle) {
  */
 function buildCorrectionCyclePanel(gate, lld400Content, failCount) {
   const baseCmd = _dfCmd('./pipeline_run.sh ').trimEnd();
+
+  if (gate === 'GATE_0') {
+    // GATE_0 correction cycle: Team 100 (architect) must fix the LOD200 scope brief
+    return `<div class="correction-cycle-panel">
+      <div class="correction-cycle-title" style="color:var(--danger)">🔄 GATE_0 Correction cycle — Team 190 BLOCKED ${failCount}× — Team 100 action required</div>
+      <div class="correction-cycle-step" data-n="1">
+        <strong>Review Team 190 rejection findings</strong> in the Gate Context prompt above
+        (⚠ CORRECTION CYCLE section shows blocking findings BF-NN)
+      </div>
+      <div class="correction-cycle-step" data-n="2">
+        <strong>Fix the LOD200</strong> scope brief per the blocking findings:
+        <span style="font-family:var(--mono);font-size:10px">_COMMUNICATION/team_100/TEAM_100_..._LOD200_v1.0.0.md</span>
+      </div>
+      <div class="correction-cycle-step" data-n="3">
+        Re-run in terminal to regenerate the corrected Team 190 validation prompt:
+        <div style="font-family:var(--mono);font-size:10px;background:#010409;padding:5px 8px;border-radius:4px;margin:4px 0">${escHtml(baseCmd)}</div>
+        <button class="btn" style="font-size:10px;margin-top:2px" onclick="copyCmd(${escAttr(JSON.stringify(baseCmd))}, this)">⎘ Copy</button>
+      </div>
+      <div class="correction-cycle-step" data-n="4">Paste the ▼▼▼ block into Codex → Team 190 re-validates → click <strong>✅ PASS</strong> (advances to GATE_1) or <strong>❌ FAIL</strong> (another correction cycle)</div>
+    </div>`;
+  }
+
+  // GATE_1 (and future self-loop gates): LLD400 correction cycle
   const lld400Badge = lld400Content
     ? `<span style="color:var(--success);font-size:10px">✅ LLD400 stored — Team 190 (Codex) mandate active</span>`
     : `<span style="color:var(--warning);font-size:10px">⏳ Awaiting Team 170 corrected LLD400</span>`;
@@ -1494,8 +1752,9 @@ async function autoLoadVerdictFile(gate, statusId, taId, previewId, isRevise) {
     logVerdictDrift(gate, 'PATH_B_NON_CANONICAL', { found: foundPath, expected: canonical });
   }
 
-  // Apply verdict state to PASS/FAIL buttons
+  // Apply verdict state to PASS/FAIL buttons AND update the Next Step banner
   applyVerdictToButtons(verdictStatus);
+  updateBannerForVerdict(gate, verdictStatus, foundPath);
 
   const ta = document.getElementById(taId);
   if (verdictStatus === 'PASS') {
@@ -1532,7 +1791,9 @@ function updateFindingsCmd(gate, taId, previewId, isRevise) {
       ? `./pipeline_run.sh revise "BLOCKER-1: [paste findings]"`
       : (def.failCmd || `./pipeline_run.sh fail "reason"`);
   } else {
-    const safe = raw.replace(/"/g, "'");
+    // Replace " with ' (already done), and replace backticks with ' to prevent
+    // bash subcommand substitution when the command is pasted into a terminal.
+    const safe = raw.replace(/"/g, "'").replace(/`/g, "'");
     cmd = isRevise
       ? `./pipeline_run.sh revise "${safe}"`
       : `./pipeline_run.sh fail "${safe}"`;
@@ -1546,6 +1807,74 @@ function updateFindingsCmd(gate, taId, previewId, isRevise) {
 function copyFindingsCmd(previewId, btn) {
   const cmd = _qbarCopyMap[previewId] || document.getElementById(previewId)?.textContent || '';
   copyText(cmd, btn);
+}
+
+/**
+ * Update the "Next Step" banner when a verdict file is detected.
+ * Called from autoLoadVerdictFile after verdict status is extracted.
+ * Ensures the operator immediately sees the correct next action without
+ * having to scroll or interpret the verdict file manually.
+ *
+ * Also writes the "last detected action" line at the bottom of the banner
+ * in a distinct italic/muted style, giving the operator context about what
+ * the system just identified.
+ */
+function updateBannerForVerdict(gate, verdictStatus, foundPath) {
+  const bannerEl = document.getElementById('current-step-banner');
+  if (!bannerEl || !verdictStatus) return;
+
+  const baseCmd    = _dfCmd('./pipeline_run.sh ').trimEnd();
+  const fileName   = foundPath ? foundPath.split('/').pop() : (gate + ' verdict');
+  const teamLabel  = getEffectiveVerdictTeam ? getEffectiveVerdictTeam(gate) : 'verdict team';
+
+  // ── Last-action line (always updated, regardless of PASS/BLOCK) ─────────
+  const lastActionEl = bannerEl.querySelector('.csb-last-action');
+  if (lastActionEl) {
+    const badge = verdictStatus === 'PASS'
+      ? '<span style="color:var(--success);font-weight:600">✅ PASS</span>'
+      : '<span style="color:var(--danger);font-weight:600">⛔ BLOCK</span>';
+    lastActionEl.innerHTML = `Last detected: ${escHtml(fileName)} — decision: ${badge}`;
+  }
+
+  const titleEl = bannerEl.querySelector('.csb-title');
+  const stepsEl = bannerEl.querySelector('.csb-steps');
+
+  if (verdictStatus === 'PASS') {
+    // ── PASS: highlight next action clearly ─────────────────────────────
+    if (titleEl) titleEl.innerHTML =
+      `✅ ${escHtml(gate)} — PASS — <span style="font-weight:400;font-size:13px">Run <code style="background:rgba(0,0,0,0.25);padding:1px 6px;border-radius:3px">${escHtml(baseCmd)} pass</code> to advance</span>`;
+    if (stepsEl) stepsEl.innerHTML = `
+      <div class="csb-step">
+        <span class="csb-step-num">1</span>
+        <span class="csb-step-text"><strong>PASS</strong> verdict received from ${escHtml(teamLabel)} — ${escHtml(fileName)}</span>
+      </div>
+      <div class="csb-step">
+        <span class="csb-step-num">2</span>
+        <span class="csb-step-text">Click ✅ PASS button above  <em style="color:var(--text-muted)">or</em>  run in terminal: <code style="background:rgba(0,0,0,0.25);padding:1px 6px;border-radius:3px">${escHtml(baseCmd)} pass</code></span>
+      </div>`;
+    bannerEl.classList.remove('csb-correction', 'csb-block-detected');
+    bannerEl.classList.add('csb-pass-detected');
+
+  } else if (verdictStatus === 'BLOCK') {
+    // ── BLOCK: show correction workflow clearly ─────────────────────────
+    if (titleEl) titleEl.innerHTML =
+      `⛔ ${escHtml(gate)} — BLOCK — <span style="font-weight:400;font-size:13px">Fix required before re-submission</span>`;
+    if (stepsEl) stepsEl.innerHTML = `
+      <div class="csb-step">
+        <span class="csb-step-num">1</span>
+        <span class="csb-step-text"><strong>BLOCK</strong> verdict from ${escHtml(teamLabel)} — review findings in the panel below</span>
+      </div>
+      <div class="csb-step">
+        <span class="csb-step-num">2</span>
+        <span class="csb-step-text">Fix the blocking issues in your spec/LOD200, then re-run: <code style="background:rgba(0,0,0,0.25);padding:1px 6px;border-radius:3px">${escHtml(baseCmd)}</code> to regenerate the mandate prompt</span>
+      </div>
+      <div class="csb-step">
+        <span class="csb-step-num">3</span>
+        <span class="csb-step-text">Re-submit to ${escHtml(teamLabel)}. When they BLOCK again, click ❌ FAIL to record it in pipeline state</span>
+      </div>`;
+    bannerEl.classList.remove('csb-pass-detected');
+    bannerEl.classList.add('csb-correction', 'csb-block-detected');
+  }
 }
 
 // ── Build Quick Action Bar (decision gates only) ───────────────────────────

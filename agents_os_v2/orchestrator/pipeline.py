@@ -611,6 +611,8 @@ def _verdict_candidates(gate_id: str, work_package_id: str) -> list[Path]:
     # "TO_TEAM_10" prefix variant included for teams that use routing-style names.
     patterns: dict[str, list[Path]] = {
         "GATE_0": [
+            # REVALIDATION first — correction-cycle superseding verdict takes priority over original
+            t190 / f"TEAM_190_{wpu}_GATE_0_REVALIDATION_v1.0.0.md",
             # Canonical patterns (underscore naming)
             t190 / f"TEAM_190_{wpu}_GATE_0_VERDICT_v1.0.0.md",
             t190 / f"TEAM_190_{wpu}_GATE_0_VALIDATION_v1.0.0.md",
@@ -622,6 +624,8 @@ def _verdict_candidates(gate_id: str, work_package_id: str) -> list[Path]:
             t190 / f"TEAM_190_{wp}_GATE_0_VERDICT_v1.0.0.md",
         ],
         "GATE_1": [
+            # REVALIDATION first — correction-cycle superseding verdict takes priority over original
+            t190 / f"TEAM_190_{wpu}_GATE_1_REVALIDATION_v1.0.0.md",
             t190 / f"TEAM_190_{wpu}_GATE_1_VERDICT_v1.0.0.md",
             t190 / f"TEAM_190_{wpu}_LLD400_VALIDATION_v1.0.0.md",
             t190 / f"TEAM_190_TO_TEAM_10_{wpu}_GATE_1_VALIDATION_RESULT_v1.0.0.md",
@@ -918,29 +922,105 @@ def _check_governance_precheck(state: "PipelineState") -> list[str]:
                 f"Fix: register the program with status=ACTIVE before GATE_0."
             )
 
-    # ── 2. Work Package Registry check ────────────────────────────────────────
+    # ── A2: Program Registry premature activation advisory (BF-02 class guard) ──────────────
+    # Detects when notes column mirrors the current WP as "activated" before GATE_0 PASS,
+    # which contradicts WSM showing NO_ACTIVE_WORK_PACKAGE (root cause of BF-02 finding).
+    # Advisory only — does not block; helps Team 100 catch the issue before Team 190 review.
+    # Matches both full ID (S002-P005-WP003) and short form (WP003) in notes column.
+    wp_short = state.work_package_id.split("-")[-1]  # e.g. "WP003" from "S002-P005-WP003"
+    for line in text.splitlines():
+        if prog_id in line and (state.work_package_id in line or wp_short in line):
+            if re.search(r"\bactivated\b", line, re.IGNORECASE) and not re.search(
+                r"\bpending\b", line, re.IGNORECASE
+            ):
+                _log(
+                    f"[GATE_0 advisory A2] Program Registry row for {prog_id} mentions "
+                    f"'{state.work_package_id}' with 'activated' language while at GATE_0. "
+                    f"This causes BF-02-class Team 190 findings (premature portfolio sync). "
+                    f"Update notes to 'pending GATE_0 validation' before Team 190 review."
+                )
+            break
+
+    # ── 2. Work Package Registry check (advisory — new WPs are registered AFTER GATE_0 PASS) ──
+    # Per pipeline contract and Team 190 constitutional ruling: WP registry insertion happens
+    # AFTER GATE_0 PASS (Team 170 mandate). This is not a hard block for GATE_0.
     wp_reg = registry_dir / "PHOENIX_WORK_PACKAGE_REGISTRY_v1.0.0.md"
     if wp_reg.exists():
         text = wp_reg.read_text(encoding="utf-8")
         if state.work_package_id not in text:
-            warnings.append(
-                f"GOVERNANCE-02: Work Package {state.work_package_id} NOT FOUND in "
-                f"PHOENIX_WORK_PACKAGE_REGISTRY. "
-                f"Fix: register the WP (even as HOLD/IN_PROGRESS) before GATE_0."
+            _log(
+                f"[GATE_0 advisory] WP {state.work_package_id} not yet in WP Registry "
+                f"— expected for new WP (Team 170 registers after GATE_0 PASS)"
             )
 
     return warnings
 
 
 def _generate_gate_0_prompt(state: PipelineState, fresh: bool = False) -> str:
+    fail_count = state.gates_failed.count("GATE_0")
+    is_correction = fail_count > 0
+
+    # ── Correction cycle: prepend Team 100 correction notice with prior findings ─
+    correction_notice = ""
+    if is_correction:
+        prior_findings = ""
+        verdict_candidates = _verdict_candidates("GATE_0", state.work_package_id)
+        for vpath in verdict_candidates:
+            if vpath.exists():
+                import re as _re
+                raw = vpath.read_text(encoding="utf-8")
+                bf_match = _re.search(
+                    r"blocking_findings:\s*((?:\s*-\s*BF-\d+:[^\n]+\n?)+)",
+                    raw,
+                )
+                if bf_match:
+                    prior_findings = bf_match.group(1).strip()
+                break
+
+        findings_block = (
+            f"**Prior blocking findings (Team 190 verdict):**\n"
+            f"```\n{prior_findings}\n```\n\n"
+            if prior_findings
+            else "*(Verdict file not found — review Team 190 communication manually)*\n\n"
+        )
+
+        correction_notice = (
+            f"## ⚠ CORRECTION CYCLE #{fail_count} — Team 100 Action Required\n\n"
+            f"GATE_0 was BLOCKED by Team 190 ({fail_count}×). The LOD200 scope brief must be\n"
+            f"revised before Team 190 can re-validate.\n\n"
+            f"{findings_block}"
+            f"**Required actions before re-submission:**\n"
+            f"1. Fix the LOD200 per the blocking findings above\n"
+            f"2. Re-run `./pipeline_run.sh --domain {state.project_domain}` to regenerate this prompt\n"
+            f"3. Paste the regenerated ▼▼▼ block into Codex for Team 190 to re-validate\n\n"
+            f"---\n\n"
+            f"*[Team 190 validation prompt — for re-submission after fixes are applied]*\n\n"
+        )
+
+    # ── WP-specific pipeline state block (domain file truth — NOT WSM) ────────
+    wp_state_block = (
+        f"## Pipeline State (domain state file — NOT WSM)\n\n"
+        f"- **Domain:** {state.project_domain}\n"
+        f"- **WP:** {state.work_package_id}\n"
+        f"- **Current gate:** {state.current_gate}"
+        f"{' (correction cycle — failed ' + str(fail_count) + '×)' if is_correction else ' (first run)'}\n"
+        f"\n"
+        f"**Important for Team 190:** WSM `active_work_package_id` is NOT updated until GATE_3\n"
+        f"intake (Team 10 responsibility). WSM showing the previous WP or NO_ACTIVE is EXPECTED\n"
+        f"pre-GATE_0 state. Do NOT raise a finding for WSM not yet reflecting this WP.\n"
+        f"Similarly, WP Registry insertion happens AFTER GATE_0 PASS (Team 170 mandate) —\n"
+        f"absent WP Registry entry is NOT a blocking finding.\n\n"
+    )
+
     return (
-        f"{_team_header('team_190', 'GATE_0', state, fresh)}"
+        correction_notice
+        + f"{_team_header('team_190', 'GATE_0', state, fresh)}"
         f"# GATE_0 — Validate LOD200 Scope (SPEC_ARC)\n\n"
         f"Validate the following LOD200 scope brief for constitutional compliance.\n\n"
         f"**Check:**\n"
         f"- Identity header consistency (stage_id, program_id, work_package_id all match WSM/registry)\n"
         f"- Program registration status (program_id must be ACTIVE in PHOENIX_PROGRAM_REGISTRY)\n"
-        f"- Work Package registration (work_package_id must exist in WORK_PACKAGE_REGISTRY)\n"
+        f"- WP registry: absent WP entry is EXPECTED for a new WP at GATE_0 (registered after PASS by Team 170) — NOT a blocking finding\n"
         f"- Domain isolation (no TikTrack ↔ Agents_OS boundary violations)\n"
         f"- No conflict with currently active programs\n"
         f"- Feasibility and scope clarity\n\n"
@@ -949,22 +1029,20 @@ def _generate_gate_0_prompt(state: PipelineState, fresh: bool = False) -> str:
         f"```\n"
         f"gate_id: GATE_0\n"
         f"decision: PASS | BLOCK_FOR_FIX\n"
-        f"route_recommendation: doc\n"
         f"blocking_findings:\n"
         f"  - BF-01: <description> | evidence: <file:line>\n"
         f"  - BF-02: <description> | evidence: <file:line>\n"
-        f"next_required_action: <what must happen before resubmission>\n"
-        f"next_responsible_team: <team_id>\n"
         f"```\n\n"
-        f"**`route_recommendation` values (REQUIRED — drives pipeline auto-routing):**\n"
-        f"```\nroute_recommendation: doc\n```  "
-        f"← any fix required before resubmission (always `doc` for GATE_0 — spec revision)\n\n"
         f"**`blocking_findings` list (REQUIRED if BLOCK_FOR_FIX — drives remediation flow):**\n"
         f"- Each entry: `BF-NN: <description> | evidence: <canonical_path:line_number>`\n"
         f"- Missing or empty findings = invalid BLOCK; pipeline cannot auto-route\n\n"
-        f"**On PASS:** route_recommendation and blocking_findings may be omitted.\n"
-        f"**On BLOCK:** architect (Team 00) is the next responsible team — LOD200 revision required.\n\n"
-        f"## Scope Brief\n\n{state.spec_brief}\n\n"
+        f"**On PASS:** blocking_findings may be omitted.\n"
+        f"**On BLOCK:** pipeline derives routing from verdict; do NOT include owner_next_action or next_responsible_team.\n\n"
+        f"**Process-Functional Separation:** Do NOT include route_recommendation, owner_next_action, or next_responsible_team. Output = structured verdict only. Pipeline handles routing.\n\n"
+        f"## Scope Brief\n\n"
+        f"**WP name:** {state.spec_brief}\n\n"
+        f"**LOD200 document (read in full to perform this validation):**\n"
+        f"`{state.spec_path or '_COMMUNICATION/team_100/ — see spec_path in domain state file'}`\n\n"
         + (
             f"## Activation Context (for S001 WPs run during S002 era)\n\n"
             f"**Authorized architectural context:** When `stage_id` on this WP is S001 while WSM "
@@ -975,7 +1053,8 @@ def _generate_gate_0_prompt(state: PipelineState, fresh: bool = False) -> str:
             f"**RESOLVED** — do NOT raise it as a blocking finding.\n\n"
             if state.stage_id == "S001" else ""
         )
-        + f"## Current State\n\n{build_state_summary()}"
+        + wp_state_block
+        + f"## Project State (from STATE_SNAPSHOT)\n\n{build_state_summary()}"
     )
 
 

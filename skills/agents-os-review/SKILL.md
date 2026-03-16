@@ -1,6 +1,6 @@
 ---
 name: agents-os-review
-description: Deep review workflow for Agents OS and its TikTrack proving-ground integration. Use when Codex needs to audit pipeline mechanics and gate flow, governance/server scripts and canonical documents, dashboard or roadmap or teams UI, MCP and E2E coverage, documentation-to-code drift, or architectural coherence across agents_os, agents_os_v2, _COMMUNICATION, and governance sources; produce a dated multi-document review pack with findings, gap analysis, and urgent action items.
+description: Deep review workflow for Agents OS as the primary domain under review, with TikTrack used only as supporting proving-ground evidence where it directly validates Agents OS claims. Use when Codex needs to audit pipeline mechanics and gate flow, governance/server scripts and canonical documents, dashboard or roadmap or teams UI, MCP and E2E coverage, documentation-to-code drift, or architectural coherence across agents_os, agents_os_v2, _COMMUNICATION, and governance sources; produce a dated multi-document review pack with findings, gap analysis, and urgent action items.
 ---
 
 # Agents OS Review
@@ -8,6 +8,8 @@ description: Deep review workflow for Agents OS and its TikTrack proving-ground 
 ## Overview
 
 Review Agents OS as an operating system for a professional one-human software house, not as an isolated code module. Start at concept and governance, descend through pipeline behavior, documents, interfaces, architecture, modules, and individual functions, then end with a dated evidence pack and an action-oriented conclusion.
+
+Agents OS is the domain under review. TikTrack may be inspected only when it functions as supporting evidence for an Agents OS claim, such as proving that a gate, MCP scenario, or operator workflow actually works end-to-end.
 
 ## Quick Start
 
@@ -46,7 +48,8 @@ Use this layered ladder in every review:
 5. Review the UI surfaces as operational tooling, not as cosmetics: dashboard, roadmap, teams page, registry docs, command copy paths.
 6. Compare documentation to code and to runtime behavior. Treat scaffolds, placeholders, and future-plan text as risk if the UI presents them like active features.
 7. Run tests and browser checks where feasible. Use MCP/browser tooling when available; otherwise document the gap explicitly.
-8. Write findings first, then gap analysis, then architectural conclusions and urgent actions.
+8. Keep domain discipline: do not let TikTrack app verification dominate the review. If a browser/E2E check is performed on TikTrack, state explicitly which Agents OS claim it is validating.
+9. Write findings first, then gap analysis, then architectural conclusions and urgent actions.
 
 ## Mandatory Checks
 

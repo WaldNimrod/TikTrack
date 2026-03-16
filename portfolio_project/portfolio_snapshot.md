@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-15T21:29:40.465310+00:00`
+- Generated (UTC): `2026-03-16T11:48:33.888900+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -16,7 +16,7 @@
 ## Portfolio Counts
 
 - stages: `6`
-- programs: `31`
+- programs: `32`
 - work_packages: `10`
 
 ## Roadmap (hierarchical)
@@ -48,7 +48,7 @@
 
     ├── **Program** `S002-P004` — Admin Review S002 | PLANNED | domain: **TIKTRACK**
 
-    └── **Program** `S002-P005` — Agents_OS v2 Writing Semantics Hardening (ADR-031 Stage A) + UI Optimization | COMPLETE | domain: **AGENTS_OS**
+    └── **Program** `S002-P005` — Agents_OS v2 Writing Semantics Hardening (ADR-031 Stage A) + UI Optimization | ACTIVE | domain: **AGENTS_OS**
         └── **WP** `S002-P005-WP002` | CLOSED | gate: GATE_8 (PASS) | domain: **AGENTS_OS**
 
 
@@ -68,7 +68,9 @@
 
     ├── **Program** `S003-P006` — Admin Review S003 | PLANNED | domain: **TIKTRACK**
 
-    └── **Program** `S003-P007` — Agents_OS Command Bridge Lite (ADR-031 Stage B) | PLANNED | domain: **AGENTS_OS**
+    ├── **Program** `S003-P007` — Agents_OS Command Bridge Lite (ADR-031 Stage B) | PLANNED | domain: **AGENTS_OS**
+
+    └── **Program** `S003-P008` — Agents_OS Pipeline Governance Hardening | PLANNED | domain: **AGENTS_OS**
 
 
 ### S004 — שלב 4 — Financial Execution | PLANNED [SHARED]

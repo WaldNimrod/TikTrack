@@ -381,6 +381,97 @@
 .csb-human .csb-step-num { background: var(--warning); }
 .csb-step-text { font-size: 11px; color: var(--text); line-height: 1.55; }
 
+/* ── 3-Layer Feedback Detection Panel (csb-fd) ─────────────────────────── */
+/* Iron Rule: present on every AI-verdict gate. Layer A = auto-scan on load,  */
+/* Layer B = guided rescan, Layer C = manual path bypass.                      */
+.csb-fd {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.csb-fd-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.csb-fd-status {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--text-muted);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.csb-fd-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-size: 10px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: border-color 0.15s, color 0.15s;
+}
+.csb-fd-btn:hover { border-color: var(--accent); color: var(--accent); }
+.csb-fd-manual-row {
+  display: none;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+}
+.csb-fd-input {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 7px;
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--text);
+  min-width: 0;
+}
+.csb-fd-input:focus { outline: none; border-color: var(--accent); }
+.csb-fd-candidates {
+  display: none;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 6px;
+}
+.csb-fd-cand-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, color 0.15s;
+}
+.csb-fd-cand-btn:hover { border-color: var(--accent); color: var(--text); }
+.csb-fd-cand-primary { border-color: var(--accent); color: var(--accent); }
+/* Banner state changes driven by verdict detection */
+.current-step-banner.csb-pass-detected {
+  border-color: var(--success);
+  background: rgba(63,185,80,0.07);
+}
+.current-step-banner.csb-pass-detected .csb-title { color: var(--success); }
+.current-step-banner.csb-pass-detected .csb-title::before { background: var(--success); }
+.current-step-banner.csb-pass-detected .csb-step-num { background: var(--success); }
+.current-step-banner.csb-block-detected {
+  border-color: var(--danger);
+  background: rgba(248,81,73,0.05);
+}
+.current-step-banner.csb-block-detected .csb-title { color: var(--danger); }
+.current-step-banner.csb-block-detected .csb-title::before { background: var(--danger); }
+.current-step-banner.csb-block-detected .csb-step-num { background: var(--danger); }
+
 /* Active-phase indicator badge on Phase 2+ mandate tabs */
 .phase-active-badge {
   background: rgba(63,185,80,0.2);

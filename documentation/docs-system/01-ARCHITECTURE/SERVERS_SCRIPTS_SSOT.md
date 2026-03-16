@@ -61,7 +61,7 @@
 
 | סקריפט | תפקיד | הערות |
 |--------|--------|-------|
-| `scripts/create-admin.sh` | יצירת משתמש admin | מריץ api/scripts/create_admin_user.py; admin/418141 |
+| `scripts/create-admin.sh` | יצירת משתמש bootstrap בשם `admin` | מריץ `api/scripts/create_admin_user.py`; יוצר `admin/418141`; לא מקור האמת ל־QA runtime |
 
 ---
 
@@ -77,7 +77,7 @@
 | `make db-base-seed` | seed בסיסי ל־test_user |
 | `make migrate-p3-020` | P3-020 user_tickers + tickers.status |
 | `make migrate-p3-021` | P3-021 exchanges, sectors, industries, market_cap_groups |
-| `python3 scripts/seed_qa_test_user.py` | משתמש QA TikTrackAdmin/4181 |
+| `python3 scripts/seed_qa_test_user.py` | משתמש QA/runtime הקנוני `TikTrackAdmin/4181` |
 | `python3 scripts/seed_base_test_user.py` | seed בסיס ל־test_user |
 
 ---
@@ -125,7 +125,7 @@
 | 📋 Check Server Status | `scripts/check-ports.sh` | |
 | 🔧 Fix Port 8082 Conflict | `scripts/fix-port-8082.sh` | |
 | 🔧 Fix Env After Restart (Login 500) | `scripts/fix-env-after-restart.sh` | PostgreSQL + .env + restart backend |
-| 👤 Create Admin User (admin/418141) | `scripts/create-admin.sh` | |
+| 👤 Create Admin User (bootstrap בלבד) | `scripts/create-admin.sh` | נועד ליצור `admin/418141`; לבדיקות שוטפות משתמשים ב־`TikTrackAdmin/4181` |
 | 🧪 Run User Tickers QA (API) | `scripts/run-user-tickers-qa-api.sh` | דורש Backend 8082 |
 | 🔄 Verify User Tickers Fix (Team 20) | `scripts/verify-user-tickers-fix.sh` | restart + QA — **חובה לפני הגשה** אחרי שינוי קוד |
 | ⚙️ Ensure Skip Live Data Check | `scripts/ensure-skip-live-data-check.sh` | dev/QA bypass |

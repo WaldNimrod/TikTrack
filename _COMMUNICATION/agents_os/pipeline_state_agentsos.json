@@ -6,7 +6,9 @@
   "spec_brief": "AOS State Alignment & Governance Integrity",
   "current_gate": "GATE_0",
   "gates_completed": [],
-  "gates_failed": [],
+  "gates_failed": [
+    "GATE_0"
+  ],
   "lld400_content": "",
   "work_plan": "",
   "mandates": "",
@@ -14,7 +16,7 @@
   "implementation_endpoints": [],
   "spec_path": "_COMMUNICATION/team_100/TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md",
   "started_at": "2026-03-16T00:00:00Z",
-  "last_updated": "2026-03-16T00:00:00Z",
+  "last_updated": "2026-03-15T23:02:37.054177+00:00",
   "gate_state": null,
   "pending_actions": [],
   "override_reason": null,

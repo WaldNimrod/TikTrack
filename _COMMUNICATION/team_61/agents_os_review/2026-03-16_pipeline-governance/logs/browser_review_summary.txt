@@ -1,0 +1,48 @@
+Agents OS / TikTrack browser review summary
+Review date: 2026-03-16
+Reviewer: Team 61
+
+Environment
+- Frontend http://localhost:8080 -> 200
+- Backend  http://localhost:8082/health -> 200
+- Agents UI http://localhost:8090/agents_os/ui/PIPELINE_DASHBOARD.html -> 200
+
+MCP / browser availability
+- list_mcp_resources -> empty
+- list_mcp_resource_templates -> empty
+- Playwright browser tool available and used successfully
+
+TikTrack login / alerts
+- /login rendered successfully
+- Login attempt admin / 418141 -> backend 401, UI alert: "שגיאת רשת. אנא בדוק את החיבור."
+- Backend direct POST /api/v1/auth/login with admin / 418141 -> {"detail":"Invalid credentials", ...}
+- Login attempt TikTrackAdmin / 4181 -> success, redirected to /
+- /alerts.html rendered successfully after login
+- Alerts page headings verified: "התראות", "ניהול התראות", "הוספת התראה"
+
+Agents OS dashboard
+- Domain switch to agents_os succeeded
+- Dashboard showed active WP S002-P005-WP003 at GATE_0
+- Live console/network 404s observed for:
+  - _COMMUNICATION/team_190/TEAM_190_S002_P005_WP003_GATE_0_VERDICT_v1.0.0.md
+  - _COMMUNICATION/team_20/TEAM_20_S001_P002_WP001_API_VERIFY_v1.0.0.md
+  - _COMMUNICATION/team_50/TEAM_50_S001_P002_WP001_QA_REPORT_v1.0.0.md
+  - _COMMUNICATION/team_10/TEAM_10_S001_P002_WP001_G3_PLAN_WORK_PLAN_v1.1.0.md
+  - _COMMUNICATION/agents_os/prompts/implementation_mandates.md
+- Dashboard still surfaced legacy Team 20/30/50 execution model in UI copy
+
+Agents OS roadmap
+- /PIPELINE_ROADMAP.html rendered successfully
+- Roadmap showed active program S002-P005 / WP003
+- Gate table still showed CURSOR_IMPLEMENTATION owner teams_20+30, GATE_4 owner team_50, GATE_8 owner team_90
+
+Agents OS teams
+- /PIPELINE_TEAMS.html rendered successfully
+- Team roster includes Team 51 and Team 61 under agents_os
+- Selecting Team 61 showed prompt context:
+  - WP REQUIRED
+  - Gate GATE_0
+  - Stage S002
+- Network capture showed teams page fetching only:
+  - _COMMUNICATION/agents_os/pipeline_state_tiktrack.json
+- Teams page therefore bound Team 61 prompts to TikTrack state rather than AGENTS_OS WP003

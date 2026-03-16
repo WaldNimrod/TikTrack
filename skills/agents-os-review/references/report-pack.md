@@ -28,6 +28,7 @@ Include:
 - Review date
 - Reviewer team
 - Review slug and scope
+- Primary domain under review and any supporting domains used as evidence
 - Canon documents consulted
 - Code surfaces inspected
 - Tests and browser checks attempted
@@ -41,6 +42,7 @@ Use for:
 - Top risks
 - Top strengths
 - Review constraints
+- One short note on domain discipline: what was reviewed as Agents OS primary evidence, and what was used only as supporting proving-ground evidence
 - One-paragraph statement on whether Agents OS currently behaves like a viable one-human software house operating system
 
 ### `02_PIPELINE_AND_GATES_REVIEW.md`
@@ -115,3 +117,4 @@ For each action include:
 - Distinguish observed fact from inference.
 - Mark missing validation explicitly instead of implying it happened.
 - Treat scaffolds, placeholders, and future-plan text as potential defects when operators can mistake them for live capability.
+- When TikTrack evidence is used, label it explicitly as supporting evidence and state which Agents OS claim it validates.

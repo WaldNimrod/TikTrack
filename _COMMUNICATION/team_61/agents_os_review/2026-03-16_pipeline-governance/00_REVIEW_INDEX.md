@@ -53,6 +53,14 @@
 - `python3 skills/agents-os-review/scripts/init_review_bundle.py --team-id 61 --review-slug pipeline-governance`
 - `./agents_os/scripts/start_ui_server.sh 8090`
 - `curl` checks against local Agents OS UI pages
+- `list_mcp_resources`
+- `list_mcp_resource_templates`
+- Playwright browser navigation, snapshots, clicks, form fills, console capture, and network capture against:
+  - `http://localhost:8080/login`
+  - `http://localhost:8080/alerts.html`
+  - `http://localhost:8090/agents_os/ui/PIPELINE_DASHBOARD.html`
+  - `http://localhost:8090/agents_os/ui/PIPELINE_ROADMAP.html`
+  - `http://localhost:8090/agents_os/ui/PIPELINE_TEAMS.html`
 
 ## Evidence inventory
 
@@ -64,12 +72,15 @@
 - `logs/pytest_agents_os_v2.txt`
 - `logs/pytest_agents_os_legacy.txt`
 - `logs/mcp_scenarios_summary.txt`
+- `logs/browser_review_summary.txt`
 
 ### Runtime artifacts used as evidence
 
 - `_COMMUNICATION/agents_os/pipeline_state_agentsos.json`
 - `_COMMUNICATION/agents_os/pipeline_state_tiktrack.json`
 - `_COMMUNICATION/agents_os/STATE_SNAPSHOT.json`
+- `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_61_MCP_CONFIGURATION_RESPONSE_v1.0.0.md`
+- `~/.codex/config.toml`
 
 ## Review ladder applied
 

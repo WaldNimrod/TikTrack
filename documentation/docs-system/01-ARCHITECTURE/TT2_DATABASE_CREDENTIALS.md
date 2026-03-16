@@ -144,7 +144,7 @@ curl http://localhost:8082/health
 - **Display Name:** `TikTrack Admin`
 - **Email:** `nimrod@mezoo.co`
 - **Phone:** `NULL` (no phone number)
-- **Password:** `4181` (will be updated later)
+- **Password:** `4181`
 - **Role:** `SUPERADMIN`
 - **Status:** ✅ **PERMANENT** - Active, Email verified
 - **Purpose:** System super administrator with full system access
@@ -154,7 +154,7 @@ curl http://localhost:8082/health
 - **Display Name:** `Nimrod Wald`
 - **Email:** `waldnimrod@gmail.com`
 - **Phone:** Verified (phone_verified: True)
-- **Password:** `4181` (will be updated later)
+- **Password:** `4181`
 - **Role:** `ADMIN`
 - **Status:** ✅ **PERMANENT** - Active, Email verified, Phone verified
 - **Purpose:** System administrator with administrative privileges
@@ -164,7 +164,7 @@ curl http://localhost:8082/health
 - **Display Name:** `Test User`
 - **Email:** `test_qa_1769933177@example.com`
 - **Phone:** `NULL` (no phone number)
-- **Password:** `4181` (will be updated later)
+- **Password:** `4181`
 - **Role:** `USER`
 - **Status:** ✅ **PERMANENT** - Active (for testing purposes)
 - **Purpose:** QA testing, development testing, integration testing
@@ -188,6 +188,15 @@ curl http://localhost:8082/health
 - **Credentials:** Username `TikTrackAdmin` / Password `4181` (או כמוגדר ב-README)
 - **הרצה אחרי DB reset:** `python3 scripts/seed_qa_test_user.py`
 - **אימות Login:** `POST /api/v1/auth/login` עם `username_or_email: "TikTrackAdmin"`, `password: "4181"` — מצופה `access_token`.
+
+### **Bootstrap Admin User (Optional / Non-Canonical for QA)**
+
+קיים גם נתיב bootstrap נפרד שיוצר משתמש בשם `admin` עם סיסמה `418141` דרך:
+
+- `python3 api/scripts/create_admin_user.py`
+- `./scripts/create-admin.sh`
+
+משתמש זה אינו מקור האמת לבדיקות QA/E2E ואסור להניח שהוא קיים בכל סביבת עבודה מקומית לאחר `DB reset` או `seed`.
 
 ---
 

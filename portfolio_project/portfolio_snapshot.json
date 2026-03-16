@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-15T21:29:40.465310+00:00",
+  "generated_at_utc": "2026-03-16T11:48:33.888900+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -126,7 +126,7 @@
       "program_name": "Agents_OS v2 Writing Semantics Hardening (ADR-031 Stage A) + UI Optimization",
       "domain": "AGENTS_OS",
       "stage_id": "S002",
-      "status": "COMPLETE",
+      "status": "ACTIVE",
       "current_gate_mirror": "GATE_8; active_flow=S002-P005-WP002 (Pipeline Governance) — **GATE_8 PASS / DOCUMENTATION_CLOSED** after Team 90 revalidation (`TEAM_90_TO_TEAM_170_S002_P005_WP002_GATE8_VALIDATION_RESPONSE_v1.0.1.md`); no active work package in execution at this time.; active_work_package_id=N/A"
     },
     {
@@ -184,6 +184,14 @@
       "stage_id": "S003",
       "status": "PLANNED",
       "current_gate_mirror": "— (next AGENTS_OS stage-3 package; scope lock: approve-path desync block, command bridge copy flow with Task ID + context, model-B path realignment; **backlog candidate:** PIPELINE_HELP.html — standalone help page replacing modal, full operator guide searchable/browser-navigable, trigger: WP002 GATE_8 PASS, LOD200 required before GATE_0; authority source: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`; lock package: `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`)"
+    },
+    {
+      "program_id": "S003-P008",
+      "program_name": "Agents_OS Pipeline Governance Hardening",
+      "domain": "AGENTS_OS",
+      "stage_id": "S003",
+      "status": "PLANNED",
+      "current_gate_mirror": "— pending GATE_0 validation; LOD200 submitted 2026-03-16; scope: STATE_VIEW.json, LOD200 ordering table schema (IDEA-040/042), gate prompt lifecycle archive (IDEA-038), test_cursor_prompt cap (IDEA-039); activation trigger: S002-P005-WP003 GATE_0 PASS; sequencing: activate before or in parallel with S003-P007; authority: TEAM_100_AGENTS_OS_PIPELINE_GOVERNANCE_HARDENING_S003_P008_LOD200_v1.0.0.md"
     },
     {
       "program_id": "S004-P001",
@@ -557,7 +565,7 @@
           "program_id": "S002-P005",
           "program_name": "Agents_OS v2 Writing Semantics Hardening (ADR-031 Stage A) + UI Optimization",
           "domain": "AGENTS_OS",
-          "status": "COMPLETE",
+          "status": "ACTIVE",
           "current_gate_mirror": "GATE_8; active_flow=S002-P005-WP002 (Pipeline Governance) — **GATE_8 PASS / DOCUMENTATION_CLOSED** after Team 90 revalidation (`TEAM_90_TO_TEAM_170_S002_P005_WP002_GATE8_VALIDATION_RESPONSE_v1.0.1.md`); no active work package in execution at this time.; active_work_package_id=N/A",
           "work_packages": [
             {
@@ -657,6 +665,14 @@
           "domain": "AGENTS_OS",
           "status": "PLANNED",
           "current_gate_mirror": "— (next AGENTS_OS stage-3 package; scope lock: approve-path desync block, command bridge copy flow with Task ID + context, model-B path realignment; **backlog candidate:** PIPELINE_HELP.html — standalone help page replacing modal, full operator guide searchable/browser-navigable, trigger: WP002 GATE_8 PASS, LOD200 required before GATE_0; authority source: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`; lock package: `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S003-P008",
+          "program_name": "Agents_OS Pipeline Governance Hardening",
+          "domain": "AGENTS_OS",
+          "status": "PLANNED",
+          "current_gate_mirror": "— pending GATE_0 validation; LOD200 submitted 2026-03-16; scope: STATE_VIEW.json, LOD200 ordering table schema (IDEA-040/042), gate prompt lifecycle archive (IDEA-038), test_cursor_prompt cap (IDEA-039); activation trigger: S002-P005-WP003 GATE_0 PASS; sequencing: activate before or in parallel with S003-P007; authority: TEAM_100_AGENTS_OS_PIPELINE_GOVERNANCE_HARDENING_S003_P008_LOD200_v1.0.0.md",
           "work_packages": []
         }
       ]

@@ -15,6 +15,9 @@ Use this workflow when executing a deep review with `$agents-os-review`.
   - What part of Agents OS is being evaluated
   - Whether the review is full-system or scoped
   - Which outputs are required
+- Record domain discipline explicitly:
+  - Primary domain under review: `agents_os`
+  - TikTrack checks are allowed only as supporting evidence for specific Agents OS claims
 
 ## 2. Create the Dated Review Pack
 
@@ -119,6 +122,7 @@ Focus on:
 - Whether copied commands are valid now, scaffold-only, or stale
 - Whether documentation registry entries match actual UI behavior
 - Whether the UI distinguishes active capability from future capability
+- Whether each UI surface is bound to the correct domain state
 
 Useful commands:
 
@@ -128,7 +132,7 @@ curl -s http://localhost:8090/agents_os/ui/PIPELINE_DASHBOARD.html
 curl -s http://localhost:8090/agents_os/ui/js/pipeline-dashboard.js
 ```
 
-If browser or MCP tooling is available, also exercise the dashboard, roadmap, and teams page visually.
+If browser or MCP tooling is available, exercise the dashboard, roadmap, and teams page visually first. Only after that, use TikTrack pages if needed to validate a specific Agents OS claim such as an MCP scenario or operator flow.
 
 ## 5. Run E2E and Operational Checks
 
@@ -147,6 +151,12 @@ Verify:
 - Frontend on `http://localhost:8080`
 - Agents OS UI pages on the local UI server
 - MCP scenarios align with actual routes, labels, and workflows
+
+Domain discipline:
+
+- Treat `agents_os/ui/*` and Agents OS runtime/state as the primary E2E target.
+- Use TikTrack login or feature pages only when they validate an Agents OS operational claim.
+- When using TikTrack pages, write one sentence in `notes/` explaining the Agents OS claim under test.
 
 If a service cannot be started, document the limitation in the summary and continue with static analysis.
 

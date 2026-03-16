@@ -9,6 +9,7 @@
   - canonized AGENTS_OS V2 governance,
   - V2 runtime/orchestrator code with partial post-split updates,
   - legacy/transition UI and mandate logic anchored in older TikTrack execution patterns.
+- `Core conclusion` `The operator surface is now provably split not only by policy, but by runtime state binding.` Live browser verification showed the dashboard, roadmap, and teams page pulling different truths for the same AGENTS_OS work package. That means the split-brain problem is no longer just a documentation inference. It is observable in the running system.
 - `Core conclusion` `The largest risk is operator misrouting, not algorithmic failure.` A one-human operator can work around a missing feature faster than around conflicting authority models. When the system says Team 51 in one place, Team 50 in another, and Team 10 or Team 70 somewhere else, it reintroduces the manual coordination burden the system is supposed to eliminate.
 - `Core conclusion` `The architecture is converging on the right abstractions, but not yet on a single truth surface.` Domain-specific state files, a state snapshot, mandate generation, and gate-specific conversations are all good abstractions. The failure is that those abstractions are not yet all bound to the same organizational model.
 
@@ -29,5 +30,5 @@
 ## Notes
 
 - The system is closest to a “governed orchestration platform under migration” rather than a finished operating system.
-- The next architectural milestone should not be adding more features. It should be collapsing the number of live process models from multiple to one.
+- The next architectural milestone should not be adding more features. It should be collapsing the number of live process models from multiple to one, and binding every operator-facing surface to the same state source for the selected domain.
 - The review skill and dated review-pack workflow are now in place, which is strategically useful. It means future reviews can focus on convergence instead of repeatedly re-inventing the audit method.

@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0.0",
-  "produced_at_iso": "2026-03-15T22:26:56.164433+00:00",
+  "produced_at_iso": "2026-03-16T11:47:27.514082+00:00",
   "agent_role": "POC-1-OBSERVER",
   "read_only": true,
   "governance": {
@@ -16,7 +16,7 @@
         "gate_state": null,
         "pending_actions": [],
         "override_reason": null,
-        "current_gate": "COMPLETE",
+        "current_gate": "GATE_0",
         "project_domain": "agents_os"
       },
       "tiktrack": {

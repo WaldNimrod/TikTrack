@@ -51,6 +51,8 @@ Use these paths to detect drift between the current V2 model and older operator-
 - `agents_os/ui/css/pipeline-teams.css`
 - `agents_os/ui/docs/PIPELINE_DASHBOARD_UI_REGISTRY_v1.0.0.md`
 
+These are the primary UI review surfaces. Do not substitute TikTrack product pages for these pages unless the check is explicitly framed as supporting evidence for an Agents OS claim.
+
 ## Operational Shell Helpers
 
 - `pipeline_run.sh`
@@ -62,6 +64,17 @@ Use these paths to detect drift between the current V2 model and older operator-
 - `scripts/start-frontend.sh`
 - `scripts/stop-frontend.sh`
 - `scripts/init-servers-for-qa.sh`
+
+## Supporting Proving-Ground Surfaces
+
+Use these only when the review needs to verify an Agents OS claim through the live product stack:
+
+- `http://localhost:8080/login`
+- TikTrack pages or API flows referenced by `agents_os_v2/mcp/test_scenarios.py`
+- `scripts/seed_qa_test_user.py`
+- `scripts/README_SEED_QA_USER.md`
+
+If these surfaces are used, record the exact Agents OS claim they support.
 
 ## Runtime State and Generated Artifacts
 

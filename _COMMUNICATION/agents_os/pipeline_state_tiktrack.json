@@ -1,5 +1,5 @@
 {
-  "pipe_run_id": "a4bc11a5",
+  "pipe_run_id": "fbdbb141",
   "work_package_id": "REQUIRED",
   "stage_id": "S002",
   "project_domain": "tiktrack",
@@ -7,7 +7,6 @@
   "current_gate": "GATE_0",
   "gates_completed": [],
   "gates_failed": [
-    "GATE_0",
     "GATE_0"
   ],
   "lld400_content": "",
@@ -17,7 +16,7 @@
   "implementation_endpoints": [],
   "spec_path": "",
   "started_at": "",
-  "last_updated": "2026-03-15T22:53:07.281583+00:00",
+  "last_updated": "2026-03-16T11:46:58.956952+00:00",
   "gate_state": null,
   "pending_actions": [],
   "override_reason": null,

@@ -95,6 +95,22 @@ _show_prompt() {
     exit 1
   fi
 
+  # ── A1: Staleness guard — warn if state file is newer than the prompt file ──
+  # Prevents displaying a prompt generated against an older pipeline state.
+  local state_file="$REPO/_COMMUNICATION/agents_os/pipeline_state_${domain_slug}.json"
+  if [ -f "$state_file" ] && [ "$state_file" -nt "$prompt_file" ]; then
+    echo ""
+    echo "⚠️  [pipeline_run] STALE PROMPT — state has changed since this prompt was generated."
+    echo "   Regenerating now..."
+    $CLI --generate-prompt "$(python3 -c "
+import sys,os; sys.path.insert(0,'.')
+from agents_os_v2.orchestrator.state import PipelineState
+domain = os.environ.get('PIPELINE_DOMAIN') or None
+print(PipelineState.load(domain).current_gate)
+")" 2>&1 | grep -v "^━"
+    echo ""
+  fi
+
   local engine
   engine=$(_get_engine "$gate")
 

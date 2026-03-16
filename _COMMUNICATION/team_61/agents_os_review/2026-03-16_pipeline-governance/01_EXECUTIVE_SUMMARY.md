@@ -31,8 +31,9 @@ The net result is a system with strong governance intent but incomplete converge
 
 ## Review constraints
 
-- No MCP resources or resource templates were exposed in this session. Browser/MCP validation could therefore not be executed through an MCP harness.
-- Local browser automation was not available as a direct tool in this session. UI verification was performed via code inspection, local server commands, and `curl`, not via interactive browser automation.
+- `list_mcp_resources` and `list_mcp_resource_templates` still returned empty after restart, so server-discovered MCP metadata remains unavailable in this Codex session.
+- Browser validation was nevertheless executed successfully through the Playwright browser tool after environment restart. The review therefore includes live navigation, form interaction, console inspection, and network inspection for TikTrack login/alerts and the three Agents OS UI surfaces.
+- Team 50’s canonical reproduction path under `_COMMUNICATION/team_50/TEAM_50_TO_TEAM_61_MCP_CONFIGURATION_RESPONSE_v1.0.0.md` was confirmed to be directionally correct for Codex parity, but the practical review evidence in this bundle comes from direct Playwright execution rather than MCP resource discovery.
 - The host `python3` is `3.9.6`, while `agents_os_v2/PHASE_6_LOCAL_SETUP_GUIDE.md` expects Python `3.12+`. Legacy test outcomes must therefore be interpreted with that environment gap in mind.
 
 ## One-human operating model verdict

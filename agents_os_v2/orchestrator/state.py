@@ -21,8 +21,8 @@ STATE_FILE = AGENTS_OS_OUTPUT_DIR / "pipeline_state.json"
 @dataclass
 class PipelineState:
     pipe_run_id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
-    work_package_id: str = "REQUIRED"
-    stage_id: str = "S002"
+    work_package_id: str = ""  # Empty = not initialized. NEVER use "REQUIRED" sentinel.
+    stage_id: str = ""         # Empty = load from WSM at init
     project_domain: str = DEFAULT_DOMAIN   # "tiktrack" | "agents_os"
     spec_brief: str = ""
     current_gate: str = "NOT_STARTED"
@@ -46,7 +46,17 @@ class PipelineState:
     def _state_file(self) -> Path:
         return get_state_file(self.project_domain)
 
+    def is_initialized(self) -> bool:
+        """True only when loaded from real WSM data, not defaults/sentinel."""
+        return bool(self.work_package_id) and self.work_package_id != "REQUIRED"
+
     def save(self):
+        if not self.is_initialized():
+            raise ValueError(
+                f"Refusing to save uninitialized PipelineState "
+                f"(work_package_id='{self.work_package_id}'). "
+                f"Call load() or set work_package_id from WSM before saving."
+            )
         f = self._state_file()
         f.parent.mkdir(parents=True, exist_ok=True)
         self.last_updated = datetime.now(timezone.utc).isoformat()

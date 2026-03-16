@@ -662,17 +662,19 @@ print(f'    Updated: {s.last_updated or \"never\"}')
     echo "[pipeline_run] ${DOMAIN_LABEL}Phase ${PHASE_NUM} — regenerating mandates for: $GATE"
     $CLI --generate-prompt "$GATE" 2>&1 | grep -v "^━"
 
-    # Determine mandate file from gate name
-    # GATE_1 uses GATE_1_mandates.md (same mechanism as GATE_8) — two-phase gate.
+    # Determine mandate file from gate name.
+    # Files are saved with domain prefix (e.g. agentsos_GATE_1_mandates.md).
+    # domain_slug: same transform as _save_prompt in pipeline.py (lower, strip _ and -)
+    _dm_slug=$(_get_domain 2>/dev/null | tr '[:upper:]' '[:lower:]' | tr -d '_-')
     case "$GATE" in
       GATE_1)
-        MANDATE_FILE="$PROMPTS_DIR/GATE_1_mandates.md"
+        MANDATE_FILE="$PROMPTS_DIR/${_dm_slug}_GATE_1_mandates.md"
         ;;
       GATE_8)
-        MANDATE_FILE="$PROMPTS_DIR/gate_8_mandates.md"
+        MANDATE_FILE="$PROMPTS_DIR/${_dm_slug}_gate_8_mandates.md"
         ;;
       *)
-        MANDATE_FILE="$PROMPTS_DIR/implementation_mandates.md"
+        MANDATE_FILE="$PROMPTS_DIR/${_dm_slug}_implementation_mandates.md"
         ;;
     esac
 

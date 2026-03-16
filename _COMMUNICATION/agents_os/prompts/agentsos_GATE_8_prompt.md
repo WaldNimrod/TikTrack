@@ -71,6 +71,7 @@ from: Team 90 (GATE_8 validation authority)
 to: Team 170 (Spec & Governance — GATE_8 executor)
 cc: Team 10, Team 00, Team 100
 date: 2026-03-15
+historical_record: true
 status: FAIL
 gate_id: GATE_8
 work_package_id: S002-P005-WP002

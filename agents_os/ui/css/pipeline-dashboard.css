@@ -507,3 +507,101 @@
 
 .help-trouble-item { border: 1px solid var(--border); border-radius: 4px; padding: 8px 12px; margin-bottom: 8px; font-size: 13px; }
 .help-trouble-item strong { display: block; margin-bottom: 4px; }
+
+/* ── GATE_1 Command-Flow Box (UI-CMD-FLOW-01, 2026-03-16) ──────────────────
+   Shows the full 3-step command sequence for two-phase gates.
+   States: gcf-done (already run), gcf-next (run NOW, highlighted), gcf-pending (future).
+*/
+.gate1-cmd-flow {
+  background: rgba(0,0,0,0.25);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin: 10px 0 2px;
+  font-size: 12px;
+}
+.gcf-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.gcf-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 4px;
+  margin-bottom: 3px;
+  transition: background 0.15s;
+}
+.gcf-done {
+  opacity: 0.45;
+}
+.gcf-next {
+  background: rgba(31,111,235,0.12);
+  border: 1px solid rgba(88,166,255,0.35);
+  opacity: 1;
+}
+.gcf-pending {
+  opacity: 0.35;
+}
+.gcf-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--border);
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+  color: var(--text-secondary);
+}
+.gcf-next .gcf-num {
+  background: var(--accent);
+  color: #fff;
+}
+.gcf-cmd {
+  font-family: var(--mono);
+  font-size: 11px;
+  background: rgba(0,0,0,0.3);
+  padding: 2px 7px;
+  border-radius: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  color: var(--text);
+}
+.gcf-next .gcf-cmd {
+  color: #c8e6ff;
+  background: rgba(0,0,0,0.45);
+}
+.gcf-note {
+  color: var(--text-muted);
+  font-size: 11px;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gcf-next .gcf-note {
+  color: var(--text-secondary);
+}
+.gcf-copy {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text-muted);
+  font-size: 11px;
+  padding: 1px 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+  line-height: 1.6;
+}
+.gcf-copy:hover { background: var(--surface-hover); color: var(--text); }
+.gcf-next .gcf-copy { border-color: rgba(88,166,255,0.4); color: var(--accent); }
+.gcf-next .gcf-copy:hover { background: rgba(88,166,255,0.1); }

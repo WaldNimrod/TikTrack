@@ -5,6 +5,7 @@ from: Team 100 (AOS Domain Architects)
 to: Team 61 (AOS Local Cursor Implementation)
 cc: Team 10, Team 51, Team 100, Team 190
 date: 2026-03-15
+historical_record: true
 status: MANDATE_ACTIVE
 scope: Implementation mandate — S002-P005-WP003 AOS State Alignment & Governance Integrity
 lod200_ref: TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md

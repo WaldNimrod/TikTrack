@@ -5,6 +5,7 @@
 **from:** Team 61  
 **to:** Team 50  
 **date:** 2026-03-15  
+**historical_record:** true  
 **status:** ACTION_REQUIRED  
 **gate_id:** N/A  
 **work_package_id:** N/A  

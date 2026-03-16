@@ -5,6 +5,7 @@ from: Team 100 (AOS Domain Architects)
 to: Team 170 (Spec & Governance)
 cc: Team 10, Team 190
 date: 2026-03-15
+historical_record: true
 status: MANDATE_ACTIVE
 scope: Registry + documentation mandate — S002-P005-WP003 activation + IDEA-003/005 deliverables
 ---

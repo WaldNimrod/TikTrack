@@ -1,4 +1,5 @@
 **date:** 2026-03-15
+**historical_record:** true
 
 # Cursor Composer Prompt
 

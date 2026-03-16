@@ -5,6 +5,7 @@ from: Team 100 (AOS Domain Architects)
 to: Team 51 (AOS QA & Functional Acceptance)
 cc: Team 10, Team 61, Team 100
 date: 2026-03-15
+historical_record: true
 status: MANDATE_ACTIVE
 scope: QA mandate — S002-P005-WP003 GATE_4 acceptance criteria
 ---

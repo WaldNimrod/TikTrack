@@ -77,6 +77,8 @@ def read_pipeline_state() -> dict[str, Any]:
                 "override_reason": data.get("override_reason"),
                 "current_gate": data.get("current_gate"),
                 "project_domain": data.get("project_domain"),
+                "work_package_id": data.get("work_package_id", ""),
+                "stage_id": data.get("stage_id", ""),
             }
         except (json.JSONDecodeError, OSError) as e:
             result["domains"][domain] = {"error": str(e)}
@@ -95,6 +97,103 @@ def read_pipeline_state() -> dict[str, Any]:
             result["legacy"] = {"error": "read_failed"}
 
     return result
+
+
+WSM_PATH = REPO_ROOT / "documentation" / "docs-governance" / "01-FOUNDATIONS" / "PHOENIX_MASTER_WSM_v1.0.0.md"
+
+
+def read_wsm_identity_fields(wsm_path: str | Path | None = None) -> dict[str, str]:
+    """
+    Read the Two-Authority identity fields from WSM.
+    These are the ground-truth values for: stage, active WP, active domain.
+    Returns dict with keys: active_stage_id, active_work_package_id, active_project_domain
+    """
+    path = Path(wsm_path) if wsm_path else WSM_PATH
+    text = _read_text(path)
+    result: dict[str, str] = {
+        "active_stage_id": "",
+        "active_work_package_id": "",
+        "active_project_domain": "",
+    }
+    if not text:
+        return result
+    # Parse CURRENT_OPERATIONAL_STATE block — table format | Field | Value |
+    stage_match = re.search(r"\|\s*active_stage_id\s*\|\s*(\S+)\s*\|", text)
+    if stage_match:
+        result["active_stage_id"] = stage_match.group(1).strip()
+    wp_match = re.search(r"\|\s*active_work_package_id\s*\|\s*(\S+)\s*\|", text)
+    if wp_match:
+        result["active_work_package_id"] = wp_match.group(1).strip()
+    domain_match = re.search(r"\|\s*active_project_domain\s*\|\s*(\S+)\s*\|", text)
+    if domain_match:
+        result["active_project_domain"] = domain_match.group(1).strip()
+    return result
+
+
+def read_stage_parallel_tracks(wsm_path: str | Path | None = None) -> list[dict[str, str]]:
+    """
+    Read STAGE_PARALLEL_TRACKS table from WSM.
+    Returns list of dicts: domain, active_program_id, active_work_package_id, phase_status, current_gate, gate_owner_team
+    """
+    path = Path(wsm_path) if wsm_path else WSM_PATH
+    text = _read_text(path)
+    if not text:
+        return []
+    # Find STAGE_PARALLEL_TRACKS block
+    tracks_match = re.search(
+        r"## STAGE_PARALLEL_TRACKS.*?\n\n\|[^\n]+\|[^\n]+\|\n\|[^\n]+\|[^\n]+\|\n((?:\|[^\n]+\|)+\n)",
+        text,
+        re.DOTALL,
+    )
+    if not tracks_match:
+        return []
+    rows_text = tracks_match.group(1)
+    rows = []
+    for line in rows_text.strip().split("\n"):
+        if not line.strip().startswith("|"):
+            continue
+        parts = [p.strip() for p in line.split("|")[1:-1]]
+        if len(parts) >= 6 and parts[0] not in ("domain", "---"):
+            rows.append({
+                "domain": parts[0].replace(" ", "").lower() if parts[0] != "—" else "",
+                "active_program_id": parts[1] if parts[1] != "—" else "",
+                "active_work_package_id": parts[2] if parts[2] != "—" else "",
+                "phase_status": parts[3] if len(parts) > 3 else "",
+                "current_gate": parts[4] if len(parts) > 4 else "",
+                "gate_owner_team": parts[5] if len(parts) > 5 else "",
+            })
+    return rows
+
+
+class DriftItem:
+    """Single drift item: WSM vs JSON mismatch."""
+
+    def __init__(self, field: str, wsm_value: str, json_value: str, severity: str = "warn"):
+        self.field = field
+        self.wsm_value = wsm_value
+        self.json_value = json_value
+        self.severity = severity
+
+
+def detect_drift(
+    wsm_identity: dict[str, str],
+    json_execution: dict[str, Any],
+    domain: str | None = None,
+) -> list[DriftItem]:
+    """
+    Compare WSM identity fields against pipeline JSON execution fields.
+    Returns list of DriftItem. Empty list = no drift.
+    """
+    drift: list[DriftItem] = []
+    wsm_wp = wsm_identity.get("active_work_package_id", "")
+    wsm_stage = wsm_identity.get("active_stage_id", "")
+    json_wp = str(json_execution.get("work_package_id", "")).strip()
+    json_stage = str(json_execution.get("stage_id", "")).strip()
+    if wsm_wp and json_wp and wsm_wp != json_wp and json_wp not in ("", "REQUIRED"):
+        drift.append(DriftItem("work_package_id", wsm_wp, json_wp, "warn"))
+    if wsm_stage and json_stage and wsm_stage != json_stage:
+        drift.append(DriftItem("stage_id", wsm_stage, json_stage, "warn"))
+    return drift
 
 
 def read_governance_state() -> dict[str, Any]:
@@ -222,18 +321,52 @@ def read_artifact_checks() -> list[dict[str, Any]]:
 
 
 def build_state_snapshot() -> dict[str, Any]:
-    return {
+    wsm_identity = read_wsm_identity_fields()
+    pipeline = read_pipeline_state()
+    governance = read_governance_state()
+    governance["wsm_identity"] = wsm_identity
+
+    # Drift detection: compare WSM vs pipeline JSON per domain
+    for domain, domain_data in pipeline.get("domains", {}).items():
+        if isinstance(domain_data, dict) and "error" not in domain_data:
+            drift_items = detect_drift(wsm_identity, domain_data, domain)
+            if drift_items:
+                try:
+                    from agents_os_v2.orchestrator.log_events import append_event
+                    for d in drift_items:
+                        append_event({
+                            "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                            "pipe_run_id": "state_reader",
+                            "event_type": "DRIFT_DETECTED",
+                            "domain": domain,
+                            "stage_id": wsm_identity.get("active_stage_id", ""),
+                            "work_package_id": wsm_identity.get("active_work_package_id", ""),
+                            "gate": domain_data.get("current_gate", ""),
+                            "agent_team": "team_61",
+                            "severity": "WARN",
+                            "description": f"WSM vs JSON drift: {d.field}",
+                            "metadata": {
+                                "field": d.field,
+                                "wsm_value": d.wsm_value,
+                                "json_value": d.json_value,
+                            },
+                        })
+                except Exception:
+                    pass
+
+    snapshot = {
         "schema_version": "2.0.0",
         "produced_at_iso": datetime.now(timezone.utc).isoformat(),
         "agent_role": "POC-1-OBSERVER",
         "read_only": True,
-        "governance": read_governance_state(),
-        "pipeline": read_pipeline_state(),
+        "governance": governance,
+        "pipeline": pipeline,
         "codebase": read_codebase_state(),
         "quality": read_quality_state(),
         "artifact_checks": read_artifact_checks(),
         "no_ssot_writes": True,
     }
+    return snapshot
 
 
 def main() -> None:
@@ -243,6 +376,25 @@ def main() -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     output_path = output_dir / "STATE_SNAPSHOT.json"
     output_path.write_text(json.dumps(snapshot, indent=2, ensure_ascii=False), encoding="utf-8")
+
+    # Emit SNAPSHOT_GENERATED event
+    try:
+        from agents_os_v2.orchestrator.log_events import append_event
+        append_event({
+            "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "pipe_run_id": "state_reader",
+            "event_type": "SNAPSHOT_GENERATED",
+            "domain": "global",
+            "stage_id": snapshot.get("governance", {}).get("wsm_identity", {}).get("active_stage_id", ""),
+            "work_package_id": snapshot.get("governance", {}).get("wsm_identity", {}).get("active_work_package_id", ""),
+            "gate": "",
+            "agent_team": "team_61",
+            "severity": "INFO",
+            "description": "STATE_SNAPSHOT.json generated",
+            "metadata": {"output_path": str(output_path.relative_to(REPO_ROOT))},
+        })
+    except Exception:
+        pass
 
     print(f"STATE_SNAPSHOT.json written to {output_path.relative_to(REPO_ROOT)}")
     print(f"  Schema: {snapshot['schema_version']}")

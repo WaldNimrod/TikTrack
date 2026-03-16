@@ -289,6 +289,10 @@ def _generate_mandate_doc(
     SEP   = "─" * 60
     SEP_H = "═" * 60
     wp    = state.work_package_id
+    # Domain-aware CLI flag — injected into all generated terminal commands.
+    # Without this, agents copy commands without --domain and target the wrong pipeline.
+    _dom = getattr(state, "project_domain", "") or ""
+    domain_flag = f"--domain {_dom} " if _dom else ""
 
     # ── 1. Execution order block ─────────────────────────────────────────────
     phases: dict = {}
@@ -321,7 +325,7 @@ def _generate_mandate_doc(
                 f"             ↓  Phase {next_phase} starts ONLY after Phase {phase_num} completes"
             )
             order_lines.append(
-                f"             💻  Phase {phase_num} done?  →  ./pipeline_run.sh phase{next_phase}"
+                f"             💻  Phase {phase_num} done?  →  ./pipeline_run.sh {domain_flag}phase{next_phase}"
             )
             # Coordination note: which teams provide data to which
             for ns in next_steps:
@@ -413,7 +417,7 @@ def _generate_mandate_doc(
                 parts.append(
                     f"\n{SEP}\n"
                     f"  ✅  Phase {step.phase} complete?\n"
-                    f"  →  Run in terminal:  ./pipeline_run.sh phase{next_ph}\n"
+                    f"  →  Run in terminal:  ./pipeline_run.sh {domain_flag}phase{next_ph}\n"
                     f"     Regenerates mandates with Phase {step.phase} output injected\n"
                     f"     + displays Phase {next_ph} section ready to copy.\n"
                     f"{SEP}\n\n"
@@ -1101,7 +1105,7 @@ def _generate_gate_1_mandates(state: PipelineState) -> str:
         f"6. **Acceptance Criteria** — numbered, each criterion independently pass/fail testable\n\n"
         f"---\n\n"
         f"Save LLD400 to: `{lld400_path}`\n\n"
-        f"When done, inform Nimrod. Nimrod runs `./pipeline_run.sh phase2` to activate Team 190 validation.\n\n"
+        f"When done, inform Nimrod. Nimrod runs `./pipeline_run.sh --domain {state.project_domain} phase2` to activate Team 190 validation.\n\n"
         f"⛔ **YOUR TASK ENDS WITH SAVING THE LLD400. Do NOT validate your own output.**"
     )
 
@@ -1157,8 +1161,8 @@ def _generate_gate_1_mandates(state: PipelineState) -> str:
             writes_to  = verdict_path,
             acceptance = [
                 "All 8 validation checklist items addressed",
-                f"If PASS  →  `./pipeline_run.sh pass`  (advances to GATE_2)",
-                f"If BLOCK →  `./pipeline_run.sh fail \"BF-XX: [description]\"`  (returns to Team 170)",
+                f"If PASS  →  `./pipeline_run.sh --domain {state.project_domain} pass`  (advances to GATE_2)",
+                f"If BLOCK →  `./pipeline_run.sh --domain {state.project_domain} fail \"BF-XX: [description]\"`  (returns to Team 170)",
             ],
         ),
     ]

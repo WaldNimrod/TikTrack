@@ -1,6 +1,7 @@
 # Team 61 → Team 100 — דוח אי־הלימת סטטוס: דשבורד ומפה מול מצב קנוני
 
 **date:** 2026-03-15  
+**historical_record:** true  
 **id:** TEAM_61_STATUS_ALIGNMENT_REPORT  
 **version:** 1.0.0  
 **owner:** Team 61 (DevOps & Platform — AOS UI)  

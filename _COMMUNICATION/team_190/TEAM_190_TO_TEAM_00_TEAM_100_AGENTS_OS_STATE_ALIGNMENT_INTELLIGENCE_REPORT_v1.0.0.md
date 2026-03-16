@@ -5,6 +5,7 @@ from: Team 190 (Constitutional Architectural Validator)
 to: Team 00 (Chief Architect), Team 100 (AOS Architects)
 cc: Team 10, Team 61, Team 170, Nimrod
 date: 2026-03-15
+historical_record: true
 status: SUBMITTED_FOR_ARCHITECT_REVIEW
 scope: Deep spy audit of state alignment drift across Dashboard / Roadmap / Teams runtime views
 ---

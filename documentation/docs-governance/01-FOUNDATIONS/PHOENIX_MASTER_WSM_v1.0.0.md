@@ -87,31 +87,43 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-15** by **Team 90** — GATE_8 PASS validated for `S002-P005-WP002`; lifecycle is DOCUMENTATION_CLOSED and no active work package remains.
+**Gate-owner update evidence:** This block was updated **2026-03-16** by **Team 00** (Chief Architect — one-time state activation per Nimrod directive): WP003 `S002-P005-WP003` activated; GATE_0 PASS (Team 190 revalidation confirmed); advancing to GATE_1. Prior state: WP002 DOCUMENTATION_CLOSED (2026-03-15). STAGE_PARALLEL_TRACKS block added per architectural decision 2026-03-16.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S002 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S002-P005-WP002 (Pipeline Governance) — **GATE_8 PASS / DOCUMENTATION_CLOSED** after Team 90 revalidation (`TEAM_90_TO_TEAM_170_S002_P005_WP002_GATE8_VALIDATION_RESPONSE_v1.0.1.md`); no active work package in execution at this time. |
+| active_flow | S002-P005-WP003 (State Alignment) — **GATE_0 PASS** (Team 190 revalidation confirmed); advancing to GATE_1; spec: `TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md` |
 | active_project_domain | AGENTS_OS |
-| active_work_package_id | N/A |
-| in_progress_work_package_id | N/A |
+| active_work_package_id | S002-P005-WP003 |
+| in_progress_work_package_id | S002-P005-WP003 |
 | last_closed_work_package_id | S002-P005-WP002 (GATE_8 PASS 2026-03-15; DOCUMENTATION_CLOSED) |
 | last_closed_program_id | S002-P005 (GATE_8 PASS 2026-03-15; DOCUMENTATION_CLOSED with WP002) |
 | last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
 | allowed_gate_range | GATE_0_TO_GATE_8 (normal execution lifecycle) |
-| current_gate | GATE_8 |
+| current_gate | GATE_1 |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
 | agents_os_parallel_track | S003-P001 WP001 + S003-P002 WP001 FAST_4 CLOSED (2026-03-11 / 2026-03-12). S002-P005-WP002 (Pipeline Governance): GATE_8 PASS (2026-03-15, Team 90 revalidation v1.0.1); DOCUMENTATION_CLOSED; NO_ACTIVE_WORK_PACKAGE confirmed. ADR-031 sequence lock: S002-P005 (Stage A immediate hotfix) -> S003-P007 (Stage B command bridge lite) -> S004-P008 (Stage C mediated reconciliation). Existing S004 AGENTS_OS baseline programs S004-P001/S004-P002/S004-P003 remain PLANNED and are not overridden by ADR-031. S003-P003 is TIKTRACK (normal GATE_0..GATE_8); G3.7 available for Team 10 at GATE_3. Governed per TEAM_00_AGENTS_OS_INDEPENDENT_ADVANCEMENT_DIRECTIVE_v1.0.0; applies to both domains for Gate-6 desync blocking policy (pending formal signer-chain lock). Sources: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`, `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`. |
 | active_program_id | S002-P005 |
 | active_plan_id | S002 |
-| phase_owner_team | Team 90 (GATE_8 owner; closure validated) |
-| last_gate_event | GATE_8_PASS_DOCUMENTATION_CLOSED; 2026-03-15; Team 90 validated Team 170 GATE_8 package and issued PASS (`TEAM_90_TO_TEAM_170_S002_P005_WP002_GATE8_VALIDATION_RESPONSE_v1.0.1.md`). |
-| next_required_action | Team 90 and Team 10 to route next lifecycle activation per roadmap priorities; S002-P005-WP002 is closed with no open gate obligations. |
-| next_responsible_team | Team 90 (state governance), Team 10 (next execution intake when activated) |
+| phase_owner_team | Team 190 (GATE_1 owner per WSM_OWNER_MATRIX_GATES_0_8_v1.0.0.md) |
+| last_gate_event | GATE_0_PASS; 2026-03-16; Team 190 revalidation PASS for S002-P005-WP003; Team 00 activated WP; advanced to GATE_1. |
+| next_required_action | Team 190 to validate LOD200 at GATE_1. Spec: `_COMMUNICATION/team_100/TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md`. Run: `./pipeline_run.sh --domain agents_os` to generate GATE_1 prompt. |
+| next_responsible_team | Team 190 (GATE_1 validation owner) |
+
+---
+
+## STAGE_PARALLEL_TRACKS (canonical — replaces agents_os_parallel_track prose in WP004)
+
+**Authority:** ARCHITECT_DIRECTIVE_DASHBOARD_ARCHITECTURE_EVOLUTION_v1.0.0.md (2026-03-16)
+**Rule:** This table is the machine-readable source of truth for parallel domain tracking. All AI agents must read this table, not the `agents_os_parallel_track` prose field. The prose field remains for backward compatibility until WP004 deprecates it.
+
+| domain | active_program_id | active_work_package_id | phase_status | current_gate | gate_owner_team |
+|--------|-------------------|------------------------|--------------|--------------|-----------------|
+| AGENTS_OS | S002-P005 | S002-P005-WP003 | GATE_0_PASS — advancing to GATE_1 | GATE_1 | Team 190 |
+| TIKTRACK | — | — | IDLE | — | — |
 
 ---
 
@@ -294,6 +306,8 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 **log_entry | TEAM_190 | IDEA_PIPELINE_HIERARCHY_REVALIDATION | PASS_WITH_ACTION | BLOCKERS_CLOSED_OPTIONAL_HARDENING_OPEN | IHC-RV-01..04 CLOSED; IHC-RV-NB-01 applied by Team 10 | 2026-03-15**
 **log_entry | TEAM_10 | IDEA_PIPELINE_HIERARCHY_MANDATE | CLOSURE_PACKAGE_SUBMITTED | IHC-RV-NB-01 hardening applied; closure package submitted to Team 100 for final architectural approval | 2026-03-15**
 **log_entry | TEAM_190 | TO_TEAM_170 | REGISTRY_MIRROR_SYNC_REQUIRED | run sync_registry_mirrors_from_wsm.py --write then --check for WP003 baseline standardization | 2026-03-10**
+**log_entry | TEAM_00 | WSM_STATE_ACTIVATION | S002-P005-WP003 activated; active_work_package_id=S002-P005-WP003; GATE_0 PASS; current_gate=GATE_1; Team 190 is next | 2026-03-16**
+**log_entry | TEAM_00 | STAGE_PARALLEL_TRACKS_ADDED | structured dual-domain table added; replaces agents_os_parallel_track prose (deprecated in WP004) | 2026-03-16**
 
 GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:
   date: 2026-03-03

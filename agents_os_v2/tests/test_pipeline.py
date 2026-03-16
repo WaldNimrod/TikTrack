@@ -24,14 +24,20 @@ class TestPipelineState:
         assert state.current_gate == "NOT_STARTED"
         assert state.gates_completed == []
 
-    def test_advance_gate_pass(self):
-        state = PipelineState()
+    def test_advance_gate_pass(self, tmp_path, monkeypatch):
+        import agents_os_v2.orchestrator.state as state_mod
+        monkeypatch.setattr(state_mod, "STATE_FILE", tmp_path / "legacy_state.json")
+        monkeypatch.setattr(state_mod, "get_state_file", lambda d: tmp_path / f"pipeline_state_{d}.json")
+        state = PipelineState(work_package_id="TEST-WP-001", project_domain="agents_os")
         state.advance_gate("GATE_0", "PASS")
         assert "GATE_0" in state.gates_completed
         assert state.current_gate == "GATE_0"
 
-    def test_advance_gate_fail(self):
-        state = PipelineState()
+    def test_advance_gate_fail(self, tmp_path, monkeypatch):
+        import agents_os_v2.orchestrator.state as state_mod
+        monkeypatch.setattr(state_mod, "STATE_FILE", tmp_path / "legacy_state.json")
+        monkeypatch.setattr(state_mod, "get_state_file", lambda d: tmp_path / f"pipeline_state_{d}.json")
+        state = PipelineState(work_package_id="TEST-WP-001", project_domain="agents_os")
         state.advance_gate("GATE_0", "FAIL")
         assert "GATE_0" in state.gates_failed
         assert state.gates_completed == []

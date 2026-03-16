@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-16T11:48:33.888900+00:00",
+  "generated_at_utc": "2026-03-16T16:31:41.411067+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -8,13 +8,13 @@
   },
   "runtime": {
     "active_stage_id": "S002",
-    "active_work_package_id": "N/A",
-    "in_progress_work_package_id": "N/A",
-    "current_gate": "GATE_8",
+    "active_work_package_id": "S002-P005-WP003",
+    "in_progress_work_package_id": "S002-P005-WP003",
+    "current_gate": "GATE_1",
     "active_program_id": "S002-P005",
-    "last_gate_event": "GATE_8_PASS_DOCUMENTATION_CLOSED; 2026-03-15; Team 90 validated Team 170 GATE_8 package and issued PASS (`TEAM_90_TO_TEAM_170_S002_P005_WP002_GATE8_VALIDATION_RESPONSE_v1.0.1.md`).",
-    "next_required_action": "Team 90 and Team 10 to route next lifecycle activation per roadmap priorities; S002-P005-WP002 is closed with no open gate obligations.",
-    "next_responsible_team": "Team 90 (state governance), Team 10 (next execution intake when activated)"
+    "last_gate_event": "GATE_0_PASS; 2026-03-16; Team 190 revalidation PASS for S002-P005-WP003; Team 00 activated WP; advanced to GATE_1.",
+    "next_required_action": "Team 190 to validate LOD200 at GATE_1. Spec: `_COMMUNICATION/team_100/TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md`. Run: `./pipeline_run.sh --domain agents_os` to generate GATE_1 prompt.",
+    "next_responsible_team": "Team 190 (GATE_1 validation owner)"
   },
   "stages": [
     {
@@ -127,7 +127,7 @@
       "domain": "AGENTS_OS",
       "stage_id": "S002",
       "status": "ACTIVE",
-      "current_gate_mirror": "GATE_8; active_flow=S002-P005-WP002 (Pipeline Governance) — **GATE_8 PASS / DOCUMENTATION_CLOSED** after Team 90 revalidation (`TEAM_90_TO_TEAM_170_S002_P005_WP002_GATE8_VALIDATION_RESPONSE_v1.0.1.md`); no active work package in execution at this time.; active_work_package_id=N/A"
+      "current_gate_mirror": "GATE_1; active_flow=S002-P005-WP003 (State Alignment) — **GATE_0 PASS** (Team 190 revalidation confirmed); advancing to GATE_1; spec: `TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md`; active_work_package_id=S002-P005-WP003"
     },
     {
       "program_id": "S003-P001",
@@ -404,6 +404,15 @@
       "active_marker_reason": "Lifecycle complete 2026-03-15"
     },
     {
+      "work_package_id": "S002-P005-WP003",
+      "program_id": "S002-P005",
+      "domain": "AGENTS_OS",
+      "status": "IN_PROGRESS",
+      "current_gate": "GATE_1",
+      "is_active": true,
+      "active_marker_reason": "S002-P005-WP003 (State Alignment) — **GATE_0 PASS** (Team 190 revalidation confirmed); advancing to GATE_1; spec: `TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md`"
+    },
+    {
       "work_package_id": "S003-P001-WP001",
       "program_id": "S003-P001",
       "domain": "AGENTS_OS",
@@ -566,7 +575,7 @@
           "program_name": "Agents_OS v2 Writing Semantics Hardening (ADR-031 Stage A) + UI Optimization",
           "domain": "AGENTS_OS",
           "status": "ACTIVE",
-          "current_gate_mirror": "GATE_8; active_flow=S002-P005-WP002 (Pipeline Governance) — **GATE_8 PASS / DOCUMENTATION_CLOSED** after Team 90 revalidation (`TEAM_90_TO_TEAM_170_S002_P005_WP002_GATE8_VALIDATION_RESPONSE_v1.0.1.md`); no active work package in execution at this time.; active_work_package_id=N/A",
+          "current_gate_mirror": "GATE_1; active_flow=S002-P005-WP003 (State Alignment) — **GATE_0 PASS** (Team 190 revalidation confirmed); advancing to GATE_1; spec: `TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md`; active_work_package_id=S002-P005-WP003",
           "work_packages": [
             {
               "work_package_id": "S002-P005-WP002",
@@ -576,6 +585,15 @@
               "current_gate": "GATE_8 (PASS)",
               "is_active": false,
               "active_marker_reason": "Lifecycle complete 2026-03-15"
+            },
+            {
+              "work_package_id": "S002-P005-WP003",
+              "program_id": "S002-P005",
+              "domain": "AGENTS_OS",
+              "status": "IN_PROGRESS",
+              "current_gate": "GATE_1",
+              "is_active": true,
+              "active_marker_reason": "S002-P005-WP003 (State Alignment) — **GATE_0 PASS** (Team 190 revalidation confirmed); advancing to GATE_1; spec: `TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md`"
             }
           ]
         }

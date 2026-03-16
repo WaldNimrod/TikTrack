@@ -5,6 +5,7 @@ from: Team 100 (AOS Domain Architects)
 to: Team 10 (Execution Orchestrator)
 cc: Team 61, Team 51, Team 170, Team 190
 date: 2026-03-15
+historical_record: true
 status: MANDATE_ACTIVE
 scope: Orchestration notice — S002-P005-WP003 AOS State Alignment & Governance Integrity
 ---

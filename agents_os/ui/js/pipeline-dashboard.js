@@ -1489,6 +1489,7 @@ function buildCurrentStepBanner(gate, state) {
   const baseCmd   = _dfCmd('./pipeline_run.sh ').trimEnd();
 
   let actor, engineLabel, phaseLabel, steps, modCls;
+  let cmdFlowBlock = ''; // Populated for multi-phase gates (GATE_1, future GATE_8)
 
   if (gateState === 'PASS_WITH_ACTION') {
     actor = 'Gate held'; engineLabel = ''; phaseLabel = 'PASS_WITH_ACTION'; modCls = 'csb-pwa';
@@ -1499,6 +1500,32 @@ function buildCurrentStepBanner(gate, state) {
     ];
 
   } else if (gate === 'GATE_1') {
+    const _p1cmd = _dfCmd('./pipeline_run.sh phase1');
+    const _p2cmd = _dfCmd('./pipeline_run.sh phase2');
+    const _pscmd = _dfCmd('./pipeline_run.sh pass');
+    // Command-flow box: shown in both phases so operator always sees the full sequence.
+    // gcf-done = already run, gcf-next = run NOW, gcf-pending = run later.
+    cmdFlowBlock = `<div class="gate1-cmd-flow">
+  <div class="gcf-title">🔁 GATE_1 — Full Command Sequence</div>
+  <div class="gcf-row gcf-done">
+    <span class="gcf-num">1</span>
+    <code class="gcf-cmd">${escHtml(_p1cmd)}</code>
+    <span class="gcf-note">← send to Team 170 (LLD400)</span>
+    <button class="gcf-copy" onclick="copyCmd(${escAttr(JSON.stringify(_p1cmd))}, this)">⎘</button>
+  </div>
+  <div class="gcf-row ${!lld400 ? 'gcf-next' : 'gcf-done'}">
+    <span class="gcf-num">2</span>
+    <code class="gcf-cmd">${escHtml(_p2cmd)}</code>
+    <span class="gcf-note">← after Team 170 saves LLD400</span>
+    <button class="gcf-copy" onclick="copyCmd(${escAttr(JSON.stringify(_p2cmd))}, this)">⎘</button>
+  </div>
+  <div class="gcf-row ${lld400 ? 'gcf-next' : 'gcf-pending'}">
+    <span class="gcf-num">3</span>
+    <code class="gcf-cmd">${escHtml(_pscmd)}</code>
+    <span class="gcf-note">← after Team 190 verdict PASS</span>
+    <button class="gcf-copy" onclick="copyCmd(${escAttr(JSON.stringify(_pscmd))}, this)">⎘</button>
+  </div>
+</div>`;
     if (!lld400) {
       actor = 'Team 170'; engineLabel = 'Gemini'; modCls = failCount > 0 ? 'csb-correction' : '';
       phaseLabel = failCount > 0 ? 'Phase 1 of 2 — correction cycle' : 'Phase 1 of 2 — LLD400 authoring';
@@ -1506,7 +1533,7 @@ function buildCurrentStepBanner(gate, state) {
         failCount > 0
           ? 'Team 170 saves the corrected LLD400 → _COMMUNICATION/team_170/TEAM_170_..._LLD400_vN.M.md'
           : 'Team 170 saves the LLD400 spec → _COMMUNICATION/team_170/TEAM_170_..._LLD400_v1.0.0.md',
-        `Run in terminal: ${baseCmd}  (auto-stores LLD400 + generates Team 190 mandate)`,
+        `Run in terminal: ${_p2cmd}  (auto-stores LLD400 + generates Team 190 mandate)`,
         'Paste the ▼▼▼ block into Codex (OpenAI) → Team 190 validates → click ✅ PASS or ❌ FAIL',
       ];
     } else {
@@ -1514,7 +1541,7 @@ function buildCurrentStepBanner(gate, state) {
       steps = [
         'LLD400 stored ✅ — scroll to "Team Mandates" accordion below → click the "Team 190" tab',
         'Click "📋 Copy mandate" → paste into Codex (OpenAI) → Team 190 validates the LLD400',
-        'Team 190 saves verdict → click ✅ PASS (advance to GATE_2) or ❌ FAIL (return to Team 170 correction)',
+        `Team 190 saves verdict → click ✅ PASS (run: ${_pscmd}) or ❌ FAIL (return to Team 170 correction)`,
       ];
     }
 
@@ -1611,6 +1638,7 @@ function buildCurrentStepBanner(gate, state) {
       <span class="csb-phase-label">${escHtml(phaseLabel)}</span>
     </div>
     <div class="csb-steps">${stepsHtml}</div>
+    ${cmdFlowBlock}
     ${footerHtml}
   </div>`;
 }
@@ -1640,23 +1668,27 @@ function buildPhaseTracker(gate, lld400Content) {
  * inCorrectionCycle: gate has been failed at least once.
  */
 function buildNextActionBanner(gate, lld400Content, inCorrectionCycle) {
-  const baseCmd = _dfCmd('./pipeline_run.sh ').trimEnd();
-  let title, note;
+  const baseCmd   = _dfCmd('./pipeline_run.sh ').trimEnd();
+  const phase2Cmd = _dfCmd('./pipeline_run.sh phase2');
+  let title, note, activeCmd;
   if (!lld400Content && inCorrectionCycle) {
-    title = '📝 Correction cycle — waiting for Team 170 revised LLD400';
-    note  = 'Run the command below after Team 170 saves the corrected LLD400. It auto-detects the latest version, stores it, and generates the Team 190 (Codex) validation mandate. No manual store step required.';
+    title     = '📝 Correction cycle — waiting for Team 170 revised LLD400';
+    note      = 'Run the command below after Team 170 saves the corrected LLD400. It auto-detects the latest version, stores it, and generates the Team 190 (Codex) validation mandate. No manual store step required.';
+    activeCmd = phase2Cmd;
   } else if (!lld400Content) {
-    title = '📝 Phase 1 active — Team 170 (Gemini) writing LLD400';
-    note  = 'Run after Team 170 saves their LLD400. The command auto-stores it and generates the Team 190 (Codex/OpenAI) validation mandate.';
+    title     = '📝 Phase 1 active — Team 170 (Gemini) writing LLD400';
+    note      = 'Run after Team 170 saves their LLD400. The command auto-stores it and generates the Team 190 (Codex/OpenAI) validation mandate.';
+    activeCmd = phase2Cmd;
   } else {
-    title = '✅ LLD400 stored — Team 190 (Codex/OpenAI) validation active';
-    note  = 'Scroll to "Team Mandates" ↓ → click "Team 190" tab → copy mandate → paste into Codex (OpenAI) → await verdict → click ✅ PASS (advance to GATE_2) or ❌ FAIL (correction cycle).';
+    title     = '✅ LLD400 stored — Team 190 (Codex/OpenAI) validation active';
+    note      = 'Scroll to "Team Mandates" ↓ → click "Team 190" tab → copy mandate → paste into Codex (OpenAI) → await verdict → click ✅ PASS (advance to GATE_2) or ❌ FAIL (correction cycle).';
+    activeCmd = _dfCmd('./pipeline_run.sh pass');
   }
   return `<div class="next-action-banner">
     <div class="next-action-title">⮕ ${escHtml(title)}</div>
-    <div class="next-action-cmd">${escHtml(baseCmd)}</div>
+    <div class="next-action-cmd">${escHtml(activeCmd)}</div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-      <button class="findings-copy-btn" style="font-size:10px" onclick="copyCmd(${escAttr(JSON.stringify(baseCmd))}, this)">⎘ Copy → terminal</button>
+      <button class="findings-copy-btn" style="font-size:10px" onclick="copyCmd(${escAttr(JSON.stringify(activeCmd))}, this)">⎘ Copy → terminal</button>
     </div>
     <div class="next-action-note">${escHtml(note)}</div>
   </div>`;

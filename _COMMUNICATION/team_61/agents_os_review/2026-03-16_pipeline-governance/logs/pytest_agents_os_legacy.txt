@@ -1,0 +1,12 @@
+
+==================================== ERRORS ====================================
+____________ ERROR collecting agents_os/tests/test_state_reader.py _____________
+agents_os/tests/test_state_reader.py:10: in <module>
+    from agents_os.observers.state_reader import build_state_snapshot
+agents_os/observers/state_reader.py:25: in <module>
+    def _read_text(path: Path) -> str | None:
+E   TypeError: unsupported operand type(s) for |: 'type' and 'NoneType'
+=========================== short test summary info ============================
+ERROR agents_os/tests/test_state_reader.py - TypeError: unsupported operand t...
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.09s

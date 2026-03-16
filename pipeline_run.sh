@@ -83,12 +83,32 @@ print(cfg.get('engine', '?') + '  |  owner: ' + effective_owner + '  [' + state.
 
 _show_prompt() {
   local gate="$1"
-  local prompt_file="$PROMPTS_DIR/${gate}_prompt.md"
+  local domain_raw
+  domain_raw=$(_get_domain)
+  local domain_slug
+  domain_slug=$(echo "$domain_raw" | tr '[:upper:]' '[:lower:]' | tr -d '_-')
+  local prompt_file="$PROMPTS_DIR/${domain_slug}_${gate}_prompt.md"
 
   if [ ! -f "$prompt_file" ]; then
     echo "[pipeline_run] Prompt file not found: $prompt_file"
     echo "[pipeline_run] Run: ./pipeline_run.sh  (to generate it first)"
     exit 1
+  fi
+
+  # ── A1: Staleness guard — warn if state file is newer than the prompt file ──
+  # Prevents displaying a prompt generated against an older pipeline state.
+  local state_file="$REPO/_COMMUNICATION/agents_os/pipeline_state_${domain_slug}.json"
+  if [ -f "$state_file" ] && [ "$state_file" -nt "$prompt_file" ]; then
+    echo ""
+    echo "⚠️  [pipeline_run] STALE PROMPT — state has changed since this prompt was generated."
+    echo "   Regenerating now..."
+    $CLI --generate-prompt "$(python3 -c "
+import sys,os; sys.path.insert(0,'.')
+from agents_os_v2.orchestrator.state import PipelineState
+domain = os.environ.get('PIPELINE_DOMAIN') or None
+print(PipelineState.load(domain).current_gate)
+")" 2>&1 | grep -v "^━"
+    echo ""
   fi
 
   local engine
@@ -181,6 +201,68 @@ print(f'STORE:{latest}')
     echo ""
     echo "  ⚠️  GATE_1: No LLD400 file found in _COMMUNICATION/team_170/ for this WP."
     echo "  Team 170 must produce the LLD400 before this gate can proceed."
+    echo ""
+  fi
+  # ALREADY_STORED: no output — silent pass
+}
+
+_auto_store_g3plan_artifact() {
+  # AC-11: at G3_PLAN gate, auto-detect the latest
+  # TEAM_10_{WP_ID}_G3_PLAN_WORK_PLAN_v*.md and store it into work_plan if
+  # the stored version is stale or empty. Mirrors the AC-10 pattern for GATE_1.
+  # Called before phase2 prompt generation at G3_PLAN.
+  local result
+  result=$(python3 -c "
+import sys, os, json, glob
+sys.path.insert(0, '.')
+domain = os.environ.get('PIPELINE_DOMAIN') or None
+if domain == 'agents_os':
+    sf = '_COMMUNICATION/agents_os/pipeline_state_agentsos.json'
+elif domain == 'tiktrack':
+    sf = '_COMMUNICATION/agents_os/pipeline_state_tiktrack.json'
+else:
+    sf = '_COMMUNICATION/agents_os/pipeline_state.json'
+try:
+    state = json.loads(open(sf).read())
+except Exception:
+    sys.exit(0)
+if state.get('current_gate') != 'G3_PLAN':
+    sys.exit(0)
+wp = state.get('work_package_id', '')
+if not wp:
+    sys.exit(0)
+wp_fs = wp.replace('-', '_')
+pattern = f'_COMMUNICATION/team_10/TEAM_10_{wp_fs}_G3_PLAN_WORK_PLAN_v*.md'
+files = sorted(glob.glob(pattern))
+if not files:
+    print('NO_FILE')
+    sys.exit(0)
+latest = files[-1]
+try:
+    content = open(latest).read()
+except Exception:
+    sys.exit(0)
+current = state.get('work_plan', '')
+if content.strip() == current.strip():
+    print(f'ALREADY_STORED:{latest}')
+    sys.exit(0)
+print(f'STORE:{latest}')
+" 2>/dev/null)
+
+  if [[ "$result" == STORE:* ]]; then
+    local file="${result#STORE:}"
+    echo ""
+    echo "  ────────────────────────────────────────────────────────────────"
+    echo "  🔄 AC-11 G3_PLAN auto-store: ${file}"
+    $CLI --store-artifact G3_PLAN "$file" 2>/dev/null && \
+      echo "  ✅ work_plan updated — G3_5 mandate will include latest plan" || \
+      echo "  ⚠️  auto-store failed — run manually: ./pipeline_run.sh ${DOMAIN_FLAG_STR:-}store G3_PLAN ${file}"
+    echo "  ────────────────────────────────────────────────────────────────"
+    echo ""
+  elif [[ "$result" == NO_FILE ]]; then
+    echo ""
+    echo "  ⚠️  G3_PLAN: No work plan found in _COMMUNICATION/team_10/ for WP."
+    echo "  Team 10 must save TEAM_10_*_G3_PLAN_WORK_PLAN_v*.md before phase2 can proceed."
     echo ""
   fi
   # ALREADY_STORED: no output — silent pass
@@ -330,6 +412,31 @@ except Exception:
     esac
 
     if [ "$VALIDATION_FAILED" -eq 1 ] && [ "$FORCE_FLAG" != "--force" ]; then
+      python3 -c "
+import sys, os
+sys.path.insert(0, '.')
+os.environ.setdefault('PIPELINE_DOMAIN', '${DOMAIN:-}')
+try:
+    from agents_os_v2.orchestrator.log_events import append_event
+    from agents_os_v2.observers.state_reader import read_wsm_identity_fields
+    from datetime import datetime, timezone
+    identity = read_wsm_identity_fields()
+    append_event({
+        'timestamp': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'pipe_run_id': 'pipeline_run',
+        'event_type': 'GATE_ADVANCE_BLOCKED',
+        'domain': '${DOMAIN:-global}',
+        'stage_id': identity.get('active_stage_id', ''),
+        'work_package_id': identity.get('active_work_package_id', ''),
+        'gate': '$GATE',
+        'agent_team': 'team_61',
+        'severity': 'WARN',
+        'description': 'Advance blocked — required artifacts missing',
+        'metadata': {'attempted_gate': '$GATE', 'reason': 'artifact_missing', 'blocking_team': 'team_61'},
+    })
+except Exception:
+    pass
+" 2>/dev/null || true
       echo ""
       echo "════════════════════════════════════════════════════════════════════"
       echo "  ⚠️  ADVANCE BLOCKED — Required artifacts are missing:"
@@ -524,8 +631,20 @@ print('yes' if GATE_CONFIG.get('${GATE}', {}).get('default_fail_route') else 'no
   revise)
     # Revision mode after G3_5 FAIL.
     # Usage: ./pipeline_run.sh revise "BLOCKER-1: ... BLOCKER-2: ..."
-    # Step 1: store current work plan artifact (if file path given as $3)
+    # If currently at G3_5, records FAIL + routes full (BF = structural) → advances to G3_PLAN.
     NOTES="${2:?Usage: ./pipeline_run.sh revise \"blocker notes\" [optional: work_plan_file_path]}"
+    # Step 0: if currently at G3_5, advance it to FAIL + route full → G3_PLAN
+    CURRENT_GATE=$(_get_gate)
+    if [[ "$CURRENT_GATE" == "G3_5" ]]; then
+      echo "[pipeline_run] ${DOMAIN_LABEL}Recording G3_5 FAIL (revision triggered)..."
+      FAIL_REASON="${NOTES:0:200}"
+      $CLI --advance G3_5 FAIL --reason "$FAIL_REASON" 2>&1 | grep -v "^━"
+      # BF (Blocking Findings) = structural issues → always route full for G3_5
+      echo "[pipeline_run] ${DOMAIN_LABEL}Routing G3_5 → G3_PLAN (full — structural work plan blockers)..."
+      $CLI --route full G3_5 --reason "$FAIL_REASON" 2>&1 | grep -v "^━"
+      echo "[pipeline_run] G3_5 routed → gate now: $(_get_gate)"
+    fi
+    # Step 1: store current work plan artifact (if file path given as $3)
     if [ -n "$3" ]; then
       echo "[pipeline_run] Storing work plan artifact: $3"
       $CLI --store-artifact G3_PLAN "$3"
@@ -638,21 +757,27 @@ print(f'    Updated: {s.last_updated or \"never\"}')
     fi
 
     GATE=$(_get_gate)
-    _auto_store_gate1_artifact   # AC-10: auto-store before phase transition prompt generation
+    _auto_store_gate1_artifact   # AC-10: auto-store latest LLD400 before phase transition
+    _auto_store_g3plan_artifact  # AC-11: auto-store G3_PLAN work plan before phase transition
     echo "[pipeline_run] ${DOMAIN_LABEL}Phase ${PHASE_NUM} — regenerating mandates for: $GATE"
     $CLI --generate-prompt "$GATE" 2>&1 | grep -v "^━"
 
-    # Determine mandate file from gate name
-    # GATE_1 uses GATE_1_mandates.md (same mechanism as GATE_8) — two-phase gate.
+    # Determine mandate file from gate name.
+    # Files are saved with domain prefix (e.g. agentsos_GATE_1_mandates.md).
+    # domain_slug: same transform as _save_prompt in pipeline.py (lower, strip _ and -)
+    _dm_slug=$(_get_domain 2>/dev/null | tr '[:upper:]' '[:lower:]' | tr -d '_-')
     case "$GATE" in
       GATE_1)
-        MANDATE_FILE="$PROMPTS_DIR/GATE_1_mandates.md"
+        MANDATE_FILE="$PROMPTS_DIR/${_dm_slug}_GATE_1_mandates.md"
+        ;;
+      G3_PLAN)
+        MANDATE_FILE="$PROMPTS_DIR/${_dm_slug}_G3_PLAN_mandates.md"
         ;;
       GATE_8)
-        MANDATE_FILE="$PROMPTS_DIR/gate_8_mandates.md"
+        MANDATE_FILE="$PROMPTS_DIR/${_dm_slug}_gate_8_mandates.md"
         ;;
       *)
-        MANDATE_FILE="$PROMPTS_DIR/implementation_mandates.md"
+        MANDATE_FILE="$PROMPTS_DIR/${_dm_slug}_implementation_mandates.md"
         ;;
     esac
 
@@ -713,6 +838,21 @@ PYEOF
     printf '▲%.0s' {1..74}; echo ""
     echo ""
 
+    # ── State update: G3_PLAN phase2 — confirm work plan stored ──────────
+    if [[ "$GATE" == "G3_PLAN" && "$PHASE_NUM" == "2" ]]; then
+      python3 -c "
+import sys, os
+sys.path.insert(0, '.')
+from agents_os_v2.orchestrator.state import PipelineState
+domain = os.environ.get('PIPELINE_DOMAIN') or None
+state = PipelineState.load(domain)
+if state.work_plan and state.work_plan.strip():
+    print('[pipeline_run] ✅ work_plan confirmed stored (' + str(len(state.work_plan)) + ' chars). Run: ./pipeline_run.sh ${DOMAIN_FLAG_STR:-}pass to advance to G3_5.')
+else:
+    print('[pipeline_run] ⚠️  work_plan is EMPTY. Ensure Team 10 saved TEAM_10_*_G3_PLAN_WORK_PLAN_v*.md')
+"
+    fi
+
     # ── State update: mark phase transition in pipeline_state ─────────────
     # When phase2 is run on GATE_8, Phase 1 (Team 70/170) is confirmed done.
     # Write phase8_content to state so the dashboard detects the transition.
@@ -728,6 +868,33 @@ state.save()
 print('[pipeline_run] ✅ State updated — phase8_content=PHASE2_ACTIVE. Dashboard will reflect Phase 2.')
 "
     fi
+
+    # ── Event log: PHASE_TRANSITION ──────────────────────────────────────
+    python3 -c "
+import sys, os
+sys.path.insert(0, '.')
+os.environ.setdefault('PIPELINE_DOMAIN', '${DOMAIN:-}')
+try:
+    from agents_os_v2.orchestrator.log_events import append_event
+    from agents_os_v2.observers.state_reader import read_wsm_identity_fields
+    from datetime import datetime, timezone
+    identity = read_wsm_identity_fields()
+    append_event({
+        'timestamp': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'pipe_run_id': 'pipeline_run',
+        'event_type': 'PHASE_TRANSITION',
+        'domain': '${DOMAIN:-global}',
+        'stage_id': identity.get('active_stage_id', ''),
+        'work_package_id': identity.get('active_work_package_id', ''),
+        'gate': '$GATE',
+        'agent_team': 'team_61',
+        'severity': 'INFO',
+        'description': f'Phase ${PHASE_NUM} mandate displayed',
+        'metadata': {'phase': ${PHASE_NUM}, 'gate': '$GATE'},
+    })
+except Exception:
+    pass
+" 2>/dev/null || true
     ;;
 
   *)

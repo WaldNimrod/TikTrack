@@ -1,11 +1,19 @@
 {
-  "pipe_run_id": "tiktrack-no-active-wp-20260315",
-  "work_package_id": "NONE",
-  "stage_id": "S002",
+  "pipe_run_id": "7cffdee3",
+  "work_package_id": "S002-P002-WP001",
+  "stage_id": "",
   "project_domain": "tiktrack",
   "spec_brief": "",
-  "current_gate": "NONE",
-  "gates_completed": [],
+  "current_gate": "G3_6_MANDATES",
+  "gates_completed": [
+    "GATE_0",
+    "GATE_1",
+    "GATE_2",
+    "WAITING_GATE2_APPROVAL",
+    "G3_PLAN",
+    "G3_5",
+    "G3_6_MANDATES"
+  ],
   "gates_failed": [],
   "lld400_content": "",
   "work_plan": "",
@@ -14,8 +22,9 @@
   "implementation_endpoints": [],
   "spec_path": "",
   "started_at": "",
-  "last_updated": "2026-03-15T21:45:00Z",
+  "last_updated": "2026-03-16T18:43:00.200202+00:00",
   "gate_state": null,
   "pending_actions": [],
-  "override_reason": null
+  "override_reason": null,
+  "phase8_content": ""
 }

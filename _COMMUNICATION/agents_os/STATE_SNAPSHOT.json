@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0.0",
-  "produced_at_iso": "2026-03-15T21:18:41.907489+00:00",
+  "produced_at_iso": "2026-03-16T22:24:16.068606+00:00",
   "agent_role": "POC-1-OBSERVER",
   "read_only": true,
   "governance": {
@@ -8,7 +8,12 @@
     "active_stage": "S002",
     "active_program": "S002-P005",
     "ssm_path": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md",
-    "master_index_path": "00_MASTER_INDEX.md"
+    "master_index_path": "00_MASTER_INDEX.md",
+    "wsm_identity": {
+      "active_stage_id": "S002",
+      "active_work_package_id": "S002-P005-WP003",
+      "active_project_domain": "AGENTS_OS"
+    }
   },
   "pipeline": {
     "domains": {
@@ -16,22 +21,26 @@
         "gate_state": null,
         "pending_actions": [],
         "override_reason": null,
-        "current_gate": "COMPLETE",
-        "project_domain": "agents_os"
+        "current_gate": "G3_PLAN",
+        "project_domain": "agents_os",
+        "work_package_id": "S002-P005-WP003",
+        "stage_id": "S002"
       },
       "tiktrack": {
         "gate_state": null,
         "pending_actions": [],
         "override_reason": null,
-        "current_gate": "NONE",
-        "project_domain": "tiktrack"
+        "current_gate": "G3_6_MANDATES",
+        "project_domain": "tiktrack",
+        "work_package_id": "S002-P002-WP001",
+        "stage_id": ""
       }
     },
     "legacy": {
       "gate_state": null,
       "pending_actions": [],
       "override_reason": null,
-      "current_gate": "COMPLETE"
+      "current_gate": "G3_PLAN"
     }
   },
   "codebase": {

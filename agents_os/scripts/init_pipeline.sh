@@ -20,6 +20,9 @@ python3 -c "
 import sys
 sys.path.insert(0, '.')
 from agents_os_v2.orchestrator.state import PipelineState
+from agents_os_v2.orchestrator.log_events import append_event
+from datetime import datetime, timezone
+
 s = PipelineState(
     work_package_id='$WP',
     project_domain='$DOMAIN',
@@ -28,6 +31,22 @@ s = PipelineState(
     current_gate='GATE_0'
 )
 s.save()
+try:
+    append_event({
+        'timestamp': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'pipe_run_id': s.pipe_run_id,
+        'event_type': 'INIT_PIPELINE',
+        'domain': '$DOMAIN',
+        'stage_id': '$STAGE',
+        'work_package_id': '$WP',
+        'gate': 'GATE_0',
+        'agent_team': 'team_61',
+        'severity': 'INFO',
+        'description': f'Pipeline initialized: $WP at GATE_0',
+        'metadata': {'initialized_by': 'init_pipeline.sh', 'source': 'CLI_PARAM'},
+    })
+except Exception:
+    pass
 print('[agents_os] Pipeline initialized')
 print(f'  WP:     {s.work_package_id}')
 print(f'  Domain: {s.project_domain}')

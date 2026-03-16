@@ -117,6 +117,29 @@
 .hw-log { flex: 1; background: rgba(0,0,0,0.35); padding: 3px 6px; border-radius: 3px; font-size: 9px; word-break: break-all; color: var(--text-muted); font-family: var(--mono); max-height: 60px; overflow-y: auto; }
 .hw-copy-btn { flex-shrink: 0; font-size: 10px; padding: 2px 6px; }
 
+/* Event Log Panel — Phase 2 */
+.event-log-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.event-log-select { font-size: 11px; padding: 3px 6px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); flex: 1; min-width: 0; }
+.event-log-list { max-height: 220px; overflow-y: auto; font-size: 11px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface2); padding: 8px; }
+.event-log-list.event-log-main { max-height: 320px; }
+.event-log-empty { color: var(--text-muted); font-style: italic; padding: 12px; text-align: center; }
+.event-log-error { color: var(--danger); font-style: normal; }
+.event-log-item { padding: 6px 8px; border-bottom: 1px solid var(--border); line-height: 1.4; }
+.event-log-item:last-child { border-bottom: none; }
+.event-log-time { font-family: var(--mono); font-size: 10px; color: var(--text-muted); margin-right: 4px; }
+.event-log-domain { font-size: 10px; color: var(--text-muted); }
+.event-log-gate { font-family: var(--mono); font-size: 10px; color: var(--accent); }
+.event-log-team { font-size: 10px; color: var(--text-muted); }
+.event-log-desc { font-size: 11px; color: var(--text); margin-top: 2px; word-break: break-word; }
+.event-badge { display: inline-block; font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 4px; margin-right: 4px; }
+.event-badge--pass { background: rgba(63,185,80,0.2); color: var(--success); }
+.event-badge--fail { background: rgba(248,81,73,0.2); color: var(--danger); }
+.event-badge--drift { background: rgba(210,153,34,0.2); color: var(--warning); }
+.event-badge--init { background: rgba(20,158,158,0.2); color: #14a39e; }
+.event-badge--wsm { background: rgba(88,166,255,0.2); color: var(--accent); }
+.event-badge--server { background: rgba(139,148,158,0.2); color: var(--text-muted); }
+.event-badge--default { background: var(--surface2); color: var(--text-muted); }
+
 .sidebar-cmd-list { display: flex; flex-direction: column; }
 .sidebar-cmd-row { display: flex; align-items: center; gap: 5px; padding: 4px 0; border-bottom: 1px solid var(--border); }
 .sidebar-cmd-row:last-child { border-bottom: none; }
@@ -381,6 +404,119 @@
 .csb-human .csb-step-num { background: var(--warning); }
 .csb-step-text { font-size: 11px; color: var(--text); line-height: 1.55; }
 
+/* ── 3-Layer Feedback Detection Panel (csb-fd) ─────────────────────────── */
+/* Iron Rule: present on every AI-verdict gate. Layer A = auto-scan on load,  */
+/* Layer B = guided rescan, Layer C = manual path bypass.                      */
+.csb-fd {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.csb-fd-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.csb-fd-status {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--text-muted);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.csb-fd-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-size: 10px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: border-color 0.15s, color 0.15s;
+}
+.csb-fd-btn:hover { border-color: var(--accent); color: var(--accent); }
+.csb-fd-manual-row {
+  display: none;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+}
+.csb-fd-input {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 7px;
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--text);
+  min-width: 0;
+}
+.csb-fd-input:focus { outline: none; border-color: var(--accent); }
+/* Layer D — paste verdict text row */
+.csb-fd-paste-row {
+  margin-top: 6px;
+  padding: 8px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.csb-fd-paste-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 6px 8px;
+  resize: vertical;
+  min-height: 80px;
+}
+.csb-fd-paste-textarea:focus { outline: none; border-color: var(--accent); }
+.csb-fd-candidates {
+  display: none;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 6px;
+}
+.csb-fd-cand-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, color 0.15s;
+}
+.csb-fd-cand-btn:hover { border-color: var(--accent); color: var(--text); }
+.csb-fd-cand-primary { border-color: var(--accent); color: var(--accent); }
+/* Banner state changes driven by verdict detection */
+.current-step-banner.csb-pass-detected {
+  border-color: var(--success);
+  background: rgba(63,185,80,0.07);
+}
+.current-step-banner.csb-pass-detected .csb-title { color: var(--success); }
+.current-step-banner.csb-pass-detected .csb-title::before { background: var(--success); }
+.current-step-banner.csb-pass-detected .csb-step-num { background: var(--success); }
+.current-step-banner.csb-block-detected {
+  border-color: var(--danger);
+  background: rgba(248,81,73,0.05);
+}
+.current-step-banner.csb-block-detected .csb-title { color: var(--danger); }
+.current-step-banner.csb-block-detected .csb-title::before { background: var(--danger); }
+.current-step-banner.csb-block-detected .csb-step-num { background: var(--danger); }
+
 /* Active-phase indicator badge on Phase 2+ mandate tabs */
 .phase-active-badge {
   background: rgba(63,185,80,0.2);
@@ -416,3 +552,131 @@
 
 .help-trouble-item { border: 1px solid var(--border); border-radius: 4px; padding: 8px 12px; margin-bottom: 8px; font-size: 13px; }
 .help-trouble-item strong { display: block; margin-bottom: 4px; }
+
+/* ── GATE_1 Command-Flow Box (UI-CMD-FLOW-01, 2026-03-16) ──────────────────
+   Shows the full 3-step command sequence for two-phase gates.
+   States: gcf-done (already run), gcf-next (run NOW, highlighted), gcf-pending (future).
+*/
+.gate1-cmd-flow {
+  background: rgba(0,0,0,0.25);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin: 10px 0 2px;
+  font-size: 12px;
+}
+.gcf-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.gcf-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 4px;
+  margin-bottom: 3px;
+  transition: background 0.15s;
+}
+.gcf-done {
+  opacity: 0.45;
+}
+.gcf-next {
+  background: rgba(31,111,235,0.12);
+  border: 1px solid rgba(88,166,255,0.35);
+  opacity: 1;
+}
+.gcf-pending {
+  opacity: 0.35;
+}
+.gcf-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--border);
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+  color: var(--text-secondary);
+}
+.gcf-next .gcf-num {
+  background: var(--accent);
+  color: #fff;
+}
+.gcf-cmd {
+  font-family: var(--mono);
+  font-size: 11px;
+  background: rgba(0,0,0,0.3);
+  padding: 2px 7px;
+  border-radius: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  color: var(--text);
+}
+.gcf-next .gcf-cmd {
+  color: #c8e6ff;
+  background: rgba(0,0,0,0.45);
+}
+.gcf-note {
+  color: var(--text-muted);
+  font-size: 11px;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gcf-next .gcf-note {
+  color: var(--text-secondary);
+}
+.gcf-copy {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text-muted);
+  font-size: 11px;
+  padding: 1px 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+  line-height: 1.6;
+}
+.gcf-copy:hover { background: var(--surface-hover); color: var(--text); }
+.gcf-next .gcf-copy { border-color: rgba(88,166,255,0.4); color: var(--accent); }
+.gcf-next .gcf-copy:hover { background: rgba(88,166,255,0.1); }
+
+/* ── Artifact Scan Panel (UI-ASP-01, 2026-03-16) ──────────────────────────
+   G3_PLAN Phase 1 — 3-layer work plan detection: auto-scan, rescan, manual paste.
+*/
+.artifact-scan-panel { background:rgba(210,153,34,0.06); border:1px solid rgba(210,153,34,0.3); border-left:3px solid var(--warning); border-radius:6px; padding:8px 12px; margin:8px 0 2px; font-size:12px; }
+.asp-title { font-size:11px; font-weight:700; color:var(--warning); text-transform:uppercase; letter-spacing:0.7px; margin-bottom:6px; }
+.asp-status { color:var(--text-secondary); font-size:12px; margin-bottom:6px; line-height:1.5; }
+.asp-status code { background:rgba(0,0,0,0.3); padding:1px 5px; border-radius:3px; font-size:10px; }
+.asp-actions { display:flex; gap:6px; margin-bottom:4px; }
+.asp-btn { background:transparent; border:1px solid var(--border); border-radius:4px; color:var(--text-secondary); font-size:11px; padding:3px 10px; cursor:pointer; }
+.asp-btn:hover { background:var(--surface-hover); color:var(--text); }
+.asp-manual-row { display:flex; gap:6px; margin-top:4px; align-items:center; }
+.asp-input { flex:1; background:rgba(0,0,0,0.25); border:1px solid var(--border); border-radius:4px; color:var(--text); font-family:var(--mono); font-size:10px; padding:4px 8px; }
+.asp-input:focus { outline:none; border-color:var(--accent); }
+
+/* ── Universal Bypass Panel (UI-BYP-01, 2026-03-16) ──────────────────────
+   Every gate. Collapsed by default. Reason required. Logs override event.
+*/
+.bypass-panel { margin-top:10px; border-top:1px solid rgba(255,255,255,0.06); padding-top:8px; }
+.bypass-toggle { background:transparent; border:1px solid rgba(210,153,34,0.35); border-radius:4px; color:var(--text-muted); font-size:10px; padding:3px 10px; cursor:pointer; letter-spacing:0.3px; }
+.bypass-toggle:hover { background:rgba(210,153,34,0.08); color:var(--warning); border-color:var(--warning); }
+.bypass-body { margin-top:8px; background:rgba(210,153,34,0.05); border:1px solid rgba(210,153,34,0.2); border-radius:5px; padding:8px 10px; }
+.bypass-warning { font-size:11px; color:var(--warning); margin-bottom:8px; padding:4px 8px; background:rgba(210,153,34,0.08); border-radius:3px; }
+.bypass-row { margin-bottom:6px; }
+.bypass-textarea { width:100%; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:4px; color:var(--text); font-family:var(--mono); font-size:11px; padding:5px 8px; resize:vertical; min-height:48px; box-sizing:border-box; }
+.bypass-textarea:focus { outline:none; border-color:var(--warning); }
+.bypass-cmd-row { display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.3); border-radius:4px; padding:5px 8px; overflow:hidden; }
+.bypass-cmd { flex:1; font-family:var(--mono); font-size:10px; color:var(--warning); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.bypass-copy-btn { background:transparent; border:1px solid rgba(210,153,34,0.4); border-radius:3px; color:var(--warning); font-size:10px; padding:2px 8px; cursor:pointer; flex-shrink:0; }
+.bypass-copy-btn:hover { background:rgba(210,153,34,0.1); }

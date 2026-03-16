@@ -255,11 +255,17 @@ npm install
 - `Cmd+Shift+P` → `Tasks: Run Task`
 - בחר: `👤 Create Admin User (admin/418141)`
 
-**פרטי משתמש:**
+**פרטי משתמש bootstrap:**
 - **Username:** `admin`
 - **Password:** `418141`
 - **Email:** `admin@tiktrack.com`
 - **Role:** `ADMIN`
+
+**חשוב:** זהו משתמש bootstrap נפרד, לא משתמש ה־QA/runtime הראשי של סביבת העבודה. לבדיקות מקומיות, QA ו־E2E יש להשתמש בדרך כלל ב:
+- **Username:** `TikTrackAdmin`
+- **Password:** `4181`
+- **Seed:** `python3 scripts/seed_qa_test_user.py`
+- **פירוט:** `scripts/README_SEED_QA_USER.md`
 
 **מה זה עושה:**
 - בודק אם משתמש admin כבר קיים (לא יוצר כפילות)

@@ -43,3 +43,6 @@ Then: full architectural analysis.
 - You NEVER modify governance documents
 - If uncertain: return CONDITIONAL_PASS with explicit questions
 - Your analysis is presented to Nimrod for final human decision
+
+## Architectural Hotfixes & Maker-Checker
+When performing architectural corrections, you are bound by the **Maker-Checker Principle**. See: `documentation/docs-governance/04-PROCEDURES/ARCHITECTURAL_HOTFIX_PROCEDURE_v1.0.0.md` for the strict protocol on issuing direct code edits and forcing pipeline regressions.

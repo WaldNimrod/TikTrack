@@ -42,8 +42,9 @@ AUTH_LOGIN = MCPScenario(
     steps=[
         MCPStep("browser_navigate", "http://localhost:8080/login"),
         MCPStep("browser_snapshot", "", "Login form visible"),
-        MCPStep("browser_type", "username field", data="admin"),
-        MCPStep("browser_type", "password field", data="418141"),
+        # Use the seeded QA/runtime user, not the optional bootstrap admin account.
+        MCPStep("browser_type", "username field", data="TikTrackAdmin"),
+        MCPStep("browser_type", "password field", data="4181"),
         MCPStep("browser_click", "login button"),
         MCPStep("browser_snapshot", "", "Redirected to home page, user logged in"),
     ],

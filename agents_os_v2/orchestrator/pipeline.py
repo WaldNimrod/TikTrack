@@ -25,6 +25,7 @@ from pathlib import Path
 
 from .state import PipelineState, STATE_FILE
 from .gate_router import run_data_model_checks
+from .log_events import append_event, get_wsm_identity
 from ..config import REPO_ROOT, AGENTS_OS_OUTPUT_DIR, DOMAIN_GATE_OWNERS
 from ..context.injection import (
     build_full_agent_prompt,
@@ -147,6 +148,33 @@ def _domain_gate_owner(gate_id: str, domain: str) -> str | None:
 def _log(msg: str):
     ts = datetime.now().strftime("%H:%M:%S")
     print(f"[{ts}] {msg}")
+
+
+def _emit_pipeline_event(
+    event_type: str,
+    state: PipelineState,
+    description: str,
+    metadata: dict | None = None,
+    severity: str = "INFO",
+) -> None:
+    """Emit pipeline event with WSM-sourced identity. Non-blocking."""
+    try:
+        identity = get_wsm_identity(state.project_domain)
+        append_event({
+            "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "pipe_run_id": state.pipe_run_id,
+            "event_type": event_type,
+            "domain": state.project_domain or "global",
+            "stage_id": identity.get("active_stage_id", ""),
+            "work_package_id": identity.get("active_work_package_id", ""),
+            "gate": state.current_gate,
+            "agent_team": "team_61",
+            "severity": severity,
+            "description": description,
+            "metadata": metadata or {},
+        })
+    except Exception:
+        pass
 
 
 def _save_prompt(filename: str, content: str, domain: str | None = None) -> Path:
@@ -289,6 +317,10 @@ def _generate_mandate_doc(
     SEP   = "─" * 60
     SEP_H = "═" * 60
     wp    = state.work_package_id
+    # Domain-aware CLI flag — injected into all generated terminal commands.
+    # Without this, agents copy commands without --domain and target the wrong pipeline.
+    _dom = getattr(state, "project_domain", "") or ""
+    domain_flag = f"--domain {_dom} " if _dom else ""
 
     # ── 1. Execution order block ─────────────────────────────────────────────
     phases: dict = {}
@@ -321,7 +353,7 @@ def _generate_mandate_doc(
                 f"             ↓  Phase {next_phase} starts ONLY after Phase {phase_num} completes"
             )
             order_lines.append(
-                f"             💻  Phase {phase_num} done?  →  ./pipeline_run.sh phase{next_phase}"
+                f"             💻  Phase {phase_num} done?  →  ./pipeline_run.sh {domain_flag}phase{next_phase}"
             )
             # Coordination note: which teams provide data to which
             for ns in next_steps:
@@ -413,7 +445,7 @@ def _generate_mandate_doc(
                 parts.append(
                     f"\n{SEP}\n"
                     f"  ✅  Phase {step.phase} complete?\n"
-                    f"  →  Run in terminal:  ./pipeline_run.sh phase{next_ph}\n"
+                    f"  →  Run in terminal:  ./pipeline_run.sh {domain_flag}phase{next_ph}\n"
                     f"     Regenerates mandates with Phase {step.phase} output injected\n"
                     f"     + displays Phase {next_ph} section ready to copy.\n"
                     f"{SEP}\n\n"
@@ -611,6 +643,8 @@ def _verdict_candidates(gate_id: str, work_package_id: str) -> list[Path]:
     # "TO_TEAM_10" prefix variant included for teams that use routing-style names.
     patterns: dict[str, list[Path]] = {
         "GATE_0": [
+            # REVALIDATION first — correction-cycle superseding verdict takes priority over original
+            t190 / f"TEAM_190_{wpu}_GATE_0_REVALIDATION_v1.0.0.md",
             # Canonical patterns (underscore naming)
             t190 / f"TEAM_190_{wpu}_GATE_0_VERDICT_v1.0.0.md",
             t190 / f"TEAM_190_{wpu}_GATE_0_VALIDATION_v1.0.0.md",
@@ -622,6 +656,8 @@ def _verdict_candidates(gate_id: str, work_package_id: str) -> list[Path]:
             t190 / f"TEAM_190_{wp}_GATE_0_VERDICT_v1.0.0.md",
         ],
         "GATE_1": [
+            # REVALIDATION first — correction-cycle superseding verdict takes priority over original
+            t190 / f"TEAM_190_{wpu}_GATE_1_REVALIDATION_v1.0.0.md",
             t190 / f"TEAM_190_{wpu}_GATE_1_VERDICT_v1.0.0.md",
             t190 / f"TEAM_190_{wpu}_LLD400_VALIDATION_v1.0.0.md",
             t190 / f"TEAM_190_TO_TEAM_10_{wpu}_GATE_1_VALIDATION_RESULT_v1.0.0.md",
@@ -781,7 +817,7 @@ def generate_prompt(gate_id: str, force_gate4: bool = False, revision_notes: str
             "  --query   GATE_2 --question '…' → Ask follow-up\n"
         )
     elif gate_id == "G3_PLAN":
-        prompt = _generate_g3_plan_prompt(state, revision_notes=revision_notes, fresh=fresh)
+        prompt = _generate_g3_plan_mandates(state, revision_notes=revision_notes, fresh=fresh)
     elif gate_id == "G3_5":
         prompt = _generate_g3_5_prompt(state, fresh)
     elif gate_id == "G3_6_MANDATES":
@@ -838,7 +874,7 @@ def generate_prompt(gate_id: str, force_gate4: bool = False, revision_notes: str
         print(f"Unknown gate: {gate_id}")
         return
 
-    path = _save_prompt(f"{gate_id}_prompt.md", prompt)
+    path = _save_prompt(f"{gate_id}_prompt.md", prompt, domain=state.project_domain)
     _log(f"Prompt saved to: {path}")
     _log(f"Paste into: {GATE_CONFIG.get(gate_id, {}).get('engine', '?')} session")
     print(f"\n{'='*60}\n{prompt[:500]}...\n{'='*60}")
@@ -918,29 +954,105 @@ def _check_governance_precheck(state: "PipelineState") -> list[str]:
                 f"Fix: register the program with status=ACTIVE before GATE_0."
             )
 
-    # ── 2. Work Package Registry check ────────────────────────────────────────
+    # ── A2: Program Registry premature activation advisory (BF-02 class guard) ──────────────
+    # Detects when notes column mirrors the current WP as "activated" before GATE_0 PASS,
+    # which contradicts WSM showing NO_ACTIVE_WORK_PACKAGE (root cause of BF-02 finding).
+    # Advisory only — does not block; helps Team 100 catch the issue before Team 190 review.
+    # Matches both full ID (S002-P005-WP003) and short form (WP003) in notes column.
+    wp_short = state.work_package_id.split("-")[-1]  # e.g. "WP003" from "S002-P005-WP003"
+    for line in text.splitlines():
+        if prog_id in line and (state.work_package_id in line or wp_short in line):
+            if re.search(r"\bactivated\b", line, re.IGNORECASE) and not re.search(
+                r"\bpending\b", line, re.IGNORECASE
+            ):
+                _log(
+                    f"[GATE_0 advisory A2] Program Registry row for {prog_id} mentions "
+                    f"'{state.work_package_id}' with 'activated' language while at GATE_0. "
+                    f"This causes BF-02-class Team 190 findings (premature portfolio sync). "
+                    f"Update notes to 'pending GATE_0 validation' before Team 190 review."
+                )
+            break
+
+    # ── 2. Work Package Registry check (advisory — new WPs are registered AFTER GATE_0 PASS) ──
+    # Per pipeline contract and Team 190 constitutional ruling: WP registry insertion happens
+    # AFTER GATE_0 PASS (Team 170 mandate). This is not a hard block for GATE_0.
     wp_reg = registry_dir / "PHOENIX_WORK_PACKAGE_REGISTRY_v1.0.0.md"
     if wp_reg.exists():
         text = wp_reg.read_text(encoding="utf-8")
         if state.work_package_id not in text:
-            warnings.append(
-                f"GOVERNANCE-02: Work Package {state.work_package_id} NOT FOUND in "
-                f"PHOENIX_WORK_PACKAGE_REGISTRY. "
-                f"Fix: register the WP (even as HOLD/IN_PROGRESS) before GATE_0."
+            _log(
+                f"[GATE_0 advisory] WP {state.work_package_id} not yet in WP Registry "
+                f"— expected for new WP (Team 170 registers after GATE_0 PASS)"
             )
 
     return warnings
 
 
 def _generate_gate_0_prompt(state: PipelineState, fresh: bool = False) -> str:
+    fail_count = state.gates_failed.count("GATE_0")
+    is_correction = fail_count > 0
+
+    # ── Correction cycle: prepend Team 100 correction notice with prior findings ─
+    correction_notice = ""
+    if is_correction:
+        prior_findings = ""
+        verdict_candidates = _verdict_candidates("GATE_0", state.work_package_id)
+        for vpath in verdict_candidates:
+            if vpath.exists():
+                import re as _re
+                raw = vpath.read_text(encoding="utf-8")
+                bf_match = _re.search(
+                    r"blocking_findings:\s*((?:\s*-\s*BF-\d+:[^\n]+\n?)+)",
+                    raw,
+                )
+                if bf_match:
+                    prior_findings = bf_match.group(1).strip()
+                break
+
+        findings_block = (
+            f"**Prior blocking findings (Team 190 verdict):**\n"
+            f"```\n{prior_findings}\n```\n\n"
+            if prior_findings
+            else "*(Verdict file not found — review Team 190 communication manually)*\n\n"
+        )
+
+        correction_notice = (
+            f"## ⚠ CORRECTION CYCLE #{fail_count} — Team 100 Action Required\n\n"
+            f"GATE_0 was BLOCKED by Team 190 ({fail_count}×). The LOD200 scope brief must be\n"
+            f"revised before Team 190 can re-validate.\n\n"
+            f"{findings_block}"
+            f"**Required actions before re-submission:**\n"
+            f"1. Fix the LOD200 per the blocking findings above\n"
+            f"2. Re-run `./pipeline_run.sh --domain {state.project_domain}` to regenerate this prompt\n"
+            f"3. Paste the regenerated ▼▼▼ block into Codex for Team 190 to re-validate\n\n"
+            f"---\n\n"
+            f"*[Team 190 validation prompt — for re-submission after fixes are applied]*\n\n"
+        )
+
+    # ── WP-specific pipeline state block (domain file truth — NOT WSM) ────────
+    wp_state_block = (
+        f"## Pipeline State (domain state file — NOT WSM)\n\n"
+        f"- **Domain:** {state.project_domain}\n"
+        f"- **WP:** {state.work_package_id}\n"
+        f"- **Current gate:** {state.current_gate}"
+        f"{' (correction cycle — failed ' + str(fail_count) + '×)' if is_correction else ' (first run)'}\n"
+        f"\n"
+        f"**Important for Team 190:** WSM `active_work_package_id` is NOT updated until GATE_3\n"
+        f"intake (Team 10 responsibility). WSM showing the previous WP or NO_ACTIVE is EXPECTED\n"
+        f"pre-GATE_0 state. Do NOT raise a finding for WSM not yet reflecting this WP.\n"
+        f"Similarly, WP Registry insertion happens AFTER GATE_0 PASS (Team 170 mandate) —\n"
+        f"absent WP Registry entry is NOT a blocking finding.\n\n"
+    )
+
     return (
-        f"{_team_header('team_190', 'GATE_0', state, fresh)}"
+        correction_notice
+        + f"{_team_header('team_190', 'GATE_0', state, fresh)}"
         f"# GATE_0 — Validate LOD200 Scope (SPEC_ARC)\n\n"
         f"Validate the following LOD200 scope brief for constitutional compliance.\n\n"
         f"**Check:**\n"
         f"- Identity header consistency (stage_id, program_id, work_package_id all match WSM/registry)\n"
         f"- Program registration status (program_id must be ACTIVE in PHOENIX_PROGRAM_REGISTRY)\n"
-        f"- Work Package registration (work_package_id must exist in WORK_PACKAGE_REGISTRY)\n"
+        f"- WP registry: absent WP entry is EXPECTED for a new WP at GATE_0 (registered after PASS by Team 170) — NOT a blocking finding\n"
         f"- Domain isolation (no TikTrack ↔ Agents_OS boundary violations)\n"
         f"- No conflict with currently active programs\n"
         f"- Feasibility and scope clarity\n\n"
@@ -949,22 +1061,20 @@ def _generate_gate_0_prompt(state: PipelineState, fresh: bool = False) -> str:
         f"```\n"
         f"gate_id: GATE_0\n"
         f"decision: PASS | BLOCK_FOR_FIX\n"
-        f"route_recommendation: doc\n"
         f"blocking_findings:\n"
         f"  - BF-01: <description> | evidence: <file:line>\n"
         f"  - BF-02: <description> | evidence: <file:line>\n"
-        f"next_required_action: <what must happen before resubmission>\n"
-        f"next_responsible_team: <team_id>\n"
         f"```\n\n"
-        f"**`route_recommendation` values (REQUIRED — drives pipeline auto-routing):**\n"
-        f"```\nroute_recommendation: doc\n```  "
-        f"← any fix required before resubmission (always `doc` for GATE_0 — spec revision)\n\n"
         f"**`blocking_findings` list (REQUIRED if BLOCK_FOR_FIX — drives remediation flow):**\n"
         f"- Each entry: `BF-NN: <description> | evidence: <canonical_path:line_number>`\n"
         f"- Missing or empty findings = invalid BLOCK; pipeline cannot auto-route\n\n"
-        f"**On PASS:** route_recommendation and blocking_findings may be omitted.\n"
-        f"**On BLOCK:** architect (Team 00) is the next responsible team — LOD200 revision required.\n\n"
-        f"## Scope Brief\n\n{state.spec_brief}\n\n"
+        f"**On PASS:** blocking_findings may be omitted.\n"
+        f"**On BLOCK:** pipeline derives routing from verdict; do NOT include owner_next_action or next_responsible_team.\n\n"
+        f"**Process-Functional Separation:** Do NOT include route_recommendation, owner_next_action, or next_responsible_team. Output = structured verdict only. Pipeline handles routing.\n\n"
+        f"## Scope Brief\n\n"
+        f"**WP name:** {state.spec_brief}\n\n"
+        f"**LOD200 document (read in full to perform this validation):**\n"
+        f"`{state.spec_path or '_COMMUNICATION/team_100/ — see spec_path in domain state file'}`\n\n"
         + (
             f"## Activation Context (for S001 WPs run during S002 era)\n\n"
             f"**Authorized architectural context:** When `stage_id` on this WP is S001 while WSM "
@@ -975,7 +1085,8 @@ def _generate_gate_0_prompt(state: PipelineState, fresh: bool = False) -> str:
             f"**RESOLVED** — do NOT raise it as a blocking finding.\n\n"
             if state.stage_id == "S001" else ""
         )
-        + f"## Current State\n\n{build_state_summary()}"
+        + wp_state_block
+        + f"## Project State (from STATE_SNAPSHOT)\n\n{build_state_summary()}"
     )
 
 
@@ -1022,7 +1133,7 @@ def _generate_gate_1_mandates(state: PipelineState) -> str:
         f"6. **Acceptance Criteria** — numbered, each criterion independently pass/fail testable\n\n"
         f"---\n\n"
         f"Save LLD400 to: `{lld400_path}`\n\n"
-        f"When done, inform Nimrod. Nimrod runs `./pipeline_run.sh phase2` to activate Team 190 validation.\n\n"
+        f"When done, inform Nimrod. Nimrod runs `./pipeline_run.sh --domain {state.project_domain} phase2` to activate Team 190 validation.\n\n"
         f"⛔ **YOUR TASK ENDS WITH SAVING THE LLD400. Do NOT validate your own output.**"
     )
 
@@ -1078,8 +1189,8 @@ def _generate_gate_1_mandates(state: PipelineState) -> str:
             writes_to  = verdict_path,
             acceptance = [
                 "All 8 validation checklist items addressed",
-                f"If PASS  →  `./pipeline_run.sh pass`  (advances to GATE_2)",
-                f"If BLOCK →  `./pipeline_run.sh fail \"BF-XX: [description]\"`  (returns to Team 170)",
+                f"If PASS  →  `./pipeline_run.sh --domain {state.project_domain} pass`  (advances to GATE_2)",
+                f"If BLOCK →  `./pipeline_run.sh --domain {state.project_domain} fail \"BF-XX: [description]\"`  (returns to Team 170)",
             ],
         ),
     ]
@@ -1106,44 +1217,121 @@ def _generate_gate_2_prompt(state: PipelineState, fresh: bool = False, team_id: 
     )
 
 
-def _generate_g3_plan_prompt(state: PipelineState, revision_notes: str = "", fresh: bool = False) -> str:
-    header = _team_header("team_10", "G3_PLAN", state, fresh)
+def _generate_g3_plan_mandates(state: PipelineState, revision_notes: str = "", fresh: bool = False) -> str:
+    """G3_PLAN two-phase mandate document.
+
+    Phase 1: Team 10 (Cursor) — produces work plan from approved spec.
+    Phase 2: Operator confirmation — work plan auto-stored; Nimrod runs pass → advances to G3_5.
+
+    Saves G3_PLAN_mandates.md (used by pipeline_run.sh phase* extraction).
+    Same pattern as GATE_1 / GATE_8.
+    """
+    import glob as _glob
+    wp  = state.work_package_id
+    wpu = wp.replace("-", "_")
+    today_utc = datetime.now(timezone.utc).date().isoformat()
+
+    # ── Resolve latest work plan file (AC-11: use newest version) ─────────
+    _plan_candidates = sorted(
+        _glob.glob(str(REPO_ROOT / f"_COMMUNICATION/team_10/TEAM_10_{wpu}_G3_PLAN_WORK_PLAN_v*.md"))
+    )
+    plan_path = (
+        str(Path(_plan_candidates[-1]).relative_to(REPO_ROOT))
+        if _plan_candidates
+        else f"_COMMUNICATION/team_10/TEAM_10_{wpu}_G3_PLAN_WORK_PLAN_v1.0.0.md"
+    )
+
     spec = state.lld400_content[:4000] if state.lld400_content else state.spec_brief
+    work_plan_stored = bool(state.work_plan and state.work_plan.strip())
 
     if revision_notes:
-        # Revision mode: G3_5 failed — ask Team 10 to fix the existing plan
-        existing_plan_ref = "_COMMUNICATION/team_10/" if not state.work_plan else ""
-        return (
-            f"{header}"
-            f"# G3_PLAN REVISION — Fix Work Plan per G3_5 Blockers\n\n"
+        phase1_task = (
+            f"### Your Task (REVISION)\n\n"
+            f"**Environment:** Cursor (Team 10 — Execution Orchestrator)\n\n"
             f"Your work plan was reviewed by Team 90 (G3_5) and **FAILED**.\n"
-            f"Do NOT produce a new plan from scratch — update the existing plan to address the blockers below.\n\n"
-            f"## G3_5 Blockers to Fix\n\n{revision_notes}\n\n"
-            f"## Existing Work Plan\n\n"
-            f"{state.work_plan[:4000] if state.work_plan else '[work plan not in state — check _COMMUNICATION/team_10/ for your prior output]'}\n\n"
-            f"## Spec (for reference)\n\n{spec}\n\n"
-            f"## Required Output\n\n"
-            f"Produce an updated work plan that resolves every blocker above.\n"
-            f"For each blocker, confirm how you fixed it.\n"
-            f"Save to: `_COMMUNICATION/team_10/TEAM_10_S001_P002_WP001_G3_PLAN_WORK_PLAN_v1.1.0.md`\n\n"
-            f"## Pipeline State\n\n{build_state_summary()}"
+            f"Do NOT produce a new plan from scratch — fix the existing plan to address the blockers.\n\n"
+            f"**G3_5 Blockers to Fix:**\n\n{revision_notes}\n\n"
+            f"**Existing Work Plan:**\n\n"
+            f"{state.work_plan[:4000] if state.work_plan else '[plan not in state — check _COMMUNICATION/team_10/]'}\n\n"
+            f"**Spec (reference):**\n\n{spec}\n\n"
+            f"---\n\n"
+            f"For each blocker, confirm how you fixed it in the revised plan.\n\n"
+            f"Save revised plan to: `{plan_path}` (increment version)\n\n"
+            f"When done, inform Nimrod. Nimrod runs `./pipeline_run.sh --domain {state.project_domain} phase2`"
+            f" to auto-store the revised plan.\n\n"
+            f"⛔ **YOUR TASK ENDS WITH SAVING THE REVISED PLAN.**"
+        )
+    else:
+        phase1_task = (
+            f"### Your Task\n\n"
+            f"**Environment:** Cursor (Team 10 — Execution Orchestrator)\n\n"
+            f"Produce a complete implementation work plan for WP `{wp}`.\n\n"
+            f"**Approved Spec (from GATE_1 LLD400):**\n\n{spec}\n\n"
+            f"---\n\n"
+            f"**Required output — all 4 sections mandatory:**\n\n"
+            f"1. **§2 Files per team** (canonical paths):\n"
+            f"   - Team 61 Contract Verify → `_COMMUNICATION/team_61/TEAM_61_{wpu}_CONTRACT_VERIFY_v1.0.0.md`\n"
+            f"   - Team 61 Implementation → `agents_os/ui/js/*.js`, `agents_os_v2/orchestrator/*.py`\n"
+            f"   - Team 51 QA → `_COMMUNICATION/team_51/TEAM_51_{wpu}_QA_REPORT_v1.0.0.md`\n\n"
+            f"2. **§3 Execution order** with dependencies\n\n"
+            f"3. **§6 Per-team acceptance criteria** — field, empty state, error contracts for UI\n\n"
+            f"4. **§4 API/contract** — CLI commands, JSON paths, Python entry points, schema\n\n"
+            f"---\n\n"
+            f"**Domain adaptation:** AGENTS_OS — Team 61 (implementation + contract verify) + Team 51 (QA)."
+            f" No Team 20/30 for this domain.\n\n"
+            f"Identity header required: `gate: G3_PLAN | wp: {wp} | stage: {state.stage_id} | domain: {state.project_domain} | date: {today_utc}`\n\n"
+            f"Save to: `{plan_path}`\n\n"
+            f"When done, inform Nimrod. Nimrod runs `./pipeline_run.sh --domain {state.project_domain} phase2`"
+            f" to auto-store the plan and confirm readiness for G3_5.\n\n"
+            f"⛔ **YOUR TASK ENDS WITH SAVING THE WORK PLAN.**"
         )
 
-    # Fresh mode: first run of G3_PLAN
-    return (
-        f"{header}"
-        f"# G3_PLAN — Build Work Plan from Approved Spec\n\n"
-        f"## Approved Spec\n\n{spec}\n\n"
-        f"## Required Output\n\n"
-        f"1. Files to create/modify per team (canonical paths):\n"
-        f"   - Team 20 (API verify only): confirm existing API endpoints — no code changes\n"
-        f"   - Team 30 (Frontend): exact file paths to create/modify in `ui/src/`\n"
-        f"   - Team 50 (QA): test scenarios + run commands + PASS criteria\n"
-        f"2. Execution order with dependencies\n"
-        f"3. Per-team acceptance criteria (field contract, empty state, error state for UI)\n"
-        f"4. API contract: endpoint, params, response shape\n\n"
-        f"## Pipeline State\n\n{build_state_summary()}"
+    phase2_task = (
+        f"### Phase 2 — Work Plan Auto-Storage & Advance\n\n"
+        f"**This phase is operator-run, not a team task.**\n\n"
+        f"Running `./pipeline_run.sh --domain {state.project_domain} phase2` will:\n\n"
+        f"1. Auto-scan `_COMMUNICATION/team_10/` for latest `TEAM_10_{wpu}_G3_PLAN_WORK_PLAN_v*.md`\n"
+        f"2. Store content → `pipeline_state.work_plan`\n"
+        f"3. Confirm storage + print next step\n\n"
+        f"**Current storage status:** "
+        f"{'✅ Stored (' + str(len(state.work_plan)) + ' chars) — ready to pass' if work_plan_stored else '⏳ Not yet stored — Team 10 must save work plan first'}\n\n"
+        f"---\n\n"
+        f"**After storage confirmed:**\n\n"
+        f"`./pipeline_run.sh --domain {state.project_domain} pass` → advances G3_PLAN → G3_5 (Team 90 validates plan)"
     )
+
+    steps = [
+        MandateStep(
+            team_id    = "team_10",
+            label      = "Team 10 — Work Plan Author",
+            phase      = 1,
+            task       = phase1_task,
+            writes_to  = plan_path,
+            acceptance = [
+                f"Work plan saved to: `{plan_path}`",
+                "All 4 sections present: §2 files per team, §3 execution order, §6 AC, §4 API contract",
+                "Domain adaptation: Team 61 + Team 51 (no Team 20/30 for agents_os)",
+                "Identity header present (gate/wp/stage/domain/date)",
+                f"When done: Nimrod runs `./pipeline_run.sh --domain {state.project_domain} phase2`",
+            ],
+        ),
+        MandateStep(
+            team_id    = "team_00",
+            label      = "Operator — Work Plan Storage Confirmation",
+            phase      = 2,
+            task       = phase2_task,
+            depends_on = ["team_10"],
+            acceptance = [
+                "work_plan field populated in pipeline state (non-empty)",
+                f"If PASS  →  `./pipeline_run.sh --domain {state.project_domain} pass`  (advances to G3_5)",
+                f"If plan missing  →  check Team 10 saved `TEAM_10_{wpu}_G3_PLAN_WORK_PLAN_v*.md`",
+            ],
+        ),
+    ]
+
+    doc = _generate_mandate_doc(steps, state, gate="G3_PLAN")
+    _save_prompt("G3_PLAN_mandates.md", doc, domain=state.project_domain)
+    return doc
 
 
 def _generate_g3_5_prompt(state: PipelineState, fresh: bool = False) -> str:
@@ -1893,6 +2081,12 @@ def pass_with_actions(actions_str: str) -> None:
     state.pending_actions = actions
     state.override_reason = None
     state.save()
+    _emit_pipeline_event(
+        "PASS_WITH_ACTION",
+        state,
+        f"PASS_WITH_ACTION recorded — {len(actions)} pending action(s)",
+        metadata={"actions": actions},
+    )
     _log(f"PASS_WITH_ACTION recorded — {len(actions)} pending action(s). Gate held at {state.current_gate}.")
 
 
@@ -1919,6 +2113,12 @@ def override_gate(reason: str) -> None:
     state.override_reason = reason or "Override (no reason given)"
     state.pending_actions = []
     state.save()
+    _emit_pipeline_event(
+        "OVERRIDE",
+        state,
+        f"Override: {state.override_reason[:80]}",
+        metadata={"reason": state.override_reason},
+    )
     gate_id = state.current_gate
     advance_gate(gate_id, "PASS", "", force=True)
     _log(f"Override reason logged: {state.override_reason}")
@@ -1939,6 +2139,17 @@ def advance_gate(gate_id: str, status: str, reason: str = "", force: bool = Fals
 
     # S002-P005-WP002: Block PASS when gate_state=PASS_WITH_ACTION unless --force
     if status == "PASS" and state.gate_state == "PASS_WITH_ACTION" and not force:
+        _emit_pipeline_event(
+            "GATE_ADVANCE_BLOCKED",
+            state,
+            "Advance blocked — gate in PASS_WITH_ACTION state",
+            metadata={
+                "attempted_gate": gate_id,
+                "reason": "pending_actions_unresolved",
+                "blocking_team": "team_61",
+            },
+            severity="WARN",
+        )
         _log("")
         _log("════════════════════════════════════════════════════════════════════")
         _log("  ⚠️  ADVANCE BLOCKED — Gate is in PASS_WITH_ACTION state")
@@ -2032,6 +2243,23 @@ def advance_gate(gate_id: str, status: str, reason: str = "", force: bool = Fals
     state.save()
     _log(f"{gate_id}: {status}")
 
+    # Emit event after save
+    if status == "PASS":
+        _emit_pipeline_event(
+            "GATE_PASS",
+            state,
+            f"{gate_id} PASS — advanced to {state.current_gate}",
+            metadata={"gate": gate_id},
+        )
+    else:
+        _emit_pipeline_event(
+            "GATE_FAIL",
+            state,
+            f"{gate_id} FAIL: {reason or 'no reason'}",
+            metadata={"gate": gate_id, "reason": reason or ""},
+            severity="WARN",
+        )
+
     if state.current_gate == "COMPLETE":
         _log("")
         _log("╔══════════════════════════════════════════════════════════╗")
@@ -2091,6 +2319,14 @@ def store_artifact(gate_id: str, file_path: str) -> bool:
 
     state.save()
     _log(f"Gate {gate_id} artifact stored successfully.")
+
+    artifact_type = {"GATE_1": "LOD400", "G3_PLAN": "MANDATE", "CURSOR_IMPLEMENTATION": "IMPLEMENTATION"}.get(gate_id, "UNKNOWN")
+    _emit_pipeline_event(
+        "ARTIFACT_STORE",
+        state,
+        f"Stored artifact for {gate_id}",
+        metadata={"artifact_path": str(path), "artifact_type": artifact_type},
+    )
     return True
 
 
@@ -2171,6 +2407,13 @@ def main():
         wait_gate = approve_map.get(gate)
         if wait_gate:
             _log(f"Human APPROVED {gate}")
+            state = PipelineState.load()
+            _emit_pipeline_event(
+                "PIPELINE_APPROVE",
+                state,
+                f"Human approved {gate}",
+                metadata={"gate": gate},
+            )
             advance_gate(wait_gate, "PASS")
         else:
             _log(f"ERROR: --approve only valid for GATE_2, GATE_6, GATE_7 (got {gate})")
@@ -2202,7 +2445,11 @@ def main():
         revision_notes = ""
         if args.revision_notes:
             rn_path = Path(args.revision_notes)
-            if rn_path.exists():
+            try:
+                rn_file_exists = rn_path.exists() and rn_path.is_file()
+            except (OSError, ValueError):
+                rn_file_exists = False  # string too long to be a valid path (e.g. inline notes)
+            if rn_file_exists:
                 revision_notes = rn_path.read_text(encoding="utf-8")
             else:
                 revision_notes = args.revision_notes

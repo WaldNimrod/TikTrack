@@ -121,4 +121,30 @@ WP002 (PASS_WITH_ACTION governance) will activate these commands in `pipeline_ru
 
 ---
 
+## DOC-07 — Event Log Panel
+
+### Component
+**Source:** `agents_os/ui/js/event-log.js`, `agents_os/ui/js/event-log-roadmap.js`
+
+### Behavior
+**Added/Changed:** 2026-03-10 (S002-P005-WP003 Event Log Phase 2)
+
+Event Log accordion on Dashboard and Roadmap. Fetches from `GET /api/log/events` with domain and work_package_id filters.
+
+**Dashboard:**
+- Panel: `#event-log-panel`, `#event-log-list`
+- Ticker in Current Step Banner: `#event-log-ticker-events`, `#event-log-ticker-count`
+- Filters: domain from `currentDomain`, work package from `pipelineState`
+- Fallback: when domain-filtered returns empty → retry system-wide
+
+**Roadmap:**
+- Panel: `#event-log-roadmap-panel`, `#event-log-roadmap-list`
+- Options: System-wide checkbox, domain select, limit select
+- Default: program-scoped
+
+**Reference:** [documentation/docs-agents-os/02-ARCHITECTURE/EVENT_LOG_REFERENCE_v1.0.0.md](../../../documentation/docs-agents-os/02-ARCHITECTURE/EVENT_LOG_REFERENCE_v1.0.0.md)
+
+---
+
 **log_entry | TEAM_170 | PIPELINE_DASHBOARD_UI_REGISTRY | DOC_04_05_06 | 2026-03-15**
+**log_entry | TEAM_170 | PIPELINE_DASHBOARD_UI_REGISTRY | DOC_07_EVENT_LOG | 2026-03-10**

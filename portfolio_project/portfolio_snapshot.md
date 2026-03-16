@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-15T21:29:40.465310+00:00`
+- Generated (UTC): `2026-03-16T16:31:41.411067+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -9,15 +9,15 @@
 
 - active_stage_id: `S002`
 - active_program_id: `S002-P005`
-- active_work_package_id: `N/A`
-- current_gate: `GATE_8`
-- next_required_action: `Team 90 and Team 10 to route next lifecycle activation per roadmap priorities; S002-P005-WP002 is closed with no open gate obligations.`
+- active_work_package_id: `S002-P005-WP003`
+- current_gate: `GATE_1`
+- next_required_action: `Team 190 to validate LOD200 at GATE_1. Spec: `_COMMUNICATION/team_100/TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md`. Run: `./pipeline_run.sh --domain agents_os` to generate GATE_1 prompt.`
 
 ## Portfolio Counts
 
 - stages: `6`
-- programs: `31`
-- work_packages: `10`
+- programs: `32`
+- work_packages: `11`
 
 ## Roadmap (hierarchical)
 
@@ -48,8 +48,9 @@
 
     ├── **Program** `S002-P004` — Admin Review S002 | PLANNED | domain: **TIKTRACK**
 
-    └── **Program** `S002-P005` — Agents_OS v2 Writing Semantics Hardening (ADR-031 Stage A) + UI Optimization | COMPLETE | domain: **AGENTS_OS**
-        └── **WP** `S002-P005-WP002` | CLOSED | gate: GATE_8 (PASS) | domain: **AGENTS_OS**
+    └── **Program** `S002-P005` — Agents_OS v2 Writing Semantics Hardening (ADR-031 Stage A) + UI Optimization | ACTIVE | domain: **AGENTS_OS**
+        ├── **WP** `S002-P005-WP002` | CLOSED | gate: GATE_8 (PASS) | domain: **AGENTS_OS**
+        └── **WP** `S002-P005-WP003` | IN_PROGRESS | gate: GATE_1 | domain: **AGENTS_OS** (active)
 
 
 ### S003 — שלב 3 — Essential Data | PLANNED [SHARED]
@@ -68,7 +69,9 @@
 
     ├── **Program** `S003-P006` — Admin Review S003 | PLANNED | domain: **TIKTRACK**
 
-    └── **Program** `S003-P007` — Agents_OS Command Bridge Lite (ADR-031 Stage B) | PLANNED | domain: **AGENTS_OS**
+    ├── **Program** `S003-P007` — Agents_OS Command Bridge Lite (ADR-031 Stage B) | PLANNED | domain: **AGENTS_OS**
+
+    └── **Program** `S003-P008` — Agents_OS Pipeline Governance Hardening | PLANNED | domain: **AGENTS_OS**
 
 
 ### S004 — שלב 4 — Financial Execution | PLANNED [SHARED]

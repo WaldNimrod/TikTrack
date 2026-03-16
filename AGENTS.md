@@ -41,7 +41,8 @@ TikTrack Phoenix is a full-stack stock/portfolio tracking web app:
 
 ### Auth & Admin
 
-- Default admin credentials: username `admin`, password `418141` (created via `python3 api/scripts/create_admin_user.py`)
+- Primary local QA/runtime login: username `TikTrackAdmin`, password `4181` (seeded via `python3 scripts/seed_qa_test_user.py` and used by current QA/E2E flows)
+- `python3 api/scripts/create_admin_user.py` creates a separate bootstrap user `admin / 418141`, but this user should not be assumed to exist in the active local database after resets or reseeds
 - Login endpoint: `POST /api/v1/auth/login` with `{"username_or_email": "...", "password": "..."}`
 - JWT tokens are issued with 24h expiry.
 

@@ -287,6 +287,28 @@ python3 -m http.server 8090
         <div class="sidebar-cmd-row"><span class="sidebar-cmd-text loading">Loading…</span></div>
       </div>
     </div>
+    <div class="sidebar-section" id="event-log-panel" data-testid="event-log-panel">
+      <div class="sidebar-label">Event Log</div>
+      <div class="event-log-filters">
+        <select id="event-log-filter-domain" data-testid="event-log-filter-domain" class="event-log-select">
+          <option value="">All</option>
+          <option value="agents_os">Agents OS</option>
+          <option value="tiktrack">TikTrack</option>
+        </select>
+        <select id="event-log-filter-type" data-testid="event-log-filter-type" class="event-log-select">
+          <option value="">All</option>
+          <option value="Gate">Gate</option>
+          <option value="State">State</option>
+          <option value="System">System</option>
+        </select>
+        <select id="event-log-filter-limit" class="event-log-select">
+          <option value="20">20</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+      </div>
+      <div class="event-log-list" id="event-log-list" data-testid="event-log-list">Loading…</div>
+    </div>
   </aside>
 
   <!-- ── Main content (right) ── -->
@@ -387,6 +409,7 @@ python3 -m http.server 8090
 <script src="js/pipeline-commands.js?v=4"></script>
 <script src="js/pipeline-booster.js?v=5"></script>
 <script src="js/pipeline-help.js?v=3"></script>
+<script src="js/event-log.js?v=1"></script>
 <script src="js/pipeline-dashboard.js?v=6"></script>
 
 </body>

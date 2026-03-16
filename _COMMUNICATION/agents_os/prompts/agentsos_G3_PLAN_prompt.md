@@ -1,154 +1,124 @@
-**ACTIVE: TEAM_10 (Gateway)**  gate=G3_PLAN | wp=S001-P002-WP001 | stage=S001 | 2026-03-13
+**ACTIVE: TEAM_10 (Gateway)**  gate=G3_PLAN | wp=S002-P005-WP003 | stage=S002 | 2026-03-16
 
 ---
 
-# G3_PLAN REVISION — Fix Work Plan per G3_5 Blockers
+# G3_PLAN — Build Work Plan from Approved Spec
 
-Your work plan was reviewed by Team 90 (G3_5) and **FAILED**.
-Do NOT produce a new plan from scratch — update the existing plan to address the blockers below.
+## Approved Spec
 
-## G3_5 Blockers to Fix
-
-BLOCKER-1: QA credential inconsistency. Work plan API test uses admin/418141 but canonical credentials are TikTrackAdmin/4181. Fix ALL credential references. BLOCKER-2: Manual QA setup not reproducible. Section 6.4 needs explicit curl commands to reset/create triggered_unread state before each check.
-
-## Existing Work Plan
+# Team 170 — LLD400 | S002-P005-WP003 AOS State Alignment & Governance Integrity
+## TEAM_170_S002_P005_WP003_LLD400_v1.0.0.md
 
 ---
-project_domain: TIKTRACK
-id: TEAM_10_S001_P002_WP001_G3_PLAN_WORK_PLAN_v1.1.0
-from: Team 10 (Execution Orchestrator)
-to: Team 20, Team 30, Team 50
-cc: Team 00, Team 90, Team 100, Team 170, Team 190
-date: 2026-03-13
-historical_record: true
-status: ACTIVE
-gate_id: GATE_3
-program_id: S001-P002
-work_package_id: S001-P002-WP001
-scope: Alerts Summary Widget — G3 Build Work Plan (G3_5 BLOCKER REMEDIATION)
-authority_mode: TEAM_10_GATE_3_OWNER
-supersedes: TEAM_10_S001_P002_WP001_G3_PLAN_WORK_PLAN_v1.0.0
-g35_remediation: B-G35-001, B-G35-002, B-G35-003
+project_domain: AGENTS_OS
+id: TEAM_170_S002_P005_WP003_LLD400_v1.0.0
+from: Team 170 (Spec & Governance Authority)
+to: Team 190 (Constitutional Validator)
+cc: Team 10, Team 100, Team 61
+date: 2026-03-16
+status: SUBMITTED_FOR_GATE_1_VALIDATION
+gate_id: GATE_1
+architectural_approval_type: SPEC
+spec_version: 1.0.0
+source: TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md
+required_ssm_version: 1.0.0
+required_wsm_version: 1.0.0
+required_active_stage: S002
+phase_owner: Team 10
 ---
 
-# Team 10 | S001-P002 WP001 — G3 Work Plan v1.1.0 (G3_5 Remediation)
-
-## G3_5 Blocker Fixes Summary
-
-| Blocker | Fix Applied |
-|---------|-------------|
-| **B-G35-001** | Canonical file paths added for Team 20 and Team 50 deliverables (§2.1, §2.3) |
-| **B-G35-002** | Test contract expanded with exact run commands and binary PASS/FAIL criteria (§6) |
-| **B-G35-003** | Team 30 acceptance criteria augmented with field contract, empty-state contract, error-state contract (§7.2) |
-
----
-
-## Mandatory Identity Header
+## §1 Identity Header
 
 | Field | Value |
-|---|---|
+|-------|-------|
+| gate | GATE_1 |
+| wp | S002-P005-WP003 |
+| stage | S002 |
+| domain | agents_os |
+| date | 2026-03-16 |
 | roadmap_id | PHOENIX_ROADMAP |
-| stage_id | S001 |
-| program_id | S001-P002 |
-| work_package_id | S001-P002-WP001 |
-| task_id | G3_PLAN |
-| gate_id | GATE_3 |
-| phase_owner | Team 10 |
+| program_id | S002-P005 |
+| work_package_id | S002-P005-WP003 |
+| task_id | AOS_STATE_ALIGNMENT |
+| architectural_approval_type | SPEC |
+| spec_version | 1.0.0 |
+| source | TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0 |
 | required_ssm_version | 1.0.0 |
-| required_active_stage | S001 |
+| required_wsm_version | 1.0.0 |
+| required_active_stage | S002 |
+| phase_owner | Team 10 |
 
 ---
 
-## 1. Approved Spec (Locked)
+## §2 Endpoint Contract
 
-**S001-P002 WP001: Alerts Summary Widget on D15.I home dashboard.**
+**Domain:** AGENTS_OS has no HTTP API. Contracts are CLI commands, file fetches (static JSON), and Python module entry points.
 
-- Read-only frontend component.
-- Triggered-unread count badge + list of N=5 most recent.
-- Fully hidden when 0 unread.
-- Uses existing `GET /api/v1/alerts/` endpoint.
-- Per-alert: ticker symbol, condition label, triggered_at relative time.
-- Click item → D34.
-- Click badge → D34 filtered unread.
-- **collapsible-container Iron Rule.**
-- **maskedLog mandatory.**
-- No new backend, no schema changes.
+### 2.1 CLI: pipeline_run.sh
 
----
+| Command | Method | Purpose |
+|---------|--------|---------|
+| `./pipeline_run.sh new S002-P005` | CREATE state | Initialize new program; creates domain-specific pipeline_state_*.json |
+| `./pipeline_run.sh --domain agents_os pass` | UPDATE state | Advance current gate to PASS |
+| `./pipeline_run.sh --domain agents_os fail "reason"` | UPDATE state | Advance current gate to FAIL |
+| `./pipeline_run.sh --domain agents_os pass_with_actions "ACTION-1\|ACTION-2"` | UPDATE state | Mark gate PASS_WITH_ACTION; set pending_actions |
+| `./pipeline_run.sh --domain agents_os status` | READ state | Display pipeline status |
+| `./pipeline_run.sh sync` | SYNC | Align registry mirrors from WSM (per Team 00 decision) |
 
-## 2. Files to Create/Modify per Team
+**Invariant (CS-02):** After any gate transition, a gate ID MUST NOT appear in both `gates_completed` and `gates_failed` simultaneously.
 
-### 2.1 Team 20 (Backend Verify Only)
+### 2.2 Static JSON Fetch (JS)
 
-| Action | File | Purpose |
-|--------|------|---------|
-| **READ / VERIFY** | `api/routers/alerts.py` | Confirm `trigger_status`, `per_page`, `sort`, `order` params |
-| **READ / VERIFY** | `api/services/alerts_service.py` | Confirm list_alerts filters + sort by triggered_at |
-| **OUTPUT (canonical)** | `_COMMUNICATION/team_20/TEAM_20_S001_P002_WP001_API_VERIFY_v1.0.0.md` | Brief note with confirmed query params for Team 30 |
+| Endpoint | Method | Request | Response |
+|----------|--------|---------|----------|
+| `_COMMUNICATION/agents_os/pipeline_state_agentsos.json` | GET | — | Pipeline state (agents_os domain) |
+| `_COMMUNICATION/agents_os/pipeline_state_tiktrack.json` | GET | — | Pipeline state (tiktrack domain) |
+| `_COMMUNICATION/agents_os/STATE_SNAPSHOT.json` | GET | — | Observer read-only snapshot |
 
-**No implementation.** Escalate immediately if API gap found.
+**Response schema (pipeline_state_*.json):** See §3 DB Contract.
 
-**B-G35-001:** Canonical path for Team 20 deliverable is explicitly `_COMMUNICATION/team_20/TEAM_20_S001_P002_WP001_API_VERIFY_v1.0.0.md`.
+**Error behavior (CS-03):** On fetch failure → MUST render `PRIMARY_STATE_READ_FAILED` error panel; NO fallback to legacy or alternate source.
 
----
+### 2.3 Python Module: state_reader
 
-### 2.2 Team 30 (Frontend — Primary Executor)
+| Entry Point | Purpose |
+|-------------|---------|
+| `python3 -m agents_os_v2.observers.state_reader` | Build STATE_SNAPSHOT.json |
 
-| Action | File | Purpose |
-|--------|------|---------|
-| **CREATE** | `ui/src/components/AlertsSummaryWidget.jsx` | New widget component |
-| **MODIFY** | `ui/src/components/HomePage.jsx` | Replace mock active-alerts section with AlertsSummaryWidget |
-| **REFERENCE** | `ui/src/views/data/alerts/alertsDataLoader.js` | Pattern for fetch + maskedLog |
-| **REFERENCE** | `documentation/docs-system/07-DESIGN/CSS_CLASSES_INDEX.md` | Use existing classes per Iron Rule |
-
-**Key constraints:** collapsible-container, maskedLog, read-only. See §7.2 for full acceptance criteria including field/empty/error contracts.
+**Output path:** `_COMMUNICATION/agents_os/STATE_SNAPSHOT.json`
 
 ---
 
-### 2.3 Team 50 (QA)
+## §3 DB Contract
 
-| Action | File | Purpose |
-|--------|------|---------|
-| **OUTPUT (canonical)** | `_COMMUNICATION/team_50/TEAM_50_S001_P002_WP001_QA_REPORT_v1.0.0.md` | QA report with binary PASS/FAIL per scenario |
+**Domain:** AGENTS_OS has no database. Data sources are JSON and markdown files.
 
-**B-G35-001:** Canonical path for Team 50 deliverable is explicitly `_COMMUNICATION/team_50/TEAM_50_S001_P002_WP001_QA_REPORT_v1.0.0.md`.
+### 3.1 Files Read
 
----
+| Path | Purpose | Columns / Fields |
+|------|---------|------------------|
+| `_COMMUNICATION/agents_os/pipeline_state_agentsos.json` | Pipeline state (agents_os) | work_package_id, current_gate, gates_completed, gates_failed, project_domain, spec_brief, lld400_content, work_plan, mandates, last_updated, gate_state, pending_actions, phase8_content |
+| `_COMMUNICATION/agents_os/pipeline_state_tiktrack.json` | Pipeline state (tiktrack) | Same schema |
+| `_COMMUNICATION/agents_os/STATE_SNAPSHOT.json` | Observer output (read-only) | produced_at_iso, governance, consistency_check, pipeline.domains.* |
+| `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` | WSM (governance SSOT) | active_work_package_id, active_stage_id, current_gate, active_project_domain |
 
-## 3. Execution Order with Dependencies
-
-```
-Step 1: Team 20 — API verification (BLOCKING for Team 30)
-        ↓
-Step 2: Team 30 — Widget implementation (depends on Step 1)
-        ↓
-Step 3: Team 50 — QA/FAV on D15.I (run commands in §6)
-        ↓
-Step 4: FAST_3 — Nimrod browser sign-off
-```
-
----
-
-## 4. API Contract (Pre-verified)
-
-**Endpoint:** `GET /api/v1/alerts/`  
-**Required params:** `trigger_status
-
-## Spec (for reference)
-
-S001-P002 WP001: Alerts Summary Widget on D15.I home dashboard. Read-only frontend component. Triggered-unread count badge + list of N=5 most recent, fully hidden when 0. Uses existing GET /api/v1/alerts/ endpoint. Per-alert: ticker symbol · condition label · triggered_at relative time. Click item → D34. Click badge → D34 filtered unread. collapsible-container Iron Rule. maskedLog mandatory. No new backend, no schema changes.
+### 3.
 
 ## Required Output
 
-Produce an updated work plan that resolves every blocker above.
-For each blocker, confirm how you fixed it.
-Save to: `_COMMUNICATION/team_10/TEAM_10_S001_P002_WP001_G3_PLAN_WORK_PLAN_v1.1.0.md`
+1. Files to create/modify per team (canonical paths):
+   - Team 20 (API verify only): confirm existing API endpoints — no code changes
+   - Team 30 (Frontend): exact file paths to create/modify in `ui/src/`
+   - Team 50 (QA): test scenarios + run commands + PASS criteria
+2. Execution order with dependencies
+3. Per-team acceptance criteria (field contract, empty state, error state for UI)
+4. API contract: endpoint, params, response shape
 
 ## Pipeline State
 
 ## Current Project State (from STATE_SNAPSHOT)
 
-- **Active stage:** unknown
+- **Active stage:** S002
 - **WSM path:** documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md
 - **SSM path:** documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md
 

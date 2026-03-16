@@ -2,6 +2,8 @@
 
 import json
 from pathlib import Path
+from typing import List, Optional
+
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
@@ -35,7 +37,7 @@ async def post_log_event(request: Request) -> JSONResponse:
     return JSONResponse({"status": "ok", "received": evt.event_type})
 
 
-def _read_events(domain: str | None, gate: str | None, event_type: str | None, limit: int) -> list[dict]:
+def _read_events(domain: Optional[str], gate: Optional[str], event_type: Optional[str], limit: int) -> List[dict]:
     """Read last N events from JSONL, optionally filtered."""
     if not LOG_FILE.exists():
         return []

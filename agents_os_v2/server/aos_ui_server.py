@@ -1,5 +1,6 @@
 """AOS Pipeline Server — Phase 1 (Event Log). S003-P007 foundation."""
 
+import os
 from pathlib import Path
 from starlette.applications import Starlette
 from starlette.routing import Route, Mount
@@ -19,10 +20,16 @@ async def redirect_root(request):
     return RedirectResponse(url="/static/PIPELINE_DASHBOARD.html", status_code=302)
 
 
+def _get_server_port() -> str:
+    """Derive bind port from runtime context. BF-G5-001: avoid hardcoded 8090."""
+    return os.environ.get("AOS_SERVER_PORT") or os.environ.get("PORT") or "8090"
+
+
 async def emit_server_start():
     """Emit SERVER_START event on startup."""
     from agents_os_v2.orchestrator.log_events import append_event
     from datetime import datetime, timezone
+    port = _get_server_port()
     evt = {
         "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "pipe_run_id": "server",
@@ -33,8 +40,8 @@ async def emit_server_start():
         "gate": "",
         "agent_team": "team_61",
         "severity": "INFO",
-        "description": "AOS Pipeline Server started on port 8090",
-        "metadata": {},
+        "description": f"AOS Pipeline Server started on port {port}",
+        "metadata": {"port": port},
     }
     try:
         append_event(evt)

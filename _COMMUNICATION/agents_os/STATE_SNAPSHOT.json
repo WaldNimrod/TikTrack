@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0.0",
-  "produced_at_iso": "2026-03-16T15:47:29.243125+00:00",
+  "produced_at_iso": "2026-03-16T16:44:59.366428+00:00",
   "agent_role": "POC-1-OBSERVER",
   "read_only": true,
   "governance": {
@@ -8,7 +8,12 @@
     "active_stage": "S002",
     "active_program": "S002-P005",
     "ssm_path": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md",
-    "master_index_path": "00_MASTER_INDEX.md"
+    "master_index_path": "00_MASTER_INDEX.md",
+    "wsm_identity": {
+      "active_stage_id": "S002",
+      "active_work_package_id": "S002-P005-WP003",
+      "active_project_domain": "AGENTS_OS"
+    }
   },
   "pipeline": {
     "domains": {
@@ -16,8 +21,10 @@
         "gate_state": null,
         "pending_actions": [],
         "override_reason": null,
-        "current_gate": "GATE_0",
-        "project_domain": "agents_os"
+        "current_gate": "GATE_1",
+        "project_domain": "agents_os",
+        "work_package_id": "S002-P005-WP003",
+        "stage_id": "S002"
       },
       "tiktrack": {
         "error": "file_not_found"
@@ -27,7 +34,7 @@
       "gate_state": null,
       "pending_actions": [],
       "override_reason": null,
-      "current_gate": "GATE_0"
+      "current_gate": "GATE_1"
     }
   },
   "codebase": {

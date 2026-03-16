@@ -15,14 +15,16 @@ if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
 fi
 
 cd "$REPO"
-python3 -m http.server "$PORT" --bind 127.0.0.1 &
+source api/venv/bin/activate 2>/dev/null || true
+export AOS_SERVER_PORT="$PORT"
+uvicorn agents_os_v2.server.aos_ui_server:app --host 127.0.0.1 --port "$PORT" &
 echo $! > "$PID_FILE"
 echo ""
-echo "[agents_os] Pipeline UI server started (port $PORT)"
+echo "[agents_os] AOS Pipeline Server started (port $PORT)"
 echo ""
-echo "  📊 Dashboard:  http://localhost:${PORT}/agents_os/ui/PIPELINE_DASHBOARD.html"
-echo "  🗺️  Roadmap:    http://localhost:${PORT}/agents_os/ui/PIPELINE_ROADMAP.html"
-echo "  👥 Teams:      http://localhost:${PORT}/agents_os/ui/PIPELINE_TEAMS.html"
+echo "  📊 Dashboard:  http://localhost:${PORT}/static/PIPELINE_DASHBOARD.html"
+echo "  🗺️  Roadmap:    http://localhost:${PORT}/static/PIPELINE_ROADMAP.html"
+echo "  👥 Teams:      http://localhost:${PORT}/static/PIPELINE_TEAMS.html"
 echo ""
 echo "  Stop: ./agents_os/scripts/stop_ui_server.sh"
 echo ""

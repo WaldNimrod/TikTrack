@@ -350,6 +350,31 @@ except Exception:
     esac
 
     if [ "$VALIDATION_FAILED" -eq 1 ] && [ "$FORCE_FLAG" != "--force" ]; then
+      python3 -c "
+import sys, os
+sys.path.insert(0, '.')
+os.environ.setdefault('PIPELINE_DOMAIN', '${DOMAIN:-}')
+try:
+    from agents_os_v2.orchestrator.log_events import append_event
+    from agents_os_v2.observers.state_reader import read_wsm_identity_fields
+    from datetime import datetime, timezone
+    identity = read_wsm_identity_fields()
+    append_event({
+        'timestamp': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'pipe_run_id': 'pipeline_run',
+        'event_type': 'GATE_ADVANCE_BLOCKED',
+        'domain': '${DOMAIN:-global}',
+        'stage_id': identity.get('active_stage_id', ''),
+        'work_package_id': identity.get('active_work_package_id', ''),
+        'gate': '$GATE',
+        'agent_team': 'team_61',
+        'severity': 'WARN',
+        'description': 'Advance blocked — required artifacts missing',
+        'metadata': {'attempted_gate': '$GATE', 'reason': 'artifact_missing', 'blocking_team': 'team_61'},
+    })
+except Exception:
+    pass
+" 2>/dev/null || true
       echo ""
       echo "════════════════════════════════════════════════════════════════════"
       echo "  ⚠️  ADVANCE BLOCKED — Required artifacts are missing:"
@@ -750,6 +775,33 @@ state.save()
 print('[pipeline_run] ✅ State updated — phase8_content=PHASE2_ACTIVE. Dashboard will reflect Phase 2.')
 "
     fi
+
+    # ── Event log: PHASE_TRANSITION ──────────────────────────────────────
+    python3 -c "
+import sys, os
+sys.path.insert(0, '.')
+os.environ.setdefault('PIPELINE_DOMAIN', '${DOMAIN:-}')
+try:
+    from agents_os_v2.orchestrator.log_events import append_event
+    from agents_os_v2.observers.state_reader import read_wsm_identity_fields
+    from datetime import datetime, timezone
+    identity = read_wsm_identity_fields()
+    append_event({
+        'timestamp': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'pipe_run_id': 'pipeline_run',
+        'event_type': 'PHASE_TRANSITION',
+        'domain': '${DOMAIN:-global}',
+        'stage_id': identity.get('active_stage_id', ''),
+        'work_package_id': identity.get('active_work_package_id', ''),
+        'gate': '$GATE',
+        'agent_team': 'team_61',
+        'severity': 'INFO',
+        'description': f'Phase ${PHASE_NUM} mandate displayed',
+        'metadata': {'phase': ${PHASE_NUM}, 'gate': '$GATE'},
+    })
+except Exception:
+    pass
+" 2>/dev/null || true
     ;;
 
   *)

@@ -25,6 +25,7 @@ from pathlib import Path
 
 from .state import PipelineState, STATE_FILE
 from .gate_router import run_data_model_checks
+from .log_events import append_event, get_wsm_identity
 from ..config import REPO_ROOT, AGENTS_OS_OUTPUT_DIR, DOMAIN_GATE_OWNERS
 from ..context.injection import (
     build_full_agent_prompt,
@@ -147,6 +148,33 @@ def _domain_gate_owner(gate_id: str, domain: str) -> str | None:
 def _log(msg: str):
     ts = datetime.now().strftime("%H:%M:%S")
     print(f"[{ts}] {msg}")
+
+
+def _emit_pipeline_event(
+    event_type: str,
+    state: PipelineState,
+    description: str,
+    metadata: dict | None = None,
+    severity: str = "INFO",
+) -> None:
+    """Emit pipeline event with WSM-sourced identity. Non-blocking."""
+    try:
+        identity = get_wsm_identity(state.project_domain)
+        append_event({
+            "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "pipe_run_id": state.pipe_run_id,
+            "event_type": event_type,
+            "domain": state.project_domain or "global",
+            "stage_id": identity.get("active_stage_id", ""),
+            "work_package_id": identity.get("active_work_package_id", ""),
+            "gate": state.current_gate,
+            "agent_team": "team_61",
+            "severity": severity,
+            "description": description,
+            "metadata": metadata or {},
+        })
+    except Exception:
+        pass
 
 
 def _save_prompt(filename: str, content: str, domain: str | None = None) -> Path:
@@ -1976,6 +2004,12 @@ def pass_with_actions(actions_str: str) -> None:
     state.pending_actions = actions
     state.override_reason = None
     state.save()
+    _emit_pipeline_event(
+        "PASS_WITH_ACTION",
+        state,
+        f"PASS_WITH_ACTION recorded — {len(actions)} pending action(s)",
+        metadata={"actions": actions},
+    )
     _log(f"PASS_WITH_ACTION recorded — {len(actions)} pending action(s). Gate held at {state.current_gate}.")
 
 
@@ -2002,6 +2036,12 @@ def override_gate(reason: str) -> None:
     state.override_reason = reason or "Override (no reason given)"
     state.pending_actions = []
     state.save()
+    _emit_pipeline_event(
+        "OVERRIDE",
+        state,
+        f"Override: {state.override_reason[:80]}",
+        metadata={"reason": state.override_reason},
+    )
     gate_id = state.current_gate
     advance_gate(gate_id, "PASS", "", force=True)
     _log(f"Override reason logged: {state.override_reason}")
@@ -2022,6 +2062,17 @@ def advance_gate(gate_id: str, status: str, reason: str = "", force: bool = Fals
 
     # S002-P005-WP002: Block PASS when gate_state=PASS_WITH_ACTION unless --force
     if status == "PASS" and state.gate_state == "PASS_WITH_ACTION" and not force:
+        _emit_pipeline_event(
+            "GATE_ADVANCE_BLOCKED",
+            state,
+            "Advance blocked — gate in PASS_WITH_ACTION state",
+            metadata={
+                "attempted_gate": gate_id,
+                "reason": "pending_actions_unresolved",
+                "blocking_team": "team_61",
+            },
+            severity="WARN",
+        )
         _log("")
         _log("════════════════════════════════════════════════════════════════════")
         _log("  ⚠️  ADVANCE BLOCKED — Gate is in PASS_WITH_ACTION state")
@@ -2115,6 +2166,23 @@ def advance_gate(gate_id: str, status: str, reason: str = "", force: bool = Fals
     state.save()
     _log(f"{gate_id}: {status}")
 
+    # Emit event after save
+    if status == "PASS":
+        _emit_pipeline_event(
+            "GATE_PASS",
+            state,
+            f"{gate_id} PASS — advanced to {state.current_gate}",
+            metadata={"gate": gate_id},
+        )
+    else:
+        _emit_pipeline_event(
+            "GATE_FAIL",
+            state,
+            f"{gate_id} FAIL: {reason or 'no reason'}",
+            metadata={"gate": gate_id, "reason": reason or ""},
+            severity="WARN",
+        )
+
     if state.current_gate == "COMPLETE":
         _log("")
         _log("╔══════════════════════════════════════════════════════════╗")
@@ -2174,6 +2242,14 @@ def store_artifact(gate_id: str, file_path: str) -> bool:
 
     state.save()
     _log(f"Gate {gate_id} artifact stored successfully.")
+
+    artifact_type = {"GATE_1": "LOD400", "G3_PLAN": "MANDATE", "CURSOR_IMPLEMENTATION": "IMPLEMENTATION"}.get(gate_id, "UNKNOWN")
+    _emit_pipeline_event(
+        "ARTIFACT_STORE",
+        state,
+        f"Stored artifact for {gate_id}",
+        metadata={"artifact_path": str(path), "artifact_type": artifact_type},
+    )
     return True
 
 
@@ -2254,6 +2330,13 @@ def main():
         wait_gate = approve_map.get(gate)
         if wait_gate:
             _log(f"Human APPROVED {gate}")
+            state = PipelineState.load()
+            _emit_pipeline_event(
+                "PIPELINE_APPROVE",
+                state,
+                f"Human approved {gate}",
+                metadata={"gate": gate},
+            )
             advance_gate(wait_gate, "PASS")
         else:
             _log(f"ERROR: --approve only valid for GATE_2, GATE_6, GATE_7 (got {gate})")

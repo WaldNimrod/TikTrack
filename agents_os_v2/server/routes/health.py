@@ -2,11 +2,13 @@
 
 import json
 import time
+from typing import Optional
+
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 # Startup time for uptime
-_start_time: float | None = None
+_start_time: Optional[float] = None
 
 
 def set_start_time():

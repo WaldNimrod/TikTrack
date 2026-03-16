@@ -132,11 +132,57 @@ let selectedTeam = null;
 let selectedPromptType = "reset";
 let _ctxOverride = {};
 
+/** SA-01: Load both domain states and populate dual-domain rows */
+async function loadDomainStatesForRows() {
+  const domainStates = {};
+  for (const domain of ["tiktrack", "agents_os"]) {
+    try {
+      const path = DOMAIN_STATE_FILES[domain];
+      const r = await fetch(path + "?t=" + Date.now());
+      if (r.ok) domainStates[domain] = await r.json();
+    } catch (_) { /* ignore */ }
+  }
+  renderTeamsDomainRows(domainStates);
+  return domainStates;
+}
+
+function renderTeamsDomainRows(domainStates) {
+  const fmt = (s) => (s && (s.work_package_id || s.current_gate) ? (s.work_package_id || "No active WP") : "No active WP");
+  const fmtGate = (s) => (s?.current_gate && s.current_gate !== "NONE" ? s.current_gate : "—");
+  const rowTt = document.getElementById("teams-domain-row-tiktrack");
+  const rowAos = document.getElementById("teams-domain-row-agents_os");
+  if (rowTt) {
+    const s = domainStates?.tiktrack;
+    const wpEl = rowTt.querySelector(".teams-domain-wp");
+    const gateEl = rowTt.querySelector(".teams-domain-gate");
+    const badgeEl = rowTt.querySelector(".teams-provenance-badge");
+    if (wpEl) wpEl.textContent = fmt(s);
+    if (gateEl) gateEl.textContent = fmtGate(s);
+    if (badgeEl) badgeEl.textContent = s ? "[domain_file]" : "[unavailable]";
+  }
+  if (rowAos) {
+    const s = domainStates?.agents_os;
+    const wpEl = rowAos.querySelector(".teams-domain-wp");
+    const gateEl = rowAos.querySelector(".teams-domain-gate");
+    const badgeEl = rowAos.querySelector(".teams-provenance-badge");
+    if (wpEl) wpEl.textContent = fmt(s);
+    if (gateEl) gateEl.textContent = fmtGate(s);
+    if (badgeEl) badgeEl.textContent = s ? "[domain_file]" : "[unavailable]";
+  }
+}
+
 async function loadState() {
-  try {
-    await loadDomainState("tiktrack");
-  } catch (e) {
-    /* state unavailable — prompts still work without it */
+  const domainStates = await loadDomainStatesForRows();
+  const domain = currentDomain || "tiktrack";
+  if (domainStates[domain]) {
+    pipelineState = domainStates[domain];
+    window.pipelineState = pipelineState;
+  } else {
+    try {
+      await loadDomainState(domain);
+    } catch (e) {
+      /* state unavailable — prompts still work without it */
+    }
   }
   if (selectedTeam) renderTeamPanel(selectedTeam);
 }

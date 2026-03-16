@@ -456,9 +456,14 @@ def _generate_mandate_doc(
 
     # ── 3. Assemble final document ────────────────────────────────────────────
     gate_label = f"  ·  {gate}" if gate else ""
+    # QA-P1-05 / AC-IDEA-036: canonical date in gate prompts
+    date_instruction = (
+        "**Canonical date:** Use `date -u +%F` for today; replace {{date}} in identity headers.\n\n"
+    )
     header = (
         f"# Mandates — {wp}{gate_label}\n\n"
         f"**Spec:** {state.spec_brief}\n\n"
+        f"{date_instruction}"
         f"{SEP_H}\n"
         f"  EXECUTION ORDER\n"
         f"{SEP_H}\n\n"
@@ -1044,9 +1049,13 @@ def _generate_gate_0_prompt(state: PipelineState, fresh: bool = False) -> str:
         f"absent WP Registry entry is NOT a blocking finding.\n\n"
     )
 
+    date_instruction = (
+        "**Canonical date:** Use `date -u +%F` for today; replace {{date}} in identity headers.\n\n"
+    )
     return (
         correction_notice
         + f"{_team_header('team_190', 'GATE_0', state, fresh)}"
+        f"{date_instruction}"
         f"# GATE_0 — Validate LOD200 Scope (SPEC_ARC)\n\n"
         f"Validate the following LOD200 scope brief for constitutional compliance.\n\n"
         f"**Check:**\n"
@@ -2175,7 +2184,7 @@ def advance_gate(gate_id: str, status: str, reason: str = "", force: bool = Fals
         # S002-P005-WP002 AC-04: override_reason is preserved for audit — do NOT clear.
         state.gate_state = None
         state.pending_actions = []
-        state.gates_completed.append(gate_id)
+        state._append_gate(gate_id, completed=True)
         if gate_id == "GATE_2":
             state.current_gate = "WAITING_GATE2_APPROVAL"
         elif gate_id == "GATE_6":
@@ -2191,7 +2200,7 @@ def advance_gate(gate_id: str, status: str, reason: str = "", force: bool = Fals
             else:
                 state.current_gate = "COMPLETE"
     else:
-        state.gates_failed.append(gate_id)
+        state._append_gate(gate_id, completed=False)
         _log(f"GATE {gate_id} FAILED: {reason}")
         # ── Auto-routing from verdict file ────────────────────────────────────
         # The reviewing team (Team 90, 190, etc.) must include:

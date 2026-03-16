@@ -92,6 +92,34 @@ const DOMAIN_GATE_OWNERS_JS = {
   },
 };
 
+/** AC-CS-06: Align to active WP. When no WP active: placeholder. Call at runtime (pipelineState must be loaded). */
+function getExpectedFiles() {
+  const wp = (typeof pipelineState !== "undefined" && pipelineState?.work_package_id) ? pipelineState.work_package_id : "";
+  if (!wp || wp === "NONE") {
+    return [{ label: "No active WP — expected files N/A", path: "" }];
+  }
+  if (wp.startsWith("S002-P005")) {
+    return [
+      { label: "Contract verify",     path: "../../_COMMUNICATION/team_61/TEAM_61_S002_P005_WP003_CONTRACT_VERIFY_v1.0.0.md" },
+      { label: "G3_PLAN work plan",   path: "../../_COMMUNICATION/team_10/TEAM_10_S002_P005_WP003_G3_PLAN_WORK_PLAN_v1.1.0.md" },
+      { label: "LLD400 spec",        path: "../../_COMMUNICATION/team_170/TEAM_170_S002_P005_WP003_LLD400_v1.0.0.md" },
+      { label: "Mandates file",      path: "../../_COMMUNICATION/agents_os/prompts/agentsos_implementation_mandates.md" },
+    ];
+  }
+  if (wp.startsWith("S001-P002")) {
+    return [
+      { label: "Team 20 API verify",  path: "../../_COMMUNICATION/team_20/TEAM_20_S001_P002_WP001_API_VERIFY_v1.0.0.md" },
+      { label: "Team 30 widget JSX", path: "../../ui/src/components/AlertsSummaryWidget.jsx" },
+      { label: "Team 30 HomePage",   path: "../../ui/src/components/HomePage.jsx" },
+      { label: "Team 50 QA report",  path: "../../_COMMUNICATION/team_50/TEAM_50_S001_P002_WP001_QA_REPORT_v1.0.0.md" },
+      { label: "G3_PLAN work plan", path: "../../_COMMUNICATION/team_10/TEAM_10_S001_P002_WP001_G3_PLAN_WORK_PLAN_v1.1.0.md" },
+      { label: "Mandates file",     path: "../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md" },
+    ];
+  }
+  return [{ label: `WP ${wp} — paths TBD`, path: "" }];
+}
+
+/** @deprecated Use getExpectedFiles() at runtime. Fallback for S001-P002 when pipelineState unset. */
 const EXPECTED_FILES = [
   { label: "Team 20 API verify",   path: "../../_COMMUNICATION/team_20/TEAM_20_S001_P002_WP001_API_VERIFY_v1.0.0.md" },
   { label: "Team 30 widget JSX",   path: "../../ui/src/components/AlertsSummaryWidget.jsx" },

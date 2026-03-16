@@ -45,12 +45,14 @@ async function loadPipelineState() {
     let state = await loadDomainState(currentDomain);
     if (!state) throw new Error("No state");
 
-    // Header + LEGACY_FALLBACK badge (SPC-02)
+    // Header + provenance badge (P0-01) — CS-03: no legacy fallback
     const lastEl = document.getElementById("last-updated");
-    const base = "[" + (state.project_domain || currentDomain) + "] " +
-      "Last updated: " + (state.last_updated ? new Date(state.last_updated).toLocaleTimeString() : "unknown");
+    const domainLabel = state.project_domain || currentDomain;
+    const base = "[" + domainLabel + "] Last updated: " + (state.last_updated ? new Date(state.last_updated).toLocaleTimeString() : "unknown");
     lastEl.textContent = base;
-    lastEl.innerHTML = base + (stateFallbackMode ? ' <span class="legacy-fallback-badge">⚠ LEGACY_FALLBACK</span>' : '');
+    lastEl.innerHTML = base;
+    const provBadge = document.getElementById("dashboard-provenance-badge");
+    if (provBadge) provBadge.textContent = `[live: ${domainLabel}]`;
 
     // Sidebar status
     document.getElementById("s-wp").textContent    = state.work_package_id || "—";
@@ -785,13 +787,11 @@ async function runProgressCheck() {
 
   let state = null;
   try {
-    // Try domain-specific file, then legacy fallback
-    let r = await fetch(getDomainStateFile() + '?t=' + Date.now());
-    if (!r.ok) r = await fetch(LEGACY_STATE_FILE + '?t=' + Date.now());
-    if (!r.ok) throw new Error("state file not found");
+    const r = await fetch(getDomainStateFile() + '?t=' + Date.now());
+    if (!r.ok) throw new Error(r.status + " " + r.statusText);
     state = await r.json();
   } catch(e) {
-    content.innerHTML = '<div class="alert-box">❌ Cannot read pipeline state — is the HTTP server running?<br><code>python3 -m http.server 8090</code></div>';
+    content.innerHTML = `<div class="alert-box">❌ PRIMARY STATE READ FAILED — ${getDomainStateFile()}<br>${escHtml(String(e.message || e))}<br>No fallback used. Ensure file exists and HTTP server is running: <code>python3 -m http.server 8090</code></div>`;
     return;
   }
 
@@ -1169,10 +1169,12 @@ async function checkExpectedFiles() {
   const list = document.getElementById("file-list");
   list.innerHTML = '<span class="loading">Checking…</span>';
 
-  const results = await Promise.all(EXPECTED_FILES.map(async f => {
+  const files = typeof getExpectedFiles === "function" ? getExpectedFiles() : EXPECTED_FILES;
+  const toCheck = files.filter(f => f.path);
+  const results = toCheck.length ? await Promise.all(toCheck.map(async f => {
     const exists = await fileExists(f.path);
     return {...f, exists};
-  }));
+  })) : files;
 
   const found = results.filter(r => r.exists).length;
   document.getElementById("files-badge").textContent = `${found}/${results.length} found`;
@@ -1558,7 +1560,7 @@ function buildCurrentStepBanner(gate, state) {
       <span class="ticker-label" style="color:var(--text-muted)">Recent:</span> <span id="event-log-ticker-events" style="color:var(--text-muted)">—</span>
       <span class="ticker-count" style="margin-left:8px;color:var(--accent)">(<span id="event-log-ticker-count">0</span> events)</span>
     </div>`;
-    return `<div class="current-step-banner csb-complete">
+    return `<div class="current-step-banner csb-complete" data-testid="gate-complete-message">
       <div class="csb-title">${escHtml(title)}</div>
       <div class="csb-header">
         <span class="csb-actor">${escHtml(actorTxt)}</span>
@@ -2415,6 +2417,30 @@ async function buildQuickActionBar(gate) {
   }
 }
 
+/** CS-08: Snapshot freshness badge — green <10min, yellow 10–60min, red >1h */
+function updateSnapshotFreshnessBadge(producedAtIso) {
+  const el = document.getElementById('snapshot-freshness-badge');
+  if (!el) return;
+  if (!producedAtIso) {
+    el.textContent = '[unavailable]';
+    el.className = 'snapshot-freshness-badge sf-unavailable';
+    return;
+  }
+  const ageSec = (Date.now() - new Date(producedAtIso).getTime()) / 1000;
+  let text, cls;
+  if (ageSec < 600) {
+    text = '[fresh]'; cls = 'snapshot-freshness-badge sf-fresh';
+  } else if (ageSec < 3600) {
+    const min = Math.floor(ageSec / 60);
+    text = `[~${min}m ago]`; cls = 'snapshot-freshness-badge sf-yellow';
+  } else {
+    const h = Math.floor(ageSec / 3600);
+    text = `[stale: ${h}h ago]`; cls = 'snapshot-freshness-badge sf-red';
+  }
+  el.textContent = text;
+  el.className = cls;
+}
+
 // ── Health warnings (reads STATE_SNAPSHOT.json, shows issues with severity + copyable log) ──
 async function loadHealthWarnings() {
   const panel   = document.getElementById('health-warnings-panel');
@@ -2429,6 +2455,7 @@ async function loadHealthWarnings() {
       : '../../_COMMUNICATION/agents_os/STATE_SNAPSHOT.json';
     const snapshot = await fetchJSON(domainPath);
     const gov = snapshot.governance || {};
+    updateSnapshotFreshnessBadge(snapshot.produced_at_iso);
 
     // AD-V2-01: active_stage missing from STATE_SNAPSHOT
     if (!gov.active_stage) {
@@ -2467,6 +2494,7 @@ async function loadHealthWarnings() {
     warnings.push({ sev:'warning',
       msg:'STATE_SNAPSHOT.json not found — system health unknown',
       log:`Run: python3 -m agents_os_v2.observers.state_reader  |  Error: ${String(e)}` });
+    updateSnapshotFreshnessBadge(null);
   }
 
   if (warnings.length === 0) {
@@ -2513,13 +2541,37 @@ function _stateRenderKey(s) {
 // Phase 1: pre-fetch state silently in background (zero DOM writes).
 // Phase 2a (state changed): full re-render — pipeline advanced, new data available.
 // Phase 2b (no change): passive update only — timestamp + event log. Banner untouched.
+/** CS-03: Show PRIMARY_STATE_READ_FAILED panel when domain state file unavailable */
+function showPrimaryStateReadFailedPanel() {
+  const panel = document.getElementById('primary-state-read-failed-panel');
+  const pathEl = document.getElementById('primary-state-fail-path');
+  const detailEl = document.getElementById('primary-state-fail-detail');
+  const layout = document.getElementById('agents-page-layout');
+  if (panel && pathEl && detailEl) {
+    const d = primaryStateReadFailedDetail || {};
+    pathEl.textContent = d.source_path || getDomainStateFile();
+    detailEl.textContent = `${d.domain || currentDomain} • ${d.error || ''} • ${d.timestamp || ''}`;
+    panel.style.display = 'block';
+    if (layout) layout.style.opacity = '0.5';
+  }
+}
+
+function hidePrimaryStateReadFailedPanel() {
+  const panel = document.getElementById('primary-state-read-failed-panel');
+  const layout = document.getElementById('agents-page-layout');
+  if (panel) panel.style.display = 'none';
+  if (layout) layout.style.opacity = '';
+}
+
 async function loadAll() {
   // ── Phase 1: background fetch ──────────────────────────────────────────
   let freshState;
   try {
     freshState = await loadDomainState(currentDomain);
+    hidePrimaryStateReadFailedPanel();
   } catch(e) {
     console.error('[loadAll] background fetch failed:', e);
+    showPrimaryStateReadFailedPanel();
     return;
   }
   if (!freshState) return;
@@ -2536,17 +2588,24 @@ async function loadAll() {
       return;
     }
     _lastRenderKey = newKey;
-    const state = await loadPipelineState();   // fetches again + renders all DOM
-    if (state) await loadPrompt(state.current_gate);
-    await Promise.all([loadMandates(), checkExpectedFiles(), loadHealthWarnings()]);
+    try {
+      const state = await loadPipelineState();   // fetches again + renders all DOM
+      if (state) await loadPrompt(state.current_gate);
+      await Promise.all([loadMandates(), checkExpectedFiles(), loadHealthWarnings()]);
+    } catch (e) {
+      console.error('[loadAll] loadPipelineState failed:', e);
+      showPrimaryStateReadFailedPanel();
+    }
   } else {
     // ── Phase 2b: passive update — only timestamp (safe, non-interactive) ─
     const lastEl = document.getElementById('last-updated');
+    const provBadge = document.getElementById('dashboard-provenance-badge');
     if (lastEl) {
-      const base = '[' + (freshState.project_domain || currentDomain) + '] Last updated: ' +
+      const domainLabel = freshState.project_domain || currentDomain;
+      const base = '[' + domainLabel + '] Last updated: ' +
         (freshState.last_updated ? new Date(freshState.last_updated).toLocaleTimeString() : 'unknown');
-      lastEl.innerHTML = base +
-        (stateFallbackMode ? ' <span class="legacy-fallback-badge">⚠ LEGACY_FALLBACK</span>' : '');
+      lastEl.innerHTML = base;
+      if (provBadge) provBadge.textContent = `[live: ${domainLabel}]`;
     }
   }
 

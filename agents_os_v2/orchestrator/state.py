@@ -57,6 +57,7 @@ class PipelineState:
                 f"(work_package_id='{self.work_package_id}'). "
                 f"Call load() or set work_package_id from WSM before saving."
             )
+        self._sanitize_gate_contradiction()
         f = self._state_file()
         f.parent.mkdir(parents=True, exist_ok=True)
         self.last_updated = datetime.now(timezone.utc).isoformat()
@@ -73,7 +74,7 @@ class PipelineState:
         Auto-detect rules (when no domain is given):
           - Scan all known domains for "active" WPs (past GATE_0 / NOT_STARTED).
           - Exactly 1 active  → deterministic auto-select (no warning needed).
-          - 0 active          → legacy pipeline_state.json fallback / empty state.
+          - 0 active          → empty state (NO_ACTIVE_PIPELINE; no legacy fallback per CS-04).
           - 2+ active         → print error to stderr and sys.exit(1).
             The caller MUST add --domain to resolve the ambiguity.
 
@@ -88,8 +89,10 @@ class PipelineState:
             path = get_state_file(resolved)
             if path.exists():
                 data = json.loads(path.read_text(encoding="utf-8"))
-                return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
-            return cls(project_domain=resolved)
+                obj = cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
+                obj._sanitize_gate_contradiction()
+                return obj
+            return cls(work_package_id="NONE", current_gate="NONE", project_domain=resolved)
 
         # ── 2. No explicit domain → scan known domains for active WPs ────────
         # "active" = has a real work_package_id AND is past the initial gate.
@@ -112,7 +115,9 @@ class PipelineState:
         if len(active) == 1:
             # Single active pipeline — deterministic, no ambiguity
             _d, _p, data = active[0]
-            return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
+            obj = cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
+            obj._sanitize_gate_contradiction()
+            return obj
 
         if len(active) > 1:
             # Ambiguous — multiple active pipelines — hard block
@@ -137,27 +142,42 @@ class PipelineState:
             )
             sys.exit(1)
 
-        # ── 3. No active pipeline → legacy fallback / empty state ────────────
-        if STATE_FILE.exists():
-            data = json.loads(STATE_FILE.read_text(encoding="utf-8"))
-            return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
+        # ── 3. No active pipeline → NO_ACTIVE_PIPELINE sentinel (CS-04: no legacy fallback) ──
         return cls()
 
     @classmethod
     def load_domain(cls, domain: str) -> "PipelineState":
-        """Load state for a specific domain. Returns new state if not found."""
+        """Load state for a specific domain. Returns NO_ACTIVE_PIPELINE sentinel if not found (CS-04)."""
         path = get_state_file(domain)
         if path.exists():
             data = json.loads(path.read_text(encoding="utf-8"))
             state = cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
             state.project_domain = domain
+            state._sanitize_gate_contradiction()
             return state
-        return cls(project_domain=domain)
+        return cls(work_package_id="NONE", current_gate="NONE", project_domain=domain)
+
+    def _append_gate(self, gate_id: str, completed: bool):
+        """Append gate to completed or failed; enforce CS-02 invariant (no gate in both)."""
+        if completed:
+            self.gates_failed = [g for g in self.gates_failed if g != gate_id]
+            if gate_id not in self.gates_completed:
+                self.gates_completed.append(gate_id)
+        else:
+            self.gates_completed = [g for g in self.gates_completed if g != gate_id]
+            if gate_id not in self.gates_failed:
+                self.gates_failed.append(gate_id)
+
+    def _sanitize_gate_contradiction(self):
+        """CS-02: Remove gates from failed if in completed (completed takes precedence)."""
+        contradiction = set(self.gates_completed) & set(self.gates_failed)
+        for g in contradiction:
+            self.gates_failed = [x for x in self.gates_failed if x != g]
 
     def advance_gate(self, gate_id: str, status: str):
         if status in ("PASS", "MANDATES_READY", "PRODUCED", "MANUAL", "CONDITIONAL_PASS"):
-            self.gates_completed.append(gate_id)
+            self._append_gate(gate_id, completed=True)
         else:
-            self.gates_failed.append(gate_id)
+            self._append_gate(gate_id, completed=False)
         self.current_gate = gate_id
         self.save()

@@ -39,6 +39,21 @@
     <div class="agents-domain-bar agents-domain-bar--sidebar agents-domain-bar--no-domain">
       <button class="btn btn-primary" onclick="loadState()">↺ Refresh State</button>
     </div>
+    <!-- SA-01: Dual-domain rows — WP/Gate per domain with provenance badge -->
+    <div class="teams-domain-rows" id="teams-domain-rows">
+      <div class="teams-domain-row" data-testid="teams-domain-row-tiktrack" id="teams-domain-row-tiktrack">
+        <span class="teams-domain-name">TikTrack</span>
+        <span data-testid="teams-provenance-badge" class="teams-provenance-badge">[domain_file]</span>
+        <span class="teams-domain-wp">—</span>
+        <span class="teams-domain-gate">—</span>
+      </div>
+      <div class="teams-domain-row" data-testid="teams-domain-row-agents_os" id="teams-domain-row-agents_os">
+        <span class="teams-domain-name">Agents_OS</span>
+        <span data-testid="teams-provenance-badge" class="teams-provenance-badge">[domain_file]</span>
+        <span class="teams-domain-wp">—</span>
+        <span class="teams-domain-gate">—</span>
+      </div>
+    </div>
     <div class="team-list-header">Teams (from Roster Lock)</div>
     <div id="team-list-content">
       <div style="padding:14px;font-size:11px;color:var(--text-muted)">Loading…</div>

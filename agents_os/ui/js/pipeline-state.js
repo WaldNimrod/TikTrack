@@ -3,32 +3,35 @@
 let pipelineState = null;
 let currentDomain = localStorage.getItem("pipeline_domain") || "tiktrack";
 let stateFallbackMode = false;
+/** CS-03: Set when primary domain state file fetch fails. NO fallback used. */
+let primaryStateReadFailed = false;
+let primaryStateReadFailedDetail = null;
 
 // Apply theme on load
 document.documentElement.classList.toggle("theme-tiktrack", currentDomain === "tiktrack");
 
-/** Try domain-specific file first; fallback to legacy, set stateFallbackMode = true */
+/** Load domain-specific state. CS-03: On failure set PRIMARY_STATE_READ_FAILED; NO fallback. */
 async function loadDomainState(domain) {
-  const domainFile = DOMAIN_STATE_FILES[domain] || LEGACY_STATE_FILE;
+  primaryStateReadFailed = false;
+  primaryStateReadFailedDetail = null;
+  stateFallbackMode = false;
+  const domainFile = DOMAIN_STATE_FILES[domain] || DOMAIN_STATE_FILES.tiktrack;
   try {
     const state = await fetchJSON(domainFile);
-    stateFallbackMode = false;
     pipelineState = state;
     window.pipelineState = state;
     return state;
   } catch (e) {
-    try {
-      const state = await fetchJSON(LEGACY_STATE_FILE);
-      stateFallbackMode = true;
-      pipelineState = state;
-      window.pipelineState = state;
-      return state;
-    } catch (e2) {
-      stateFallbackMode = true;
-      pipelineState = null;
-      window.pipelineState = null;
-      throw e2;
-    }
+    primaryStateReadFailed = true;
+    primaryStateReadFailedDetail = {
+      domain,
+      source_path: domainFile,
+      error: String(e.message || e),
+      timestamp: new Date().toISOString(),
+    };
+    pipelineState = null;
+    window.pipelineState = null;
+    throw e;
   }
 }
 
@@ -45,7 +48,7 @@ function getDomainOwner(gateId) {
 }
 
 function getDomainStateFile() {
-  return DOMAIN_STATE_FILES[currentDomain] || LEGACY_STATE_FILE;
+  return DOMAIN_STATE_FILES[currentDomain] || DOMAIN_STATE_FILES.tiktrack;
 }
 
 function getDomainFlag() {

@@ -136,6 +136,12 @@ const AUTHORIZED_STAGE_EXCEPTIONS = {
     description:    "S001-P002 Deferred Parallel Activation — authorized by Team 00 (2026-03-14)",
     authorized_programs: ["S001-P002"],
   },
+  "S003": {
+    authority_ref:  "TEAM_100_PIPELINE_RESILIENCE_LOD400_DRAFT_v1.0.0.md",
+    authority_path: "../../_COMMUNICATION/team_100/TEAM_100_PIPELINE_RESILIENCE_LOD400_DRAFT_v1.0.0.md",
+    description:    "S003-P009 Pipeline Resilience Package — authorized by Team 00 (2026-03-17); WSM active_stage=S002 but pipeline work is S003-domain",
+    authorized_programs: ["S003-P009"],
+  },
 };
 
 /** Canonical task files (Roadmap sidebar) */

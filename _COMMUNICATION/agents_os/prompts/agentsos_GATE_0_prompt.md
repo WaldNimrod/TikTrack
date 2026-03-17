@@ -1,4 +1,4 @@
-**ACTIVE: TEAM_190 (Constitutional-Validator)**  gate=GATE_0 | wp=S002-P005-WP003 | stage=S002 | 2026-03-17
+**ACTIVE: TEAM_190 (Constitutional-Validator)**  gate=GATE_0 | wp=S003-P009-WP001 | stage=S003 | 2026-03-17
 
 **date:** 2026-03-17
 
@@ -41,19 +41,19 @@ blocking_findings:
 
 ## Scope Brief
 
-**WP name:** AOS State Alignment & Governance Integrity
+**WP name:** Pipeline Resilience Package — 3-tier file resolution, wsm_writer.py auto-write, targeted git integration (pre-GATE_4 + GATE_8), route alias normalization (4a/4b already implemented)
 
 **LOD200 document (read in full to perform this validation):**
-`_COMMUNICATION/team_100/TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md`
+`_COMMUNICATION/team_100/TEAM_100_PIPELINE_RESILIENCE_LOD400_DRAFT_v1.0.0.md`
 
 ## Pipeline State (domain state file — NOT WSM)
 
 - **Domain:** agents_os
-- **WP:** S002-P005-WP003
-- **Current gate:** G3_6_MANDATES (first run)
+- **WP:** S003-P009-WP001
+- **Current gate:** GATE_0 (first run)
 
-**Important for Team 190:** WSM `active_work_package_id` is NOT updated until GATE_3
-intake (Team 10 responsibility). WSM showing the previous WP or NO_ACTIVE is EXPECTED
+**Important for Team 190:** WSM updates are managed by the pipeline system. Team 10 does not modify WSM directly.
+WSM `active_work_package_id` is NOT updated until GATE_3 intake. WSM showing the previous WP or NO_ACTIVE is EXPECTED
 pre-GATE_0 state. Do NOT raise a finding for WSM not yet reflecting this WP.
 Similarly, WP Registry insertion happens AFTER GATE_0 PASS (Team 170 mandate) —
 absent WP Registry entry is NOT a blocking finding.

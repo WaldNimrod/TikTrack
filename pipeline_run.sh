@@ -310,7 +310,7 @@ if not wsm_stage or pipe_stage == wsm_stage:
     sys.exit(0)  # match or unknown WSM stage → OK
 
 # Mismatch detected — check for authorized exception
-AUTHORIZED = ['S001']  # mirrors pipeline-config.js AUTHORIZED_STAGE_EXCEPTIONS
+AUTHORIZED = ['S001', 'S003']  # mirrors pipeline-config.js AUTHORIZED_STAGE_EXCEPTIONS
 if pipe_stage in AUTHORIZED:
     print(f'[pipeline_run] ℹ️  AUTHORIZED EXCEPTION: pipeline stage {pipe_stage} ≠ WSM {wsm_stage} — exception registered, continuing')
     sys.exit(0)

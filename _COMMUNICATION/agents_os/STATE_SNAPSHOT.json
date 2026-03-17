@@ -1,17 +1,17 @@
 {
   "schema_version": "2.0.0",
-  "produced_at_iso": "2026-03-16T23:51:42.304856+00:00",
+  "produced_at_iso": "2026-03-17T20:29:18.681990+00:00",
   "agent_role": "POC-1-OBSERVER",
   "read_only": true,
   "governance": {
     "wsm_path": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "active_stage": "S002",
-    "active_program": "S002-P005",
+    "active_program": "NONE",
     "ssm_path": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md",
     "master_index_path": "00_MASTER_INDEX.md",
     "wsm_identity": {
       "active_stage_id": "S002",
-      "active_work_package_id": "S002-P005-WP003",
+      "active_work_package_id": "NONE",
       "active_project_domain": "AGENTS_OS"
     }
   },
@@ -21,10 +21,10 @@
         "gate_state": null,
         "pending_actions": [],
         "override_reason": null,
-        "current_gate": "G3_6_MANDATES",
+        "current_gate": "GATE_0",
         "project_domain": "agents_os",
-        "work_package_id": "S002-P005-WP003",
-        "stage_id": "S002"
+        "work_package_id": "S003-P009-WP001",
+        "stage_id": "S003"
       },
       "tiktrack": {
         "gate_state": null,
@@ -37,10 +37,12 @@
       }
     },
     "legacy": {
-      "gate_state": null,
-      "pending_actions": [],
+      "gate_state": "PASS_WITH_ACTION",
+      "pending_actions": [
+        "STATE-TEST"
+      ],
       "override_reason": null,
-      "current_gate": "G3_6_MANDATES"
+      "current_gate": "GATE_6"
     }
   },
   "codebase": {

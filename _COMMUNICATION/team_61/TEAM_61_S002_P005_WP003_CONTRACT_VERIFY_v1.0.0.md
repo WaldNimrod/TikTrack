@@ -3,6 +3,7 @@ id: TEAM_61_S002_P005_WP003_CONTRACT_VERIFY_v1.0.0
 from: Team 61 (AOS Local Cursor Implementation)
 to: Team 00, Team 10, Team 100
 date: 2026-03-16
+historical_record: true
 status: CONTRACT_VERIFY_COMPLETE
 work_package_id: S002-P005-WP003
 mandate: TEAM_00_TO_TEAM_61_WP003_DIRECT_IMPLEMENTATION_MANDATE_v1.0.0

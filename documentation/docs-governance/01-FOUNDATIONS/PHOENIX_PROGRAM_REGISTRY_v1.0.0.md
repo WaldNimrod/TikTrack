@@ -123,9 +123,9 @@ Source directives:
 
 ---
 
-**current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-16). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
+**current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-17). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
 
-**WSM mirror (2026-03-16):** active_stage_id=S002; active_program_id=S002-P005; current_gate=GATE_1; active_work_package_id=S002-P005-WP003; active_flow=S002-P005-WP003 (State Alignment) — **GATE_0 PASS** (Team 190 revalidation confirmed); advancing to GATE_1; spec: `TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md`.
+**WSM mirror (2026-03-17):** active_stage_id=S002; active_program_id=NONE; current_gate=NONE — S003 activation pending; active_work_package_id=NONE; active_flow=**NONE — S002-P005 DOCUMENTATION_CLOSED (2026-03-17). Awaiting S003 activation decision.**.
 
 ---
 

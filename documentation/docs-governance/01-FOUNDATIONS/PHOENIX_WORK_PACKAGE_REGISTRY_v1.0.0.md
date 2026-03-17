@@ -45,15 +45,15 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S002-P002 | S002-P002-WP003 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-03-13 |
 | S002-P003 | S002-P003-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-03-07 |
 | S002-P005 | S002-P005-WP002 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-03-15 |
-| S002-P005 | S002-P005-WP003 | IN_PROGRESS | GATE_1 | true | S002-P005-WP003 (State Alignment) — **GATE_0 PASS** (Team 190 revalidation confirmed); advancing to GATE_1; spec: `TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md` |
+| S002-P005 | S002-P005-WP003 | IN_PROGRESS | GATE_1 | false | S002-P005-WP003 (State Alignment) — **GATE_0 PASS** (Team 190 revalidation confirmed); advancing to GATE_1; spec: `TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md` |
 | S003-P001 | S003-P001-WP001 | CLOSED | FAST_4 (PASS) | false | Data Model Validator deployed; FAST_4 CLOSED 2026-03-11 (Team 170 closure) |
 | S003-P002 | S003-P002-WP001 | CLOSED | FAST_4 (PASS) | false | Test Template Generator deployed; G3.7 in gate chain; FAST_4 CLOSED 2026-03-12 (Team 170 closure) |
 
 
 
-**Current active WP state (mirror from WSM):** **ACTIVE_WORK_PACKAGE_PRESENT** — WSM `active_stage_id=S002`, `active_program_id=S002-P005`, `current_gate=GATE_1`, `active_work_package_id=S002-P005-WP003`.
+**Current active WP state (mirror from WSM):** **NO_ACTIVE_WORK_PACKAGE** — WSM `active_stage_id=S002`, `active_program_id=NONE`, `current_gate=NONE — S003 activation pending`, `active_work_package_id=N/A`.
 
-**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-16). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
+**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-17). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
 
 ---
 

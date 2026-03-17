@@ -68,9 +68,9 @@ GATE_CONFIG = {
 #   "doc"  → Documentation / governance / artifact issues ONLY.
 #            No code changes needed. Team 10 fixes specific files/paths/evidence.
 #
-#   GATE_5 "doc" → CURSOR_IMPLEMENTATION (direct to impl team — no separate gate state)
-#   GATE_5 "full" → G3_PLAN
-#   G5_DOC_FIX abolished in S002-P005-WP004.
+#            GATE_5 "doc" → G5_DOC_FIX (Team 10 doc-fix sprint) → GATE_5
+#            ⚠️  NEVER routes to CURSOR_IMPLEMENTATION — that activates impl teams.
+#            ⚠️  NEVER routes to GATE_4 — that's a full QA re-run cycle.
 #
 #   "full" → Substantial code or design issues (or unclear/mixed).
 #            Full cycle: return to G3_PLAN for new plan → mandates → implementation.
@@ -715,6 +715,8 @@ def _extract_route_recommendation(gate_id: str, work_package_id: str) -> tuple[s
         "loop":         "doc",   # GATE_0/1 self-loop = doc route
         "reject":       "full",
         "revision":     "full",
+        "artifacts_only": "doc",
+        "full_cycle":     "full",
     }
 
     for path in candidates:
@@ -722,9 +724,9 @@ def _extract_route_recommendation(gate_id: str, work_package_id: str) -> tuple[s
             text = path.read_text(encoding="utf-8")
             # Match: route_recommendation: doc | full | DOC_ONLY_LOOP | etc.
             m = re.search(
-                r'^route_recommendation\s*[:\-]\s*([A-Za-z_]+)',
+                r'route[_\s-]*recommendation\s*[:\-=]\s*([A-Za-z_-]+)',
                 text,
-                re.IGNORECASE | re.MULTILINE,
+                re.IGNORECASE,
             )
             if m:
                 raw = m.group(1).lower().replace("-", "_")

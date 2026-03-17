@@ -1,17 +1,17 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-16T16:31:41.411067+00:00`
+- Generated (UTC): `2026-03-17T17:01:55.901888+00:00`
 - Validation: `PASS`
 - Errors: `0`
-- Warnings: `0`
+- Warnings: `1`
 
 ## Runtime (from WSM)
 
 - active_stage_id: `S002`
-- active_program_id: `S002-P005`
-- active_work_package_id: `S002-P005-WP003`
-- current_gate: `GATE_1`
-- next_required_action: `Team 190 to validate LOD200 at GATE_1. Spec: `_COMMUNICATION/team_100/TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md`. Run: `./pipeline_run.sh --domain agents_os` to generate GATE_1 prompt.`
+- active_program_id: `NONE`
+- active_work_package_id: `NONE`
+- current_gate: `NONE — S003 activation pending`
+- next_required_action: `S003 stage activation decision by Team 00. Candidate first program: S003-P001 (Data Model Validator) — test flight target per Team 101 report. Run `./pipeline_run.sh --domain agents_os status` for current state.`
 
 ## Portfolio Counts
 
@@ -50,7 +50,7 @@
 
     └── **Program** `S002-P005` — Agents_OS v2 Writing Semantics Hardening (ADR-031 Stage A) + UI Optimization | ACTIVE | domain: **AGENTS_OS**
         ├── **WP** `S002-P005-WP002` | CLOSED | gate: GATE_8 (PASS) | domain: **AGENTS_OS**
-        └── **WP** `S002-P005-WP003` | IN_PROGRESS | gate: GATE_1 | domain: **AGENTS_OS** (active)
+        └── **WP** `S002-P005-WP003` | IN_PROGRESS | gate: GATE_1 | domain: **AGENTS_OS**
 
 
 ### S003 — שלב 3 — Essential Data | PLANNED [SHARED]
@@ -115,3 +115,8 @@
     ├── **Program** `S006-P003` — Level-1 Dashboards | PLANNED | domain: **TIKTRACK**
 
     └── **Program** `S006-P004` — Admin Review S006 FINAL | PLANNED | domain: **TIKTRACK**
+
+
+## Warnings
+
+- Active program NONE not found in program registry

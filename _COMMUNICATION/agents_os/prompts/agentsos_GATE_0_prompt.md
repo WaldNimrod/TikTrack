@@ -1,29 +1,10 @@
-**date:** 2026-03-16
+**ACTIVE: TEAM_190 (Constitutional-Validator)**  gate=GATE_0 | wp=S002-P005-WP003 | stage=S002 | 2026-03-17
 
----
-## ⚠ CORRECTION CYCLE #1 — Team 100 Action Required
-
-GATE_0 was BLOCKED by Team 190 (1×). The LOD200 scope brief must be
-revised before Team 190 can re-validate.
-
-**Prior blocking findings (Team 190 verdict):**
-```
-- BF-01: Submitted current-state claims for `S002-P005-WP003` assert unauthorized runtime activation (`active WP = S002-P005-WP003`, `current gate = GATE_0`, `WSM active_work_package_id = S002-P005-WP003`), but canonical governance sources still show `NO_ACTIVE_WORK_PACKAGE`; WP003 is only pending registry entry after GATE_0 PASS and WSM activation at GATE_3 intake. | evidence: documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md:96
-  - BF-02: Canonical governance sources are not synchronized for WP003 activation: the Program Registry already mirrors `GATE_0` and says `WP003` was activated on `2026-03-16`, while the WSM and Work Package Registry still record `NO_ACTIVE_WORK_PACKAGE`, `active_work_package_id = N/A`, and `current_gate = GATE_8`. | evidence: documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md:46
-```
-
-**Required actions before re-submission:**
-1. Fix the LOD200 per the blocking findings above
-2. Re-run `./pipeline_run.sh --domain agents_os` to regenerate this prompt
-3. Paste the regenerated ▼▼▼ block into Codex for Team 190 to re-validate
+**date:** 2026-03-17
 
 ---
 
-*[Team 190 validation prompt — for re-submission after fixes are applied]*
-
-**ACTIVE: TEAM_190 (Constitutional-Validator)**  gate=GATE_0 | wp=S002-P005-WP003 | stage=S002 | 2026-03-16
-
----
+**Canonical date:** Use `date -u +%F` for today; replace {{date}} in identity headers.
 
 # GATE_0 — Validate LOD200 Scope (SPEC_ARC)
 
@@ -69,7 +50,7 @@ blocking_findings:
 
 - **Domain:** agents_os
 - **WP:** S002-P005-WP003
-- **Current gate:** GATE_0 (correction cycle — failed 1×)
+- **Current gate:** G3_6_MANDATES (first run)
 
 **Important for Team 190:** WSM `active_work_package_id` is NOT updated until GATE_3
 intake (Team 10 responsibility). WSM showing the previous WP or NO_ACTIVE is EXPECTED

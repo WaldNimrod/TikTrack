@@ -114,7 +114,7 @@ Role contract lock:
 | **Team 170** | Spec Owner | Original documents only. |
 | **Team 190** | Architectural Validator + Submission Owner | Validation and submission package ownership. |
 | **Team 70** | Documentation Authority (Execution Department Librarian) | Organizationally part of the Development Department (10-90). Exclusive writer to canonical documentation folders; may support Architecture via request flow only (no departmental reassignment). |
-| **Team 10** | Execution Orchestrator | Execution coordination. |
+| **Team 10** | Work Plan Generator | Produces G3_PLAN at GATE_3; does not orchestrate teams, manage state, or update WSM directly. WSM state is managed exclusively by the pipeline system. |
 
 ---
 
@@ -123,6 +123,23 @@ Role contract lock:
 * **RTL Native:** כל ממשק UI נבנה לתמיכה בעברית ללא Inline CSS, תוך שימוש בלעדי ב-Logical Properties (Start/End).
 * **Visual Integrity:** ולידציה מבנית (DOM/CSS) מול הבלופרינט כחסם קשיח. שימוש בסקרינשוטים ע"י אייג'נטים - אסור.
 * **Authority Model:** הפרדת רשויות מוחלטת בין ארכיטקטורה (100+) לביצוע (10-90).
+
+### IR-MAKER-CHECKER-01 — The Maker-Checker Principle (locked 2026-03-17)
+
+No team may serve as the Checker (validator) for an artifact it produced as the Maker
+(executor) in the same work package.
+
+Definitions:
+- **Maker:** A team that produces an artifact in a gate (plan, spec, code, document).
+- **Checker:** A team that evaluates an artifact for correctness, compliance, or completeness.
+
+A team may be a Maker in one WP and a Checker in a different WP. The constraint is
+per-work-package, not per-team globally.
+
+Enforcement: Gate ownership assignments enforce this rule structurally. Violations
+require Team 00 constitutional authorization to override.
+
+Reference: ARCHITECT_DIRECTIVE_GATE_ARCHITECTURE_CANONICAL_ADDENDUM_v1.0.0.md §B.1
 
 ### Gate signer semantics (ADR-026, Dual-Manifest — Gate Model v2.3.0, realignment v1.1.0)
 
@@ -220,6 +237,7 @@ Reference: _COMMUNICATION/team_100/TEAM_100_ARCH_APPROVAL_PACKAGE_FORMAT_LOCK_v1
 | 2026-02-22 | **TEAM_190_WSM_VALIDATION_FAIL_F2_REMEDIATION** | §5 / §5.1: removed operational data (current stage, ACTIVE/FROZEN status); retained structural lock rule only; current state lives solely in WSM CURRENT_OPERATIONAL_STATE. |
 | 2026-02-22 | **GATE_PROTOCOL_v2.3.0_OFFICIALIZATION** | structural_revision updated to v2.3.0; Gate Model source references updated from v2.2.0 to v2.3.0. |
 | 2026-03-07 | **TEAM_10_WSM_SSM_SYNC_POST_GATE8** | Team 10 (Gateway) updated WSM per TEAM_90_TO_TEAM_10_S002_P003_WP002_GATE8_VALIDATION_REPORT (GATE_8 PASS; S002-P003-WP002 COMPLETE). Next authorized program S002-P002 (MCP-QA Transition) — GATE_2 approved by Team 190; activation prompt received. Operational state remains in WSM only; this changelog entry is audit. |
+| 2026-03-17 | **ARCHITECT_DIRECTIVE_GATE_ARCHITECTURE_CANONICAL_ADDENDUM** | §1: IR-MAKER-CHECKER-01 Maker-Checker Principle added. §1.1: Team 10 role updated — Execution Orchestrator → Work Plan Generator; WSM managed by pipeline system only. Reference: ARCHITECT_DIRECTIVE_GATE_ARCHITECTURE_CANONICAL_ADDENDUM_v1.0.0.md. |
 
 ---
 

@@ -5,7 +5,7 @@
 #   ./pipeline_run.sh              → generate current gate prompt + display for copy-paste
 #   ./pipeline_run.sh pass         → advance current gate PASS → show next
 #   ./pipeline_run.sh fail "why"   → advance current gate FAIL with reason
-#   ./pipeline_run.sh approve      → approve human-gate (GATE_2, GATE_6, GATE_7)
+#   ./pipeline_run.sh approve      → approve human-gate (GATE_2, GATE_7)
 #   ./pipeline_run.sh status       → show pipeline status only
 #   ./pipeline_run.sh gate NAME    → override: generate prompt for specific gate
 #
@@ -568,7 +568,6 @@ print('yes' if GATE_CONFIG.get('${GATE}', {}).get('default_fail_route') else 'no
     _validate_stage_alignment || exit 1
     GATE=$(_get_gate)
     # Map WAITING_ gates to their base gate for --approve
-    # WAITING_GATE6_APPROVAL → GATE6 → GATE_6 (re-add underscore before digit)
     BASE_GATE=$(echo "$GATE" | sed 's/WAITING_//; s/_APPROVAL//; s/GATE\([0-9]\)/GATE_\1/')
     echo "[pipeline_run] ${DOMAIN_LABEL}Approving: $BASE_GATE"
     $CLI --approve "$BASE_GATE"
@@ -597,7 +596,7 @@ print('yes' if GATE_CONFIG.get('${GATE}', {}).get('default_fail_route') else 'no
   route)
     # Route pipeline after a FAIL decision.
     # Usage:
-    #   ./pipeline_run.sh route doc   [notes]   → doc/governance fix → G5_DOC_FIX
+    #   ./pipeline_run.sh route doc   [notes]   → doc fix → impl team → GATE_5 re-validation
     #   ./pipeline_run.sh route full  [notes]   → full cycle → G3_PLAN
     #   ./pipeline_run.sh route doc   [notes] GATE_NAME  → override gate (default: current)
     TYPE="${2:?Usage: ./pipeline_run.sh route doc|full [notes]}"
@@ -904,7 +903,8 @@ except Exception:
     echo "  pass                     Advance current gate → PASS → show next"
     echo "  fail <reason>            Record FAIL with reason → show routing options"
     echo "  route doc|full [notes]   Route after FAIL: doc=quick fix, full=full cycle"
-    echo "  approve                  Approve human gate (GATE_2, GATE_6, GATE_7)"
+    echo "  approve                  Approve human gate (GATE_2, GATE_7)"
+    echo "  approve                  Approve human gate (GATE_2, GATE_7)"
     echo "  status                   Show pipeline state only"
     echo "  gate <NAME>              Generate prompt for specific gate"
     echo "  revise <notes> [file]    Generate G3_PLAN revision prompt after G3_5 FAIL"

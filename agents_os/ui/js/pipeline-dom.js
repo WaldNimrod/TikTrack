@@ -17,7 +17,7 @@ function gateStatus(gate, state) {
   // Auto-infer "skipped" — gate was legitimately bypassed if the active/completed
   // gate is later in the sequence. Handles intermediate pseudo-gates like
   // WAITING_GATE2_APPROVAL, G3_PLAN, G3_5, G3_6_MANDATES, CURSOR_IMPLEMENTATION,
-  // G5_DOC_FIX, WAITING_GATE6_APPROVAL when they are not explicitly recorded.
+  // WAITING_GATE6_APPROVAL when not explicitly recorded (G5_DOC_FIX removed WP004).
   const gateIdx = GATE_SEQUENCE.indexOf(gate);
   if (gateIdx >= 0) {
     const currIdx = GATE_SEQUENCE.indexOf(state.current_gate || '');

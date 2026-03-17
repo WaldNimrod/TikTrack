@@ -5,7 +5,7 @@ const GATE_SEQUENCE = [
   "GATE_0", "GATE_1", "GATE_2", "WAITING_GATE2_APPROVAL",
   "G3_PLAN", "G3_5", "G3_6_MANDATES",
   "CURSOR_IMPLEMENTATION",
-  "GATE_4", "GATE_5", "G5_DOC_FIX", "GATE_6", "WAITING_GATE6_APPROVAL",
+  "GATE_4", "GATE_5", "GATE_6", "WAITING_GATE6_APPROVAL",
   "GATE_7", "GATE_8"
 ];
 
@@ -20,7 +20,6 @@ const GATE_CONFIG = {
   "CURSOR_IMPLEMENTATION":  { owner: "teams_20+30", engine: "cursor",         desc: "Implement (Teams 20+30)", twoPaths: false },
   "GATE_4":                 { owner: "team_50",     engine: "cursor+mcp",     desc: "QA — Team 50", twoPaths: true },
   "GATE_5":                 { owner: "team_90",     engine: "codex",          desc: "Dev validation", twoPaths: true },
-  "G5_DOC_FIX":             { owner: "team_10",     engine: "cursor",         desc: "Admin doc fix → GATE_5 re-validation", twoPaths: true },
   "GATE_6":                 { owner: "team_100",    engine: "codex+human",     desc: "Team 100 → reality vs intent", twoPaths: true },
   "WAITING_GATE6_APPROVAL": { owner: "team_00",     engine: "human",          desc: "Nimrod approves GATE_6", twoPaths: true },
   "GATE_7":                 { owner: "team_90",     engine: "human",          desc: "Team 90 orchestrates UX review; Nimrod browser sign-off", twoPaths: true },
@@ -60,7 +59,7 @@ const DOMAIN_STATE_FILES = {
 const LEGACY_STATE_FILE = "../../_COMMUNICATION/agents_os/pipeline_state.json";
 
 const BOOSTER_TEAM_DATA = {
-  "team_10":   { label: "Team 10",   name: "Execution Orchestrator",    writesTo: ["../../_COMMUNICATION/team_10/"],   isoRules: ["No gate submission without all artifacts", "Work plan must be versioned", "Identity header mandatory on all outputs"] },
+  "team_10":   { label: "Team 10",   name: "Work Plan Generator",        writesTo: ["../../_COMMUNICATION/team_10/"],   isoRules: ["No gate submission without all artifacts", "Work plan must be versioned", "Identity header mandatory on all outputs"] },
   "team_20":   { label: "Team 20",   name: "Backend Implementation",    writesTo: ["../../_COMMUNICATION/team_20/"],   isoRules: ["maskedLog mandatory on all server-side logging", "NUMERIC(20,8) for financial data", "4-state status model (pending/active/inactive/cancelled)"] },
   "team_30":   { label: "Team 30",   name: "Frontend Implementation",    writesTo: ["../../_COMMUNICATION/team_30/"],   isoRules: ["collapsible-container Iron Rule on ALL pages", "maskedLog mandatory", "Rich text: ONE unified object"] },
   "team_31":   { label: "Team 31",   name: "Blueprint Maker",            writesTo: ["../../staging/blueprints/"],        isoRules: ["OUTSIDE gate pipeline — no gate submissions", "Blueprint files are staging artifacts only — not production code"] },
@@ -92,6 +91,34 @@ const DOMAIN_GATE_OWNERS_JS = {
   },
 };
 
+/** AC-CS-06: Align to active WP. When no WP active: placeholder. Call at runtime (pipelineState must be loaded). */
+function getExpectedFiles() {
+  const wp = (typeof pipelineState !== "undefined" && pipelineState?.work_package_id) ? pipelineState.work_package_id : "";
+  if (!wp || wp === "NONE") {
+    return [{ label: "No active WP — expected files N/A", path: "" }];
+  }
+  if (wp.startsWith("S002-P005")) {
+    return [
+      { label: "Contract verify",     path: "../../_COMMUNICATION/team_61/TEAM_61_S002_P005_WP003_CONTRACT_VERIFY_v1.0.0.md" },
+      { label: "G3_PLAN work plan",   path: "../../_COMMUNICATION/team_10/TEAM_10_S002_P005_WP003_G3_PLAN_WORK_PLAN_v1.1.0.md" },
+      { label: "LLD400 spec",        path: "../../_COMMUNICATION/team_170/TEAM_170_S002_P005_WP003_LLD400_v1.0.0.md" },
+      { label: "Mandates file",      path: "../../_COMMUNICATION/agents_os/prompts/agentsos_implementation_mandates.md" },
+    ];
+  }
+  if (wp.startsWith("S001-P002")) {
+    return [
+      { label: "Team 20 API verify",  path: "../../_COMMUNICATION/team_20/TEAM_20_S001_P002_WP001_API_VERIFY_v1.0.0.md" },
+      { label: "Team 30 widget JSX", path: "../../ui/src/components/AlertsSummaryWidget.jsx" },
+      { label: "Team 30 HomePage",   path: "../../ui/src/components/HomePage.jsx" },
+      { label: "Team 50 QA report",  path: "../../_COMMUNICATION/team_50/TEAM_50_S001_P002_WP001_QA_REPORT_v1.0.0.md" },
+      { label: "G3_PLAN work plan", path: "../../_COMMUNICATION/team_10/TEAM_10_S001_P002_WP001_G3_PLAN_WORK_PLAN_v1.1.0.md" },
+      { label: "Mandates file",     path: "../../_COMMUNICATION/agents_os/prompts/implementation_mandates.md" },
+    ];
+  }
+  return [{ label: `WP ${wp} — paths TBD`, path: "" }];
+}
+
+/** @deprecated Use getExpectedFiles() at runtime. Fallback for S001-P002 when pipelineState unset. */
 const EXPECTED_FILES = [
   { label: "Team 20 API verify",   path: "../../_COMMUNICATION/team_20/TEAM_20_S001_P002_WP001_API_VERIFY_v1.0.0.md" },
   { label: "Team 30 widget JSX",   path: "../../ui/src/components/AlertsSummaryWidget.jsx" },

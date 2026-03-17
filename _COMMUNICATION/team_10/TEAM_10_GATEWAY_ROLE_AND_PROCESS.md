@@ -1,24 +1,24 @@
 **date:** 2026-03-09
 
-# תפקיד צוות 10 (The Gateway) — ניהול תהליך והפעלת צוותים
+# תפקיד צוות 10 (Work Plan Generator) — ניהול תהליך והפעלת צוותים
 **project_domain:** SHARED (TIKTRACK + AGENTS_OS)
 
 **id:** `TEAM_10_GATEWAY_ROLE_AND_PROCESS`  
-**owner:** Team 10 (The Gateway)  
+**owner:** Team 10 (Work Plan Generator)  
 **status:** 🔒 **מחייב — רענון תפקיד ונוהל עבודה**  
-**last_updated:** 2026-02-25  
+**last_updated:** 2026-03-17  
 **מקורות קנוניים:** Gate Protocol `documentation/docs-governance/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md`; Runbook `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md`; מיפוי צוותים `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md`; נעילת פורמט הודעות `_COMMUNICATION/team_190/TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK_v1.0.0.md`.
 
 ---
 
 ## 1. תפקידנו — בקצרה
 
-**מנצח התזמורת והמתזמן והמתזמר.** צוות 10 = שומרי השערים והסטטוס בכל רגע; הקורדינטור; יוצר התוכנית ואחראי להביאה לסיום ולידציה בצורה האופטימלית והיעילה ביותר — מקבלת האפיון המאושר ועד לסיום QA וולידציה.
+**יוצר תוכנית העבודה (Work Plan Generator).** בעבר צוות 10 תפקד כ"מנצח התזמורת", אך כעת תפקיד זה עבר לסקריפט האורקסטרציה (`pipeline.py`). צוות 10 מתמקד בלעדית בקבלת האפיון המאושר (LOD400) ופירוקו לתוכנית עבודה מדויקת (G3_PLAN).
 
-- **ניהול התהליך:** שמירת סדר המשימות והסטטוס; **הפעלת הצוותים** — בסדר הנכון, עם המידע הדרוש לביצוע אופטימלי ומדויק.
-- **לאחר אישור חבילת עבודה (GATE_3 G3.5 — work-plan validation PASS):** **להוציא את התוכנית לפועל** = להעביר לכל צוות: (1) **קישור לתוכנית המלאה** כקונטקסט, (2) **סדר ביצוע** כולל תלויות ותאומים דרושים, (3) **משימות ספציפיות** לאותו צוות. מסמך מרכזי אחד + פרומט לכל צוות (בבלוק קוד, עם כותרת קנונית) לפי סדר הביצוע.
-- **משימות צוותים:** מיד הודעה ברורה עם משימות, תוצרים נדרשים ודיווח. הצוותים ממתינים להוראות מאיתנו.
-- **משימות צוות 10:** לממש ישירות — אנחנו צוות 10.
+- **ניהול התהליך (Deprecation):** הסקריפט מנהל את הסטטוס, מעדכן את ה-WSM, ומפעיל את הצוותים באמצעות מנדטים מבוססי טרמינל. 
+- **תכנון בלבד:** תפקידנו מסתכם ביצירת `TEAM_10_{WP}_G3_PLAN_WORK_PLAN_v*.md` בשער G3_PLAN, ותיקונו אם נכשל בשער G3_5.
+- **אין לייצר מנדטים ידנית:** לאחר שער G3_5, ה-Pipeline מייצר את המנדטים (G3_6_MANDATES) באופן דטרמיניסטי מתוך תוכנית העבודה שלנו. הצוותים מקבלים מנדטים מ-V2.
+- **משימות צוות 10:** תכנון משימות בלבד, לא ניהולן.
 - **אופציה V2 (Agents_OS V2):** בנוסף לצ'אט ב-Cursor Composer, Team 10 יכול להפעיל את **V2 Orchestrator** (CLI) לניהול state, ייצור prompts ומנדטים דטרמיניסטיים. ראה `documentation/docs-governance/04-PROCEDURES/AGENTS_OS_V2_OPERATING_PROCEDURES_v1.0.0.md` — Pipeline Usage Guide, Per-team instructions, ו־Context injection. כשמשתמשים ב-V2, הפקודה `python3 -m agents_os_v2.orchestrator.pipeline --generate-prompt GATE_X` מייצרת את הפרומט המלא (4 שכבות); הצוותים מקבלים mandates מ-V2 ולא רק מצ'אט ידני.
 
 ---
@@ -28,11 +28,11 @@
 | חובה | פירוט |
 |------|--------|
 | **סדר משימות וסטטוס** | רשימות רמה 2 מעודכנות: `TEAM_10_MASTER_TASK_LIST.md` + `TEAM_10_LEVEL2_COMPLETION_CARRYOVER_LIST.md` + רג'יסטרי (`TEAM_10_LEVEL2_LISTS_REGISTRY.md`). |
-| **הפעלת צוותים** | כשיש משימות לצוות — **מיד** מסמך הודעה ייעודי **אל הצוות** עם משימות ברורות, תוצרים נדרשים, ודיווח. חל גם על Team 70 ו-Team 100 לפי רלוונטיות. לא להשאיר צוות בלי הוראות. |
-| **הודעות רשמיות** | כל החלטת SSOT, פרסום מדיניות, מנדט, או משנה מצב — **הודעה לכל צוות מושפע**. קבצים ב־`_COMMUNICATION/team_10/` (למשל `TEAM_10_TO_TEAM_20_...`, `TEAM_10_TO_TEAM_60_...`). |
-| **משימות צוות 10** | משימות שמוטלות על Gateway (מסמכי SSOT, תיאום, צ'קליסט, Evidence log) — **מממשים ישירות**, לא מעבירים לאחר. |
+| **הפעלת צוותים (מיושן)** | מנוהל כעת ע"י הסקריפט (G3_6_MANDATES). בעבר צוות 10 הוציא הודעות ידניות. |
+| **הודעות רשמיות** | מנוהל כעת ברובו ע"י הסקריפט. |
+| **משימות צוות 10** | יצירת G3_PLAN ותיקוני תוכנית עבודה (מממשים ישירות). |
 | **תאום רמות** | תאום מלא בין רמה 1 (מפת הדרכים), רמה 2 (רשימת משימות), רמה 3 (ביצוע צוותים). עדכון מלמטה למעלה כשמתקבלים דוחות. |
-| **עדכון WSM** | **חובה:** בכל עדכון שער/פאזה — לעדכן את WSM (בלוק CURRENT_OPERATIONAL_STATE). בעל השער (Gate Owner) מעדכן מיד עם סגירת שער; Team 10 מוודא עדכון WSM כשאנחנו Gate Owner (למשל GATE_3) או מתאם עם בעל השער. מקור: TEAM_100_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0. |
+| **WSM** | WSM state is managed exclusively by the pipeline system (`pipeline.py`). Team 10 does not modify WSM files directly. Pipeline state transitions that require WSM updates are handled automatically by the orchestrator. Team 10's sole output at GATE_3 is the implementation work plan (`TEAM_10_{WP}_G3_PLAN_WORK_PLAN_v*.md`). מקור: ARCHITECT_DIRECTIVE_GATE_ARCHITECTURE_CANONICAL_ADDENDUM_v1.0.0.md §B.3. |
 | **ללא מסמכי אישור מיותרים** | אין לייצר מסמכי "אישור קבלה" / "acknowledgment" נפרדים — מבזבז זמן; עדכון רשימות ו־WSM מספיק. |
 
 ---

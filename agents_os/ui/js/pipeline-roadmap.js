@@ -417,7 +417,7 @@ function renderConflictResult(conflictEl, valEl, valBadge, stages, programs, res
   conflictEl.innerHTML = stageConflicts.map(it => {
     const bannerClass = it.type === 'AUTHORIZED_EXCEPTION' ? 'conflict-banner state-exception' : 'conflict-banner state-blocking';
     const title = it.type === 'AUTHORIZED_EXCEPTION' ? '⚠️ Authorized Exception' : '⚠️ Stage/Program Conflict';
-    return `<div class="${bannerClass}">
+    return `<div class="${bannerClass}" data-testid="roadmap-stage-conflict-banner">
       <strong>${escHtml(title)}</strong>
       ${escHtml(it.msg)}
       ${it.log ? `<div class="log-line">${escHtml(it.log)}</div>` : ''}

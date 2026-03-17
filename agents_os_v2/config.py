@@ -28,6 +28,7 @@ TEAM_ENGINE_MAP = {
     "team_90":  "openai",
     "team_61":  "cursor",
     "team_100": "gemini",
+    "team_101": "cursor",
     "team_170": "gemini",
     "team_190": "openai",
 }
@@ -64,13 +65,11 @@ DOMAIN_GATE_OWNERS: dict[str, dict[str, str]] = {
         "GATE_2":    "team_00",   # TikTrack architect approves intent
         "WAITING_GATE2_APPROVAL": "team_00",
         "GATE_6":    "team_00",   # TikTrack architect validates reality
-        "WAITING_GATE6_APPROVAL": "team_00",
     },
     "agents_os": {
         "GATE_2":    "team_100",  # Strategic reviewer approves AgentsOS intent
         "WAITING_GATE2_APPROVAL": "team_100",
         "GATE_6":    "team_100",  # Strategic reviewer validates AgentsOS reality
-        "WAITING_GATE6_APPROVAL": "team_100",
     },
 }
 

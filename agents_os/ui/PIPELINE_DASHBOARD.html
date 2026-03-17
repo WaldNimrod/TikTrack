@@ -19,6 +19,7 @@
   <div class="agents-header-left">
     <h1 class="agents-header-title">📊 Agents OS — <span>Pipeline Dashboard</span></h1>
     <span class="domain-badge" id="domain-badge-header">—</span>
+    <span data-testid="dashboard-provenance-badge" id="dashboard-provenance-badge" class="provenance-badge" title="Data source">[live: —]</span>
     <span class="agents-refresh-label" id="last-updated">Loading…</span>
   </div>
   <div class="agents-header-right">
@@ -241,7 +242,18 @@ python3 -m http.server 8090
   </div>
 </div>
 
-<div class="agents-page-layout">
+<!-- CS-03: PRIMARY_STATE_READ_FAILED panel — shown when domain state file fetch fails; NO fallback -->
+<div id="primary-state-read-failed-panel" data-testid="primary-state-read-failed" class="primary-state-read-failed" style="display:none">
+  <div class="primary-state-read-failed-inner">
+    <strong>⚠️ PRIMARY STATE READ FAILED</strong><br>
+    Domain state file not accessible. No fallback is used.<br>
+    Check: <code id="primary-state-fail-path">—</code><br>
+    <span id="primary-state-fail-detail" style="font-size:11px;color:var(--text-muted)"></span><br>
+    <em>Recovery:</em> Ensure <code>_COMMUNICATION/agents_os/pipeline_state_[domain].json</code> exists.
+  </div>
+</div>
+
+<div class="agents-page-layout" id="agents-page-layout">
 
   <!-- ── LEFT: Sidebar (per Agents LTR) ── -->
   <aside class="agents-page-sidebar">
@@ -263,13 +275,19 @@ python3 -m http.server 8090
     <div class="sidebar-section" id="pwa-banner-sidebar" style="display:none">
       <!-- S002-P005-WP002: filled by loadPipelineState when gate_state=PASS_WITH_ACTION -->
     </div>
-    <div class="sidebar-section">
+    <div class="sidebar-section" data-testid="dashboard-wp-gate-strip">
       <div class="sidebar-label">Pipeline Status</div>
       <div class="info-row"><span class="info-key">WP</span>     <span class="info-val" id="s-wp">—</span></div>
       <div class="info-row"><span class="info-key">Stage</span>  <span class="info-val" id="s-stage">—</span></div>
       <div class="info-row"><span class="info-key">Gate</span>   <span id="s-gate-pill">—</span></div>
       <div class="info-row"><span class="info-key">Owner</span>  <span class="info-val" id="s-owner">—</span></div>
       <div class="info-row"><span class="info-key">Engine</span> <span class="info-val" id="s-engine">—</span></div>
+    </div>
+    <div class="sidebar-section" id="snapshot-freshness-section">
+      <div class="sidebar-label">Snapshot</div>
+      <div id="snapshot-freshness-badge-wrap">
+        <span data-testid="snapshot-freshness-badge" id="snapshot-freshness-badge" class="snapshot-freshness-badge">—</span>
+      </div>
     </div>
     <div class="sidebar-section" id="health-warnings-panel" style="display:none">
       <div class="sidebar-label">⚠️ System Health</div>

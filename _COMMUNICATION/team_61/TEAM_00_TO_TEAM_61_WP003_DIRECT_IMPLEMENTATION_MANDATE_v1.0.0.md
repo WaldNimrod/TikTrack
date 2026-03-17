@@ -341,17 +341,101 @@ Phase B (commit separately):
 
 ---
 
-## 9. References
+## 9. Additional Mandates — Addendum v1.1 (2026-03-17)
+
+The following tasks are appended to this mandate per `ARCHITECT_DIRECTIVE_GATE_ARCHITECTURE_CANONICAL_ADDENDUM_v1.0.0.md`. They are part of the same delivery — implement alongside the original tasks.
+
+---
+
+### 9.1 Remove G5_DOC_FIX from the Pipeline (P0)
+
+**Files:**
+
+1. `agents_os_v2/orchestrator/pipeline.py`:
+   - Remove `"G5_DOC_FIX"` from `GATE_SEQUENCE` list
+   - Remove `"G5_DOC_FIX"` entry from `GATE_CONFIG` dict
+   - Remove `"G5_DOC_FIX"` entry from `FAIL_ROUTING` dict
+   - Delete `_generate_g5_doc_fix_prompt()` function entirely
+   - Update `GATE_5` routing in `FAIL_ROUTING`:
+     ```python
+     "GATE_5": {
+         "doc":  ("CURSOR_IMPLEMENTATION", "Doc/artifact gap — implementation team fixes directly → GATE_5 re-validation"),
+         "full": ("G3_PLAN", "Code/design issues — full re-plan → mandates → impl → QA → GATE_5"),
+     },
+     ```
+
+2. `pipeline_run.sh`:
+   - Remove any case block referencing `G5_DOC_FIX`
+   - Remove any `_show_prompt` or `_generate_and_show` reference to `G5_DOC_FIX`
+
+3. `agents_os/ui/js/pipeline-config.js`:
+   - Remove `G5_DOC_FIX` from `ALL_GATE_DEFS`
+   - Remove from any sequence arrays or mandate-file maps
+
+---
+
+### 9.2 Fix Team 10 "Orchestrator" Label Drift in pipeline.py (P0)
+
+**File:** `agents_os_v2/orchestrator/pipeline.py`
+
+| Location | Current text | Replace with |
+|----------|-------------|-------------|
+| File header / top comment (line ~6) | "The Orchestrator IS Team 10..." | "Team 10 is the Work Plan Generator. The Python pipeline is the sole orchestrator." |
+| G3_PLAN prompt, Phase 1 header (line ~1250) | "Team 10 — Execution Orchestrator" | "Team 10 — Work Plan Generator" |
+| G3_PLAN prompt, revision Phase 1 (line ~1267) | "Team 10 — Execution Orchestrator" | "Team 10 — Work Plan Generator" |
+| GATE_0 prompt WSM note (lines ~1040–1042) | "WSM `active_work_package_id` is NOT updated until GATE_3 intake (Team 10 responsibility)" | "WSM `active_work_package_id` is NOT updated until GATE_3 intake. WSM updates are managed by the pipeline system — not by Team 10 directly." |
+
+---
+
+### 9.3 PASS_WITH_ACTION Button in Dashboard UI (P1)
+
+**File:** `agents_os/ui/js/pipeline-dashboard.js`
+
+For all VALIDATION gates (gates owned by Team 90, 190, 50, 51 — as defined in `ALL_GATE_DEFS`), add a third verdict option alongside PASS and FAIL:
+
+**Button:** `⚠️ PASS_WITH_ACTION`
+- `data-testid="pass-with-action-btn"` on the button
+- Opens a textarea for the operator to enter pipe-separated actions
+- Generates: `./pipeline_run.sh --domain [domain] pass_with_actions "ACTION-1|ACTION-2"`
+- Includes copy-to-terminal button (same pattern as existing fail/pass builders)
+
+**Pending actions display:**
+- If `pipelineState.pending_actions` is non-empty, show:
+  ```html
+  <div data-testid="pending-actions-panel" class="pending-actions">
+    ⚠️ Pending actions: [list]
+  </div>
+  ```
+- This panel shown in the current-step-banner area, not just in the QA bar
+
+---
+
+### 9.4 GATE_CONFIG Documentation Comment (P1 doc)
+
+**File:** `agents_os_v2/orchestrator/pipeline.py`
+
+In `GATE_CONFIG` at `CURSOR_IMPLEMENTATION` entry, add comment:
+```python
+"CURSOR_IMPLEMENTATION": {
+    ...,
+    # canonical display name: GATE_3_IMPL (code rename deferred to S003 — dedicated rename WP)
+},
+```
+
+---
+
+## 10. References
 
 | Doc | Path |
 |-----|------|
 | LLD400 (locked spec) | `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP003_LLD400_v1.0.0.md` |
 | Work Plan v1.1.0 | `_COMMUNICATION/team_10/TEAM_10_S002_P005_WP003_G3_PLAN_WORK_PLAN_v1.1.0.md` |
-| Team 51 QA Mandate | `_COMMUNICATION/team_100/TEAM_100_TO_TEAM_51_STATE_ALIGNMENT_WP003_QA_MANDATE.md` *(to be issued separately)* |
-| Gate Architecture | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GATE_ARCHITECTURE_CANONICAL_v1.0.0.md` |
+| Gate Architecture v1.0.0 | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GATE_ARCHITECTURE_CANONICAL_v1.0.0.md` |
+| Gate Architecture Addendum | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GATE_ARCHITECTURE_CANONICAL_ADDENDUM_v1.0.0.md` |
 
 ---
 
 **log_entry | TEAM_00 | WP003_DIRECT_MANDATE | ISSUED | 2026-03-17**
 **log_entry | TEAM_00 | BYPASS_REASON | PIPELINE_DASHBOARD_STALL | 2026-03-17**
 **log_entry | TEAM_00 | AUTHORITY | CONSTITUTIONAL_DIRECT_MANDATE | 2026-03-17**
+**log_entry | TEAM_00 | ADDENDUM_v1.1 | G5_REMOVAL+T10_DRIFT+PASS_WITH_ACTION | 2026-03-17**

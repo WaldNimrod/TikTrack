@@ -1,5 +1,15 @@
 /* pipeline-dashboard.css — Team 61 AOUI LOD400 — Dashboard-specific styles */
 
+/* CS-03: PRIMARY_STATE_READ_FAILED panel */
+.primary-state-read-failed { padding: 16px; background: rgba(220,53,69,0.12); border: 1px solid var(--danger); border-radius: 8px; margin: 16px; }
+.primary-state-read-failed-inner { font-size: 13px; color: var(--text); }
+.provenance-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border); margin-left: 6px; }
+.snapshot-freshness-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; }
+.sf-fresh { background: rgba(63,185,80,0.15); color: var(--success); border: 1px solid rgba(63,185,80,0.3); }
+.sf-yellow { background: rgba(210,153,34,0.15); color: var(--warning); border: 1px solid rgba(210,153,34,0.3); }
+.sf-red { background: rgba(248,81,73,0.15); color: var(--danger); border: 1px solid rgba(248,81,73,0.3); }
+.sf-unavailable { background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border); }
+
 /* Dashboard uses agents-page-layout from shared; sidebar on right */
 .dashboard-layout { display: grid; grid-template-columns: 1fr 300px; gap: 0; min-height: calc(100vh - 49px); }
 @media (max-width: 960px) { .dashboard-layout { grid-template-columns: 1fr; } }

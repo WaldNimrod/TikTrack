@@ -1,6 +1,6 @@
 # CURSOR IMPLEMENTATION
-date: 2026-03-14
-historical_record: true
+
+**date:** 2026-03-17
 
 Open the mandates file and paste each team's mandate into a Cursor Composer session:
 

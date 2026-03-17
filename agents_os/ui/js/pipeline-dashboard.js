@@ -45,12 +45,14 @@ async function loadPipelineState() {
     let state = await loadDomainState(currentDomain);
     if (!state) throw new Error("No state");
 
-    // Header + LEGACY_FALLBACK badge (SPC-02)
+    // Header + provenance badge (P0-01) — CS-03: no legacy fallback
     const lastEl = document.getElementById("last-updated");
-    const base = "[" + (state.project_domain || currentDomain) + "] " +
-      "Last updated: " + (state.last_updated ? new Date(state.last_updated).toLocaleTimeString() : "unknown");
+    const domainLabel = state.project_domain || currentDomain;
+    const base = "[" + domainLabel + "] Last updated: " + (state.last_updated ? new Date(state.last_updated).toLocaleTimeString() : "unknown");
     lastEl.textContent = base;
-    lastEl.innerHTML = base + (stateFallbackMode ? ' <span class="legacy-fallback-badge">⚠ LEGACY_FALLBACK</span>' : '');
+    lastEl.innerHTML = base;
+    const provBadge = document.getElementById("dashboard-provenance-badge");
+    if (provBadge) provBadge.textContent = `[live: ${domainLabel}]`;
 
     // Sidebar status
     document.getElementById("s-wp").textContent    = state.work_package_id || "—";
@@ -94,7 +96,7 @@ async function loadPipelineState() {
         const domainFlag = (state.project_domain || currentDomain) === 'agents_os' ? '--domain agents_os ' : '';
         const clearCmd = domainFlag + './pipeline_run.sh actions_clear';
         pwaContainer.dataset.domainFlag = domainFlag;
-        pwaContainer.innerHTML = `<div class="pwa-banner">
+        pwaContainer.innerHTML = `<div class="pwa-banner" data-testid="pending-actions-panel">
           <div class="pwa-banner-title">⚡ PASS_WITH_ACTION</div>
           <div class="pwa-action-list">${actions.length ? actions.map(a => `<div class="pwa-action-item">${escHtml(a)}</div>`).join('') : '<div class="pwa-action-item" style="color:var(--text-muted)">No actions recorded</div>'}</div>
           <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
@@ -777,6 +779,28 @@ function getEffectiveVerdictTeam(gate) {
   return (ALL_GATE_DEFS[gate] || {}).verdictTeam || null;
 }
 
+/** WP004: Validation gates only — owner in team_90, 190, 50, 51; exclude human gates */
+function isValidationGateForPWA(gate) {
+  const owner = getDomainOwner(gate);
+  const def = ALL_GATE_DEFS[gate] || {};
+  const cfg = GATE_CONFIG[gate] || {};
+  const engine = def.engine || cfg.engine || '';
+  if (engine && String(engine).includes('human')) return false;
+  return ['team_90', 'team_190', 'team_50', 'team_51'].indexOf(owner || '') >= 0;
+}
+
+/** WP004: Generate pass_with_actions command from textarea and copy to clipboard */
+function generateAndCopyPwaCmd(gate, taId, btnEl) {
+  const ta = document.getElementById(taId);
+  const raw = ta ? (ta.value || '').trim() : '';
+  const actions = raw || 'ACTION-1|ACTION-2';
+  const safe = actions.replace(/"/g, '\\"');
+  const cmd = _dfCmd(`./pipeline_run.sh pass_with_actions "${safe}"`);
+  copyText(cmd, btnEl);
+  if (btnEl) btnEl.textContent = '✓ Copied';
+  setTimeout(function() { if (btnEl) btnEl.textContent = 'Generate & Copy'; }, 1500);
+}
+
 // ── Progress Check ─────────────────────────────────────────────────────────
 async function runProgressCheck() {
   document.getElementById("progress-modal").classList.add("open");
@@ -785,13 +809,11 @@ async function runProgressCheck() {
 
   let state = null;
   try {
-    // Try domain-specific file, then legacy fallback
-    let r = await fetch(getDomainStateFile() + '?t=' + Date.now());
-    if (!r.ok) r = await fetch(LEGACY_STATE_FILE + '?t=' + Date.now());
-    if (!r.ok) throw new Error("state file not found");
+    const r = await fetch(getDomainStateFile() + '?t=' + Date.now());
+    if (!r.ok) throw new Error(r.status + " " + r.statusText);
     state = await r.json();
   } catch(e) {
-    content.innerHTML = '<div class="alert-box">❌ Cannot read pipeline state — is the HTTP server running?<br><code>python3 -m http.server 8090</code></div>';
+    content.innerHTML = `<div class="alert-box">❌ PRIMARY STATE READ FAILED — ${getDomainStateFile()}<br>${escHtml(String(e.message || e))}<br>No fallback used. Ensure file exists and HTTP server is running: <code>python3 -m http.server 8090</code></div>`;
     return;
   }
 
@@ -1169,10 +1191,12 @@ async function checkExpectedFiles() {
   const list = document.getElementById("file-list");
   list.innerHTML = '<span class="loading">Checking…</span>';
 
-  const results = await Promise.all(EXPECTED_FILES.map(async f => {
+  const files = typeof getExpectedFiles === "function" ? getExpectedFiles() : EXPECTED_FILES;
+  const toCheck = files.filter(f => f.path);
+  const results = toCheck.length ? await Promise.all(toCheck.map(async f => {
     const exists = await fileExists(f.path);
     return {...f, exists};
-  }));
+  })) : files;
 
   const found = results.filter(r => r.exists).length;
   document.getElementById("files-badge").textContent = `${found}/${results.length} found`;
@@ -1558,7 +1582,7 @@ function buildCurrentStepBanner(gate, state) {
       <span class="ticker-label" style="color:var(--text-muted)">Recent:</span> <span id="event-log-ticker-events" style="color:var(--text-muted)">—</span>
       <span class="ticker-count" style="margin-left:8px;color:var(--accent)">(<span id="event-log-ticker-count">0</span> events)</span>
     </div>`;
-    return `<div class="current-step-banner csb-complete">
+    return `<div class="current-step-banner csb-complete" data-testid="gate-complete-message">
       <div class="csb-title">${escHtml(title)}</div>
       <div class="csb-header">
         <span class="csb-actor">${escHtml(actorTxt)}</span>
@@ -2281,7 +2305,7 @@ async function buildQuickActionBar(gate) {
     const actionItems = pendingActions.length
       ? pendingActions.map(a => `<div class="pwa-action-item">• ${escHtml(a)}</div>`).join('')
       : `<div class="pwa-action-item" style="color:var(--text-muted)">No action items recorded</div>`;
-    pwaBanner = `<div class="pwa-banner">
+    pwaBanner = `<div class="pwa-banner" data-testid="pending-actions-panel">
       <div class="pwa-banner-title">⚡ PASS_WITH_ACTION — gate held pending resolution</div>
       ${actionItems}
       <div style="display:flex;gap:6px;margin-top:8px">
@@ -2337,15 +2361,24 @@ async function buildQuickActionBar(gate) {
     </div>`;
 
   } else {
-    // ── Mode B: normal (gate not yet failed) — PASS + PWA + FAIL buttons ────
-    const pwaCmd = _dfCmd('./pipeline_run.sh pass_with_actions "ACTION-1: [describe]|ACTION-2: [describe]"');
+    // ── Mode B: normal (gate not yet failed) — PASS + PWA (validation only) + FAIL buttons ────
+    const showPwa = isValidationGateForPWA(gate);
     html += `<div class="quick-action-bar">
       <button class="qa-btn qa-btn-pass" onclick="copyCmd(${escAttr(JSON.stringify(passCmd))}, this)">
         ${escHtml(passLabel)} &nbsp;<span class="terminal-hint">⎘ copy → terminal</span>
-      </button>
-      <button class="qa-btn qa-btn-pwa" onclick="copyCmd(${escAttr(JSON.stringify(pwaCmd))}, this)" title="Pass with follow-up actions required (WP002)">
-        ⚡ Pass w/ Action &nbsp;<span class="pwa-badge">WP002</span><span class="terminal-hint">⎘ copy</span>
       </button>`;
+    if (showPwa) {
+      const pwaFormId = 'pwa-form-' + gate.replace(/_/g, '-');
+      const pwaTaId   = 'pwa-ta-' + gate.replace(/_/g, '-');
+      html += `<button class="qa-btn qa-btn-pwa" data-testid="pass-with-action-btn" onclick="var f=document.getElementById('${pwaFormId}');f.style.display=f.style.display==='none'?'block':'none';" title="Pass with follow-up actions required">
+        ⚡ Pass w/ Action &nbsp;<span class="terminal-hint">⎘</span>
+      </button>
+      <div id="${pwaFormId}" class="pwa-actions-form" style="display:none;grid-column:1/-1;margin-top:8px;padding:8px;background:rgba(210,153,34,0.06);border:1px solid var(--warning);border-radius:6px">
+        <div style="font-size:11px;color:var(--warning);margin-bottom:6px">Pipe-separated actions:</div>
+        <textarea id="${pwaTaId}" class="findings-textarea" placeholder="ACTION-1|ACTION-2|ACTION-3" style="min-height:50px"></textarea>
+        <button class="btn" style="font-size:10px;margin-top:6px" onclick="generateAndCopyPwaCmd('${escAttr(gate)}','${pwaTaId}',this)">Generate &amp; Copy</button>
+      </div>`;
+    }
 
     if (needsBuilder) {
       html += `<button class="qa-btn qa-btn-fail" disabled style="opacity:0.45;cursor:default">
@@ -2415,6 +2448,30 @@ async function buildQuickActionBar(gate) {
   }
 }
 
+/** CS-08: Snapshot freshness badge — green <10min, yellow 10–60min, red >1h */
+function updateSnapshotFreshnessBadge(producedAtIso) {
+  const el = document.getElementById('snapshot-freshness-badge');
+  if (!el) return;
+  if (!producedAtIso) {
+    el.textContent = '[unavailable]';
+    el.className = 'snapshot-freshness-badge sf-unavailable';
+    return;
+  }
+  const ageSec = (Date.now() - new Date(producedAtIso).getTime()) / 1000;
+  let text, cls;
+  if (ageSec < 600) {
+    text = '[fresh]'; cls = 'snapshot-freshness-badge sf-fresh';
+  } else if (ageSec < 3600) {
+    const min = Math.floor(ageSec / 60);
+    text = `[~${min}m ago]`; cls = 'snapshot-freshness-badge sf-yellow';
+  } else {
+    const h = Math.floor(ageSec / 3600);
+    text = `[stale: ${h}h ago]`; cls = 'snapshot-freshness-badge sf-red';
+  }
+  el.textContent = text;
+  el.className = cls;
+}
+
 // ── Health warnings (reads STATE_SNAPSHOT.json, shows issues with severity + copyable log) ──
 async function loadHealthWarnings() {
   const panel   = document.getElementById('health-warnings-panel');
@@ -2429,6 +2486,7 @@ async function loadHealthWarnings() {
       : '../../_COMMUNICATION/agents_os/STATE_SNAPSHOT.json';
     const snapshot = await fetchJSON(domainPath);
     const gov = snapshot.governance || {};
+    updateSnapshotFreshnessBadge(snapshot.produced_at_iso);
 
     // AD-V2-01: active_stage missing from STATE_SNAPSHOT
     if (!gov.active_stage) {
@@ -2467,6 +2525,7 @@ async function loadHealthWarnings() {
     warnings.push({ sev:'warning',
       msg:'STATE_SNAPSHOT.json not found — system health unknown',
       log:`Run: python3 -m agents_os_v2.observers.state_reader  |  Error: ${String(e)}` });
+    updateSnapshotFreshnessBadge(null);
   }
 
   if (warnings.length === 0) {
@@ -2513,13 +2572,37 @@ function _stateRenderKey(s) {
 // Phase 1: pre-fetch state silently in background (zero DOM writes).
 // Phase 2a (state changed): full re-render — pipeline advanced, new data available.
 // Phase 2b (no change): passive update only — timestamp + event log. Banner untouched.
+/** CS-03: Show PRIMARY_STATE_READ_FAILED panel when domain state file unavailable */
+function showPrimaryStateReadFailedPanel() {
+  const panel = document.getElementById('primary-state-read-failed-panel');
+  const pathEl = document.getElementById('primary-state-fail-path');
+  const detailEl = document.getElementById('primary-state-fail-detail');
+  const layout = document.getElementById('agents-page-layout');
+  if (panel && pathEl && detailEl) {
+    const d = primaryStateReadFailedDetail || {};
+    pathEl.textContent = d.source_path || getDomainStateFile();
+    detailEl.textContent = `${d.domain || currentDomain} • ${d.error || ''} • ${d.timestamp || ''}`;
+    panel.style.display = 'block';
+    if (layout) layout.style.opacity = '0.5';
+  }
+}
+
+function hidePrimaryStateReadFailedPanel() {
+  const panel = document.getElementById('primary-state-read-failed-panel');
+  const layout = document.getElementById('agents-page-layout');
+  if (panel) panel.style.display = 'none';
+  if (layout) layout.style.opacity = '';
+}
+
 async function loadAll() {
   // ── Phase 1: background fetch ──────────────────────────────────────────
   let freshState;
   try {
     freshState = await loadDomainState(currentDomain);
+    hidePrimaryStateReadFailedPanel();
   } catch(e) {
     console.error('[loadAll] background fetch failed:', e);
+    showPrimaryStateReadFailedPanel();
     return;
   }
   if (!freshState) return;
@@ -2536,17 +2619,24 @@ async function loadAll() {
       return;
     }
     _lastRenderKey = newKey;
-    const state = await loadPipelineState();   // fetches again + renders all DOM
-    if (state) await loadPrompt(state.current_gate);
-    await Promise.all([loadMandates(), checkExpectedFiles(), loadHealthWarnings()]);
+    try {
+      const state = await loadPipelineState();   // fetches again + renders all DOM
+      if (state) await loadPrompt(state.current_gate);
+      await Promise.all([loadMandates(), checkExpectedFiles(), loadHealthWarnings()]);
+    } catch (e) {
+      console.error('[loadAll] loadPipelineState failed:', e);
+      showPrimaryStateReadFailedPanel();
+    }
   } else {
     // ── Phase 2b: passive update — only timestamp (safe, non-interactive) ─
     const lastEl = document.getElementById('last-updated');
+    const provBadge = document.getElementById('dashboard-provenance-badge');
     if (lastEl) {
-      const base = '[' + (freshState.project_domain || currentDomain) + '] Last updated: ' +
+      const domainLabel = freshState.project_domain || currentDomain;
+      const base = '[' + domainLabel + '] Last updated: ' +
         (freshState.last_updated ? new Date(freshState.last_updated).toLocaleTimeString() : 'unknown');
-      lastEl.innerHTML = base +
-        (stateFallbackMode ? ' <span class="legacy-fallback-badge">⚠ LEGACY_FALLBACK</span>' : '');
+      lastEl.innerHTML = base;
+      if (provBadge) provBadge.textContent = `[live: ${domainLabel}]`;
     }
   }
 

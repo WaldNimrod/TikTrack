@@ -47,10 +47,10 @@ Internal sub-stage sequence: _COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION
 | Item | Content |
 |------|---------|
 | **Entry** | Work Package defined; execution plan ready. G3.5 PASS (Team 90 work-plan validation) required before G3.6 (and before G3.7 when AGENTS_OS). |
-| **Team 10 mandatory actions** | (1) G3.1–G3.5: Spec intake, implementation review, clarification loop, detailed build, **submit to Team 90 for validation (G3.5)**; wait for PASS. (2) **AGENTS_OS:** Execute **G3.7 (Test Template Generation)** — run `generate_test_templates` on spec; ensure outputs in `tests/api/`, `tests/ui/`; TT-00 BLOCK if section empty. (3) G3.6–G3.9: Issue mandate to each dev team in scope (20/30/40/60 per TEAM_DEVELOPMENT_ROLE_MAPPING); orchestrate; collect deliverables; pre-check; build GATE_3 exit package; submit to GATE_4 (QA). (4) Update WSM (current_gate, last_gate_event, next_required_action). |
+| **Team 10 mandatory actions** | (1) G3.1–G3.5: Spec intake, implementation review, clarification loop, detailed build, **submit to Team 90 for validation (G3.5)**; wait for PASS. (2) **AGENTS_OS:** Execute **G3.7 (Test Template Generation)** — run `generate_test_templates` on spec; ensure outputs in `tests/api/`, `tests/ui/`; TT-00 BLOCK if section empty. (3) G3.6–G3.9: Issue mandate to each dev team in scope (20/30/40/60 per TEAM_DEVELOPMENT_ROLE_MAPPING); orchestrate; collect deliverables; pre-check; build GATE_3 exit package; submit to GATE_4 (QA). WSM state is managed exclusively by the pipeline system; Team 10 does not modify WSM directly (ARCHITECT_DIRECTIVE_GATE_ARCHITECTURE_CANONICAL_ADDENDUM_v1.0.0.md §B.3). |
 | **Required artifacts** | EXECUTION_AND_TEAM_PROMPTS (or equivalent); Team 90 G3.5 response; (AGENTS_OS: G3.7 test template outputs where applicable); completion reports; GATE_3 exit package to GATE_4. |
 | **Exit** | Implementation complete; package handed to GATE_4 (QA). |
-| **WSM** | Team 10 (Gate Owner for GATE_3) updates WSM immediately upon GATE_3 closure. |
+| **WSM** | Pipeline system manages WSM; gate closure triggers WSM update via pipeline commands. Team 10 does not modify WSM directly. |
 
 ---
 
@@ -62,7 +62,7 @@ Internal sub-stage sequence: _COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION
 | **Team 10 mandatory actions** | (1) Deliver QA package (context, links, evidence) to QA per role mapping. (2) Wait for QA report (0 SEVERE). (3) Update task lists; on PASS proceed to GATE_5. |
 | **Required artifacts** | QA handover (canonical format); QA report. |
 | **Exit** | QA PASS (0 SEVERE). |
-| **WSM** | Team 10 (Gate Owner for GATE_4) updates WSM on gate closure. |
+| **WSM** | Pipeline system manages WSM on gate closure. Team 10 does not modify WSM directly. |
 
 ---
 
@@ -71,7 +71,7 @@ Internal sub-stage sequence: _COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION
 | Item | Content |
 |------|---------|
 | **Entry** | GATE_4 PASS. |
-| **Team 10 mandatory actions** | (1) Submit WORK_PACKAGE_VALIDATION_REQUEST (gate_id GATE_5) to Team 90 with full package. (2) Wait for VALIDATION_RESPONSE. (3) Update task lists and WSM on PASS. |
+| **Team 10 mandatory actions** | (1) Submit WORK_PACKAGE_VALIDATION_REQUEST (gate_id GATE_5) to Team 90 with full package. (2) Wait for VALIDATION_RESPONSE. (3) Update task lists on PASS. WSM is managed by the pipeline system; Team 10 does not modify WSM directly. |
 | **Required artifacts** | GATE_5 validation request (canonical + identity header); Team 90 response. |
 | **Exit** | Team 90 PASS. |
 | **WSM** | Gate Owner (Team 90 for GATE_5) updates WSM; Team 10 updates lists. |
@@ -86,7 +86,7 @@ Internal sub-stage sequence: _COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION
 |------|---------|
 | **Entry** | GATE_5 PASS. |
 | **Owner** | Team 90 (execution). **Approval authority:** Team 100. |
-| **Team 10 mandatory actions** | (1) Submit GATE_6 package to Team 90 (or _ARCHITECT_INBOX per process). (2) Wait for Team 90 / architect decision. (3) On rejection: apply GATE_6 rejection route (DOC_ONLY_LOOP vs CODE_CHANGE_REQUIRED vs escalate to Team 00). Reference: _COMMUNICATION/team_170/GATE_6_REJECTION_ROUTE_PROTOCOL_v1.0.0.md. (4) Update lists and WSM on PASS. |
+| **Team 10 mandatory actions** | (1) Submit GATE_6 package to Team 90 (or _ARCHITECT_INBOX per process). (2) Wait for Team 90 / architect decision. (3) On rejection: apply GATE_6 rejection route (DOC_ONLY_LOOP vs CODE_CHANGE_REQUIRED vs escalate to Team 00). Reference: _COMMUNICATION/team_170/GATE_6_REJECTION_ROUTE_PROTOCOL_v1.0.0.md. (4) Update lists on PASS. WSM is managed by the pipeline system; Team 10 does not modify WSM directly. |
 | **Required artifacts** | GATE_6 submission (canonical) including `G6_TRACEABILITY_MATRIX.md`; Team 90 / architect decision; route classification per GATE_6 rejection protocol. |
 | **Exit** | GATE_6 PASS (architectural dev validation approved). |
 | **WSM** | Team 90 (Gate Owner) updates WSM on closure. |
@@ -122,7 +122,7 @@ Internal sub-stage sequence: _COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION
 
 ## 9) WSM update duty (all gates)
 
-**WSM ownership matrix (per _COMMUNICATION/team_170/WSM_OWNER_MATRIX_GATES_0_8_v1.0.0.md):** Gates 0–2 → Team 190 updates WSM. Gates 3–4 → Team 10 updates WSM. Gates 5–8 → Team 90 updates WSM. The Gate Owner must update `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` block **CURRENT_OPERATIONAL_STATE** immediately upon gate closure. Fields: active_stage_id, current_gate, last_gate_event, next_required_action, next_responsible_team, active_work_package_id (or — if closed). No gate progression without WSM update.
+**WSM management (ARCHITECT_DIRECTIVE_GATE_ARCHITECTURE_CANONICAL_ADDENDUM_v1.0.0.md §B.3):** WSM state is managed exclusively by the pipeline system. Team 10 does NOT modify WSM directly. Team-facing operations that require WSM changes must be routed through `./pipeline_run.sh` commands. The pipeline system updates `PHOENIX_MASTER_WSM_v1.0.0.md` block **CURRENT_OPERATIONAL_STATE** upon gate closure. Fields: active_stage_id, current_gate, last_gate_event, next_required_action, next_responsible_team, active_work_package_id. No gate progression without WSM update.
 
 ---
 
@@ -141,3 +141,4 @@ Normative fast-track protocol:
 
 **log_entry | TEAM_170 | TEAM_10_GATE_ACTIONS_RUNBOOK | v1.0.0_LOCKED | 2026-02-23**
 **log_entry | TEAM_190 | TEAM_10_GATE_ACTIONS_RUNBOOK | FAST_TRACK_REFERENCE_ADDED | 2026-02-26**
+**log_entry | TEAM_170 | TEAM_10_GATE_ACTIONS_RUNBOOK | WSM_PIPELINE_SYSTEM_ONLY | 2026-03-17**

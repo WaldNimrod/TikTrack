@@ -7,7 +7,7 @@ cc: Team 00 (Chief Architect — final authority)
 date: 2026-03-17
 status: FINALIZED — APPROVED_FOR_MANDATE_ISSUANCE
 type: LOD400 — Technical Specification
-program: [S003-PXX — registry assignment pending; see §1]
+program: S003-P009
 scope: Pipeline Resilience Package (Items 1–3 + item verification 4a/4b)
 test_flight_target: S003-P001 (Data Model Validator)
 ---
@@ -38,13 +38,13 @@ Before specifying changes, Team 100 performed direct code reads to ground all it
 
 ## §1 — Work Package Registration
 
-### Program Assignment (Pending)
-This work package requires formal registration before GATE_0 activation.
+### Program Assignment (Completed)
+This work package has been formally registered for GATE_0 activation.
 
 | Field | Value |
 |-------|-------|
-| `program_id` | TBD — Team 00 to assign (suggested: `S003-P002`) |
-| `work_package_id` | TBD — Team 00 to assign (suggested: `S003-P002-WP001`) |
+| `program_id` | S003-P009 |
+| `work_package_id` | S003-P009-WP001 |
 | `stage_id` | `S003` |
 | `project_domain` | `AGENTS_OS` |
 | `spec_brief` | Pipeline Resilience: file-path resolution (AC-10/AC-11 hardening), WSM auto-write, and pre-GATE_4 / GATE_8 targeted git commits |
@@ -52,7 +52,7 @@ This work package requires formal registration before GATE_0 activation.
 | `qa_team` | Team 50 |
 | `validation_teams` | Team 190 (GATE_5), Team 100 + Team 101 (GATE_6, dual-arch) |
 
-**Action required before GATE_0:** Team 00 assigns program/WP IDs in `PHOENIX_PROGRAM_REGISTRY` and `PHOENIX_WORK_PACKAGE_REGISTRY`. This LOD400 draft provides the spec; registry assignment is a separate administrative gate.
+**Action completed before GATE_0:** Team 00 has assigned program/WP IDs in `PHOENIX_PROGRAM_REGISTRY` and `PHOENIX_WORK_PACKAGE_REGISTRY`.
 
 ---
 

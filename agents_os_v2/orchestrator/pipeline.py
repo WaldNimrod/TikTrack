@@ -37,7 +37,7 @@ GATE_SEQUENCE = [
     "GATE_0", "GATE_1", "GATE_2", "WAITING_GATE2_APPROVAL",
     "G3_PLAN", "G3_5", "G3_6_MANDATES",
     "CURSOR_IMPLEMENTATION",
-    "GATE_4", "GATE_5", "GATE_6", "WAITING_GATE6_APPROVAL",
+    "GATE_4", "GATE_5", "GATE_6",
     "GATE_7", "GATE_8",
 ]
 
@@ -53,8 +53,7 @@ GATE_CONFIG = {
     "CURSOR_IMPLEMENTATION": {"owner": "teams_20_30", "engine": "cursor", "desc": "Cursor Composer: implement + MCP test"},
     "GATE_4":    {"owner": "team_10",  "engine": "cursor",       "desc": "QA — Team 10 coordinates, Team 50 executes tests + MCP"},
     "GATE_5":    {"owner": "team_90",  "engine": "codex",        "desc": "Team 90 dev validation (code vs spec)"},
-    "GATE_6":    {"owner": "team_100", "engine": "codex+human",  "desc": "Architectural reality review → WAITING_GATE6_APPROVAL (domain-aware owner)"},
-    "WAITING_GATE6_APPROVAL": {"owner": "team_00", "engine": "human", "desc": "Nimrod reviews GATE_6 analysis and decides"},
+    "GATE_6":    {"owner": "team_100", "engine": "codex",        "desc": "Architectural reality review (domain-aware owner)"},
     "GATE_7":    {"owner": "team_90",  "engine": "human",        "desc": "Team 90 executes; Nimrod (Team 00) human authority"},
     "GATE_8":    {"owner": "team_90",  "engine": "codex",        "desc": "Team 90 + Team 70 documentation closure",               "default_fail_route": "doc"},
     "WAITING_FOR_IMPLEMENTATION_COMMIT": {
@@ -69,9 +68,9 @@ GATE_CONFIG = {
 #   "doc"  → Documentation / governance / artifact issues ONLY.
 #            No code changes needed. Team 10 fixes specific files/paths/evidence.
 #
-#            GATE_5 "doc" → G5_DOC_FIX (Team 10 doc-fix sprint) → GATE_5
-#            ⚠️  NEVER routes to CURSOR_IMPLEMENTATION — that activates impl teams.
-#            ⚠️  NEVER routes to GATE_4 — that's a full QA re-run cycle.
+#   GATE_5 "doc" → CURSOR_IMPLEMENTATION (direct to impl team — no separate gate state)
+#   GATE_5 "full" → G3_PLAN
+#   G5_DOC_FIX abolished in S002-P005-WP004.
 #
 #   "full" → Substantial code or design issues (or unclear/mixed).
 #            Full cycle: return to G3_PLAN for new plan → mandates → implementation.
@@ -111,10 +110,6 @@ FAIL_ROUTING: dict[str, dict[str, tuple[str, str]]] = {
     "GATE_6": {
         "doc":  ("CURSOR_IMPLEMENTATION", "Team 100: minor code gaps — Team 10 fixes → re-validate"),
         "full": ("G3_PLAN",               "Team 100: major intent gap — full re-implementation required"),
-    },
-    "WAITING_GATE6_APPROVAL": {
-        "doc":  ("CURSOR_IMPLEMENTATION", "Nimrod: minor issues found — Team 10 fixes → re-validate"),
-        "full": ("G3_PLAN",               "Nimrod rejected — full re-implementation cycle required"),
     },
     "GATE_7": {
         "doc":  ("CURSOR_IMPLEMENTATION", "UX issues (UI/wording) — Team 10/30 fixes → re-review"),
@@ -843,19 +838,6 @@ def generate_prompt(gate_id: str, force_gate4: bool = False, revision_notes: str
     elif gate_id == "GATE_6":
         gate6_owner = _domain_gate_owner("GATE_6", state.project_domain) or "team_100"
         prompt = _generate_gate_6_prompt(state, fresh, team_id=gate6_owner)
-    elif gate_id == "WAITING_GATE6_APPROVAL":
-        gate6_owner = _domain_gate_owner("GATE_6", state.project_domain) or "team_100"
-        impl_summary = ", ".join(state.implementation_files[:10]) if state.implementation_files else "(no impl files stored)"
-        _print_human_approval_prompt("GATE_6", impl_summary, state.spec_brief)
-        prompt = (
-            "# WAITING_GATE6_APPROVAL — Human Decision Required\n\n"
-            f"{gate6_owner.replace('_', ' ').title()} has completed GATE_6 analysis.\n"
-            "Nimrod must review and decide.\n\n"
-            "## Actions\n"
-            "  --approve GATE_6   → PASS and continue to GATE_7\n"
-            "  --reject  GATE_6 --reason '…' → FAIL with reason\n"
-            "  --query   GATE_6 --question '…' → Ask follow-up\n"
-        )
     elif gate_id == "GATE_7":
         prompt = _generate_gate_7_prompt(state)
     elif gate_id == "GATE_8":
@@ -2097,8 +2079,6 @@ def advance_gate(gate_id: str, status: str, reason: str = "", force: bool = Fals
         state._append_gate(gate_id, completed=True)
         if gate_id == "GATE_2":
             state.current_gate = "WAITING_GATE2_APPROVAL"
-        elif gate_id == "GATE_6":
-            state.current_gate = "WAITING_GATE6_APPROVAL"
         else:
             idx = GATE_SEQUENCE.index(gate_id) if gate_id in GATE_SEQUENCE else -1
             if idx >= 0 and idx + 1 < len(GATE_SEQUENCE):
@@ -2314,8 +2294,6 @@ def main():
         approve_map = {
             "GATE_2": "WAITING_GATE2_APPROVAL",
             "gate2": "WAITING_GATE2_APPROVAL",
-            "GATE_6": "WAITING_GATE6_APPROVAL",
-            "gate6": "WAITING_GATE6_APPROVAL",
             "GATE_7": "GATE_7",
             "gate7": "GATE_7",
         }
@@ -2331,14 +2309,12 @@ def main():
             )
             advance_gate(wait_gate, "PASS")
         else:
-            _log(f"ERROR: --approve only valid for GATE_2, GATE_6, GATE_7 (got {gate})")
+            _log(f"ERROR: --approve only valid for GATE_2, GATE_7 (got {gate})")
     elif args.reject:
         gate = args.reject
         reject_map = {
             "GATE_2": "WAITING_GATE2_APPROVAL",
             "gate2": "WAITING_GATE2_APPROVAL",
-            "GATE_6": "WAITING_GATE6_APPROVAL",
-            "gate6": "WAITING_GATE6_APPROVAL",
             "GATE_7": "GATE_7",
             "gate7": "GATE_7",
         }
@@ -2347,14 +2323,14 @@ def main():
             _log(f"Human REJECTED {gate}: {args.reason}")
             advance_gate(wait_gate, "FAIL", args.reason)
         else:
-            _log(f"ERROR: --reject only valid for GATE_2, GATE_6, GATE_7 (got {gate})")
+            _log(f"ERROR: --reject only valid for GATE_2, GATE_7 (got {gate})")
     elif args.query:
         gate = args.query
-        if gate in ("GATE_2", "GATE_6"):
+        if gate == "GATE_2":
             _log(f"QUERY on {gate}: {args.question}")
             _log(f"Re-run --generate-prompt {gate} with updated context, or ask in the Codex/Claude session.")
         else:
-            _log(f"ERROR: --query only valid for GATE_2, GATE_6 (got {gate})")
+            _log(f"ERROR: --query only valid for GATE_2 (got {gate})")
     elif args.generate_prompt:
         # If --revision-notes is a file path, read it; otherwise use as inline text
         revision_notes = ""

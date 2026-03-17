@@ -51,6 +51,7 @@
 4. **ארכיון:** העברת ארטיפקטים זמניים ל־Stage archive path; מניפסט ו־cross-reference.
 5. **ניקוי:** בתיקיות הצוותים נשארים רק נהלים/מפרטים/קבצים קבועים; אי־געת ב־`_Architects_Decisions`.
 6. **אימות:** וידוא שאין evidence פתוח מחוץ לנתיבים קנוניים; דוחות GATE_8 (AS_MADE, Developer Guides, Cleanup, Archive, Closure Check).
+7. **אחרי תיקונים — חובה:** אם Team 90 החזיר PASS_WITH_ACTION או ממצא (finding) הדורש תיקון: לאחר ביצוע התיקון או צירוף הראיה הנדרשת, **חובה תמיד** להוציא **בקשת ולידציה חוזרת** (re-validation request) ל־Team 90. אין consider השער סגור עד לקבלת GATE_8 PASS סופי.
 
 ---
 
@@ -80,4 +81,5 @@
 
 ---
 
-**log_entry | TEAM_70 | INTERNAL_WORK_PROCEDURE | V2_ACTIVE_CONTEXT_ALIGNED | 2026-02-26**
+**log_entry | TEAM_70 | INTERNAL_WORK_PROCEDURE | V2_ACTIVE_CONTEXT_ALIGNED | 2026-02-26**  
+**log_entry | TEAM_70 | INTERNAL_WORK_PROCEDURE | §4.7_POST_CORRECTION_REVALIDATION_MANDATORY | 2026-03-17** — אחרי תיקונים: חובה להוציא בקשת ולידציה חוזרת ל־Team 90.

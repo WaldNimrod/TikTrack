@@ -5,7 +5,7 @@ from: Team 100 (Development Architecture Authority)
 to: Team 70, Team 00
 cc: Team 90, Team 10, Team 51, Team 61, Team 170
 date: 2026-03-17
-status: PASS
+status: FINAL_PASS
 gate_id: GATE_8_FINAL_ARCH
 program_id: S002-P005
 work_packages: S002-P005-WP002, S002-P005-WP003, S002-P005-WP004
@@ -34,10 +34,14 @@ in_response_to: TEAM_70_TO_TEAM_100_S002_P005_FINAL_ARCHITECTURAL_VALIDATION_TRI
 
 ```
 STATUS:              PASS
-RECOMMENDATION:      APPROVE — S002-P005 closure confirmed
+RECOMMENDATION:      APPROVE — S002-P005 closure authorized
 ARCHITECTURAL RISK:  NONE IDENTIFIED
-CONDITIONS:          NONE
+CONDITIONS:          NONE — all items resolved
+GATE_8_AUTHORIZED:   YES
 ```
+
+**B2-02 resolved:** `TEAM_51_B2_02_TARGETED_RETEST_RESULT_v1.0.0` → PASS (2026-03-17).
+All prior ON_HOLD conditions lifted.
 
 ---
 
@@ -83,7 +87,7 @@ All 11 planned deliverables confirmed in code audit (ARCHITECT_DECISION_S002_P00
 | CS-04 NONE sentinel handling (`work_package_id=NONE` → inactive) | ✅ PASS | Constitutional review CS-04 |
 | SA-01 Domain isolation (`loadDomainStatesForRows` independent per domain) | ✅ PASS | Constitutional review SA-01 |
 | CS-07 / PWA-01 COMPLETE gate safe path | ✅ PASS | B2-01 runtime verified |
-| CS-05 / PWA-02 Conflict banner (stage-conflict detection) | ⚠️ PARTIAL | Testid present; full ACTIVE-in-COMPLETE scenario not executed at runtime — see §4 |
+| CS-05 / PWA-02 Conflict banner (stage-conflict detection) | ✅ PASS | Both AUTHORIZED_EXCEPTION + CONFLICT_BLOCKING branches verified; testid rendered on both paths; see §4 |
 | CS-08 / PWA-03 Snapshot freshness badge (yellow >1h / red >24h) | ✅ PASS | B2-03 + B2-04; thresholds confirmed |
 | PWA-04 Cross-engine constitutional review | ✅ COMPLETE | Team 90 PASS; GATE_8_AUTHORIZED: YES |
 | 9 data-testid contracts (§4.3) | ✅ PASS | QA Block 4 P0 testids confirmed; CR-002 resolved |
@@ -91,7 +95,7 @@ All 11 planned deliverables confirmed in code audit (ARCHITECT_DECISION_S002_P00
 
 **Architectural significance:** CS-03 (fallback prohibition) is the most critical Iron Rule enforcement in this WP. It ensures the system fails visibly on state read failure rather than silently degrading. The provenance badge model (CS-01) creates a correct epistemic architecture: every state-bearing display surface declares its data source. SA-01 domain isolation is correctly designed — failures in one domain do not contaminate the other.
 
-**Assessment: PASS (B2-02 PARTIAL documented, non-blocking — see §4)**
+**Assessment: PASS — all items resolved**
 
 ---
 
@@ -134,25 +138,44 @@ C.1 (G5_DOC_FIX removal) eliminates a routing dead-end that could have trapped t
 
 ## §4 Findings
 
-### B2-02 — Conflict Banner Full Scenario (PARTIAL, NON-BLOCKING)
+### B2-02 — CS-05 Conflict Banner (CLOSED — PASS)
 
-**Severity:** ADVISORY (non-blocking)
-**Origin:** Team 51 QA Block 2 B2-02 PARTIAL; carried through constitutional review and GATE_8 as documented partial.
+**Origin:** Team 51 QA Block 2 B2-02 PARTIAL → resolved via `TEAM_00_TO_TEAM_51_B2_02_TARGETED_RETEST_v1.0.0`.
+**Result:** `TEAM_51_B2_02_TARGETED_RETEST_RESULT_v1.0.0` → **PASS** (2026-03-17).
 
-**Architectural assessment:**
-- `data-testid="roadmap-stage-conflict-banner"` is present in the Roadmap HTML — contract anchor exists
-- Conflict detection logic (CS-05) is present in `pipeline-roadmap.js` — implementation exists
-- The partial is a runtime scenario gap: the test environment did not have a COMPLETE stage + ACTIVE program to trigger the live conflict path
-- **Architectural verdict:** Code structure is sound. The testid anchor and detection logic are in place. The unexecuted scenario requires a specific data state (COMPLETE stage with active program in same domain), not a code fix.
-- **Risk:** LOW — no architectural defect. If triggered in production, the banner will render or the gap will be detectable and correctable in a targeted follow-up.
+**Architectural analysis of re-test results:**
 
-**Disposition:** Accepted as documented known partial. No corrective action required before S002-P005 closure. If the scenario arises in production operation, route as a targeted WP in S003+.
+The test injected `stage_id = "S001"` into `pipeline_state_agentsos.json` while `work_package_id = "S002-P005-WP003"` remained in state. This caused **both** conflict detection paths to fire simultaneously:
 
-### CR-001 / CR-002 — Advisory Items (RESOLVED)
+- **Path 1 (lines 355–373):** `S001` is COMPLETE in roadmap → `AUTHORIZED_STAGE_EXCEPTIONS["S001"]` found → `AUTHORIZED_EXCEPTION` banner rendered
+- **Path 2 (lines 374–384):** `activeProg = "S002-P005"` belongs to `stage_id = "S002"` ≠ `pipeline.stage_id = "S001"` → `CONFLICT_BLOCKING` banner rendered
 
-Both advisory items identified by Team 90 constitutional review were resolved by Team 00 direct edit (2026-03-17):
-- **CR-001:** LLD400 §2.1 CLI table corrected (`new`/`sync` removed; WP002 commands added)
-- **CR-002:** Constitutional mandate testid count corrected ("12" → "9")
+Both paths independently render `data-testid="roadmap-stage-conflict-banner"` via `renderConflictResult()` (line 420). **Dual firing is architecturally correct** — the two checks are independent invariants, not mutually exclusive. In the artificial injection state, both conditions were simultaneously true, and both were correctly detected.
+
+**Architectural verdict on CS-05:** The conflict detection is structurally sound. The exception registry correctly modulates severity (AUTHORIZED vs BLOCKING). The testid contract is fully upheld on all paths.
+
+---
+
+### AO-001 — Domain Selection Required Before Roadmap Inspection (ARCHITECTURAL OBSERVATION)
+
+**Severity:** ADVISORY — not a defect; operational note
+**Origin:** Team 51 re-test observation: "Dashboard → Agents OS must be selected before navigating to Roadmap"
+
+**Analysis:** `pipeline-roadmap.js` line 131 calls `loadDomainState(currentDomain)` where `currentDomain` is a global managed by `pipeline-state.js` `switchDomain()`. Default domain is `tiktrack`. The Roadmap correctly loads state for the **active domain** — not both domains simultaneously. This is by design per SA-01 (domain isolation).
+
+**Why this is not a defect:** SA-01 mandates that each domain loads independently. The Roadmap is a single-domain view — it shows the pipeline state of the domain the operator is currently working with. The Teams page (WP003 scope) is the multi-domain view. Domain selection persisting via `currentDomain` global (backed by localStorage) is the correct coordination mechanism between pages.
+
+**Operational note for S003+:** If an operator navigates directly to the Roadmap without setting domain, they see tiktrack state. A domain indicator label at the top of the Roadmap page would improve UX. Not a code defect — route as a UX enhancement request if desired.
+
+**Disposition:** Documented as AO-001. No corrective action in S002-P005 scope.
+
+---
+
+### CR-001 / CR-002 — Advisory Items (CLOSED)
+
+Both Team 90 constitutional review advisories resolved by Team 00 direct edit (2026-03-17):
+- **CR-001:** LLD400 §2.1 CLI table: `new`/`sync` removed; WP002 commands added; §3.2 write trigger corrected
+- **CR-002:** Constitutional mandate testid count: "12" → "9"
 
 **Status:** CLOSED — no forward action required.
 
@@ -187,22 +210,32 @@ No cross-WP conflicts or contradictions identified.
 | Combined AS_MADE | Team 70 | `TEAM_70_S002_P005_COMBINED_AS_MADE_REPORT_v1.0.0` | COMPLETE |
 | Closure packet index | Team 10 | `TEAM_10_S002_P005_CLOSURE_PACKET_INDEX_v1.0.0` | PUBLISHED (CF-G8-001 closed) |
 | GATE_8 re-validation | Team 90 | `TEAM_90_TO_TEAM_70_S002_P005_COMBINED_GATE8_REVALIDATION_RESULT_v1.0.0` | PASS; GATE_8_LOCK: CLOSED |
-| **Final arch validation** | **Team 100** | **This document** | **PASS** |
+| B2-02 re-test | Team 51 | `TEAM_51_B2_02_TARGETED_RETEST_RESULT_v1.0.0` | PASS |
+| **Final arch validation** | **Team 100** | **This document** | ✅ **FINAL_PASS** |
 
-**Chain status: COMPLETE — no gaps**
+**Chain status: COMPLETE — all items resolved — no open findings**
 
 ---
 
 ## §7 Conclusion and Recommendation
 
-S002-P005 (WP002 + WP003 + WP004) is architecturally validated as complete. The program delivered a correct, coherent set of governance enhancements to the AGENTS_OS pipeline infrastructure. All Iron Rules are satisfied. The validation chain is intact and multi-engine. No open architectural findings require action.
+S002-P005 (WP002 + WP003 + WP004) is **architecturally complete and valid**. All three work packages were implemented, validated across multiple engines (Team 61/Cursor → Team 51/Gemini → Team 90/OpenAI → Team 100/Gemini), and constitutionally reviewed. Every Iron Rule applicable to the AGENTS_OS pipeline domain is satisfied. All findings are closed. No open architectural items remain.
+
+**Final architectural assessment per work package:**
+
+| WP | Architectural substance | Status |
+|----|------------------------|--------|
+| WP002 | Pipeline state machine now complete — three-answer model with structural blocking and audit trail | ✅ PASS |
+| WP003 | Data provenance enforced; fallback prohibition structural; domain isolation correct; CS-05 conflict detection verified on all code paths | ✅ PASS |
+| WP004 | Iron Rule IR-ONE-HUMAN-01 converted from documentation to code invariant; anti-patterns eliminated; role labels correct | ✅ PASS |
+
+**AO-001 (domain selection UX) noted as an observational item.** Not a defect. Routable as UX improvement in S003+ if desired.
 
 **Team 100 recommendation to Team 00 (Chief Architect):**
 
-> **S002-P005 is ready for final Team 00 acknowledgment and WSM closure. No architectural objections.**
-
-The WSM update (marking S002-P005 GATE_8 CLOSED) may proceed per WSM Rule (pipeline system, not manual).
+> **S002-P005 is architecturally approved. GATE_8 closure and WSM update may proceed.**
+> No conditions. No open items. No architectural objections.
 
 ---
 
-**log_entry | TEAM_100 | S002_P005_FINAL_ARCH_VALIDATION | PASS | 2026-03-17**
+**log_entry | TEAM_100 | S002_P005_FINAL_ARCH_VALIDATION | FINAL_PASS | GATE8_AUTHORIZED | 2026-03-17**

@@ -96,7 +96,7 @@ async function loadPipelineState() {
         const domainFlag = (state.project_domain || currentDomain) === 'agents_os' ? '--domain agents_os ' : '';
         const clearCmd = domainFlag + './pipeline_run.sh actions_clear';
         pwaContainer.dataset.domainFlag = domainFlag;
-        pwaContainer.innerHTML = `<div class="pwa-banner">
+        pwaContainer.innerHTML = `<div class="pwa-banner" data-testid="pending-actions-panel">
           <div class="pwa-banner-title">⚡ PASS_WITH_ACTION</div>
           <div class="pwa-action-list">${actions.length ? actions.map(a => `<div class="pwa-action-item">${escHtml(a)}</div>`).join('') : '<div class="pwa-action-item" style="color:var(--text-muted)">No actions recorded</div>'}</div>
           <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
@@ -777,6 +777,28 @@ function getEffectiveVerdictTeam(gate) {
     return getDomainOwner(gate);
   }
   return (ALL_GATE_DEFS[gate] || {}).verdictTeam || null;
+}
+
+/** WP004: Validation gates only — owner in team_90, 190, 50, 51; exclude human gates */
+function isValidationGateForPWA(gate) {
+  const owner = getDomainOwner(gate);
+  const def = ALL_GATE_DEFS[gate] || {};
+  const cfg = GATE_CONFIG[gate] || {};
+  const engine = def.engine || cfg.engine || '';
+  if (engine && String(engine).includes('human')) return false;
+  return ['team_90', 'team_190', 'team_50', 'team_51'].indexOf(owner || '') >= 0;
+}
+
+/** WP004: Generate pass_with_actions command from textarea and copy to clipboard */
+function generateAndCopyPwaCmd(gate, taId, btnEl) {
+  const ta = document.getElementById(taId);
+  const raw = ta ? (ta.value || '').trim() : '';
+  const actions = raw || 'ACTION-1|ACTION-2';
+  const safe = actions.replace(/"/g, '\\"');
+  const cmd = _dfCmd(`./pipeline_run.sh pass_with_actions "${safe}"`);
+  copyText(cmd, btnEl);
+  if (btnEl) btnEl.textContent = '✓ Copied';
+  setTimeout(function() { if (btnEl) btnEl.textContent = 'Generate & Copy'; }, 1500);
 }
 
 // ── Progress Check ─────────────────────────────────────────────────────────
@@ -2283,7 +2305,7 @@ async function buildQuickActionBar(gate) {
     const actionItems = pendingActions.length
       ? pendingActions.map(a => `<div class="pwa-action-item">• ${escHtml(a)}</div>`).join('')
       : `<div class="pwa-action-item" style="color:var(--text-muted)">No action items recorded</div>`;
-    pwaBanner = `<div class="pwa-banner">
+    pwaBanner = `<div class="pwa-banner" data-testid="pending-actions-panel">
       <div class="pwa-banner-title">⚡ PASS_WITH_ACTION — gate held pending resolution</div>
       ${actionItems}
       <div style="display:flex;gap:6px;margin-top:8px">
@@ -2339,15 +2361,24 @@ async function buildQuickActionBar(gate) {
     </div>`;
 
   } else {
-    // ── Mode B: normal (gate not yet failed) — PASS + PWA + FAIL buttons ────
-    const pwaCmd = _dfCmd('./pipeline_run.sh pass_with_actions "ACTION-1: [describe]|ACTION-2: [describe]"');
+    // ── Mode B: normal (gate not yet failed) — PASS + PWA (validation only) + FAIL buttons ────
+    const showPwa = isValidationGateForPWA(gate);
     html += `<div class="quick-action-bar">
       <button class="qa-btn qa-btn-pass" onclick="copyCmd(${escAttr(JSON.stringify(passCmd))}, this)">
         ${escHtml(passLabel)} &nbsp;<span class="terminal-hint">⎘ copy → terminal</span>
-      </button>
-      <button class="qa-btn qa-btn-pwa" onclick="copyCmd(${escAttr(JSON.stringify(pwaCmd))}, this)" title="Pass with follow-up actions required (WP002)">
-        ⚡ Pass w/ Action &nbsp;<span class="pwa-badge">WP002</span><span class="terminal-hint">⎘ copy</span>
       </button>`;
+    if (showPwa) {
+      const pwaFormId = 'pwa-form-' + gate.replace(/_/g, '-');
+      const pwaTaId   = 'pwa-ta-' + gate.replace(/_/g, '-');
+      html += `<button class="qa-btn qa-btn-pwa" data-testid="pass-with-action-btn" onclick="var f=document.getElementById('${pwaFormId}');f.style.display=f.style.display==='none'?'block':'none';" title="Pass with follow-up actions required">
+        ⚡ Pass w/ Action &nbsp;<span class="terminal-hint">⎘</span>
+      </button>
+      <div id="${pwaFormId}" class="pwa-actions-form" style="display:none;grid-column:1/-1;margin-top:8px;padding:8px;background:rgba(210,153,34,0.06);border:1px solid var(--warning);border-radius:6px">
+        <div style="font-size:11px;color:var(--warning);margin-bottom:6px">Pipe-separated actions:</div>
+        <textarea id="${pwaTaId}" class="findings-textarea" placeholder="ACTION-1|ACTION-2|ACTION-3" style="min-height:50px"></textarea>
+        <button class="btn" style="font-size:10px;margin-top:6px" onclick="generateAndCopyPwaCmd('${escAttr(gate)}','${pwaTaId}',this)">Generate &amp; Copy</button>
+      </div>`;
+    }
 
     if (needsBuilder) {
       html += `<button class="qa-btn qa-btn-fail" disabled style="opacity:0.45;cursor:default">

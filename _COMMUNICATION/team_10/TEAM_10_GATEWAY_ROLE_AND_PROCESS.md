@@ -1,12 +1,12 @@
 **date:** 2026-03-09
 
-# תפקיד צוות 10 (The Gateway) — ניהול תהליך והפעלת צוותים
+# תפקיד צוות 10 (Work Plan Generator) — ניהול תהליך והפעלת צוותים
 **project_domain:** SHARED (TIKTRACK + AGENTS_OS)
 
 **id:** `TEAM_10_GATEWAY_ROLE_AND_PROCESS`  
-**owner:** Team 10 (The Gateway)  
+**owner:** Team 10 (Work Plan Generator)  
 **status:** 🔒 **מחייב — רענון תפקיד ונוהל עבודה**  
-**last_updated:** 2026-02-25  
+**last_updated:** 2026-03-17  
 **מקורות קנוניים:** Gate Protocol `documentation/docs-governance/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL_v2.3.0.md`; Runbook `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md`; מיפוי צוותים `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md`; נעילת פורמט הודעות `_COMMUNICATION/team_190/TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK_v1.0.0.md`.
 
 ---
@@ -32,7 +32,7 @@
 | **הודעות רשמיות** | כל החלטת SSOT, פרסום מדיניות, מנדט, או משנה מצב — **הודעה לכל צוות מושפע**. קבצים ב־`_COMMUNICATION/team_10/` (למשל `TEAM_10_TO_TEAM_20_...`, `TEAM_10_TO_TEAM_60_...`). |
 | **משימות צוות 10** | משימות שמוטלות על Gateway (מסמכי SSOT, תיאום, צ'קליסט, Evidence log) — **מממשים ישירות**, לא מעבירים לאחר. |
 | **תאום רמות** | תאום מלא בין רמה 1 (מפת הדרכים), רמה 2 (רשימת משימות), רמה 3 (ביצוע צוותים). עדכון מלמטה למעלה כשמתקבלים דוחות. |
-| **עדכון WSM** | **חובה:** בכל עדכון שער/פאזה — לעדכן את WSM (בלוק CURRENT_OPERATIONAL_STATE). בעל השער (Gate Owner) מעדכן מיד עם סגירת שער; Team 10 מוודא עדכון WSM כשאנחנו Gate Owner (למשל GATE_3) או מתאם עם בעל השער. מקור: TEAM_100_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0. |
+| **WSM** | WSM state is managed exclusively by the pipeline system (`pipeline.py`). Team 10 does not modify WSM files directly. Pipeline state transitions that require WSM updates are handled automatically by the orchestrator. Team 10's sole output at GATE_3 is the implementation work plan (`TEAM_10_{WP}_G3_PLAN_WORK_PLAN_v*.md`). מקור: ARCHITECT_DIRECTIVE_GATE_ARCHITECTURE_CANONICAL_ADDENDUM_v1.0.0.md §B.3. |
 | **ללא מסמכי אישור מיותרים** | אין לייצר מסמכי "אישור קבלה" / "acknowledgment" נפרדים — מבזבז זמן; עדכון רשימות ו־WSM מספיק. |
 
 ---

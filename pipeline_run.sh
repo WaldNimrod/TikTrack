@@ -597,7 +597,7 @@ print('yes' if GATE_CONFIG.get('${GATE}', {}).get('default_fail_route') else 'no
   route)
     # Route pipeline after a FAIL decision.
     # Usage:
-    #   ./pipeline_run.sh route doc   [notes]   → doc/governance fix → G5_DOC_FIX
+    #   ./pipeline_run.sh route doc   [notes]   → doc fix → impl team → GATE_5 re-validation
     #   ./pipeline_run.sh route full  [notes]   → full cycle → G3_PLAN
     #   ./pipeline_run.sh route doc   [notes] GATE_NAME  → override gate (default: current)
     TYPE="${2:?Usage: ./pipeline_run.sh route doc|full [notes]}"

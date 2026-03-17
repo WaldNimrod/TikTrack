@@ -2,6 +2,8 @@
 
 **Spec:** AOS State Alignment & Governance Integrity
 
+**Canonical date:** Use `date -u +%F` for today; replace {{date}} in identity headers.
+
 ════════════════════════════════════════════════════════════
   EXECUTION ORDER
 ════════════════════════════════════════════════════════════

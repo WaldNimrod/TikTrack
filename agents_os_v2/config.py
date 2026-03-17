@@ -28,6 +28,7 @@ TEAM_ENGINE_MAP = {
     "team_90":  "openai",
     "team_61":  "cursor",
     "team_100": "gemini",
+    "team_101": "cursor",
     "team_170": "gemini",
     "team_190": "openai",
 }

@@ -3,7 +3,7 @@ from __future__ import annotations
 Agents_OS V2 — Pipeline Orchestrator (Redesigned)
 Deterministic state machine that replaces Team 10 chat.
 
-The Orchestrator IS Team 10 — it manages state, routing, and prompt generation.
+Team 10 is the Work Plan Generator. The Python pipeline is the sole orchestrator.
 Actual LLM work happens in:
   - Cursor Composer sessions (primary, has MCP)
   - Codex sessions (Teams 90/190 validation)
@@ -45,17 +45,14 @@ GATE_CONFIG = {
     "GATE_0":    {"owner": "team_190", "engine": "codex",        "desc": "Team 190 validates LOD200 scope",                        "default_fail_route": "doc"},
     "GATE_1":    {"owner": "team_190", "engine": "codex",        "desc": "Team 170 produces LLD400 → Team 190 validates",          "default_fail_route": "doc"},
     "GATE_2":    {"owner": "team_100", "engine": "codex+human",  "desc": "Architectural intent review → WAITING_GATE2_APPROVAL (domain-aware owner)"},
-    "WAITING_GATE2_APPROVAL": {"owner": "team_00", "engine": "human", "desc": "Nimrod reviews GATE_2 analysis and decides"},
+    "WAITING_GATE2_APPROVAL": {"owner": "team_00", "engine": "codex",  "desc": "Architectural review — not human; Nimrod awareness"},
     "G3_PLAN":   {"owner": "team_10",  "engine": "cursor",       "desc": "Build work plan from approved spec"},
     "G3_5":      {"owner": "team_90",  "engine": "codex",        "desc": "Team 90 validates work plan"},
     "G3_6_MANDATES": {"owner": "team_10", "engine": "orchestrator", "desc": "Generate per-team mandates (deterministic)"},
+    # canonical display name: GATE_3_IMPL (rename pending — separate WP in S003)
     "CURSOR_IMPLEMENTATION": {"owner": "teams_20_30", "engine": "cursor", "desc": "Cursor Composer: implement + MCP test"},
     "GATE_4":    {"owner": "team_10",  "engine": "cursor",       "desc": "QA — Team 10 coordinates, Team 50 executes tests + MCP"},
     "GATE_5":    {"owner": "team_90",  "engine": "codex",        "desc": "Team 90 dev validation (code vs spec)"},
-    "G5_DOC_FIX": {
-        "owner": "team_10", "engine": "cursor",
-        "desc": "Admin block — Team 10 fixes doc/artifact gaps from GATE_5 → direct re-validation (no GATE_4, no impl teams)",
-    },
     "GATE_6":    {"owner": "team_100", "engine": "codex+human",  "desc": "Architectural reality review → WAITING_GATE6_APPROVAL (domain-aware owner)"},
     "WAITING_GATE6_APPROVAL": {"owner": "team_00", "engine": "human", "desc": "Nimrod reviews GATE_6 analysis and decides"},
     "GATE_7":    {"owner": "team_90",  "engine": "human",        "desc": "Team 90 executes; Nimrod (Team 00) human authority"},
@@ -106,16 +103,10 @@ FAIL_ROUTING: dict[str, dict[str, tuple[str, str]]] = {
         "full": ("G3_6_MANDATES",         "QA: code failures — new mandates, full re-implementation, re-QA"),
     },
     "GATE_5": {
-        # ⚠️ "doc" route: admin/artifact block — Team 10 fixes docs DIRECTLY → back to GATE_5
-        # NO CURSOR_IMPLEMENTATION, NO mandates, NO Teams 20/30 activation.
-        "doc":  ("G5_DOC_FIX", "Admin block (doc/artifact only) — Team 10 fixes → GATE_5 direct re-validation"),
-        "full": ("G3_PLAN",    "Code/design issues — full re-plan → mandates → impl → QA → GATE_5"),
-    },
-    "G5_DOC_FIX": {
-        # After Team 10 iterates on the doc fix: re-validate at GATE_5 (PASS → GATE_5).
-        # If doc fix reveals code issues, escalate to full cycle.
-        "doc":  ("G5_DOC_FIX", "Still doc gaps — Team 10 iterates doc fix"),
-        "full": ("G3_PLAN",    "Doc fix revealed code issues — escalate to full cycle"),
+        # doc route: targeted fix — return directly to implementation with instructions
+        # No separate G5_DOC_FIX state. Team 10/61 fixes docs, then re-presents to GATE_5.
+        "doc":  ("CURSOR_IMPLEMENTATION", "Doc/artifact gap — implementation team fixes directly → GATE_5 re-validation"),
+        "full": ("G3_PLAN",               "Code/design issues — full re-plan → mandates → impl → QA → GATE_5"),
     },
     "GATE_6": {
         "doc":  ("CURSOR_IMPLEMENTATION", "Team 100: minor code gaps — Team 10 fixes → re-validate"),
@@ -697,10 +688,6 @@ def _verdict_candidates(gate_id: str, work_package_id: str) -> list[Path]:
             t90 / f"TEAM_90_TO_TEAM_10_{wpu}_BLOCKING_REPORT.md",  # blocking report naming variant
             t90 / f"TEAM_90_{wp}_GATE_5_VALIDATION_v1.0.0.md",
         ],
-        "G5_DOC_FIX": [
-            # G5_DOC_FIX is passed manually — Team 10 confirms all docs fixed, no AI verdict file.
-            # Verdict candidates are unused (no auto-routing from file at this gate).
-        ],
         "GATE_6": [
             t100 / f"TEAM_100_{wpu}_GATE_6_VERDICT_v1.0.0.md",
             t100 / f"TEAM_100_{wpu}_GATE_6_REVIEW_v1.0.0.md",
@@ -871,8 +858,6 @@ def generate_prompt(gate_id: str, force_gate4: bool = False, revision_notes: str
         )
     elif gate_id == "GATE_7":
         prompt = _generate_gate_7_prompt(state)
-    elif gate_id == "G5_DOC_FIX":
-        prompt = _generate_g5_doc_fix_prompt(state)
     elif gate_id == "GATE_8":
         prompt = _generate_gate_8_mandates(state, fresh)
     else:
@@ -1042,8 +1027,8 @@ def _generate_gate_0_prompt(state: PipelineState, fresh: bool = False) -> str:
         f"- **Current gate:** {state.current_gate}"
         f"{' (correction cycle — failed ' + str(fail_count) + '×)' if is_correction else ' (first run)'}\n"
         f"\n"
-        f"**Important for Team 190:** WSM `active_work_package_id` is NOT updated until GATE_3\n"
-        f"intake (Team 10 responsibility). WSM showing the previous WP or NO_ACTIVE is EXPECTED\n"
+        f"**Important for Team 190:** WSM updates are managed by the pipeline system. Team 10 does not modify WSM directly.\n"
+        f"WSM `active_work_package_id` is NOT updated until GATE_3 intake. WSM showing the previous WP or NO_ACTIVE is EXPECTED\n"
         f"pre-GATE_0 state. Do NOT raise a finding for WSM not yet reflecting this WP.\n"
         f"Similarly, WP Registry insertion happens AFTER GATE_0 PASS (Team 170 mandate) —\n"
         f"absent WP Registry entry is NOT a blocking finding.\n\n"
@@ -1256,7 +1241,7 @@ def _generate_g3_plan_mandates(state: PipelineState, revision_notes: str = "", f
     if revision_notes:
         phase1_task = (
             f"### Your Task (REVISION)\n\n"
-            f"**Environment:** Cursor (Team 10 — Execution Orchestrator)\n\n"
+            f"**Environment:** Cursor (Team 10 — Work Plan Generator)\n\n"
             f"Your work plan was reviewed by Team 90 (G3_5) and **FAILED**.\n"
             f"Do NOT produce a new plan from scratch — fix the existing plan to address the blockers.\n\n"
             f"**G3_5 Blockers to Fix:**\n\n{revision_notes}\n\n"
@@ -1273,7 +1258,7 @@ def _generate_g3_plan_mandates(state: PipelineState, revision_notes: str = "", f
     else:
         phase1_task = (
             f"### Your Task\n\n"
-            f"**Environment:** Cursor (Team 10 — Execution Orchestrator)\n\n"
+            f"**Environment:** Cursor (Team 10 — Work Plan Generator)\n\n"
             f"Produce a complete implementation work plan for WP `{wp}`.\n\n"
             f"**Approved Spec (from GATE_1 LLD400):**\n\n{spec}\n\n"
             f"---\n\n"
@@ -1749,81 +1734,6 @@ def _generate_gate_5_prompt(
     )
 
 
-def _generate_g5_doc_fix_prompt(state: PipelineState) -> str:
-    """Generate the Team 10 prompt for fixing admin/doc blockers from GATE_5.
-
-    This is the G5_DOC_FIX gate — an administrative sprint.
-    - NO mandate generation
-    - NO CURSOR_IMPLEMENTATION activation
-    - NO Teams 20/30 code implementation
-    - Team 10 fixes docs/artifacts/evidence directly, then ./pipeline_run.sh pass → GATE_5
-    """
-    wp  = state.work_package_id
-    wpu = wp.replace("-", "_")
-
-    # ── Load the GATE_5 blocking report to extract specific blockers ──────────
-    t90         = REPO_ROOT / "_COMMUNICATION" / "team_90"
-    blocking_report_candidates = [
-        t90 / f"TEAM_90_TO_TEAM_10_{wpu}_BLOCKING_REPORT.md",
-        t90 / f"TEAM_90_{wpu}_GATE_5_VALIDATION_v1.0.0.md",
-        t90 / f"TEAM_90_{wpu}_GATE_5_VERDICT_v1.0.0.md",
-    ]
-    blocking_report_content = ""
-    blocking_report_path    = ""
-    for p in blocking_report_candidates:
-        if p.exists():
-            blocking_report_content = p.read_text(encoding="utf-8")
-            blocking_report_path    = str(p.relative_to(REPO_ROOT))
-            break
-
-    blockers_section = (
-        f"## Blocking Report (from Team 90 — GATE_5 FAIL)\n\n"
-        f"Source: `{blocking_report_path}`\n\n"
-        + (
-            f"```\n{blocking_report_content[:3000]}\n```\n\n"
-            if blocking_report_content else
-            f"⚠️  Blocking report not found — check `_COMMUNICATION/team_90/` manually.\n\n"
-        )
-    )
-
-    return (
-        f"{_team_header('team_10', 'G5_DOC_FIX', state, fresh=False)}"
-        f"╔══════════════════════════════════════════════════════════════╗\n"
-        f"║  ⚙  G5_DOC_FIX — ADMINISTRATIVE DOC FIX SPRINT              ║\n"
-        f"║                                                              ║\n"
-        f"║  GATE_5 failed on documentation/artifact gaps.              ║\n"
-        f"║  This is NOT a code issue. You are Team 10.                 ║\n"
-        f"║                                                              ║\n"
-        f"║  ⛔ DO NOT generate new mandates                             ║\n"
-        f"║  ⛔ DO NOT activate Teams 20 or 30 for code implementation   ║\n"
-        f"║  ⛔ DO NOT trigger CURSOR_IMPLEMENTATION                     ║\n"
-        f"║  ⛔ DO NOT run a full GATE_4 QA cycle                        ║\n"
-        f"║                                                              ║\n"
-        f"║  ✅ Fix ONLY the doc/artifact gaps listed in the report      ║\n"
-        f"║  ✅ Coordinate Team 50 for partial QA re-run if needed       ║\n"
-        f"║  ✅ When all fixes are done → ./pipeline_run.sh pass         ║\n"
-        f"╚══════════════════════════════════════════════════════════════╝\n\n"
-        f"# G5_DOC_FIX — Administrative Doc Fix for `{wp}`\n\n"
-        f"**WP:** `{wp}` | **Your role:** Team 10 (Execution Orchestrator)\n\n"
-        f"## Your Mission\n\n"
-        f"GATE_5 returned `route_recommendation: doc` — all blockers are documentation/artifact gaps.\n"
-        f"No code changes are needed. Fix each blocker below and confirm resolution.\n\n"
-        f"## Typical doc-fix tasks (check the blocking report below):\n"
-        f"- Rename or alias mismatched artifact file paths (Team 20, Team 30, Team 50)\n"
-        f"- Write missing completion/closure artifacts for any team that lacks one\n"
-        f"- Coordinate Team 50 for a **targeted partial QA re-run** (specific scenarios only)\n"
-        f"  — NOT a full GATE_4 cycle; just the N/A or missing test scenarios\n"
-        f"- Update work plan artifact references if paths changed\n\n"
-        f"{blockers_section}"
-        f"## When All Fixes Are Done\n\n"
-        f"1. Verify each fix with a quick file-level check\n"
-        f"2. Run: `./pipeline_run.sh pass`\n"
-        f"   → Pipeline advances directly to **GATE_5** (Team 90 re-validates)\n\n"
-        f"⚠️  If during the fix you discover a **code bug** (not a doc gap),\n"
-        f"    do NOT fix it yourself — run: `./pipeline_run.sh fail \"code issue found: [description]\"`\n"
-        f"    and let the pipeline escalate to a full cycle."
-    )
-
 
 def _generate_gate_6_prompt(state: PipelineState, fresh: bool = False, team_id: str = "team_100") -> str:
     domain_note = (
@@ -2189,10 +2099,6 @@ def advance_gate(gate_id: str, status: str, reason: str = "", force: bool = Fals
             state.current_gate = "WAITING_GATE2_APPROVAL"
         elif gate_id == "GATE_6":
             state.current_gate = "WAITING_GATE6_APPROVAL"
-        elif gate_id == "G5_DOC_FIX":
-            # Admin block fixed — go directly to GATE_5 re-validation (no GATE_4, no impl teams)
-            state.current_gate = "GATE_5"
-            _log("G5_DOC_FIX PASS — routing directly to GATE_5 for re-validation")
         else:
             idx = GATE_SEQUENCE.index(gate_id) if gate_id in GATE_SEQUENCE else -1
             if idx >= 0 and idx + 1 < len(GATE_SEQUENCE):
@@ -2340,7 +2246,7 @@ def store_artifact(gate_id: str, file_path: str) -> bool:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Agents_OS V2 Pipeline — Team 10 Orchestrator")
+    parser = argparse.ArgumentParser(description="Agents_OS V2 Pipeline — Team 10 Work Plan Generator")
     parser.add_argument("--spec", type=str, help="Start pipeline with spec brief")
     parser.add_argument("--status", action="store_true", help="Show pipeline status")
     parser.add_argument("--next", action="store_true", help="Show next action")

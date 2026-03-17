@@ -50,9 +50,7 @@ in_response_to: TEAM_61_S002_P005_WP003_IMPLEMENTATION_COMPLETE_v1.0.0
 | QA-P1-02 | No active WP message | **PASS** | getExpectedFiles() returns "No active WP — expected files N/A" when work_package_id NONE |
 | QA-P1-03 | Gate COMPLETE message | **PARTIAL** | data-testid="gate-complete-message" in Dashboard HTML; COMPLETE state scenario not executed |
 | QA-P1-04 | Snapshot freshness badge | **PARTIAL** | data-testid="snapshot-freshness-badge" in DOM; manual aging of STATE_SNAPSHOT not executed |
-| QA-P1-05 | Date placeholders in prompts | **FAIL** | `grep -r "{{date}}\|date -u +%F" _COMMUNICATION/agents_os/prompts/ \| wc -l` → 2 (both meta in QA-P1-05 spec); actual prompt templates: 0 |
-
-**Note:** QA-P1-05 failure: prompt templates do not contain ≥3 instances of `{{date}}` or `date -u +%F`. This is a non-blocking informational finding (prompt authoring best practice). No P0 or pytest impact.
+| QA-P1-05 | Date placeholders in prompts | **PASS** *(remediated)* | Re-submission: 5 matches (≥3); see TEAM_51_S002_P005_WP003_QA_RERESUBMISSION_REPORT_v1.0.0 |
 
 ---
 
@@ -83,13 +81,13 @@ python3 -m pytest agents_os_v2/tests/test_pipeline.py -v -k "not OpenAI and not 
 | overall_result | QA_PASS |
 | blocking_findings | NONE |
 | remaining_blockers | 0 |
-| non_blocking | QA-P1-05 (date placeholders in prompts: 0/3) |
+| non_blocking | NONE *(QA-P1-05 remediated per reresubmission)* |
 
 ---
 
 ## §6 Recommendations
 
-1. **QA-P1-05 (informational):** Add `{{date}}` or `date -u +%F` to ≥3 prompt templates (e.g. mandate headers, copy prompts) for consistent dating. Route to Team 61 or Team 170 if in scope.
+1. ~~**QA-P1-05**~~ — **REMEDIATED** per TEAM_61_TO_TEAM_51_WP003_QA_RERESUBMISSION_v1.0.0; re-report: TEAM_51_S002_P005_WP003_QA_RERESUBMISSION_REPORT_v1.0.0.
 2. **P1-01, P1-03, P1-04:** Full scenario execution (conflict state, COMPLETE gate, aged snapshot) can be run in a follow-up QA pass if required.
 
 ---

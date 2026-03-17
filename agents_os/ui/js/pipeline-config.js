@@ -5,7 +5,7 @@ const GATE_SEQUENCE = [
   "GATE_0", "GATE_1", "GATE_2", "WAITING_GATE2_APPROVAL",
   "G3_PLAN", "G3_5", "G3_6_MANDATES",
   "CURSOR_IMPLEMENTATION",
-  "GATE_4", "GATE_5", "G5_DOC_FIX", "GATE_6", "WAITING_GATE6_APPROVAL",
+  "GATE_4", "GATE_5", "GATE_6", "WAITING_GATE6_APPROVAL",
   "GATE_7", "GATE_8"
 ];
 
@@ -20,7 +20,6 @@ const GATE_CONFIG = {
   "CURSOR_IMPLEMENTATION":  { owner: "teams_20+30", engine: "cursor",         desc: "Implement (Teams 20+30)", twoPaths: false },
   "GATE_4":                 { owner: "team_50",     engine: "cursor+mcp",     desc: "QA — Team 50", twoPaths: true },
   "GATE_5":                 { owner: "team_90",     engine: "codex",          desc: "Dev validation", twoPaths: true },
-  "G5_DOC_FIX":             { owner: "team_10",     engine: "cursor",         desc: "Admin doc fix → GATE_5 re-validation", twoPaths: true },
   "GATE_6":                 { owner: "team_100",    engine: "codex+human",     desc: "Team 100 → reality vs intent", twoPaths: true },
   "WAITING_GATE6_APPROVAL": { owner: "team_00",     engine: "human",          desc: "Nimrod approves GATE_6", twoPaths: true },
   "GATE_7":                 { owner: "team_90",     engine: "human",          desc: "Team 90 orchestrates UX review; Nimrod browser sign-off", twoPaths: true },
@@ -60,7 +59,7 @@ const DOMAIN_STATE_FILES = {
 const LEGACY_STATE_FILE = "../../_COMMUNICATION/agents_os/pipeline_state.json";
 
 const BOOSTER_TEAM_DATA = {
-  "team_10":   { label: "Team 10",   name: "Execution Orchestrator",    writesTo: ["../../_COMMUNICATION/team_10/"],   isoRules: ["No gate submission without all artifacts", "Work plan must be versioned", "Identity header mandatory on all outputs"] },
+  "team_10":   { label: "Team 10",   name: "Work Plan Generator",        writesTo: ["../../_COMMUNICATION/team_10/"],   isoRules: ["No gate submission without all artifacts", "Work plan must be versioned", "Identity header mandatory on all outputs"] },
   "team_20":   { label: "Team 20",   name: "Backend Implementation",    writesTo: ["../../_COMMUNICATION/team_20/"],   isoRules: ["maskedLog mandatory on all server-side logging", "NUMERIC(20,8) for financial data", "4-state status model (pending/active/inactive/cancelled)"] },
   "team_30":   { label: "Team 30",   name: "Frontend Implementation",    writesTo: ["../../_COMMUNICATION/team_30/"],   isoRules: ["collapsible-container Iron Rule on ALL pages", "maskedLog mandatory", "Rich text: ONE unified object"] },
   "team_31":   { label: "Team 31",   name: "Blueprint Maker",            writesTo: ["../../staging/blueprints/"],        isoRules: ["OUTSIDE gate pipeline — no gate submissions", "Blueprint files are staging artifacts only — not production code"] },

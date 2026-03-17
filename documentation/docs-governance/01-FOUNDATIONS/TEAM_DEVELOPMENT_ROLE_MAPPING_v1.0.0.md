@@ -29,6 +29,7 @@
 | **Team 170** | Spec & Governance (AGENTS_OS + Governance Canonical) | LOD contracts, AGENTS_OS/governance canonical maintenance, registry synchronization, governance procedure locks. |
 | **Team 190** | Constitutional Validation | GATE_0-GATE_2 constitutional integrity and validation authority — cross-domain (TIKTRACK + AGENTS_OS + SHARED). **Output: structured verdict only — no routing.** Per ARCHITECT_DIRECTIVE_PROCESS_FUNCTIONAL_SEPARATION_v1.0.0. |
 | **Team 191** | Git Governance Operations (child of Team 190) | Commit/push guard operations, date-lint/snapshot/sync remediation, clean-tree enforcement, Git drift triage — cross-domain (TIKTRACK + AGENTS_OS + SHARED). |
+| **Team 101** | IDE Architecture Authority | Local IDE (Cursor co-pilot). Advisory architecture review — surfacing code-level observations to Team 00. Team 00 exclusively. Does NOT produce mandates or issue directives. Registered 2026-03-17. |
 
 ## 1.1) Team 61 registration record (canonical)
 
@@ -66,6 +67,20 @@
 | Non-authority | Must not issue constitutional gate verdicts; must not alter business logic under cover of Git fixes; must not override policy semantics without Team 190/Team 00 ruling. |
 | Reports to | Team 190 (primary), Team 10 (operational coordination). |
 
+## 1.4) Team 101 registration record (canonical)
+
+| Field | Value |
+|---|---|
+| Team ID | 101 |
+| Name | IDE Architecture Authority |
+| Role | Advisory architecture review. Surfaces code-level observations, pattern anomalies, and architectural questions to Team 00. Does NOT produce mandates, does NOT issue directives to other teams. |
+| Engine | Local IDE (Cursor co-pilot — same environment as Team 00) |
+| Authority | Advisory only. All output is treated as input to Team 00 for evaluation. Team 00 decides whether to adopt, modify, or reject. |
+| Reporting line | Team 00 exclusively. Team 101 does not communicate with any other team directly. |
+| Status | Active (registered 2026-03-17) |
+| Reference | ARCHITECT_DIRECTIVE_GATE_ARCHITECTURE_CANONICAL_ADDENDUM_v1.0.0.md §A |
+| Framing | Team 101 input is processed as "architectural observations submitted to Team 00" — not as requests, mandates, or directives. Correct framing: "Team 101 observation → Team 00 evaluates → Team 00 decides." |
+
 ---
 
 ## 2) Rule: scope by domain
@@ -84,12 +99,12 @@ A Work Package must assign implementation **by domain** — Backend→20, Fronte
 
 ## 3) Team 10 — Mode-Aware Definition (per ARCHITECT_DIRECTIVE_TEAM_ROSTER_LOCK_v2.0.0)
 
-**Permanent core:** Technical Implementation Authority — architectural depth for implementation decisions.
+**Canonical role (2026-03-17):** Work Plan Generator. WSM state is managed exclusively by the pipeline system; Team 10 does NOT modify WSM directly. Pipeline state transitions that require WSM updates are handled automatically by the orchestrator. Reference: ARCHITECT_DIRECTIVE_GATE_ARCHITECTURE_CANONICAL_ADDENDUM_v1.0.0.md §B.3.
 
 | Mode | Role | Scope |
 |------|------|-------|
-| **Mode 1** (Legacy, no AOS pipeline) | Process Coordinator + Implementation Authority | Receives verdicts from 190/50/90; routes per `TEAM_10_MODE1_ROUTING_TABLE_v1.0.0.md` (deterministic); activates next team; manages WSM updates. |
-| **Mode 2** (AOS + Dashboard) | Implementation Technical Authority | GATE_3 work plan, GATE_4 build oversight, Team 61 activation. Does NOT route between gates (pipeline does). Does NOT issue owner_next_action. |
+| **Mode 1** (Legacy, no AOS pipeline) | Process Coordinator + Work Plan Generator | Receives verdicts from 190/50/90; routes per `TEAM_10_MODE1_ROUTING_TABLE_v1.0.0.md` (deterministic); activates next team. WSM updates are managed by the pipeline system. |
+| **Mode 2** (AOS + Dashboard) | Work Plan Generator (GATE_3) | GATE_3 work plan only; GATE_4 build oversight, Team 61 activation. Does NOT route between gates (pipeline does). Does NOT issue owner_next_action. Does NOT update WSM directly. |
 | **Mode 3** (Full-auto AOS) | Technical Consultation Authority | On-demand escalation for complex/risky builds. Pipeline fully replaces process coordination. |
 
 ---
@@ -122,3 +137,4 @@ This document must be updated whenever a new squad is added. Missing squad defin
 **log_entry | TEAM_190 | TEAM_DEVELOPMENT_ROLE_MAPPING | DOMAIN_SPLIT_REINFORCED_10_20_30_40_50__60__90_190__61 | 2026-03-11**
 **log_entry | TEAM_190 | TEAM_DEVELOPMENT_ROLE_MAPPING | TEAM_191_CHILD_GIT_GOVERNANCE_OPERATIONS_REGISTERED | 2026-03-12**
 **log_entry | TEAM_170 | TEAM_DEVELOPMENT_ROLE_MAPPING | ROSTER_V2_PROCESS_FUNCTIONAL_SEPARATION_APPLIED | 2026-03-15**
+**log_entry | TEAM_170 | TEAM_DEVELOPMENT_ROLE_MAPPING | TEAM_101_IDE_ARCHITECTURE_AUTHORITY_REGISTERED | 2026-03-17**

@@ -14,6 +14,7 @@ from .routes.state_stub import stub_state_domain, stub_pipeline_command, stub_st
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 STATIC_DIR = REPO_ROOT / "agents_os" / "ui"
 COMMUNICATION_DIR = REPO_ROOT / "_COMMUNICATION"
+DOCUMENTATION_DIR = REPO_ROOT / "documentation"
 
 
 async def redirect_root(request):
@@ -62,6 +63,7 @@ def create_app():
         Route("/api/pipeline/{domain}/{command}", stub_pipeline_command, methods=["POST"]),
         Mount("/static", app=StaticFiles(directory=str(STATIC_DIR)), name="static"),
         Mount("/_COMMUNICATION", app=StaticFiles(directory=str(COMMUNICATION_DIR)), name="communication"),
+        Mount("/documentation", app=StaticFiles(directory=str(DOCUMENTATION_DIR)), name="documentation"),
     ]
     app = Starlette(
         routes=routes,

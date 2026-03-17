@@ -48,7 +48,7 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S002-P005 | S002-P005-WP003 | IN_PROGRESS | GATE_1 | false | S002-P005-WP003 (State Alignment) — **GATE_0 PASS** (Team 190 revalidation confirmed); advancing to GATE_1; spec: `TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md` |
 | S003-P001 | S003-P001-WP001 | CLOSED | FAST_4 (PASS) | false | Data Model Validator deployed; FAST_4 CLOSED 2026-03-11 (Team 170 closure) |
 | S003-P002 | S003-P002-WP001 | CLOSED | FAST_4 (PASS) | false | Test Template Generator deployed; G3.7 in gate chain; FAST_4 CLOSED 2026-03-12 (Team 170 closure) |
-| S003-P009 | S003-P009-WP001 | IN_PROGRESS | GATE_0 | true | S003-P009-WP001 (Pipeline Resilience Package) — activated 2026-03-17; GATE_0 underway; spec: `TEAM_100_PIPELINE_RESILIENCE_LOD400_DRAFT_v1.0.0.md` |
+| S003-P009 | S003-P009-WP001 | IN_PROGRESS | GATE_0 | false | S003-P009-WP001 (Pipeline Resilience Package) — activated 2026-03-17; GATE_0 underway; spec: `TEAM_100_PIPELINE_RESILIENCE_LOD400_DRAFT_v1.0.0.md` |
 
 
 

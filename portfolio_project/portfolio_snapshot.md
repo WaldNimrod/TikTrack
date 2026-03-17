@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-17T17:01:55.901888+00:00`
+- Generated (UTC): `2026-03-17T20:53:42.503883+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `1`
@@ -16,8 +16,8 @@
 ## Portfolio Counts
 
 - stages: `6`
-- programs: `32`
-- work_packages: `11`
+- programs: `33`
+- work_packages: `12`
 
 ## Roadmap (hierarchical)
 
@@ -71,7 +71,10 @@
 
     ├── **Program** `S003-P007` — Agents_OS Command Bridge Lite (ADR-031 Stage B) | PLANNED | domain: **AGENTS_OS**
 
-    └── **Program** `S003-P008` — Agents_OS Pipeline Governance Hardening | PLANNED | domain: **AGENTS_OS**
+    ├── **Program** `S003-P008` — Agents_OS Pipeline Governance Hardening | PLANNED | domain: **AGENTS_OS**
+
+    └── **Program** `S003-P009` — Agents_OS Pipeline Resilience Package | ACTIVE | domain: **AGENTS_OS**
+        └── **WP** `S003-P009-WP001` | IN_PROGRESS | gate: GATE_0 | domain: **AGENTS_OS**
 
 
 ### S004 — שלב 4 — Financial Execution | PLANNED [SHARED]

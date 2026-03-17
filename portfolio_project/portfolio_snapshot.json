@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-17T17:01:55.901888+00:00",
+  "generated_at_utc": "2026-03-17T20:53:42.503883+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -192,6 +192,14 @@
       "stage_id": "S003",
       "status": "PLANNED",
       "current_gate_mirror": "— pending GATE_0 validation; LOD200 submitted 2026-03-16; scope: STATE_VIEW.json, LOD200 ordering table schema (IDEA-040/042), gate prompt lifecycle archive (IDEA-038), test_cursor_prompt cap (IDEA-039); activation trigger: S002-P005-WP003 GATE_0 PASS; sequencing: activate before or in parallel with S003-P007; authority: TEAM_100_AGENTS_OS_PIPELINE_GOVERNANCE_HARDENING_S003_P008_LOD200_v1.0.0.md"
+    },
+    {
+      "program_id": "S003-P009",
+      "program_name": "Agents_OS Pipeline Resilience Package",
+      "domain": "AGENTS_OS",
+      "stage_id": "S003",
+      "status": "ACTIVE",
+      "current_gate_mirror": "GATE_0 — activated 2026-03-17; scope: file-path 3-tier resolution hardening (AC-10/AC-11), WSM auto-write module (wsm_writer.py), targeted git operations (pre-GATE_4 + GATE_8); Items 4a/4b already implemented; LOD400 finalized: TEAM_100_PIPELINE_RESILIENCE_LOD400_DRAFT_v1.0.0; authority: Team 00 PRE-CONDITION approval 2026-03-17; test_flight_target: S003-P001 (Data Model Validator)"
     },
     {
       "program_id": "S004-P001",
@@ -429,6 +437,15 @@
       "current_gate": "FAST_4 (PASS)",
       "is_active": false,
       "active_marker_reason": "Test Template Generator deployed; G3.7 in gate chain; FAST_4 CLOSED 2026-03-12 (Team 170 closure)"
+    },
+    {
+      "work_package_id": "S003-P009-WP001",
+      "program_id": "S003-P009",
+      "domain": "AGENTS_OS",
+      "status": "IN_PROGRESS",
+      "current_gate": "GATE_0",
+      "is_active": false,
+      "active_marker_reason": "S003-P009-WP001 (Pipeline Resilience Package) — activated 2026-03-17; GATE_0 underway; spec: `TEAM_100_PIPELINE_RESILIENCE_LOD400_DRAFT_v1.0.0.md`"
     }
   ],
   "hierarchy": [
@@ -692,6 +709,24 @@
           "status": "PLANNED",
           "current_gate_mirror": "— pending GATE_0 validation; LOD200 submitted 2026-03-16; scope: STATE_VIEW.json, LOD200 ordering table schema (IDEA-040/042), gate prompt lifecycle archive (IDEA-038), test_cursor_prompt cap (IDEA-039); activation trigger: S002-P005-WP003 GATE_0 PASS; sequencing: activate before or in parallel with S003-P007; authority: TEAM_100_AGENTS_OS_PIPELINE_GOVERNANCE_HARDENING_S003_P008_LOD200_v1.0.0.md",
           "work_packages": []
+        },
+        {
+          "program_id": "S003-P009",
+          "program_name": "Agents_OS Pipeline Resilience Package",
+          "domain": "AGENTS_OS",
+          "status": "ACTIVE",
+          "current_gate_mirror": "GATE_0 — activated 2026-03-17; scope: file-path 3-tier resolution hardening (AC-10/AC-11), WSM auto-write module (wsm_writer.py), targeted git operations (pre-GATE_4 + GATE_8); Items 4a/4b already implemented; LOD400 finalized: TEAM_100_PIPELINE_RESILIENCE_LOD400_DRAFT_v1.0.0; authority: Team 00 PRE-CONDITION approval 2026-03-17; test_flight_target: S003-P001 (Data Model Validator)",
+          "work_packages": [
+            {
+              "work_package_id": "S003-P009-WP001",
+              "program_id": "S003-P009",
+              "domain": "AGENTS_OS",
+              "status": "IN_PROGRESS",
+              "current_gate": "GATE_0",
+              "is_active": false,
+              "active_marker_reason": "S003-P009-WP001 (Pipeline Resilience Package) — activated 2026-03-17; GATE_0 underway; spec: `TEAM_100_PIPELINE_RESILIENCE_LOD400_DRAFT_v1.0.0.md`"
+            }
+          ]
         }
       ]
     },

@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0.0",
-  "produced_at_iso": "2026-03-17T22:40:06.882095+00:00",
+  "produced_at_iso": "2026-03-17T23:54:28.906396+00:00",
   "agent_role": "POC-1-OBSERVER",
   "read_only": true,
   "governance": {
@@ -21,7 +21,7 @@
         "gate_state": null,
         "pending_actions": [],
         "override_reason": null,
-        "current_gate": "G3_6_MANDATES",
+        "current_gate": "GATE_5",
         "project_domain": "agents_os",
         "work_package_id": "S003-P009-WP001",
         "stage_id": "S003"
@@ -40,7 +40,7 @@
       "gate_state": null,
       "pending_actions": [],
       "override_reason": null,
-      "current_gate": "G3_6_MANDATES"
+      "current_gate": "GATE_1"
     }
   },
   "codebase": {

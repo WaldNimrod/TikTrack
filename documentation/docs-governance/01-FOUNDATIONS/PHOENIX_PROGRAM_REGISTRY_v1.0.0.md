@@ -126,7 +126,7 @@ Source directives:
 
 **current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-17). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
 
-**WSM mirror (2026-03-17):** active_stage_id=S002; active_program_id=NONE; current_gate=NONE — S003 activation pending; active_work_package_id=NONE; active_flow=**NONE — S002-P005 DOCUMENTATION_CLOSED (2026-03-17). Awaiting S003 activation decision.**.
+**WSM mirror (2026-03-17):** active_stage_id=S003; active_program_id=NONE; current_gate=GATE_5; active_work_package_id=S003-P009-WP001; active_flow=**NONE — S002-P005 DOCUMENTATION_CLOSED (2026-03-17). Awaiting S003 activation decision.**.
 
 ---
 

@@ -26,6 +26,7 @@ from pathlib import Path
 from .state import PipelineState, STATE_FILE
 from .gate_router import run_data_model_checks
 from .log_events import append_event, get_wsm_identity
+from .wsm_writer import write_wsm_state
 from ..config import REPO_ROOT, AGENTS_OS_OUTPUT_DIR, DOMAIN_GATE_OWNERS
 from ..context.injection import (
     build_full_agent_prompt,
@@ -603,9 +604,12 @@ def route_after_fail(gate_id: str, route_type: str, notes: str = ""):
             _log(f"  ./pipeline_run.sh revise \"[paste blocker findings]\"")
     elif target_gate == "CURSOR_IMPLEMENTATION":
         _log(f"")
-        _log(f"→ Generate doc-fix mandate for Team 10:")
-        _log(f"  ./pipeline_run.sh gate CURSOR_IMPLEMENTATION")
-        _log(f"  (Team 10 fixes governance/doc files only — no re-implementation)")
+        _log(f"→ Generate correction mandate for implementation teams:")
+        if notes:
+            safe_notes = notes[:120].replace("'", "\\'")
+            _log(f'  ./pipeline_run.sh revise "{safe_notes}"')
+        else:
+            _log(f"  ./pipeline_run.sh revise \"[paste blocker findings]\"")
     elif target_gate in ("GATE_0", "GATE_1", "GATE_8"):
         _log(f"")
         _log(f"→ Re-run the same gate:")
@@ -736,6 +740,108 @@ def _extract_route_recommendation(gate_id: str, work_package_id: str) -> tuple[s
     return None, ""
 
 
+def _extract_blocking_findings(gate_id: str, work_package_id: str) -> tuple[str, str]:
+    """Extract blocking findings (BF-XX lines) from verdict/BLOCKING_REPORT files.
+
+    Supports both formats:
+    1) YAML-like:
+       blocking_findings:
+         - BF-01: ... | evidence: ...
+    2) Prose section:
+       ## Blocking Findings
+       - **BF-01:** ... | evidence: ...
+
+    Returns:
+      (formatted_findings, source_path)
+      where formatted_findings is bullet-list text or empty string if not found.
+    """
+    import re
+
+    def _normalize_bf_token(token: str) -> str:
+        num = re.search(r"(\d+)", token)
+        if not num:
+            return token.upper().replace("_", "-").replace(" ", "-")
+        return f"BF-{int(num.group(1)):02d}"
+
+    # AUTO mode = prefer latest evidence from GATE_5 then GATE_4.
+    search_gates = [gate_id]
+    if gate_id == "AUTO":
+        search_gates = ["GATE_5", "GATE_4"]
+
+    existing_files: list[tuple[str, Path]] = []
+    for g in search_gates:
+        for path in _verdict_candidates(g, work_package_id):
+            if path.exists():
+                existing_files.append((g, path))
+
+    if not existing_files:
+        return "", ""
+
+    # Newest verdict/report first.
+    existing_files.sort(key=lambda gp: gp[1].stat().st_mtime, reverse=True)
+
+    for _, path in existing_files:
+        text = path.read_text(encoding="utf-8")
+        findings: list[str] = []
+
+        # Format A: YAML-like blocking_findings list.
+        m = re.search(
+            r"blocking_findings\s*:\s*\n((?:\s*-\s*(?:\*\*)?BF[-_\s]?\d+.*(?:\n|$))+)",
+            text,
+            re.IGNORECASE,
+        )
+        if m:
+            for line in m.group(1).splitlines():
+                line = line.strip()
+                if not line.startswith("-"):
+                    continue
+                line = re.sub(r"^-\s*", "", line).strip()
+                line = line.replace("**", "")
+                bf = re.match(r"(BF[-_\s]?\d+)\s*:?\s*(.*)", line, re.IGNORECASE)
+                if bf:
+                    findings.append(f"{_normalize_bf_token(bf.group(1))}: {bf.group(2).strip()}")
+
+        # Format B: "## Blocking Findings" section.
+        if not findings:
+            sec = re.search(
+                r"^##\s*Blocking\s*Findings\b(.*?)(?=^##\s+|\Z)",
+                text,
+                flags=re.IGNORECASE | re.MULTILINE | re.DOTALL,
+            )
+            if sec:
+                for line in sec.group(1).splitlines():
+                    line = line.strip()
+                    if "BF-" not in line.upper():
+                        continue
+                    line = re.sub(r"^[-*]\s*", "", line)
+                    line = line.replace("**", "")
+                    bf = re.match(r"(BF[-_\s]?\d+)\s*:?\s*(.*)", line, re.IGNORECASE)
+                    if bf:
+                        findings.append(f"{_normalize_bf_token(bf.group(1))}: {bf.group(2).strip()}")
+
+        # Format C: fallback — collect BF lines globally.
+        if not findings:
+            for bf in re.finditer(
+                r"^\s*[-*]?\s*\**\s*(BF[-_\s]?\d+)\**\s*:?\s*(.+)$",
+                text,
+                flags=re.IGNORECASE | re.MULTILINE,
+            ):
+                findings.append(f"{_normalize_bf_token(bf.group(1))}: {bf.group(2).strip()}")
+
+        if findings:
+            # De-duplicate while preserving order.
+            seen = set()
+            uniq = []
+            for f in findings:
+                if f in seen:
+                    continue
+                seen.add(f)
+                uniq.append(f"- {f}")
+            return "\n".join(uniq), str(path)
+
+    return "", ""
+
+
 def generate_prompt(gate_id: str, force_gate4: bool = False, revision_notes: str = "", fresh: bool = False):
     state = PipelineState.load()
     if gate_id == "WAITING_FOR_IMPLEMENTATION_COMMIT":
@@ -806,13 +912,33 @@ def generate_prompt(gate_id: str, force_gate4: bool = False, revision_notes: str
             "  --query   GATE_2 --question '…' → Ask follow-up\n"
         )
     elif gate_id == "G3_PLAN":
+        # Constitutional remediation rule (route=full from GATE_4/GATE_5):
+        # If no manual revision notes provided, auto-inject blocking findings.
+        if not revision_notes and ("GATE_4" in state.gates_failed or "GATE_5" in state.gates_failed):
+            auto_findings, source = _extract_blocking_findings("AUTO", state.work_package_id)
+            if auto_findings:
+                revision_notes = (
+                    f"Auto-injected from validation report: `{source}`\n\n"
+                    f"{auto_findings}"
+                )
+                _log("Auto-injected blocking findings into G3_PLAN revision prompt.")
         prompt = _generate_g3_plan_mandates(state, revision_notes=revision_notes, fresh=fresh)
     elif gate_id == "G3_5":
         prompt = _generate_g3_5_prompt(state, fresh)
     elif gate_id == "G3_6_MANDATES":
         prompt = _generate_mandates(state)
     elif gate_id == "CURSOR_IMPLEMENTATION":
-        prompt = _generate_cursor_prompts(state)
+        # Constitutional remediation rule (route=doc from GATE_4/GATE_5):
+        # Auto-inject blockers so remediation mandate is targeted.
+        if not revision_notes and ("GATE_4" in state.gates_failed or "GATE_5" in state.gates_failed):
+            auto_findings, source = _extract_blocking_findings("AUTO", state.work_package_id)
+            if auto_findings:
+                revision_notes = (
+                    f"Auto-injected from validation report: `{source}`\n\n"
+                    f"{auto_findings}"
+                )
+                _log("Auto-injected blocking findings into CURSOR_IMPLEMENTATION prompt.")
+        prompt = _generate_cursor_prompts(state, revision_notes=revision_notes)
     elif gate_id == "GATE_4":
         if not force_gate4:
             import subprocess
@@ -1591,16 +1717,40 @@ def _generate_gate_8_mandates(state: PipelineState, fresh: bool = False) -> str:
     return doc
 
 
-def _generate_cursor_prompts(state: PipelineState) -> str:
-    return (
-        f"# CURSOR IMPLEMENTATION\n\n"
-        f"Open the mandates file and paste each team's mandate into a Cursor Composer session:\n\n"
-        f"  File: _COMMUNICATION/agents_os/prompts/implementation_mandates.md\n\n"
-        f"1. Open Cursor Composer → paste Team 20 mandate → backend implementation\n"
-        f"2. Open Cursor Composer → paste Team 30 mandate → frontend + MCP tests\n\n"
-        f"When both are done:\n"
-        f"  python3 -m agents_os_v2.orchestrator.pipeline --advance CURSOR_IMPLEMENTATION PASS"
-    )
+def _generate_cursor_prompts(state: PipelineState, revision_notes: str = "") -> str:
+    if revision_notes:
+        notes_l = revision_notes.lower()
+        dependency_hint = any(k in notes_l for k in ("api", "backend", "500", "endpoint", "server error"))
+        sequencing_note = (
+            "If blockers indicate backend/API root cause, execute sequentially: "
+            "Team 20 fixes first and commits; Team 30 applies UI fixes after backend verification.\n"
+            if dependency_hint else
+            "If blockers are independent across backend/UI, Team 20 and Team 30 may remediate in parallel.\n"
+        )
+        return (
+            f"╔══════════════════════════════════════════════════════════════╗\n"
+            f"║  ⚠ CORRECTION CYCLE — CURSOR IMPLEMENTATION                  ║\n"
+            f"╚══════════════════════════════════════════════════════════════╝\n\n"
+            f"Your previous implementation was rejected during validation.\n\n"
+            f"## Blockers to Fix:\n\n{revision_notes}\n\n"
+            f"## Sequencing Note\n"
+            f"{sequencing_note}\n"
+            f"## Your Task:\n"
+            f"1. Open Cursor Composer for the relevant executing team (Team 61/20/30).\n"
+            f"2. Fix ONLY the issues listed above. Do NOT rewrite the whole feature.\n"
+            f"3. When fixed, commit the changes.\n"
+            f"4. Run: `./pipeline_run.sh pass`\n"
+        )
+    else:
+        return (
+            f"# CURSOR IMPLEMENTATION\n\n"
+            f"Open the mandates file and paste each team's mandate into a Cursor Composer session:\n\n"
+            f"  File: _COMMUNICATION/agents_os/prompts/implementation_mandates.md\n\n"
+            f"1. Open Cursor Composer → paste Team 20 mandate → backend implementation\n"
+            f"2. Open Cursor Composer → paste Team 30 mandate → frontend + MCP tests\n\n"
+            f"When both are done:\n"
+            f"  python3 -m agents_os_v2.orchestrator.pipeline --advance CURSOR_IMPLEMENTATION PASS"
+        )
 
 
 def _generate_gate_4_prompt(state: PipelineState) -> str:
@@ -2138,6 +2288,21 @@ def advance_gate(gate_id: str, status: str, reason: str = "", force: bool = Fals
                     _log(f"╚══════════════════════════════════════════════════════════╝")
 
     state.save()
+
+    # S003-P009-WP001 Item 2: non-blocking WSM auto-write after state persistence.
+    # Guarded by gate_state in both caller and writer for PASS_WITH_ACTION safety.
+    if state.gate_state is None:
+        try:
+            write_wsm_state(state=state, gate_id=gate_id, result=status)
+        except Exception:
+            _emit_pipeline_event(
+                "WSM_UPDATE_WARN",
+                state,
+                "WSM auto-write failed (non-blocking)",
+                metadata={"gate": gate_id, "result": status},
+                severity="WARN",
+            )
+
     _log(f"{gate_id}: {status}")
 
     # Emit event after save

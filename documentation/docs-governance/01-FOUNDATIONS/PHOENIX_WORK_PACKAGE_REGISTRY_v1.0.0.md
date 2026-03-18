@@ -48,11 +48,11 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S002-P005 | S002-P005-WP003 | IN_PROGRESS | GATE_1 | false | S002-P005-WP003 (State Alignment) — **GATE_0 PASS** (Team 190 revalidation confirmed); advancing to GATE_1; spec: `TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md` |
 | S003-P001 | S003-P001-WP001 | CLOSED | FAST_4 (PASS) | false | Data Model Validator deployed; FAST_4 CLOSED 2026-03-11 (Team 170 closure) |
 | S003-P002 | S003-P002-WP001 | CLOSED | FAST_4 (PASS) | false | Test Template Generator deployed; G3.7 in gate chain; FAST_4 CLOSED 2026-03-12 (Team 170 closure) |
-| S003-P009 | S003-P009-WP001 | IN_PROGRESS | GATE_0 | false | S003-P009-WP001 (Pipeline Resilience Package) — activated 2026-03-17; GATE_0 underway; spec: `TEAM_100_PIPELINE_RESILIENCE_LOD400_DRAFT_v1.0.0.md` |
+| S003-P009 | S003-P009-WP001 | IN_PROGRESS | GATE_5 | true | **NONE — S002-P005 DOCUMENTATION_CLOSED (2026-03-17). Awaiting S003 activation decision.** |
 
 
 
-**Current active WP state (mirror from WSM):** **NO_ACTIVE_WORK_PACKAGE** — WSM `active_stage_id=S002`, `active_program_id=NONE`, `current_gate=NONE — S003 activation pending`, `active_work_package_id=N/A`.
+**Current active WP state (mirror from WSM):** **ACTIVE_WORK_PACKAGE_PRESENT** — WSM `active_stage_id=S003`, `active_program_id=NONE`, `current_gate=GATE_5`, `active_work_package_id=S003-P009-WP001`.
 
 **Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-17). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
 

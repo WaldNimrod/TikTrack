@@ -1,16 +1,16 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-17T20:53:42.503883+00:00`
+- Generated (UTC): `2026-03-18T16:06:19.278348+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `1`
 
 ## Runtime (from WSM)
 
-- active_stage_id: `S002`
+- active_stage_id: `S003`
 - active_program_id: `NONE`
-- active_work_package_id: `NONE`
-- current_gate: `NONE — S003 activation pending`
+- active_work_package_id: `S003-P009-WP001`
+- current_gate: `GATE_5`
 - next_required_action: `S003 stage activation decision by Team 00. Candidate first program: S003-P001 (Data Model Validator) — test flight target per Team 101 report. Run `./pipeline_run.sh --domain agents_os status` for current state.`
 
 ## Portfolio Counts
@@ -74,7 +74,7 @@
     ├── **Program** `S003-P008` — Agents_OS Pipeline Governance Hardening | PLANNED | domain: **AGENTS_OS**
 
     └── **Program** `S003-P009` — Agents_OS Pipeline Resilience Package | ACTIVE | domain: **AGENTS_OS**
-        └── **WP** `S003-P009-WP001` | IN_PROGRESS | gate: GATE_0 | domain: **AGENTS_OS**
+        └── **WP** `S003-P009-WP001` | IN_PROGRESS | gate: GATE_5 | domain: **AGENTS_OS** (active)
 
 
 ### S004 — שלב 4 — Financial Execution | PLANNED [SHARED]

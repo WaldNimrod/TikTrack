@@ -91,17 +91,17 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 | Field | Value |
 |-------|-------|
-| active_stage_id | S002 |
+| active_stage_id | S003 |
 | active_stage_label | שלב 2 — Stage 2 |
 | active_flow | **NONE — S002-P005 DOCUMENTATION_CLOSED (2026-03-17). Awaiting S003 activation decision.** |
 | active_project_domain | AGENTS_OS |
-| active_work_package_id | NONE |
+| active_work_package_id | S003-P009-WP001 |
 | in_progress_work_package_id | NONE |
 | last_closed_work_package_id | S002-P005-WP004 (combined WP002+WP003+WP004 GATE_8 PASS 2026-03-17; Team 100 FINAL_PASS; DOCUMENTATION_CLOSED) |
 | last_closed_program_id | S002-P005 (GATE_8 PASS 2026-03-17; DOCUMENTATION_CLOSED; WP002+WP003+WP004 all closed) |
 | last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
 | allowed_gate_range | GATE_0_TO_GATE_8 (normal execution lifecycle) |
-| current_gate | NONE — S003 activation pending |
+| current_gate | GATE_5 |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
@@ -323,3 +323,4 @@ GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:
 
 **log_entry | TEAM_170 | PHOENIX_MASTER_WSM | SSOT_CORRECTIONS_APPLIED_5_PER_ARCHITECT_DIRECTIVE_SSOT_CORRECTIONS_v1.0.0 | 2026-03-03**
 **log_entry | TEAM_170 | PHOENIX_MASTER_WSM | GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE | 2026-03-03**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_5 FAIL | S003-P009-WP001 | 2026-03-17**

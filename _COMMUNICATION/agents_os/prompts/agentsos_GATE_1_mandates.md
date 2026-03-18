@@ -1,5 +1,7 @@
 # Mandates — S003-P009-WP001  ·  GATE_1
 
+**date:** 2026-03-18
+
 **Spec:** Pipeline Resilience Package — 3-tier file resolution, wsm_writer.py auto-write, targeted git integration (pre-GATE_4 + GATE_8), route alias normalization (4a/4b already implemented)
 
 **Canonical date:** Use `date -u +%F` for today; replace {{date}} in identity headers.
@@ -112,64 +114,11 @@ If BLOCK: Team 170 must revise the LLD400. Do NOT fix it yourself.
 
 ### Coordination Data — LLD400 produced by Team 170 (Phase 1 output)
 
-✅  Auto-loaded: `_COMMUNICATION/team_170/TEAM_170_S003_P009_WP001_LLD400_v1.0.0.md`
+⚠️  File not yet available. Searched (in order):
+  - `_COMMUNICATION/team_170/TEAM_170_S003_P009_WP001_LLD400_v1.0.0.md`
 
-```
-# Team 170 — LLD400 | S003-P009-WP001 Pipeline Resilience Package
-## TEAM_170_S003_P009_WP001_LLD400_v1.0.0.md
-
----
-project_domain: AGENTS_OS
-id: TEAM_170_S003_P009_WP001_LLD400_v1.0.0
-from: Team 170 (Spec & Governance Authority)
-to: Team 190 (Constitutional Validator)
-cc: Team 10, Team 100, Team 61
-date: 2026-03-17
-status: SUBMITTED_FOR_GATE_1_VALIDATION
-gate_id: GATE_1
-architectural_approval_type: SPEC
-spec_version: 1.0.0
-source: TEAM_100_PIPELINE_RESILIENCE_LOD400_DRAFT_v1.0.0.md
-required_ssm_version: 1.0.0
-required_wsm_version: 1.0.0
-required_active_stage: S003
-phase_owner: Team 10
----
-
-## §1 Identity Header
-
-| Field | Value |
-|-------|-------|
-| gate | GATE_1 |
-| wp | S003-P009-WP001 |
-| stage | S003 |
-| domain | agents_os |
-| date | 2026-03-17 |
-| roadmap_id | PHOENIX_ROADMAP |
-| program_id | S003-P009 |
-| work_package_id | S003-P009-WP001 |
-| task_id | PIPELINE_RESILIENCE |
-| architectural_approval_type | SPEC |
-| spec_version | 1.0.0 |
-| source | TEAM_100_PIPELINE_RESILIENCE_LOD400_DRAFT_v1.0.0 |
-| required_ssm_version | 1.0.0 |
-| required_wsm_version | 1.0.0 |
-| required_active_stage | S003 |
-| phase_owner | Team 10 |
-
----
-
-## §2 Endpoint Contract
-
-**Domain:** AGENTS_OS Pipeline Resilience has no HTTP API. Contracts are CLI commands, Python module entry points, and file I/O.
-
-### 2.1 CLI: pipeline_run.sh
-
-| Command | Method | Purpose |
-|---------|--------|---------|
-| `./pipeline_run.sh --domain agents_os pass` | UPDATE state | Advance current gate to PASS; triggers 
-```
-_[… content truncated at 1500 chars]_
+→ Complete the prerequisite team's work first.
+→ Re-generate after: `./pipeline_run.sh` injects real data.
 
 
 ### Acceptance

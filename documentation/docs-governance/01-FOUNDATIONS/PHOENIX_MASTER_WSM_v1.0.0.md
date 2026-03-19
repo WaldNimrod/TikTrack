@@ -87,31 +87,31 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-16** by **Team 00** (Chief Architect — one-time state activation per Nimrod directive): WP003 `S002-P005-WP003` activated; GATE_0 PASS (Team 190 revalidation confirmed); advancing to GATE_1. Prior state: WP002 DOCUMENTATION_CLOSED (2026-03-15). STAGE_PARALLEL_TRACKS block added per architectural decision 2026-03-16.
+**Gate-owner update evidence:** This block was updated **2026-03-19** by **Team 00** (EXPLICIT_WSM_PATCH): S003-P010-WP001 SUPERVISED_SPRINT activated; direct Team 61 implementation; no pipeline ceremony. Prior: S003-P009 GATE_8 PASS 2026-03-18; DOCUMENTATION_CLOSED.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S003 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | **NONE — S002-P005 DOCUMENTATION_CLOSED (2026-03-17). Awaiting S003 activation decision.** |
+| active_flow | SUPERVISED_SPRINT — Pipeline Core Reliability |
 | active_project_domain | AGENTS_OS |
-| active_work_package_id | S003-P009-WP001 |
+| active_work_package_id | S003-P010-WP001 |
 | in_progress_work_package_id | NONE |
-| last_closed_work_package_id | S002-P005-WP004 (combined WP002+WP003+WP004 GATE_8 PASS 2026-03-17; Team 100 FINAL_PASS; DOCUMENTATION_CLOSED) |
-| last_closed_program_id | S002-P005 (GATE_8 PASS 2026-03-17; DOCUMENTATION_CLOSED; WP002+WP003+WP004 all closed) |
+| last_closed_work_package_id | S003-P009-WP001 |
+| last_closed_program_id | S003-P009 (GATE_8 PASS 2026-03-18; S003-P009-WP001 Pipeline Resilience DOCUMENTATION_CLOSED). Prior: S002-P005 (2026-03-17; WP002+WP003+WP004 closed) |
 | last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
 | allowed_gate_range | GATE_0_TO_GATE_8 (normal execution lifecycle) |
-| current_gate | GATE_5 |
+| current_gate | SPRINT_ACTIVE |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
-| agents_os_parallel_track | S002-P005 FULLY CLOSED (2026-03-17): WP002 (Pipeline Governance) + WP003 (State Alignment) + WP004 (Code Integrity) — all GATE_8 PASS; Team 100 FINAL_PASS; DOCUMENTATION_CLOSED. ADR-031 sequence: next is S003-P007 (Stage B command bridge lite). S003-P001 (Data Model Validator) proposed as test flight target per Team 101 dry-run report; pending Team 00 S003 activation decision. AO-001 (domain selection UX) noted as non-blocking observation for S003+ roadmap. |
-| active_program_id | NONE |
+| agents_os_parallel_track | S003-P010-WP001 (Pipeline Core Reliability) SUPERVISED_SPRINT active 2026-03-19; direct Team 61 implementation; no pipeline ceremony. Prior: S003-P009 GATE_8 PASS 2026-03-18; DOCUMENTATION_CLOSED. |
+| active_program_id | S003-P010 |
 | active_plan_id | S002 |
 | phase_owner_team | Team 00 (S003 activation authority) |
-| last_gate_event | GATE_8_PASS; 2026-03-17; S002-P005 combined WP002+WP003+WP004; Team 100 FINAL_PASS (TEAM_100_S002_P005_FINAL_ARCHITECTURAL_VALIDATION_RESULT_v1.0.0); DOCUMENTATION_CLOSED. |
-| next_required_action | S003 stage activation decision by Team 00. Candidate first program: S003-P001 (Data Model Validator) — test flight target per Team 101 report. Run `./pipeline_run.sh --domain agents_os status` for current state. |
-| next_responsible_team | Team 00 (S003 activation decision) |
+| last_gate_event | GATE_8_PASS; 2026-03-18; S003-P009-WP001 (Pipeline Resilience) Team 90 closure validation PASS; DOCUMENTATION_CLOSED. Prior: 2026-03-17 S002-P005 combined; Team 100 FINAL_PASS. |
+| next_required_action | S003-P010-WP001 direct implementation by Team 61; no pipeline ceremony. Run `./pipeline_run.sh --domain agents_os status` for current state. |
+| next_responsible_team | Team 61 |
 
 ---
 
@@ -122,7 +122,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 | domain | active_program_id | active_work_package_id | phase_status | current_gate | gate_owner_team |
 |--------|-------------------|------------------------|--------------|--------------|-----------------|
-| AGENTS_OS | — | — | IDLE — S002-P005 DOCUMENTATION_CLOSED; S003 activation pending | — | Team 00 |
+| AGENTS_OS | S003-P010 | S003-P010-WP001 | SUPERVISED_SPRINT — Pipeline Core Reliability | SPRINT_ACTIVE | Team 61 |
 | TIKTRACK | — | — | IDLE | — | — |
 
 ---
@@ -324,3 +324,5 @@ GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:
 **log_entry | TEAM_170 | PHOENIX_MASTER_WSM | SSOT_CORRECTIONS_APPLIED_5_PER_ARCHITECT_DIRECTIVE_SSOT_CORRECTIONS_v1.0.0 | 2026-03-03**
 **log_entry | TEAM_170 | PHOENIX_MASTER_WSM | GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE | 2026-03-03**
 **log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_5 FAIL | S003-P009-WP001 | 2026-03-17**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_8 PASS | S003-P009-WP001 | 2026-03-18**
+**log_entry | TEAM_00 | EXPLICIT_WSM_PATCH | SUPERVISED_SPRINT | S003-P010-WP001 ACTIVE; direct Team 61 implementation; no pipeline ceremony | 2026-03-19**

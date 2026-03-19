@@ -46,7 +46,7 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | S002 | S002-P005 | Agents_OS v2 Writing Semantics Hardening (ADR-031 Stage A) + UI Optimization | AGENTS_OS | ACTIVE | GATE_1; active_flow=S002-P005-WP003 (State Alignment) — **GATE_0 PASS** (Team 190 revalidation confirmed); advancing to GATE_1; spec: `TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md`; active_work_package_id=S002-P005-WP003 |
 | S003 | S003-P001 | Data Model Validator | AGENTS_OS | COMPLETE | FAST_4 CLOSED (WP001) 2026-03-11 — Data Model Validator deployed; FAST_0..FAST_3 completed; Team 170 closure per TEAM_61_TO_TEAM_170_S003_P001_WP001_FAST4_HANDOFF_PROMPT_v1.0.0 |
 | S003 | S003-P002 | Test Template Generator | AGENTS_OS | COMPLETE | FAST_4 CLOSED (WP001) 2026-03-12 — Test Template Generator deployed; G3.7 added; agents_os_v2/requirements.txt canonical |
-| S003 | S003-P003 | System Settings (D39+D40+D41) | TIKTRACK | PLANNED | — (scope updated per ROADMAP_AMENDMENT_v2 §B3; D41 user_management companion) |
+| S003 | S003-P003 | System Settings (D39+D40+D41) | TIKTRACK | ACTIVE | GATE_2; active_flow=NORMAL — GATE_0 active (TikTrack S003-P003-WP001); active_work_package_id=S003-P003-WP001 |
 | S003 | S003-P004 | User Tickers (D33) | TIKTRACK | PLANNED | — (registered from integrated roadmap v1.1.0) |
 | S003 | S003-P005 | Watch Lists (D26) | TIKTRACK | PLANNED | — (D38 tag_management relocated to S005 per ARCHITECT_DIRECTIVE_ROADMAP_AMENDMENT_v1.0.0 §A1; registered from integrated roadmap v1.1.0) |
 | S003 | S003-P006 | Admin Review S003 | TIKTRACK | PLANNED | — (Stage Governance Package; planning marker per integrated roadmap v1.1.0) |
@@ -128,7 +128,7 @@ Source directives:
 
 **current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-19). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
 
-**WSM mirror (2026-03-19):** active_stage_id=S003; active_program_id=NONE; current_gate=IDLE — awaiting next WP activation; active_work_package_id=NONE; active_flow=NORMAL — next: S003-P011 (AOS) + S003-P003-WP001 (TikTrack).
+**WSM mirror (2026-03-19):** active_stage_id=S003; active_program_id=S003-P003; current_gate=GATE_2; active_work_package_id=S003-P003-WP001; active_flow=NORMAL — GATE_0 active (TikTrack S003-P003-WP001).
 
 ---
 

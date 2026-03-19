@@ -1,23 +1,23 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-19T01:55:45.446779+00:00`
+- Generated (UTC): `2026-03-19T02:38:46.474854+00:00`
 - Validation: `PASS`
 - Errors: `0`
-- Warnings: `1`
+- Warnings: `0`
 
 ## Runtime (from WSM)
 
 - active_stage_id: `S003`
-- active_program_id: `NONE`
-- active_work_package_id: `NONE`
-- current_gate: `IDLE — awaiting next WP activation`
-- next_required_action: `Activate S003-P011-WP001 (Dashboard Copilot) via ./pipeline_run.sh --domain agents_os. Activate S003-P003-WP001 (D39 User Preferences) for TikTrack test flight.`
+- active_program_id: `S003-P003`
+- active_work_package_id: `S003-P003-WP001`
+- current_gate: `GATE_2`
+- next_required_action: `Team 190: run GATE_0 validation of S003-P003-WP001 LOD200. Paste prompt from ./pipeline_run.sh --domain tiktrack`
 
 ## Portfolio Counts
 
 - stages: `6`
 - programs: `35`
-- work_packages: `13`
+- work_packages: `14`
 
 ## Roadmap (hierarchical)
 
@@ -61,7 +61,8 @@
     ├── **Program** `S003-P002` — Test Template Generator | COMPLETE | domain: **AGENTS_OS**
         └── **WP** `S003-P002-WP001` | CLOSED | gate: FAST_4 (PASS) | domain: **AGENTS_OS**
 
-    ├── **Program** `S003-P003` — System Settings (D39+D40+D41) | PLANNED | domain: **TIKTRACK**
+    ├── **Program** `S003-P003` — System Settings (D39+D40+D41) | ACTIVE | domain: **TIKTRACK**
+        └── **WP** `S003-P003-WP001` | IN_PROGRESS | gate: GATE_2 | domain: **TIKTRACK** (active)
 
     ├── **Program** `S003-P004` — User Tickers (D33) | PLANNED | domain: **TIKTRACK**
 
@@ -123,8 +124,3 @@
     ├── **Program** `S006-P003` — Level-1 Dashboards | PLANNED | domain: **TIKTRACK**
 
     └── **Program** `S006-P004` — Admin Review S006 FINAL | PLANNED | domain: **TIKTRACK**
-
-
-## Warnings
-
-- Active program NONE not found in program registry

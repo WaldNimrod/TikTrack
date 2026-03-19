@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-19T01:55:45.446779+00:00",
+  "generated_at_utc": "2026-03-19T02:38:46.474854+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -8,13 +8,13 @@
   },
   "runtime": {
     "active_stage_id": "S003",
-    "active_work_package_id": "NONE",
-    "in_progress_work_package_id": "NONE",
-    "current_gate": "IDLE — awaiting next WP activation",
-    "active_program_id": "NONE",
-    "last_gate_event": "SUPERVISED_SPRINT_CLOSE; 2026-03-19; S003-P010-WP001 all 4 phases PASS; Team 51 QA 108/108; Team 00 architectural PASS.",
-    "next_required_action": "Activate S003-P011-WP001 (Dashboard Copilot) via ./pipeline_run.sh --domain agents_os. Activate S003-P003-WP001 (D39 User Preferences) for TikTrack test flight.",
-    "next_responsible_team": "Team 00 (WP activation) → Team 190 (GATE_0)"
+    "active_work_package_id": "S003-P003-WP001",
+    "in_progress_work_package_id": "S003-P003-WP001",
+    "current_gate": "GATE_2",
+    "active_program_id": "S003-P003",
+    "last_gate_event": "WP_ACTIVATED; 2026-03-19; S003-P003-WP001 GATE_0 started; domain=tiktrack; Team 190 next.",
+    "next_required_action": "Team 190: run GATE_0 validation of S003-P003-WP001 LOD200. Paste prompt from ./pipeline_run.sh --domain tiktrack",
+    "next_responsible_team": "Team 190 (GATE_0)"
   },
   "stages": [
     {
@@ -150,8 +150,8 @@
       "program_name": "System Settings (D39+D40+D41)",
       "domain": "TIKTRACK",
       "stage_id": "S003",
-      "status": "PLANNED",
-      "current_gate_mirror": "— (scope updated per ROADMAP_AMENDMENT_v2 §B3; D41 user_management companion)"
+      "status": "ACTIVE",
+      "current_gate_mirror": "GATE_2; active_flow=NORMAL — GATE_0 active (TikTrack S003-P003-WP001); active_work_package_id=S003-P003-WP001"
     },
     {
       "program_id": "S003-P004",
@@ -455,6 +455,15 @@
       "active_marker_reason": "Test Template Generator deployed; G3.7 in gate chain; FAST_4 CLOSED 2026-03-12 (Team 170 closure)"
     },
     {
+      "work_package_id": "S003-P003-WP001",
+      "program_id": "S003-P003",
+      "domain": "TIKTRACK",
+      "status": "IN_PROGRESS",
+      "current_gate": "GATE_2",
+      "is_active": true,
+      "active_marker_reason": "NORMAL — GATE_0 active (TikTrack S003-P003-WP001)"
+    },
+    {
       "work_package_id": "S003-P009-WP001",
       "program_id": "S003-P009",
       "domain": "AGENTS_OS",
@@ -470,7 +479,7 @@
       "status": "CLOSED",
       "current_gate": "SPRINT_ACTIVE",
       "is_active": false,
-      "active_marker_reason": "SUPERVISED_SPRINT — Pipeline Core Reliability"
+      "active_marker_reason": "SUPERVISED_SPRINT — Pipeline Core Reliability — DOCUMENTATION_CLOSED 2026-03-19"
     }
   ],
   "hierarchy": [
@@ -691,9 +700,19 @@
           "program_id": "S003-P003",
           "program_name": "System Settings (D39+D40+D41)",
           "domain": "TIKTRACK",
-          "status": "PLANNED",
-          "current_gate_mirror": "— (scope updated per ROADMAP_AMENDMENT_v2 §B3; D41 user_management companion)",
-          "work_packages": []
+          "status": "ACTIVE",
+          "current_gate_mirror": "GATE_2; active_flow=NORMAL — GATE_0 active (TikTrack S003-P003-WP001); active_work_package_id=S003-P003-WP001",
+          "work_packages": [
+            {
+              "work_package_id": "S003-P003-WP001",
+              "program_id": "S003-P003",
+              "domain": "TIKTRACK",
+              "status": "IN_PROGRESS",
+              "current_gate": "GATE_2",
+              "is_active": true,
+              "active_marker_reason": "NORMAL — GATE_0 active (TikTrack S003-P003-WP001)"
+            }
+          ]
         },
         {
           "program_id": "S003-P004",
@@ -767,7 +786,7 @@
               "status": "CLOSED",
               "current_gate": "SPRINT_ACTIVE",
               "is_active": false,
-              "active_marker_reason": "SUPERVISED_SPRINT — Pipeline Core Reliability"
+              "active_marker_reason": "SUPERVISED_SPRINT — Pipeline Core Reliability — DOCUMENTATION_CLOSED 2026-03-19"
             }
           ]
         },

@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-19T02:38:46.474854+00:00`
+- Generated (UTC): `2026-03-19T18:27:30.520283+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -9,15 +9,15 @@
 
 - active_stage_id: `S003`
 - active_program_id: `S003-P003`
-- active_work_package_id: `S003-P003-WP001`
-- current_gate: `GATE_2`
-- next_required_action: `Team 190: run GATE_0 validation of S003-P003-WP001 LOD200. Paste prompt from ./pipeline_run.sh --domain tiktrack`
+- active_work_package_id: `S003-P011-WP001`
+- current_gate: `CURSOR_IMPLEMENTATION`
+- next_required_action: `Team 00: complete gate sequence canonicalization (S003-P011-WP001 scope). After canonical gate map approved → resume S003-P003-WP001 at G3_PLAN (work plan already stored).`
 
 ## Portfolio Counts
 
 - stages: `6`
 - programs: `35`
-- work_packages: `14`
+- work_packages: `15`
 
 ## Roadmap (hierarchical)
 
@@ -62,7 +62,7 @@
         └── **WP** `S003-P002-WP001` | CLOSED | gate: FAST_4 (PASS) | domain: **AGENTS_OS**
 
     ├── **Program** `S003-P003` — System Settings (D39+D40+D41) | ACTIVE | domain: **TIKTRACK**
-        └── **WP** `S003-P003-WP001` | IN_PROGRESS | gate: GATE_2 | domain: **TIKTRACK** (active)
+        └── **WP** `S003-P003-WP001` | IN_PROGRESS | gate: GATE_2 | domain: **TIKTRACK**
 
     ├── **Program** `S003-P004` — User Tickers (D33) | PLANNED | domain: **TIKTRACK**
 
@@ -80,7 +80,8 @@
     ├── **Program** `S003-P010` — Agents_OS Pipeline Core Reliability | COMPLETE | domain: **AGENTS_OS**
         └── **WP** `S003-P010-WP001` | CLOSED | gate: SPRINT_ACTIVE | domain: **AGENTS_OS**
 
-    └── **Program** `S003-P011` — Agents_OS Dashboard Copilot + Event-Driven | PLANNED | domain: **AGENTS_OS**
+    └── **Program** `S003-P011` — Agents_OS — Process Model v2.0 + Dashboard Copilot + Event-Driven | ACTIVE | domain: **AGENTS_OS**
+        └── **WP** `S003-P011-WP001` | IN_PROGRESS | gate: CURSOR_IMPLEMENTATION | domain: **AGENTS_OS** (active)
 
 
 ### S004 — שלב 4 — Financial Execution | PLANNED [SHARED]

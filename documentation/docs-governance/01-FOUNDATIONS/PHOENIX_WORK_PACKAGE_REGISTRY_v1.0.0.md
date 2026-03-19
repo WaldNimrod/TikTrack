@@ -49,9 +49,9 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S003-P001 | S003-P001-WP001 | CLOSED | FAST_4 (PASS) | false | Data Model Validator deployed; FAST_4 CLOSED 2026-03-11 (Team 170 closure) |
 | S003-P002 | S003-P002-WP001 | CLOSED | FAST_4 (PASS) | false | Test Template Generator deployed; G3.7 in gate chain; FAST_4 CLOSED 2026-03-12 (Team 170 closure) |
 | S003-P003 | S003-P003-WP001 | IN_PROGRESS | GATE_2 | false | NORMAL — GATE_0 active (TikTrack S003-P003-WP001) |
-| S003-P003 | S003-P011-WP001 | IN_PROGRESS | CURSOR_IMPLEMENTATION | true | HOLD — S003-P003-WP001 paused at G3_PLAN pending gate sequence canonicalization |
 | S003-P009 | S003-P009-WP001 | CLOSED | GATE_8 (PASS) | false | Pipeline Resilience Package — GATE_8 PASS 2026-03-18; Team 90 closure validation; DOCUMENTATION_CLOSED. |
 | S003-P010 | S003-P010-WP001 | CLOSED | SPRINT_ACTIVE | false | SUPERVISED_SPRINT — Pipeline Core Reliability — DOCUMENTATION_CLOSED 2026-03-19 |
+| S003-P011 | S003-P011-WP001 | IN_PROGRESS | CURSOR_IMPLEMENTATION | true | HOLD — S003-P003-WP001 paused at G3_PLAN pending gate sequence canonicalization |
 
 
 

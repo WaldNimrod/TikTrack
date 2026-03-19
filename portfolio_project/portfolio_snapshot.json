@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-19T02:38:46.474854+00:00",
+  "generated_at_utc": "2026-03-19T18:27:30.520283+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -8,13 +8,13 @@
   },
   "runtime": {
     "active_stage_id": "S003",
-    "active_work_package_id": "S003-P003-WP001",
+    "active_work_package_id": "S003-P011-WP001",
     "in_progress_work_package_id": "S003-P003-WP001",
-    "current_gate": "GATE_2",
+    "current_gate": "CURSOR_IMPLEMENTATION",
     "active_program_id": "S003-P003",
-    "last_gate_event": "WP_ACTIVATED; 2026-03-19; S003-P003-WP001 GATE_0 started; domain=tiktrack; Team 190 next.",
-    "next_required_action": "Team 190: run GATE_0 validation of S003-P003-WP001 LOD200. Paste prompt from ./pipeline_run.sh --domain tiktrack",
-    "next_responsible_team": "Team 190 (GATE_0)"
+    "last_gate_event": "S003-P003-WP001 HOLD at G3_PLAN; 2026-03-19; gate sequence canonicalization initiated; work plan stored (12,595 chars); pipeline state preserved",
+    "next_required_action": "Team 00: complete gate sequence canonicalization (S003-P011-WP001 scope). After canonical gate map approved → resume S003-P003-WP001 at G3_PLAN (work plan already stored).",
+    "next_responsible_team": "Team 00 (process analysis) → S003-P011-WP001"
   },
   "stages": [
     {
@@ -151,7 +151,7 @@
       "domain": "TIKTRACK",
       "stage_id": "S003",
       "status": "ACTIVE",
-      "current_gate_mirror": "GATE_2; active_flow=NORMAL — GATE_0 active (TikTrack S003-P003-WP001); active_work_package_id=S003-P003-WP001"
+      "current_gate_mirror": "CURSOR_IMPLEMENTATION; active_flow=HOLD — S003-P003-WP001 paused at G3_PLAN pending gate sequence canonicalization; active_work_package_id=S003-P011-WP001"
     },
     {
       "program_id": "S003-P004",
@@ -203,11 +203,11 @@
     },
     {
       "program_id": "S003-P011",
-      "program_name": "Agents_OS Dashboard Copilot + Event-Driven",
+      "program_name": "Agents_OS — Process Model v2.0 + Dashboard Copilot + Event-Driven",
       "domain": "AGENTS_OS",
       "stage_id": "S003",
-      "status": "PLANNED",
-      "current_gate_mirror": "**ACTIVATION PENDING** — P010 DOCUMENTATION_CLOSED trigger met 2026-03-19. LOD200 approved. Ready for GATE_0. WP001: Dashboard Copilot (Active Guided Copilot + ADR-031 Stage B); WP002: Event-Driven Watcher + SSE Push."
+      "status": "ACTIVE",
+      "current_gate_mirror": "**WP001 ACTIVATED 2026-03-19** — LOD200 v1.3 APPROVED. active_work_package_id=S003-P011-WP001. Scope: 5-gate canonical model, FCP protocol, TRACK_FULL/TRACK_FOCUSED/TRACK_FAST variants, team_engine_config.json, Team 00 identity correction, Team 11/102/191 registration, state schema migration. Authority: ARCHITECT_DIRECTIVE_GATE_SEQUENCE_CANON_v1.0.0 + ARCHITECT_DIRECTIVE_TEAM_ROSTER_v2.0.0. WP002: Dashboard Copilot (requires WP001 GATE_5 PASS). WP003: Event-Driven Watcher + SSE Push."
     },
     {
       "program_id": "S003-P009",
@@ -460,7 +460,7 @@
       "domain": "TIKTRACK",
       "status": "IN_PROGRESS",
       "current_gate": "GATE_2",
-      "is_active": true,
+      "is_active": false,
       "active_marker_reason": "NORMAL — GATE_0 active (TikTrack S003-P003-WP001)"
     },
     {
@@ -480,6 +480,15 @@
       "current_gate": "SPRINT_ACTIVE",
       "is_active": false,
       "active_marker_reason": "SUPERVISED_SPRINT — Pipeline Core Reliability — DOCUMENTATION_CLOSED 2026-03-19"
+    },
+    {
+      "work_package_id": "S003-P011-WP001",
+      "program_id": "S003-P011",
+      "domain": "AGENTS_OS",
+      "status": "IN_PROGRESS",
+      "current_gate": "CURSOR_IMPLEMENTATION",
+      "is_active": true,
+      "active_marker_reason": "HOLD — S003-P003-WP001 paused at G3_PLAN pending gate sequence canonicalization"
     }
   ],
   "hierarchy": [
@@ -701,7 +710,7 @@
           "program_name": "System Settings (D39+D40+D41)",
           "domain": "TIKTRACK",
           "status": "ACTIVE",
-          "current_gate_mirror": "GATE_2; active_flow=NORMAL — GATE_0 active (TikTrack S003-P003-WP001); active_work_package_id=S003-P003-WP001",
+          "current_gate_mirror": "CURSOR_IMPLEMENTATION; active_flow=HOLD — S003-P003-WP001 paused at G3_PLAN pending gate sequence canonicalization; active_work_package_id=S003-P011-WP001",
           "work_packages": [
             {
               "work_package_id": "S003-P003-WP001",
@@ -709,7 +718,7 @@
               "domain": "TIKTRACK",
               "status": "IN_PROGRESS",
               "current_gate": "GATE_2",
-              "is_active": true,
+              "is_active": false,
               "active_marker_reason": "NORMAL — GATE_0 active (TikTrack S003-P003-WP001)"
             }
           ]
@@ -792,11 +801,21 @@
         },
         {
           "program_id": "S003-P011",
-          "program_name": "Agents_OS Dashboard Copilot + Event-Driven",
+          "program_name": "Agents_OS — Process Model v2.0 + Dashboard Copilot + Event-Driven",
           "domain": "AGENTS_OS",
-          "status": "PLANNED",
-          "current_gate_mirror": "**ACTIVATION PENDING** — P010 DOCUMENTATION_CLOSED trigger met 2026-03-19. LOD200 approved. Ready for GATE_0. WP001: Dashboard Copilot (Active Guided Copilot + ADR-031 Stage B); WP002: Event-Driven Watcher + SSE Push.",
-          "work_packages": []
+          "status": "ACTIVE",
+          "current_gate_mirror": "**WP001 ACTIVATED 2026-03-19** — LOD200 v1.3 APPROVED. active_work_package_id=S003-P011-WP001. Scope: 5-gate canonical model, FCP protocol, TRACK_FULL/TRACK_FOCUSED/TRACK_FAST variants, team_engine_config.json, Team 00 identity correction, Team 11/102/191 registration, state schema migration. Authority: ARCHITECT_DIRECTIVE_GATE_SEQUENCE_CANON_v1.0.0 + ARCHITECT_DIRECTIVE_TEAM_ROSTER_v2.0.0. WP002: Dashboard Copilot (requires WP001 GATE_5 PASS). WP003: Event-Driven Watcher + SSE Push.",
+          "work_packages": [
+            {
+              "work_package_id": "S003-P011-WP001",
+              "program_id": "S003-P011",
+              "domain": "AGENTS_OS",
+              "status": "IN_PROGRESS",
+              "current_gate": "CURSOR_IMPLEMENTATION",
+              "is_active": true,
+              "active_marker_reason": "HOLD — S003-P003-WP001 paused at G3_PLAN pending gate sequence canonicalization"
+            }
+          ]
         }
       ]
     },

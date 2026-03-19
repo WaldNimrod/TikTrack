@@ -1,23 +1,23 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-18T16:06:19.278348+00:00`
-- Validation: `PASS`
-- Errors: `0`
+- Generated (UTC): `2026-03-19T01:55:29.470366+00:00`
+- Validation: `FAIL`
+- Errors: `2`
 - Warnings: `1`
 
 ## Runtime (from WSM)
 
 - active_stage_id: `S003`
 - active_program_id: `NONE`
-- active_work_package_id: `S003-P009-WP001`
-- current_gate: `GATE_5`
-- next_required_action: `S003 stage activation decision by Team 00. Candidate first program: S003-P001 (Data Model Validator) — test flight target per Team 101 report. Run `./pipeline_run.sh --domain agents_os status` for current state.`
+- active_work_package_id: `NONE`
+- current_gate: `IDLE — awaiting next WP activation`
+- next_required_action: `Activate S003-P011-WP001 (Dashboard Copilot) via ./pipeline_run.sh --domain agents_os. Activate S003-P003-WP001 (D39 User Preferences) for TikTrack test flight.`
 
 ## Portfolio Counts
 
 - stages: `6`
-- programs: `33`
-- work_packages: `12`
+- programs: `35`
+- work_packages: `13`
 
 ## Roadmap (hierarchical)
 
@@ -69,12 +69,17 @@
 
     ├── **Program** `S003-P006` — Admin Review S003 | PLANNED | domain: **TIKTRACK**
 
-    ├── **Program** `S003-P007` — Agents_OS Command Bridge Lite (ADR-031 Stage B) | PLANNED | domain: **AGENTS_OS**
+    ├── **Program** `S003-P007` — Agents_OS Command Bridge Lite (ADR-031 Stage B) | MERGED | domain: **AGENTS_OS**
 
-    ├── **Program** `S003-P008` — Agents_OS Pipeline Governance Hardening | PLANNED | domain: **AGENTS_OS**
+    ├── **Program** `S003-P008` — Agents_OS Pipeline Governance Hardening | SUPERSEDED | domain: **AGENTS_OS**
 
-    └── **Program** `S003-P009` — Agents_OS Pipeline Resilience Package | ACTIVE | domain: **AGENTS_OS**
-        └── **WP** `S003-P009-WP001` | IN_PROGRESS | gate: GATE_5 | domain: **AGENTS_OS** (active)
+    ├── **Program** `S003-P009` — Agents_OS Pipeline Resilience Package | COMPLETE | domain: **AGENTS_OS**
+        └── **WP** `S003-P009-WP001` | CLOSED | gate: GATE_8 (PASS) | domain: **AGENTS_OS**
+
+    ├── **Program** `S003-P010` — Agents_OS Pipeline Core Reliability | COMPLETE | domain: **AGENTS_OS**
+        └── **WP** `S003-P010-WP001` | CLOSED | gate: SPRINT_ACTIVE | domain: **AGENTS_OS**
+
+    └── **Program** `S003-P011` — Agents_OS Dashboard Copilot + Event-Driven | PLANNED | domain: **AGENTS_OS**
 
 
 ### S004 — שלב 4 — Financial Execution | PLANNED [SHARED]
@@ -119,6 +124,11 @@
 
     └── **Program** `S006-P004` — Admin Review S006 FINAL | PLANNED | domain: **TIKTRACK**
 
+
+## Errors
+
+- Program S003-P007 has invalid status 'MERGED'
+- Program S003-P008 has invalid status 'SUPERSEDED'
 
 ## Warnings
 

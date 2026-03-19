@@ -87,31 +87,31 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-19** by **Team 00** (EXPLICIT_WSM_PATCH): S003-P010-WP001 SUPERVISED_SPRINT activated; direct Team 61 implementation; no pipeline ceremony. Prior: S003-P009 GATE_8 PASS 2026-03-18; DOCUMENTATION_CLOSED.
+**Gate-owner update evidence:** This block was updated **2026-03-19** by **Team 00** (EXPLICIT_WSM_PATCH): S003-P010-WP001 SUPERVISED_SPRINT DOCUMENTATION_CLOSED; Team 51 QA PASS + Team 00 architectural review PASS. Pipeline repaired. Next: S003-P011 + first TikTrack program via normal pipeline. Prior: 2026-03-19 SUPERVISED_SPRINT activated.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S003 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | SUPERVISED_SPRINT — Pipeline Core Reliability |
-| active_project_domain | AGENTS_OS |
-| active_work_package_id | S003-P010-WP001 |
+| active_flow | NORMAL — next: S003-P011 (AOS) + S003-P003-WP001 (TikTrack) |
+| active_project_domain | AGENTS_OS + TIKTRACK (parallel) |
+| active_work_package_id | NONE |
 | in_progress_work_package_id | NONE |
-| last_closed_work_package_id | S003-P009-WP001 |
-| last_closed_program_id | S003-P009 (GATE_8 PASS 2026-03-18; S003-P009-WP001 Pipeline Resilience DOCUMENTATION_CLOSED). Prior: S002-P005 (2026-03-17; WP002+WP003+WP004 closed) |
+| last_closed_work_package_id | S003-P010-WP001 |
+| last_closed_program_id | S003-P010 (SUPERVISED_SPRINT DOCUMENTATION_CLOSED 2026-03-19; Team 51 QA PASS + Team 00 architectural review PASS). Prior: S003-P009 (GATE_8 PASS 2026-03-18) |
 | last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
 | allowed_gate_range | GATE_0_TO_GATE_8 (normal execution lifecycle) |
-| current_gate | SPRINT_ACTIVE |
+| current_gate | IDLE — awaiting next WP activation |
 | track_mode | NORMAL |
 | suspended_track_state | FAST:IDLE |
 | hold_reason | NONE |
-| agents_os_parallel_track | S003-P010-WP001 (Pipeline Core Reliability) SUPERVISED_SPRINT active 2026-03-19; direct Team 61 implementation; no pipeline ceremony. Prior: S003-P009 GATE_8 PASS 2026-03-18; DOCUMENTATION_CLOSED. |
-| active_program_id | S003-P010 |
+| agents_os_parallel_track | S003-P010 DOCUMENTATION_CLOSED 2026-03-19. Next: S003-P011-WP001 (Dashboard Copilot) pending GATE_0 activation. |
+| active_program_id | NONE |
 | active_plan_id | S002 |
 | phase_owner_team | Team 00 (S003 activation authority) |
-| last_gate_event | GATE_8_PASS; 2026-03-18; S003-P009-WP001 (Pipeline Resilience) Team 90 closure validation PASS; DOCUMENTATION_CLOSED. Prior: 2026-03-17 S002-P005 combined; Team 100 FINAL_PASS. |
-| next_required_action | S003-P010-WP001 direct implementation by Team 61; no pipeline ceremony. Run `./pipeline_run.sh --domain agents_os status` for current state. |
-| next_responsible_team | Team 61 |
+| last_gate_event | SUPERVISED_SPRINT_CLOSE; 2026-03-19; S003-P010-WP001 all 4 phases PASS; Team 51 QA 108/108; Team 00 architectural PASS. |
+| next_required_action | Activate S003-P011-WP001 (Dashboard Copilot) via ./pipeline_run.sh --domain agents_os. Activate S003-P003-WP001 (D39 User Preferences) for TikTrack test flight. |
+| next_responsible_team | Team 00 (WP activation) → Team 190 (GATE_0) |
 
 ---
 
@@ -122,8 +122,8 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 | domain | active_program_id | active_work_package_id | phase_status | current_gate | gate_owner_team |
 |--------|-------------------|------------------------|--------------|--------------|-----------------|
-| AGENTS_OS | S003-P010 | S003-P010-WP001 | SUPERVISED_SPRINT — Pipeline Core Reliability | SPRINT_ACTIVE | Team 61 |
-| TIKTRACK | — | — | IDLE | — | — |
+| AGENTS_OS | S003-P011 | — | PENDING_ACTIVATION — Dashboard Copilot | PRE_GATE_0 | Team 190 (on activation) |
+| TIKTRACK | S003-P003 | — | PENDING_ACTIVATION — D39 User Preferences test flight | PRE_GATE_0 | Team 190 (on activation) |
 
 ---
 
@@ -326,3 +326,4 @@ GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:
 **log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_5 FAIL | S003-P009-WP001 | 2026-03-17**
 **log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_8 PASS | S003-P009-WP001 | 2026-03-18**
 **log_entry | TEAM_00 | EXPLICIT_WSM_PATCH | SUPERVISED_SPRINT | S003-P010-WP001 ACTIVE; direct Team 61 implementation; no pipeline ceremony | 2026-03-19**
+**log_entry | TEAM_00 | EXPLICIT_WSM_PATCH | SUPERVISED_SPRINT | S003-P010-WP001 DOCUMENTATION_CLOSED; Team 51 QA PASS 108/108; Team 00 architectural review PASS; pipeline repaired | 2026-03-19**

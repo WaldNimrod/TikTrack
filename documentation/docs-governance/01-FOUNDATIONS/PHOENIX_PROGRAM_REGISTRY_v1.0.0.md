@@ -52,8 +52,8 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | S003 | S003-P006 | Admin Review S003 | TIKTRACK | PLANNED | — (Stage Governance Package; planning marker per integrated roadmap v1.1.0) |
 | S003 | S003-P007 | Agents_OS Command Bridge Lite (ADR-031 Stage B) | AGENTS_OS | MERGED | **MERGED_INTO_S003-P011-WP001** (2026-03-19). ADR-031 Stage B scope (approve-path desync, command bridge copy flow, model-B realignment) fully delivered through S003-P011-WP001. Authority: ARCHITECT_DIRECTIVE_AOS_ROADMAP_RESET_v1.0.0. |
 | S003 | S003-P008 | Agents_OS Pipeline Governance Hardening | AGENTS_OS | SUPERSEDED | **SUPERSEDED_BY_S003-P010** (2026-03-19). LOD200 acknowledged as historical reference. Scope absorbed: STATE_VIEW.json + date governance → P010-WP003; JSON verdict protocol → P010-WP002. Authority: ARCHITECT_DIRECTIVE_AOS_ROADMAP_RESET_v1.0.0. |
-| S003 | S003-P010 | Agents_OS Pipeline Core Reliability | AGENTS_OS | ACTIVE | SPRINT_ACTIVE; active_flow=SUPERVISED_SPRINT — Pipeline Core Reliability; active_work_package_id=S003-P010-WP001 |
-| S003 | S003-P011 | Agents_OS Dashboard Copilot + Event-Driven | AGENTS_OS | DEFERRED | **DEFERRED** — pending P010-WP001 SUPERVISED_SPRINT completion. LOD200 exists as forward reference. Activation trigger: P010-WP001 DOCUMENTATION_CLOSED. Authority: ARCHITECT_DIRECTIVE_AOS_ROADMAP_RESET_v1.0.0. |
+| S003 | S003-P010 | Agents_OS Pipeline Core Reliability | AGENTS_OS | COMPLETE | **DOCUMENTATION_CLOSED 2026-03-19.** SUPERVISED_SPRINT completed: 4 phases; Team 51 QA 108/108 PASS; Team 00 architectural review PASS. Deliverables: PipelineState remediation fields, _generate_remediation_mandate, json_enforcer.py, FAIL_ROUTING G3_PLAN, _write_state_view, _preflight_date_correction. active_work_package_id=N/A. |
+| S003 | S003-P011 | Agents_OS Dashboard Copilot + Event-Driven | AGENTS_OS | PLANNED | **ACTIVATION PENDING** — P010 DOCUMENTATION_CLOSED trigger met 2026-03-19. LOD200 approved. Ready for GATE_0. WP001: Dashboard Copilot (Active Guided Copilot + ADR-031 Stage B); WP002: Event-Driven Watcher + SSE Push. |
 | S003 | S003-P009 | Agents_OS Pipeline Resilience Package | AGENTS_OS | COMPLETE | S003-P009-WP001 GATE_8 PASS 2026-03-18; DOCUMENTATION_CLOSED. Scope: 3-tier resolution (AC-10/AC-11), wsm_writer.py, targeted git (pre-GATE_4 + GATE_8); Items 4a/4b verification only. LOD400: TEAM_100_PIPELINE_RESILIENCE_LOD400_DRAFT; authority: Team 00 PRE-CONDITION 2026-03-17. |
 | S004 | S004-P001 | Financial Precision Validator | AGENTS_OS | PLANNED | — (placeholder; program number assigned at activation; LOD200 authoring begins when S003 Agents_OS programs complete; scope: float prohibition E-18..E-19, NUMERIC(20,8) enforcement E-20..E-22) |
 | S004 | S004-P002 | Business Logic Validator | AGENTS_OS | PLANNED | — (placeholder; ⚡ ACCELERATED from S005; scope: multi-entity consistency, state machine completeness, business rule coverage; MUST complete before S005 TikTrack begins) |
@@ -126,9 +126,9 @@ Source directives:
 
 ---
 
-**current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-18). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
+**current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-19). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
 
-**WSM mirror (2026-03-18):** active_stage_id=S003; active_program_id=S003-P010; current_gate=SPRINT_ACTIVE; active_work_package_id=S003-P010-WP001; active_flow=SUPERVISED_SPRINT — Pipeline Core Reliability.
+**WSM mirror (2026-03-19):** active_stage_id=S003; active_program_id=NONE; current_gate=IDLE — awaiting next WP activation; active_work_package_id=NONE; active_flow=NORMAL — next: S003-P011 (AOS) + S003-P003-WP001 (TikTrack).
 
 ---
 

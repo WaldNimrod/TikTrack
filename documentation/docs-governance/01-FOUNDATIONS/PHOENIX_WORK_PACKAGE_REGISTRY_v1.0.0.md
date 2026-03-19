@@ -49,13 +49,13 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S003-P001 | S003-P001-WP001 | CLOSED | FAST_4 (PASS) | false | Data Model Validator deployed; FAST_4 CLOSED 2026-03-11 (Team 170 closure) |
 | S003-P002 | S003-P002-WP001 | CLOSED | FAST_4 (PASS) | false | Test Template Generator deployed; G3.7 in gate chain; FAST_4 CLOSED 2026-03-12 (Team 170 closure) |
 | S003-P009 | S003-P009-WP001 | CLOSED | GATE_8 (PASS) | false | Pipeline Resilience Package — GATE_8 PASS 2026-03-18; Team 90 closure validation; DOCUMENTATION_CLOSED. |
-| S003-P010 | S003-P010-WP001 | IN_PROGRESS | SPRINT_ACTIVE | true | SUPERVISED_SPRINT — Pipeline Core Reliability |
+| S003-P010 | S003-P010-WP001 | CLOSED | SPRINT_ACTIVE | false | SUPERVISED_SPRINT — Pipeline Core Reliability |
 
 
 
-**Current active WP state (mirror from WSM):** **ACTIVE_WORK_PACKAGE_PRESENT** — WSM `active_stage_id=S003`, `active_program_id=S003-P010`, `current_gate=SPRINT_ACTIVE`, `active_work_package_id=S003-P010-WP001`.
+**Current active WP state (mirror from WSM):** **NO_ACTIVE_WORK_PACKAGE** — WSM `active_stage_id=S003`, `active_program_id=NONE`, `current_gate=IDLE — awaiting next WP activation`, `active_work_package_id=N/A`.
 
-**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-18). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
+**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-19). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
 
 ---
 

@@ -5,6 +5,7 @@ from: Team 30 (Frontend Implementation)
 to: Team 10 (Gateway)
 cc: Team 50, Team 61, Team 100
 date: 2026-03-18
+historical_record: true
 status: SUBMITTED
 gate_id: GATE_4
 program_id: S003-P009

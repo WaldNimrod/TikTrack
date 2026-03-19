@@ -5,6 +5,7 @@ from: Team 100 (Strategic Architecture Reviewer)
 to: Team 101 (IDE Architecture Authority)
 cc: Team 00, Team 190
 date: 2026-03-18
+historical_record: true
 status: ARCHITECTURAL_REVIEW — FORWARDED_TO_TEAM_00_FOR_DIRECTIVE
 ---
 

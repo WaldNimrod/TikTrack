@@ -4,6 +4,7 @@ id: TEAM_101_IDEA_040_DASHBOARD_UX_EVENT_DRIVEN_v1.0.0
 from: Team 101 (IDE Architecture Authority)
 to: Team 100, Team 00
 date: 2026-03-17
+historical_record: true
 status: PROPOSED_IDEA
 type: ARCHITECTURAL_EVOLUTION
 target_stage: S003+
@@ -56,7 +57,9 @@ To support the Event-Driven architecture, agents cannot return free-text Markdow
 **Execution:**
 1. **Backend:** Enhance `pipeline.py`'s `_generate_cursor_prompts` and `pipeline_run.sh`'s `revise` command.
 2. **Data Flow:** When routing from a `FAIL` with `route: doc`, the pipeline must call a new `_generate_remediation_mandate()` function.
-3. **Logic:** This function will parse the `blocking_findings` from the failed gate's verdict file and construct a new, focused mandate containing ONLY the tasks required to fix the specified blockers, explicitly forbidding a full rewrite. This mandate will be stored in a separate artifact (e.g., `remediation_mandates.md`) and injected into the prompt.
+3. **Logic:** This function will parse the `blocking_findings` from the failed gate's verdict file and construct a new, focused mandate containing ONLY the tasks required to fix the specified blockers, explicitly forbidding a full rewrite. This mandate will be stored in a separate artifact (e.g., `remediation_mandates.md`).
+
+**Architectural Note (Team 00):** The above is a high-level concept. A full LOD400 will be required before implementation, detailing all edge cases (e.g., multi-team impact scope, dependency management in remediation, etc.).
 
 ---
-**log_entry | TEAM_101 | IDEA_040 | REMEDIATION_MANDATE_ENGINE_PILLAR_REFINED_PER_TEAM00 | 2026-03-18**
+**log_entry | TEAM_101 | IDEA_040 | REMEDIATION_MANDATE_ENGINE_CONCEPT_LOCKED | 2026-03-18**

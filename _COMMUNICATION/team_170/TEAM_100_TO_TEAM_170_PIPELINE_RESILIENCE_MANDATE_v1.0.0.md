@@ -5,6 +5,7 @@ from: Team 100 (AOS Domain Architects)
 to: Team 170 (Governance & Registry Documentation)
 cc: Team 00 (Chief Architect), Team 101 (IDE Architecture Authority)
 date: 2026-03-17
+historical_record: true
 status: ACTIVE — AWAITING_IMPLEMENTATION
 authority: LOD400 FINALIZED — TEAM_100_PIPELINE_RESILIENCE_LOD400_DRAFT_v1.0.0
 priority: P1

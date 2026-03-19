@@ -1,6 +1,7 @@
 # Cursor Composer Prompt
 
 **date:** 2026-03-17
+**historical_record:** true
 
 **Paste this entire content into a Cursor Composer session.**
 

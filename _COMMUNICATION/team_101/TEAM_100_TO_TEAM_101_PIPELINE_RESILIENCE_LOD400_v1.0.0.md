@@ -5,6 +5,7 @@ from: Team 100 (AOS Domain Architects)
 to: Team 101 (IDE Architecture Authority)
 cc: Team 00 (Chief Architect)
 date: 2026-03-17
+historical_record: true
 status: FOR_YOUR_RECORDS — FINALIZED
 type: Full Package Handoff
 ---

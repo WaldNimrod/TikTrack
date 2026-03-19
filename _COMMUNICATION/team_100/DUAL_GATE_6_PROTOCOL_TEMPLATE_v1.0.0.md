@@ -5,6 +5,7 @@ from: Team 100 (AOS Domain Architects — primary author per OI-03)
 to: Team 101 (IDE Architecture Authority — adoption and local execution)
 cc: Team 00 (Chief Architect)
 date: 2026-03-17
+historical_record: true
 status: ACTIVE — PROTOCOL PUBLISHED
 scope: GATE_6 dual architectural validation for AGENTS_OS domain WPs
 first_application: S003-P001 (Data Model Validator) test flight

@@ -5,6 +5,7 @@ from: Team 30 (Frontend Implementation)
 to: Team 10 (Gateway), Team 50 (QA), Team 51 (QA), Nimrod
 cc: Team 20, Team 61, Team 100
 date: 2026-03-18
+historical_record: true
 status: COMPLETED
 gate_id: G3_6_MANDATES
 program_id: S003-P009

@@ -4,6 +4,7 @@ id: TEAM_101_IDEA_038_AGENTIC_FRAMEWORKS_RESEARCH_v1.0.0
 from: Team 101 (IDE Architecture Authority)
 to: Team 100, Team 00
 date: 2026-03-17
+historical_record: true
 status: PROPOSED_IDEA
 type: RESEARCH_AND_RECOMMENDATION
 target_stage: S003+

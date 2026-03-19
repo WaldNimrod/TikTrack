@@ -10,6 +10,7 @@ from: Team 190 (Constitutional Validator)
 to: Team 100, Team 00
 cc: Team 61, Team 170
 date: 2026-03-17
+historical_record: true
 status: BLOCK_FOR_FIX
 scope: GATE_0 constitutional validation for S003-P009-WP001 LOD400 scope
 in_response_to: agentsos_GATE_0_prompt (pipeline_run.sh)

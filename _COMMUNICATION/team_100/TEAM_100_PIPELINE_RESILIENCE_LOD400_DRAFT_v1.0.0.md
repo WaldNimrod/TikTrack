@@ -5,6 +5,7 @@ from: Team 100 (AOS Domain Architects)
 to: Team 101 (IDE Architecture Authority) — for joint review and sign-off
 cc: Team 00 (Chief Architect — final authority)
 date: 2026-03-17
+historical_record: true
 status: FINALIZED — APPROVED_FOR_MANDATE_ISSUANCE
 type: LOD400 — Technical Specification
 program: S003-P009

@@ -5,6 +5,7 @@ from: Team 190 (Constitutional Validator)
 to: Team 00, Team 100, Team 10, Team 61
 cc: Team 90, Team 50, Team 170
 date: 2026-03-18
+historical_record: true
 status: BINDING_CONSTITUTIONAL_RULING
 in_response_to: TEAM_101_TO_TEAM_190_REMEDIATION_FLOW_CONSULTATION_REQUEST_v1.0.0
 reference: 04_GATE_MODEL_PROTOCOL_v2.3.0, TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0

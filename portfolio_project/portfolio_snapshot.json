@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-19T18:27:30.520283+00:00",
+  "generated_at_utc": "2026-03-20T13:56:24.165999+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -8,13 +8,13 @@
   },
   "runtime": {
     "active_stage_id": "S003",
-    "active_work_package_id": "S003-P011-WP001",
+    "active_work_package_id": "NONE",
     "in_progress_work_package_id": "S003-P003-WP001",
-    "current_gate": "CURSOR_IMPLEMENTATION",
-    "active_program_id": "S003-P003",
-    "last_gate_event": "S003-P003-WP001 HOLD at G3_PLAN; 2026-03-19; gate sequence canonicalization initiated; work plan stored (12,595 chars); pipeline state preserved",
-    "next_required_action": "Team 00: complete gate sequence canonicalization (S003-P011-WP001 scope). After canonical gate map approved → resume S003-P003-WP001 at G3_PLAN (work plan already stored).",
-    "next_responsible_team": "Team 00 (process analysis) → S003-P011-WP001"
+    "current_gate": "COMPLETE",
+    "active_program_id": "S003-P011",
+    "last_gate_event": "S003-P011-WP002 REGISTERED 2026-03-20; LOD200 approved by Team 100 (Nimrod instruction); active_work_package_id=S003-P011-WP002; GATE_2 Phase 2.1 next (Team 101 LLD400). Prior: S003-P011-WP001 COMPLETE + DOCUMENTATION_CLOSED.",
+    "next_required_action": "Team 101: produce LLD400 for S003-P011-WP002 (Pipeline Stabilization). LOD200: `_COMMUNICATION/team_00/TEAM_100_S003_P011_WP002_PIPELINE_STABILIZATION_LOD200_v1.0.0.md`. Output path: `_COMMUNICATION/team_101/`. Then Team 190 validates → Team 100 signs off.",
+    "next_responsible_team": "Team 101"
   },
   "stages": [
     {
@@ -203,11 +203,11 @@
     },
     {
       "program_id": "S003-P011",
-      "program_name": "Agents_OS — Process Model v2.0 + Dashboard Copilot + Event-Driven",
+      "program_name": "Agents_OS — Process Model v2.0 + Pipeline Stabilization",
       "domain": "AGENTS_OS",
       "stage_id": "S003",
       "status": "ACTIVE",
-      "current_gate_mirror": "**WP001 ACTIVATED 2026-03-19** — LOD200 v1.3 APPROVED. active_work_package_id=S003-P011-WP001. Scope: 5-gate canonical model, FCP protocol, TRACK_FULL/TRACK_FOCUSED/TRACK_FAST variants, team_engine_config.json, Team 00 identity correction, Team 11/102/191 registration, state schema migration. Authority: ARCHITECT_DIRECTIVE_GATE_SEQUENCE_CANON_v1.0.0 + ARCHITECT_DIRECTIVE_TEAM_ROSTER_v2.0.0. WP002: Dashboard Copilot (requires WP001 GATE_5 PASS). WP003: Event-Driven Watcher + SSE Push."
+      "current_gate_mirror": "COMPLETE; active_flow=HOLD — S003-P003-WP001 paused at G3_PLAN pending gate sequence canonicalization; active_work_package_id=NONE"
     },
     {
       "program_id": "S003-P009",
@@ -485,10 +485,10 @@
       "work_package_id": "S003-P011-WP001",
       "program_id": "S003-P011",
       "domain": "AGENTS_OS",
-      "status": "IN_PROGRESS",
-      "current_gate": "CURSOR_IMPLEMENTATION",
-      "is_active": true,
-      "active_marker_reason": "HOLD — S003-P003-WP001 paused at G3_PLAN pending gate sequence canonicalization"
+      "status": "CLOSED",
+      "current_gate": "COMPLETE (5-gate + GATE_8 doc closure)",
+      "is_active": false,
+      "active_marker_reason": "Process Architecture v2.0 — GATE_5 PASS; Team 70 AS_MADE + archive 2026-03-19; `pipeline_state_agentsos.json` current_gate=COMPLETE. Next: WP002 Dashboard Copilot (activation pending)."
     }
   ],
   "hierarchy": [
@@ -801,19 +801,19 @@
         },
         {
           "program_id": "S003-P011",
-          "program_name": "Agents_OS — Process Model v2.0 + Dashboard Copilot + Event-Driven",
+          "program_name": "Agents_OS — Process Model v2.0 + Pipeline Stabilization",
           "domain": "AGENTS_OS",
           "status": "ACTIVE",
-          "current_gate_mirror": "**WP001 ACTIVATED 2026-03-19** — LOD200 v1.3 APPROVED. active_work_package_id=S003-P011-WP001. Scope: 5-gate canonical model, FCP protocol, TRACK_FULL/TRACK_FOCUSED/TRACK_FAST variants, team_engine_config.json, Team 00 identity correction, Team 11/102/191 registration, state schema migration. Authority: ARCHITECT_DIRECTIVE_GATE_SEQUENCE_CANON_v1.0.0 + ARCHITECT_DIRECTIVE_TEAM_ROSTER_v2.0.0. WP002: Dashboard Copilot (requires WP001 GATE_5 PASS). WP003: Event-Driven Watcher + SSE Push.",
+          "current_gate_mirror": "COMPLETE; active_flow=HOLD — S003-P003-WP001 paused at G3_PLAN pending gate sequence canonicalization; active_work_package_id=NONE",
           "work_packages": [
             {
               "work_package_id": "S003-P011-WP001",
               "program_id": "S003-P011",
               "domain": "AGENTS_OS",
-              "status": "IN_PROGRESS",
-              "current_gate": "CURSOR_IMPLEMENTATION",
-              "is_active": true,
-              "active_marker_reason": "HOLD — S003-P003-WP001 paused at G3_PLAN pending gate sequence canonicalization"
+              "status": "CLOSED",
+              "current_gate": "COMPLETE (5-gate + GATE_8 doc closure)",
+              "is_active": false,
+              "active_marker_reason": "Process Architecture v2.0 — GATE_5 PASS; Team 70 AS_MADE + archive 2026-03-19; `pipeline_state_agentsos.json` current_gate=COMPLETE. Next: WP002 Dashboard Copilot (activation pending)."
             }
           ]
         }

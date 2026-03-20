@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-19T18:27:30.520283+00:00`
+- Generated (UTC): `2026-03-20T13:56:24.165999+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -8,10 +8,10 @@
 ## Runtime (from WSM)
 
 - active_stage_id: `S003`
-- active_program_id: `S003-P003`
-- active_work_package_id: `S003-P011-WP001`
-- current_gate: `CURSOR_IMPLEMENTATION`
-- next_required_action: `Team 00: complete gate sequence canonicalization (S003-P011-WP001 scope). After canonical gate map approved → resume S003-P003-WP001 at G3_PLAN (work plan already stored).`
+- active_program_id: `S003-P011`
+- active_work_package_id: `NONE`
+- current_gate: `COMPLETE`
+- next_required_action: `Team 101: produce LLD400 for S003-P011-WP002 (Pipeline Stabilization). LOD200: `_COMMUNICATION/team_00/TEAM_100_S003_P011_WP002_PIPELINE_STABILIZATION_LOD200_v1.0.0.md`. Output path: `_COMMUNICATION/team_101/`. Then Team 190 validates → Team 100 signs off.`
 
 ## Portfolio Counts
 
@@ -80,8 +80,8 @@
     ├── **Program** `S003-P010` — Agents_OS Pipeline Core Reliability | COMPLETE | domain: **AGENTS_OS**
         └── **WP** `S003-P010-WP001` | CLOSED | gate: SPRINT_ACTIVE | domain: **AGENTS_OS**
 
-    └── **Program** `S003-P011` — Agents_OS — Process Model v2.0 + Dashboard Copilot + Event-Driven | ACTIVE | domain: **AGENTS_OS**
-        └── **WP** `S003-P011-WP001` | IN_PROGRESS | gate: CURSOR_IMPLEMENTATION | domain: **AGENTS_OS** (active)
+    └── **Program** `S003-P011` — Agents_OS — Process Model v2.0 + Pipeline Stabilization | ACTIVE | domain: **AGENTS_OS**
+        └── **WP** `S003-P011-WP001` | CLOSED | gate: COMPLETE (5-gate + GATE_8 doc closure) | domain: **AGENTS_OS**
 
 
 ### S004 — שלב 4 — Financial Execution | PLANNED [SHARED]

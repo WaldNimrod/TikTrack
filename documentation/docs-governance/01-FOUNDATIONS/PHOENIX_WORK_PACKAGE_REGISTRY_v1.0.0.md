@@ -51,13 +51,13 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S003-P003 | S003-P003-WP001 | IN_PROGRESS | GATE_2 | false | NORMAL — GATE_0 active (TikTrack S003-P003-WP001) |
 | S003-P009 | S003-P009-WP001 | CLOSED | GATE_8 (PASS) | false | Pipeline Resilience Package — GATE_8 PASS 2026-03-18; Team 90 closure validation; DOCUMENTATION_CLOSED. |
 | S003-P010 | S003-P010-WP001 | CLOSED | SPRINT_ACTIVE | false | SUPERVISED_SPRINT — Pipeline Core Reliability — DOCUMENTATION_CLOSED 2026-03-19 |
-| S003-P011 | S003-P011-WP001 | IN_PROGRESS | CURSOR_IMPLEMENTATION | true | HOLD — S003-P003-WP001 paused at G3_PLAN pending gate sequence canonicalization |
+| S003-P011 | S003-P011-WP001 | CLOSED | COMPLETE (5-gate + GATE_8 doc closure) | false | Process Architecture v2.0 — GATE_5 PASS; Team 70 AS_MADE + archive 2026-03-19; `pipeline_state_agentsos.json` current_gate=COMPLETE. Next: WP002 Dashboard Copilot (activation pending). |
 
 
 
-**Current active WP state (mirror from WSM):** **ACTIVE_WORK_PACKAGE_PRESENT** — WSM `active_stage_id=S003`, `active_program_id=S003-P003`, `current_gate=CURSOR_IMPLEMENTATION`, `active_work_package_id=S003-P011-WP001`.
+**Current active WP state (mirror from WSM):** **NO_ACTIVE_WORK_PACKAGE** — WSM `active_stage_id=S003`, `active_program_id=S003-P011`, `current_gate=COMPLETE`, `active_work_package_id=N/A`.
 
-**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-19). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
+**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-20). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
 
 ---
 

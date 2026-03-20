@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-20T13:56:24.165999+00:00",
+  "generated_at_utc": "2026-03-20T16:15:29.246422+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -489,6 +489,15 @@
       "current_gate": "COMPLETE (5-gate + GATE_8 doc closure)",
       "is_active": false,
       "active_marker_reason": "Process Architecture v2.0 — GATE_5 PASS; Team 70 AS_MADE + archive 2026-03-19; `pipeline_state_agentsos.json` current_gate=COMPLETE. Next: WP002 Dashboard Copilot (activation pending)."
+    },
+    {
+      "work_package_id": "S003-P011-WP002",
+      "program_id": "S003-P011",
+      "domain": "AGENTS_OS",
+      "status": "IN_PROGRESS",
+      "current_gate": "GATE_2",
+      "is_active": false,
+      "active_marker_reason": "Pipeline Stabilization & Hardening — ACTIVE at GATE_2/2.1 (Team 101 LLD400 lane). Mirror aligned to WSM and `pipeline_state_agentsos.json` on 2026-03-20."
     }
   ],
   "hierarchy": [
@@ -814,6 +823,15 @@
               "current_gate": "COMPLETE (5-gate + GATE_8 doc closure)",
               "is_active": false,
               "active_marker_reason": "Process Architecture v2.0 — GATE_5 PASS; Team 70 AS_MADE + archive 2026-03-19; `pipeline_state_agentsos.json` current_gate=COMPLETE. Next: WP002 Dashboard Copilot (activation pending)."
+            },
+            {
+              "work_package_id": "S003-P011-WP002",
+              "program_id": "S003-P011",
+              "domain": "AGENTS_OS",
+              "status": "IN_PROGRESS",
+              "current_gate": "GATE_2",
+              "is_active": false,
+              "active_marker_reason": "Pipeline Stabilization & Hardening — ACTIVE at GATE_2/2.1 (Team 101 LLD400 lane). Mirror aligned to WSM and `pipeline_state_agentsos.json` on 2026-03-20."
             }
           ]
         }

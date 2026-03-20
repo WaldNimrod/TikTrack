@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-20T13:56:24.165999+00:00`
+- Generated (UTC): `2026-03-20T16:15:29.246422+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -17,7 +17,7 @@
 
 - stages: `6`
 - programs: `35`
-- work_packages: `15`
+- work_packages: `16`
 
 ## Roadmap (hierarchical)
 
@@ -81,7 +81,8 @@
         └── **WP** `S003-P010-WP001` | CLOSED | gate: SPRINT_ACTIVE | domain: **AGENTS_OS**
 
     └── **Program** `S003-P011` — Agents_OS — Process Model v2.0 + Pipeline Stabilization | ACTIVE | domain: **AGENTS_OS**
-        └── **WP** `S003-P011-WP001` | CLOSED | gate: COMPLETE (5-gate + GATE_8 doc closure) | domain: **AGENTS_OS**
+        ├── **WP** `S003-P011-WP001` | CLOSED | gate: COMPLETE (5-gate + GATE_8 doc closure) | domain: **AGENTS_OS**
+        └── **WP** `S003-P011-WP002` | IN_PROGRESS | gate: GATE_2 | domain: **AGENTS_OS**
 
 
 ### S004 — שלב 4 — Financial Execution | PLANNED [SHARED]

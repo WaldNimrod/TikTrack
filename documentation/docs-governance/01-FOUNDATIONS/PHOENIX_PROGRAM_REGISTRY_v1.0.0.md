@@ -76,6 +76,33 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 
 
 ---
+## S003-P011 Backlog and Deferred Scope
+
+### WP002 Active (GATE_2 Phase 2.2)
+Spec: `_COMMUNICATION/team_00/TEAM_100_S003_P011_WP002_PIPELINE_STABILIZATION_LOD200_v1.0.1.md`
+LLD400: `_COMMUNICATION/team_101/TEAM_101_S003_P011_WP002_GATE_2_LLD400_v1.0.1.md`
+Status: Team 11 producing Work Plan; next: Team 90 review (2.2v) → Team 100 sign-off (2.3) → GATE_3 Team 61
+
+### WP003 Candidate — Role-Based Team Management & Roster Hardening
+**Trigger:** WP002 GATE_5 PASS
+**Authority:** ARCHITECT_DIRECTIVE_DECISIONS_WP2_02_03_04_v1.0.0 (DECISION-WP2-02)
+**Scope (C-items deferred from WP002 — canonical registration):**
+
+| Item | ID | Source | Description |
+|---|---|---|---|
+| Role-Based Team Management | C1 | T190 Monitor Report v1.1 | `role_catalog.json` + `domain_role_defaults.json` + `wp_role_assignments/{wp}.json`; role→team resolution replacing `_DOMAIN_PHASE_ROUTING` nested dict |
+| Teams UI roster-driven | C2 | T190 GAP-A1 | Remove hardcoded `TEAMS` array from `pipeline-teams.js`; drive from `TEAMS_ROSTER_v1.0.0.json` at runtime |
+| TEAMS_ROSTER entries | C3 | T190 GAP-A2 | Add missing roster entries: `team_11`, `team_101`, `team_102` (team_191 is utility — assess at WP003 spec) |
+| .cursorrules coverage | C4 | T190 GAP-A5 | `.cursorrules` team list is subset-only; expand to full active roster |
+| Engine editor role extension | C5 | T190 RBTM-F06 | Extend engine editor from team→engine to role→preferred_engine |
+| WP-level role override policy | C6 | T190 §5 | Define approval model for per-WP role overrides (after role catalog established) |
+| Multi-channel context parity | C7 | T190 GAP-A6 | CI checks for context construction parity across LLM channels |
+| TRACK_FAST variant | C8 | LLD400 §2 | `_DOMAIN_PHASE_ROUTING` spec drafted but TRACK_FAST implementation deferred; full routing chain for single-team execution |
+
+**LOD200 authoring:** requires Team 101; begins at WP002 GATE_8 PASS.
+**WP03 Directive source:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_DECISIONS_WP2_02_03_04_v1.0.0.md §DECISION-WP2-02`
+
+---
 ### S005 stage context notes (TikTrack)
 
 - D38 (tag_management): added to S005 from S003 per architectural decision 2026-03-02.
@@ -170,3 +197,5 @@ Source directives:
 **log_entry | TEAM_00 | PHOENIX_PROGRAM_REGISTRY | AOS_ROADMAP_RESET_P007_MERGED_P008_SUPERSEDED_P010_P011_ACTIVATED | 2026-03-19 | authority: ARCHITECT_DIRECTIVE_AOS_ROADMAP_RESET_v1.0.0**
 **log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S003_P011_WP001_DOCUMENTATION_CLOSED_FINAL | TEAM_170_GATE5_CLOSURE_TEAM_90_VALIDATION_PASS | 2026-03-20 | authority: Nimrod explicit instruction**
 **log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S003_P011_WP002_REGISTERED | PIPELINE_STABILIZATION_HARDENING | KB26_TO_KB39 | 15_DRY_RUN_SCENARIOS | CANONICAL_NAMING_ADR | LOD200_APPROVED | active_work_package_id=S003-P011-WP002 | 2026-03-20**
+**log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S003_P011_ROW_UPDATED_GATE2_PHASE2.2_ACTIVE | WP001_CLOSED_WP002_IN_EXECUTION | 2026-03-20**
+**log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S003_P011_WP003_BACKLOG_REGISTERED | C1_C8_DEFERRED_ITEMS_CAPTURED | AUTHORITY_DECISIONS_WP2_02_03_04 | 2026-03-20**

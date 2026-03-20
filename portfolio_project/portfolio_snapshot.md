@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-20T19:54:38.955779+00:00`
+- Generated (UTC): `2026-03-20T20:50:31.189325+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -11,7 +11,7 @@
 - active_program_id: `S003-P011`
 - active_work_package_id: `NONE`
 - current_gate: `COMPLETE`
-- next_required_action: `Team 11: produce Work Plan for S003-P011-WP002 GATE_2 Phase 2.2. LLD400 ref: `_COMMUNICATION/team_101/TEAM_101_S003_P011_WP002_GATE_2_LLD400_v1.0.1.md`. Include §3 clarifications from architectural review. Then Team 90 reviews (Phase 2.2v) → Team 100 signs off (Phase 2.3).`
+- next_required_action: `Team 11: produce GATE_3 Phase 3.1 mandate to Team 61. Output: `_COMMUNICATION/team_11/TEAM_11_TO_TEAM_61_S003_P011_WP002_GATE_3_PHASE_3.1_MANDATE_v1.0.0.md`. Reference: Work Plan + LLD400 v1.0.1 §17. Then Team 61 implements (Phase 3.2) → Team 51 QA (Phase 3.3).`
 
 ## Portfolio Counts
 

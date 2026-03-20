@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-20T20:50:31.189325+00:00`
+- Generated (UTC): `2026-03-20T22:34:46.751610+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -9,15 +9,15 @@
 
 - active_stage_id: `S003`
 - active_program_id: `S003-P011`
-- active_work_package_id: `NONE`
-- current_gate: `COMPLETE`
-- next_required_action: `Team 11: produce GATE_3 Phase 3.1 mandate to Team 61. Output: `_COMMUNICATION/team_11/TEAM_11_TO_TEAM_61_S003_P011_WP002_GATE_3_PHASE_3.1_MANDATE_v1.0.0.md`. Reference: Work Plan + LLD400 v1.0.1 §17. Then Team 61 implements (Phase 3.2) → Team 51 QA (Phase 3.3).`
+- active_work_package_id: `S003-P011-WP099`
+- current_gate: `GATE_3`
+- next_required_action: `Team 170: execute GATE_5 Phase 5.1 governance closure (D-12). Scope: verify/close KB-32..39; mandate Team 61 (via Team 11) for KB-32/33/34/38 fixes; create identity files team_11/101/102/191; SSOT audit (D-11); D-07/D-08 archived doc promotion; AC-WP2-16..22 deep verification; SMOKE_01..03 final evidence.`
 
 ## Portfolio Counts
 
 - stages: `6`
 - programs: `35`
-- work_packages: `16`
+- work_packages: `17`
 
 ## Roadmap (hierarchical)
 
@@ -82,7 +82,8 @@
 
     └── **Program** `S003-P011` — Agents_OS — Process Model v2.0 + Pipeline Stabilization | ACTIVE | domain: **AGENTS_OS**
         ├── **WP** `S003-P011-WP001` | CLOSED | gate: COMPLETE (5-gate + GATE_8 doc closure) | domain: **AGENTS_OS**
-        └── **WP** `S003-P011-WP002` | IN_PROGRESS | gate: GATE_2 | domain: **AGENTS_OS**
+        ├── **WP** `S003-P011-WP002` | IN_PROGRESS | gate: GATE_2 | domain: **AGENTS_OS**
+        └── **WP** `S003-P011-WP099` | IN_PROGRESS | gate: GATE_3 | domain: **AGENTS_OS** (active)
 
 
 ### S004 — שלב 4 — Financial Execution | PLANNED [SHARED]

@@ -87,31 +87,31 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-19** by **Team 00** (EXPLICIT_WSM_PATCH): S003-P010-WP001 SUPERVISED_SPRINT DOCUMENTATION_CLOSED; Team 51 QA PASS + Team 00 architectural review PASS. Pipeline repaired. Next: S003-P011 + first TikTrack program via normal pipeline. Prior: 2026-03-19 SUPERVISED_SPRINT activated.
+**Gate-owner update evidence:** This block was updated **2026-03-19** by **Team 00** (EXPLICIT_WSM_PATCH): S003-P003-WP001 placed on HOLD at G3_PLAN. Reason: architectural process clarification required — gate sequence canonicalization (S003-P011-WP001 scope) must be resolved before continuing. Work plan IS stored (12,595 chars); pipeline state preserved. Prior: GATE_2 PASS + WAITING_GATE2_APPROVAL PASS.
 
 | Field | Value |
 |-------|-------|
 | active_stage_id | S003 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | NORMAL — next: S003-P011 (AOS) + S003-P003-WP001 (TikTrack) |
-| active_project_domain | AGENTS_OS + TIKTRACK (parallel) |
+| active_flow | HOLD — S003-P003-WP001 paused at G3_PLAN pending gate sequence canonicalization |
+| active_project_domain | TIKTRACK |
 | active_work_package_id | NONE |
-| in_progress_work_package_id | NONE |
-| last_closed_work_package_id | S003-P010-WP001 |
-| last_closed_program_id | S003-P010 (SUPERVISED_SPRINT DOCUMENTATION_CLOSED 2026-03-19; Team 51 QA PASS + Team 00 architectural review PASS). Prior: S003-P009 (GATE_8 PASS 2026-03-18) |
+| in_progress_work_package_id | S003-P003-WP001 |
+| last_closed_work_package_id | S003-P011-WP001 |
+| last_closed_program_id | S003-P011 (WP001 Process Architecture v2.0 — DOCUMENTATION_CLOSED 2026-03-19; 5-gate + Team 70 GATE_8 doc package). Prior: S003-P010 (SPRINT CLOSED 2026-03-19); S003-P009 (GATE_8 2026-03-18) |
 | last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
 | allowed_gate_range | GATE_0_TO_GATE_8 (normal execution lifecycle) |
-| current_gate | IDLE — awaiting next WP activation |
-| track_mode | NORMAL |
-| suspended_track_state | FAST:IDLE |
-| hold_reason | NONE |
-| agents_os_parallel_track | S003-P010 DOCUMENTATION_CLOSED 2026-03-19. Next: S003-P011-WP001 (Dashboard Copilot) pending GATE_0 activation. |
-| active_program_id | NONE |
-| active_plan_id | S002 |
-| phase_owner_team | Team 00 (S003 activation authority) |
-| last_gate_event | SUPERVISED_SPRINT_CLOSE; 2026-03-19; S003-P010-WP001 all 4 phases PASS; Team 51 QA 108/108; Team 00 architectural PASS. |
-| next_required_action | Activate S003-P011-WP001 (Dashboard Copilot) via ./pipeline_run.sh --domain agents_os. Activate S003-P003-WP001 (D39 User Preferences) for TikTrack test flight. |
-| next_responsible_team | Team 00 (WP activation) → Team 190 (GATE_0) |
+| current_gate | COMPLETE |
+| track_mode | HOLD |
+| suspended_track_state | TIKTRACK:G3_PLAN:WORK_PLAN_STORED |
+| hold_reason | PROCESS_CLARIFICATION — gate sequence canonicalization required before G3_PLAN→G3_5 advance. Reference: Team 190 gate diagram (2026-03-19) + S003-P011-WP001 (Terminology Canonicalization). |
+| agents_os_parallel_track | WP002 Pipeline Stabilization ACTIVE — GATE_2 Phase 2.2 (Team 11 Work Plan). Phase 2.1 PASS (Team 101 LLD400 v1.0.1 produced). Phase 2.1v PASS (Team 190 constitutional validation). LOD200 v1.0.1 + LLD400 v1.0.1 both approved and locked. Team 100 Architectural Review complete (2026-03-20). S003-P003 TikTrack HOLD G3_PLAN (auto-migration to GATE_3/3.1 pending WP002 stabilization). |
+| active_program_id | S003-P011 |
+| active_plan_id | S003 |
+| phase_owner_team | Team 11 (GATE_2 Phase 2.2 — Work Plan production) |
+| last_gate_event | GATE_2 Phase 2.1v PASS 2026-03-20 — Team 190 validated LLD400 v1.0.1 (all BF-01..BF-05 closed). GATE_2 Phase 2.2 now active. Team 100 pre-phase architectural review complete: 3 open decisions for Team 00, all immediate fixes applied. |
+| next_required_action | Team 11: produce Work Plan for S003-P011-WP002 GATE_2 Phase 2.2. LLD400 ref: `_COMMUNICATION/team_101/TEAM_101_S003_P011_WP002_GATE_2_LLD400_v1.0.1.md`. Include §3 clarifications from architectural review. Then Team 90 reviews (Phase 2.2v) → Team 100 signs off (Phase 2.3). |
+| next_responsible_team | Team 11 |
 
 ---
 
@@ -122,8 +122,8 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 | domain | active_program_id | active_work_package_id | phase_status | current_gate | gate_owner_team |
 |--------|-------------------|------------------------|--------------|--------------|-----------------|
-| AGENTS_OS | S003-P011 | — | PENDING_ACTIVATION — Dashboard Copilot | PRE_GATE_0 | Team 190 (on activation) |
-| TIKTRACK | S003-P003 | — | PENDING_ACTIVATION — D39 User Preferences test flight | PRE_GATE_0 | Team 190 (on activation) |
+| AGENTS_OS | S003-P011 | S003-P011-WP002 | WP002 Pipeline Stabilization ACTIVE — GATE_2 Phase 2.2 (Team 11 Work Plan). Phase 2.1 PASS (LLD400 v1.0.1). Phase 2.1v PASS (Team 190). Architectural Review complete 2026-03-20. | GATE_2 | Team 11 |
+| TIKTRACK | S003-P003 | S003-P003-WP001 | HOLD — System Settings (D39+D40+D41). Pending migration GATE_3/current_phase=3.1 (WP002 will deliver auto-migration) | GATE_3 (was G3_PLAN) | Team 10 |
 
 ---
 
@@ -327,3 +327,27 @@ GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:
 **log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_8 PASS | S003-P009-WP001 | 2026-03-18**
 **log_entry | TEAM_00 | EXPLICIT_WSM_PATCH | SUPERVISED_SPRINT | S003-P010-WP001 ACTIVE; direct Team 61 implementation; no pipeline ceremony | 2026-03-19**
 **log_entry | TEAM_00 | EXPLICIT_WSM_PATCH | SUPERVISED_SPRINT | S003-P010-WP001 DOCUMENTATION_CLOSED; Team 51 QA PASS 108/108; Team 00 architectural review PASS; pipeline repaired | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_0 PASS | S003-P003-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_1 PASS | S003-P003-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_2 PASS | S003-P003-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | WAITING_GATE2_APPROVAL PASS | S003-P003-WP001 | 2026-03-19**
+**log_entry | TEAM_00 | EXPLICIT_WSM_PATCH | WP_HOLD | S003-P003-WP001 placed on HOLD at G3_PLAN; work plan stored; reason: gate sequence canonicalization required; reference: Team 190 gate diagram 2026-03-19 | 2026-03-19**
+**log_entry | TEAM_00 | EXPLICIT_WSM_PATCH | PROCESS_MODEL_v2.0 | GATE_SEQUENCE_CANON_v1.0.0 + TEAM_ROSTER_v2.0.0 LOCKED; S003-P011 scope upgraded to Process Architecture v2.0; directives issued; FCP + dual-validation + AOS_COMPACT + engine-config + Team 00 identity correction | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_0 FAIL | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_0 PASS | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_1 FAIL | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_1 PASS | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_2 PASS | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | WAITING_GATE2_APPROVAL PASS | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | G3_PLAN PASS | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | G3_5 PASS | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | G3_6_MANDATES PASS | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | G3_REMEDIATION PASS | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_3 FAIL | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_3 PASS | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_4 FAIL | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_4 PASS | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_5 PASS | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_100 | EXPLICIT_WSM_PATCH | S003_P011_WP001_DOCUMENTATION_CLOSED_FINAL | TEAM_170_GATE5_PHASE5.1_CLOSURE + TEAM_90_PHASE5.2_VALIDATION_PASS | 2026-03-20 | authority: Nimrod instruction**
+**log_entry | TEAM_100 | EXPLICIT_WSM_PATCH | S003_P011_WP002_REGISTERED_ACTIVE | PIPELINE_STABILIZATION | LOD200_APPROVED | active_work_package_id=S003-P011-WP002 | GATE_2_PHASE_2.1_NEXT_TEAM_101 | 2026-03-20**
+**log_entry | TEAM_100 | EXPLICIT_WSM_PATCH | STAGE_PARALLEL_TRACKS_UPDATED | AOS=WP002_GATE2 | TT=GATE3_HOLD_MIGRATION_PENDING | CANONICAL_NAMING_ADR_ADDED_TO_WP002_SCOPE | 2026-03-20**

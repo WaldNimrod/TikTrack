@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-20T16:15:29.246422+00:00`
+- Generated (UTC): `2026-03-20T19:54:38.955779+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -11,7 +11,7 @@
 - active_program_id: `S003-P011`
 - active_work_package_id: `NONE`
 - current_gate: `COMPLETE`
-- next_required_action: `Team 101: produce LLD400 for S003-P011-WP002 (Pipeline Stabilization). LOD200: `_COMMUNICATION/team_00/TEAM_100_S003_P011_WP002_PIPELINE_STABILIZATION_LOD200_v1.0.0.md`. Output path: `_COMMUNICATION/team_101/`. Then Team 190 validates → Team 100 signs off.`
+- next_required_action: `Team 11: produce Work Plan for S003-P011-WP002 GATE_2 Phase 2.2. LLD400 ref: `_COMMUNICATION/team_101/TEAM_101_S003_P011_WP002_GATE_2_LLD400_v1.0.1.md`. Include §3 clarifications from architectural review. Then Team 90 reviews (Phase 2.2v) → Team 100 signs off (Phase 2.3).`
 
 ## Portfolio Counts
 

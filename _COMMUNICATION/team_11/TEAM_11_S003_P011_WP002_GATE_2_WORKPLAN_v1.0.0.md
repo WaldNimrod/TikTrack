@@ -4,6 +4,7 @@ from: Team 11 (AOS Gateway / Execution Lead)
 to: Team 90 (for Phase 2.2v review), Team 100 (for Phase 2.3 sign-off)
 cc: Team 00, Team 61, Team 101, Team 190
 date: 2026-03-20
+historical_record: true
 gate: GATE_2
 phase: "2.2"
 wp: S003-P011-WP002

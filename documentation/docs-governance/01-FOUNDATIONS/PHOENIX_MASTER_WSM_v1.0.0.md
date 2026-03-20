@@ -95,23 +95,23 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | active_stage_label | שלב 2 — Stage 2 |
 | active_flow | HOLD — S003-P003-WP001 paused at G3_PLAN pending gate sequence canonicalization |
 | active_project_domain | TIKTRACK |
-| active_work_package_id | NONE |
+| active_work_package_id | S003-P011-WP099 |
 | in_progress_work_package_id | S003-P003-WP001 |
 | last_closed_work_package_id | S003-P011-WP001 |
 | last_closed_program_id | S003-P011 (WP001 Process Architecture v2.0 — DOCUMENTATION_CLOSED 2026-03-19; 5-gate + Team 70 GATE_8 doc package). Prior: S003-P010 (SPRINT CLOSED 2026-03-19); S003-P009 (GATE_8 2026-03-18) |
 | last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
 | allowed_gate_range | GATE_0_TO_GATE_8 (normal execution lifecycle) |
-| current_gate | COMPLETE |
+| current_gate | GATE_3 |
 | track_mode | HOLD |
 | suspended_track_state | TIKTRACK:G3_PLAN:WORK_PLAN_STORED |
 | hold_reason | PROCESS_CLARIFICATION — gate sequence canonicalization required before G3_PLAN→G3_5 advance. Reference: Team 190 gate diagram (2026-03-19) + S003-P011-WP001 (Terminology Canonicalization). |
-| agents_os_parallel_track | WP002 Pipeline Stabilization ACTIVE — **GATE_3 Phase 3.1** (Team 11 Mandate issuance to Team 61). GATE_2 PASS 2026-03-20: 2.1 (LLD400 v1.0.1), 2.1v (Team 190), 2.2 (Work Plan), 2.2v (Team 90 17/17), 2.3 (Team 100 sign-off, PAD-01/02 resolved). S003-P003 TikTrack HOLD G3_PLAN (auto-migration to GATE_3/3.1 pending WP002 stabilization). |
+| agents_os_parallel_track | WP002 Pipeline Stabilization — **GATE_5 Phase 5.1 ACTIVE** (Team 170 governance closure lane). GATE_4 FULLY CLOSED 2026-03-21: Phase 4.1 (Team 90 PASS 10/10), Phase 4.2 (Team 100 PASS), Phase 4.3 (Nimrod personal sign-off). QA: 22/22 AC PASS, CERT 19/19, regression 127. KB-32..39 OPEN — mandatory Team 170 Phase 5.1 items (KB-32/33/34/38 require Team 61 fixes before Phase 5.2). S003-P003 TikTrack HOLD G3_PLAN (pending WP002 GATE_5 KB-33 auto-migration fix). |
 | active_program_id | S003-P011 |
 | active_plan_id | S003 |
-| phase_owner_team | Team 11 (GATE_3 Phase 3.1 — Mandate issuance to Team 61) |
-| last_gate_event | **GATE_2 PASS 2026-03-20** — all 5 phases complete (2.1/2.1v/2.2/2.2v/2.3). Team 100 sign-off: PAD-01 COVERED by existing docs; PAD-02 resolved by DECISION-WP2-02. gates_completed=["GATE_2"]. |
-| next_required_action | Team 11: produce GATE_3 Phase 3.1 mandate to Team 61. Output: `_COMMUNICATION/team_11/TEAM_11_TO_TEAM_61_S003_P011_WP002_GATE_3_PHASE_3.1_MANDATE_v1.0.0.md`. Reference: Work Plan + LLD400 v1.0.1 §17. Then Team 61 implements (Phase 3.2) → Team 51 QA (Phase 3.3). |
-| next_responsible_team | Team 11 |
+| phase_owner_team | Team 170 (GATE_5 Phase 5.1 — governance closure, D-12, KB register, identity files, SSOT audit) |
+| last_gate_event | **GATE_4 PASS 2026-03-21** — Phase 4.1 (Team 90 10/10), Phase 4.2 (Team 100 architect review), Phase 4.3 (Nimrod sign-off). 22/22 AC PASS. KB-32..39 OPEN as non-blocking follow-up (see Phase 4.2 sign-off for dispositions). gates_completed=["GATE_2","GATE_3","GATE_4"]. |
+| next_required_action | Team 170: execute GATE_5 Phase 5.1 governance closure (D-12). Scope: verify/close KB-32..39; mandate Team 61 (via Team 11) for KB-32/33/34/38 fixes; create identity files team_11/101/102/191; SSOT audit (D-11); D-07/D-08 archived doc promotion; AC-WP2-16..22 deep verification; SMOKE_01..03 final evidence. |
+| next_responsible_team | Team 170 |
 
 ---
 
@@ -122,8 +122,8 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 | domain | active_program_id | active_work_package_id | phase_status | current_gate | gate_owner_team |
 |--------|-------------------|------------------------|--------------|--------------|-----------------|
-| AGENTS_OS | S003-P011 | S003-P011-WP002 | **GATE_2 PASS 2026-03-20.** GATE_3 Phase 3.1 ACTIVE — Team 11 issuing mandate to Team 61. All GATE_2 phases (2.1/2.1v/2.2/2.2v/2.3) PASS. | GATE_3 | Team 11 |
-| TIKTRACK | S003-P003 | S003-P003-WP001 | HOLD — System Settings (D39+D40+D41). Pending migration GATE_3/current_phase=3.1 (WP002 will deliver auto-migration) | GATE_3 (was G3_PLAN) | Team 10 |
+| AGENTS_OS | S003-P011 | S003-P011-WP002 | **GATE_4 PASS 2026-03-21.** GATE_5 Phase 5.1 ACTIVE — Team 170 governance closure (D-12, KB-32..39, identity files, SSOT audit). KB-32/33/34/38 require Team 61 fixes before Phase 5.2. | GATE_5 | Team 170 |
+| TIKTRACK | S003-P003 | S003-P003-WP001 | HOLD — System Settings (D39+D40+D41). Pending WP002 GATE_5 KB-33 fix (auto-migration on load). Re-launch target: post-WP002 GATE_5 PASS. | GATE_3 (was G3_PLAN) | Team 10 |
 
 ---
 
@@ -352,3 +352,8 @@ GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:
 **log_entry | TEAM_100 | EXPLICIT_WSM_PATCH | S003_P011_WP002_REGISTERED_ACTIVE | PIPELINE_STABILIZATION | LOD200_APPROVED | active_work_package_id=S003-P011-WP002 | GATE_2_PHASE_2.1_NEXT_TEAM_101 | 2026-03-20**
 **log_entry | TEAM_100 | EXPLICIT_WSM_PATCH | STAGE_PARALLEL_TRACKS_UPDATED | AOS=WP002_GATE2 | TT=GATE3_HOLD_MIGRATION_PENDING | CANONICAL_NAMING_ADR_ADDED_TO_WP002_SCOPE | 2026-03-20**
 **log_entry | TEAM_100 | GATE_2_PASS | S003_P011_WP002 | ALL_5_PHASES_PASS (2.1/2.1v/2.2/2.2v/2.3) | PAD-01_COVERED PAD-02_DECIDED | gates_completed=GATE_2 | current_gate=GATE_3 current_phase=3.1 | GATE_3_TEAM_11_MANDATE_AUTHORIZED | 2026-03-20**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_3 FAIL | S003-P011-WP002 | 2026-03-20**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_3 PASS | S003-P011-WP002 | 2026-03-20**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_3 FAIL | S003-P011-WP099 | 2026-03-20**
+**log_entry | TEAM_00 | NIMROD | GATE_4_PASS | S003_P011_WP002 | PHASE_4.1_TEAM90_PASS + PHASE_4.2_TEAM100_PASS + PHASE_4.3_NIMROD_SIGNOFF | GATE_5_AUTHORIZED | 2026-03-21**
+**log_entry | TEAM_100 | WSM_UPDATE | GATE_5_PHASE_5.1_ACTIVE | TEAM_170_NEXT | pipeline_state=GATE_5/5.1 | gates_completed=GATE_2+GATE_3+GATE_4 | 2026-03-21**

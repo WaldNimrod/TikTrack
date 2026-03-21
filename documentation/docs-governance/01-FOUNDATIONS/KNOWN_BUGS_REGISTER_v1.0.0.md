@@ -6,7 +6,7 @@
 **version:** 1.0.0  
 **owner:** Team 170 (canonical maintenance); Team 190 is validation intake authority  
 **date:** 2026-03-03  
-**last_updated:** 2026-03-21 (KB-2026-03-21-57..58 INTAKE — TT Test Flight batch 4; `fail --finding_type` undocumented + first-run wrong state file; prev: KB-50..56)  
+**last_updated:** 2026-03-21 (KB-2026-03-21-70 INTAKE — GATE_8 nomenclature drift in Team 100 S003 closure docs; prev: KB-57..69)  
 **status:** ACTIVE  
 **purpose:** Single canonical register for validated known bugs that are accepted into a batched remediation cycle or marked as immediate blockers.
 
@@ -438,3 +438,17 @@ Operational maintenance model:
 **log_entry | TEAM_100 | KNOWN_BUGS_REGISTER | KB_2026_03_21_67_INTAKE | NO_UI_TEST_COVERAGE_IN_PYTEST_SUITE | HIGH | IMMEDIATE | TF-18_G4.3 | 2026-03-21**
 **log_entry | TEAM_100 | KNOWN_BUGS_REGISTER | KB_2026_03_21_68_INTAKE | EVENT_LOG_NO_EVENT_STATE_CONTRACT | MEDIUM | BATCHED | TF-18_G4.4 | 2026-03-21**
 **log_entry | TEAM_100 | KNOWN_BUGS_REGISTER | KB_2026_03_21_69_INTAKE | DUAL_STATE_READER_IMPLEMENTATIONS_DRIFT_RISK | MEDIUM | BATCHED | TF-18_G4.5 | 2026-03-21**
+
+---
+
+### S003-P012 Governance Correction — KB-2026-03-21-70 (2026-03-21)
+
+- **source:** Team 100 self-correction — GATE_8 nomenclature used in S003 closure documents
+- **authority:** Team 100 (direct issue + direct fix)
+- **status:** FIXED (same session — no handoff required)
+
+| bug_id | date | domain | wp | severity | status | owner | coordinator | description | code_location | remediation_status | notes |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| KB-2026-03-21-70 | 2026-03-21 | SHARED | S003-P012-WP002/WP003 | MEDIUM | FIXED | Team 100 | Team 00 | Team 100 issued WP002 and WP003 lifecycle closure documents using "GATE_8 FULL PASS" as the closure label. S003-P012 is a 5-gate-model program — its lifecycle gate is GATE_5, not GATE_8. GATE_8 = old 8-gate model label valid only for S002 programs. This creates nomenclature drift in governance documents and `pipeline_state_agentsos.json` `phase8_content` field values, and risks propagating the old gate model into S003 documentation. Root cause: Team 100 applied the historically familiar "GATE_8 FULL PASS" label without checking gate-model applicability for S003. | `_COMMUNICATION/team_100/TEAM_100_S003_P012_WP002_GATE8_FULL_PASS_v1.0.0.md`; `_COMMUNICATION/team_100/TEAM_100_S003_P012_WP003_GATE8_FULL_PASS_v1.0.0.md`; `_COMMUNICATION/agents_os/pipeline_state_agentsos.json` (phase8_content); `_COMMUNICATION/agents_os/pipeline_state.json` (phase8_content + override_reason) | FIXED 2026-03-21 | Fix applied: all four locations corrected from "GATE_8 FULL PASS" → "GATE_5 FULL PASS". Filenames retained (reference integrity) with `filename_note` field added to frontmatter. Prevention: S003+ closure documents must use GATE_5 as lifecycle closure label. |
+
+**log_entry | TEAM_100 | KNOWN_BUGS_REGISTER | KB_2026_03_21_70_INTAKE | GATE_8_NOMENCLATURE_DRIFT_IN_S003_CLOSURE_DOCS | MEDIUM | FIXED | 2026-03-21**

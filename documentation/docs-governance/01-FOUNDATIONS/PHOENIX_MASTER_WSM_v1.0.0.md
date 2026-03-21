@@ -87,31 +87,37 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-20** by **Team 100** (GATE_2_PASS_WP002): GATE_2 all phases PASS; GATE_3 Phase 3.1 active; pipeline state = GATE_3/3.1; gates_completed=["GATE_2"]. Prior (2026-03-19): S003-P003-WP001 placed on HOLD at G3_PLAN. Reason: architectural process clarification required — gate sequence canonicalization (S003-P011-WP001 scope) must be resolved before continuing. Work plan IS stored (12,595 chars); pipeline state preserved. Prior: GATE_2 PASS + WAITING_GATE2_APPROVAL PASS.
+**Gate-owner update evidence:** This block was updated **2026-03-21** by **Team 170** (GOVERNANCE_CLOSURE_S003-P012-WP001): Tasks 1-3 mandate; S003-P012-WP001 active at GATE_8 pending governance closure.
+
+> ⚠️ **AUTO-GENERATED BLOCK — Do NOT edit manually.**
+> This block is written exclusively by `pipeline_run.sh` (pass / fail / approve).
+> Manual edits will be overwritten on next pipeline advance.
+> To check SSOT consistency: `python -m agents_os_v2.tools.ssot_check`
+> To see drift: `python -m agents_os_v2.tools.ssot_check --domain tiktrack`
 
 | Field | Value |
 |-------|-------|
-| active_stage_id | S003 |
-| active_stage_label | שלב 2 — Stage 2 |
-| active_flow | S003-P003-WP001 — TikTrack test flight AUTHORIZED. Resuming at GATE_3/3.1 post auto-migration (KB-33 fix live). Team 10 next: run pipeline_run.sh --domain tiktrack to confirm auto-migration then issue GATE_3 mandate to Teams 20/30/40 |
-| active_project_domain | TIKTRACK |
-| active_work_package_id | S003-P003-WP001 |
-| in_progress_work_package_id | S003-P003-WP001 |
-| last_closed_work_package_id | S003-P011-WP001 |
-| last_closed_program_id | S003-P011 (WP001 Process Architecture v2.0 — DOCUMENTATION_CLOSED 2026-03-19; 5-gate + Team 70 GATE_8 doc package). Prior: S003-P010 (SPRINT CLOSED 2026-03-19); S003-P009 (GATE_8 2026-03-18) |
+| active_stage_id | S003|
+| active_stage_label | שלב 2 — Stage 2|
+| active_flow | S003-P012-WP001 — SSOT Implementation (GATE_8 PASS pending governance closure) |
+| active_project_domain | AGENTS_OS |
+| active_work_package_id | S003-P012-WP001 |
+| in_progress_work_package_id | S003-P012-WP001 |
+| last_closed_work_package_id | S003-P003-WP001 |
+| last_closed_program_id | S003-P003 (System Settings D39+D40+D41 — GATE_8 PASS 2026-03-21; DOCUMENTATION_CLOSED). Prior: S003-P011-WP002 (DOCUMENTATION_CLOSED 2026-03-21). |
 | last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
 | allowed_gate_range | GATE_0_TO_GATE_8 (normal execution lifecycle) |
-| current_gate | GATE_5 |
+| current_gate | GATE_8 (WP001 governance closure in progress) |
 | track_mode | NORMAL |
-| suspended_track_state | RELEASED — WP002 GATE_5 PASS 2026-03-21; HOLD reason resolved; TikTrack test flight authorized |
-| hold_reason | N/A — HOLD released 2026-03-21 upon WP002 DOCUMENTATION_CLOSED |
-| agents_os_parallel_track | WP002 Pipeline Stabilization — **DOCUMENTATION_CLOSED 2026-03-21**. All 5 gates PASS. CERT 21/21, DRY_RUN 15/15, regression 155. KB-26..38 CLOSED. KB-36/37/39 carry to WP003. AOS domain IDLE — WP003 (Role-Based Team Management) LOD200 authorized (Team 101). |
-| active_program_id | S003-P011 |
+| suspended_track_state | N/A |
+| hold_reason | N/A |
+| agents_os_parallel_track | S003-P012-WP001 — SSOT Implementation. ARCHITECT_REVIEW PASS 2026-03-21. Governance closure (AC-06, AC-10) in progress — Team 170. |
+| active_program_id | S003-P012 |
 | active_plan_id | S003 |
-| phase_owner_team | Team 10 (TikTrack GATE_3 Phase 3.1 — test flight launch) |
-| last_gate_event | **GATE_5 PASS + WP002 DOCUMENTATION_CLOSED 2026-03-21** — Phase 5.1 (Team 170 governance closure: KB-26..38 CLOSED, identity files, SSOT audit, ARCHIVED headers, AC-WP2-16..22 PASS), Phase 5.2 (Team 90 PASS: CERT 21/21, DRY_RUN 15/15, regression 155). S003-P011-WP002 lifecycle complete. |
-| next_required_action | Team 10: (1) run `./pipeline_run.sh --domain tiktrack` — confirm G3_PLAN auto-migrates to GATE_3/3.1 (KB-33 live validation); (2) issue GATE_3 Phase 3.1 mandate to Teams 20/30/40 for S003-P003-WP001 (D39+D40+D41). AOS: Team 101 may begin WP003 LOD200 in parallel. |
-| next_responsible_team | Team 10 |
+| phase_owner_team | Team 170 (governance closure owner) |
+| last_gate_event | **ARCHITECT_REVIEW PASS** — S003-P012-WP001 SSOT code scope 2026-03-21 |
+| next_required_action | Team 170: complete Tasks 1-3 → WP001 GATE_8 FULL PASS → unlock WP002+WP003 |
+| next_responsible_team | Team 170 |
 
 ---
 
@@ -123,7 +129,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | domain | active_program_id | active_work_package_id | phase_status | current_gate | gate_owner_team |
 |--------|-------------------|------------------------|--------------|--------------|-----------------|
 | AGENTS_OS | S003-P011 | S003-P011-WP002 | **DOCUMENTATION_CLOSED 2026-03-21** — all 5 gates PASS. CERT 21/21, DRY_RUN 15/15, regression 155. KB-26..38 CLOSED. WP003 authorized (KB-36/37/39 carry-forward + C1..C8). AOS IDLE. | DOCUMENTATION_CLOSED | Team 101 (WP003 LOD200) |
-| TIKTRACK | S003-P003 | S003-P003-WP001 | **TEST FLIGHT AUTHORIZED 2026-03-21** — HOLD released. pipeline_state_tiktrack.json created (current_gate=G3_PLAN; will auto-migrate to GATE_3/3.1 on load). Team 10 next: run pipeline + issue GATE_3 mandate to Teams 20/30/40. | GATE_3 | Team 10 |
+| TIKTRACK | S003-P003 | S003-P003-WP001 | **DOCUMENTATION_CLOSED 2026-03-21** — GATE_8 PASS validated by Team 90; revalidation completed; `GATE_8_LOCK=CLOSED`; archive and AS_MADE package accepted. | DOCUMENTATION_CLOSED | Team 90 |
 
 ---
 
@@ -365,3 +371,6 @@ GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:
 **log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_3 PASS | S003-P003-WP001 | 2026-03-21**
 **log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_4 FAIL | S003-P003-WP001 | 2026-03-21**
 **log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_4 PASS | S003-P003-WP001 | 2026-03-21**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_8 PASS S003-P003-WP001; revalidation PASS; GATE_8_LOCK CLOSED; DOCUMENTATION_CLOSED; NO_ACTIVE_WORK_PACKAGE | 2026-03-21**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | STAGE_PARALLEL_TRACKS | AGENTS_OS=DOCUMENTATION_CLOSED; TIKTRACK=DOCUMENTATION_CLOSED; awaiting next activation decision | 2026-03-21**
+**log_entry | TEAM_61 | SSOT_WSM_SYNC | GATE_3 FAIL | S003-P011-WP099 | 2026-03-21**

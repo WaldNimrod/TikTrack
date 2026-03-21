@@ -46,14 +46,15 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | S002 | S002-P005 | Agents_OS v2 Writing Semantics Hardening (ADR-031 Stage A) + UI Optimization | AGENTS_OS | ACTIVE | GATE_1; active_flow=S002-P005-WP003 (State Alignment) — **GATE_0 PASS** (Team 190 revalidation confirmed); advancing to GATE_1; spec: `TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md`; active_work_package_id=S002-P005-WP003 |
 | S003 | S003-P001 | Data Model Validator | AGENTS_OS | COMPLETE | FAST_4 CLOSED (WP001) 2026-03-11 — Data Model Validator deployed; FAST_0..FAST_3 completed; Team 170 closure per TEAM_61_TO_TEAM_170_S003_P001_WP001_FAST4_HANDOFF_PROMPT_v1.0.0 |
 | S003 | S003-P002 | Test Template Generator | AGENTS_OS | COMPLETE | FAST_4 CLOSED (WP001) 2026-03-12 — Test Template Generator deployed; G3.7 added; agents_os_v2/requirements.txt canonical |
-| S003 | S003-P003 | System Settings (D39+D40+D41) | TIKTRACK | ACTIVE | **TEST FLIGHT AUTHORIZED 2026-03-21** — HOLD released; pipeline_state_tiktrack.json created; auto-migration G3_PLAN→GATE_3/3.1 on load (KB-33 fix live). Resuming at GATE_3 Phase 3.1. active_work_package_id=S003-P003-WP001 |
+| S003 | S003-P003 | System Settings (D39+D40+D41) | TIKTRACK | COMPLETE | GATE_8; active_flow=S003-P003-WP001 — DOCUMENTATION_CLOSED (GATE_8 PASS + lock closed 2026-03-21). Lifecycle complete.; active_work_package_id=N/A |
 | S003 | S003-P004 | User Tickers (D33) | TIKTRACK | PLANNED | — (registered from integrated roadmap v1.1.0) |
 | S003 | S003-P005 | Watch Lists (D26) | TIKTRACK | PLANNED | — (D38 tag_management relocated to S005 per ARCHITECT_DIRECTIVE_ROADMAP_AMENDMENT_v1.0.0 §A1; registered from integrated roadmap v1.1.0) |
 | S003 | S003-P006 | Admin Review S003 | TIKTRACK | PLANNED | — (Stage Governance Package; planning marker per integrated roadmap v1.1.0) |
 | S003 | S003-P007 | Agents_OS Command Bridge Lite (ADR-031 Stage B) | AGENTS_OS | MERGED | **MERGED_INTO_S003-P011-WP001** (2026-03-19). ADR-031 Stage B scope (approve-path desync, command bridge copy flow, model-B realignment) fully delivered through S003-P011-WP001. Authority: ARCHITECT_DIRECTIVE_AOS_ROADMAP_RESET_v1.0.0. |
 | S003 | S003-P008 | Agents_OS Pipeline Governance Hardening | AGENTS_OS | SUPERSEDED | **SUPERSEDED_BY_S003-P010** (2026-03-19). LOD200 acknowledged as historical reference. Scope absorbed: STATE_VIEW.json + date governance → P010-WP003; JSON verdict protocol → P010-WP002. Authority: ARCHITECT_DIRECTIVE_AOS_ROADMAP_RESET_v1.0.0. |
 | S003 | S003-P010 | Agents_OS Pipeline Core Reliability | AGENTS_OS | COMPLETE | **DOCUMENTATION_CLOSED 2026-03-19.** SUPERVISED_SPRINT completed: 4 phases; Team 51 QA 108/108 PASS; Team 00 architectural review PASS. Deliverables: PipelineState remediation fields, _generate_remediation_mandate, json_enforcer.py, FAIL_ROUTING G3_PLAN, _write_state_view, _preflight_date_correction. active_work_package_id=N/A. |
-| S003 | S003-P011 | Agents_OS — Process Model v2.0 + Pipeline Stabilization | AGENTS_OS | COMPLETE | GATE_5; active_flow=S003-P003-WP001 — TikTrack test flight AUTHORIZED. Resuming at GATE_3/3.1 post auto-migration (KB-33 fix live). Team 10 next: run pipeline_run.sh --domain tiktrack to confirm auto-migration then issue GATE_3 mandate to Teams 20/30/40; active_work_package_id=S003-P003-WP001 |
+| S003 | S003-P011 | Agents_OS — Process Model v2.0 + Pipeline Stabilization | AGENTS_OS | COMPLETE | DOCUMENTATION_CLOSED (WP001 2026-03-20; WP002 2026-03-21). AOS domain idle; WP003 planning/LOD200 lane remains authorized. |
+| S003 | S003-P012 | AOS Pipeline Operator Reliability | AGENTS_OS | ACTIVE | GATE_8 (WP001 governance closure in progress); active_flow=S003-P012-WP001 — SSOT Implementation (GATE_8 PASS pending governance closure); active_work_package_id=S003-P012-WP001 |
 | S003 | S003-P009 | Agents_OS Pipeline Resilience Package | AGENTS_OS | COMPLETE | S003-P009-WP001 GATE_8 PASS 2026-03-18; DOCUMENTATION_CLOSED. Scope: 3-tier resolution (AC-10/AC-11), wsm_writer.py, targeted git (pre-GATE_4 + GATE_8); Items 4a/4b verification only. LOD400: TEAM_100_PIPELINE_RESILIENCE_LOD400_DRAFT; authority: Team 00 PRE-CONDITION 2026-03-17. |
 | S004 | S004-P001 | Financial Precision Validator | AGENTS_OS | PLANNED | — (placeholder; program number assigned at activation; LOD200 authoring begins when S003 Agents_OS programs complete; scope: float prohibition E-18..E-19, NUMERIC(20,8) enforcement E-20..E-22) |
 | S004 | S004-P002 | Business Logic Validator | AGENTS_OS | PLANNED | — (placeholder; ⚡ ACCELERATED from S005; scope: multi-entity consistency, state machine completeness, business rule coverage; MUST complete before S005 TikTrack begins) |
@@ -155,7 +156,7 @@ Source directives:
 
 **current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-21). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
 
-**WSM mirror (2026-03-19 post–P011-WP001 close):** active_stage_id=S003; S003-P011-WP001 CLOSED; agents_os `pipeline_state` current_gate=COMPLETE; TikTrack S003-P003-WP001 HOLD at G3_PLAN unchanged until Team 00 resume. See WSM CURRENT_OPERATIONAL_STATE for `active_work_package_id` / `in_progress_work_package_id`.
+**WSM mirror (2026-03-21):** active_stage_id=S003; active_program_id=S003-P012; current_gate=GATE_8 (WP001 governance closure in progress); active_work_package_id=S003-P012-WP001; active_flow=S003-P012-WP001 — SSOT Implementation (GATE_8 PASS pending governance closure).
 
 ---
 
@@ -198,4 +199,6 @@ Source directives:
 **log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S003_P011_WP001_DOCUMENTATION_CLOSED_FINAL | TEAM_170_GATE5_CLOSURE_TEAM_90_VALIDATION_PASS | 2026-03-20 | authority: Nimrod explicit instruction**
 **log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S003_P011_WP002_REGISTERED | PIPELINE_STABILIZATION_HARDENING | KB26_TO_KB39 | 15_DRY_RUN_SCENARIOS | CANONICAL_NAMING_ADR | LOD200_APPROVED | active_work_package_id=S003-P011-WP002 | 2026-03-20**
 **log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S003_P011_ROW_UPDATED_GATE2_PHASE2.2_ACTIVE | WP001_CLOSED_WP002_IN_EXECUTION | 2026-03-20**
+**log_entry | TEAM_90 | PHOENIX_PROGRAM_REGISTRY | S003_P003_WP001_GATE8_PASS_DOCUMENTATION_CLOSED | TEAM_90_REVALIDATION_LOCK_CLOSED | LIFECYCLE_COMPLETE | 2026-03-21**
 **log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S003_P011_WP003_BACKLOG_REGISTERED | C1_C8_DEFERRED_ITEMS_CAPTURED | AUTHORITY_DECISIONS_WP2_02_03_04 | 2026-03-20**
+**log_entry | TEAM_00 | PHOENIX_PROGRAM_REGISTRY | S003_P012_REGISTERED_ACTIVE | AOS_PIPELINE_OPERATOR_RELIABILITY | 5_WPs | SSOT+PROMPT+DASHBOARD+CI+TESTKIT | PRE_CONDITION_ALL_SUBSEQUENT | 2026-03-21**

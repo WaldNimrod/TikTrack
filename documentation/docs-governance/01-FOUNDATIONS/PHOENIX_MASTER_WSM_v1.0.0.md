@@ -93,25 +93,25 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 |-------|-------|
 | active_stage_id | S003 |
 | active_stage_label | שלב 2 — Stage 2 |
-| active_flow | HOLD — S003-P003-WP001 paused at G3_PLAN pending gate sequence canonicalization |
+| active_flow | S003-P003-WP001 — TikTrack test flight AUTHORIZED. Resuming at GATE_3/3.1 post auto-migration (KB-33 fix live). Team 10 next: run pipeline_run.sh --domain tiktrack to confirm auto-migration then issue GATE_3 mandate to Teams 20/30/40 |
 | active_project_domain | TIKTRACK |
-| active_work_package_id | S003-P011-WP099 |
+| active_work_package_id | S003-P003-WP001 |
 | in_progress_work_package_id | S003-P003-WP001 |
 | last_closed_work_package_id | S003-P011-WP001 |
 | last_closed_program_id | S003-P011 (WP001 Process Architecture v2.0 — DOCUMENTATION_CLOSED 2026-03-19; 5-gate + Team 70 GATE_8 doc package). Prior: S003-P010 (SPRINT CLOSED 2026-03-19); S003-P009 (GATE_8 2026-03-18) |
 | last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
 | allowed_gate_range | GATE_0_TO_GATE_8 (normal execution lifecycle) |
-| current_gate | GATE_3 |
-| track_mode | HOLD |
-| suspended_track_state | TIKTRACK:G3_PLAN:WORK_PLAN_STORED |
-| hold_reason | PROCESS_CLARIFICATION — gate sequence canonicalization required before G3_PLAN→G3_5 advance. Reference: Team 190 gate diagram (2026-03-19) + S003-P011-WP001 (Terminology Canonicalization). |
-| agents_os_parallel_track | WP002 Pipeline Stabilization — **GATE_5 Phase 5.1 ACTIVE** (Team 170 governance closure lane). GATE_4 FULLY CLOSED 2026-03-21: Phase 4.1 (Team 90 PASS 10/10), Phase 4.2 (Team 100 PASS), Phase 4.3 (Nimrod personal sign-off). QA: 22/22 AC PASS, CERT 19/19, regression 127. KB-32..39 OPEN — mandatory Team 170 Phase 5.1 items (KB-32/33/34/38 require Team 61 fixes before Phase 5.2). S003-P003 TikTrack HOLD G3_PLAN (pending WP002 GATE_5 KB-33 auto-migration fix). |
+| current_gate | GATE_4 |
+| track_mode | NORMAL |
+| suspended_track_state | RELEASED — WP002 GATE_5 PASS 2026-03-21; HOLD reason resolved; TikTrack test flight authorized |
+| hold_reason | N/A — HOLD released 2026-03-21 upon WP002 DOCUMENTATION_CLOSED |
+| agents_os_parallel_track | WP002 Pipeline Stabilization — **DOCUMENTATION_CLOSED 2026-03-21**. All 5 gates PASS. CERT 21/21, DRY_RUN 15/15, regression 155. KB-26..38 CLOSED. KB-36/37/39 carry to WP003. AOS domain IDLE — WP003 (Role-Based Team Management) LOD200 authorized (Team 101). |
 | active_program_id | S003-P011 |
 | active_plan_id | S003 |
-| phase_owner_team | Team 170 (GATE_5 Phase 5.1 — governance closure, D-12, KB register, identity files, SSOT audit) |
-| last_gate_event | **GATE_4 PASS 2026-03-21** — Phase 4.1 (Team 90 10/10), Phase 4.2 (Team 100 architect review), Phase 4.3 (Nimrod sign-off). 22/22 AC PASS. KB-32..39 OPEN as non-blocking follow-up (see Phase 4.2 sign-off for dispositions). gates_completed=["GATE_2","GATE_3","GATE_4"]. |
-| next_required_action | Team 170: execute GATE_5 Phase 5.1 governance closure (D-12). Scope: verify/close KB-32..39; mandate Team 61 (via Team 11) for KB-32/33/34/38 fixes; create identity files team_11/101/102/191; SSOT audit (D-11); D-07/D-08 archived doc promotion; AC-WP2-16..22 deep verification; SMOKE_01..03 final evidence. |
-| next_responsible_team | Team 170 |
+| phase_owner_team | Team 10 (TikTrack GATE_3 Phase 3.1 — test flight launch) |
+| last_gate_event | **GATE_5 PASS + WP002 DOCUMENTATION_CLOSED 2026-03-21** — Phase 5.1 (Team 170 governance closure: KB-26..38 CLOSED, identity files, SSOT audit, ARCHIVED headers, AC-WP2-16..22 PASS), Phase 5.2 (Team 90 PASS: CERT 21/21, DRY_RUN 15/15, regression 155). S003-P011-WP002 lifecycle complete. |
+| next_required_action | Team 10: (1) run `./pipeline_run.sh --domain tiktrack` — confirm G3_PLAN auto-migrates to GATE_3/3.1 (KB-33 live validation); (2) issue GATE_3 Phase 3.1 mandate to Teams 20/30/40 for S003-P003-WP001 (D39+D40+D41). AOS: Team 101 may begin WP003 LOD200 in parallel. |
+| next_responsible_team | Team 10 |
 
 ---
 
@@ -122,8 +122,8 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 | domain | active_program_id | active_work_package_id | phase_status | current_gate | gate_owner_team |
 |--------|-------------------|------------------------|--------------|--------------|-----------------|
-| AGENTS_OS | S003-P011 | S003-P011-WP002 | **GATE_4 PASS 2026-03-21.** GATE_5 Phase 5.1 ACTIVE — Team 170 governance closure (D-12, KB-32..39, identity files, SSOT audit). KB-32/33/34/38 require Team 61 fixes before Phase 5.2. | GATE_5 | Team 170 |
-| TIKTRACK | S003-P003 | S003-P003-WP001 | HOLD — System Settings (D39+D40+D41). Pending WP002 GATE_5 KB-33 fix (auto-migration on load). Re-launch target: post-WP002 GATE_5 PASS. | GATE_3 (was G3_PLAN) | Team 10 |
+| AGENTS_OS | S003-P011 | S003-P011-WP002 | **DOCUMENTATION_CLOSED 2026-03-21** — all 5 gates PASS. CERT 21/21, DRY_RUN 15/15, regression 155. KB-26..38 CLOSED. WP003 authorized (KB-36/37/39 carry-forward + C1..C8). AOS IDLE. | DOCUMENTATION_CLOSED | Team 101 (WP003 LOD200) |
+| TIKTRACK | S003-P003 | S003-P003-WP001 | **TEST FLIGHT AUTHORIZED 2026-03-21** — HOLD released. pipeline_state_tiktrack.json created (current_gate=G3_PLAN; will auto-migrate to GATE_3/3.1 on load). Team 10 next: run pipeline + issue GATE_3 mandate to Teams 20/30/40. | GATE_3 | Team 10 |
 
 ---
 
@@ -357,3 +357,10 @@ GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:
 **log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_3 FAIL | S003-P011-WP099 | 2026-03-20**
 **log_entry | TEAM_00 | NIMROD | GATE_4_PASS | S003_P011_WP002 | PHASE_4.1_TEAM90_PASS + PHASE_4.2_TEAM100_PASS + PHASE_4.3_NIMROD_SIGNOFF | GATE_5_AUTHORIZED | 2026-03-21**
 **log_entry | TEAM_100 | WSM_UPDATE | GATE_5_PHASE_5.1_ACTIVE | TEAM_170_NEXT | pipeline_state=GATE_5/5.1 | gates_completed=GATE_2+GATE_3+GATE_4 | 2026-03-21**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_3 FAIL | S003-P011-WP099 | 2026-03-21**
+**log_entry | TEAM_90 | GATE_5_PHASE_5.2_PASS | S003_P011_WP002 | CERT_21/21 DRY_RUN_15/15 REGRESSION_155 | KB-32/34/38_CLOSED | 2026-03-21**
+**log_entry | TEAM_100 | WP002_DOCUMENTATION_CLOSED | S003_P011_WP002 | ALL_5_GATES_PASS | AOS_IDLE | KB_36_37_39_CARRY_WP003 | 2026-03-21**
+**log_entry | TEAM_100 | TT_TEST_FLIGHT_AUTHORIZED | S003_P003_WP001 | HOLD_RELEASED | pipeline_state_tiktrack.json_CREATED | KB33_AUTO_MIGRATION_LIVE | Team_10_NEXT | 2026-03-21**
+**log_entry | TEAM_100 | STAGE_PARALLEL_TRACKS_UPDATED | AOS=DOCUMENTATION_CLOSED | TT=TEST_FLIGHT_AUTHORIZED | TRACK_MODE=NORMAL | 2026-03-21**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_3 PASS | S003-P003-WP001 | 2026-03-21**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_4 FAIL | S003-P003-WP001 | 2026-03-21**

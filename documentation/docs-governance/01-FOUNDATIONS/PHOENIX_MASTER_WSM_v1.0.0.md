@@ -99,25 +99,25 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 |-------|-------|
 | active_stage_id | S003|
 | active_stage_label | שלב 2 — Stage 2|
-| active_flow | S003-P012-WP001 — SSOT Implementation (GATE_8 PASS pending governance closure) |
-| active_project_domain | AGENTS_OS |
-| active_work_package_id | S003-P012-WP001 |
-| in_progress_work_package_id | S003-P012-WP001 |
+| active_flow | S003-P011-WP099 — gate GATE_3 (last event: GATE_3 FAIL)|
+| active_project_domain | AGENTS_OS|
+| active_work_package_id | S003-P011-WP099|
+| in_progress_work_package_id | S003-P011-WP099|
 | last_closed_work_package_id | S003-P003-WP001 |
 | last_closed_program_id | S003-P003 (System Settings D39+D40+D41 — GATE_8 PASS 2026-03-21; DOCUMENTATION_CLOSED). Prior: S003-P011-WP002 (DOCUMENTATION_CLOSED 2026-03-21). |
 | last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
 | allowed_gate_range | GATE_0_TO_GATE_8 (normal execution lifecycle) |
-| current_gate | GATE_8 (WP001 governance closure in progress) |
-| track_mode | NORMAL |
+| current_gate | GATE_3|
+| track_mode | NORMAL|
 | suspended_track_state | N/A |
 | hold_reason | N/A |
 | agents_os_parallel_track | S003-P012-WP001 — SSOT Implementation. ARCHITECT_REVIEW PASS 2026-03-21. Governance closure (AC-06, AC-10) in progress — Team 170. |
-| active_program_id | S003-P012 |
-| active_plan_id | S003 |
-| phase_owner_team | Team 170 (governance closure owner) |
-| last_gate_event | **ARCHITECT_REVIEW PASS** — S003-P012-WP001 SSOT code scope 2026-03-21 |
-| next_required_action | Team 170: complete Tasks 1-3 → WP001 GATE_8 FULL PASS → unlock WP002+WP003 |
-| next_responsible_team | Team 170 |
+| active_program_id | S003-P011|
+| active_plan_id | S003|
+| phase_owner_team | Team 61|
+| last_gate_event | **GATE_3 FAIL** — S003-P011-WP099 \| 2026-03-21| 2026-03-21| 2026-03-21| 2026-03-21|
+| next_required_action | Execute GATE_3 — generate prompt via pipeline_run.sh (owner: Team 61).|
+| next_responsible_team | Team 61|
 
 ---
 

@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-21T17:45:20.401372+00:00`
+- Generated (UTC): `2026-03-21T19:14:41.850299+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -8,10 +8,10 @@
 ## Runtime (from WSM)
 
 - active_stage_id: `S003`
-- active_program_id: `S003-P012`
-- active_work_package_id: `S003-P012-WP001`
-- current_gate: `GATE_8 (WP001 governance closure in progress)`
-- next_required_action: `Team 170: complete Tasks 1-3 → WP001 GATE_8 FULL PASS → unlock WP002+WP003`
+- active_program_id: `S003-P011`
+- active_work_package_id: `S003-P011-WP099`
+- current_gate: `GATE_3`
+- next_required_action: `Execute GATE_3 — generate prompt via pipeline_run.sh (owner: Team 61).`
 
 ## Portfolio Counts
 
@@ -83,10 +83,10 @@
     ├── **Program** `S003-P011` — Agents_OS — Process Model v2.0 + Pipeline Stabilization | COMPLETE | domain: **AGENTS_OS**
         ├── **WP** `S003-P011-WP001` | CLOSED | gate: COMPLETE (5-gate + GATE_8 doc closure) | domain: **AGENTS_OS**
         ├── **WP** `S003-P011-WP002` | IN_PROGRESS | gate: GATE_2 | domain: **AGENTS_OS**
-        └── **WP** `S003-P011-WP099` | IN_PROGRESS | gate: GATE_3 | domain: **AGENTS_OS**
+        └── **WP** `S003-P011-WP099` | IN_PROGRESS | gate: GATE_3 | domain: **AGENTS_OS** (active)
 
     └── **Program** `S003-P012` — AOS Pipeline Operator Reliability | ACTIVE | domain: **AGENTS_OS**
-        └── **WP** `S003-P012-WP001` | IN_PROGRESS | gate: GATE_8 (WP001 governance closure in progress) | domain: **AGENTS_OS** (active)
+        └── **WP** `S003-P012-WP001` | IN_PROGRESS | gate: GATE_8 (WP001 governance closure in progress) | domain: **AGENTS_OS**
 
 
 ### S004 — שלב 4 — Financial Execution | PLANNED [SHARED]

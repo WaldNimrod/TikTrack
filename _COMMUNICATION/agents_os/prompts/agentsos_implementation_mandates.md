@@ -19,6 +19,17 @@
 
 ════════════════════════════════════════════════════════════
 
+## Domain roster excerpt (phase 3.1 mandates — WP002 KB-62)
+
+| Team | Track role (AOS) |
+|---|---|
+| team_11 | AOS Gateway |
+| team_61 | AOS implementation |
+| team_51 | AOS QA (GATE_4) |
+| team_101 | LOD200 / domain architect |
+| team_170 | Spec / GATE_5 closure |
+
+
 ## Full Work Plan (reference)
 
 Team 20 | x

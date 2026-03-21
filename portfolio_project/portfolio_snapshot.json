@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-21T21:27:03.759696+00:00",
+  "generated_at_utc": "2026-03-21T22:22:04.247461+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -12,7 +12,7 @@
     "in_progress_work_package_id": "S003-P011-WP099",
     "current_gate": "GATE_3",
     "active_program_id": "S003-P011",
-    "last_gate_event": "**GATE_3 FAIL** — S003-P011-WP099 \\",
+    "last_gate_event": "**TEAM_170 \\",
     "next_required_action": "Execute GATE_3 — generate prompt via pipeline_run.sh (owner: Team 61).",
     "next_responsible_team": "Team 61"
   },
@@ -214,8 +214,8 @@
       "program_name": "AOS Pipeline Operator Reliability",
       "domain": "AGENTS_OS",
       "stage_id": "S003",
-      "status": "ACTIVE",
-      "current_gate_mirror": "GATE_8 (WP001 governance closure in progress); active_flow=S003-P012-WP001 — SSOT Implementation (GATE_8 PASS pending governance closure); active_work_package_id=S003-P012-WP001"
+      "status": "COMPLETE",
+      "current_gate_mirror": "**DOCUMENTATION_CLOSED 2026-03-21 — Team 100.** WP001–WP005 **GATE_5 FULL PASS**; pipeline readiness **205 tests**. Program-level closure + comms archive: `TEAM_170_S003_P012_GOVERNANCE_CLOSURE_AND_ARCHIVE_MANDATE_v1.0.0.md`."
     },
     {
       "program_id": "S003-P009",
@@ -874,8 +874,8 @@
           "program_id": "S003-P012",
           "program_name": "AOS Pipeline Operator Reliability",
           "domain": "AGENTS_OS",
-          "status": "ACTIVE",
-          "current_gate_mirror": "GATE_8 (WP001 governance closure in progress); active_flow=S003-P012-WP001 — SSOT Implementation (GATE_8 PASS pending governance closure); active_work_package_id=S003-P012-WP001",
+          "status": "COMPLETE",
+          "current_gate_mirror": "**DOCUMENTATION_CLOSED 2026-03-21 — Team 100.** WP001–WP005 **GATE_5 FULL PASS**; pipeline readiness **205 tests**. Program-level closure + comms archive: `TEAM_170_S003_P012_GOVERNANCE_CLOSURE_AND_ARCHIVE_MANDATE_v1.0.0.md`.",
           "work_packages": [
             {
               "work_package_id": "S003-P012-WP001",

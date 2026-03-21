@@ -87,7 +87,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-21** by **Team 100** (GATE_8_FULL_PASS_S003-P012-WP002): WP001+WP002 DOCUMENTATION_CLOSED; pipeline_state_agentsos.json corrected (non-canonical gate repaired); WP003 unlocked. Prior update: Team 170 (WP001 governance closure).
+**Gate-owner update evidence:** **2026-03-21** by **Team 100** (S003-P012 PROGRAM COMPLETE — all 5 WPs GATE_5 FULL PASS): AOS Pipeline Operator Reliability fully closed. Pipeline readiness certificate: 205 tests. **Team 170** governance closure + registry sync per `TEAM_170_S003_P012_GOVERNANCE_CLOSURE_AND_ARCHIVE_MANDATE_v1.0.0.md`.
 
 > ⚠️ **AUTO-GENERATED BLOCK — Do NOT edit manually.**
 > This block is written exclusively by `pipeline_run.sh` (pass / fail / approve).
@@ -103,7 +103,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | active_project_domain | AGENTS_OS|
 | active_work_package_id | S003-P011-WP099|
 | in_progress_work_package_id | S003-P011-WP099|
-| last_closed_work_package_id | S003-P012-WP002|
+| last_closed_work_package_id | S003-P012-WP005|
 | last_closed_program_id | S003-P003 (System Settings D39+D40+D41 — GATE_8 PASS 2026-03-21; DOCUMENTATION_CLOSED). Prior: S003-P011-WP002 (DOCUMENTATION_CLOSED 2026-03-21). |
 | last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
 | allowed_gate_range | GATE_0_TO_GATE_8 (normal execution lifecycle) |
@@ -111,11 +111,11 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | track_mode | NORMAL|
 | suspended_track_state | N/A |
 | hold_reason | N/A |
-| agents_os_parallel_track | S003-P012-WP002 — DOCUMENTATION_CLOSED 2026-03-21. WP001 (SSOT) CLOSED + WP002 (Prompt Quality) CLOSED — GATE_8 FULL PASS by Team 100. WP003 (Dashboard UI Stabilization) UNLOCKED — Team 61 next. |
+| agents_os_parallel_track | **S003-P012 PROGRAM COMPLETE 2026-03-21 — all 5 WPs GATE_5 FULL PASS.** Next AOS: **S003-P011-WP003 (RBAC)** — awaiting activation (Team 00 signal). |
 | active_program_id | S003-P011|
 | active_plan_id | S003|
 | phase_owner_team | Team 61|
-| last_gate_event | **GATE_3 FAIL** — S003-P011-WP099 \| 2026-03-21| 2026-03-21| 2026-03-21| 2026-03-21| 2026-03-21| 2026-03-21| 2026-03-21| 2026-03-21| 2026-03-21| 2026-03-21| 2026-03-21| 2026-03-21| 2026-03-21| 2026-03-21| 2026-03-21|
+| last_gate_event | **TEAM_170 \| S003_P012_PROGRAM_COMPLETE \|** parallel_track + WSM fields synced 2026-03-21. Runtime row above remains until next `pipeline_run.sh` advance. |
 | next_required_action | Execute GATE_3 — generate prompt via pipeline_run.sh (owner: Team 61).|
 | next_responsible_team | Team 61|
 
@@ -128,7 +128,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 | domain | active_program_id | active_work_package_id | phase_status | current_gate | gate_owner_team |
 |--------|-------------------|------------------------|--------------|--------------|-----------------|
-| AGENTS_OS | S003-P012 | S003-P012-WP002 | **DOCUMENTATION_CLOSED 2026-03-21** — WP001 (SSOT) + WP002 (Prompt Quality) GATE_8 FULL PASS by Team 100. 157 tests pass. `--from-report`, TF-21 cleanup, FAIL_CMD canonical format. WP003 (Dashboard UI) UNLOCKED. | DOCUMENTATION_CLOSED | Team 61 (WP003 implementor) |
+| AGENTS_OS | S003-P011 | PENDING (S003-P011-WP003 awaiting GATE_1) | **S003-P012 PROGRAM COMPLETE 2026-03-21.** Next: **S003-P011-WP003** (Role-Based Team Management) — activation pending Team 00 signal. | PENDING | Team 00 (activation decision) |
 | TIKTRACK | S003-P003 | S003-P003-WP001 | **DOCUMENTATION_CLOSED 2026-03-21** — GATE_8 PASS validated by Team 90; revalidation completed; `GATE_8_LOCK=CLOSED`; archive and AS_MADE package accepted. | DOCUMENTATION_CLOSED | Team 90 |
 
 ---
@@ -377,3 +377,4 @@ GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | STAGE_PARALLEL_TRACKS | AGENTS_OS=DOCUMENTATION_CLOSED; TIKTRACK=DOCUMENTATION_CLOSED; awaiting next activation decision | 2026-03-21**
 **log_entry | TEAM_61 | SSOT_WSM_SYNC | GATE_3 FAIL | S003-P011-WP099 | 2026-03-21**
 **log_entry | TEAM_61 | SSOT_WSM_SYNC | COMPLETE PASS | S003-P012-WP002 | 2026-03-21**
+**log_entry | TEAM_170 | WSM_GOVERNANCE_UPDATE | S003_P012_PROGRAM_COMPLETE | AOS_PARALLEL_TRACK_UPDATED | STAGE_PARALLEL_TRACKS_AOS_UPDATED | 2026-03-21**

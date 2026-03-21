@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-21T21:27:03.759696+00:00`
+- Generated (UTC): `2026-03-21T22:22:04.247461+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -85,7 +85,7 @@
         ├── **WP** `S003-P011-WP002` | IN_PROGRESS | gate: GATE_2 | domain: **AGENTS_OS**
         └── **WP** `S003-P011-WP099` | IN_PROGRESS | gate: GATE_3 | domain: **AGENTS_OS** (active)
 
-    └── **Program** `S003-P012` — AOS Pipeline Operator Reliability | ACTIVE | domain: **AGENTS_OS**
+    └── **Program** `S003-P012` — AOS Pipeline Operator Reliability | COMPLETE | domain: **AGENTS_OS**
         └── **WP** `S003-P012-WP001` | IN_PROGRESS | gate: GATE_8 (WP001 governance closure in progress) | domain: **AGENTS_OS**
 
 

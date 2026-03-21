@@ -6,7 +6,7 @@
 **version:** 1.0.0  
 **owner:** Team 170 (canonical maintenance); Team 190 is validation intake authority  
 **date:** 2026-03-03  
-**last_updated:** 2026-03-21 (KB-2026-03-21-70 INTAKE — GATE_8 nomenclature drift in Team 100 S003 closure docs; prev: KB-57..69)  
+**last_updated:** 2026-03-21 (KB-2026-03-21-71 INTAKE — SSOT override pattern not formalized (WP004 closure); KB-70 FIXED; prev: KB-57..70)  
 **status:** ACTIVE  
 **purpose:** Single canonical register for validated known bugs that are accepted into a batched remediation cycle or marked as immediate blockers.
 
@@ -439,6 +439,16 @@ Operational maintenance model:
 **log_entry | TEAM_100 | KNOWN_BUGS_REGISTER | KB_2026_03_21_68_INTAKE | EVENT_LOG_NO_EVENT_STATE_CONTRACT | MEDIUM | BATCHED | TF-18_G4.4 | 2026-03-21**
 **log_entry | TEAM_100 | KNOWN_BUGS_REGISTER | KB_2026_03_21_69_INTAKE | DUAL_STATE_READER_IMPLEMENTATIONS_DRIFT_RISK | MEDIUM | BATCHED | TF-18_G4.5 | 2026-03-21**
 
+### S003-P012 Closure Review (2026-03-21)
+
+Team 170 review: KB items tied to **S003-P012** scope were reviewed; statuses confirmed against `TEAM_170_S003_P012_AS_MADE_REPORT_v1.0.0.md`.
+
+| Item | Disposition |
+|------|-------------|
+| KB-2026-03-21-70 | **FIXED** — confirmed (GATE_5 nomenclature correction) |
+| KB-2026-03-21-71 | **OPEN** — **LOW** — **BATCHED** (SSOT override protocol — post-WP005 / consolidation per existing note) |
+| KB-2026-03-21-65 .. KB-2026-03-21-69 | **OPEN** — **not altered** (TIKTRACK / CI-foundation intake; outside S003-P012 program closure edit scope per mandate) |
+
 ---
 
 ### S003-P012 Governance Correction — KB-2026-03-21-70 (2026-03-21)
@@ -452,3 +462,17 @@ Operational maintenance model:
 | KB-2026-03-21-70 | 2026-03-21 | SHARED | S003-P012-WP002/WP003 | MEDIUM | FIXED | Team 100 | Team 00 | Team 100 issued WP002 and WP003 lifecycle closure documents using "GATE_8 FULL PASS" as the closure label. S003-P012 is a 5-gate-model program — its lifecycle gate is GATE_5, not GATE_8. GATE_8 = old 8-gate model label valid only for S002 programs. This creates nomenclature drift in governance documents and `pipeline_state_agentsos.json` `phase8_content` field values, and risks propagating the old gate model into S003 documentation. Root cause: Team 100 applied the historically familiar "GATE_8 FULL PASS" label without checking gate-model applicability for S003. | `_COMMUNICATION/team_100/TEAM_100_S003_P012_WP002_GATE8_FULL_PASS_v1.0.0.md`; `_COMMUNICATION/team_100/TEAM_100_S003_P012_WP003_GATE8_FULL_PASS_v1.0.0.md`; `_COMMUNICATION/agents_os/pipeline_state_agentsos.json` (phase8_content); `_COMMUNICATION/agents_os/pipeline_state.json` (phase8_content + override_reason) | FIXED 2026-03-21 | Fix applied: all four locations corrected from "GATE_8 FULL PASS" → "GATE_5 FULL PASS". Filenames retained (reference integrity) with `filename_note` field added to frontmatter. Prevention: S003+ closure documents must use GATE_5 as lifecycle closure label. |
 
 **log_entry | TEAM_100 | KNOWN_BUGS_REGISTER | KB_2026_03_21_70_INTAKE | GATE_8_NOMENCLATURE_DRIFT_IN_S003_CLOSURE_DOCS | MEDIUM | FIXED | 2026-03-21**
+
+---
+
+### WP004 closure — KB-2026-03-21-71 (2026-03-21)
+
+- **source:** Team 100 architectural review — WP004 GATE_5 closure
+- **authority:** Team 100 (direct intake at closure)
+- **status:** OPEN — deferred to post-WP005 consolidation
+
+| bug_id | date | domain | wp | severity | status | owner | coordinator | description | code_location | remediation_status | notes |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| KB-2026-03-21-71 | 2026-03-21 | SHARED | S003-P012-WP004 | LOW | OPEN | Team 61 | Team 100 | The `pipeline_state_agentsos.json` SSOT override pattern — where Team 61 aligns identity fields (`work_package_id`, `current_gate`, etc.) to match WSM CURRENT_OPERATIONAL_STATE for ssot_check consistency — is operationally valid but undocumented. No protocol defines when this override is authorized, who may issue it, or how to reverse it. Without formalization, future agents may refuse to override (treating any state change as out-of-scope) or override incorrectly (corrupting real pipeline state). The override is necessary because S003-P012 WPs operate as a meta-process outside the standard pipeline CLI flow (mandate §0), creating a structural mismatch between the pipeline_state schema and the parallel-track governance model. | `_COMMUNICATION/agents_os/pipeline_state_agentsos.json` — `override_reason` field (ad hoc, no schema); mandate `TEAM_00_S003_P012_WP002_TO_WP005_MANDATES_v1.0.0.md` §0 meta-process note | BATCHED | Post-WP005: formalize SSOT override protocol — (a) define authorized override triggers, (b) add `override_authorized_by` + `override_gate_context` fields to schema, (c) document in Team 61 operating procedures. V90-WP004-NB-01 / Team 170 FINDING-001 (semantic split GATE_ALIASES vs `_canonical_fail_routing_key`) also deferred here — Team 61 + Team 170 to document in next hardening batch. |
+
+**log_entry | TEAM_100 | KNOWN_BUGS_REGISTER | KB_2026_03_21_71_INTAKE | SSOT_OVERRIDE_PATTERN_NOT_FORMALIZED | LOW | BATCHED | WP004_GATE5_CLOSURE | 2026-03-21**

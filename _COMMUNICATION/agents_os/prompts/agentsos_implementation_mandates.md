@@ -1,8 +1,8 @@
-# Mandates — S003-P011-WP002  ·  G3_6_MANDATES
+# Mandates — S003-P012-WP005-AOS-FULL  ·  G3_6_MANDATES
 
 **date:** 2026-03-21
 
-**Spec:** test
+**Spec:** WP005 AOS TRACK_FULL
 
 **Canonical date:** Use `date -u +%F` for today; replace {{date}} in identity headers.
 
@@ -32,8 +32,8 @@
 
 ## Full Work Plan (reference)
 
-Team 20 | x
-Team 30 | y
+Team 20 | be
+Team 30 | fe
 
 ────────────────────────────────────────────────────────────
 
@@ -50,7 +50,7 @@ No code changes unless a critical blocker is found.
 Document: endpoint paths, params, response shapes, auth requirements.
 
 **Output — write to:**
-`_COMMUNICATION/team_20/TEAM_20_S003_P011_WP002_API_VERIFY_v1.0.0.md`
+`_COMMUNICATION/team_20/TEAM_20_S003_P012_WP005_AOS_FULL_API_VERIFY_v1.0.0.md`
 
 ### Additional Context
 ### Backend Conventions
@@ -78,7 +78,7 @@ Document: endpoint paths, params, response shapes, auth requirements.
 - All required endpoints confirmed present and behaving as specified
 - API params + response shapes documented
 - No code changes (unless blocker found — document it)
-- Output saved to: `_COMMUNICATION/team_20/TEAM_20_S003_P011_WP002_API_VERIFY_v1.0.0.md`
+- Output saved to: `_COMMUNICATION/team_20/TEAM_20_S003_P012_WP005_AOS_FULL_API_VERIFY_v1.0.0.md`
 
 ────────────────────────────────────────────────────────────
   ✅  Phase 1 complete?
@@ -93,7 +93,7 @@ Document: endpoint paths, params, response shapes, auth requirements.
 
 ### Your Task
 
-Implement frontend for: test
+Implement frontend for: WP005 AOS TRACK_FULL
 
 **Environment:** Cursor Composer + MCP browser tools
 
@@ -109,8 +109,8 @@ Implement the frontend feature per spec. After implementation, run MCP verificat
 ### Coordination Data — Team 20 API verification report
 
 ⚠️  File not yet available. Searched (in order):
-  - `_COMMUNICATION/team_20/TEAM_20_S003_P011_WP002_API_VERIFY_v1.0.0.md`
-  - `_COMMUNICATION/team_20/TEAM_20_S003_P011_WP002_API_VERIFICATION_v1.0.0.md`
+  - `_COMMUNICATION/team_20/TEAM_20_S003_P012_WP005_AOS_FULL_API_VERIFY_v1.0.0.md`
+  - `_COMMUNICATION/team_20/TEAM_20_S003_P012_WP005_AOS_FULL_API_VERIFICATION_v1.0.0.md`
 
 → Complete the prerequisite team's work first.
 → Re-generate after: `./pipeline_run.sh` injects real data.

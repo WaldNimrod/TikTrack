@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-21T10:59:46.647237+00:00`
+- Generated (UTC): `2026-03-21T11:45:13.401970+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -10,7 +10,7 @@
 - active_stage_id: `S003`
 - active_program_id: `S003-P011`
 - active_work_package_id: `S003-P003-WP001`
-- current_gate: `GATE_4`
+- current_gate: `GATE_5`
 - next_required_action: `Team 10: (1) run `./pipeline_run.sh --domain tiktrack` — confirm G3_PLAN auto-migrates to GATE_3/3.1 (KB-33 live validation); (2) issue GATE_3 Phase 3.1 mandate to Teams 20/30/40 for S003-P003-WP001 (D39+D40+D41). AOS: Team 101 may begin WP003 LOD200 in parallel.`
 
 ## Portfolio Counts
@@ -62,7 +62,7 @@
         └── **WP** `S003-P002-WP001` | CLOSED | gate: FAST_4 (PASS) | domain: **AGENTS_OS**
 
     ├── **Program** `S003-P003` — System Settings (D39+D40+D41) | ACTIVE | domain: **TIKTRACK**
-        └── **WP** `S003-P003-WP001` | IN_PROGRESS | gate: GATE_4 | domain: **TIKTRACK** (active)
+        └── **WP** `S003-P003-WP001` | IN_PROGRESS | gate: GATE_5 | domain: **TIKTRACK** (active)
 
     ├── **Program** `S003-P004` — User Tickers (D33) | PLANNED | domain: **TIKTRACK**
 

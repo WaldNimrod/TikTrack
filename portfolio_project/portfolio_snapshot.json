@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-20T23:28:19.273347+00:00",
+  "generated_at_utc": "2026-03-21T10:33:37.043723+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -8,13 +8,13 @@
   },
   "runtime": {
     "active_stage_id": "S003",
-    "active_work_package_id": "S003-P011-WP099",
+    "active_work_package_id": "S003-P003-WP001",
     "in_progress_work_package_id": "S003-P003-WP001",
-    "current_gate": "GATE_3",
+    "current_gate": "GATE_4",
     "active_program_id": "S003-P011",
-    "last_gate_event": "**GATE_4 PASS 2026-03-21** — Phase 4.1 (Team 90 10/10), Phase 4.2 (Team 100 architect review), Phase 4.3 (Nimrod sign-off). 22/22 AC PASS. KB-32..39 OPEN as non-blocking follow-up (see Phase 4.2 sign-off for dispositions). gates_completed=[\"GATE_2\",\"GATE_3\",\"GATE_4\"].",
-    "next_required_action": "Team 170: execute GATE_5 Phase 5.1 governance closure (D-12). Scope: verify/close KB-32..39; mandate Team 61 (via Team 11) for KB-32/33/34/38 fixes; create identity files team_11/101/102/191; SSOT audit (D-11); D-07/D-08 archived doc promotion; AC-WP2-16..22 deep verification; SMOKE_01..03 final evidence.",
-    "next_responsible_team": "Team 170"
+    "last_gate_event": "**GATE_5 PASS + WP002 DOCUMENTATION_CLOSED 2026-03-21** — Phase 5.1 (Team 170 governance closure: KB-26..38 CLOSED, identity files, SSOT audit, ARCHIVED headers, AC-WP2-16..22 PASS), Phase 5.2 (Team 90 PASS: CERT 21/21, DRY_RUN 15/15, regression 155). S003-P011-WP002 lifecycle complete.",
+    "next_required_action": "Team 10: (1) run `./pipeline_run.sh --domain tiktrack` — confirm G3_PLAN auto-migrates to GATE_3/3.1 (KB-33 live validation); (2) issue GATE_3 Phase 3.1 mandate to Teams 20/30/40 for S003-P003-WP001 (D39+D40+D41). AOS: Team 101 may begin WP003 LOD200 in parallel.",
+    "next_responsible_team": "Team 10"
   },
   "stages": [
     {
@@ -151,7 +151,7 @@
       "domain": "TIKTRACK",
       "stage_id": "S003",
       "status": "ACTIVE",
-      "current_gate_mirror": "CURSOR_IMPLEMENTATION; active_flow=HOLD — S003-P003-WP001 paused at G3_PLAN pending gate sequence canonicalization; active_work_package_id=S003-P011-WP001"
+      "current_gate_mirror": "**TEST FLIGHT AUTHORIZED 2026-03-21** — HOLD released; pipeline_state_tiktrack.json created; auto-migration G3_PLAN→GATE_3/3.1 on load (KB-33 fix live). Resuming at GATE_3 Phase 3.1. active_work_package_id=S003-P003-WP001"
     },
     {
       "program_id": "S003-P004",
@@ -206,8 +206,8 @@
       "program_name": "Agents_OS — Process Model v2.0 + Pipeline Stabilization",
       "domain": "AGENTS_OS",
       "stage_id": "S003",
-      "status": "ACTIVE",
-      "current_gate_mirror": "GATE_3; active_flow=HOLD — S003-P003-WP001 paused at G3_PLAN pending gate sequence canonicalization; active_work_package_id=S003-P011-WP099"
+      "status": "COMPLETE",
+      "current_gate_mirror": "GATE_4; active_flow=S003-P003-WP001 — TikTrack test flight AUTHORIZED. Resuming at GATE_3/3.1 post auto-migration (KB-33 fix live). Team 10 next: run pipeline_run.sh --domain tiktrack to confirm auto-migration then issue GATE_3 mandate to Teams 20/30/40; active_work_package_id=S003-P003-WP001"
     },
     {
       "program_id": "S003-P009",
@@ -459,9 +459,9 @@
       "program_id": "S003-P003",
       "domain": "TIKTRACK",
       "status": "IN_PROGRESS",
-      "current_gate": "GATE_2",
-      "is_active": false,
-      "active_marker_reason": "NORMAL — GATE_0 active (TikTrack S003-P003-WP001)"
+      "current_gate": "GATE_4",
+      "is_active": true,
+      "active_marker_reason": "S003-P003-WP001 — TikTrack test flight AUTHORIZED. Resuming at GATE_3/3.1 post auto-migration (KB-33 fix live). Team 10 next: run pipeline_run.sh --domain tiktrack to confirm auto-migration then issue GATE_3 mandate to Teams 20/30/40"
     },
     {
       "work_package_id": "S003-P009-WP001",
@@ -505,7 +505,7 @@
       "domain": "AGENTS_OS",
       "status": "IN_PROGRESS",
       "current_gate": "GATE_3",
-      "is_active": true,
+      "is_active": false,
       "active_marker_reason": "HOLD — S003-P003-WP001 paused at G3_PLAN pending gate sequence canonicalization"
     }
   ],
@@ -728,16 +728,16 @@
           "program_name": "System Settings (D39+D40+D41)",
           "domain": "TIKTRACK",
           "status": "ACTIVE",
-          "current_gate_mirror": "CURSOR_IMPLEMENTATION; active_flow=HOLD — S003-P003-WP001 paused at G3_PLAN pending gate sequence canonicalization; active_work_package_id=S003-P011-WP001",
+          "current_gate_mirror": "**TEST FLIGHT AUTHORIZED 2026-03-21** — HOLD released; pipeline_state_tiktrack.json created; auto-migration G3_PLAN→GATE_3/3.1 on load (KB-33 fix live). Resuming at GATE_3 Phase 3.1. active_work_package_id=S003-P003-WP001",
           "work_packages": [
             {
               "work_package_id": "S003-P003-WP001",
               "program_id": "S003-P003",
               "domain": "TIKTRACK",
               "status": "IN_PROGRESS",
-              "current_gate": "GATE_2",
-              "is_active": false,
-              "active_marker_reason": "NORMAL — GATE_0 active (TikTrack S003-P003-WP001)"
+              "current_gate": "GATE_4",
+              "is_active": true,
+              "active_marker_reason": "S003-P003-WP001 — TikTrack test flight AUTHORIZED. Resuming at GATE_3/3.1 post auto-migration (KB-33 fix live). Team 10 next: run pipeline_run.sh --domain tiktrack to confirm auto-migration then issue GATE_3 mandate to Teams 20/30/40"
             }
           ]
         },
@@ -821,8 +821,8 @@
           "program_id": "S003-P011",
           "program_name": "Agents_OS — Process Model v2.0 + Pipeline Stabilization",
           "domain": "AGENTS_OS",
-          "status": "ACTIVE",
-          "current_gate_mirror": "GATE_3; active_flow=HOLD — S003-P003-WP001 paused at G3_PLAN pending gate sequence canonicalization; active_work_package_id=S003-P011-WP099",
+          "status": "COMPLETE",
+          "current_gate_mirror": "GATE_4; active_flow=S003-P003-WP001 — TikTrack test flight AUTHORIZED. Resuming at GATE_3/3.1 post auto-migration (KB-33 fix live). Team 10 next: run pipeline_run.sh --domain tiktrack to confirm auto-migration then issue GATE_3 mandate to Teams 20/30/40; active_work_package_id=S003-P003-WP001",
           "work_packages": [
             {
               "work_package_id": "S003-P011-WP001",
@@ -848,7 +848,7 @@
               "domain": "AGENTS_OS",
               "status": "IN_PROGRESS",
               "current_gate": "GATE_3",
-              "is_active": true,
+              "is_active": false,
               "active_marker_reason": "HOLD — S003-P003-WP001 paused at G3_PLAN pending gate sequence canonicalization"
             }
           ]

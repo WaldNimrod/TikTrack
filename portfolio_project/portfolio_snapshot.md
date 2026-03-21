@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-20T23:28:19.273347+00:00`
+- Generated (UTC): `2026-03-21T10:33:37.043723+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -9,9 +9,9 @@
 
 - active_stage_id: `S003`
 - active_program_id: `S003-P011`
-- active_work_package_id: `S003-P011-WP099`
-- current_gate: `GATE_3`
-- next_required_action: `Team 170: execute GATE_5 Phase 5.1 governance closure (D-12). Scope: verify/close KB-32..39; mandate Team 61 (via Team 11) for KB-32/33/34/38 fixes; create identity files team_11/101/102/191; SSOT audit (D-11); D-07/D-08 archived doc promotion; AC-WP2-16..22 deep verification; SMOKE_01..03 final evidence.`
+- active_work_package_id: `S003-P003-WP001`
+- current_gate: `GATE_4`
+- next_required_action: `Team 10: (1) run `./pipeline_run.sh --domain tiktrack` — confirm G3_PLAN auto-migrates to GATE_3/3.1 (KB-33 live validation); (2) issue GATE_3 Phase 3.1 mandate to Teams 20/30/40 for S003-P003-WP001 (D39+D40+D41). AOS: Team 101 may begin WP003 LOD200 in parallel.`
 
 ## Portfolio Counts
 
@@ -62,7 +62,7 @@
         └── **WP** `S003-P002-WP001` | CLOSED | gate: FAST_4 (PASS) | domain: **AGENTS_OS**
 
     ├── **Program** `S003-P003` — System Settings (D39+D40+D41) | ACTIVE | domain: **TIKTRACK**
-        └── **WP** `S003-P003-WP001` | IN_PROGRESS | gate: GATE_2 | domain: **TIKTRACK**
+        └── **WP** `S003-P003-WP001` | IN_PROGRESS | gate: GATE_4 | domain: **TIKTRACK** (active)
 
     ├── **Program** `S003-P004` — User Tickers (D33) | PLANNED | domain: **TIKTRACK**
 
@@ -80,10 +80,10 @@
     ├── **Program** `S003-P010` — Agents_OS Pipeline Core Reliability | COMPLETE | domain: **AGENTS_OS**
         └── **WP** `S003-P010-WP001` | CLOSED | gate: SPRINT_ACTIVE | domain: **AGENTS_OS**
 
-    └── **Program** `S003-P011` — Agents_OS — Process Model v2.0 + Pipeline Stabilization | ACTIVE | domain: **AGENTS_OS**
+    └── **Program** `S003-P011` — Agents_OS — Process Model v2.0 + Pipeline Stabilization | COMPLETE | domain: **AGENTS_OS**
         ├── **WP** `S003-P011-WP001` | CLOSED | gate: COMPLETE (5-gate + GATE_8 doc closure) | domain: **AGENTS_OS**
         ├── **WP** `S003-P011-WP002` | IN_PROGRESS | gate: GATE_2 | domain: **AGENTS_OS**
-        └── **WP** `S003-P011-WP099` | IN_PROGRESS | gate: GATE_3 | domain: **AGENTS_OS** (active)
+        └── **WP** `S003-P011-WP099` | IN_PROGRESS | gate: GATE_3 | domain: **AGENTS_OS**
 
 
 ### S004 — שלב 4 — Financial Execution | PLANNED [SHARED]

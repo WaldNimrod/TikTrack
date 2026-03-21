@@ -1,6 +1,6 @@
 # Mandates — S003-P011-WP002  ·  G3_6_MANDATES
 
-**date:** 2026-03-20
+**date:** 2026-03-21
 
 **Spec:** test
 

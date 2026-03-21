@@ -5,7 +5,10 @@
 **promotion_date:** 2026-02-22
 **directive_id:** TEAM_190_TO_TEAM_170_GOVERNANCE_PROCEDURES_CONSOLIDATION_DIRECTIVE_v1.0.0
 **classification:** PROMOTE_TO_CANONICAL_GOVERNANCE
+**status:** ARCHIVED — superseded by ARCHITECT_DIRECTIVE_GATE_SEQUENCE_CANON_v1.0.0.md
 ---
+
+> **[ARCHIVED — superseded by ARCHITECT_DIRECTIVE_GATE_SEQUENCE_CANON_v1.0.0.md — 5-gate canonical model]**
 
 # 7 GATE MODEL PROTOCOL v2.2.0
 **project_domain:** TIKTRACK

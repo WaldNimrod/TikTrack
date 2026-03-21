@@ -1,19 +1,10 @@
-**ACTIVE: TEAM_90 (Dev-Validator)**  gate=G3_5 | wp=S003-P009-WP001 | stage=S003 | 2026-03-17
+**ACTIVE: TEAM_90 (Dev-Validator)**  gate=G3_5 | wp=S003-P011-WP001 | stage=S003 | 2026-03-19
 
 ---
 
-╔══════════════════════════════════════════════════════════════╗
-║  ⚠  RE-VALIDATION — G3_5 CYCLE #2                          ║
-║  Work plan was revised to address prior blockers.            ║
-║  Perform a FRESH review — do NOT repeat previous findings.   ║
-╚══════════════════════════════════════════════════════════════╝
+# G3.5 — Validate Work Plan  [FIRST RUN]
 
-Previous verdict (read for context, do NOT copy its blockers):
-  `_COMMUNICATION/team_90/TEAM_90_S003_P009_WP001_G3_5_VERDICT_v1.0.0.md`
-
-# G3.5 — Validate Work Plan  [RE-RUN #2]
-
-**WP:** `S003-P009-WP001`
+**WP:** `S003-P011-WP001`
 
 Validate this work plan for implementation readiness.
 Check: completeness, team assignments, deliverables, test coverage.
@@ -40,88 +31,52 @@ Respond with: PASS or FAIL + blocking findings.
 ## Work Plan
 
 ---
-project_domain: AGENTS_OS
-id: TEAM_10_S003_P009_WP001_G3_PLAN_WORK_PLAN_v1.2.0
-from: Team 10 (Execution Orchestrator / Work Plan Generator)
-to: Team 61, Team 51, Team 170
-cc: Team 00, Team 100, Team 190
-date: 2026-03-17
-status: ACTIVE
-gate_id: G3_PLAN
-program_id: S003-P009
-work_package_id: S003-P009-WP001
-scope: Pipeline Resilience Package — G3 Build Work Plan (G3_5 Blocker Remediation)
-authority_mode: TEAM_10_GATE_3_OWNER
-spec_source: TEAM_170_S003_P009_WP001_LLD400_v1.0.0.md
-supersedes: TEAM_10_S003_P009_WP001_G3_PLAN_WORK_PLAN_v1.1.0
-g35_remediation: BF-G3_5-WP001-001, BF-G3_5-WP001-002, BF-G3_5-WP001-003, BF-G3_5-WP001-RE2-001
+id: TEAM_11_S003_P011_WP001_WORKPLAN_v1.0.0
+from: Team 11 (AOS Gateway)
+to: Team 90 (review), Team 100 (arch sign-off)
+date: 2026-03-19
+gate: GATE_2 / Phase 2.2
+process_variant: TRACK_FOCUSED
+stage: S003
+program: S003-P011
+work_package: S003-P011-WP001
+spec_source: TEAM_170_S003_P011_WP001_LLD400_v1.0.1
+authority: ARCHITECT_DIRECTIVE_GATE_SEQUENCE_CANON_v1.0.0 + ARCHITECT_DIRECTIVE_TEAM_ROSTER_v2.0.0
 ---
 
-# Team 10 | S003-P009-WP001 — G3 Work Plan v1.2.0 (G3_5 Blocker Remediation)
+# Work Plan — S003-P011-WP001 | Process Architecture v2.0
 
-## G3_5 Blocker Fixes Summary
+## §1 Overview
 
-| Blocker | Severity | Fix Applied |
-|---------|----------|-------------|
-| **BF-G3_5-WP001: 001** | SEVERE | Structural completeness: Added G3_5 fixes table; §3.2 Gate Routing table (G3_PLAN→G3_5→G3_6); completed dependency rules; §2 canonical paths per team with exact file lists; §7 Team 61 completion artifact contract |
-| **BF-G3_5-WP001: 002** | SEVERE | Test coverage operationalized: §5 P0/P1 tests with exact runnable commands; binary PASS/FAIL per row; copy-paste-ready steps; pytest + regression with explicit commands |
-| **BF-G3_5-WP001: 003** | MAJOR | Team 61 completion artifact contract: §7 required sections (identity header, modified files list, Item 1/2/3 checklist, test evidence, handover prompt); format spec; Team 51 trigger |
-| **BF-G3_5-WP001-RE2: 001** | SEVERE | Submitted work plan incomplete: Added §G3_5 Readiness Checklist (immediately below) to attest all required sections present; Team 90 can validate completeness before full read. Full plan in `_COMMUNICATION/team_10/TEAM_10_S003_P009_WP001_G3_PLAN_WORK_PLAN_v1.0.0.md` |
+This work plan implements Process Architecture v2.0 for the Agents_OS domain: the 5-gate canonical model, FCP classification, TRACK_FOCUSED routing, team_engine_config.json externalization, Team 00 identity correction, Team 11/102/191 registration, state schema migration from legacy GATE_0..GATE_8.
+
+**Domain:** AGENTS_OS (TRACK_FOCUSED default)
+**Implementor:** Team 61 (all 6 layers)
+**QA:** Team 51
+**Spec authority:** LLD400 v1.0.1 (Team 170) — validated GATE_1 PASS
 
 ---
 
-## G3_5 Submission Readiness Checklist
+## §2 Phase Sequence
 
-**Attestation:** This work plan is structurally complete. All required sections present.
-
-| # | Required Element | Section | Status |
-|---|------------------|---------|--------|
-| 1 | Identity header (gate/wp/stage/domain/date) | Mandatory Identity Header | ✓ |
-| 2 | §2 Files per team (canonical paths) | §2.1 Canonical Paths; §2.2–2.5 per team | ✓ |
-| 3 | §3 Execution order with dependencies | §3.1 Execution Order; §3.2 Gate Routing | ✓ |
-| 4 | §4 API/contract (CLI, Python, JSON) | §4 API / Contract Summary | ✓ |
-| 5 | §5 Test scenarios (operationalized) | §5 P0/P1 tests, pytest | ✓ |
-| 6 | §6 Per-team acceptance criteria | §6.1–6.6 | ✓ |
-| 7 | §7 Team 61 completion artifact contract | §7 | ✓ |
-| 8 | Domain adaptation (Team 61 + 51, no 20/30) | §2, §6 | ✓ |
-
-**Canonical file (full content):** `_COMMUNICATION/team_10/TEAM_10_S003_P009_WP001_G3_PLAN_WORK_PLAN_v1.0.0.md`
+| Phase | ID | Responsible | Description | Dependencies | Risk |
+|-------|-----|-------------|-------------|--------------|------|
+| **P1** | State schema + config | Team 61 | Add `current_phase`, `process_variant`, `finding_type`, `fcp_level`, `return_target_team`, `lod200_author_team`, `gate_state` to state schema. Create `team_engine_config.json` per LLD400 §2.3 schema (per-team object with engine + domain). | None | MEDIUM |
+| **P2** | Migration script | Team 61 | Copy-first migration: backup all `pipeline_state_*.json`, apply legacy→canonical gate ID mapping per LLD400 §3.1 table. Preserve S003-P003-WP001 state (map G3_PLAN → GATE_3, current_phase="3.1"). Validate no data loss. | P1 | HIGH |
+| **P3** | pipeline.py GATE_SEQUENCE + GATE_META | Team 61 | Replace `GATE_SEQUENCE` with 5-gate canonical. Refactor `GATE_META` to load team assignments from `team_engine_config.json`. Add Phase 2.2 (Team 11) and Phase 2.2v (Team 90) to GATE_2; remove `WAITING_GATE2_APPROVAL`; add `gate_state="HUMAN_PENDING"`. TRACK_FOCUSED routing: Phase 2.2 → Team 11, Phase 3.1 → Team 11. | P1 | HIGH |
+| **P4** | KB-26 + KB-27 remediation | Team 61 | **KB-2026-03-19-26:** Correction-cycle prompt: when `last_blocking_gate == current_gate AND remediation_cycle_count > 0` → inject `last_blocking_findings` in prompt; `fail` command writes to `last_blocking_findings` / `last_blocking_gate`; `pass` preflight blocks if active BLOCK_FOR_FIX. **KB-2026-03-19-27:** Part of P3. | P3 | MEDIUM |
+| **P5** | Prompt injection + FCP | Team 61 | Extend directive auto-injection to ALL gate prompts. Add FCP rules to relevant gate prompts. Each prompt states `process_variant` and routing. Add `finding_type` preflight for `fail`. | P3 | MEDIUM |
+| **P6** | pipeline_run.sh preflight | Team 61 | Preflight: rejection → `finding_type` required; `process_variant` set and valid; team assignment matches gate+phase+variant; PWA scope check for Team 10. | P3 | LOW |
+| **P7** | Dashboard (JS) | Team 61 | GateStatusPanel: `current_phase`, `process_variant` badge. FCPPanel: show when `finding_type === "unclear"`. TeamAssignmentPanel, EngineEditor, Lod200AuthorOverride per LLD400 §4.0 component tree. Read/write `team_engine_config.json`. | P1 | MEDIUM |
+| **P8** | Governance + identity | Team 61 | Team 102 and Team 191 activation documents (registration). Retroactive Team 00 identity: "Chief Architect" → "System Designer". Team 11 activation prompt exists (done). | None | LOW |
+| **P9** | QA validation | Team 51 | Full E2E per LLD400 §5 MCP scenarios. AC-01..AC-26 validation. Migration integrity check. | P1–P8 | — |
 
 ---
 
-## Mandatory Identity Header
+## §3 Migration Plan
 
-| Field | Value |
-|-------|-------|
-| roadmap_id | PHOENIX_ROADMAP |
-| stage_id | S003 |
-| program_id | S003-P009 |
-| work_package_id | S003-P009-WP001 |
-| task_id | G3_PLAN |
-| gate_id | G3_PLAN |
-| phase_owner | Team 10 |
-| required_ssm_version | 1.0.0 |
-| required_active_stage | S003 |
-| project_domain | AGENTS_OS |
-| date | 2026-03-17 |
+### 3.1 Approach
 
----
-
-## 1. Approved Spec (Locked)
-
-**Source:** `_COMMUNICATION/team_170/TEAM_170_S003_P009_WP001_LLD400_v1.0.0.md`
-
-S003-P009-WP001: Pipeline Resilience Package. 3-tier file path resolution (AC-10/AC-11 hardening), WSM auto-write module (`wsm_writer.py`), targeted git operations (pre-GATE_4 uncommitted block + GATE_8 closure checklist). Items 4a/4b (route alias) already implemented — verification only. No HTTP API — contracts are CLI, Python modules, file I/O.
-
----
-
-## 2. Files to Create/Modify per Team
-
-**Domain:** AGENTS_OS — Team 61 (implementation + contract verify), Team 51 (QA), Team 170 (governance doc).
-
-### 2.1 §2 Canonical Paths per Team
-
-| Team | Deliverable | Canonical Path |
-|------|-------------|----------------|
-| Team 61 | Contract verify | `_COMMUNICATION/team_61/TEAM_61_S003_P009_WP001_CONTRACT_VERIFY_v1.0.0.md` |
-| Team 61 | Implementation | `pi
+1. **Copy-first:** Before any migration, copy `pipeline_state_agentsos.json`, `pipeline_state_tiktrack.json`, and any active WP state files to `_COMMUNICATION/agents_os/backups/` with timestamp.
+2. **Migrate:** Script reads state, applies LLD400 §3.1 old→new mapping, writes new state with defaults for new fields.
+3. **Validate:** Load migrated state; assert

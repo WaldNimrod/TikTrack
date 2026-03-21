@@ -1,14 +1,14 @@
-**ACTIVE: TEAM_90 (Dev-Validator)**  gate=GATE_5 | wp=S003-P009-WP001 | stage=S003 | 2026-03-18
+**ACTIVE: TEAM_90 (Dev-Validator)**  gate=GATE_5 | wp=S003-P011-WP001 | stage=S003 | 2026-03-19
 
 ---
 
 # GATE_5 — Dev Validation  [FIRST RUN]
 
-**WP under validation:** `S003-P009-WP001`
+**WP under validation:** `S003-P011-WP001`
 
 ## Your Task
 
-Perform a **complete, fresh validation** of the implementation for `S003-P009-WP001`.
+Perform a **complete, fresh validation** of the implementation for `S003-P011-WP001`.
 Read the actual files listed below. Report only findings you observe in the CURRENT run.
 
 ## Validation Checklist
@@ -25,12 +25,12 @@ Include these in your validation findings — mark PASS if spec declares no sche
 
 - **DM-E-01**: DM-E-01: BLOCK — alembic versions directory not found
 
-## Artifacts to inspect for `S003-P009-WP001`
+## Artifacts to inspect for `S003-P011-WP001`
 
 | Artifact | Path |
 |---|---|
-| Work Plan (latest version) | `_COMMUNICATION/team_10/TEAM_10_S003_P009_WP001_G3_PLAN_WORK_PLAN_v*.md` |
-| GATE_4 QA report | `_COMMUNICATION/team_50/TEAM_50_S003_P009_WP001_QA_REPORT_v*.md` |
+| Work Plan (latest version) | `_COMMUNICATION/team_11/TEAM_11_S003_P011_WP001_G3_PLAN_WORK_PLAN_v*.md` |
+| GATE_4 QA report | `_COMMUNICATION/team_50/TEAM_50_S003_P011_WP001_QA_REPORT_v*.md` |
 | Team 20 outputs | `_COMMUNICATION/team_20/` |
 | Team 30 outputs | `_COMMUNICATION/team_30/` |
 
@@ -38,87 +38,45 @@ You MUST check these files exist and contain valid content before reporting find
 
 ## Spec
 
-# Team 170 — LLD400 | S003-P009-WP001 Pipeline Resilience Package
-## TEAM_170_S003_P009_WP001_LLD400_v1.0.0.md
+# LLD400 v1.0.1 — Delta Note
 
----
-project_domain: AGENTS_OS
-id: TEAM_170_S003_P009_WP001_LLD400_v1.0.0
-from: Team 170 (Spec & Governance Authority)
-to: Team 190 (Constitutional Validator)
-cc: Team 10, Team 100, Team 61
-date: 2026-03-17
-status: SUBMITTED_FOR_GATE_1_VALIDATION
-gate_id: GATE_1
-architectural_approval_type: SPEC
-spec_version: 1.0.0
-source: TEAM_100_PIPELINE_RESILIENCE_LOD400_DRAFT_v1.0.0.md
-required_ssm_version: 1.0.0
-required_wsm_version: 1.0.0
-required_active_stage: S003
-phase_owner: Team 10
----
-
-## §1 Identity Header
-
-| Field | Value |
-|-------|-------|
-| gate | GATE_1 |
-| wp | S003-P009-WP001 |
-| stage | S003 |
-| domain | agents_os |
-| date | 2026-03-17 |
-| roadmap_id | PHOENIX_ROADMAP |
-| program_id | S003-P009 |
-| work_package_id | S003-P009-WP001 |
-| task_id | PIPELINE_RESILIENCE |
-| architectural_approval_type | SPEC |
-| spec_version | 1.0.0 |
-| source | TEAM_100_PIPELINE_RESILIENCE_LOD400_DRAFT_v1.0.0 |
-| required_ssm_version | 1.0.0 |
-| required_wsm_version | 1.0.0 |
-| required_active_stage | S003 |
-| phase_owner | Team 10 |
+**in_response_to:** TEAM_190_TO_TEAM_170_S003_P011_WP001_G1_CORRECTION_PROMPT_v1.0.0  
+**date:** 2026-03-19  
+**from:** Team 170  
 
 ---
 
-## §2 Endpoint Contract
+## Sections Changed
 
-**Domain:** AGENTS_OS Pipeline Resilience has no HTTP API. Contracts are CLI commands, Python module entry points, and file I/O.
+### BF-01 — UI contract (R-01)
 
-### 2.1 CLI: pipeline_run.sh
+| Section | Change |
+|---------|--------|
+| §4 | Added §4.0 **Consolidated Component Tree and State Shape** |
+| §4.0 | Full hierarchy: Dashboard → GateStatusPanel, FCPPanel, TeamAssignmentPanel, EngineEditor, Lod200AuthorOverride |
+| §4.0 | Complete **state shape**: current_gate, current_phase, process_variant, finding_type, fcp_level, return_target_team, lod200_author_team, project_domain |
+| §4.0 | **Engine-config payload shape** for EngineEditor |
+| §4.1–§4.5 | Each subsection references §4.0 subtree; retains per-panel state shape and DOM anchors |
 
-| Command | Method | Purpose |
-|---------|--------|---------|
-| `./pipeline_run.sh --domain agents_os pass` | UPDATE state | Advance current gate to PASS; triggers wsm_writer; pre-GATE_4: block if uncommitted changes |
-| `./pipeline_run.sh --domain agents_os fail "reason"` | UPDATE state | Advance current gate to FAIL |
-| `./pipeline_run.sh --domain agents_os store GATE_1 <path>` | UPDATE state | Manual Tier 3 store for LLD400 artifact |
-| `./pipeline_run.sh --domain agents_os store G3_PLAN <path>` | UPDATE state | Manual Tier 3 store for work plan artifact |
-| `./pipeline_run.sh --domain agents_os status` | READ state | Display pipeline status |
+### BF-02 — team_engine_config.json (R-02)
 
-**GATE_1 / G3_PLAN auto-store (inline Python):** When at GATE_1 or G3_PLAN, `pipeline_run.sh` invokes `_auto_store_gate1_artifact()` or `_auto_store_g3plan_artifact()` which output: `STORE:<path>`, `NO_FILE`, `ALREADY_STORED:<path>`, or `TIER2_MATCH:<path>` (stderr).
+| Section | Change |
+|---------|--------|
+| §2.3 | Replaced flat `team_engine` map with **per-team object schema** |
+| §2.3 | Each `teams.{team_id}` = `{ engine: string, domain: string }` |
+| §2.3 | Team 11 explicitly: `teams.team_11 = { "engine": "Cursor Composer", "domain": "AOS" }` |
+| §3.2 | Updated contract text to match per-team object schema |
+| §5.4 MCP-10 | Assertion: `teams.team_11.domain === "AOS"` AND `teams.team_11.engine === "Cursor Composer"` |
+| §6 AC-10 | Wording: Team 11 has AOS domain (`teams.team_11.domain === "AOS"`) and Cursor Composer default (`teams.team_11.engine === "Cursor Composer"`) |
 
-**Request (implicit):** Domain from `--domain` or `PIPELINE_DOMAIN` env.
+## AC Numbering
 
-**Response (auto-store):** One of: `STORE:<path>`, `NO_FILE`, `ALREADY_STORED:<path>`.
-
-### 2.2 Python Module: wsm_writer
-
-| Entry Point | Purpose |
-|-------------|---------|
-| `from agents_os_v2.orchestrator.wsm_writer import write_wsm_state` | Update WSM CURRENT_OPERATIONAL_STATE table; append log_entry |
-
-**Invocation:** Called from `pipeline.py` `advance()` after `state.save()`, when `state.gate_state is None`.
-
-**Request:** `state: PipelineState`, `gate_id: str`, `result: str`.
-
-**Response:** None (side effect: WSM file updated). On error: WARN event to `pipeline_events.jsonl`; pipeline continues (non-blocking).
+No change. AC numbering unchanged (AC-01 through AC-26).
 
 ---
 
-## §3 DB Contract
+**log_entry | TEAM_170 | S003_P011_WP001_LLD400_DELTA | v1.0.1 | BF-01_BF-02_CLOSED | 2026-03-19**
 
-**Domain:** AGE
 
 ## MANDATORY: route_recommendation
 

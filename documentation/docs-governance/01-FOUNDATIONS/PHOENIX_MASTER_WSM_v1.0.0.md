@@ -115,7 +115,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | active_program_id | S003-P011|
 | active_plan_id | S003|
 | phase_owner_team | Team 61|
-| last_gate_event | **GATE_3 FAIL** — S003-P011-WP099 \| 2026-03-21| 2026-03-21| 2026-03-21| 2026-03-21|
+| last_gate_event | **GATE_3 FAIL** — S003-P011-WP099 \| 2026-03-21| 2026-03-21| 2026-03-21| 2026-03-21| 2026-03-21| 2026-03-21|
 | next_required_action | Execute GATE_3 — generate prompt via pipeline_run.sh (owner: Team 61).|
 | next_responsible_team | Team 61|
 

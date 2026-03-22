@@ -267,7 +267,11 @@ def _sync_wp_registry(wp_text: str, wsm: Dict[str, str], event_date: str) -> Tup
         target_row["active_marker_reason"] = active_flow or "Active per WSM"
         messages.append(f"WP registry: marked {active_wp} as active=true")
 
-    if last_closed_wp and not _is_no_active(last_closed_wp):
+    if (
+        last_closed_wp
+        and not _is_no_active(last_closed_wp)
+        and last_closed_wp != active_wp
+    ):
         current_gate_upper = (current_gate or "").upper()
         active_flow_upper = (active_flow or "").upper()
         last_gate_event_upper = (last_gate_event or "").upper()

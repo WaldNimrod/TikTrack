@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-21T22:22:04.247461+00:00`
+- Generated (UTC): `2026-03-22T18:06:38.066779+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -8,16 +8,16 @@
 ## Runtime (from WSM)
 
 - active_stage_id: `S003`
-- active_program_id: `S003-P011`
-- active_work_package_id: `S003-P011-WP099`
-- current_gate: `GATE_3`
-- next_required_action: `Execute GATE_3 — generate prompt via pipeline_run.sh (owner: Team 61).`
+- active_program_id: `S003-P013`
+- active_work_package_id: `S003-P013-WP001`
+- current_gate: `GATE_2`
+- next_required_action: `Execute GATE_2 — generate prompt via pipeline_run.sh (owner: Team 11).`
 
 ## Portfolio Counts
 
 - stages: `6`
-- programs: `36`
-- work_packages: `18`
+- programs: `37`
+- work_packages: `19`
 
 ## Roadmap (hierarchical)
 
@@ -83,10 +83,13 @@
     ├── **Program** `S003-P011` — Agents_OS — Process Model v2.0 + Pipeline Stabilization | COMPLETE | domain: **AGENTS_OS**
         ├── **WP** `S003-P011-WP001` | CLOSED | gate: COMPLETE (5-gate + GATE_8 doc closure) | domain: **AGENTS_OS**
         ├── **WP** `S003-P011-WP002` | IN_PROGRESS | gate: GATE_2 | domain: **AGENTS_OS**
-        └── **WP** `S003-P011-WP099` | IN_PROGRESS | gate: GATE_3 | domain: **AGENTS_OS** (active)
+        └── **WP** `S003-P011-WP099` | IN_PROGRESS | gate: GATE_3 | domain: **AGENTS_OS**
 
-    └── **Program** `S003-P012` — AOS Pipeline Operator Reliability | COMPLETE | domain: **AGENTS_OS**
+    ├── **Program** `S003-P012` — AOS Pipeline Operator Reliability | COMPLETE | domain: **AGENTS_OS**
         └── **WP** `S003-P012-WP001` | IN_PROGRESS | gate: GATE_8 (WP001 governance closure in progress) | domain: **AGENTS_OS**
+
+    └── **Program** `S003-P013` — TikTrack Pipeline Canary Run (D33 display_name) | ACTIVE | domain: **TIKTRACK**
+        └── **WP** `S003-P013-WP001` | IN_PROGRESS | gate: GATE_2 | domain: **TIKTRACK** (active)
 
 
 ### S004 — שלב 4 — Financial Execution | PLANNED [SHARED]

@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-21T22:22:04.247461+00:00",
+  "generated_at_utc": "2026-03-22T18:06:38.066779+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -8,13 +8,13 @@
   },
   "runtime": {
     "active_stage_id": "S003",
-    "active_work_package_id": "S003-P011-WP099",
-    "in_progress_work_package_id": "S003-P011-WP099",
-    "current_gate": "GATE_3",
-    "active_program_id": "S003-P011",
-    "last_gate_event": "**TEAM_170 \\",
-    "next_required_action": "Execute GATE_3 — generate prompt via pipeline_run.sh (owner: Team 61).",
-    "next_responsible_team": "Team 61"
+    "active_work_package_id": "S003-P013-WP001",
+    "in_progress_work_package_id": "S003-P013-WP001",
+    "current_gate": "GATE_2",
+    "active_program_id": "S003-P013",
+    "last_gate_event": "**GATE_1 PASS** — S003-P013-WP001 \\",
+    "next_required_action": "Execute GATE_2 — generate prompt via pipeline_run.sh (owner: Team 11).",
+    "next_responsible_team": "Team 11"
   },
   "stages": [
     {
@@ -216,6 +216,14 @@
       "stage_id": "S003",
       "status": "COMPLETE",
       "current_gate_mirror": "**DOCUMENTATION_CLOSED 2026-03-21 — Team 100.** WP001–WP005 **GATE_5 FULL PASS**; pipeline readiness **205 tests**. Program-level closure + comms archive: `TEAM_170_S003_P012_GOVERNANCE_CLOSURE_AND_ARCHIVE_MANDATE_v1.0.0.md`."
+    },
+    {
+      "program_id": "S003-P013",
+      "program_name": "TikTrack Pipeline Canary Run (D33 display_name)",
+      "domain": "TIKTRACK",
+      "stage_id": "S003",
+      "status": "ACTIVE",
+      "current_gate_mirror": "GATE_2; active_flow=S003-P013-WP001 — gate GATE_2 (last event: GATE_1 PASS); active_work_package_id=S003-P013-WP001"
     },
     {
       "program_id": "S003-P009",
@@ -513,7 +521,7 @@
       "domain": "AGENTS_OS",
       "status": "IN_PROGRESS",
       "current_gate": "GATE_3",
-      "is_active": true,
+      "is_active": false,
       "active_marker_reason": "S003-P011-WP099 — gate GATE_3 (last event: GATE_3 FAIL)"
     },
     {
@@ -524,6 +532,15 @@
       "current_gate": "GATE_8 (WP001 governance closure in progress)",
       "is_active": false,
       "active_marker_reason": "S003-P012-WP001 — SSOT Implementation (GATE_8 PASS pending governance closure)"
+    },
+    {
+      "work_package_id": "S003-P013-WP001",
+      "program_id": "S003-P013",
+      "domain": "TIKTRACK",
+      "status": "IN_PROGRESS",
+      "current_gate": "GATE_2",
+      "is_active": true,
+      "active_marker_reason": "S003-P013-WP001 — gate GATE_2 (last event: GATE_1 PASS)"
     }
   ],
   "hierarchy": [
@@ -865,7 +882,7 @@
               "domain": "AGENTS_OS",
               "status": "IN_PROGRESS",
               "current_gate": "GATE_3",
-              "is_active": true,
+              "is_active": false,
               "active_marker_reason": "S003-P011-WP099 — gate GATE_3 (last event: GATE_3 FAIL)"
             }
           ]
@@ -885,6 +902,24 @@
               "current_gate": "GATE_8 (WP001 governance closure in progress)",
               "is_active": false,
               "active_marker_reason": "S003-P012-WP001 — SSOT Implementation (GATE_8 PASS pending governance closure)"
+            }
+          ]
+        },
+        {
+          "program_id": "S003-P013",
+          "program_name": "TikTrack Pipeline Canary Run (D33 display_name)",
+          "domain": "TIKTRACK",
+          "status": "ACTIVE",
+          "current_gate_mirror": "GATE_2; active_flow=S003-P013-WP001 — gate GATE_2 (last event: GATE_1 PASS); active_work_package_id=S003-P013-WP001",
+          "work_packages": [
+            {
+              "work_package_id": "S003-P013-WP001",
+              "program_id": "S003-P013",
+              "domain": "TIKTRACK",
+              "status": "IN_PROGRESS",
+              "current_gate": "GATE_2",
+              "is_active": true,
+              "active_marker_reason": "S003-P013-WP001 — gate GATE_2 (last event: GATE_1 PASS)"
             }
           ]
         }

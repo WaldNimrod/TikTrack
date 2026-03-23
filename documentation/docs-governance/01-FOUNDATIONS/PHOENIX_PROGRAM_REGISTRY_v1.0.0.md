@@ -55,7 +55,7 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | S003 | S003-P010 | Agents_OS Pipeline Core Reliability | AGENTS_OS | COMPLETE | **DOCUMENTATION_CLOSED 2026-03-19.** SUPERVISED_SPRINT completed: 4 phases; Team 51 QA 108/108 PASS; Team 00 architectural review PASS. Deliverables: PipelineState remediation fields, _generate_remediation_mandate, json_enforcer.py, FAIL_ROUTING G3_PLAN, _write_state_view, _preflight_date_correction. active_work_package_id=N/A. |
 | S003 | S003-P011 | Agents_OS — Process Model v2.0 + Pipeline Stabilization | AGENTS_OS | COMPLETE | GATE_3; active_flow=S003-P011-WP099 — gate GATE_3 (last event: GATE_3 FAIL); active_work_package_id=S003-P011-WP099; DB_DEPENDENCY_REF: IDEA-052 |
 | S003 | S003-P012 | AOS Pipeline Operator Reliability | AGENTS_OS | COMPLETE | **DOCUMENTATION_CLOSED 2026-03-21 — Team 100.** WP001–WP005 **GATE_5 FULL PASS**; pipeline readiness **205 tests**. Program-level closure + comms archive: `TEAM_170_S003_P012_GOVERNANCE_CLOSURE_AND_ARCHIVE_MANDATE_v1.0.0.md`; DB_DEPENDENCY_REF: IDEA-052 |
-| S003 | S003-P013 | TikTrack Pipeline Canary Run (D33 display_name) | TIKTRACK | ACTIVE | GATE_5; active_flow=S003-P013-WP001 — gate GATE_5 (last event: GATE_4 PASS); active_work_package_id=S003-P013-WP001 |
+| S003 | S003-P013 | TikTrack Pipeline Canary Run (D33 display_name) | TIKTRACK | COMPLETE | COMPLETE; active_flow=S003-P013-WP001 — gate COMPLETE (last event: GATE_5 PASS); active_work_package_id=N/A |
 | S003 | S003-P009 | Agents_OS Pipeline Resilience Package | AGENTS_OS | COMPLETE | S003-P009-WP001 GATE_8 PASS 2026-03-18; DOCUMENTATION_CLOSED. Scope: 3-tier resolution (AC-10/AC-11), wsm_writer.py, targeted git (pre-GATE_4 + GATE_8); Items 4a/4b verification only. LOD400: TEAM_100_PIPELINE_RESILIENCE_LOD400_DRAFT; authority: Team 00 PRE-CONDITION 2026-03-17; DB_DEPENDENCY_REF: IDEA-052 |
 | S004 | S004-P001 | Financial Precision Validator | AGENTS_OS | PLANNED | — (placeholder; program number assigned at activation; LOD200 authoring begins when S003 Agents_OS programs complete; scope: float prohibition E-18..E-19, NUMERIC(20,8) enforcement E-20..E-22; DB_DEPENDENCY_REF: IDEA-052) |
 | S004 | S004-P002 | Business Logic Validator | AGENTS_OS | PLANNED | — (placeholder; ⚡ ACCELERATED from S005; scope: multi-entity consistency, state machine completeness, business rule coverage; MUST complete before S005 TikTrack begins; DB_DEPENDENCY_REF: IDEA-052) |
@@ -157,7 +157,7 @@ Source directives:
 
 **current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-23). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
 
-**WSM mirror (2026-03-23):** active_stage_id=S003; active_program_id=S003-P013; current_gate=GATE_5; active_work_package_id=S003-P013-WP001; active_flow=S003-P013-WP001 — gate GATE_5 (last event: GATE_4 PASS).
+**WSM mirror (2026-03-23):** active_stage_id=S003; active_program_id=S003-P013; current_gate=COMPLETE; active_work_package_id=N/A; active_flow=S003-P013-WP001 — gate COMPLETE (last event: GATE_5 PASS).
 
 ---
 

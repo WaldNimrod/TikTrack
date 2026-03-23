@@ -55,11 +55,11 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S003-P011 | S003-P011-WP002 | IN_PROGRESS | GATE_2 | false | Pipeline Stabilization & Hardening — ACTIVE at GATE_2/2.1 (Team 101 LLD400 lane). Mirror aligned to WSM and `pipeline_state_agentsos.json` on 2026-03-20. |
 | S003-P011 | S003-P011-WP099 | IN_PROGRESS | GATE_3 | false | S003-P011-WP099 — gate GATE_3 (last event: GATE_3 FAIL) |
 | S003-P012 | S003-P012-WP001 | IN_PROGRESS | GATE_8 (WP001 governance closure in progress) | false | S003-P012-WP001 — SSOT Implementation (GATE_8 PASS pending governance closure) |
-| S003-P013 | S003-P013-WP001 | IN_PROGRESS | GATE_5 | true | S003-P013-WP001 — gate GATE_5 (last event: GATE_4 PASS) |
+| S003-P013 | S003-P013-WP001 | CLOSED | GATE_5 | false | S003-P013-WP001 — gate GATE_5 (last event: GATE_4 PASS) |
 
 
 
-**Current active WP state (mirror from WSM):** **ACTIVE_WORK_PACKAGE_PRESENT** — WSM `active_stage_id=S003`, `active_program_id=S003-P013`, `current_gate=GATE_5`, `active_work_package_id=S003-P013-WP001`.
+**Current active WP state (mirror from WSM):** **NO_ACTIVE_WORK_PACKAGE** — WSM `active_stage_id=S003`, `active_program_id=S003-P013`, `current_gate=COMPLETE`, `active_work_package_id=N/A`.
 
 **Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-23). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
 

@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-23T15:42:39.289801+00:00",
+  "generated_at_utc": "2026-03-23T17:40:47.439893+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -8,13 +8,13 @@
   },
   "runtime": {
     "active_stage_id": "S003",
-    "active_work_package_id": "S003-P013-WP001",
-    "in_progress_work_package_id": "S003-P013-WP001",
-    "current_gate": "GATE_5",
+    "active_work_package_id": "N/A",
+    "in_progress_work_package_id": "N/A",
+    "current_gate": "COMPLETE",
     "active_program_id": "S003-P013",
-    "last_gate_event": "**GATE_4 PASS** — S003-P013-WP001 \\",
-    "next_required_action": "Execute GATE_5 — generate prompt via pipeline_run.sh (owner: Team 170).",
-    "next_responsible_team": "Team 170"
+    "last_gate_event": "**GATE_5 PASS** — S003-P013-WP001 \\",
+    "next_required_action": "Lifecycle complete — await next WP activation (Team 100 / Team 00).",
+    "next_responsible_team": "Team 100"
   },
   "stages": [
     {
@@ -222,8 +222,8 @@
       "program_name": "TikTrack Pipeline Canary Run (D33 display_name)",
       "domain": "TIKTRACK",
       "stage_id": "S003",
-      "status": "ACTIVE",
-      "current_gate_mirror": "GATE_5; active_flow=S003-P013-WP001 — gate GATE_5 (last event: GATE_4 PASS); active_work_package_id=S003-P013-WP001"
+      "status": "COMPLETE",
+      "current_gate_mirror": "COMPLETE; active_flow=S003-P013-WP001 — gate COMPLETE (last event: GATE_5 PASS); active_work_package_id=N/A"
     },
     {
       "program_id": "S003-P009",
@@ -537,9 +537,9 @@
       "work_package_id": "S003-P013-WP001",
       "program_id": "S003-P013",
       "domain": "TIKTRACK",
-      "status": "IN_PROGRESS",
+      "status": "CLOSED",
       "current_gate": "GATE_5",
-      "is_active": true,
+      "is_active": false,
       "active_marker_reason": "S003-P013-WP001 — gate GATE_5 (last event: GATE_4 PASS)"
     }
   ],
@@ -909,16 +909,16 @@
           "program_id": "S003-P013",
           "program_name": "TikTrack Pipeline Canary Run (D33 display_name)",
           "domain": "TIKTRACK",
-          "status": "ACTIVE",
-          "current_gate_mirror": "GATE_5; active_flow=S003-P013-WP001 — gate GATE_5 (last event: GATE_4 PASS); active_work_package_id=S003-P013-WP001",
+          "status": "COMPLETE",
+          "current_gate_mirror": "COMPLETE; active_flow=S003-P013-WP001 — gate COMPLETE (last event: GATE_5 PASS); active_work_package_id=N/A",
           "work_packages": [
             {
               "work_package_id": "S003-P013-WP001",
               "program_id": "S003-P013",
               "domain": "TIKTRACK",
-              "status": "IN_PROGRESS",
+              "status": "CLOSED",
               "current_gate": "GATE_5",
-              "is_active": true,
+              "is_active": false,
               "active_marker_reason": "S003-P013-WP001 — gate GATE_5 (last event: GATE_4 PASS)"
             }
           ]

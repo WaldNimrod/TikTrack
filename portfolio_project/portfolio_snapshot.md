@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-22T18:06:38.066779+00:00`
+- Generated (UTC): `2026-03-23T15:42:39.289801+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -10,8 +10,8 @@
 - active_stage_id: `S003`
 - active_program_id: `S003-P013`
 - active_work_package_id: `S003-P013-WP001`
-- current_gate: `GATE_2`
-- next_required_action: `Execute GATE_2 — generate prompt via pipeline_run.sh (owner: Team 11).`
+- current_gate: `GATE_5`
+- next_required_action: `Execute GATE_5 — generate prompt via pipeline_run.sh (owner: Team 170).`
 
 ## Portfolio Counts
 
@@ -89,7 +89,7 @@
         └── **WP** `S003-P012-WP001` | IN_PROGRESS | gate: GATE_8 (WP001 governance closure in progress) | domain: **AGENTS_OS**
 
     └── **Program** `S003-P013` — TikTrack Pipeline Canary Run (D33 display_name) | ACTIVE | domain: **TIKTRACK**
-        └── **WP** `S003-P013-WP001` | IN_PROGRESS | gate: GATE_2 | domain: **TIKTRACK** (active)
+        └── **WP** `S003-P013-WP001` | IN_PROGRESS | gate: GATE_5 | domain: **TIKTRACK** (active)
 
 
 ### S004 — שלב 4 — Financial Execution | PLANNED [SHARED]

@@ -1,6 +1,6 @@
 # Mandates — S003-P012-WP005-AOS-FULL  ·  G3_6_MANDATES
 
-**date:** 2026-03-22
+**date:** 2026-03-23
 
 **Spec:** WP005 AOS TRACK_FULL
 

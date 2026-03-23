@@ -99,7 +99,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 |-------|-------|
 | active_stage_id | S003|
 | active_stage_label | שלב 2 — Stage 2|
-| active_flow | S003-P013-WP001 — gate GATE_2 (last event: GATE_1 PASS)|
+| active_flow | S003-P013-WP001 — gate GATE_5 (last event: GATE_4 PASS)|
 | active_project_domain | TIKTRACK|
 | active_work_package_id | S003-P013-WP001|
 | in_progress_work_package_id | S003-P013-WP001|
@@ -107,17 +107,17 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | last_closed_program_id | S003-P003 (System Settings D39+D40+D41 — GATE_8 PASS 2026-03-21; DOCUMENTATION_CLOSED). Prior: S003-P011-WP002 (DOCUMENTATION_CLOSED 2026-03-21). |
 | last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
 | allowed_gate_range | GATE_0_TO_GATE_8 (normal execution lifecycle) |
-| current_gate | GATE_2|
+| current_gate | GATE_5|
 | track_mode | NORMAL|
 | suspended_track_state | N/A |
 | hold_reason | N/A |
 | agents_os_parallel_track | **S003-P012 PROGRAM COMPLETE 2026-03-21 — all 5 WPs GATE_5 FULL PASS.** Next AOS: **S003-P011-WP003 (RBAC)** — awaiting activation (Team 00 signal). |
 | active_program_id | S003-P013|
 | active_plan_id | S003|
-| phase_owner_team | Team 11|
-| last_gate_event | **GATE_1 PASS** — S003-P013-WP001 \| 2026-03-22. Parallel: S003-P012 program complete 2026-03-21; runtime row synced until next `pipeline_run.sh` advance. |
-| next_required_action | Execute GATE_2 — generate prompt via pipeline_run.sh (owner: Team 11).|
-| next_responsible_team | Team 11|
+| phase_owner_team | Team 170|
+| last_gate_event | **GATE_4 PASS** — S003-P013-WP001 \| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-22| 2026-03-22| 2026-03-22. Parallel: S003-P012 program complete 2026-03-21; runtime row synced until next `pipeline_run.sh` advance. |
+| next_required_action | Execute GATE_5 — generate prompt via pipeline_run.sh (owner: Team 170).|
+| next_responsible_team | Team 170|
 
 ---
 
@@ -129,7 +129,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | domain | active_program_id | active_work_package_id | phase_status | current_gate | gate_owner_team |
 |--------|-------------------|------------------------|--------------|--------------|-----------------|
 | AGENTS_OS | S003-P011 | PENDING (S003-P011-WP003 awaiting GATE_1) | **S003-P012 PROGRAM COMPLETE 2026-03-21.** Next: **S003-P011-WP003** (Role-Based Team Management) — activation pending Team 00 signal. | PENDING | Team 00 (activation decision) |
-| TIKTRACK | S003-P013 | S003-P013-WP001 | **ACTIVE 2026-03-22** — Canary monitored pipeline run (D33 display_name field). GATE_0 PASS 2026-03-22 (Team 190 validated). Monitor: Team 100. Prior closed: S003-P003-WP001 DOCUMENTATION_CLOSED 2026-03-21. | GATE_1 | Team 100 |
+| TIKTRACK | S003-P013 | S003-P013-WP001 | **ACTIVE 2026-03-22/23** — Canary monitored pipeline run (D33 display_name field). GATE_0+1+2 PASS 2026-03-22/23. Team 102 arch review PASS (phase 2.3). Monitor: Team 100. Prior closed: S003-P003-WP001 DOCUMENTATION_CLOSED 2026-03-21. | GATE_3 | Team 10 |
 
 ---
 
@@ -382,3 +382,7 @@ GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:
 **log_entry | TEAM_100 | PRE_RUN_INIT | STAGE_PARALLEL_TRACKS_TIKTRACK_UPDATED | S003-P013-WP001_ACTIVE | CANARY_MONITORED_RUN | DEV-PRE-001_RESOLVED | 2026-03-22**
 **log_entry | TEAM_61 | SSOT_WSM_SYNC | GATE_0 PASS | S003-P013-WP001 | 2026-03-22**
 **log_entry | TEAM_61 | SSOT_WSM_SYNC | GATE_1 PASS | S003-P013-WP001 | 2026-03-22**
+**log_entry | TEAM_61 | SSOT_WSM_SYNC | GATE_2 PASS | S003-P013-WP001 | 2026-03-22**
+**log_entry | TEAM_00 | EXPLICIT_WSM_PATCH | STAGE_PARALLEL_TRACKS_TIKTRACK_UPDATED | GATE_3_ACTIVE | DEV-GATE2-002_RESOLVED | authority: canary run operator | 2026-03-23**
+**log_entry | TEAM_61 | SSOT_WSM_SYNC | GATE_3 PASS | S003-P013-WP001 | 2026-03-23**
+**log_entry | TEAM_61 | SSOT_WSM_SYNC | GATE_4 PASS | S003-P013-WP001 | 2026-03-23**

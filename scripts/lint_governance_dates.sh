@@ -59,6 +59,12 @@ echo "DATE-LINT: today_utc=$TODAY_UTC wsm_ref_date=$WSM_REF_DATE"
 fail_count=0
 
 for file in "${changed_docs[@]}"; do
+  # Outgoing commits that remove paths from the tree (e.g. git rm --cached for local-only
+  # archives) still leave files on disk and/or list the path in the diff — skip date gate
+  # when the path is absent from the target tree at HEAD_REF.
+  if ! git cat-file -e "$HEAD_REF:$file" 2>/dev/null; then
+    continue
+  fi
   if [[ ! -f "$file" ]]; then
     # Deleted or moved file; no date checks needed.
     continue

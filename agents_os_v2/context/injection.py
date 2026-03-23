@@ -102,7 +102,12 @@ def build_context_reset(team_id: str) -> str:
     Kept for backward compatibility with conversations/*.py files.
     Returns a lean stamp rather than the old verbose CONTEXT_RESET line.
     """
-    return build_identity_stamp(team_id, gate_id="N/A")
+    team_num = team_id.split("_")[-1] if "_" in team_id else team_id.upper()
+    # Keep legacy marker text for older tests/consumers that still parse CONTEXT_RESET.
+    return (
+        f"CONTEXT_RESET | TEAM {team_num} | active stage anchor\n"
+        f"{build_identity_stamp(team_id, gate_id='N/A')}"
+    )
 
 
 def build_state_summary() -> str:
@@ -229,7 +234,10 @@ def build_full_agent_prompt(
     """
     parts = []
 
-    # Identity stamp — always present, prevents drift
+    # Legacy compatibility: keep the old marker while using the lean identity stamp.
+    parts.append(build_context_reset(team_id))
+    parts.append("")
+    parts.append("## Layer 1 — Identity")
     parts.append(build_identity_stamp(team_id, gate_id, work_package_id, stage_id))
     parts.append("")
 
@@ -242,7 +250,14 @@ def build_full_agent_prompt(
         parts.append(load_governance_rules())
         parts.append("")
 
+    parts.append("## Layer 2 — Governance")
+    parts.append("Drift Prevention: no-assumption-decisions | no-cross-domain-leakage")
+    if not fresh:
+        parts.append("Use canonical gate contracts and mandatory identity header.")
+    parts.append("")
+
     # State snapshot — always include (changes every session)
+    parts.append("## Layer 3 — Current State")
     parts.append("# Current Project State")
     parts.append(build_state_summary())
     parts.append("")
@@ -256,6 +271,9 @@ def build_full_agent_prompt(
             parts.append("")
 
     # Gate + WP context anchor
+    parts.append("## Layer 4 — Task")
+    parts.append(task_message)
+    parts.append("")
     parts.append(f"gate={gate_id} | wp={work_package_id} | no-assumption-decisions | no-cross-domain-leakage")
     parts.append("")
 

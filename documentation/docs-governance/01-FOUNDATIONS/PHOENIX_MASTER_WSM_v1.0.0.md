@@ -87,31 +87,37 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 **Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
 **Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
 
-**Gate-owner update evidence:** This block was updated **2026-03-16** by **Team 00** (Chief Architect — one-time state activation per Nimrod directive): WP003 `S002-P005-WP003` activated; GATE_0 PASS (Team 190 revalidation confirmed); advancing to GATE_1. Prior state: WP002 DOCUMENTATION_CLOSED (2026-03-15). STAGE_PARALLEL_TRACKS block added per architectural decision 2026-03-16.
+**Gate-owner update evidence:** **2026-03-21** by **Team 100** (S003-P012 PROGRAM COMPLETE — all 5 WPs GATE_5 FULL PASS): AOS Pipeline Operator Reliability fully closed. Pipeline readiness certificate: 205 tests. **Team 170** governance closure + registry sync per `TEAM_170_S003_P012_GOVERNANCE_CLOSURE_AND_ARCHIVE_MANDATE_v1.0.0.md`.
+
+> ⚠️ **AUTO-GENERATED BLOCK — Do NOT edit manually.**
+> This block is written exclusively by `pipeline_run.sh` (pass / fail / approve).
+> Manual edits will be overwritten on next pipeline advance.
+> To check SSOT consistency: `python -m agents_os_v2.tools.ssot_check`
+> To see drift: `python -m agents_os_v2.tools.ssot_check --domain tiktrack`
 
 | Field | Value |
 |-------|-------|
-| active_stage_id | S002 |
-| active_stage_label | שלב 2 — Stage 2 |
-| active_flow | **NONE — S002-P005 DOCUMENTATION_CLOSED (2026-03-17). Awaiting S003 activation decision.** |
-| active_project_domain | AGENTS_OS |
-| active_work_package_id | NONE |
-| in_progress_work_package_id | NONE |
-| last_closed_work_package_id | S002-P005-WP004 (combined WP002+WP003+WP004 GATE_8 PASS 2026-03-17; Team 100 FINAL_PASS; DOCUMENTATION_CLOSED) |
-| last_closed_program_id | S002-P005 (GATE_8 PASS 2026-03-17; DOCUMENTATION_CLOSED; WP002+WP003+WP004 all closed) |
+| active_stage_id | S003|
+| active_stage_label | שלב 2 — Stage 2|
+| active_flow | S003-P013-WP001 — gate COMPLETE (last event: GATE_5 PASS)|
+| active_project_domain | TIKTRACK|
+| active_work_package_id | N/A|
+| in_progress_work_package_id | N/A|
+| last_closed_work_package_id | S003-P013-WP001|
+| last_closed_program_id | S003-P003 (System Settings D39+D40+D41 — GATE_8 PASS 2026-03-21; DOCUMENTATION_CLOSED). Prior: S003-P011-WP002 (DOCUMENTATION_CLOSED 2026-03-21). |
 | last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
 | allowed_gate_range | GATE_0_TO_GATE_8 (normal execution lifecycle) |
-| current_gate | NONE — S003 activation pending |
-| track_mode | NORMAL |
-| suspended_track_state | FAST:IDLE |
-| hold_reason | NONE |
-| agents_os_parallel_track | S002-P005 FULLY CLOSED (2026-03-17): WP002 (Pipeline Governance) + WP003 (State Alignment) + WP004 (Code Integrity) — all GATE_8 PASS; Team 100 FINAL_PASS; DOCUMENTATION_CLOSED. ADR-031 sequence: next is S003-P007 (Stage B command bridge lite). S003-P001 (Data Model Validator) proposed as test flight target per Team 101 dry-run report; pending Team 00 S003 activation decision. AO-001 (domain selection UX) noted as non-blocking observation for S003+ roadmap. |
-| active_program_id | NONE |
-| active_plan_id | S002 |
-| phase_owner_team | Team 00 (S003 activation authority) |
-| last_gate_event | GATE_8_PASS; 2026-03-17; S002-P005 combined WP002+WP003+WP004; Team 100 FINAL_PASS (TEAM_100_S002_P005_FINAL_ARCHITECTURAL_VALIDATION_RESULT_v1.0.0); DOCUMENTATION_CLOSED. |
-| next_required_action | S003 stage activation decision by Team 00. Candidate first program: S003-P001 (Data Model Validator) — test flight target per Team 101 report. Run `./pipeline_run.sh --domain agents_os status` for current state. |
-| next_responsible_team | Team 00 (S003 activation decision) |
+| current_gate | COMPLETE|
+| track_mode | NORMAL|
+| suspended_track_state | N/A |
+| hold_reason | N/A |
+| agents_os_parallel_track | **S003-P012 PROGRAM COMPLETE 2026-03-21 — all 5 WPs GATE_5 FULL PASS.** Next AOS: **S003-P011-WP003 (RBAC)** — awaiting activation (Team 00 signal). |
+| active_program_id | S003-P013|
+| active_plan_id | S003|
+| phase_owner_team | Team 10|
+| last_gate_event | **GATE_5 PASS** — S003-P013-WP001 \| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-22| 2026-03-22| 2026-03-22. Parallel: S003-P012 program complete 2026-03-21; runtime row synced until next `pipeline_run.sh` advance. |
+| next_required_action | Lifecycle complete — await next WP activation (Team 100 / Team 00).|
+| next_responsible_team | Team 100|
 
 ---
 
@@ -122,8 +128,8 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 | domain | active_program_id | active_work_package_id | phase_status | current_gate | gate_owner_team |
 |--------|-------------------|------------------------|--------------|--------------|-----------------|
-| AGENTS_OS | — | — | IDLE — S002-P005 DOCUMENTATION_CLOSED; S003 activation pending | — | Team 00 |
-| TIKTRACK | — | — | IDLE | — | — |
+| AGENTS_OS | S003-P011 | PENDING (S003-P011-WP003 awaiting GATE_1) | **S003-P012 PROGRAM COMPLETE 2026-03-21.** Next: **S003-P011-WP003** (Role-Based Team Management) — activation pending Team 00 signal. | PENDING | Team 00 (activation decision) |
+| TIKTRACK | S003-P013 | S003-P013-WP001 | **COMPLETE 2026-03-23** — Canary monitored pipeline run (D33 display_name field). ALL GATES PASS: GATE_0–GATE_5 complete. No blocking findings. Monitor: Team 100. Pipeline state: COMPLETE. Prior closed: S003-P003-WP001 DOCUMENTATION_CLOSED 2026-03-21. | COMPLETE | Team 10 |
 
 ---
 
@@ -165,6 +171,8 @@ All Architect Inbox submissions (SPEC or EXECUTION) MUST use the canonical packa
 
 **log_entry | [Team 10] | WSM_V1_0_0_ACTIVE | GREEN | 2026-02-19**  
 **log_entry | TEAM_70 | WSM_CANONICAL_UPDATE | content_from_Team_170 | ARCH_APPROVAL_PACKAGE_FORMAT_EXECUTION_ORDER_LOCK | 2026-02-21**  
+**log_entry | TEAM_100 | GATE_OWNER_WSM_UPDATE | AGENTS_OS_PARALLEL_TRACK + STAGE_PARALLEL_TRACKS | S003-P012-WP002 GATE_8_FULL_PASS DOCUMENTATION_CLOSED + WP003_UNLOCKED | 2026-03-21**
+
 **log_entry | TEAM_10 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | upon GATE_4 closure 2026-02-21 | 2026-02-22**  
 **log_entry | TEAM_170 | WSM_CANONICAL_APPLY | at Gate Owner request | TEAM_100_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0 | 2026-02-22**  
 **log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | upon GATE_5 closure 2026-02-21 | 2026-02-22**  
@@ -323,3 +331,60 @@ GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:
 
 **log_entry | TEAM_170 | PHOENIX_MASTER_WSM | SSOT_CORRECTIONS_APPLIED_5_PER_ARCHITECT_DIRECTIVE_SSOT_CORRECTIONS_v1.0.0 | 2026-03-03**
 **log_entry | TEAM_170 | PHOENIX_MASTER_WSM | GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE | 2026-03-03**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_5 FAIL | S003-P009-WP001 | 2026-03-17**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_8 PASS | S003-P009-WP001 | 2026-03-18**
+**log_entry | TEAM_00 | EXPLICIT_WSM_PATCH | SUPERVISED_SPRINT | S003-P010-WP001 ACTIVE; direct Team 61 implementation; no pipeline ceremony | 2026-03-19**
+**log_entry | TEAM_00 | EXPLICIT_WSM_PATCH | SUPERVISED_SPRINT | S003-P010-WP001 DOCUMENTATION_CLOSED; Team 51 QA PASS 108/108; Team 00 architectural review PASS; pipeline repaired | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_0 PASS | S003-P003-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_1 PASS | S003-P003-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_2 PASS | S003-P003-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | WAITING_GATE2_APPROVAL PASS | S003-P003-WP001 | 2026-03-19**
+**log_entry | TEAM_00 | EXPLICIT_WSM_PATCH | WP_HOLD | S003-P003-WP001 placed on HOLD at G3_PLAN; work plan stored; reason: gate sequence canonicalization required; reference: Team 190 gate diagram 2026-03-19 | 2026-03-19**
+**log_entry | TEAM_00 | EXPLICIT_WSM_PATCH | PROCESS_MODEL_v2.0 | GATE_SEQUENCE_CANON_v1.0.0 + TEAM_ROSTER_v2.0.0 LOCKED; S003-P011 scope upgraded to Process Architecture v2.0; directives issued; FCP + dual-validation + AOS_COMPACT + engine-config + Team 00 identity correction | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_0 FAIL | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_0 PASS | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_1 FAIL | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_1 PASS | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_2 PASS | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | WAITING_GATE2_APPROVAL PASS | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | G3_PLAN PASS | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | G3_5 PASS | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | G3_6_MANDATES PASS | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | G3_REMEDIATION PASS | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_3 FAIL | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_3 PASS | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_4 FAIL | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_4 PASS | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_5 PASS | S003-P011-WP001 | 2026-03-19**
+**log_entry | TEAM_100 | EXPLICIT_WSM_PATCH | S003_P011_WP001_DOCUMENTATION_CLOSED_FINAL | TEAM_170_GATE5_PHASE5.1_CLOSURE + TEAM_90_PHASE5.2_VALIDATION_PASS | 2026-03-20 | authority: Nimrod instruction**
+**log_entry | TEAM_100 | EXPLICIT_WSM_PATCH | S003_P011_WP002_REGISTERED_ACTIVE | PIPELINE_STABILIZATION | LOD200_APPROVED | active_work_package_id=S003-P011-WP002 | GATE_2_PHASE_2.1_NEXT_TEAM_101 | 2026-03-20**
+**log_entry | TEAM_100 | EXPLICIT_WSM_PATCH | STAGE_PARALLEL_TRACKS_UPDATED | AOS=WP002_GATE2 | TT=GATE3_HOLD_MIGRATION_PENDING | CANONICAL_NAMING_ADR_ADDED_TO_WP002_SCOPE | 2026-03-20**
+**log_entry | TEAM_100 | GATE_2_PASS | S003_P011_WP002 | ALL_5_PHASES_PASS (2.1/2.1v/2.2/2.2v/2.3) | PAD-01_COVERED PAD-02_DECIDED | gates_completed=GATE_2 | current_gate=GATE_3 current_phase=3.1 | GATE_3_TEAM_11_MANDATE_AUTHORIZED | 2026-03-20**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_3 FAIL | S003-P011-WP002 | 2026-03-20**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_3 PASS | S003-P011-WP002 | 2026-03-20**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_3 FAIL | S003-P011-WP099 | 2026-03-20**
+**log_entry | TEAM_00 | NIMROD | GATE_4_PASS | S003_P011_WP002 | PHASE_4.1_TEAM90_PASS + PHASE_4.2_TEAM100_PASS + PHASE_4.3_NIMROD_SIGNOFF | GATE_5_AUTHORIZED | 2026-03-21**
+**log_entry | TEAM_100 | WSM_UPDATE | GATE_5_PHASE_5.1_ACTIVE | TEAM_170_NEXT | pipeline_state=GATE_5/5.1 | gates_completed=GATE_2+GATE_3+GATE_4 | 2026-03-21**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_3 FAIL | S003-P011-WP099 | 2026-03-21**
+**log_entry | TEAM_90 | GATE_5_PHASE_5.2_PASS | S003_P011_WP002 | CERT_21/21 DRY_RUN_15/15 REGRESSION_155 | KB-32/34/38_CLOSED | 2026-03-21**
+**log_entry | TEAM_100 | WP002_DOCUMENTATION_CLOSED | S003_P011_WP002 | ALL_5_GATES_PASS | AOS_IDLE | KB_36_37_39_CARRY_WP003 | 2026-03-21**
+**log_entry | TEAM_100 | TT_TEST_FLIGHT_AUTHORIZED | S003_P003_WP001 | HOLD_RELEASED | pipeline_state_tiktrack.json_CREATED | KB33_AUTO_MIGRATION_LIVE | Team_10_NEXT | 2026-03-21**
+**log_entry | TEAM_100 | STAGE_PARALLEL_TRACKS_UPDATED | AOS=DOCUMENTATION_CLOSED | TT=TEST_FLIGHT_AUTHORIZED | TRACK_MODE=NORMAL | 2026-03-21**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_3 PASS | S003-P003-WP001 | 2026-03-21**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_4 FAIL | S003-P003-WP001 | 2026-03-21**
+**log_entry | TEAM_61 | EXPLICIT_WSM_PATCH | GATE_4 PASS | S003-P003-WP001 | 2026-03-21**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | CURRENT_OPERATIONAL_STATE | GATE_8 PASS S003-P003-WP001; revalidation PASS; GATE_8_LOCK CLOSED; DOCUMENTATION_CLOSED; NO_ACTIVE_WORK_PACKAGE | 2026-03-21**
+**log_entry | TEAM_90 | GATE_OWNER_WSM_UPDATE | STAGE_PARALLEL_TRACKS | AGENTS_OS=DOCUMENTATION_CLOSED; TIKTRACK=DOCUMENTATION_CLOSED; awaiting next activation decision | 2026-03-21**
+**log_entry | TEAM_61 | SSOT_WSM_SYNC | GATE_3 FAIL | S003-P011-WP099 | 2026-03-21**
+**log_entry | TEAM_61 | SSOT_WSM_SYNC | COMPLETE PASS | S003-P012-WP002 | 2026-03-21**
+**log_entry | TEAM_170 | WSM_GOVERNANCE_UPDATE | S003_P012_PROGRAM_COMPLETE | AOS_PARALLEL_TRACK_UPDATED | STAGE_PARALLEL_TRACKS_AOS_UPDATED | 2026-03-21**
+**log_entry | TEAM_61 | SSOT_WSM_SYNC | GATE_3 FAIL | S003-P011-WP099 | 2026-03-22**
+**log_entry | TEAM_100 | PRE_RUN_INIT | STAGE_PARALLEL_TRACKS_TIKTRACK_UPDATED | S003-P013-WP001_ACTIVE | CANARY_MONITORED_RUN | DEV-PRE-001_RESOLVED | 2026-03-22**
+**log_entry | TEAM_61 | SSOT_WSM_SYNC | GATE_0 PASS | S003-P013-WP001 | 2026-03-22**
+**log_entry | TEAM_61 | SSOT_WSM_SYNC | GATE_1 PASS | S003-P013-WP001 | 2026-03-22**
+**log_entry | TEAM_61 | SSOT_WSM_SYNC | GATE_2 PASS | S003-P013-WP001 | 2026-03-22**
+**log_entry | TEAM_00 | EXPLICIT_WSM_PATCH | STAGE_PARALLEL_TRACKS_TIKTRACK_UPDATED | GATE_3_ACTIVE | DEV-GATE2-002_RESOLVED | authority: canary run operator | 2026-03-23**
+**log_entry | TEAM_61 | SSOT_WSM_SYNC | GATE_3 PASS | S003-P013-WP001 | 2026-03-23**
+**log_entry | TEAM_61 | SSOT_WSM_SYNC | GATE_4 PASS | S003-P013-WP001 | 2026-03-23**
+**log_entry | TEAM_70 | STAGE_PARALLEL_TRACKS_SYNC | S003-P013-WP001 | TIKTRACK_row_current_gate_GATE_3_to_GATE_5 | BF-G5-DOC-001_REMEDIATED | aligns_WITH_CURRENT_OPERATIONAL_STATE | 2026-03-23**
+**log_entry | TEAM_61 | SSOT_WSM_SYNC | GATE_5 PASS | S003-P013-WP001 | 2026-03-23**

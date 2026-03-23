@@ -151,7 +151,7 @@ _auto_store_gate1_artifact() {
   # Called before prompt generation AND before pass validation.
   local result
   result=$(python3 -c "
-import sys, os, json, glob
+import sys, os, json, glob, time
 sys.path.insert(0, '.')
 domain = os.environ.get('PIPELINE_DOMAIN') or None
 if domain == 'agents_os':
@@ -169,13 +169,54 @@ if state.get('current_gate') != 'GATE_1':
 wp = state.get('work_package_id', '')
 if not wp:
     sys.exit(0)
+
+wp_activated_at = state.get('last_updated', '')
+try:
+    from datetime import datetime, timezone
+    activation_dt = datetime.fromisoformat(wp_activated_at.replace('Z', '+00:00'))
+    activation_ts = activation_dt.timestamp()
+except Exception:
+    activation_ts = None
+
+now = time.time()
+cutoff_48h = now - (48 * 3600)
+
 wp_fs = wp.replace('-', '_')
-pattern = f'_COMMUNICATION/team_170/TEAM_170_{wp_fs}_LLD400_v*.md'
-files = sorted(glob.glob(pattern))
-if not files:
+pattern1 = f'_COMMUNICATION/team_170/TEAM_170_{wp_fs}_LLD400_v*.md'
+candidates = glob.glob(pattern1)
+
+tier2_used = False
+if not candidates:
+    wp_fragment = wp_fs[-8:] if len(wp_fs) >= 8 else wp_fs
+    pattern2 = f'_COMMUNICATION/**/TEAM_170_*{wp_fragment}*LLD400*.md'
+    candidates = glob.glob(pattern2, recursive=True)
+    if candidates:
+        tier2_used = True
+
+def is_recent(path):
+    try:
+        mtime = os.path.getmtime(path)
+        if mtime < cutoff_48h: return False
+        if activation_ts and mtime < activation_ts: return False
+        return True
+    except Exception:
+        return False
+
+recent = [f for f in candidates if is_recent(f)]
+if not recent and candidates:
+    recent = candidates
+    print(f'⚠️  AC-10: no recent LLD400 found — using oldest available match (mtime unverified)', file=sys.stderr)
+
+if not recent:
     print('NO_FILE')
     sys.exit(0)
-latest = files[-1]
+
+recent.sort(key=lambda f: os.path.getmtime(f), reverse=True)
+latest = recent[0]
+
+if tier2_used:
+    print(f'TIER2_MATCH:{latest}', file=sys.stderr)
+
 try:
     content = open(latest).read()
 except Exception:
@@ -199,8 +240,10 @@ print(f'STORE:{latest}')
     echo ""
   elif [[ "$result" == NO_FILE ]]; then
     echo ""
-    echo "  ⚠️  GATE_1: No LLD400 file found in _COMMUNICATION/team_170/ for this WP."
+    echo "  ⚠️  GATE_1: No LLD400 file found for this WP (checked team_170/ + full _COMMUNICATION/ tree)."
     echo "  Team 170 must produce the LLD400 before this gate can proceed."
+    echo "  If file exists at a non-standard path, store manually:"
+    echo "    ./pipeline_run.sh ${DOMAIN_FLAG_STR:-}store GATE_1 <path/to/LLD400.md>"
     echo ""
   fi
   # ALREADY_STORED: no output — silent pass
@@ -213,7 +256,7 @@ _auto_store_g3plan_artifact() {
   # Called before phase2 prompt generation at G3_PLAN.
   local result
   result=$(python3 -c "
-import sys, os, json, glob
+import sys, os, json, glob, time
 sys.path.insert(0, '.')
 domain = os.environ.get('PIPELINE_DOMAIN') or None
 if domain == 'agents_os':
@@ -231,13 +274,54 @@ if state.get('current_gate') != 'G3_PLAN':
 wp = state.get('work_package_id', '')
 if not wp:
     sys.exit(0)
+
+wp_activated_at = state.get('last_updated', '')
+try:
+    from datetime import datetime, timezone
+    activation_dt = datetime.fromisoformat(wp_activated_at.replace('Z', '+00:00'))
+    activation_ts = activation_dt.timestamp()
+except Exception:
+    activation_ts = None
+
+now = time.time()
+cutoff_48h = now - (48 * 3600)
+
 wp_fs = wp.replace('-', '_')
-pattern = f'_COMMUNICATION/team_10/TEAM_10_{wp_fs}_G3_PLAN_WORK_PLAN_v*.md'
-files = sorted(glob.glob(pattern))
-if not files:
+pattern1 = f'_COMMUNICATION/team_10/TEAM_10_{wp_fs}_G3_PLAN_WORK_PLAN_v*.md'
+candidates = glob.glob(pattern1)
+
+tier2_used = False
+if not candidates:
+    wp_fragment = wp_fs[-8:] if len(wp_fs) >= 8 else wp_fs
+    pattern2 = f'_COMMUNICATION/**/TEAM_10_*{wp_fragment}*G3_PLAN*WORK_PLAN*.md'
+    candidates = glob.glob(pattern2, recursive=True)
+    if candidates:
+        tier2_used = True
+
+def is_recent(path):
+    try:
+        mtime = os.path.getmtime(path)
+        if mtime < cutoff_48h: return False
+        if activation_ts and mtime < activation_ts: return False
+        return True
+    except Exception:
+        return False
+
+recent = [f for f in candidates if is_recent(f)]
+if not recent and candidates:
+    recent = candidates
+    print(f'⚠️  AC-11: no recent work plan found — using oldest available match (mtime unverified)', file=sys.stderr)
+
+if not recent:
     print('NO_FILE')
     sys.exit(0)
-latest = files[-1]
+
+recent.sort(key=lambda f: os.path.getmtime(f), reverse=True)
+latest = recent[0]
+
+if tier2_used:
+    print(f'TIER2_MATCH:{latest}', file=sys.stderr)
+
 try:
     content = open(latest).read()
 except Exception:
@@ -261,8 +345,10 @@ print(f'STORE:{latest}')
     echo ""
   elif [[ "$result" == NO_FILE ]]; then
     echo ""
-    echo "  ⚠️  G3_PLAN: No work plan found in _COMMUNICATION/team_10/ for WP."
+    echo "  ⚠️  G3_PLAN: No work plan found for this WP (checked team_10/ + full _COMMUNICATION/ tree)."
     echo "  Team 10 must save TEAM_10_*_G3_PLAN_WORK_PLAN_v*.md before phase2 can proceed."
+    echo "  If file exists at a non-standard path, store manually:"
+    echo "    ./pipeline_run.sh ${DOMAIN_FLAG_STR:-}store G3_PLAN <path/to/work_plan.md>"
     echo ""
   fi
   # ALREADY_STORED: no output — silent pass
@@ -310,7 +396,7 @@ if not wsm_stage or pipe_stage == wsm_stage:
     sys.exit(0)  # match or unknown WSM stage → OK
 
 # Mismatch detected — check for authorized exception
-AUTHORIZED = ['S001']  # mirrors pipeline-config.js AUTHORIZED_STAGE_EXCEPTIONS
+AUTHORIZED = ['S001', 'S003']  # mirrors pipeline-config.js AUTHORIZED_STAGE_EXCEPTIONS
 if pipe_stage in AUTHORIZED:
     print(f'[pipeline_run] ℹ️  AUTHORIZED EXCEPTION: pipeline stage {pipe_stage} ≠ WSM {wsm_stage} — exception registered, continuing')
     sys.exit(0)
@@ -353,6 +439,28 @@ case "${1:-next}" in
     _validate_stage_alignment || exit 1
     GATE=$(_get_gate)
     _auto_store_gate1_artifact   # AC-10: ensure latest LLD400 is stored before validation guard runs
+
+    # ── S003-P009-WP001 Item 3: pre-GATE_4 uncommitted-change block ───────
+    # If we are about to leave CURSOR_IMPLEMENTATION (next gate is GATE_4),
+    # require tracked changes to be committed first. Untracked files are allowed.
+    if [[ "$GATE" == "CURSOR_IMPLEMENTATION" ]]; then
+      if ! git diff --quiet || ! git diff --cached --quiet; then
+        echo ""
+        echo "════════════════════════════════════════════════════════════════════"
+        echo "  ⛔ UNCOMMITTED CHANGES — pre-GATE_4 block"
+        echo "  Gate CURSOR_IMPLEMENTATION cannot advance to GATE_4 while"
+        echo "  tracked changes are still staged/unstaged."
+        echo ""
+        echo "  Required:"
+        echo "    1) Commit implementation changes"
+        echo "    2) Re-run: ./pipeline_run.sh ${DOMAIN_FLAG_STR:-}pass"
+        echo ""
+        echo "  Note: untracked files do not block this check."
+        echo "════════════════════════════════════════════════════════════════════"
+        echo ""
+        exit 1
+      fi
+    fi
 
     # ── Artifact validation before advancing ─────────────────────────────
     # Server-side check: required deliverables must exist before advancing.
@@ -522,12 +630,9 @@ except Exception as e:
       echo "  ✅ AUTO-ROUTED (route_recommendation found in verdict file)"
       echo "  $GATE → $NEXT_GATE"
       echo "════════════════════════════════════════════════════════════"
-      if [[ "$NEXT_GATE" == "G3_PLAN" ]]; then
-        echo "[pipeline_run] → Now at G3_PLAN. Generate revision prompt:"
-        echo "    ./pipeline_run.sh revise \"$REASON\""
-      else
-        _generate_and_show "$NEXT_GATE"
-      fi
+      # Auto-generate next prompt. pipeline.py auto-injects blocking findings
+      # for remediation cycles (CURSOR_IMPLEMENTATION / G3_PLAN).
+      _generate_and_show "$NEXT_GATE"
     else
       # Gate stayed at same position — check if it's a self-loop gate (e.g. GATE_8)
       # Self-loop gates always route back to themselves; default_fail_route handles it.
@@ -615,42 +720,43 @@ print('yes' if GATE_CONFIG.get('${GATE}', {}).get('default_fail_route') else 'no
     $CLI --route "$TYPE" "$GATE" --reason "$NOTES"
     echo ""
     NEXT_GATE=$(_get_gate)
-    if [[ "$NEXT_GATE" == "G3_PLAN" ]]; then
-      echo "[pipeline_run] → Now at G3_PLAN. To generate revision prompt:"
-      if [ -n "$NOTES" ]; then
-        echo "    ./pipeline_run.sh revise \"$NOTES\""
-      else
-        echo "    ./pipeline_run.sh revise \"BLOCKER-1: ...\""
-      fi
+    if [ -n "$NOTES" ]; then
+      # Explicit notes provided by operator: pass them directly into prompt generation.
+      echo "[pipeline_run] ${DOMAIN_LABEL}Generating remediation prompt for: $NEXT_GATE"
+      $CLI --generate-prompt "$NEXT_GATE" --revision-notes "$NOTES" 2>&1 | grep -v "^━"
+      _show_prompt "$NEXT_GATE"
     else
+      # No notes: rely on pipeline auto-extraction from blocking reports/verdicts.
       _generate_and_show "$NEXT_GATE"
     fi
     ;;
 
   revise)
-    # Revision mode after G3_5 FAIL.
-    # Usage: ./pipeline_run.sh revise "BLOCKER-1: ... BLOCKER-2: ..."
-    # If currently at G3_5, records FAIL + routes full (BF = structural) → advances to G3_PLAN.
+    # Universal Revision mode (handles G3_PLAN rewrites and CURSOR_IMPLEMENTATION fixes).
+    # Usage: ./pipeline_run.sh revise "BLOCKER-1: ..." [optional: work_plan_file_path]
     NOTES="${2:?Usage: ./pipeline_run.sh revise \"blocker notes\" [optional: work_plan_file_path]}"
-    # Step 0: if currently at G3_5, advance it to FAIL + route full → G3_PLAN
     CURRENT_GATE=$(_get_gate)
+
+    # Step 0: if currently at G3_5, advance it to FAIL + route full → G3_PLAN
     if [[ "$CURRENT_GATE" == "G3_5" ]]; then
       echo "[pipeline_run] ${DOMAIN_LABEL}Recording G3_5 FAIL (revision triggered)..."
       FAIL_REASON="${NOTES:0:200}"
       $CLI --advance G3_5 FAIL --reason "$FAIL_REASON" 2>&1 | grep -v "^━"
-      # BF (Blocking Findings) = structural issues → always route full for G3_5
       echo "[pipeline_run] ${DOMAIN_LABEL}Routing G3_5 → G3_PLAN (full — structural work plan blockers)..."
       $CLI --route full G3_5 --reason "$FAIL_REASON" 2>&1 | grep -v "^━"
-      echo "[pipeline_run] G3_5 routed → gate now: $(_get_gate)"
+      CURRENT_GATE="G3_PLAN"
+      echo "[pipeline_run] G3_5 routed → gate now: $CURRENT_GATE"
     fi
+
     # Step 1: store current work plan artifact (if file path given as $3)
-    if [ -n "$3" ]; then
+    if [[ "$CURRENT_GATE" == "G3_PLAN" && -n "$3" ]]; then
       echo "[pipeline_run] Storing work plan artifact: $3"
       $CLI --store-artifact G3_PLAN "$3"
     fi
-    echo "[pipeline_run] ${DOMAIN_LABEL}Generating G3_PLAN REVISION prompt..."
-    $CLI --generate-prompt G3_PLAN --revision-notes "$NOTES" 2>&1 | grep -v "^━"
-    _show_prompt "G3_PLAN"
+    
+    echo "[pipeline_run] ${DOMAIN_LABEL}Generating ${CURRENT_GATE} REVISION prompt..."
+    $CLI --generate-prompt "$CURRENT_GATE" --revision-notes "$NOTES" 2>&1 | grep -v "^━"
+    _show_prompt "$CURRENT_GATE"
     ;;
 
   store)

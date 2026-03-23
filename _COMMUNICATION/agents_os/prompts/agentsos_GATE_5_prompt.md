@@ -1,32 +1,14 @@
-**ACTIVE: TEAM_90 (Dev-Validator)**  gate=GATE_5 | wp=S001-P002-WP001 | stage=S001 | 2026-03-14
-date: 2026-03-14
-historical_record: true
+**ACTIVE: TEAM_90 (Dev-Validator)**  gate=GATE_5 | wp=S003-P011-WP001 | stage=S003 | 2026-03-19
 
 ---
 
-╔══════════════════════════════════════════════════════════════╗
-║  ⚠  RE-VALIDATION — GATE_5 CYCLE #9                         ║
-║                                                              ║
-║  GATE_5 was attempted 8× before this run.                  ║
-║  Teams addressed the previous blockers.                      ║
-║                                                              ║
-║  YOU MUST PERFORM A COMPLETELY FRESH VALIDATION:             ║
-║  • Read the CURRENT state of code and artifacts NOW          ║
-║  • Do NOT copy or repeat findings from previous cycles       ║
-║  • Do NOT return a template or placeholder document          ║
-║  • If prior issues are fixed → do NOT re-raise them          ║
-╚══════════════════════════════════════════════════════════════╝
+# GATE_5 — Dev Validation  [FIRST RUN]
 
-Previous verdict file (read for context, do NOT copy its blockers):
-  `_COMMUNICATION/team_90/TEAM_90_S001_P002_WP001_GATE_5_VALIDATION_v1.0.0.md`
-
-# GATE_5 — Dev Validation  [RE-RUN #9 of 9]
-
-**WP under validation:** `S001-P002-WP001`
+**WP under validation:** `S003-P011-WP001`
 
 ## Your Task
 
-Perform a **complete, fresh validation** of the implementation for `S001-P002-WP001`.
+Perform a **complete, fresh validation** of the implementation for `S003-P011-WP001`.
 Read the actual files listed below. Report only findings you observe in the CURRENT run.
 
 ## Validation Checklist
@@ -43,12 +25,12 @@ Include these in your validation findings — mark PASS if spec declares no sche
 
 - **DM-E-01**: DM-E-01: BLOCK — alembic versions directory not found
 
-## Artifacts to inspect for `S001-P002-WP001`
+## Artifacts to inspect for `S003-P011-WP001`
 
 | Artifact | Path |
 |---|---|
-| Work Plan (latest version) | `_COMMUNICATION/team_10/TEAM_10_S001_P002_WP001_G3_PLAN_WORK_PLAN_v*.md` |
-| GATE_4 QA report | `_COMMUNICATION/team_50/TEAM_50_S001_P002_WP001_QA_REPORT_v*.md` |
+| Work Plan (latest version) | `_COMMUNICATION/team_11/TEAM_11_S003_P011_WP001_G3_PLAN_WORK_PLAN_v*.md` |
+| GATE_4 QA report | `_COMMUNICATION/team_50/TEAM_50_S003_P011_WP001_QA_REPORT_v*.md` |
 | Team 20 outputs | `_COMMUNICATION/team_20/` |
 | Team 30 outputs | `_COMMUNICATION/team_30/` |
 
@@ -56,7 +38,45 @@ You MUST check these files exist and contain valid content before reporting find
 
 ## Spec
 
-S001-P002 WP001: Alerts Summary Widget on D15.I home dashboard. Read-only frontend component. Triggered-unread count badge + list of N=5 most recent, fully hidden when 0. Uses existing GET /api/v1/alerts/ endpoint. Per-alert: ticker symbol · condition label · triggered_at relative time. Click item → D34. Click badge → D34 filtered unread. collapsible-container Iron Rule. maskedLog mandatory. No new backend, no schema changes.
+# LLD400 v1.0.1 — Delta Note
+
+**in_response_to:** TEAM_190_TO_TEAM_170_S003_P011_WP001_G1_CORRECTION_PROMPT_v1.0.0  
+**date:** 2026-03-19  
+**from:** Team 170  
+
+---
+
+## Sections Changed
+
+### BF-01 — UI contract (R-01)
+
+| Section | Change |
+|---------|--------|
+| §4 | Added §4.0 **Consolidated Component Tree and State Shape** |
+| §4.0 | Full hierarchy: Dashboard → GateStatusPanel, FCPPanel, TeamAssignmentPanel, EngineEditor, Lod200AuthorOverride |
+| §4.0 | Complete **state shape**: current_gate, current_phase, process_variant, finding_type, fcp_level, return_target_team, lod200_author_team, project_domain |
+| §4.0 | **Engine-config payload shape** for EngineEditor |
+| §4.1–§4.5 | Each subsection references §4.0 subtree; retains per-panel state shape and DOM anchors |
+
+### BF-02 — team_engine_config.json (R-02)
+
+| Section | Change |
+|---------|--------|
+| §2.3 | Replaced flat `team_engine` map with **per-team object schema** |
+| §2.3 | Each `teams.{team_id}` = `{ engine: string, domain: string }` |
+| §2.3 | Team 11 explicitly: `teams.team_11 = { "engine": "Cursor Composer", "domain": "AOS" }` |
+| §3.2 | Updated contract text to match per-team object schema |
+| §5.4 MCP-10 | Assertion: `teams.team_11.domain === "AOS"` AND `teams.team_11.engine === "Cursor Composer"` |
+| §6 AC-10 | Wording: Team 11 has AOS domain (`teams.team_11.domain === "AOS"`) and Cursor Composer default (`teams.team_11.engine === "Cursor Composer"`) |
+
+## AC Numbering
+
+No change. AC numbering unchanged (AC-01 through AC-26).
+
+---
+
+**log_entry | TEAM_170 | S003_P011_WP001_LLD400_DELTA | v1.0.1 | BF-01_BF-02_CLOSED | 2026-03-19**
+
 
 ## MANDATORY: route_recommendation
 

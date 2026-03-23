@@ -240,6 +240,8 @@ def _sync_wp_registry(wp_text: str, wsm: Dict[str, str], event_date: str) -> Tup
     if _is_no_active(active_wp):
         messages.append("WP registry: WSM has NO_ACTIVE_WORK_PACKAGE")
     else:
+        # Derive program_id from work_package_id (S003-P011-WP001 -> S003-P011) per hierarchy
+        wp_program_id = active_wp.rsplit("-WP", 1)[0] if "-WP" in active_wp else active_program_id
         target_row = None
         for row in rows:
             if row.get("work_package_id", "").strip() == active_wp:
@@ -248,7 +250,7 @@ def _sync_wp_registry(wp_text: str, wsm: Dict[str, str], event_date: str) -> Tup
 
         if target_row is None:
             target_row = {
-                "program_id": active_program_id or "N/A",
+                "program_id": wp_program_id or active_program_id or "N/A",
                 "work_package_id": active_wp,
                 "status": "IN_PROGRESS",
                 "current_gate": current_gate or "GATE_3",
@@ -258,14 +260,18 @@ def _sync_wp_registry(wp_text: str, wsm: Dict[str, str], event_date: str) -> Tup
             rows.append(target_row)
             messages.append(f"WP registry: created missing row for active WP {active_wp}")
 
-        target_row["program_id"] = target_row.get("program_id", "").strip() or active_program_id
+        target_row["program_id"] = wp_program_id
         target_row["status"] = _status_for_active_wp(current_gate, active_flow, last_gate_event)
         target_row["current_gate"] = current_gate or target_row.get("current_gate", "—")
         target_row["is_active"] = "true"
         target_row["active_marker_reason"] = active_flow or "Active per WSM"
         messages.append(f"WP registry: marked {active_wp} as active=true")
 
-    if last_closed_wp and not _is_no_active(last_closed_wp):
+    if (
+        last_closed_wp
+        and not _is_no_active(last_closed_wp)
+        and last_closed_wp != active_wp
+    ):
         current_gate_upper = (current_gate or "").upper()
         active_flow_upper = (active_flow or "").upper()
         last_gate_event_upper = (last_gate_event or "").upper()

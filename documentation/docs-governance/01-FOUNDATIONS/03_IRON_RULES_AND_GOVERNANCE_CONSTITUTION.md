@@ -7,6 +7,8 @@
 **classification:** PROMOTE_TO_CANONICAL_GOVERNANCE
 ---
 
+**date:** 2026-03-21
+
 # Governance Constitution
 **project_domain:** TIKTRACK
 
@@ -27,6 +29,6 @@
 190 = Constitutional Validator  
 100 = Spec Engineering  
 10 = Gateway & Orchestration  
-00 = Chief Architect (Strategic Decisions)
+00 = System Designer (Strategic Decisions)
 
 No overlap permitted.

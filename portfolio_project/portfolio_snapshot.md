@@ -1,23 +1,23 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-17T17:01:55.901888+00:00`
+- Generated (UTC): `2026-03-23T17:40:47.439893+00:00`
 - Validation: `PASS`
 - Errors: `0`
-- Warnings: `1`
+- Warnings: `0`
 
 ## Runtime (from WSM)
 
-- active_stage_id: `S002`
-- active_program_id: `NONE`
-- active_work_package_id: `NONE`
-- current_gate: `NONE — S003 activation pending`
-- next_required_action: `S003 stage activation decision by Team 00. Candidate first program: S003-P001 (Data Model Validator) — test flight target per Team 101 report. Run `./pipeline_run.sh --domain agents_os status` for current state.`
+- active_stage_id: `S003`
+- active_program_id: `S003-P013`
+- active_work_package_id: `N/A`
+- current_gate: `COMPLETE`
+- next_required_action: `Lifecycle complete — await next WP activation (Team 100 / Team 00).`
 
 ## Portfolio Counts
 
 - stages: `6`
-- programs: `32`
-- work_packages: `11`
+- programs: `37`
+- work_packages: `19`
 
 ## Roadmap (hierarchical)
 
@@ -61,7 +61,8 @@
     ├── **Program** `S003-P002` — Test Template Generator | COMPLETE | domain: **AGENTS_OS**
         └── **WP** `S003-P002-WP001` | CLOSED | gate: FAST_4 (PASS) | domain: **AGENTS_OS**
 
-    ├── **Program** `S003-P003` — System Settings (D39+D40+D41) | PLANNED | domain: **TIKTRACK**
+    ├── **Program** `S003-P003` — System Settings (D39+D40+D41) | COMPLETE | domain: **TIKTRACK**
+        └── **WP** `S003-P003-WP001` | CLOSED | gate: GATE_8 (PASS) | domain: **TIKTRACK**
 
     ├── **Program** `S003-P004` — User Tickers (D33) | PLANNED | domain: **TIKTRACK**
 
@@ -69,9 +70,26 @@
 
     ├── **Program** `S003-P006` — Admin Review S003 | PLANNED | domain: **TIKTRACK**
 
-    ├── **Program** `S003-P007` — Agents_OS Command Bridge Lite (ADR-031 Stage B) | PLANNED | domain: **AGENTS_OS**
+    ├── **Program** `S003-P007` — Agents_OS Command Bridge Lite (ADR-031 Stage B) | MERGED | domain: **AGENTS_OS**
 
-    └── **Program** `S003-P008` — Agents_OS Pipeline Governance Hardening | PLANNED | domain: **AGENTS_OS**
+    ├── **Program** `S003-P008` — Agents_OS Pipeline Governance Hardening | SUPERSEDED | domain: **AGENTS_OS**
+
+    ├── **Program** `S003-P009` — Agents_OS Pipeline Resilience Package | COMPLETE | domain: **AGENTS_OS**
+        └── **WP** `S003-P009-WP001` | CLOSED | gate: GATE_8 (PASS) | domain: **AGENTS_OS**
+
+    ├── **Program** `S003-P010` — Agents_OS Pipeline Core Reliability | COMPLETE | domain: **AGENTS_OS**
+        └── **WP** `S003-P010-WP001` | CLOSED | gate: SPRINT_ACTIVE | domain: **AGENTS_OS**
+
+    ├── **Program** `S003-P011` — Agents_OS — Process Model v2.0 + Pipeline Stabilization | COMPLETE | domain: **AGENTS_OS**
+        ├── **WP** `S003-P011-WP001` | CLOSED | gate: COMPLETE (5-gate + GATE_8 doc closure) | domain: **AGENTS_OS**
+        ├── **WP** `S003-P011-WP002` | IN_PROGRESS | gate: GATE_2 | domain: **AGENTS_OS**
+        └── **WP** `S003-P011-WP099` | IN_PROGRESS | gate: GATE_3 | domain: **AGENTS_OS**
+
+    ├── **Program** `S003-P012` — AOS Pipeline Operator Reliability | COMPLETE | domain: **AGENTS_OS**
+        └── **WP** `S003-P012-WP001` | IN_PROGRESS | gate: GATE_8 (WP001 governance closure in progress) | domain: **AGENTS_OS**
+
+    └── **Program** `S003-P013` — TikTrack Pipeline Canary Run (D33 display_name) | COMPLETE | domain: **TIKTRACK**
+        └── **WP** `S003-P013-WP001` | CLOSED | gate: GATE_5 | domain: **TIKTRACK**
 
 
 ### S004 — שלב 4 — Financial Execution | PLANNED [SHARED]
@@ -115,8 +133,3 @@
     ├── **Program** `S006-P003` — Level-1 Dashboards | PLANNED | domain: **TIKTRACK**
 
     └── **Program** `S006-P004` — Admin Review S006 FINAL | PLANNED | domain: **TIKTRACK**
-
-
-## Warnings
-
-- Active program NONE not found in program registry

@@ -1,6 +1,8 @@
-# Mandates — S002-P005-WP003  ·  GATE_1
+# Mandates — S003-P011-WP001  ·  GATE_1
 
-**Spec:** AOS State Alignment & Governance Integrity
+**Spec:** Process Architecture v2.0 — 5-gate canonical model (GATE_1..5), FCP 3-level classification with auto-routing, TRACK_FULL/TRACK_FOCUSED/TRACK_FAST process variants, team_engine_config.json externalization, Team 00 identity correction, Team 11/102/191 registration, lod200_author_team LOD200 Author Rule, state schema migration from legacy gate sequence (GATE_0→GATE_8). LOD200 v1.3 APPROVED 2026-03-19.
+
+**Canonical date:** Use `date -u +%F` for today; replace {{date}} in identity headers.
 
 ════════════════════════════════════════════════════════════
   EXECUTION ORDER
@@ -21,17 +23,17 @@
 
 **Environment:** Gemini (Team 170 — Spec-Author)
 
-Produce a complete LLD400 spec for WP `S002-P005-WP003`.
+Produce a complete LLD400 spec for WP `S003-P011-WP001`.
 
 **Spec Brief:**
 
-AOS State Alignment & Governance Integrity
+Process Architecture v2.0 — 5-gate canonical model (GATE_1..5), FCP 3-level classification with auto-routing, TRACK_FULL/TRACK_FOCUSED/TRACK_FAST process variants, team_engine_config.json externalization, Team 00 identity correction, Team 11/102/191 registration, lod200_author_team LOD200 Author Rule, state schema migration from legacy gate sequence (GATE_0→GATE_8). LOD200 v1.3 APPROVED 2026-03-19.
 
 ---
 
 **Required sections (all 6 are mandatory):**
 
-1. **Identity Header** — `gate: GATE_1 | wp: S002-P005-WP003 | stage: S002 | domain: agents_os | date: 2026-03-16`
+1. **Identity Header** — `gate: GATE_1 | wp: S003-P011-WP001 | stage: S003 | domain: agents_os | date: 2026-03-19`
 2. **Endpoint Contract** — HTTP method, path, request body schema, response schema
 3. **DB Contract** — tables accessed, columns read/written, query patterns; no new schema unless spec mandates
 4. **UI Structural Contract** — component hierarchy, DOM anchors (`data-testid`), state shape
@@ -40,17 +42,17 @@ AOS State Alignment & Governance Integrity
 
 ---
 
-Save LLD400 to: `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP003_LLD400_v1.0.0.md`
+Save LLD400 to: `_COMMUNICATION/team_170/TEAM_170_S003_P011_WP001_LLD400_v1.0.0.md`
 
 When done, inform Nimrod. Nimrod runs `./pipeline_run.sh --domain agents_os phase2` to activate Team 190 validation.
 
 ⛔ **YOUR TASK ENDS WITH SAVING THE LLD400. Do NOT validate your own output.**
 
 **Output — write to:**
-`_COMMUNICATION/team_170/TEAM_170_S002_P005_WP003_LLD400_v1.0.0.md`
+`_COMMUNICATION/team_170/TEAM_170_S003_P011_WP001_LLD400_v1.0.0.md`
 
 ### Acceptance
-- LLD400 saved to: `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP003_LLD400_v1.0.0.md`
+- LLD400 saved to: `_COMMUNICATION/team_170/TEAM_170_S003_P011_WP001_LLD400_v1.0.0.md`
 - All 6 required sections present with complete content
 - Identity Header matches state (gate/wp/stage/domain/date)
 - Scope matches spec_brief — no undeclared additions
@@ -73,7 +75,7 @@ When done, inform Nimrod. Nimrod runs `./pipeline_run.sh --domain agents_os phas
 
 Validate the LLD400 produced by Team 170. This is **external validation** — you use a different engine from Team 170 by architectural design.
 
-**Read the LLD400 from:** `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP003_LLD400_v1.0.0.md`
+**Read the LLD400 from:** `_COMMUNICATION/team_170/TEAM_170_S003_P011_WP001_LLD400_v1.0.0.md`
 
 (If the file is missing, Team 170 has not completed Phase 1. Stop and notify.)
 
@@ -92,11 +94,41 @@ Validate the LLD400 produced by Team 170. This is **external validation** — yo
 
 **Spec Brief (reference):**
 
-AOS State Alignment & Governance Integrity
+Process Architecture v2.0 — 5-gate canonical model (GATE_1..5), FCP 3-level classification with auto-routing, TRACK_FULL/TRACK_FOCUSED/TRACK_FAST process variants, team_engine_config.json externalization, Team 00 identity correction, Team 11/102/191 registration, lod200_author_team LOD200 Author Rule, state schema migration from legacy gate sequence (GATE_0→GATE_8). LOD200 v1.3 APPROVED 2026-03-19.
 
 ---
 
-Save verdict to: `_COMMUNICATION/team_190/TEAM_190_S002_P005_WP003_GATE_1_VERDICT_v1.0.0.md`
+## MANDATORY: JSON Verdict Block
+
+Your verdict file MUST begin with this JSON block as the first content:
+
+```json
+{
+  "gate_id": "GATE_1",
+  "decision": "PASS",
+  "blocking_findings": [],
+  "route_recommendation": null,
+  "summary": "One sentence summary"
+}
+```
+
+For BLOCK_FOR_FIX:
+
+```json
+{
+  "gate_id": "GATE_1",
+  "decision": "BLOCK_FOR_FIX",
+  "blocking_findings": [
+    {"id": "BF-01", "description": "...", "evidence": "path/file.py:42"}
+  ],
+  "route_recommendation": "doc",
+  "summary": "N blockers. [summary]"
+}
+```
+
+**Rules:** JSON block must be first. Detailed analysis follows after the block.
+
+Save verdict to: `_COMMUNICATION/team_190/TEAM_190_S003_P011_WP001_GATE_1_VERDICT_v1.0.0.md`
 
 - **PASS** → ready for GATE_2
 - **BLOCK** → `BF-XX: description | fix required`
@@ -106,66 +138,64 @@ If BLOCK: Team 170 must revise the LLD400. Do NOT fix it yourself.
 ⛔ **YOU ARE TEAM 190 — VALIDATE ONLY. Do NOT rewrite or fix the LLD400.**
 
 **Output — write to:**
-`_COMMUNICATION/team_190/TEAM_190_S002_P005_WP003_GATE_1_VERDICT_v1.0.0.md`
+`_COMMUNICATION/team_190/TEAM_190_S003_P011_WP001_GATE_1_VERDICT_v1.0.0.md`
 
 ### Coordination Data — LLD400 produced by Team 170 (Phase 1 output)
 
-✅  Auto-loaded: `_COMMUNICATION/team_170/TEAM_170_S002_P005_WP003_LLD400_v1.0.0.md`
+✅  Auto-loaded: `_COMMUNICATION/team_170/TEAM_170_S003_P011_WP001_LLD400_v1.0.0.md`
 
 ```
-# Team 170 — LLD400 | S002-P005-WP003 AOS State Alignment & Governance Integrity
-## TEAM_170_S002_P005_WP003_LLD400_v1.0.0.md
+# TEAM_170_S003_P011_WP001_LLD400_v1.0.0 — Process Architecture v2.0
 
----
-project_domain: AGENTS_OS
-id: TEAM_170_S002_P005_WP003_LLD400_v1.0.0
-from: Team 170 (Spec & Governance Authority)
-to: Team 190 (Constitutional Validator)
-cc: Team 10, Team 100, Team 61
-date: 2026-03-16
-status: SUBMITTED_FOR_GATE_1_VALIDATION
-gate_id: GATE_1
-architectural_approval_type: SPEC
-spec_version: 1.0.0
-source: TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md
-required_ssm_version: 1.0.0
-required_wsm_version: 1.0.0
-required_active_stage: S002
-phase_owner: Team 10
+**project_domain:** AGENTS_OS  
+**id:** TEAM_170_S003_P011_WP001_LLD400  
+**from:** Team 170 (Spec & Governance Authority)  
+**to:** Team 190 (GATE_1 validation), Team 61 (implementation)  
+**cc:** Team 10, Team 100, Team 11  
+**date:** 2026-03-19  
+**status:** SUBMITTED_FOR_GATE_1_VALIDATION  
+**gate_id:** GATE_1  
+**architectural_approval_type:** SPEC  
+**spec_version:** 1.0.0  
+**source:** _COMMUNICATION/team_00/TEAM_00_S003_P011_WP001_LOD200_v1.0.0.md  
+**required_ssm_version:** 1.0.0  
+**required_wsm_version:** 1.0.0  
+**required_active_stage:** S003  
+**phase_owner:** Team 100  
+
 ---
 
 ## §1 Identity Header
 
 | Field | Value |
-|-------|-------|
-| gate | GATE_1 |
-| wp | S002-P005-WP003 |
-| stage | S002 |
-| domain | agents_os |
-| date | 2026-03-16 |
+|-------|--------|
 | roadmap_id | PHOENIX_ROADMAP |
-| program_id | S002-P005 |
-| work_package_id | S002-P005-WP003 |
-| task_id | AOS_STATE_ALIGNMENT |
+| stage_id | S003 |
+| program_id | S003-P011 |
+| work_package_id | S003-P011-WP001 |
+| task_id | N/A |
+| gate_id | GATE_1 |
 | architectural_approval_type | SPEC |
 | spec_version | 1.0.0 |
-| source | TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0 |
+| date | 2026-03-19 |
+| source | TEAM_00_S003_P011_WP001_LOD200_v1.0.0.md |
 | required_ssm_version | 1.0.0 |
 | required_wsm_version | 1.0.0 |
-| required_active_stage | S002 |
-| phase_owner | Team 10 |
+| required_active_stage | S003 |
+| phase_owner | Team 100 |
 
 ---
 
 ## §2 Endpoint Contract
 
-**Domain:** AGENTS_OS has no HTTP API. Contracts are CLI commands, file fetches (static JSON), and Python module entry points.
+**Domain:** Process Architecture v2.0 has no HTTP API. Contracts are CLI commands, Python module entry points, and config file schemas.
 
 ### 2.1 CLI: pipeline_run.sh
 
-| Command | Method | Purpose |
-|---------|--------|---------|
-| `./pipeline_run.sh new S002-P005` | CREATE state | Initialize new program; 
+| Command | Purpose |
+|---------|---------|
+| `./pipeline_run.sh --domain agents_os` | Generate current gate prompt (GATE_N nomenclature) |
+| `./pipeli
 ```
 _[… content truncated at 1500 chars]_
 

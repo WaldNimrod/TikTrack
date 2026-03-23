@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-17T17:01:55.901888+00:00",
+  "generated_at_utc": "2026-03-23T17:40:47.439893+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -7,14 +7,14 @@
     "work_package_registry": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_WORK_PACKAGE_REGISTRY_v1.0.0.md"
   },
   "runtime": {
-    "active_stage_id": "S002",
-    "active_work_package_id": "NONE",
-    "in_progress_work_package_id": "NONE",
-    "current_gate": "NONE — S003 activation pending",
-    "active_program_id": "NONE",
-    "last_gate_event": "GATE_8_PASS; 2026-03-17; S002-P005 combined WP002+WP003+WP004; Team 100 FINAL_PASS (TEAM_100_S002_P005_FINAL_ARCHITECTURAL_VALIDATION_RESULT_v1.0.0); DOCUMENTATION_CLOSED.",
-    "next_required_action": "S003 stage activation decision by Team 00. Candidate first program: S003-P001 (Data Model Validator) — test flight target per Team 101 report. Run `./pipeline_run.sh --domain agents_os status` for current state.",
-    "next_responsible_team": "Team 00 (S003 activation decision)"
+    "active_stage_id": "S003",
+    "active_work_package_id": "N/A",
+    "in_progress_work_package_id": "N/A",
+    "current_gate": "COMPLETE",
+    "active_program_id": "S003-P013",
+    "last_gate_event": "**GATE_5 PASS** — S003-P013-WP001 \\",
+    "next_required_action": "Lifecycle complete — await next WP activation (Team 100 / Team 00).",
+    "next_responsible_team": "Team 100"
   },
   "stages": [
     {
@@ -127,7 +127,7 @@
       "domain": "AGENTS_OS",
       "stage_id": "S002",
       "status": "ACTIVE",
-      "current_gate_mirror": "GATE_1; active_flow=S002-P005-WP003 (State Alignment) — **GATE_0 PASS** (Team 190 revalidation confirmed); advancing to GATE_1; spec: `TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md`; active_work_package_id=S002-P005-WP003"
+      "current_gate_mirror": "GATE_1; active_flow=S002-P005-WP003 (State Alignment) — **GATE_0 PASS** (Team 190 revalidation confirmed); advancing to GATE_1; spec: `TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md`; active_work_package_id=S002-P005-WP003; DB_DEPENDENCY_REF: IDEA-052"
     },
     {
       "program_id": "S003-P001",
@@ -150,8 +150,8 @@
       "program_name": "System Settings (D39+D40+D41)",
       "domain": "TIKTRACK",
       "stage_id": "S003",
-      "status": "PLANNED",
-      "current_gate_mirror": "— (scope updated per ROADMAP_AMENDMENT_v2 §B3; D41 user_management companion)"
+      "status": "COMPLETE",
+      "current_gate_mirror": "GATE_8; active_flow=S003-P003-WP001 — DOCUMENTATION_CLOSED (GATE_8 PASS + lock closed 2026-03-21). Lifecycle complete.; active_work_package_id=N/A"
     },
     {
       "program_id": "S003-P004",
@@ -182,16 +182,56 @@
       "program_name": "Agents_OS Command Bridge Lite (ADR-031 Stage B)",
       "domain": "AGENTS_OS",
       "stage_id": "S003",
-      "status": "PLANNED",
-      "current_gate_mirror": "— (next AGENTS_OS stage-3 package; scope lock: approve-path desync block, command bridge copy flow with Task ID + context, model-B path realignment; **backlog candidate:** PIPELINE_HELP.html — standalone help page replacing modal, full operator guide searchable/browser-navigable, trigger: WP002 GATE_8 PASS, LOD200 required before GATE_0; authority source: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`; lock package: `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`)"
+      "status": "MERGED",
+      "current_gate_mirror": "**MERGED_INTO_S003-P011-WP001** (2026-03-19). ADR-031 Stage B scope (approve-path desync, command bridge copy flow, model-B realignment) fully delivered through S003-P011-WP001. Authority: ARCHITECT_DIRECTIVE_AOS_ROADMAP_RESET_v1.0.0."
     },
     {
       "program_id": "S003-P008",
       "program_name": "Agents_OS Pipeline Governance Hardening",
       "domain": "AGENTS_OS",
       "stage_id": "S003",
-      "status": "PLANNED",
-      "current_gate_mirror": "— pending GATE_0 validation; LOD200 submitted 2026-03-16; scope: STATE_VIEW.json, LOD200 ordering table schema (IDEA-040/042), gate prompt lifecycle archive (IDEA-038), test_cursor_prompt cap (IDEA-039); activation trigger: S002-P005-WP003 GATE_0 PASS; sequencing: activate before or in parallel with S003-P007; authority: TEAM_100_AGENTS_OS_PIPELINE_GOVERNANCE_HARDENING_S003_P008_LOD200_v1.0.0.md"
+      "status": "SUPERSEDED",
+      "current_gate_mirror": "**SUPERSEDED_BY_S003-P010** (2026-03-19). LOD200 acknowledged as historical reference. Scope absorbed: STATE_VIEW.json + date governance → P010-WP003; JSON verdict protocol → P010-WP002. Authority: ARCHITECT_DIRECTIVE_AOS_ROADMAP_RESET_v1.0.0."
+    },
+    {
+      "program_id": "S003-P010",
+      "program_name": "Agents_OS Pipeline Core Reliability",
+      "domain": "AGENTS_OS",
+      "stage_id": "S003",
+      "status": "COMPLETE",
+      "current_gate_mirror": "**DOCUMENTATION_CLOSED 2026-03-19.** SUPERVISED_SPRINT completed: 4 phases; Team 51 QA 108/108 PASS; Team 00 architectural review PASS. Deliverables: PipelineState remediation fields, _generate_remediation_mandate, json_enforcer.py, FAIL_ROUTING G3_PLAN, _write_state_view, _preflight_date_correction. active_work_package_id=N/A."
+    },
+    {
+      "program_id": "S003-P011",
+      "program_name": "Agents_OS — Process Model v2.0 + Pipeline Stabilization",
+      "domain": "AGENTS_OS",
+      "stage_id": "S003",
+      "status": "COMPLETE",
+      "current_gate_mirror": "GATE_3; active_flow=S003-P011-WP099 — gate GATE_3 (last event: GATE_3 FAIL); active_work_package_id=S003-P011-WP099; DB_DEPENDENCY_REF: IDEA-052"
+    },
+    {
+      "program_id": "S003-P012",
+      "program_name": "AOS Pipeline Operator Reliability",
+      "domain": "AGENTS_OS",
+      "stage_id": "S003",
+      "status": "COMPLETE",
+      "current_gate_mirror": "**DOCUMENTATION_CLOSED 2026-03-21 — Team 100.** WP001–WP005 **GATE_5 FULL PASS**; pipeline readiness **205 tests**. Program-level closure + comms archive: `TEAM_170_S003_P012_GOVERNANCE_CLOSURE_AND_ARCHIVE_MANDATE_v1.0.0.md`; DB_DEPENDENCY_REF: IDEA-052"
+    },
+    {
+      "program_id": "S003-P013",
+      "program_name": "TikTrack Pipeline Canary Run (D33 display_name)",
+      "domain": "TIKTRACK",
+      "stage_id": "S003",
+      "status": "COMPLETE",
+      "current_gate_mirror": "COMPLETE; active_flow=S003-P013-WP001 — gate COMPLETE (last event: GATE_5 PASS); active_work_package_id=N/A"
+    },
+    {
+      "program_id": "S003-P009",
+      "program_name": "Agents_OS Pipeline Resilience Package",
+      "domain": "AGENTS_OS",
+      "stage_id": "S003",
+      "status": "COMPLETE",
+      "current_gate_mirror": "S003-P009-WP001 GATE_8 PASS 2026-03-18; DOCUMENTATION_CLOSED. Scope: 3-tier resolution (AC-10/AC-11), wsm_writer.py, targeted git (pre-GATE_4 + GATE_8); Items 4a/4b verification only. LOD400: TEAM_100_PIPELINE_RESILIENCE_LOD400_DRAFT; authority: Team 00 PRE-CONDITION 2026-03-17; DB_DEPENDENCY_REF: IDEA-052"
     },
     {
       "program_id": "S004-P001",
@@ -199,7 +239,7 @@
       "domain": "AGENTS_OS",
       "stage_id": "S004",
       "status": "PLANNED",
-      "current_gate_mirror": "— (placeholder; program number assigned at activation; LOD200 authoring begins when S003 Agents_OS programs complete; scope: float prohibition E-18..E-19, NUMERIC(20,8) enforcement E-20..E-22)"
+      "current_gate_mirror": "— (placeholder; program number assigned at activation; LOD200 authoring begins when S003 Agents_OS programs complete; scope: float prohibition E-18..E-19, NUMERIC(20,8) enforcement E-20..E-22; DB_DEPENDENCY_REF: IDEA-052)"
     },
     {
       "program_id": "S004-P002",
@@ -207,7 +247,7 @@
       "domain": "AGENTS_OS",
       "stage_id": "S004",
       "status": "PLANNED",
-      "current_gate_mirror": "— (placeholder; ⚡ ACCELERATED from S005; scope: multi-entity consistency, state machine completeness, business rule coverage; MUST complete before S005 TikTrack begins)"
+      "current_gate_mirror": "— (placeholder; ⚡ ACCELERATED from S005; scope: multi-entity consistency, state machine completeness, business rule coverage; MUST complete before S005 TikTrack begins; DB_DEPENDENCY_REF: IDEA-052)"
     },
     {
       "program_id": "S004-P003",
@@ -215,7 +255,7 @@
       "domain": "AGENTS_OS",
       "stage_id": "S004",
       "status": "PLANNED",
-      "current_gate_mirror": "— (placeholder; ⚡ ACCELERATED from S006; scope: LLM-assisted LOD200/LLD400 first draft from product requirements; ~70% reduction in spec authoring token cost; MUST complete before S005 TikTrack begins)"
+      "current_gate_mirror": "— (placeholder; ⚡ ACCELERATED from S006; scope: LLM-assisted LOD200/LLD400 first draft from product requirements; ~70% reduction in spec authoring token cost; MUST complete before S005 TikTrack begins; DB_DEPENDENCY_REF: IDEA-052)"
     },
     {
       "program_id": "S004-P004",
@@ -255,7 +295,7 @@
       "domain": "AGENTS_OS",
       "stage_id": "S004",
       "status": "PLANNED",
-      "current_gate_mirror": "— (independent stage-4 package after existing AGENTS_OS stage-4 programs; scope lock: proposed_updates mediator, SSM legality gate, visual evidence diff/capture flow; authority source: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`; lock package: `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`)"
+      "current_gate_mirror": "— (independent stage-4 package after existing AGENTS_OS stage-4 programs; scope lock: proposed_updates mediator, SSM legality gate, visual evidence diff/capture flow; authority source: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`; lock package: `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`; DB_DEPENDENCY_REF: IDEA-052)"
     },
     {
       "program_id": "S005-P001",
@@ -263,7 +303,7 @@
       "domain": "AGENTS_OS",
       "stage_id": "S005",
       "status": "PLANNED",
-      "current_gate_mirror": "— (placeholder; moved from S006; scope: analytics calculation declaration, output format compliance; built during S005 era to serve S006 TikTrack analytics work)"
+      "current_gate_mirror": "— (placeholder; moved from S006; scope: analytics calculation declaration, output format compliance; built during S005 era to serve S006 TikTrack analytics work; DB_DEPENDENCY_REF: IDEA-052)"
     },
     {
       "program_id": "S005-P002",
@@ -429,6 +469,78 @@
       "current_gate": "FAST_4 (PASS)",
       "is_active": false,
       "active_marker_reason": "Test Template Generator deployed; G3.7 in gate chain; FAST_4 CLOSED 2026-03-12 (Team 170 closure)"
+    },
+    {
+      "work_package_id": "S003-P003-WP001",
+      "program_id": "S003-P003",
+      "domain": "TIKTRACK",
+      "status": "CLOSED",
+      "current_gate": "GATE_8 (PASS)",
+      "is_active": false,
+      "active_marker_reason": "Lifecycle complete 2026-03-21"
+    },
+    {
+      "work_package_id": "S003-P009-WP001",
+      "program_id": "S003-P009",
+      "domain": "AGENTS_OS",
+      "status": "CLOSED",
+      "current_gate": "GATE_8 (PASS)",
+      "is_active": false,
+      "active_marker_reason": "Pipeline Resilience Package — GATE_8 PASS 2026-03-18; Team 90 closure validation; DOCUMENTATION_CLOSED."
+    },
+    {
+      "work_package_id": "S003-P010-WP001",
+      "program_id": "S003-P010",
+      "domain": "AGENTS_OS",
+      "status": "CLOSED",
+      "current_gate": "SPRINT_ACTIVE",
+      "is_active": false,
+      "active_marker_reason": "SUPERVISED_SPRINT — Pipeline Core Reliability — DOCUMENTATION_CLOSED 2026-03-19"
+    },
+    {
+      "work_package_id": "S003-P011-WP001",
+      "program_id": "S003-P011",
+      "domain": "AGENTS_OS",
+      "status": "CLOSED",
+      "current_gate": "COMPLETE (5-gate + GATE_8 doc closure)",
+      "is_active": false,
+      "active_marker_reason": "Process Architecture v2.0 — GATE_5 PASS; Team 70 AS_MADE + archive 2026-03-19; `pipeline_state_agentsos.json` current_gate=COMPLETE. Next: WP002 Dashboard Copilot (activation pending)."
+    },
+    {
+      "work_package_id": "S003-P011-WP002",
+      "program_id": "S003-P011",
+      "domain": "AGENTS_OS",
+      "status": "IN_PROGRESS",
+      "current_gate": "GATE_2",
+      "is_active": false,
+      "active_marker_reason": "Pipeline Stabilization & Hardening — ACTIVE at GATE_2/2.1 (Team 101 LLD400 lane). Mirror aligned to WSM and `pipeline_state_agentsos.json` on 2026-03-20."
+    },
+    {
+      "work_package_id": "S003-P011-WP099",
+      "program_id": "S003-P011",
+      "domain": "AGENTS_OS",
+      "status": "IN_PROGRESS",
+      "current_gate": "GATE_3",
+      "is_active": false,
+      "active_marker_reason": "S003-P011-WP099 — gate GATE_3 (last event: GATE_3 FAIL)"
+    },
+    {
+      "work_package_id": "S003-P012-WP001",
+      "program_id": "S003-P012",
+      "domain": "AGENTS_OS",
+      "status": "IN_PROGRESS",
+      "current_gate": "GATE_8 (WP001 governance closure in progress)",
+      "is_active": false,
+      "active_marker_reason": "S003-P012-WP001 — SSOT Implementation (GATE_8 PASS pending governance closure)"
+    },
+    {
+      "work_package_id": "S003-P013-WP001",
+      "program_id": "S003-P013",
+      "domain": "TIKTRACK",
+      "status": "CLOSED",
+      "current_gate": "GATE_5",
+      "is_active": false,
+      "active_marker_reason": "S003-P013-WP001 — gate GATE_5 (last event: GATE_4 PASS)"
     }
   ],
   "hierarchy": [
@@ -575,7 +687,7 @@
           "program_name": "Agents_OS v2 Writing Semantics Hardening (ADR-031 Stage A) + UI Optimization",
           "domain": "AGENTS_OS",
           "status": "ACTIVE",
-          "current_gate_mirror": "GATE_1; active_flow=S002-P005-WP003 (State Alignment) — **GATE_0 PASS** (Team 190 revalidation confirmed); advancing to GATE_1; spec: `TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md`; active_work_package_id=S002-P005-WP003",
+          "current_gate_mirror": "GATE_1; active_flow=S002-P005-WP003 (State Alignment) — **GATE_0 PASS** (Team 190 revalidation confirmed); advancing to GATE_1; spec: `TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md`; active_work_package_id=S002-P005-WP003; DB_DEPENDENCY_REF: IDEA-052",
           "work_packages": [
             {
               "work_package_id": "S002-P005-WP002",
@@ -649,9 +761,19 @@
           "program_id": "S003-P003",
           "program_name": "System Settings (D39+D40+D41)",
           "domain": "TIKTRACK",
-          "status": "PLANNED",
-          "current_gate_mirror": "— (scope updated per ROADMAP_AMENDMENT_v2 §B3; D41 user_management companion)",
-          "work_packages": []
+          "status": "COMPLETE",
+          "current_gate_mirror": "GATE_8; active_flow=S003-P003-WP001 — DOCUMENTATION_CLOSED (GATE_8 PASS + lock closed 2026-03-21). Lifecycle complete.; active_work_package_id=N/A",
+          "work_packages": [
+            {
+              "work_package_id": "S003-P003-WP001",
+              "program_id": "S003-P003",
+              "domain": "TIKTRACK",
+              "status": "CLOSED",
+              "current_gate": "GATE_8 (PASS)",
+              "is_active": false,
+              "active_marker_reason": "Lifecycle complete 2026-03-21"
+            }
+          ]
         },
         {
           "program_id": "S003-P004",
@@ -681,17 +803,125 @@
           "program_id": "S003-P007",
           "program_name": "Agents_OS Command Bridge Lite (ADR-031 Stage B)",
           "domain": "AGENTS_OS",
-          "status": "PLANNED",
-          "current_gate_mirror": "— (next AGENTS_OS stage-3 package; scope lock: approve-path desync block, command bridge copy flow with Task ID + context, model-B path realignment; **backlog candidate:** PIPELINE_HELP.html — standalone help page replacing modal, full operator guide searchable/browser-navigable, trigger: WP002 GATE_8 PASS, LOD200 required before GATE_0; authority source: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`; lock package: `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`)",
+          "status": "MERGED",
+          "current_gate_mirror": "**MERGED_INTO_S003-P011-WP001** (2026-03-19). ADR-031 Stage B scope (approve-path desync, command bridge copy flow, model-B realignment) fully delivered through S003-P011-WP001. Authority: ARCHITECT_DIRECTIVE_AOS_ROADMAP_RESET_v1.0.0.",
           "work_packages": []
         },
         {
           "program_id": "S003-P008",
           "program_name": "Agents_OS Pipeline Governance Hardening",
           "domain": "AGENTS_OS",
-          "status": "PLANNED",
-          "current_gate_mirror": "— pending GATE_0 validation; LOD200 submitted 2026-03-16; scope: STATE_VIEW.json, LOD200 ordering table schema (IDEA-040/042), gate prompt lifecycle archive (IDEA-038), test_cursor_prompt cap (IDEA-039); activation trigger: S002-P005-WP003 GATE_0 PASS; sequencing: activate before or in parallel with S003-P007; authority: TEAM_100_AGENTS_OS_PIPELINE_GOVERNANCE_HARDENING_S003_P008_LOD200_v1.0.0.md",
+          "status": "SUPERSEDED",
+          "current_gate_mirror": "**SUPERSEDED_BY_S003-P010** (2026-03-19). LOD200 acknowledged as historical reference. Scope absorbed: STATE_VIEW.json + date governance → P010-WP003; JSON verdict protocol → P010-WP002. Authority: ARCHITECT_DIRECTIVE_AOS_ROADMAP_RESET_v1.0.0.",
           "work_packages": []
+        },
+        {
+          "program_id": "S003-P009",
+          "program_name": "Agents_OS Pipeline Resilience Package",
+          "domain": "AGENTS_OS",
+          "status": "COMPLETE",
+          "current_gate_mirror": "S003-P009-WP001 GATE_8 PASS 2026-03-18; DOCUMENTATION_CLOSED. Scope: 3-tier resolution (AC-10/AC-11), wsm_writer.py, targeted git (pre-GATE_4 + GATE_8); Items 4a/4b verification only. LOD400: TEAM_100_PIPELINE_RESILIENCE_LOD400_DRAFT; authority: Team 00 PRE-CONDITION 2026-03-17; DB_DEPENDENCY_REF: IDEA-052",
+          "work_packages": [
+            {
+              "work_package_id": "S003-P009-WP001",
+              "program_id": "S003-P009",
+              "domain": "AGENTS_OS",
+              "status": "CLOSED",
+              "current_gate": "GATE_8 (PASS)",
+              "is_active": false,
+              "active_marker_reason": "Pipeline Resilience Package — GATE_8 PASS 2026-03-18; Team 90 closure validation; DOCUMENTATION_CLOSED."
+            }
+          ]
+        },
+        {
+          "program_id": "S003-P010",
+          "program_name": "Agents_OS Pipeline Core Reliability",
+          "domain": "AGENTS_OS",
+          "status": "COMPLETE",
+          "current_gate_mirror": "**DOCUMENTATION_CLOSED 2026-03-19.** SUPERVISED_SPRINT completed: 4 phases; Team 51 QA 108/108 PASS; Team 00 architectural review PASS. Deliverables: PipelineState remediation fields, _generate_remediation_mandate, json_enforcer.py, FAIL_ROUTING G3_PLAN, _write_state_view, _preflight_date_correction. active_work_package_id=N/A.",
+          "work_packages": [
+            {
+              "work_package_id": "S003-P010-WP001",
+              "program_id": "S003-P010",
+              "domain": "AGENTS_OS",
+              "status": "CLOSED",
+              "current_gate": "SPRINT_ACTIVE",
+              "is_active": false,
+              "active_marker_reason": "SUPERVISED_SPRINT — Pipeline Core Reliability — DOCUMENTATION_CLOSED 2026-03-19"
+            }
+          ]
+        },
+        {
+          "program_id": "S003-P011",
+          "program_name": "Agents_OS — Process Model v2.0 + Pipeline Stabilization",
+          "domain": "AGENTS_OS",
+          "status": "COMPLETE",
+          "current_gate_mirror": "GATE_3; active_flow=S003-P011-WP099 — gate GATE_3 (last event: GATE_3 FAIL); active_work_package_id=S003-P011-WP099; DB_DEPENDENCY_REF: IDEA-052",
+          "work_packages": [
+            {
+              "work_package_id": "S003-P011-WP001",
+              "program_id": "S003-P011",
+              "domain": "AGENTS_OS",
+              "status": "CLOSED",
+              "current_gate": "COMPLETE (5-gate + GATE_8 doc closure)",
+              "is_active": false,
+              "active_marker_reason": "Process Architecture v2.0 — GATE_5 PASS; Team 70 AS_MADE + archive 2026-03-19; `pipeline_state_agentsos.json` current_gate=COMPLETE. Next: WP002 Dashboard Copilot (activation pending)."
+            },
+            {
+              "work_package_id": "S003-P011-WP002",
+              "program_id": "S003-P011",
+              "domain": "AGENTS_OS",
+              "status": "IN_PROGRESS",
+              "current_gate": "GATE_2",
+              "is_active": false,
+              "active_marker_reason": "Pipeline Stabilization & Hardening — ACTIVE at GATE_2/2.1 (Team 101 LLD400 lane). Mirror aligned to WSM and `pipeline_state_agentsos.json` on 2026-03-20."
+            },
+            {
+              "work_package_id": "S003-P011-WP099",
+              "program_id": "S003-P011",
+              "domain": "AGENTS_OS",
+              "status": "IN_PROGRESS",
+              "current_gate": "GATE_3",
+              "is_active": false,
+              "active_marker_reason": "S003-P011-WP099 — gate GATE_3 (last event: GATE_3 FAIL)"
+            }
+          ]
+        },
+        {
+          "program_id": "S003-P012",
+          "program_name": "AOS Pipeline Operator Reliability",
+          "domain": "AGENTS_OS",
+          "status": "COMPLETE",
+          "current_gate_mirror": "**DOCUMENTATION_CLOSED 2026-03-21 — Team 100.** WP001–WP005 **GATE_5 FULL PASS**; pipeline readiness **205 tests**. Program-level closure + comms archive: `TEAM_170_S003_P012_GOVERNANCE_CLOSURE_AND_ARCHIVE_MANDATE_v1.0.0.md`; DB_DEPENDENCY_REF: IDEA-052",
+          "work_packages": [
+            {
+              "work_package_id": "S003-P012-WP001",
+              "program_id": "S003-P012",
+              "domain": "AGENTS_OS",
+              "status": "IN_PROGRESS",
+              "current_gate": "GATE_8 (WP001 governance closure in progress)",
+              "is_active": false,
+              "active_marker_reason": "S003-P012-WP001 — SSOT Implementation (GATE_8 PASS pending governance closure)"
+            }
+          ]
+        },
+        {
+          "program_id": "S003-P013",
+          "program_name": "TikTrack Pipeline Canary Run (D33 display_name)",
+          "domain": "TIKTRACK",
+          "status": "COMPLETE",
+          "current_gate_mirror": "COMPLETE; active_flow=S003-P013-WP001 — gate COMPLETE (last event: GATE_5 PASS); active_work_package_id=N/A",
+          "work_packages": [
+            {
+              "work_package_id": "S003-P013-WP001",
+              "program_id": "S003-P013",
+              "domain": "TIKTRACK",
+              "status": "CLOSED",
+              "current_gate": "GATE_5",
+              "is_active": false,
+              "active_marker_reason": "S003-P013-WP001 — gate GATE_5 (last event: GATE_4 PASS)"
+            }
+          ]
         }
       ]
     },
@@ -710,7 +940,7 @@
           "program_name": "Financial Precision Validator",
           "domain": "AGENTS_OS",
           "status": "PLANNED",
-          "current_gate_mirror": "— (placeholder; program number assigned at activation; LOD200 authoring begins when S003 Agents_OS programs complete; scope: float prohibition E-18..E-19, NUMERIC(20,8) enforcement E-20..E-22)",
+          "current_gate_mirror": "— (placeholder; program number assigned at activation; LOD200 authoring begins when S003 Agents_OS programs complete; scope: float prohibition E-18..E-19, NUMERIC(20,8) enforcement E-20..E-22; DB_DEPENDENCY_REF: IDEA-052)",
           "work_packages": []
         },
         {
@@ -718,7 +948,7 @@
           "program_name": "Business Logic Validator",
           "domain": "AGENTS_OS",
           "status": "PLANNED",
-          "current_gate_mirror": "— (placeholder; ⚡ ACCELERATED from S005; scope: multi-entity consistency, state machine completeness, business rule coverage; MUST complete before S005 TikTrack begins)",
+          "current_gate_mirror": "— (placeholder; ⚡ ACCELERATED from S005; scope: multi-entity consistency, state machine completeness, business rule coverage; MUST complete before S005 TikTrack begins; DB_DEPENDENCY_REF: IDEA-052)",
           "work_packages": []
         },
         {
@@ -726,7 +956,7 @@
           "program_name": "Spec Draft Generator",
           "domain": "AGENTS_OS",
           "status": "PLANNED",
-          "current_gate_mirror": "— (placeholder; ⚡ ACCELERATED from S006; scope: LLM-assisted LOD200/LLD400 first draft from product requirements; ~70% reduction in spec authoring token cost; MUST complete before S005 TikTrack begins)",
+          "current_gate_mirror": "— (placeholder; ⚡ ACCELERATED from S006; scope: LLM-assisted LOD200/LLD400 first draft from product requirements; ~70% reduction in spec authoring token cost; MUST complete before S005 TikTrack begins; DB_DEPENDENCY_REF: IDEA-052)",
           "work_packages": []
         },
         {
@@ -766,7 +996,7 @@
           "program_name": "Agents_OS Mediated Reconciliation Engine (ADR-031 Stage C)",
           "domain": "AGENTS_OS",
           "status": "PLANNED",
-          "current_gate_mirror": "— (independent stage-4 package after existing AGENTS_OS stage-4 programs; scope lock: proposed_updates mediator, SSM legality gate, visual evidence diff/capture flow; authority source: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`; lock package: `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`)",
+          "current_gate_mirror": "— (independent stage-4 package after existing AGENTS_OS stage-4 programs; scope lock: proposed_updates mediator, SSM legality gate, visual evidence diff/capture flow; authority source: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`; lock package: `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`; DB_DEPENDENCY_REF: IDEA-052)",
           "work_packages": []
         }
       ]
@@ -786,7 +1016,7 @@
           "program_name": "Analytics Quality Validator",
           "domain": "AGENTS_OS",
           "status": "PLANNED",
-          "current_gate_mirror": "— (placeholder; moved from S006; scope: analytics calculation declaration, output format compliance; built during S005 era to serve S006 TikTrack analytics work)",
+          "current_gate_mirror": "— (placeholder; moved from S006; scope: analytics calculation declaration, output format compliance; built during S005 era to serve S006 TikTrack analytics work; DB_DEPENDENCY_REF: IDEA-052)",
           "work_packages": []
         },
         {

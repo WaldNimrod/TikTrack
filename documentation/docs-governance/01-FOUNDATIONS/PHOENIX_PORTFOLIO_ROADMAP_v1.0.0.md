@@ -4,7 +4,7 @@
 **id:** PHOENIX_PORTFOLIO_ROADMAP  
 **version:** 1.0.0  
 **owner:** Team 100 / Team 00 (architectural); maintained by Team 170 per consolidation  
-**date:** 2026-02-23  
+**date:** 2026-03-21 (program closure mirror S003-P012 — Team 170)  
 **directive:** TEAM_190_TO_TEAM_170_PORTFOLIO_CANONICALIZATION_MIGRATION_WORK_PACKAGE_v1.0.0  
 **מפת דרכים אחת:** אין כפילות. מסמך נרטיב/חבילות ישן הועבר לארכיון: `archive/2026-02-23_roadmap_and_batch_superseded/`.
 
@@ -102,6 +102,12 @@ D32 (portfolio_state) מחייב אפיון ארכיטקטוני ייעודי ו
   - `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`
   - `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`
   - `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_10_TEAM_170_ADR031_THREE_STAGE_ACTIVATION_PROMPT_v1.0.0.md`
+
+### Program closure mirror — S003-P012 (Agents_OS)
+
+| program_id | status | closed_date | closure_authority | closure_note |
+|------------|--------|-------------|---------------------|--------------|
+| S003-P012 | DOCUMENTATION_CLOSED | 2026-03-21 | Team 100 | WP001–WP005 all **GATE_5 FULL PASS**. Pipeline readiness certificate: **205 tests**. Registry + WSM sync: Team 170 per `TEAM_170_S003_P012_GOVERNANCE_CLOSURE_AND_ARCHIVE_MANDATE_v1.0.0.md`. |
 
 ### Tag Assignment Rollout (S004 onward)
 

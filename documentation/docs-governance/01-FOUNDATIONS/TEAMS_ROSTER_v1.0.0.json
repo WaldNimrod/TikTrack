@@ -2,7 +2,7 @@
   "_meta": {
     "roster_version": "1.0.0",
     "last_updated": "2026-03-15",
-    "authority": "Team 00 — Chief Architect",
+    "authority": "Team 00 — System Designer",
     "source_directive": "ARCHITECT_DIRECTIVE_TEAM_ROSTER_LOCK_v1.0.0.md",
     "note": "This is the SINGLE SOURCE OF TRUTH for all team definitions. The UI reads from this file directly. Do NOT maintain team data in pipeline-teams.js or pipeline-config.js beyond what is needed to bootstrap loading. All substantive definitions live here.",
     "update_rule": "Any change to team definitions MUST be made here first. pipeline-teams.js pulls from this file at runtime."

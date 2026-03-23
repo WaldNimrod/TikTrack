@@ -13,7 +13,7 @@ id: PHOENIX_SYSTEM_STATE
 version: 1.0.0
 status: LOCKED
 structural_revision: v2.3.0
-owner: Chief Architect
+owner: System Designer
 promotion_authority: Team 70 (Librarian) — promotion execution ONLY; Team 170 — SSOT integrity only (no promotion execution); Team 10 / Architect — authority
 validation_authority: Team 190
 active_stage: GAP_CLOSURE_BEFORE_AGENT_POC
@@ -109,7 +109,7 @@ Role contract lock:
 
 | Team | Role | Authority |
 |------|------|-----------|
-| **Team 00 (Chief Architect)** | Product authority (TikTrack system) | Final SPEC and EXECUTION approval authority. |
+| **Team 00 (System Designer)** | Product authority (TikTrack system) | Final SPEC and EXECUTION approval authority. |
 | **Team 100 (Development Architecture Authority)** | Architectural partner of Team 00 in domain vision and executable plans | Responsible for GATE_0 (LOD200 initial intent) and GATE_1 (SPEC submission to validation); holds **approval authority** at **GATE_2** (final spec approval) and **GATE_6** (post-execution architectural approval). Defines gate model, lifecycle contracts, and orchestration rules; operates in strategic alignment with Team 00. |
 | **Team 170** | Spec Owner | Original documents only. |
 | **Team 190** | Architectural Validator + Submission Owner | Validation and submission package ownership. |

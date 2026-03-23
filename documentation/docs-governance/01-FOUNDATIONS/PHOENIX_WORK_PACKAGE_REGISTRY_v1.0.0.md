@@ -48,12 +48,20 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S002-P005 | S002-P005-WP003 | IN_PROGRESS | GATE_1 | false | S002-P005-WP003 (State Alignment) — **GATE_0 PASS** (Team 190 revalidation confirmed); advancing to GATE_1; spec: `TEAM_100_AGENTS_OS_STATE_ALIGNMENT_WP003_LOD200_v1.0.0.md` |
 | S003-P001 | S003-P001-WP001 | CLOSED | FAST_4 (PASS) | false | Data Model Validator deployed; FAST_4 CLOSED 2026-03-11 (Team 170 closure) |
 | S003-P002 | S003-P002-WP001 | CLOSED | FAST_4 (PASS) | false | Test Template Generator deployed; G3.7 in gate chain; FAST_4 CLOSED 2026-03-12 (Team 170 closure) |
+| S003-P003 | S003-P003-WP001 | CLOSED | GATE_8 (PASS) | false | Lifecycle complete 2026-03-21 |
+| S003-P009 | S003-P009-WP001 | CLOSED | GATE_8 (PASS) | false | Pipeline Resilience Package — GATE_8 PASS 2026-03-18; Team 90 closure validation; DOCUMENTATION_CLOSED. |
+| S003-P010 | S003-P010-WP001 | CLOSED | SPRINT_ACTIVE | false | SUPERVISED_SPRINT — Pipeline Core Reliability — DOCUMENTATION_CLOSED 2026-03-19 |
+| S003-P011 | S003-P011-WP001 | CLOSED | COMPLETE (5-gate + GATE_8 doc closure) | false | Process Architecture v2.0 — GATE_5 PASS; Team 70 AS_MADE + archive 2026-03-19; `pipeline_state_agentsos.json` current_gate=COMPLETE. Next: WP002 Dashboard Copilot (activation pending). |
+| S003-P011 | S003-P011-WP002 | IN_PROGRESS | GATE_2 | false | Pipeline Stabilization & Hardening — ACTIVE at GATE_2/2.1 (Team 101 LLD400 lane). Mirror aligned to WSM and `pipeline_state_agentsos.json` on 2026-03-20. |
+| S003-P011 | S003-P011-WP099 | IN_PROGRESS | GATE_3 | false | S003-P011-WP099 — gate GATE_3 (last event: GATE_3 FAIL) |
+| S003-P012 | S003-P012-WP001 | IN_PROGRESS | GATE_8 (WP001 governance closure in progress) | false | S003-P012-WP001 — SSOT Implementation (GATE_8 PASS pending governance closure) |
+| S003-P013 | S003-P013-WP001 | CLOSED | GATE_5 | false | S003-P013-WP001 — gate GATE_5 (last event: GATE_4 PASS) |
 
 
 
-**Current active WP state (mirror from WSM):** **NO_ACTIVE_WORK_PACKAGE** — WSM `active_stage_id=S002`, `active_program_id=NONE`, `current_gate=NONE — S003 activation pending`, `active_work_package_id=N/A`.
+**Current active WP state (mirror from WSM):** **NO_ACTIVE_WORK_PACKAGE** — WSM `active_stage_id=S003`, `active_program_id=S003-P013`, `current_gate=COMPLETE`, `active_work_package_id=N/A`.
 
-**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-17). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
+**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-23). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
 
 ---
 
@@ -78,3 +86,5 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 **log_entry | TEAM_170 | PHOENIX_WORK_PACKAGE_REGISTRY | S003_P002_WP001_FAST4_CLOSED_ADDED | 2026-03-12**
 **log_entry | TEAM_00 | PHOENIX_WORK_PACKAGE_REGISTRY | S001_P002_WP001_REGISTERED_GATE_0_IN_PROGRESS_PER_ARCHITECT_DIRECTIVE_S001_P002_ACTIVATION_v1.0.0 | 2026-03-14**
 **log_entry | TEAM_170 | PHOENIX_WORK_PACKAGE_REGISTRY | S002_P005_WP002_GATE1_PASS_MIRROR_SYNC_PER_WP002_FV_ACT01 | 2026-03-15**
+**log_entry | TEAM_190 | PHOENIX_WORK_PACKAGE_REGISTRY | S003_P011_WP002_ACTIVE_ROW_ADDED_SYNC_TO_WSM_AND_PIPELINE_STATE | 2026-03-20**
+**log_entry | TEAM_90 | PHOENIX_WORK_PACKAGE_REGISTRY | S003_P003_WP001_GATE8_PASS_LOCK_CLOSED_NO_ACTIVE_WP | 2026-03-21**

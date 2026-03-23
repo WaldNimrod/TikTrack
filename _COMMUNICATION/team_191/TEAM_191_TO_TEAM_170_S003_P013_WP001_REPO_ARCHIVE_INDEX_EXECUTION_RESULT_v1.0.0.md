@@ -28,6 +28,10 @@ in_response_to: TEAM_170_TO_TEAM_191_S003_P013_WP001_REPO_NOISE_AND_LOCAL_ARCHIV
 - הוסרו מהמעקב (cached only, ללא מחיקה מדיסק): **`_COMMUNICATION/99-ARCHIVE/`**, **`_COMMUNICATION/_ARCHIVE/`**, ו־**14** קבצים תחת `archive/.../99-ARCHIVE/`.
 - סה״כ שינוי commit צפוי: סדר גודל **~1999** קבצים מהעץ (מחיקות מ־index בלבד) + עדכון `.gitignore` + מסמכי משוב זה.
 
+## Errata (post-commit)
+
+- במהלך `git rm -r --cached` הוסרו בטעות ממדדים **שני** קבצי evidence תחת `_COMMUNICATION/team_60/evidence/runtime/check_alert_conditions.launchd.*` (לא היו חלק מ־`99-ARCHIVE/`). **תוקן** בקומיט המשחזר מיד אחרי קומיט המדיניות (`restore Team 60 runtime evidence logs`).
+
 ## סיכונים / הערות
 
 - **Clone ציבורי חדש:** לא יכלול תוכן ארכיון מקומי — זה היעד לפי הבקשה.

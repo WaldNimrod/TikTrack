@@ -20,9 +20,14 @@ _Cursor_full_design_*/
 storage/uploads/users/
 
 # Archive (Phoenix 99-ARCHIVE + root archive)
+# Team 170 / Team 191 (S003-P013-WP001): shards under _COMMUNICATION/99-ARCHIVE/ are local-only;
+# legacy blobs may remain in git history until optional history rewrite.
 **/99-ARCHIVE/
 **/99-archive/
 archive/
+
+# Program / lifecycle archives under _COMMUNICATION (local-only; pipeline may still write here)
+_COMMUNICATION/_ARCHIVE/
 
 # OS specific
 .DS_Store

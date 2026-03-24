@@ -3,9 +3,10 @@
 #
 # Usage:
 #   ./pipeline_run.sh              → generate current gate prompt + display for copy-paste
-#   ./pipeline_run.sh pass         → advance current gate PASS → show next
+#   ./pipeline_run.sh pass         → advance current gate PASS (no guard)
+#   ./pipeline_run.sh --wp S003-P013-WP001 --gate GATE_3 --phase 3.3 pass  → precision pass (locked)
 #   ./pipeline_run.sh fail "why"   → advance current gate FAIL with reason
-#   ./pipeline_run.sh approve      → approve human-gate (GATE_2, GATE_7)
+#   ./pipeline_run.sh approve      → approve human-gate (GATE_2, GATE_4 UX sign-off; alias gate7)
 #   ./pipeline_run.sh status       → show pipeline status only
 #   ./pipeline_run.sh gate NAME    → override: generate prompt for specific gate
 #
@@ -35,6 +36,27 @@ if [[ "${1:-}" == "--domain" ]]; then
   shift 2
 fi
 
+# ── Explicit gate/phase/wp guard (KB-84: precision pass safety) ──────────────
+# Optional: --wp WP_ID --gate GATE_N --phase N.N  before the subcommand
+# When provided, ALL supplied flags are validated against the active state.
+# Full format:
+#   ./pipeline_run.sh --domain tiktrack --wp S003-P013-WP001 --gate GATE_3 --phase 3.3 pass
+# Any mismatch → BLOCKED + shows active state + correct command.
+EXPLICIT_GATE=""
+EXPLICIT_PHASE=""
+EXPLICIT_WP=""
+while true; do
+  if [[ "${1:-}" == "--gate" ]]; then
+    EXPLICIT_GATE="$2"; shift 2
+  elif [[ "${1:-}" == "--phase" ]]; then
+    EXPLICIT_PHASE="$2"; shift 2
+  elif [[ "${1:-}" == "--wp" ]]; then
+    EXPLICIT_WP="$2"; shift 2
+  else
+    break
+  fi
+done
+
 # Export so Python subprocesses can read it
 if [ -n "$DOMAIN" ]; then
   export PIPELINE_DOMAIN="$DOMAIN"
@@ -55,6 +77,16 @@ print(PipelineState.load(domain).current_gate)
 "
 }
 
+_get_wp_id() {
+  python3 -c "
+import sys, os
+sys.path.insert(0, '.')
+from agents_os_v2.orchestrator.state import PipelineState
+domain = os.environ.get('PIPELINE_DOMAIN') or None
+print(PipelineState.load(domain).work_package_id)
+"
+}
+
 _get_domain() {
   python3 -c "
 import sys, os
@@ -63,6 +95,16 @@ from agents_os_v2.orchestrator.state import PipelineState
 domain = os.environ.get('PIPELINE_DOMAIN') or None
 print(PipelineState.load(domain).project_domain)
 "
+}
+
+# ── Pre-flight date correction (S003-P010-WP001 Ph4) ─────────────────────
+_preflight_date_correction() {
+    local f="$1"
+    [[ -f "$f" ]] || return 0
+    local today; today=$(date -u +%F)
+    sed -i.bak "s/^\(date: \)[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}$/\1${today}/" "$f"
+    sed -i.bak "s/| date | [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} |/| date | ${today} |/g" "$f"
+    rm -f "${f}.bak"
 }
 
 _get_engine() {
@@ -114,6 +156,9 @@ print(PipelineState.load(domain).current_gate)
   local engine
   engine=$(_get_engine "$gate")
 
+  # Auto-correct date in prompt before displaying (S003-P010-WP001 Ph4)
+  _preflight_date_correction "$prompt_file"
+
   echo ""
   printf '▼%.0s' {1..74}; echo ""
   printf "  ${DOMAIN_LABEL}PASTE INTO AI:  %-20s  →  %s\n" "$gate" "$engine"
@@ -130,6 +175,17 @@ print(PipelineState.load(domain).current_gate)
 
 _generate_and_show() {
   local gate="$1"
+  # OBS-51-001: after final PASS, state is COMPLETE — no prompt file exists; skip CLI + _show_prompt
+  # (otherwise _show_prompt exits 1 on missing *_COMPLETE_prompt.md despite successful close).
+  if [[ "$gate" == "COMPLETE" ]]; then
+    echo ""
+    echo "════════════════════════════════════════════════════════════════════"
+    echo "  ✅ LIFECYCLE COMPLETE — no further prompt for this work package."
+    echo "  (Terminal state: current_gate=COMPLETE — OBS-51-001)"
+    echo "════════════════════════════════════════════════════════════════════"
+    echo ""
+    return 0
+  fi
   echo ""
   echo "[pipeline_run] ${DOMAIN_LABEL}Generating prompt for: $gate"
   $CLI --generate-prompt "$gate" 2>&1 | grep -v "^━"
@@ -142,6 +198,31 @@ _refresh_state_snapshot() {
   # AD-V2-01 prevention: snapshot is always fresh before any pipeline operation.
   python3 -m agents_os_v2.observers.state_reader 2>/dev/null || \
     echo "[pipeline_run] ⚠️  state_reader refresh failed (STATE_SNAPSHOT.json may be stale)"
+}
+
+# S003-P012 SSOT — compare pipeline_state vs WSM (FIX-101-02: fail closed on drift)
+_ssot_check_print() {
+  local d="${PIPELINE_DOMAIN:-tiktrack}"
+  if ! python3 -m agents_os_v2.tools.ssot_check --domain "$d"; then
+    echo ""
+    echo "════════════════════════════════════════════════════════════════════"
+    echo "  SSOT CHECK FAILED — pipeline_state vs WSM drift (domain=$d)"
+    echo "  Re-run after WSM sync or fix pipeline state."
+    echo "════════════════════════════════════════════════════════════════════"
+    return 1
+  fi
+  return 0
+}
+
+# FIX-101-02: sync STAGE_PARALLEL_TRACKS from current pipeline_state (phase* / recovery)
+_auto_wsm_sync() {
+  python3 -c "
+import os, sys
+sys.path.insert(0, '.')
+from agents_os_v2.orchestrator.wsm_writer import sync_parallel_tracks_from_pipeline
+sync_parallel_tracks_from_pipeline()
+" || return 1
+  return 0
 }
 
 _auto_store_gate1_artifact() {
@@ -269,7 +350,11 @@ try:
     state = json.loads(open(sf).read())
 except Exception:
     sys.exit(0)
-if state.get('current_gate') != 'G3_PLAN':
+_gate  = state.get('current_gate', '')
+_phase = state.get('current_phase') or ''
+# G3_PLAN (legacy) OR GATE_2/2.2 (canonical post-migration) — same work-plan phase
+_is_g3plan = _gate == 'G3_PLAN' or (_gate == 'GATE_2' and _phase in ('2.2', ''))
+if not _is_g3plan:
     sys.exit(0)
 wp = state.get('work_package_id', '')
 if not wp:
@@ -354,6 +439,125 @@ print(f'STORE:{latest}')
   # ALREADY_STORED: no output — silent pass
 }
 
+_kb84_guard() {
+  # KB-84 + FIX-101-04: Validate --wp / --gate / --phase for state-mutating commands.
+  # Default (strict): --wp and --gate required; --phase required when state has current_phase.
+  # Relaxed legacy: set PIPELINE_RELAXED_KB84=1 to allow commands without identifiers.
+  local CMD_LABEL="${1:-pass}"
+  local SF
+  if [ "$DOMAIN" = "tiktrack" ]; then
+    SF="_COMMUNICATION/agents_os/pipeline_state_tiktrack.json"
+  elif [ "$DOMAIN" = "agents_os" ]; then
+    SF="_COMMUNICATION/agents_os/pipeline_state_agentsos.json"
+  else
+    SF="_COMMUNICATION/agents_os/pipeline_state.json"
+  fi
+  local ACTIVE_PHASE ACTIVE_WP DOMAIN_RAW
+  ACTIVE_PHASE=$(python3 -c "
+import json, os
+try: print(json.loads(open('${SF}').read()).get('current_phase','') or '')
+except: print('')
+" 2>/dev/null)
+  ACTIVE_WP=$(python3 -c "
+import json, os
+try: print(json.loads(open('${SF}').read()).get('work_package_id','') or '')
+except: print('')
+" 2>/dev/null)
+  DOMAIN_RAW=$(_get_domain)
+  local CUR_GATE
+  CUR_GATE=$(_get_gate)
+
+  if [ -n "${PIPELINE_RELAXED_KB84:-}" ]; then
+    if [ -z "$EXPLICIT_GATE" ] && [ -z "$EXPLICIT_PHASE" ] && [ -z "$EXPLICIT_WP" ]; then
+      return 0
+    fi
+  else
+    if [ -z "$EXPLICIT_WP" ] || [ -z "$EXPLICIT_GATE" ]; then
+      local PHASE_HINT=""
+      if [ -n "$ACTIVE_PHASE" ]; then PHASE_HINT=" --phase ${ACTIVE_PHASE}"; fi
+      echo ""
+      echo "════════════════════════════════════════════════════════════════════"
+      echo "  ❌  ADVANCE BLOCKED — identifiers required (${CMD_LABEL})"
+      echo ""
+      echo "  Provide --wp and --gate matching active pipeline state."
+      if [ -n "$ACTIVE_PHASE" ]; then
+        echo "  Active phase is set — also pass --phase ${ACTIVE_PHASE}"
+      fi
+      echo ""
+      echo "  Active pipeline state:"
+      echo "    domain = ${DOMAIN_RAW}"
+      echo "    wp     = ${ACTIVE_WP:-—}"
+      echo "    gate   = ${CUR_GATE}"
+      echo "    phase  = ${ACTIVE_PHASE:-—}"
+      echo ""
+      echo "  Example:"
+      echo "    ./pipeline_run.sh --domain ${DOMAIN_RAW} --wp ${ACTIVE_WP:-<WP>} --gate ${CUR_GATE}${PHASE_HINT} ${CMD_LABEL}"
+      echo ""
+      echo "  Relaxed mode (not recommended): PIPELINE_RELAXED_KB84=1 ./pipeline_run.sh ..."
+      echo "════════════════════════════════════════════════════════════════════"
+      echo ""
+      return 1
+    fi
+    if [ -n "$ACTIVE_PHASE" ] && [ -z "$EXPLICIT_PHASE" ]; then
+      echo ""
+      echo "════════════════════════════════════════════════════════════════════"
+      echo "  ❌  ADVANCE BLOCKED — --phase required (${CMD_LABEL})"
+      echo ""
+      echo "  Active phase: ${ACTIVE_PHASE}"
+      echo "  Example:"
+      echo "    ./pipeline_run.sh --domain ${DOMAIN_RAW} --wp ${ACTIVE_WP} --gate ${CUR_GATE} --phase ${ACTIVE_PHASE} ${CMD_LABEL}"
+      echo "════════════════════════════════════════════════════════════════════"
+      echo ""
+      return 1
+    fi
+  fi
+
+  local MISMATCH=0
+  local MISMATCH_LINES=""
+
+  if [ -n "$EXPLICIT_WP" ] && [ "$EXPLICIT_WP" != "$ACTIVE_WP" ]; then
+    MISMATCH=1
+    MISMATCH_LINES="${MISMATCH_LINES}
+  WP mismatch:    --wp ${EXPLICIT_WP}     ≠  active WP ${ACTIVE_WP}"
+  fi
+  if [ -n "$EXPLICIT_GATE" ] && [ "$EXPLICIT_GATE" != "$CUR_GATE" ]; then
+    MISMATCH=1
+    MISMATCH_LINES="${MISMATCH_LINES}
+  Gate mismatch:  --gate ${EXPLICIT_GATE}  ≠  active gate ${CUR_GATE}"
+  fi
+  if [ -n "$EXPLICIT_PHASE" ] && [ -n "$ACTIVE_PHASE" ] && [ "$EXPLICIT_PHASE" != "$ACTIVE_PHASE" ]; then
+    MISMATCH=1
+    MISMATCH_LINES="${MISMATCH_LINES}
+  Phase mismatch: --phase ${EXPLICIT_PHASE}  ≠  active phase ${ACTIVE_PHASE}"
+  fi
+
+  if [ "$MISMATCH" -eq 1 ]; then
+    local PHASE_HINT="" WP_HINT=""
+    if [ -n "$ACTIVE_PHASE" ]; then PHASE_HINT=" --phase ${ACTIVE_PHASE}"; fi
+    if [ -n "$ACTIVE_WP" ];    then WP_HINT=" --wp ${ACTIVE_WP}"; fi
+    echo ""
+    echo "════════════════════════════════════════════════════════════════════"
+    echo "  ❌  ADVANCE BLOCKED — identifier mismatch (${CMD_LABEL})"
+    echo "${MISMATCH_LINES}"
+    echo ""
+    echo "  Active pipeline state:"
+    echo "    domain = ${DOMAIN_RAW}"
+    echo "    wp     = ${ACTIVE_WP:-—}"
+    echo "    gate   = ${CUR_GATE}"
+    echo "    phase  = ${ACTIVE_PHASE:-—}"
+    echo ""
+    echo "  Correct command for active state:"
+    echo "    ./pipeline_run.sh --domain ${DOMAIN_RAW}${WP_HINT} --gate ${CUR_GATE}${PHASE_HINT} ${CMD_LABEL}"
+    echo ""
+    echo "  Relaxed mode: PIPELINE_RELAXED_KB84=1 ./pipeline_run.sh --domain ${DOMAIN_RAW} ${CMD_LABEL}"
+    echo "════════════════════════════════════════════════════════════════════"
+    echo ""
+    return 1
+  fi
+  echo "[pipeline_run] ${DOMAIN_LABEL}Precision guard ✓ — wp=${ACTIVE_WP} gate=${CUR_GATE} phase=${ACTIVE_PHASE:-—} (${CMD_LABEL})"
+  return 0
+}
+
 _validate_stage_alignment() {
   # Stage-alignment guard — prevents pipeline ops on a wrong-stage state file.
   # Reads stage_id from the active pipeline state and compares to WSM active_stage_id.
@@ -430,15 +634,101 @@ case "${1:-next}" in
     _refresh_state_snapshot
     GATE=$(_get_gate)
     _auto_store_gate1_artifact   # AC-10: auto-store latest LLD400 before generating prompt
+    _auto_store_g3plan_artifact  # AC-11: auto-store latest G3_PLAN work plan before generating prompt
     $CLI --status
-    _generate_and_show "$GATE"
+
+    # ── GATE_2/2.2: work plan already stored — show compact "ready to advance" banner ──
+    # Prevents showing the full Team 10 mandate again when work plan is done.
+    # The full mandate is still regenerated for freshness, but is suppressed in display.
+    GATE2_READY=0
+    if [[ "$GATE" == "GATE_2" ]] || [[ "$GATE" == "G3_PLAN" ]]; then
+      GATE2_PHASE=$(python3 -c "
+import sys,os,json
+sys.path.insert(0,'.')
+domain=os.environ.get('PIPELINE_DOMAIN') or None
+sf='_COMMUNICATION/agents_os/pipeline_state_tiktrack.json' if domain=='tiktrack' else \
+   '_COMMUNICATION/agents_os/pipeline_state_agentsos.json' if domain=='agents_os' else \
+   '_COMMUNICATION/agents_os/pipeline_state.json'
+try: print(json.loads(open(sf).read()).get('current_phase','') or '')
+except: print('')
+" 2>/dev/null)
+      GATE2_WP=$(python3 -c "
+import sys,os,json
+sys.path.insert(0,'.')
+domain=os.environ.get('PIPELINE_DOMAIN') or None
+sf='_COMMUNICATION/agents_os/pipeline_state_tiktrack.json' if domain=='tiktrack' else \
+   '_COMMUNICATION/agents_os/pipeline_state_agentsos.json' if domain=='agents_os' else \
+   '_COMMUNICATION/agents_os/pipeline_state.json'
+try: print(str(json.loads(open(sf).read()).get('work_plan','') or '').strip())
+except: print('')
+" 2>/dev/null)
+      if [[ "$GATE2_PHASE" == "2.2" ]] && [[ -n "$GATE2_WP" ]]; then
+        GATE2_READY=1
+      fi
+    fi
+
+    if [[ "$GATE2_READY" -eq 1 ]]; then
+      WP_LEN=${#GATE2_WP}
+      DOMAIN_RAW=$(_get_domain)
+      echo ""
+      echo "╔══════════════════════════════════════════════════════════════════╗"
+      echo "  ✅  GATE_2 / Phase 2.2 — Work Plan Stored ($WP_LEN chars)"
+      echo ""
+      echo "  Team 10 work plan is confirmed in pipeline state."
+      echo "  Phase 2.2 is COMPLETE — advance to Phase 2.2v (Team 90 review)."
+      echo ""
+      echo "  ▶  Run:  ./pipeline_run.sh --domain ${DOMAIN_RAW} pass"
+      echo "╚══════════════════════════════════════════════════════════════════╝"
+      echo ""
+    else
+      _generate_and_show "$GATE"
+    fi
     ;;
 
   pass)
     _refresh_state_snapshot
     _validate_stage_alignment || exit 1
     GATE=$(_get_gate)
+
+    # ── WP099 PERMANENT TOMBSTONE guard ──────────────────────────────────
+    # S003-P011-WP099 was a simulation artifact. It must NEVER advance gates
+    # on the live pipeline, regardless of what is in the state file.
+    # This guard fires even if someone restores the state file from a stale cache.
+    WP_ID=$(_get_wp_id 2>/dev/null || echo "")
+    if [[ "$WP_ID" == *"WP099"* ]]; then
+      echo ""
+      echo "════════════════════════════════════════════════════════════════════"
+      echo "  ⛔ WP099 TOMBSTONE — S003-P011-WP099 is a simulation artifact"
+      echo "  This WP is permanently excluded from live pipeline execution."
+      echo "  The state file was likely restored from a stale external cache."
+      echo ""
+      echo "  Recovery:  git checkout HEAD -- <pipeline_state_file>"
+      echo "             ./pipeline_run.sh wsm-reset"
+      echo "════════════════════════════════════════════════════════════════════"
+      echo ""
+      exit 1
+    fi
+
+    # ── COMPLETE guard: refuse to advance when no WP is active ───────────
+    # Prevents simulation/stale-state runs from writing ghost WP IDs to WSM.
+    if [[ "$GATE" == "COMPLETE" ]]; then
+      _DOM_FLAG=""; if [[ -n "${DOMAIN:-}" ]]; then _DOM_FLAG="--domain $DOMAIN "; fi
+      echo ""
+      echo "════════════════════════════════════════════════════════════════════"
+      echo "  ⛔ NO ACTIVE WORK PACKAGE — pipeline is in COMPLETE state"
+      echo "  Cannot pass gate COMPLETE — there is no WP to advance."
+      echo ""
+      echo "  Sync WSM to idle state:  ./pipeline_run.sh ${_DOM_FLAG}wsm-reset"
+      echo "  Show pipeline status:    ./pipeline_run.sh ${_DOM_FLAG}status"
+      echo "════════════════════════════════════════════════════════════════════"
+      echo ""
+      exit 1
+    fi
+
     _auto_store_gate1_artifact   # AC-10: ensure latest LLD400 is stored before validation guard runs
+
+    # ── KB-84: Explicit WP / gate / phase guard (delegated to _kb84_guard) ──
+    _kb84_guard pass || exit 1
 
     # ── S003-P009-WP001 Item 3: pre-GATE_4 uncommitted-change block ───────
     # If we are about to leave CURSOR_IMPLEMENTATION (next gate is GATE_4),
@@ -493,6 +783,220 @@ except Exception:
     print('')
 " "$1" 2>/dev/null || echo ""
     }
+
+    # ── GATE_2 sub-phase advance (2.2→2.2v→2.3→full gate close) ──────────────
+    # advance_gate(GATE_2, PASS) skips sub-phases — handle them here first.
+    if [[ "$GATE" == "GATE_2" ]]; then
+      GATE2_PHASE=$(python3 -c "
+import sys,os,json
+sys.path.insert(0,'.')
+domain=os.environ.get('PIPELINE_DOMAIN') or None
+sf='_COMMUNICATION/agents_os/pipeline_state_tiktrack.json' if domain=='tiktrack' else \
+   '_COMMUNICATION/agents_os/pipeline_state_agentsos.json' if domain=='agents_os' else \
+   '_COMMUNICATION/agents_os/pipeline_state.json'
+try: print(json.loads(open(sf).read()).get('current_phase','') or '')
+except: print('')
+" 2>/dev/null)
+
+      _g2_phase_advance() {
+        local target_phase="$1"
+        local label="$2"
+        python3 -c "
+import sys,os,json
+from datetime import datetime,timezone
+sys.path.insert(0,'.')
+domain=os.environ.get('PIPELINE_DOMAIN') or None
+sf='_COMMUNICATION/agents_os/pipeline_state_tiktrack.json' if domain=='tiktrack' else \
+   '_COMMUNICATION/agents_os/pipeline_state_agentsos.json' if domain=='agents_os' else \
+   '_COMMUNICATION/agents_os/pipeline_state.json'
+try:
+    s=json.loads(open(sf).read())
+    s['current_phase']='${target_phase}'
+    s['last_updated']=datetime.now(timezone.utc).isoformat()
+    open(sf,'w').write(json.dumps(s,indent=2,ensure_ascii=False))
+    print('[OK]')
+except Exception as e:
+    print('[ERR] '+str(e)); raise
+"
+      }
+
+      if [[ "$GATE2_PHASE" == "2.2" ]]; then
+        # Phase 2.2 → 2.2v: validate work_plan stored first
+        WORK_PLAN=$(_check_state_field "work_plan")
+        if [ -z "$WORK_PLAN" ] && [ "$FORCE_FLAG" != "--force" ]; then
+          echo ""
+          echo "════════════════════════════════════════════════════════════════════"
+          echo "  ⚠️  ADVANCE BLOCKED — work_plan not stored"
+          echo "  GATE_2 / Phase 2.2 cannot advance to 2.2v until Team 10's work"
+          echo "  plan is stored in pipeline state."
+          echo ""
+          echo "  Store it:  ./pipeline_run.sh ${DOMAIN_FLAG_STR}phase2"
+          echo "  Then retry: ./pipeline_run.sh ${DOMAIN_FLAG_STR}pass"
+          echo "════════════════════════════════════════════════════════════════════"
+          echo ""
+          exit 1
+        fi
+        echo "[pipeline_run] ${DOMAIN_LABEL}GATE_2 phase advance: 2.2 → 2.2v (Team 90 work plan review)"
+        _g2_phase_advance "2.2v" "Team 90 work plan review"
+        echo ""
+        _generate_and_show "GATE_2"
+        ACTIVE_DOMAIN=$(_get_domain)
+        echo ""
+        echo "  ────────────────────────────────────────────────────────────────"
+        echo "  💡 Dashboard: reload to see Phase 2.2v (${ACTIVE_DOMAIN})"
+        echo "  ────────────────────────────────────────────────────────────────"
+        exit 0
+
+      elif [[ "$GATE2_PHASE" == "2.2v" ]]; then
+        # Phase 2.2v → 2.3: Team 90 validated — advance to architect sign-off
+        echo "[pipeline_run] ${DOMAIN_LABEL}GATE_2 phase advance: 2.2v → 2.3 (architect sign-off)"
+        _g2_phase_advance "2.3" "Architect sign-off"
+        echo ""
+        _generate_and_show "GATE_2"
+        ACTIVE_DOMAIN=$(_get_domain)
+        echo ""
+        echo "  ────────────────────────────────────────────────────────────────"
+        echo "  💡 Dashboard: reload to see Phase 2.3 (${ACTIVE_DOMAIN})"
+        echo "  ────────────────────────────────────────────────────────────────"
+        exit 0
+
+      fi
+      # Phase 2.3 (or empty/unknown): fall through to full gate advance → GATE_3
+      echo "[pipeline_run] ${DOMAIN_LABEL}GATE_2/2.3 → full gate close → GATE_3/3.1"
+    fi
+
+    # ── GATE_3 sub-phase advance (3.1→3.2→3.3→full gate close) ───────────────
+    # advance_gate(GATE_3, PASS) skips sub-phases — handle them here first.
+    # 3.1 (mandates) → pass → 3.2 (implementation) → pass → 3.3 (QA) → pass → GATE_4
+    if [[ "$GATE" == "GATE_3" ]]; then
+      GATE3_PHASE=$(python3 -c "
+import sys,os,json
+sys.path.insert(0,'.')
+domain=os.environ.get('PIPELINE_DOMAIN') or None
+sf='_COMMUNICATION/agents_os/pipeline_state_tiktrack.json' if domain=='tiktrack' else \
+   '_COMMUNICATION/agents_os/pipeline_state_agentsos.json' if domain=='agents_os' else \
+   '_COMMUNICATION/agents_os/pipeline_state.json'
+try: print(json.loads(open(sf).read()).get('current_phase','') or '')
+except: print('')
+" 2>/dev/null)
+
+      _g3_phase_advance() {
+        local target_phase="$1"
+        python3 -c "
+import sys,os,json
+from datetime import datetime,timezone
+sys.path.insert(0,'.')
+domain=os.environ.get('PIPELINE_DOMAIN') or None
+sf='_COMMUNICATION/agents_os/pipeline_state_tiktrack.json' if domain=='tiktrack' else \
+   '_COMMUNICATION/agents_os/pipeline_state_agentsos.json' if domain=='agents_os' else \
+   '_COMMUNICATION/agents_os/pipeline_state.json'
+try:
+    s=json.loads(open(sf).read())
+    s['current_phase']='${target_phase}'
+    s['last_updated']=datetime.now(timezone.utc).isoformat()
+    open(sf,'w').write(json.dumps(s,indent=2,ensure_ascii=False))
+    print('[OK]')
+except Exception as e:
+    print('[ERR] '+str(e)); raise
+"
+      }
+
+      if [[ "$GATE3_PHASE" == "3.1" ]]; then
+        echo "[pipeline_run] ${DOMAIN_LABEL}GATE_3 phase advance: 3.1 → 3.2 (implementation)"
+        _g3_phase_advance "3.2"
+        echo ""
+        _generate_and_show "GATE_3"
+        ACTIVE_DOMAIN=$(_get_domain)
+        echo ""
+        echo "  ────────────────────────────────────────────────────────────────"
+        echo "  💡 GATE_3/3.2 active — paste mandate to implementation teams"
+        echo "  💡 Dashboard: reload to see Phase 3.2 (${ACTIVE_DOMAIN})"
+        echo "  ────────────────────────────────────────────────────────────────"
+        exit 0
+
+      elif [[ "$GATE3_PHASE" == "3.2" ]]; then
+        echo "[pipeline_run] ${DOMAIN_LABEL}GATE_3 phase advance: 3.2 → 3.3 (QA — Team 50/51)"
+        _g3_phase_advance "3.3"
+        echo ""
+        _generate_and_show "GATE_3"
+        ACTIVE_DOMAIN=$(_get_domain)
+        echo ""
+        echo "  ────────────────────────────────────────────────────────────────"
+        echo "  💡 GATE_3/3.3 active — paste QA mandate to Team 50/51"
+        echo "  💡 Dashboard: reload to see Phase 3.3 (${ACTIVE_DOMAIN})"
+        echo "  ────────────────────────────────────────────────────────────────"
+        exit 0
+
+      fi
+      # Phase 3.3 (or unknown): fall through to full gate advance → GATE_4
+      echo "[pipeline_run] ${DOMAIN_LABEL}GATE_3/3.3 QA complete → full gate close → GATE_4/4.1"
+    fi
+
+    # ── GATE_4 sub-phase advance (4.1→4.2→4.3→full gate close) ───────────────
+    # 4.1 (Team 90 constitutional) → pass → 4.2 (arch review) → pass → 4.3 (Nimrod) → pass → GATE_5
+    if [[ "$GATE" == "GATE_4" ]]; then
+      GATE4_PHASE=$(python3 -c "
+import sys,os,json
+sys.path.insert(0,'.')
+domain=os.environ.get('PIPELINE_DOMAIN') or None
+sf='_COMMUNICATION/agents_os/pipeline_state_tiktrack.json' if domain=='tiktrack' else \
+   '_COMMUNICATION/agents_os/pipeline_state_agentsos.json' if domain=='agents_os' else \
+   '_COMMUNICATION/agents_os/pipeline_state.json'
+try: print(json.loads(open(sf).read()).get('current_phase','') or '')
+except: print('')
+" 2>/dev/null)
+
+      _g4_phase_advance() {
+        local target_phase="$1"
+        python3 -c "
+import sys,os,json
+from datetime import datetime,timezone
+sys.path.insert(0,'.')
+domain=os.environ.get('PIPELINE_DOMAIN') or None
+sf='_COMMUNICATION/agents_os/pipeline_state_tiktrack.json' if domain=='tiktrack' else \
+   '_COMMUNICATION/agents_os/pipeline_state_agentsos.json' if domain=='agents_os' else \
+   '_COMMUNICATION/agents_os/pipeline_state.json'
+try:
+    s=json.loads(open(sf).read())
+    s['current_phase']='${target_phase}'
+    s['last_updated']=datetime.now(timezone.utc).isoformat()
+    open(sf,'w').write(json.dumps(s,indent=2,ensure_ascii=False))
+    print('[OK]')
+except Exception as e:
+    print('[ERR] '+str(e)); raise
+"
+      }
+
+      if [[ "$GATE4_PHASE" == "4.1" ]]; then
+        echo "[pipeline_run] ${DOMAIN_LABEL}GATE_4 phase advance: 4.1 → 4.2 (architectural review)"
+        _g4_phase_advance "4.2"
+        echo ""
+        _generate_and_show "GATE_4"
+        ACTIVE_DOMAIN=$(_get_domain)
+        echo ""
+        echo "  ────────────────────────────────────────────────────────────────"
+        echo "  💡 GATE_4/4.2 active — paste mandate to lod200_author_team (arch review)"
+        echo "  💡 Dashboard: reload to see Phase 4.2 (${ACTIVE_DOMAIN})"
+        echo "  ────────────────────────────────────────────────────────────────"
+        exit 0
+
+      elif [[ "$GATE4_PHASE" == "4.2" ]]; then
+        echo "[pipeline_run] ${DOMAIN_LABEL}GATE_4 phase advance: 4.2 → 4.3 (Nimrod human sign-off)"
+        _g4_phase_advance "4.3"
+        echo ""
+        _generate_and_show "GATE_4"
+        ACTIVE_DOMAIN=$(_get_domain)
+        echo ""
+        echo "  ────────────────────────────────────────────────────────────────"
+        echo "  💡 GATE_4/4.3 active — Nimrod reviews + approves or rejects"
+        echo "  💡 Dashboard: reload to see Phase 4.3 (${ACTIVE_DOMAIN})"
+        echo "  ────────────────────────────────────────────────────────────────"
+        exit 0
+
+      fi
+      # Phase 4.3 (or unknown): fall through to full gate advance → GATE_5
+      echo "[pipeline_run] ${DOMAIN_LABEL}GATE_4/4.3 approved → full gate close → GATE_5/5.1"
+    fi
 
     case "$GATE" in
       GATE_1)
@@ -571,16 +1075,57 @@ except Exception:
       echo "  Missing: $MISSING_ARTIFACTS"
       echo ""
     fi
+    # ── S003-P011-WP001 KB-26: Block pass when BLOCK_FOR_FIX active ──────────
+    # If last_blocking_gate == current_gate and last_blocking_findings non-empty, do not advance.
+    python3 -c "
+import sys, os, json
+sys.path.insert(0, '.')
+os.environ.setdefault('PIPELINE_DOMAIN', '${DOMAIN:-}')
+from agents_os_v2.orchestrator.state import PipelineState
+domain = os.environ.get('PIPELINE_DOMAIN') or None
+state = PipelineState.load(domain)
+lbg = getattr(state, 'last_blocking_gate', '') or ''
+lbf = getattr(state, 'last_blocking_findings', '') or ''
+cg = state.current_gate or ''
+if lbg and cg and lbg == cg and lbf.strip():
+    print('', file=sys.stderr)
+    print('════════════════════════════════════════════════════════════', file=sys.stderr)
+    print('  ⛔ BLOCK_FOR_FIX — Fix blocking findings before advancing', file=sys.stderr)
+    print('  Gate:', cg, file=sys.stderr)
+    print('  Blocking findings must be addressed. Run: ./pipeline_run.sh insist', file=sys.stderr)
+    print('  to regenerate remediation mandate.', file=sys.stderr)
+    print('════════════════════════════════════════════════════════════', file=sys.stderr)
+    sys.exit(1)
+" 2>&1
+    KB26_EXIT=$?
+    if [ "$KB26_EXIT" -ne 0 ]; then
+      echo ""
+      echo "  ⛔ BLOCK_FOR_FIX active — address blocking findings (./pipeline_run.sh insist)"
+      echo ""
+      exit 1
+    fi
     # ──────────────────────────────────────────────────────────────────────
 
     echo "[pipeline_run] ${DOMAIN_LABEL}Advancing $GATE → PASS"
     $CLI --advance "$GATE" PASS
     echo ""
+    _ssot_check_print
+    echo ""
     NEXT_GATE=$(_get_gate)
     ACTIVE_DOMAIN=$(_get_domain)
+    # S003-P011-WP001 KB-27: GATE_2 with gate_state=HUMAN_PENDING also needs approve
+    GATE_STATE=$(python3 -c "
+import sys, os; sys.path.insert(0, '.'); os.environ.setdefault('PIPELINE_DOMAIN', '${DOMAIN:-}')
+from agents_os_v2.orchestrator.state import PipelineState
+print(getattr(PipelineState.load(os.environ.get('PIPELINE_DOMAIN')), 'gate_state', '') or '')
+" 2>/dev/null || echo "")
     if [[ "$NEXT_GATE" == WAITING_* ]]; then
       echo "[pipeline_run] Human approval gate reached: $NEXT_GATE"
       echo "[pipeline_run] Review and run: ./pipeline_run.sh approve"
+    elif [[ "$NEXT_GATE" == "GATE_2" && "$GATE_STATE" == "HUMAN_PENDING" ]]; then
+      echo "[pipeline_run] GATE_2 human approval required (gate_state=HUMAN_PENDING)"
+      echo "[pipeline_run] Review and run: ./pipeline_run.sh approve"
+      _generate_and_show "$NEXT_GATE"
     else
       _generate_and_show "$NEXT_GATE"
     fi
@@ -593,10 +1138,88 @@ except Exception:
 
   fail)
     _validate_stage_alignment || exit 1
+    # S003-P011-WP001 P6 + S003-P012-WP002: fail [--finding_type TYPE] [--from-report PATH] [reason...]
+    shift
+    FINDING_TYPE="${FINDING_TYPE:-}"
+    FROM_REPORT=""
+    REASON=""
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        --finding_type|--finding-type)
+          FINDING_TYPE="$2"
+          shift 2
+          ;;
+        --from-report)
+          FROM_REPORT="$2"
+          shift 2
+          ;;
+        *)
+          REASON="${REASON}${REASON:+ }$1"
+          shift 1
+          ;;
+      esac
+    done
+    FINDING_TYPE_ENUM="PWA|doc|wording|canonical_deviation|code_fix_single|code_fix_multi|architectural|scope_change|unclear"
+    if [[ -z "$FINDING_TYPE" ]]; then
+      echo "" >&2
+      echo "════════════════════════════════════════════════════════════" >&2
+      echo "  ⛔ FAIL PREFLIGHT — finding_type is required" >&2
+      echo "  Set via: ./pipeline_run.sh fail --finding_type PWA \"reason\"" >&2
+      echo "  Or: ./pipeline_run.sh fail --finding_type doc --from-report /path/to/report.md" >&2
+      echo "  Or: FINDING_TYPE=PWA ./pipeline_run.sh fail \"reason\"" >&2
+      echo "  Valid: $FINDING_TYPE_ENUM" >&2
+      echo "════════════════════════════════════════════════════════════" >&2
+      exit 1
+    fi
+    if ! [[ "$FINDING_TYPE" =~ ^(PWA|doc|wording|canonical_deviation|code_fix_single|code_fix_multi|architectural|scope_change|unclear)$ ]]; then
+      echo "" >&2
+      echo "  ⛔ finding_type '$FINDING_TYPE' not in ENUM. Valid: $FINDING_TYPE_ENUM" >&2
+      exit 1
+    fi
+    export FINDING_TYPE
+    # ── KB-84: Precision guard (fail) ─────────────────────────────────────────
+    _kb84_guard "fail --finding_type ${FINDING_TYPE} \"${REASON}\"" || exit 1
     GATE=$(_get_gate)
-    REASON="${2:-no reason given}"
-    echo "[pipeline_run] ${DOMAIN_LABEL}Advancing $GATE → FAIL: $REASON"
-    $CLI --advance "$GATE" FAIL --reason "$REASON"
+
+    # ── WP099 PERMANENT TOMBSTONE guard ──────────────────────────────────
+    WP_ID_FAIL=$(_get_wp_id 2>/dev/null || echo "")
+    if [[ "$WP_ID_FAIL" == *"WP099"* ]]; then
+      echo ""
+      echo "════════════════════════════════════════════════════════════════════"
+      echo "  ⛔ WP099 TOMBSTONE — S003-P011-WP099 is a simulation artifact"
+      echo "  This WP is permanently excluded from live pipeline execution."
+      echo ""
+      echo "  Recovery:  git checkout HEAD -- <pipeline_state_file>"
+      echo "             ./pipeline_run.sh wsm-reset"
+      echo "════════════════════════════════════════════════════════════════════"
+      echo ""
+      exit 1
+    fi
+
+    # ── COMPLETE guard: refuse to record FAIL when no WP is active ────────
+    if [[ "$GATE" == "COMPLETE" ]]; then
+      _DOM_FLAG=""; if [[ -n "${DOMAIN:-}" ]]; then _DOM_FLAG="--domain $DOMAIN "; fi
+      echo ""
+      echo "════════════════════════════════════════════════════════════════════"
+      echo "  ⛔ NO ACTIVE WORK PACKAGE — pipeline is in COMPLETE state"
+      echo "  Cannot record FAIL — there is no WP to advance."
+      echo ""
+      echo "  Sync WSM to idle state:  ./pipeline_run.sh ${_DOM_FLAG}wsm-reset"
+      echo "  Show pipeline status:    ./pipeline_run.sh ${_DOM_FLAG}status"
+      echo "════════════════════════════════════════════════════════════════════"
+      echo ""
+      exit 1
+    fi
+
+    echo "[pipeline_run] ${DOMAIN_LABEL}Advancing $GATE → FAIL (finding_type=$FINDING_TYPE): ${REASON:-<from-report or empty>}"
+    FR_ARGS=()
+    if [[ -n "$FROM_REPORT" ]]; then
+      FR_ARGS=(--from-report "$FROM_REPORT")
+    fi
+    $CLI --advance "$GATE" FAIL --reason "$REASON" --finding-type "$FINDING_TYPE" "${FR_ARGS[@]}"
+    echo ""
+    _ssot_check_print
+    echo ""
 
     # GATE_1 FAIL: clear lld400_content so the dashboard reverts to Phase 1
     # (correction cycle) instead of showing stale Phase 2 state.
@@ -634,7 +1257,7 @@ except Exception as e:
       # for remediation cycles (CURSOR_IMPLEMENTATION / G3_PLAN).
       _generate_and_show "$NEXT_GATE"
     else
-      # Gate stayed at same position — check if it's a self-loop gate (e.g. GATE_8)
+      # Gate stayed at same position — check if it's a self-loop gate (e.g. GATE_5 closure)
       # Self-loop gates always route back to themselves; default_fail_route handles it.
       IS_SELF_LOOP=$(python3 -c "
 import sys, os; sys.path.insert(0, '.')
@@ -677,6 +1300,8 @@ print('yes' if GATE_CONFIG.get('${GATE}', {}).get('default_fail_route') else 'no
     echo "[pipeline_run] ${DOMAIN_LABEL}Approving: $BASE_GATE"
     $CLI --approve "$BASE_GATE"
     echo ""
+    _ssot_check_print
+    echo ""
     NEXT_GATE=$(_get_gate)
     ACTIVE_DOMAIN=$(_get_domain)
     _generate_and_show "$NEXT_GATE"
@@ -690,6 +1315,46 @@ print('yes' if GATE_CONFIG.get('${GATE}', {}).get('default_fail_route') else 'no
   status)
     _refresh_state_snapshot
     $CLI --status
+    ;;
+
+  wsm-reset)
+    # Write clean COMPLETE/idle state to all WSM COS fields.
+    # Use when both domains are COMPLETE and ghost WP IDs contaminate the WSM
+    # (e.g. after a simulation run that accidentally called pass/fail with a stale WP).
+    echo "[pipeline_run] ${DOMAIN_LABEL}WSM idle-reset — syncing all COS fields to COMPLETE/idle state"
+    python3 -c "
+import sys, os, json
+from pathlib import Path
+sys.path.insert(0, '.')
+try:
+    from agents_os_v2.orchestrator.wsm_writer import write_wsm_idle_reset
+    agents_dir = Path('_COMMUNICATION/agents_os')
+    tt_wp = tt_gate = aos_wp = aos_gate = ''
+    tt_file = agents_dir / 'pipeline_state_tiktrack.json'
+    aos_file = agents_dir / 'pipeline_state_agentsos.json'
+    if tt_file.exists():
+        d = json.loads(tt_file.read_text())
+        tt_wp   = d.get('work_package_id', '')
+        tt_gate = d.get('current_gate', '')
+    if aos_file.exists():
+        d = json.loads(aos_file.read_text())
+        aos_wp   = d.get('work_package_id', '')
+        aos_gate = d.get('current_gate', '')
+    write_wsm_idle_reset(tt_wp=tt_wp, tt_gate=tt_gate, aos_wp=aos_wp, aos_gate=aos_gate)
+    from agents_os_v2.orchestrator.wsm_writer import write_stage_parallel_tracks_row
+    from agents_os_v2.orchestrator.state import PipelineState
+    for _dom in ('tiktrack', 'agents_os'):
+        write_stage_parallel_tracks_row(PipelineState.load(_dom))
+    print('  ✅ WSM idle-reset complete')
+    print(f'     TikTrack last: {tt_wp or \"N/A\"} ({tt_gate or \"?\"})')
+    print(f'     AOS last:      {aos_wp or \"N/A\"} ({aos_gate or \"?\"})')
+except Exception as e:
+    print(f'  ⚠️  wsm-reset failed: {e}', file=sys.stderr)
+    sys.exit(1)
+" || exit 1
+    echo ""
+    _ssot_check_print
+    echo ""
     ;;
 
   gate)
@@ -713,6 +1378,8 @@ print('yes' if GATE_CONFIG.get('${GATE}', {}).get('default_fail_route') else 'no
     else
       GATE=$(_get_gate)
     fi
+    # ── KB-84: Precision guard (route) ────────────────────────────────────────
+    _kb84_guard "route ${TYPE}" || exit 1
     echo "[pipeline_run] ${DOMAIN_LABEL}Routing $GATE FAIL → $TYPE"
     if [ -n "$NOTES" ]; then
       echo "[pipeline_run] Notes: $NOTES"
@@ -729,6 +1396,8 @@ print('yes' if GATE_CONFIG.get('${GATE}', {}).get('default_fail_route') else 'no
       # No notes: rely on pipeline auto-extraction from blocking reports/verdicts.
       _generate_and_show "$NEXT_GATE"
     fi
+    echo ""
+    _ssot_check_print || exit 1
     ;;
 
   revise)
@@ -860,10 +1529,39 @@ print(f'    Updated: {s.last_updated or \"never\"}')
       echo "Usage: ./pipeline_run.sh phase<N>  (e.g. phase2, phase3)"
       exit 1
     fi
+    # ── KB-84: Precision guard (phase advance) ────────────────────────────────
+    _kb84_guard "phase${PHASE_NUM}" || exit 1
 
     GATE=$(_get_gate)
     _auto_store_gate1_artifact   # AC-10: auto-store latest LLD400 before phase transition
     _auto_store_g3plan_artifact  # AC-11: auto-store G3_PLAN work plan before phase transition
+
+    # FIX-101-07: gates where phase advance must update state *before* mandate regeneration
+    if [[ "$GATE" == "GATE_5" && "$PHASE_NUM" == "2" ]]; then
+      python3 -c "
+import sys, os
+sys.path.insert(0, '.')
+from agents_os_v2.orchestrator.state import PipelineState
+domain = os.environ.get('PIPELINE_DOMAIN') or None
+state = PipelineState.load(domain)
+state.current_phase = '5.2'
+state.save()
+print('[pipeline_run] GATE_5: current_phase set to 5.2 before mandate regeneration (FIX-101-07).')
+" 2>/dev/null || true
+    fi
+    if [[ "$GATE" == "GATE_8" && "$PHASE_NUM" == "2" ]]; then
+      python3 -c "
+import sys, os
+sys.path.insert(0, '.')
+from agents_os_v2.orchestrator.state import PipelineState
+domain = os.environ.get('PIPELINE_DOMAIN') or None
+state = PipelineState.load(domain)
+state.phase8_content = 'PHASE2_ACTIVE'
+state.save()
+print('[pipeline_run] GATE_8: phase8_content=PHASE2_ACTIVE before mandate regeneration (FIX-101-07).')
+" 2>/dev/null || true
+    fi
+
     echo "[pipeline_run] ${DOMAIN_LABEL}Phase ${PHASE_NUM} — regenerating mandates for: $GATE"
     $CLI --generate-prompt "$GATE" 2>&1 | grep -v "^━"
 
@@ -875,8 +1573,14 @@ print(f'    Updated: {s.last_updated or \"never\"}')
       GATE_1)
         MANDATE_FILE="$PROMPTS_DIR/${_dm_slug}_GATE_1_mandates.md"
         ;;
+      GATE_2)
+        MANDATE_FILE="$PROMPTS_DIR/${_dm_slug}_GATE_2_mandates.md"
+        ;;
       G3_PLAN)
         MANDATE_FILE="$PROMPTS_DIR/${_dm_slug}_G3_PLAN_mandates.md"
+        ;;
+      GATE_5)
+        MANDATE_FILE="$PROMPTS_DIR/${_dm_slug}_gate_5_mandates.md"
         ;;
       GATE_8)
         MANDATE_FILE="$PROMPTS_DIR/${_dm_slug}_gate_8_mandates.md"
@@ -944,7 +1648,8 @@ PYEOF
     echo ""
 
     # ── State update: G3_PLAN phase2 — confirm work plan stored ──────────
-    if [[ "$GATE" == "G3_PLAN" && "$PHASE_NUM" == "2" ]]; then
+    # Also matches GATE_2 (canonical post-migration of G3_PLAN)
+    if [[ ("$GATE" == "G3_PLAN" || "$GATE" == "GATE_2") && "$PHASE_NUM" == "2" ]]; then
       python3 -c "
 import sys, os
 sys.path.insert(0, '.')
@@ -958,21 +1663,7 @@ else:
 "
     fi
 
-    # ── State update: mark phase transition in pipeline_state ─────────────
-    # When phase2 is run on GATE_8, Phase 1 (Team 70/170) is confirmed done.
-    # Write phase8_content to state so the dashboard detects the transition.
-    if [[ "$GATE" == "GATE_8" && "$PHASE_NUM" == "2" ]]; then
-      python3 -c "
-import sys, os
-sys.path.insert(0, '.')
-from agents_os_v2.orchestrator.state import PipelineState
-domain = os.environ.get('PIPELINE_DOMAIN') or None
-state = PipelineState.load(domain)
-state.phase8_content = 'PHASE2_ACTIVE'
-state.save()
-print('[pipeline_run] ✅ State updated — phase8_content=PHASE2_ACTIVE. Dashboard will reflect Phase 2.')
-"
-    fi
+    # ── (GATE_5 / GATE_8 phase2 state updates moved before --generate-prompt — FIX-101-07) ──
 
     # ── Event log: PHASE_TRANSITION ──────────────────────────────────────
     python3 -c "
@@ -1000,18 +1691,24 @@ try:
 except Exception:
     pass
 " 2>/dev/null || true
+    # FIX-101-02: parallel tracks + SSOT after phase mandate display (state may have changed)
+    _auto_wsm_sync || exit 1
+    _ssot_check_print || exit 1
     ;;
 
   *)
     echo "Usage: ./pipeline_run.sh [--domain tiktrack|agents_os] [next|pass|fail <reason>|approve|status|gate <NAME>|route doc|full [notes]|revise <notes> [file]|store <GATE> <FILE>|pass_with_actions <a1|a2>|actions_clear|override <reason>|insist|domain|phase<N>]"
     echo ""
     echo "  next / (no arg)          Generate current gate prompt + display"
-    echo "  pass                     Advance current gate → PASS → show next"
+    echo "  pass                              Advance current gate → PASS (no validation)
+  --wp WP --gate G --phase P pass   Precision pass: validate WP+gate+phase vs active state
+                                    Recommended: ./pipeline_run.sh --domain D --wp S003-P013-WP001 --gate GATE_3 --phase 3.3 pass
+                                    Blocks with correction if any identifier mismatches"
     echo "  fail <reason>            Record FAIL with reason → show routing options"
     echo "  route doc|full [notes]   Route after FAIL: doc=quick fix, full=full cycle"
-    echo "  approve                  Approve human gate (GATE_2, GATE_7)"
-    echo "  approve                  Approve human gate (GATE_2, GATE_7)"
+    echo "  approve                  Approve human gate (GATE_2, GATE_4 UX; alias gate7)"
     echo "  status                   Show pipeline state only"
+    echo "  wsm-reset                Sync WSM to idle state when both domains COMPLETE"
     echo "  gate <NAME>              Generate prompt for specific gate"
     echo "  revise <notes> [file]    Generate G3_PLAN revision prompt after G3_5 FAIL"
     echo "  store <GATE> <FILE>      Store artifact file to pipeline state"

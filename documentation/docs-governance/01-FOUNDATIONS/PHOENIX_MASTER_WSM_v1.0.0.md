@@ -99,25 +99,25 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 |-------|-------|
 | active_stage_id | S003|
 | active_stage_label | שלב 2 — Stage 2|
-| active_flow | S003-P013-WP001 — gate COMPLETE (last event: GATE_5 PASS)|
-| active_project_domain | TIKTRACK|
-| active_work_package_id | N/A|
-| in_progress_work_package_id | N/A|
+| active_flow | S003-P011-WP099 — gate GATE_3 (last event: GATE_3 FAIL)|
+| active_project_domain | AGENTS_OS|
+| active_work_package_id | S003-P011-WP099|
+| in_progress_work_package_id | S003-P011-WP099|
 | last_closed_work_package_id | S003-P013-WP001|
 | last_closed_program_id | S003-P003 (System Settings D39+D40+D41 — GATE_8 PASS 2026-03-21; DOCUMENTATION_CLOSED). Prior: S003-P011-WP002 (DOCUMENTATION_CLOSED 2026-03-21). |
 | last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
 | allowed_gate_range | GATE_0_TO_GATE_8 (normal execution lifecycle) |
-| current_gate | COMPLETE|
+| current_gate | GATE_3|
 | track_mode | NORMAL|
 | suspended_track_state | N/A |
 | hold_reason | N/A |
 | agents_os_parallel_track | **S003-P012 PROGRAM COMPLETE 2026-03-21 — all 5 WPs GATE_5 FULL PASS.** Next AOS: **S003-P011-WP003 (RBAC)** — awaiting activation (Team 00 signal). |
-| active_program_id | S003-P013|
+| active_program_id | S003-P011|
 | active_plan_id | S003|
-| phase_owner_team | Team 10|
-| last_gate_event | **GATE_5 PASS** — S003-P013-WP001 \| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-22| 2026-03-22| 2026-03-22. Parallel: S003-P012 program complete 2026-03-21; runtime row synced until next `pipeline_run.sh` advance. |
-| next_required_action | Lifecycle complete — await next WP activation (Team 100 / Team 00).|
-| next_responsible_team | Team 100|
+| phase_owner_team | Team 61|
+| last_gate_event | **GATE_3 FAIL** — S003-P011-WP099 \| 2026-03-24| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-22| 2026-03-22| 2026-03-22. Parallel: S003-P012 program complete 2026-03-21; runtime row synced until next `pipeline_run.sh` advance. |
+| next_required_action | Execute GATE_3 — generate prompt via pipeline_run.sh (owner: Team 61).|
+| next_responsible_team | Team 61|
 
 ---
 
@@ -128,8 +128,8 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 | domain | active_program_id | active_work_package_id | phase_status | current_gate | gate_owner_team |
 |--------|-------------------|------------------------|--------------|--------------|-----------------|
-| AGENTS_OS | S003-P011 | PENDING (S003-P011-WP003 awaiting GATE_1) | **S003-P012 PROGRAM COMPLETE 2026-03-21.** Next: **S003-P011-WP003** (Role-Based Team Management) — activation pending Team 00 signal. | PENDING | Team 00 (activation decision) |
-| TIKTRACK | S003-P013 | S003-P013-WP001 | **COMPLETE 2026-03-23** — Canary monitored pipeline run (D33 display_name field). ALL GATES PASS: GATE_0–GATE_5 complete. No blocking findings. Monitor: Team 100. Pipeline state: COMPLETE. Prior closed: S003-P003-WP001 DOCUMENTATION_CLOSED 2026-03-21. | COMPLETE | Team 10 |
+| AGENTS_OS | S003-P011 | S003-P011-WP099 | **2026-03-24** pipeline sync — gate=GATE_3 — phase=3.2 — wp=S003-P011-WP099 | GATE_3 | Team 61 |
+| TIKTRACK | S003-P013 | S003-P013-WP001 | **2026-03-24** pipeline sync — gate=COMPLETE — wp=S003-P013-WP001 | COMPLETE | Team 10 |
 
 ---
 
@@ -388,3 +388,8 @@ GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:
 **log_entry | TEAM_61 | SSOT_WSM_SYNC | GATE_4 PASS | S003-P013-WP001 | 2026-03-23**
 **log_entry | TEAM_70 | STAGE_PARALLEL_TRACKS_SYNC | S003-P013-WP001 | TIKTRACK_row_current_gate_GATE_3_to_GATE_5 | BF-G5-DOC-001_REMEDIATED | aligns_WITH_CURRENT_OPERATIONAL_STATE | 2026-03-23**
 **log_entry | TEAM_61 | SSOT_WSM_SYNC | GATE_5 PASS | S003-P013-WP001 | 2026-03-23**
+**log_entry | PIPELINE_RUNNER | WSM_IDLE_RESET | COMPLETE | TT=S003-P013-WP001 AOS=S003-P015-WP001 | 2026-03-24**
+**log_entry | PIPELINE_RUNNER | STAGE_PARALLEL_TRACKS_SYNC | TIKTRACK | COMPLETE | S003-P013-WP001 | 2026-03-24**
+**log_entry | PIPELINE_RUNNER | STAGE_PARALLEL_TRACKS_SYNC | AGENTS_OS | COMPLETE | S003-P015-WP001 | 2026-03-24**
+**log_entry | TEAM_61 | SSOT_WSM_SYNC | GATE_3 FAIL | S003-P011-WP099 | 2026-03-24**
+**log_entry | PIPELINE_RUNNER | STAGE_PARALLEL_TRACKS_SYNC | AGENTS_OS | GATE_3 | S003-P011-WP099 | 2026-03-24**

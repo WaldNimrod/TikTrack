@@ -111,3 +111,23 @@ S{NNN}-P{NNN}-WP{NNN}: Team 61 — [Category X-XX]: [brief description]
 - Verify 0 test failures before push
 
 **Pre-GATE_4 check:** Pipeline warns if no new commits since last run. Ensure implementation is committed before continuing to GATE_4.
+
+---
+
+## Pipeline Dashboard — Display State Reference (G-01)
+
+When `current_gate = COMPLETE` (or `NONE` / empty), the dashboard intentionally shows `—`
+in several sidebar fields.  This is correct behavior — not a test failure.
+
+| `current_gate` value | `s-owner` | `s-engine` | Gate pill | `team-assignment-expected` |
+|----------------------|-----------|------------|-----------|---------------------------|
+| `COMPLETE` | `—` | `—` | ✅ WP CLOSED | `—` (empty or not rendered) |
+| `NONE` or empty | `—` | `—` | ✅ WP CLOSED | `—` |
+| Any active gate (e.g. `GATE_3`) | Team ID | Engine string | Gate name + status | Team ID |
+
+**Source:** `agents_os/ui/js/pipeline-dashboard.js` — `isComplete` flag (around line 157).
+
+**For QA tests:** Assert `s-owner` = `—` (not empty string check) when gate is COMPLETE.
+The `team-assignment-expected` element may be absent from the DOM entirely in COMPLETE state.
+
+**Domain deep-link:** `http://localhost:8090/?domain=agents_os` loads Agents OS domain directly.

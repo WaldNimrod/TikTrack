@@ -141,6 +141,21 @@ if [[ -z "$COMMIT_MSG" ]]; then
   exit 2
 fi
 
+# ── WP-branch guard (S003-P016) ──────────────────────────────────────────────
+# Team 191 must NEVER commit on wp/* branches — those are pipeline-exclusive.
+# If the current branch matches wp/*, block immediately.
+CURRENT_BRANCH=$(git branch --show-current 2>/dev/null || echo "main")
+if [[ "$CURRENT_BRANCH" == wp/* ]]; then
+  echo ""
+  echo -e "  ${C_RED}⛔ WP BRANCH DETECTED — current branch: ${CURRENT_BRANCH}${C_RESET}"
+  echo ""
+  echo -e "  ${C_YELLOW}wp/* branches are exclusively owned by pipeline_run.sh (S003-P016).${C_RESET}"
+  echo -e "  ${C_YELLOW}Team 191 commits must go to main. Switch branches before committing:${C_RESET}"
+  echo -e "  ${C_YELLOW}  git checkout main${C_RESET}"
+  echo ""
+  exit 1
+fi
+
 # ── Pipeline-file ownership guard ────────────────────────────────────────────
 if [[ "$UNLOCK_PIPELINE" != "1" ]]; then
   LOCKED_FOUND=()

@@ -98,9 +98,10 @@ print(PipelineState.load(domain).project_domain)
 }
 
 # ── Pipeline state auto-commit (PIPELINE_AUTOCOMMIT=0 to disable) ────────────
-# After every gate advance or wsm-reset, automatically commit the runtime files
-# that pipeline_run.sh owns. This keeps git HEAD in sync with pipeline state
-# without requiring Team 191 to manually commit these files (which causes drift).
+# S003-P016 Branch-per-WP: each active WP gets an isolated git branch wp/{WP_ID}.
+# Pipeline commits exclusively to that branch. main is untouched during execution.
+# At COMPLETE: WP branch is merged back to main automatically.
+# Team 191 commits to main are structurally isolated — cannot affect pipeline.
 _autocommit_pipeline_state() {
   [[ "${PIPELINE_AUTOCOMMIT:-1}" == "0" ]] && return 0
   local msg="${1:-pipeline: auto-commit runtime state}"
@@ -108,24 +109,19 @@ _autocommit_pipeline_state() {
   local gate="${2:-}"
   local wp="${3:-}"
 
-  # Files pipeline_run.sh owns — committed atomically after each state change
+  # Canonical pipeline-owned files (S003-P016: volatile files gitignored, legacy deleted)
   local -a STATE_FILES=(
     "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md"
     "_COMMUNICATION/agents_os/pipeline_state_tiktrack.json"
     "_COMMUNICATION/agents_os/pipeline_state_agentsos.json"
-    "_COMMUNICATION/agents_os/pipeline_state.json"
-    "_COMMUNICATION/agents_os/STATE_SNAPSHOT.json"
-    "_COMMUNICATION/agents_os/logs/pipeline_events.jsonl"
   )
 
-  # Only stage files that actually changed
+  # Only stage files that actually changed or are new
   local -a CHANGED=()
   for f in "${STATE_FILES[@]}"; do
     if [[ -f "$f" ]] && ! git diff --quiet "$f" 2>/dev/null; then
       CHANGED+=("$f")
-    fi
-    # Also catch newly created files
-    if git ls-files --others --exclude-standard "$f" 2>/dev/null | grep -q .; then
+    elif git ls-files --others --exclude-standard "$f" 2>/dev/null | grep -q .; then
       CHANGED+=("$f")
     fi
   done
@@ -134,14 +130,73 @@ _autocommit_pipeline_state() {
     return 0  # nothing changed — no commit needed
   fi
 
+  # ── Branch-per-WP lifecycle (S003-P016) ─────────────────────────────────────
+  # Detect COMPLETE: read current_gate from the domain state file (already advanced)
+  local current_gate_in_state=""
+  if [[ -n "$domain" ]]; then
+    local _sf="_COMMUNICATION/agents_os/pipeline_state_${domain}.json"
+    [[ "$domain" == "agents_os" ]] && _sf="_COMMUNICATION/agents_os/pipeline_state_agentsos.json"
+    if [[ -f "$_sf" ]]; then
+      current_gate_in_state=$(python3 -c "
+import json, sys
+try:
+    print(json.load(open('$_sf')).get('current_gate',''))
+except Exception:
+    print('')
+" 2>/dev/null || echo "")
+    fi
+  fi
+
+  local wp_branch=""
+  local is_complete=0
+  [[ "$current_gate_in_state" == "COMPLETE" ]] && is_complete=1
+  [[ -n "$wp" && "$wp" != "NONE" && "$wp" != "N/A" && "$wp" != "" ]] && \
+    wp_branch="wp/${wp}"
+
+  local current_branch
+  current_branch=$(git branch --show-current 2>/dev/null || echo "main")
+
+  if [[ -n "$wp_branch" && "$is_complete" -eq 0 ]]; then
+    # Active WP — operate on wp/{WP_ID} branch
+    if ! git show-ref --verify --quiet "refs/heads/${wp_branch}" 2>/dev/null; then
+      # First activation: create WP branch from main HEAD
+      echo "[pipeline] Creating WP branch: ${wp_branch}"
+      if [[ "$current_branch" != "main" ]]; then
+        git checkout main 2>/dev/null || true
+      fi
+      git checkout -b "$wp_branch" 2>/dev/null || {
+        echo "[pipeline] WARNING: could not create branch ${wp_branch} — committing to current branch" >&2
+      }
+    elif [[ "$current_branch" != "$wp_branch" ]]; then
+      git checkout "$wp_branch" 2>/dev/null || true
+    fi
+  fi
+
+  # Commit to current branch (WP branch or main for wsm-reset/COMPLETE transitions)
   git add "${CHANGED[@]}" 2>/dev/null || return 0
   git commit -m "$msg
 
 [pipeline-auto] domain=${domain} gate=${gate} wp=${wp}
 Co-Authored-By: pipeline_run.sh <noreply@tiktrack.local>" \
     --no-verify 2>/dev/null || true
-  # --no-verify: skip pre-commit hooks on auto-commits (hooks check staged governance
-  # docs for date headers which don't apply to runtime state files)
+
+  # ── Merge WP branch → main at COMPLETE ──────────────────────────────────────
+  if [[ "$is_complete" -eq 1 && -n "$wp_branch" ]]; then
+    local on_branch
+    on_branch=$(git branch --show-current 2>/dev/null || echo "")
+    if [[ "$on_branch" == "$wp_branch" ]]; then
+      echo "[pipeline] COMPLETE — merging ${wp_branch} → main"
+      git checkout main 2>/dev/null || {
+        echo "[pipeline] WARNING: could not checkout main for merge — merge manually: git merge --no-ff ${wp_branch}" >&2
+        return 0
+      }
+      git merge --no-ff "$wp_branch" \
+        -m "pipeline: merge ${wp_branch} → main (GATE_5 PASS / COMPLETE)" \
+        --no-verify 2>/dev/null || \
+        echo "[pipeline] WARNING: merge conflict — resolve manually: git merge --no-ff ${wp_branch}" >&2
+    fi
+  fi
+  # --no-verify: skip pre-commit hooks (date-lint doesn't apply to runtime state commits)
 }
 
 # ── Action log (PIPELINE_ACTION_LOG=0 to silence) ────────────────────────────

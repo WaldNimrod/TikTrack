@@ -1,18 +1,19 @@
 {
   "schema_version": "2.0.0",
-  "produced_at_iso": "2026-03-17T23:54:28.906396+00:00",
+  "produced_at_iso": "2026-03-24T19:02:28.939994+00:00",
   "agent_role": "POC-1-OBSERVER",
   "read_only": true,
   "governance": {
     "wsm_path": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
-    "active_stage": "S002",
-    "active_program": "NONE",
+    "active_stage": "S003",
+    "active_program": "S003-P011|",
     "ssm_path": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_SSM_v1.0.0.md",
     "master_index_path": "00_MASTER_INDEX.md",
     "wsm_identity": {
-      "active_stage_id": "S002",
-      "active_work_package_id": "NONE",
-      "active_project_domain": "AGENTS_OS"
+      "active_stage_id": "S003",
+      "active_work_package_id": "S003-P011-WP099",
+      "active_project_domain": "AGENTS_OS",
+      "current_gate": "GATE_3"
     }
   },
   "pipeline": {
@@ -21,26 +22,26 @@
         "gate_state": null,
         "pending_actions": [],
         "override_reason": null,
-        "current_gate": "GATE_5",
+        "current_gate": "COMPLETE",
         "project_domain": "agents_os",
-        "work_package_id": "S003-P009-WP001",
+        "work_package_id": "S003-P015-WP001",
         "stage_id": "S003"
       },
       "tiktrack": {
         "gate_state": null,
         "pending_actions": [],
         "override_reason": null,
-        "current_gate": "G3_6_MANDATES",
+        "current_gate": "COMPLETE",
         "project_domain": "tiktrack",
-        "work_package_id": "S002-P002-WP001",
-        "stage_id": ""
+        "work_package_id": "S003-P013-WP001",
+        "stage_id": "S003"
       }
     },
     "legacy": {
       "gate_state": null,
       "pending_actions": [],
       "override_reason": null,
-      "current_gate": "GATE_1"
+      "current_gate": "G3_6_MANDATES"
     }
   },
   "codebase": {
@@ -52,6 +53,7 @@
         "cash_flows",
         "enums",
         "exchange_rates",
+        "feature_flags",
         "identity",
         "market_reference",
         "notes",
@@ -67,6 +69,8 @@
         "user_tickers"
       ],
       "routers": [
+        "admin_feature_flags",
+        "admin_users",
         "alerts",
         "api_keys",
         "auth",
@@ -77,6 +81,7 @@
         "notes",
         "notifications",
         "positions",
+        "preferences",
         "reference",
         "settings",
         "system",
@@ -118,6 +123,7 @@
         "identity",
         "notes",
         "positions",
+        "preferences",
         "reference",
         "tickers",
         "trade_plans",
@@ -170,21 +176,22 @@
         "trading_journal",
         "trading_journal.content",
         "unified-header",
+        "user_management",
         "user_tickers",
         "user_tickers.content",
         "watch_lists",
         "watch_lists.content"
       ],
-      "route_count": 27,
+      "route_count": 28,
       "has_react": true
     },
     "database": {
-      "migration_count": 41,
+      "migration_count": 42,
       "has_ddl": true
     }
   },
   "quality": {
-    "unit_test_files": 5,
+    "unit_test_files": 6,
     "has_eslint_config": true,
     "has_mypy_config": true,
     "has_ci_pipeline": true,

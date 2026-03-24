@@ -115,7 +115,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 | active_program_id | N/A|
 | active_plan_id | S003|
 | phase_owner_team | Team 00|
-| last_gate_event | **GATE_3 FAIL** — S003-P011-WP099 \| 2026-03-24| 2026-03-24| 2026-03-24| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-22| 2026-03-22| 2026-03-22. Parallel: S003-P012 program complete 2026-03-21; runtime row synced until next `pipeline_run.sh` advance. |
+| last_gate_event | **GATE_3 FAIL** — S003-P011-WP099 \| 2026-03-24| 2026-03-24| 2026-03-24| 2026-03-24| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-22| 2026-03-22| 2026-03-22. Parallel: S003-P012 program complete 2026-03-21; runtime row synced until next `pipeline_run.sh` advance. |
 | next_required_action | Activate next program — Team 00 decision.|
 | next_responsible_team | Team 00|
 

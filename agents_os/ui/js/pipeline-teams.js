@@ -92,20 +92,20 @@ const TEAMS = [
     isoRules: ["CRITICAL: Every GATE_5 run MUST be a FRESH validation — never repeat prior findings", "route_recommendation MANDATORY in every BLOCKING_REPORT", "Do NOT return template or placeholder responses", "Identity header mandatory on all outputs"] },
   // Team 100 = Chief System Architect, Claude Code (TEAM_ROSTER_v2.0.0 Correction 2 — updated 2026-03-24)
   { id: "team_100", group: "architects", label: "Team 100", name: "Chief System Architect", engine: "claude", domain: "multi",
-    role: "System-level architectural decisions, delegated by Team 00 (Nimrod). GATE_2 Intent gate — 'האם אנחנו מאשרים לבנות את זה?' (Phase 2.3 final sign-off). GATE_6 Reality gate — 'האם מה שנבנה הוא מה שאישרנו?' (post-execution validation). Applies FCP on rejection. Coordinates domain architects: Team 101 (AOS), Team 102 (TikTrack).",
+    role: "System-level architectural decisions, delegated by Team 00 (Nimrod). GATE_2 Phase 2.3: 'האם אנחנו מאשרים לבנות את זה?' — final sign-off before execution. Post-execution architectural review (organizational action, not a pipeline gate): 'האם מה שנבנה הוא מה שאישרנו?' Applies FCP on rejection. Coordinates domain architects: Team 101 (AOS), Team 102 (TikTrack).",
     responsibilities: [
-      "GATE_2 Phase 2.3: Final architectural sign-off on LLD400 + Work Plan (Intent gate — delegated by Team 00)",
-      "GATE_6: Post-execution architectural validation — verify build matches GATE_2 intent (Reality gate — delegated by Team 00)",
+      "GATE_2 Phase 2.3: Final architectural sign-off on LLD400 + Work Plan (delegated by Team 00)",
+      "Post-execution organizational review: verify build matches GATE_2 intent — triggered by Team 00, not by pipeline_run.sh",
       "Apply FCP (FCP-1/2/3) on rejection with mandatory routing recommendation",
       "System-level cross-domain architectural decisions and coordination",
       "Route constitutional-level rulings upward to Team 00",
       "Coordinate domain architects: Team 101 (AOS domain authority), Team 102 (TikTrack domain authority)"
     ],
-    writesTo: ["../../_COMMUNICATION/team_100/"], governedBy: ["SSM v1.0.0", "ARCHITECT_DIRECTIVE_TEAM_ROSTER_v2.0.0.md", "ARCHITECT_DIRECTIVE_GATE_SEQUENCE_CANON_v1.0.0.md", "GATE_LIFECYCLE_DESCRIPTION_AND_OWNERS_v1.1.0.md"],
+    writesTo: ["../../_COMMUNICATION/team_100/"], governedBy: ["SSM v1.0.0", "ARCHITECT_DIRECTIVE_TEAM_ROSTER_v2.0.0.md", "ARCHITECT_DIRECTIVE_GATE_SEQUENCE_CANON_v1.0.0.md"],
     isoRules: [
-      "GATE_2 Phase 2.3 and GATE_6 approval require explicit evidence review — no rubber-stamp",
+      "GATE_2 Phase 2.3 approval requires explicit evidence review — no rubber-stamp",
       "FCP classification mandatory on every rejection (FCP-1: doc route / FCP-2: partial fix / FCP-3: full restart)",
-      "LOD200 Author Rule: lod200_author_team = default reviewer for Phase 2.3 + GATE_6",
+      "LOD200 Author Rule: lod200_author_team = default reviewer for Phase 2.3",
       "Never issue cross-domain mandates without Team 00 strategic alignment",
       "Runtime state (current gate, WP, stage) lives exclusively in pipeline_state_*.json — WSM COS section removed (S003-P016). Read pipeline_state_tiktrack.json / pipeline_state_agentsos.json for operational state, never WSM.",
       "Active work: S003-P004 (User Tickers, D33, TikTrack domain). Runbook: _COMMUNICATION/team_00/S003_P004_ACTIVATION_RUNBOOK_v1.0.0.md"

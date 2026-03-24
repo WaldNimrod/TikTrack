@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Standardize Program/WP registry mirror fields from WSM runtime SSOT.
+"""Standardize Program/WP registry mirror fields from runtime SSOT.
 
-Goal:
-- WSM remains the only runtime source of truth.
-- Program and WP registries are deterministic mirrors.
-- Prevent drift by supporting --check in CI and --write locally.
+S003-P016: Operational state lives in `pipeline_state_*.json`; WSM COS table may be absent.
+This script reads legacy COS from WSM when present, else derives the same field shape from
+pipeline state JSON (see `_parse_wsm_state`). Program/WP registries remain deterministic mirrors.
+
+Prevent drift via `--check` (CI / pre-push) and `--write` (local refresh).
 """
 
 from __future__ import annotations

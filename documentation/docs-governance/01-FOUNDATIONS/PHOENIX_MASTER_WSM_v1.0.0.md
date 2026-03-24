@@ -39,7 +39,7 @@ ssm_dependency: 1.0.0
 | L4 | Task | משימה | Atomic task within a work package. |
 
 **Rule:** Gate binding **only to Work Package** (L3).  
-**Portfolio boundary (per PORTFOLIO_CANONICALIZATION):** Runtime state (active stage, current gate, last_gate_event, active_work_package_id) is **stored only in this document** (block CURRENT_OPERATIONAL_STATE). The canonical Portfolio layer (Roadmap/Program/Work Package registries) holds a **mirror** for structural catalog only; they are not a second source of runtime truth. See `documentation/docs-governance/00-INDEX/PORTFOLIO_INDEX.md` and `PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.  
+**Portfolio boundary (per PORTFOLIO_CANONICALIZATION, updated S003-P016):** Runtime state (active stage, current gate, last_gate_event, active_work_package_id) is **stored exclusively in `pipeline_state_tiktrack.json` and `pipeline_state_agentsos.json`** — not in this document (COS section removed per S003-P016 architectural directive). The canonical Portfolio layer (Roadmap/Program/Work Package registries) holds a **mirror** for structural catalog only; they are not a second source of runtime truth. See `documentation/docs-governance/00-INDEX/PORTFOLIO_INDEX.md` and `PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.  
 **Numbering:** S{NNN}-P{NNN}-WP{NNN}-T{NNN}; prefix inheritance; no implicit numbering; no duplicate identifiers. Validation rules: 04_GATE_MODEL_PROTOCOL_v2.3.0 §2.3.  
 **Uniqueness (mandatory):** Within a Stage, each Program number is unique; within a Program, each Work Package number is unique. **One domain per Program:** each Program is assigned to exactly one domain (per SSM §0 and 04_GATE_MODEL §2.2).  
 **Identity header:** roadmap_id, stage_id, program_id, work_package_id, task_id, gate_id, phase_owner, required_ssm_version, required_active_stage.  
@@ -99,7 +99,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 ## 🗺️ LEVEL 1: ROADMAP MODULES (אסטרטגי — structural catalog only; no operational status)
 
-**Live status of modules/roadmap is solely in CURRENT_OPERATIONAL_STATE.** This list is a structural catalog; it does not store operational state.
+**Live status of modules/roadmap is in `pipeline_state_tiktrack.json` / `pipeline_state_agentsos.json` (S003-P016: COS removed from WSM).** This list is a structural catalog; it does not store operational state.
 
 - M1: Identity & Security (v1.0.0)
 - M2: Financial Core (שלב 2.5)
@@ -109,7 +109,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 ## 📋 LEVEL 2: Task list reference (מבצעי — structural catalog only; no operational status)
 
-**Canonical Master Task List (רשימת משימות מרכזית):** `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md` — this is the source for Task status (OPEN/CLOSED) and closure dates. **Live task/execution status is solely in CURRENT_OPERATIONAL_STATE** (block above). The table below is a structural/other catalog — not the central list.
+**Canonical Master Task List (רשימת משימות מרכזית):** `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md` — this is the source for Task status (OPEN/CLOSED) and closure dates. **Live task/execution status is in `pipeline_state_*.json`** (S003-P016: COS section removed from WSM — see Section 5). The table below is a structural/other catalog — not the central list.
 
 | Task ID | Description | Owner | Evidence Link |
 | :--- | :--- | :--- | :--- |

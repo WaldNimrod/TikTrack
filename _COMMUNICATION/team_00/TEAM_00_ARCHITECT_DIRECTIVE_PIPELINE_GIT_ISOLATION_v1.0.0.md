@@ -4,7 +4,7 @@ from: Team 00 (System Designer / Constitutional Authority)
 to: Team 170 (Implementation Lead), Team 61 (Pipeline Orchestration)
 cc: Team 00, Team 100, Team 191, Nimrod
 date: 2026-03-24
-status: ACTIVE — blocks S003-P004
+status: IMPLEMENTED — pending Team 51 QA (S003-P004 unblocks on QA PASS)
 priority: CRITICAL
 subject: Architectural Directive — S003-P016 Pipeline Git Isolation (Branch-per-WP + State Consolidation)
 program_ref: S003-P016

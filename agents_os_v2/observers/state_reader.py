@@ -92,8 +92,12 @@ WSM_PATH = REPO_ROOT / "documentation" / "docs-governance" / "01-FOUNDATIONS" / 
 
 def read_wsm_identity_fields(wsm_path: str | Path | None = None) -> dict[str, str]:
     """
-    Read the Two-Authority identity fields from WSM.
-    These are the ground-truth values for: stage, active WP, active domain.
+    Read the CURRENT_OPERATIONAL_STATE identity fields from WSM (S003-P016: COS removed).
+
+    S003-P016: The CURRENT_OPERATIONAL_STATE section was removed from WSM; runtime state
+    now lives exclusively in pipeline_state_*.json.  This function scopes its regex to the
+    COS block only — returns all-empty if the section is absent (normal post-P016 state).
+
     Returns dict with keys: active_stage_id, active_work_package_id, active_project_domain, current_gate
     """
     path = Path(wsm_path) if wsm_path else WSM_PATH
@@ -106,17 +110,22 @@ def read_wsm_identity_fields(wsm_path: str | Path | None = None) -> dict[str, st
     }
     if not text:
         return result
-    # Parse CURRENT_OPERATIONAL_STATE block — table format | Field | Value |
-    stage_match = re.search(r"\|\s*active_stage_id\s*\|\s*([^\n|]+)\|", text)
+    # Scope search to CURRENT_OPERATIONAL_STATE block only (removed in S003-P016)
+    cos_start = text.find("## CURRENT_OPERATIONAL_STATE")
+    if cos_start < 0:
+        return result  # COS section absent — return empty (S003-P016 normal state)
+    next_section = text.find("\n## ", cos_start + 1)
+    block = text[cos_start:next_section] if next_section > 0 else text[cos_start:]
+    stage_match = re.search(r"\|\s*active_stage_id\s*\|\s*([^\n|]+)\|", block)
     if stage_match:
         result["active_stage_id"] = stage_match.group(1).strip()
-    wp_match = re.search(r"\|\s*active_work_package_id\s*\|\s*([^\n|]+)\|", text)
+    wp_match = re.search(r"\|\s*active_work_package_id\s*\|\s*([^\n|]+)\|", block)
     if wp_match:
         result["active_work_package_id"] = wp_match.group(1).strip()
-    domain_match = re.search(r"\|\s*active_project_domain\s*\|\s*([^\n|]+)\|", text)
+    domain_match = re.search(r"\|\s*active_project_domain\s*\|\s*([^\n|]+)\|", block)
     if domain_match:
         result["active_project_domain"] = domain_match.group(1).strip()
-    cg_match = re.search(r"\|\s*current_gate\s*\|\s*([^\n|]+)\|", text)
+    cg_match = re.search(r"\|\s*current_gate\s*\|\s*([^\n|]+)\|", block)
     if cg_match:
         result["current_gate"] = cg_match.group(1).strip()
     return result

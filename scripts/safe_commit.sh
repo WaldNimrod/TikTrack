@@ -32,6 +32,21 @@ C_CYAN="\033[36m"
 C_BOLD="\033[1m"
 
 WSM_PATH="documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md"
+
+# ── Pipeline-owned runtime files — Team 191 must NEVER commit these ───────────
+# Only pipeline_run.sh commits these, atomically, after gate advances.
+# Committing them mid-operation causes SSOT drift and git HEAD contamination.
+PIPELINE_OWNED_FILES=(
+  "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md"
+  "_COMMUNICATION/agents_os/pipeline_state_tiktrack.json"
+  "_COMMUNICATION/agents_os/pipeline_state_agentsos.json"
+  "_COMMUNICATION/agents_os/pipeline_state.json"
+  "_COMMUNICATION/agents_os/STATE_SNAPSHOT.json"
+  "_COMMUNICATION/agents_os/logs/pipeline_events.jsonl"
+)
+# Override with --unlock-pipeline-files (emergency only, requires justification)
+UNLOCK_PIPELINE="${UNLOCK_PIPELINE_FILES:-0}"
+
 COMMIT_MSG="${1:-}"
 shift || true
 
@@ -124,6 +139,33 @@ if [[ -z "$COMMIT_MSG" ]]; then
   echo -e "  Usage: bash scripts/safe_commit.sh \"commit message\" <path1> [path2] ..."
   echo ""
   exit 2
+fi
+
+# ── Pipeline-file ownership guard ────────────────────────────────────────────
+if [[ "$UNLOCK_PIPELINE" != "1" ]]; then
+  LOCKED_FOUND=()
+  for f in "$@"; do
+    for locked in "${PIPELINE_OWNED_FILES[@]}"; do
+      if [[ "$f" == "$locked" || "$f" == *"$(basename "$locked")"* ]]; then
+        LOCKED_FOUND+=("$f")
+        break
+      fi
+    done
+  done
+  if [[ ${#LOCKED_FOUND[@]} -gt 0 ]]; then
+    echo ""
+    echo -e "  ${C_RED}⛔ PIPELINE-OWNED FILE — Team 191 cannot commit these directly${C_RESET}"
+    for lf in "${LOCKED_FOUND[@]}"; do
+      echo -e "  ${C_RED}   · $lf${C_RESET}"
+    done
+    echo ""
+    echo -e "  ${C_YELLOW}These files are owned by pipeline_run.sh and committed atomically${C_RESET}"
+    echo -e "  ${C_YELLOW}after gate advances. Committing mid-operation causes SSOT drift.${C_RESET}"
+    echo ""
+    echo -e "  ${C_YELLOW}If you MUST include them (emergency): UNLOCK_PIPELINE_FILES=1 bash scripts/safe_commit.sh ...${C_RESET}"
+    echo ""
+    exit 1
+  fi
 fi
 
 # ── Commit ────────────────────────────────────────────────────────────────────

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Build and validate canonical portfolio snapshot from markdown SSOT files.
 
-SSOT rules:
-- Runtime current state is read only from WSM CURRENT_OPERATIONAL_STATE.
+SSOT rules (S003-P016 update):
+- Runtime current state is read from pipeline_state_*.json (WSM COS removed per S003-P016).
+  Falls back to WSM CURRENT_OPERATIONAL_STATE if present (legacy/pre-P016 environments).
 - Portfolio pipeline is read from roadmap/program/wp registries.
 """
 

@@ -251,7 +251,7 @@ def _sync_program_registry(program_text: str, wsm: Dict[str, str], event_date: s
 
     mirror_source_pattern = r"\*\*current_gate_mirror source:\*\*.*"
     mirror_source_repl = (
-        f"**current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update {event_date}). "
+        f"**current_gate_mirror source:** pipeline_state_*.json via wsm_sync (S003-P016 — COS removed from WSM; last update {event_date}). "
         "Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`."
     )
     new_text = re.sub(mirror_source_pattern, mirror_source_repl, new_text, count=1)
@@ -376,7 +376,7 @@ def _sync_wp_registry(wp_text: str, wsm: Dict[str, str], event_date: str) -> Tup
     )
     new_text = re.sub(
         r"\*\*Mirror source:\*\*.*",
-        f"**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update {event_date}). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.",
+        f"**Mirror source:** pipeline_state_*.json via wsm_sync (S003-P016 — COS removed from WSM; last update {event_date}). When no WP is active, no row has `is_active=true`; state is derived from pipeline_state and reflected here.",
         new_text,
         count=1,
     )

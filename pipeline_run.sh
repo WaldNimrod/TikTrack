@@ -1400,16 +1400,16 @@ print('yes' if GATE_CONFIG.get('${GATE}', {}).get('default_fail_route') else 'no
     ;;
 
   wsm-reset)
-    # Write clean COMPLETE/idle state to all WSM COS fields.
-    # Use when both domains are COMPLETE and ghost WP IDs contaminate the WSM
-    # (e.g. after a simulation run that accidentally called pass/fail with a stale WP).
-    echo "[pipeline_run] ${DOMAIN_LABEL}WSM idle-reset — syncing all COS fields to COMPLETE/idle state"
+    # S003-P016: COS removed from WSM — wsm-reset now syncs STAGE_PARALLEL_TRACKS
+    # from pipeline_state_*.json (the single source of runtime truth).
+    echo "[pipeline_run] ${DOMAIN_LABEL}WSM reset — syncing STAGE_PARALLEL_TRACKS from pipeline state"
     python3 -c "
 import sys, os, json
 from pathlib import Path
 sys.path.insert(0, '.')
 try:
-    from agents_os_v2.orchestrator.wsm_writer import write_wsm_idle_reset
+    from agents_os_v2.orchestrator.wsm_writer import write_stage_parallel_tracks_row
+    from agents_os_v2.orchestrator.state import PipelineState
     agents_dir = Path('_COMMUNICATION/agents_os')
     tt_wp = tt_gate = aos_wp = aos_gate = ''
     tt_file = agents_dir / 'pipeline_state_tiktrack.json'
@@ -1422,9 +1422,6 @@ try:
         d = json.loads(aos_file.read_text())
         aos_wp   = d.get('work_package_id', '')
         aos_gate = d.get('current_gate', '')
-    write_wsm_idle_reset(tt_wp=tt_wp, tt_gate=tt_gate, aos_wp=aos_wp, aos_gate=aos_gate)
-    from agents_os_v2.orchestrator.wsm_writer import write_stage_parallel_tracks_row
-    from agents_os_v2.orchestrator.state import PipelineState
     for _dom in ('tiktrack', 'agents_os'):
         write_stage_parallel_tracks_row(PipelineState.load(_dom))
     print('  ✅ WSM idle-reset complete')
@@ -1434,8 +1431,8 @@ except Exception as e:
     print(f'  ⚠️  wsm-reset failed: {e}', file=sys.stderr)
     sys.exit(1)
 " || exit 1
-    _log_action "WSM_RESET" "COMPLETE" "" "idle-reset"
-    _autocommit_pipeline_state "pipeline: wsm-reset — COS cleared to idle" "COMPLETE" ""
+    _log_action "WSM_RESET" "COMPLETE" "" "stage-parallel-tracks-sync"
+    _autocommit_pipeline_state "pipeline: wsm-reset — STAGE_PARALLEL_TRACKS synced" "COMPLETE" ""
     echo ""
     _ssot_check_print
     echo ""

@@ -78,46 +78,10 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 ## 5. EXECUTION ORDER LOCK (structural rule only — no operational state here)
 
-**Structural lock (per SSM §5.1):** S001-P002 may not be activated until S001-P001-WP001 completes GATE_8. **Current operational state** (active stage, current gate, last_gate_event, etc.) is **solely** in the **CURRENT_OPERATIONAL_STATE** block below. No duplication of operational truth elsewhere in this document.
+**Structural lock (per SSM §5.1):** S001-P002 may not be activated until S001-P001-WP001 completes GATE_8. **Current operational state** (active stage, current gate, last_gate_event, etc.) is stored exclusively in `pipeline_state_tiktrack.json` and `pipeline_state_agentsos.json` (S003-P016 architectural directive — COS extracted from WSM).
 
----
-
-## CURRENT_OPERATIONAL_STATE (single canonical block — TEAM_100_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0)
-
-**Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
-**Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
-
-**Gate-owner update evidence:** **2026-03-21** by **Team 100** (S003-P012 PROGRAM COMPLETE — all 5 WPs GATE_5 FULL PASS): AOS Pipeline Operator Reliability fully closed. Pipeline readiness certificate: 205 tests. **Team 170** governance closure + registry sync per `TEAM_170_S003_P012_GOVERNANCE_CLOSURE_AND_ARCHIVE_MANDATE_v1.0.0.md`.
-
-> ⚠️ **AUTO-GENERATED BLOCK — Do NOT edit manually.**
-> This block is written exclusively by `pipeline_run.sh` (pass / fail / approve).
-> Manual edits will be overwritten on next pipeline advance.
-> To check SSOT consistency: `python -m agents_os_v2.tools.ssot_check`
-> To see drift: `python -m agents_os_v2.tools.ssot_check --domain tiktrack`
-
-| Field | Value |
-|-------|-------|
-| active_stage_id | S003|
-| active_stage_label | שלב 2 — Stage 2|
-| active_flow | IDLE — both domains COMPLETE. Last closed: S003-P013-WP001 (TikTrack COMPLETE 2026-03-24); S003-P015-WP001 (AOS COMPLETE 2026-03-24)|
-| active_project_domain | AGENTS_OS|
-| active_work_package_id | N/A|
-| in_progress_work_package_id | N/A|
-| last_closed_work_package_id | S003-P013-WP001|
-| last_closed_program_id | S003-P003 (System Settings D39+D40+D41 — GATE_8 PASS 2026-03-21; DOCUMENTATION_CLOSED). Prior: S003-P011-WP002 (DOCUMENTATION_CLOSED 2026-03-21). |
-| last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
-| allowed_gate_range | GATE_0_TO_GATE_8 (normal execution lifecycle) |
-| current_gate | COMPLETE|
-| track_mode | NORMAL|
-| suspended_track_state | N/A |
-| hold_reason | N/A |
-| agents_os_parallel_track | **S003-P012 PROGRAM COMPLETE 2026-03-21 — all 5 WPs GATE_5 FULL PASS.** Next AOS: **S003-P011-WP003 (RBAC)** — awaiting activation (Team 00 signal). |
-| active_program_id | N/A|
-| active_plan_id | S003|
-| phase_owner_team | Team 00|
-| last_gate_event | **GATE_3 FAIL** — S003-P011-WP099 \| 2026-03-24| 2026-03-24| 2026-03-24| 2026-03-24| 2026-03-24| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-22| 2026-03-22| 2026-03-22. Parallel: S003-P012 program complete 2026-03-21; runtime row synced until next `pipeline_run.sh` advance. |
-| next_required_action | Activate next program — Team 00 decision.|
-| next_responsible_team | Team 00|
+> **Runtime state:** see `_COMMUNICATION/agents_os/pipeline_state_tiktrack.json` and `_COMMUNICATION/agents_os/pipeline_state_agentsos.json`
+> To check state consistency: `python -m agents_os_v2.tools.ssot_check`
 
 ---
 
@@ -128,7 +92,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 | domain | active_program_id | active_work_package_id | phase_status | current_gate | gate_owner_team |
 |--------|-------------------|------------------------|--------------|--------------|-----------------|
-| AGENTS_OS | S003-P015 | S003-P015-WP001 | **2026-03-24** pipeline sync — gate=COMPLETE — wp=S003-P015-WP001 | COMPLETE | Team 10 |
+| AGENTS_OS | S003-P011 | S003-P011-WP099 | **2026-03-24** pipeline sync — gate=GATE_3 — phase=3.2 — wp=S003-P011-WP099 | GATE_3 | Team 61 |
 | TIKTRACK | S003-P013 | S003-P013-WP001 | **2026-03-24** pipeline sync — gate=COMPLETE — wp=S003-P013-WP001 | COMPLETE | Team 10 |
 
 ---

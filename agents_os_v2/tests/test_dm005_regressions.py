@@ -107,35 +107,24 @@ class TestG11CanarySafeScript:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# G-12 — write_wsm_idle_reset clears all ghost fields
+# G-12 — write_wsm_idle_reset (S003-P016: function is now a no-op)
 # ─────────────────────────────────────────────────────────────────────────────
-
-_WSM_GHOST_TEMPLATE = """
-## CURRENT_OPERATIONAL_STATE
-
-| field | value |
-|---|---|
-| active_flow | S003-P011-WP099 (AOS GATE_3 2026-03-23) |
-| in_progress_work_package_id | S003-P011-WP099 |
-| active_program_id | S003-P011 |
-| current_gate | GATE_3 |
-| phase_owner_team | Team 61 |
-| next_required_action | Run GATE_3 mandate |
-| next_responsible_team | Team 61 |
-"""
-
+# The COS section was removed from WSM in S003-P016 (Pipeline Git Isolation).
+# write_wsm_idle_reset() is retained as a no-op for import compatibility.
+# The original 5 field-clearing assertions are replaced by a single no-op contract test.
 
 class TestG12WsmIdleReset:
-    """G-12: write_wsm_idle_reset must clear all COS ghost fields, including WP099 artifacts."""
+    """G-12 (S003-P016): write_wsm_idle_reset is a no-op — COS removed from WSM."""
 
-    def _run_reset(self, wsm_text: str) -> str:
-        """Write wsm_text to a temp file, patch WSM_PATH, call write_wsm_idle_reset, return result."""
+    def test_noop_does_not_modify_file(self):
+        """write_wsm_idle_reset must not write anything to the WSM (it is a no-op)."""
         import agents_os_v2.orchestrator.wsm_writer as wsm_mod
 
+        original_content = "## some WSM content\n\nno COS section here\n"
         with tempfile.NamedTemporaryFile(
             mode="w", suffix=".md", delete=False, encoding="utf-8"
         ) as f:
-            f.write(wsm_text)
+            f.write(original_content)
             tmp = Path(f.name)
 
         try:
@@ -146,60 +135,13 @@ class TestG12WsmIdleReset:
                     aos_wp="S003-P015-WP001",
                     aos_gate="COMPLETE",
                 )
-            return tmp.read_text(encoding="utf-8")
+            result = tmp.read_text(encoding="utf-8")
         finally:
             tmp.unlink(missing_ok=True)
 
-    def test_clears_active_work_package_id(self):
-        result = self._run_reset(_WSM_GHOST_TEMPLATE)
-        assert "S003-P011-WP099" not in result or "N/A" in result
-        m = re.search(r"\|\s*in_progress_work_package_id\s*\|\s*([^|\n]+)\|", result)
-        assert m, "in_progress_work_package_id field not found in WSM"
-        assert m.group(1).strip() == "N/A", (
-            f"in_progress_work_package_id should be 'N/A', got: {m.group(1).strip()!r}"
+        assert result == original_content, (
+            "write_wsm_idle_reset should be a no-op (S003-P016); file must be unchanged"
         )
-
-    def test_clears_active_program_id(self):
-        result = self._run_reset(_WSM_GHOST_TEMPLATE)
-        m = re.search(r"\|\s*active_program_id\s*\|\s*([^|\n]+)\|", result)
-        assert m, "active_program_id field not found"
-        assert m.group(1).strip() == "N/A", (
-            f"active_program_id should be 'N/A', got: {m.group(1).strip()!r}"
-        )
-
-    def test_sets_gate_complete(self):
-        result = self._run_reset(_WSM_GHOST_TEMPLATE)
-        m = re.search(r"\|\s*current_gate\s*\|\s*([^|\n]+)\|", result)
-        assert m, "current_gate field not found"
-        assert m.group(1).strip() == "COMPLETE"
-
-    def test_sets_next_team_00(self):
-        result = self._run_reset(_WSM_GHOST_TEMPLATE)
-        m = re.search(r"\|\s*next_responsible_team\s*\|\s*([^|\n]+)\|", result)
-        assert m, "next_responsible_team field not found"
-        assert "Team 00" in m.group(1)
-
-    def test_wp099_string_absent_from_cos(self):
-        """WP099 must not appear in any COS data field after reset."""
-        result = self._run_reset(_WSM_GHOST_TEMPLATE)
-        cos_block_m = re.search(
-            r"## CURRENT_OPERATIONAL_STATE(.+?)(?=\n##|\Z)", result, re.S
-        )
-        cos_block = cos_block_m.group(1) if cos_block_m else result
-        # WP099 may appear in log entries (acceptable) but not in table rows
-        table_rows = [
-            line for line in cos_block.splitlines()
-            if line.strip().startswith("|") and "WP099" in line
-        ]
-        assert table_rows == [], (
-            f"WP099 still present in COS table rows after idle reset:\n"
-            + "\n".join(table_rows)
-        )
-
-    def test_log_entry_appended(self):
-        result = self._run_reset(_WSM_GHOST_TEMPLATE)
-        assert "WSM_IDLE_RESET" in result
-        assert "S003-P015-WP001" in result
 
 
 # ─────────────────────────────────────────────────────────────────────────────

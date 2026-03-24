@@ -56,7 +56,8 @@ def _count_lines(path: Path, pattern: str) -> int:
 def read_pipeline_state() -> dict[str, Any]:
     """
     S002-P005-WP002 AC-08: Parse gate_state, pending_actions, override_reason from pipeline state.
-    Reads domain-specific state files (agents_os, tiktrack) and legacy pipeline_state.json.
+    Reads domain-specific state files (agents_os, tiktrack).
+    Legacy pipeline_state.json removed in S003-P016.
     """
     result: dict[str, Any] = {"domains": {}}
     agents_dir = REPO_ROOT / "_COMMUNICATION" / "agents_os"
@@ -83,19 +84,6 @@ def read_pipeline_state() -> dict[str, Any]:
         except (json.JSONDecodeError, OSError) as e:
             result["domains"][domain] = {"error": str(e)}
 
-    legacy_path = agents_dir / "pipeline_state.json"
-    if legacy_path.exists():
-        try:
-            data = json.loads(legacy_path.read_text(encoding="utf-8"))
-            result["legacy"] = {
-                "gate_state": data.get("gate_state"),
-                "pending_actions": data.get("pending_actions", []),
-                "override_reason": data.get("override_reason"),
-                "current_gate": data.get("current_gate"),
-            }
-        except (json.JSONDecodeError, OSError):
-            result["legacy"] = {"error": "read_failed"}
-
     return result
 
 
@@ -106,7 +94,7 @@ def read_wsm_identity_fields(wsm_path: str | Path | None = None) -> dict[str, st
     """
     Read the Two-Authority identity fields from WSM.
     These are the ground-truth values for: stage, active WP, active domain.
-    Returns dict with keys: active_stage_id, active_work_package_id, active_project_domain
+    Returns dict with keys: active_stage_id, active_work_package_id, active_project_domain, current_gate
     """
     path = Path(wsm_path) if wsm_path else WSM_PATH
     text = _read_text(path)
@@ -114,19 +102,23 @@ def read_wsm_identity_fields(wsm_path: str | Path | None = None) -> dict[str, st
         "active_stage_id": "",
         "active_work_package_id": "",
         "active_project_domain": "",
+        "current_gate": "",
     }
     if not text:
         return result
     # Parse CURRENT_OPERATIONAL_STATE block — table format | Field | Value |
-    stage_match = re.search(r"\|\s*active_stage_id\s*\|\s*(\S+)\s*\|", text)
+    stage_match = re.search(r"\|\s*active_stage_id\s*\|\s*([^\n|]+)\|", text)
     if stage_match:
         result["active_stage_id"] = stage_match.group(1).strip()
-    wp_match = re.search(r"\|\s*active_work_package_id\s*\|\s*(\S+)\s*\|", text)
+    wp_match = re.search(r"\|\s*active_work_package_id\s*\|\s*([^\n|]+)\|", text)
     if wp_match:
         result["active_work_package_id"] = wp_match.group(1).strip()
-    domain_match = re.search(r"\|\s*active_project_domain\s*\|\s*(\S+)\s*\|", text)
+    domain_match = re.search(r"\|\s*active_project_domain\s*\|\s*([^\n|]+)\|", text)
     if domain_match:
         result["active_project_domain"] = domain_match.group(1).strip()
+    cg_match = re.search(r"\|\s*current_gate\s*\|\s*([^\n|]+)\|", text)
+    if cg_match:
+        result["current_gate"] = cg_match.group(1).strip()
     return result
 
 
@@ -139,30 +131,63 @@ def read_stage_parallel_tracks(wsm_path: str | Path | None = None) -> list[dict[
     text = _read_text(path)
     if not text:
         return []
-    # Find STAGE_PARALLEL_TRACKS block
-    tracks_match = re.search(
-        r"## STAGE_PARALLEL_TRACKS.*?\n\n\|[^\n]+\|[^\n]+\|\n\|[^\n]+\|[^\n]+\|\n((?:\|[^\n]+\|)+\n)",
-        text,
-        re.DOTALL,
-    )
-    if not tracks_match:
+    idx = text.find("## STAGE_PARALLEL_TRACKS")
+    if idx < 0:
         return []
-    rows_text = tracks_match.group(1)
-    rows = []
-    for line in rows_text.strip().split("\n"):
-        if not line.strip().startswith("|"):
+    block = text[idx : idx + 32000]
+    rows: list[dict[str, str]] = []
+    for line in block.splitlines():
+        raw = line.strip()
+        if not raw.startswith("|"):
+            if rows:
+                break
             continue
-        parts = [p.strip() for p in line.split("|")[1:-1]]
-        if len(parts) >= 6 and parts[0] not in ("domain", "---"):
-            rows.append({
-                "domain": parts[0].replace(" ", "").lower() if parts[0] != "—" else "",
-                "active_program_id": parts[1] if parts[1] != "—" else "",
-                "active_work_package_id": parts[2] if parts[2] != "—" else "",
-                "phase_status": parts[3] if len(parts) > 3 else "",
-                "current_gate": parts[4] if len(parts) > 4 else "",
-                "gate_owner_team": parts[5] if len(parts) > 5 else "",
-            })
+        parts = [p.strip() for p in raw.split("|")]
+        parts = [p for p in parts if p != ""]
+        if len(parts) < 6:
+            continue
+        if set(parts[0]) <= {"-", ":"} or parts[0].startswith("---"):
+            continue
+        key = parts[0].replace(" ", "").lower()
+        if key == "domain":
+            continue
+        rows.append({
+            "domain": key if key != "—" else "",
+            "active_program_id": parts[1] if parts[1] != "—" else "",
+            "active_work_package_id": parts[2] if parts[2] != "—" else "",
+            "phase_status": parts[3] if len(parts) > 3 else "",
+            "current_gate": parts[4] if len(parts) > 4 else "",
+            "gate_owner_team": parts[5] if len(parts) > 5 else "",
+        })
     return rows
+
+
+def read_ssot_reference_identity(domain: str, wsm_path: str | Path | None = None) -> dict[str, str]:
+    """
+    Identity fields for `ssot_check` vs pipeline_state_*.json.
+
+    - **agents_os:** `CURRENT_OPERATIONAL_STATE` (single active runtime track).
+    - **tiktrack:** `STAGE_PARALLEL_TRACKS` row for domain TIKTRACK (parallel catalog).
+
+    Falls back to `read_wsm_identity_fields()` if a domain-specific row is missing.
+    """
+    d = (domain or "").strip().lower().replace("-", "_")
+    if d in ("agents_os", "agentsos"):
+        return read_wsm_identity_fields(wsm_path)
+    if d == "tiktrack":
+        for row in read_stage_parallel_tracks(wsm_path):
+            if row.get("domain", "").lower() == "tiktrack":
+                wp = (row.get("active_work_package_id") or "").strip()
+                stage_id = ""
+                if wp and "-" in wp:
+                    stage_id = wp.split("-")[0].strip()
+                return {
+                    "active_stage_id": stage_id,
+                    "active_work_package_id": wp,
+                    "active_project_domain": "TIKTRACK",
+                    "current_gate": (row.get("current_gate") or "").strip(),
+                }
+    return read_wsm_identity_fields(wsm_path)
 
 
 class DriftItem:

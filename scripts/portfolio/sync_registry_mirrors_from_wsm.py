@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import difflib
+import json
 import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -22,6 +23,10 @@ ROOT = Path(__file__).resolve().parents[2]
 WSM_PATH = ROOT / "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md"
 PROGRAM_PATH = ROOT / "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md"
 WP_PATH = ROOT / "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_WORK_PACKAGE_REGISTRY_v1.0.0.md"
+
+# S003-P016: COS removed from WSM; runtime SSOT is pipeline_state_*.json (mirror sync fallback).
+PIPELINE_STATE_AGENTS_OS = ROOT / "_COMMUNICATION/agents_os/pipeline_state_agentsos.json"
+PIPELINE_STATE_TIKTRACK = ROOT / "_COMMUNICATION/agents_os/pipeline_state_tiktrack.json"
 
 NO_ACTIVE_MARKERS = {"", "N/A", "—", "-", "NONE"}
 
@@ -74,21 +79,65 @@ def _parse_table(block: str) -> Tuple[List[str], List[Dict[str, str]]]:
     return headers, rows
 
 
+def _parse_wsm_state_from_pipeline_json() -> Dict[str, str]:
+    """Derive legacy COS-shaped dict from domain pipeline_state files (post S003-P016)."""
+    candidates: List[dict] = []
+    for path in (PIPELINE_STATE_AGENTS_OS, PIPELINE_STATE_TIKTRACK):
+        if not path.exists():
+            continue
+        try:
+            candidates.append(json.loads(path.read_text(encoding="utf-8")))
+        except (json.JSONDecodeError, OSError):
+            continue
+    if not candidates:
+        raise SyncError(
+            "No readable pipeline_state_*.json; cannot derive registry mirror state (S003-P016)"
+        )
+
+    def _pick(rows: List[dict]) -> dict:
+        for d in rows:
+            cg = str(d.get("current_gate") or "").strip().upper()
+            if cg and cg != "COMPLETE":
+                return d
+        return rows[0]
+
+    d = _pick(candidates)
+    wp = str(d.get("work_package_id") or "").strip()
+    st = str(d.get("stage_id") or "").strip()
+    prog = wp.rsplit("-WP", 1)[0] if "-WP" in wp else ""
+    spec = str(d.get("spec_brief") or "").replace("\n", " ").strip()
+    if len(spec) > 240:
+        spec = spec[:237] + "..."
+    return {
+        "active_stage_id": st,
+        "active_program_id": prog,
+        "active_work_package_id": wp,
+        "current_gate": str(d.get("current_gate") or "").strip(),
+        "active_project_domain": str(d.get("project_domain") or "").strip(),
+        "active_flow": spec,
+        "last_gate_event": "",
+        "last_closed_work_package_id": "",
+    }
+
+
 def _parse_wsm_state(text: str) -> Dict[str, str]:
-    block = _find_heading_block(
-        text,
-        "CURRENT_OPERATIONAL_STATE (single canonical block — TEAM_100_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0)",
-    )
-    _, rows = _parse_table(block)
-    out: Dict[str, str] = {}
-    for row in rows:
-        field = row.get("Field", "").strip()
-        value = row.get("Value", "").strip()
-        if field:
-            out[field] = value
-    if not out:
-        raise SyncError("WSM CURRENT_OPERATIONAL_STATE table is empty")
-    return out
+    try:
+        block = _find_heading_block(
+            text,
+            "CURRENT_OPERATIONAL_STATE (single canonical block — TEAM_100_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0)",
+        )
+        _, rows = _parse_table(block)
+        out: Dict[str, str] = {}
+        for row in rows:
+            field = row.get("Field", "").strip()
+            value = row.get("Value", "").strip()
+            if field:
+                out[field] = value
+        if not out:
+            raise SyncError("WSM CURRENT_OPERATIONAL_STATE table is empty")
+        return out
+    except SyncError:
+        return _parse_wsm_state_from_pipeline_json()
 
 
 def _table_after_heading(text: str, heading: str) -> Tuple[List[str], List[Dict[str, str]]]:

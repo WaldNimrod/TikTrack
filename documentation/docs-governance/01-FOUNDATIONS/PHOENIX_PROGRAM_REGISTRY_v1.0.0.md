@@ -57,7 +57,8 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | S003 | S003-P012 | AOS Pipeline Operator Reliability | AGENTS_OS | COMPLETE | **DOCUMENTATION_CLOSED 2026-03-21 — Team 100.** WP001–WP005 **GATE_5 FULL PASS**; pipeline readiness **205 tests**. Program-level closure + comms archive: `TEAM_170_S003_P012_GOVERNANCE_CLOSURE_AND_ARCHIVE_MANDATE_v1.0.0.md`; DB_DEPENDENCY_REF: IDEA-052 |
 | S003 | S003-P013 | TikTrack Pipeline Canary Run (D33 display_name) | TIKTRACK | COMPLETE | COMPLETE; active_flow=S003-P013-WP001 — gate COMPLETE (last event: GATE_5 PASS); active_work_package_id=N/A. **SIMULATION slot:** `S003-P013-WP002` registered as HOLD in Work Package Registry for future Team 100 Canary mocks (does not change ACTIVE program rows). |
 | S003 | S003-P014 | TikTrack Pipeline Operator E2E Simulation | TIKTRACK | COMPLETE | **SIMULATION CLOSED 2026-03-23** — operator dry-run completed (GATE_0–GATE_5); registry row retained as evidence. |
-| S003 | S003-P015 | AOS DM-005 SC Verification Run | AGENTS_OS | ACTIVE | GATE_0 pending. Documentation-only pipeline run (GATE_0→GATE_5, TRACK_FOCUSED) to verify AOS pipeline engine readiness and close DM-005 SC criteria (SC-AOS-03, SC-TT-03). Authority: DM-005 v1.2.0 cascade authorization + TEAM_100_GATEWAY_DECISION_D1_D6_TEST_ISOLATION_v1.0.0 §4. Executor: Team 101. |
+| S003 | S003-P015 | AOS DM-005 SC Verification Run | AGENTS_OS | ACTIVE | COMPLETE; active_flow=S003-P015-WP001 — AOS DM-005 SC Verification Run. Documentation-only pipeline run (GATE_0→GATE_5, TRACK_FOCUSED) to verify AOS pipeline engine readiness for DM-005 closure. No code changes. Authority: DM-005 v1.2.0.; active_work_package_id=S003-P015-WP001 |
+| S003 | S003-P016 | Pipeline Git Isolation — Branch-per-WP + State Consolidation | SHARED | PLANNED | **PREREQUISITE to S003-P004.** Architectural refactor: (1) WSM COS block extracted → pipeline_state_*.json; (2) volatile state files gitignored; (3) branch-per-WP: pipeline creates isolated git branch at GATE_0, merges to main at COMPLETE; (4) SSOT check rewritten (single source); (5) dashboard updated; (6) full regression suite + stability validation. Authority: Team 00 architectural directive TEAM_00_ARCHITECT_DIRECTIVE_PIPELINE_GIT_ISOLATION_v1.0.0.md. **S003-P004 cannot start until S003-P016 reaches GATE_5 PASS.** |
 | S003 | S003-P009 | Agents_OS Pipeline Resilience Package | AGENTS_OS | COMPLETE | S003-P009-WP001 GATE_8 PASS 2026-03-18; DOCUMENTATION_CLOSED. Scope: 3-tier resolution (AC-10/AC-11), wsm_writer.py, targeted git (pre-GATE_4 + GATE_8); Items 4a/4b verification only. LOD400: TEAM_100_PIPELINE_RESILIENCE_LOD400_DRAFT; authority: Team 00 PRE-CONDITION 2026-03-17; DB_DEPENDENCY_REF: IDEA-052 |
 | S004 | S004-P001 | Financial Precision Validator | AGENTS_OS | PLANNED | — (placeholder; program number assigned at activation; LOD200 authoring begins when S003 Agents_OS programs complete; scope: float prohibition E-18..E-19, NUMERIC(20,8) enforcement E-20..E-22; DB_DEPENDENCY_REF: IDEA-052) |
 | S004 | S004-P002 | Business Logic Validator | AGENTS_OS | PLANNED | — (placeholder; ⚡ ACCELERATED from S005; scope: multi-entity consistency, state machine completeness, business rule coverage; MUST complete before S005 TikTrack begins; DB_DEPENDENCY_REF: IDEA-052) |
@@ -157,9 +158,9 @@ Source directives:
 
 ---
 
-**current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-23). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
+**current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-24). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
 
-**WSM mirror (2026-03-23):** active_stage_id=S003; active_program_id=S003-P013; current_gate=COMPLETE; active_work_package_id=N/A; active_flow=S003-P013-WP001 — gate COMPLETE (last event: GATE_5 PASS).
+**WSM mirror (2026-03-24):** active_stage_id=S003; active_program_id=S003-P015; current_gate=COMPLETE; active_work_package_id=S003-P015-WP001; active_flow=S003-P015-WP001 — AOS DM-005 SC Verification Run. Documentation-only pipeline run (GATE_0→GATE_5, TRACK_FOCUSED) to verify AOS pipeline engine readiness for DM-005 closure. No code changes. Authority: DM-005 v1.2.0..
 
 ---
 

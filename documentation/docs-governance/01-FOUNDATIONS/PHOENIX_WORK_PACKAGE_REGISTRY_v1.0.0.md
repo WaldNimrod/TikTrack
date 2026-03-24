@@ -56,12 +56,15 @@ Each Work Package has **one** gate lifecycle. **current_gate** and **is_active**
 | S003-P011 | S003-P011-WP099 | IN_PROGRESS | GATE_3 | false | S003-P011-WP099 — gate GATE_3 (last event: GATE_3 FAIL) |
 | S003-P012 | S003-P012-WP001 | IN_PROGRESS | GATE_8 (WP001 governance closure in progress) | false | S003-P012-WP001 — SSOT Implementation (GATE_8 PASS pending governance closure) |
 | S003-P013 | S003-P013-WP001 | CLOSED | GATE_5 | false | S003-P013-WP001 — gate GATE_5 (last event: GATE_4 PASS) |
+| S003-P013 | S003-P013-WP002 | HOLD | GATE_0 | false | Reserved — Team 100 Canary Simulation mandate (dummy WP; not activated). Completed operator dry-run evidence: **S003-P014-WP001**. See `_COMMUNICATION/team_101/TEAM_101_SIMULATION_WP_REGISTRY_ALIGNMENT_v1.0.0.md`. |
+| S003-P014 | S003-P014-WP001 | CLOSED | GATE_5 (PASS) | false | **SIMULATION CLOSED 2026-03-23** — E2E operator walk complete; not a product delivery WP. |
+| S003-P015 | S003-P015-WP001 | IN_PROGRESS | COMPLETE | true | S003-P015-WP001 — AOS DM-005 SC Verification Run. Documentation-only pipeline run (GATE_0→GATE_5, TRACK_FOCUSED) to verify AOS pipeline engine readiness for DM-005 closure. No code changes. Authority: DM-005 v1.2.0. |
 
 
 
-**Current active WP state (mirror from WSM):** **NO_ACTIVE_WORK_PACKAGE** — WSM `active_stage_id=S003`, `active_program_id=S003-P013`, `current_gate=COMPLETE`, `active_work_package_id=N/A`.
+**Current active WP state (mirror from WSM):** **ACTIVE_WORK_PACKAGE_PRESENT** — WSM `active_stage_id=S003`, `active_program_id=S003-P015`, `current_gate=COMPLETE`, `active_work_package_id=S003-P015-WP001`.
 
-**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-23). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
+**Mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-24). When no WP is active, no row has `is_active=true`; state is explicit in WSM and reflected here.
 
 ---
 

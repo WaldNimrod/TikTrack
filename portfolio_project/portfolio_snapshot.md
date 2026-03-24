@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-23T17:40:47.439893+00:00`
+- Generated (UTC): `2026-03-24T20:04:30.969859+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -8,16 +8,16 @@
 ## Runtime (from WSM)
 
 - active_stage_id: `S003`
-- active_program_id: `S003-P013`
-- active_work_package_id: `N/A`
+- active_program_id: `S003-P015`
+- active_work_package_id: `S003-P015-WP001`
 - current_gate: `COMPLETE`
-- next_required_action: `Lifecycle complete — await next WP activation (Team 100 / Team 00).`
+- next_required_action: ``
 
 ## Portfolio Counts
 
 - stages: `6`
-- programs: `37`
-- work_packages: `19`
+- programs: `40`
+- work_packages: `22`
 
 ## Roadmap (hierarchical)
 
@@ -88,8 +88,17 @@
     ├── **Program** `S003-P012` — AOS Pipeline Operator Reliability | COMPLETE | domain: **AGENTS_OS**
         └── **WP** `S003-P012-WP001` | IN_PROGRESS | gate: GATE_8 (WP001 governance closure in progress) | domain: **AGENTS_OS**
 
-    └── **Program** `S003-P013` — TikTrack Pipeline Canary Run (D33 display_name) | COMPLETE | domain: **TIKTRACK**
-        └── **WP** `S003-P013-WP001` | CLOSED | gate: GATE_5 | domain: **TIKTRACK**
+    ├── **Program** `S003-P013` — TikTrack Pipeline Canary Run (D33 display_name) | COMPLETE | domain: **TIKTRACK**
+        ├── **WP** `S003-P013-WP001` | CLOSED | gate: GATE_5 | domain: **TIKTRACK**
+        └── **WP** `S003-P013-WP002` | HOLD | gate: GATE_0 | domain: **TIKTRACK**
+
+    ├── **Program** `S003-P014` — TikTrack Pipeline Operator E2E Simulation | COMPLETE | domain: **TIKTRACK**
+        └── **WP** `S003-P014-WP001` | CLOSED | gate: GATE_5 (PASS) | domain: **TIKTRACK**
+
+    ├── **Program** `S003-P015` — AOS DM-005 SC Verification Run | ACTIVE | domain: **AGENTS_OS**
+        └── **WP** `S003-P015-WP001` | IN_PROGRESS | gate: COMPLETE | domain: **AGENTS_OS** (active)
+
+    └── **Program** `S003-P016` — Pipeline Git Isolation — Branch-per-WP + State Consolidation | PLANNED | domain: **SHARED**
 
 
 ### S004 — שלב 4 — Financial Execution | PLANNED [SHARED]

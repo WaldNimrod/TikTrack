@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "agents_os_ui",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["--yes", "serve", "agents_os/ui", "-l", "8090", "--no-clipboard"],
+      "port": 8090
+    }
+  ]
+}

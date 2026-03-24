@@ -97,6 +97,33 @@ print(PipelineState.load(domain).project_domain)
 "
 }
 
+# ── Action log (PIPELINE_ACTION_LOG=0 to silence) ────────────────────────────
+_log_action() {
+  # Usage: _log_action ACTION_TYPE [gate] [phase] [details_string]
+  # Non-blocking — failures are fully suppressed.
+  [[ "${PIPELINE_ACTION_LOG:-1}" == "0" ]] && return 0
+  local _WP; _WP=$(_get_wp_id 2>/dev/null || echo "")
+  LOG_ACTION="${1:-UNKNOWN}" LOG_DOMAIN="${DOMAIN:-}" LOG_WP="$_WP" \
+  LOG_GATE="${2:-}" LOG_PHASE="${3:-}" LOG_DETAILS="${4:-}" \
+  python3 -c "
+import os, sys
+sys.path.insert(0, '.')
+try:
+    from agents_os_v2.orchestrator.action_log import append_action
+    append_action(
+        action_type=os.environ.get('LOG_ACTION', ''),
+        domain=os.environ.get('LOG_DOMAIN', ''),
+        wp=os.environ.get('LOG_WP', ''),
+        gate=os.environ.get('LOG_GATE', ''),
+        phase=os.environ.get('LOG_PHASE', ''),
+        actor='pipeline_run.sh',
+        details={'info': os.environ.get('LOG_DETAILS', '')},
+    )
+except Exception:
+    pass
+" 2>/dev/null || true
+}
+
 # ── Pre-flight date correction (S003-P010-WP001 Ph4) ─────────────────────
 _preflight_date_correction() {
     local f="$1"
@@ -1108,6 +1135,7 @@ if lbg and cg and lbg == cg and lbf.strip():
 
     echo "[pipeline_run] ${DOMAIN_LABEL}Advancing $GATE → PASS"
     $CLI --advance "$GATE" PASS
+    _log_action "GATE_PASS" "$GATE" "${EXPLICIT_PHASE:-}"
     echo ""
     _ssot_check_print
     echo ""
@@ -1217,6 +1245,7 @@ print(getattr(PipelineState.load(os.environ.get('PIPELINE_DOMAIN')), 'gate_state
       FR_ARGS=(--from-report "$FROM_REPORT")
     fi
     $CLI --advance "$GATE" FAIL --reason "$REASON" --finding-type "$FINDING_TYPE" "${FR_ARGS[@]}"
+    _log_action "GATE_FAIL" "$GATE" "${EXPLICIT_PHASE:-}" "$FINDING_TYPE"
     echo ""
     _ssot_check_print
     echo ""
@@ -1352,6 +1381,7 @@ except Exception as e:
     print(f'  ⚠️  wsm-reset failed: {e}', file=sys.stderr)
     sys.exit(1)
 " || exit 1
+    _log_action "WSM_RESET" "COMPLETE" "" "idle-reset"
     echo ""
     _ssot_check_print
     echo ""

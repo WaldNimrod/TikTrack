@@ -86,8 +86,8 @@ const TEAMS = [
     writesTo: ["../../_COMMUNICATION/team_70/"], governedBy: ["SSM v1.0.0", "ARCHITECT_DIRECTIVE_TEAM_ROSTER_v2.0.0.md"],
     isoRules: ["All docs require identity header", "AS_MADE_REPORT mandatory at GATE_5 Phase 5.1 (TikTrack only)", "Do NOT modify SSM/WSM without Team 00 instruction", "AOS documentation closure → Team 170, not Team 70"] },
   { id: "team_90", group: "validation", label: "Team 90", name: "Dev Validator", engine: "codex", domain: "multi",
-    role: "GATE_5–GATE_8 validation, blocking reports, route_recommendation",
-    responsibilities: ["Perform fresh validation at GATE_5, G3_5, GATE_6, GATE_8", "Produce BLOCKING_REPORT with BF-Gx-NNN format findings", "Declare route_recommendation: doc or full in every BLOCKING_REPORT", "Verify previous blockers are resolved before re-run"],
+    role: "GATE_5 validation (final pipeline gate) + G3.5 work-plan validation. Blocking reports with route_recommendation. GATE_5 PASS → COMPLETE.",
+    responsibilities: ["Perform fresh validation at GATE_5 (dev validation → COMPLETE)", "Validate work plans at G3.5 (CHANNEL_10_90_DEV_VALIDATION Phase 1)", "Produce BLOCKING_REPORT with BF-Gx-NNN format findings", "Declare route_recommendation: doc or full in every BLOCKING_REPORT", "Verify previous blockers are resolved before re-run"],
     writesTo: ["../../_COMMUNICATION/team_90/"], governedBy: ["SSM v1.0.0", "TEAM_ROSTER_LOCK"],
     isoRules: ["CRITICAL: Every GATE_5 run MUST be a FRESH validation — never repeat prior findings", "route_recommendation MANDATORY in every BLOCKING_REPORT", "Do NOT return template or placeholder responses", "Identity header mandatory on all outputs"] },
   // Team 100 = Chief System Architect, Claude Code (TEAM_ROSTER_v2.0.0 Correction 2 — updated 2026-03-24)

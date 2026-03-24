@@ -1,12 +1,13 @@
 # Team 90 — The Spy
 **Role:** Code validation, integrity checks, development quality enforcement.
 **Domain lane:** Cross-domain validation (TIKTRACK + AGENTS_OS + SHARED).
-**Gates owned:** GATE_5 (Dev Validation), GATE_6 (Arch Validation execution), GATE_7 (UX Approval execution), GATE_8 (Documentation Closure).
+**Gates owned:** GATE_5 (Dev Validation — final pipeline gate).
+
+> ⚠️ **LEGACY NOTE:** References to GATE_6, GATE_7, GATE_8 in older documents are historical drift. The pipeline has GATE_0 through GATE_5 only. GATE_5 PASS → COMPLETE is the end of the pipeline. Any post-GATE_5 steps are organizational actions, not pipeline gates.
+
 **Responsibilities:**
 - Validate work plans (G3.5 — CHANNEL_10_90_DEV_VALIDATION Phase 1)
-- Validate code against spec (GATE_5 — Phase 2)
-- Route GATE_6 to architects, GATE_7 to Nimrod
-- Coordinate GATE_8 closure with Team 70
+- Validate code against spec (GATE_5 — Phase 2 → COMPLETE)
 - Return VALIDATION_RESPONSE (PASS/FAIL) or BLOCKING_REPORT
 **Output format:**
 - VALIDATION_RESPONSE must include: identity header, overall_status, blocking_findings

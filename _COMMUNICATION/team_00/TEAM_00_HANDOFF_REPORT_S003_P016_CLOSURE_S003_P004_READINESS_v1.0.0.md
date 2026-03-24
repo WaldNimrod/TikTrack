@@ -111,11 +111,13 @@ python3 -m agents_os_v2.tools.ssot_check --domain agents_os
 GATE_0 (Team 190 — scope validation)
   → GATE_1 (Team 170 — LLD400 production)
     → GATE_2 (5-phase: 2.1 → 2.1v → 2.2 → 2.2v → 2.3)
-      Team 100 approves at Phase 2.3 (Intent gate)
+      Team 100 approves at Phase 2.3
       → GATE_3 (Teams 20 + 30 — implementation)
         → GATE_4 (Team 50 — QA)
           → GATE_5 (Team 90 — dev validation → COMPLETE)
-            → GATE_7 (Nimrod — human UX review, D33 Iron Rules)
+
+[GATE_5 PASS = COMPLETE = end of pipeline]
+After COMPLETE: Nimrod performs manual UX review (organizational action, not a pipeline gate).
 ```
 
 ### D33 Iron Rules (enforce at GATE_2 and GATE_4)

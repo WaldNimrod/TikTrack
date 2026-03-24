@@ -167,7 +167,9 @@ python3 -m agents_os_v2.tools.ssot_check --domain agents_os
 
 ---
 
-## Step 8 — GATE_7 Human UX Review (SC-UI-01)
+## Step 8 — Human UX Review (organizational action — not a pipeline gate)
+
+> ⚠️ This is NOT a pipeline gate. GATE_5 PASS = COMPLETE = end of pipeline. The review below is a manual organizational check by Nimrod, triggered outside the pipeline.
 
 ```bash
 # Start UI server

@@ -23,6 +23,7 @@ while IFS= read -r file; do
 done < <(
   git diff --cached --name-only --diff-filter=ACMR \
     | grep -E '^(_COMMUNICATION/|documentation/docs-governance/).+\.md$' \
+    | grep -v '^_COMMUNICATION/99-ARCHIVE/' \
     || true
 )
 

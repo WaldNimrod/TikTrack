@@ -1,7 +1,5 @@
 # Cursor Composer Prompt
 
-**date:** 2026-03-23
-
 **Paste this entire content into a Cursor Composer session.**
 
 ---

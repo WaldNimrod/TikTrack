@@ -48,7 +48,7 @@ Roster semantics **team_101 → team_110**, **team_102 → team_111** in listed 
 | Commit | Scope |
 |--------|--------|
 | `2b133d5640729fec567aa4a5f5d96aa1ab21d706` | Governance docs: taxonomy v1.0.0 alignment, Role Mapping §5.1, Principal §2.1, program registry, pipeline reference |
-| `17d9cd45be7be194654a6fd8fac8acce1a1f0c54` | ADRs (roster v3, org+pipeline, gate sequence) + `TEAM_101_IDENTITY` banner + Team 170 handoff trio (incl. populated hash rows) |
+| `HEAD` של הסניף לאחר מסירת החבילה | ADRs (roster v3, org+pipeline, gate sequence) + `TEAM_101_IDENTITY` banner + מסמכי handoff ב-`team_170/` — אימות: `git log -2 --oneline` (צפוי commit מסוג `refactor(roster): ADRs 110/111 + Team 170 T190/T100 handoff` מעל ה-commit של שורה ראשונה) |
 
 ---
 

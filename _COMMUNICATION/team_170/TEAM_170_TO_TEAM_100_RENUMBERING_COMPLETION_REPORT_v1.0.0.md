@@ -45,7 +45,7 @@ correction_cycle: 0
 | Hash | תיאור |
 |------|--------|
 | `2b133d5640729fec567aa4a5f5d96aa1ab21d706` | תיעוד `documentation/` — taxonomy, Role Mapping, Principal, program registry, pipeline reference |
-| `17d9cd45be7be194654a6fd8fac8acce1a1f0c54` | `_Architects_Decisions` + כותרת זהות + שלושת מסמכי team_170 (מדד / T190 / דוח זה) |
+| `git log -1 --format=%H` אחרי ה-merge המקומי | `_Architects_Decisions` + כותרת זהות + מסמכי `team_170` (מדד / בקשת T190 / דוח זה) — עשוי לכלול תיקוני hash עדכניים; השווה ל-`refactor(roster): ADRs 110/111 + …` |
 
 ## המשך מומלץ
 

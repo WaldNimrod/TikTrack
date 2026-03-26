@@ -4,8 +4,8 @@ from: Team 170 (Spec & Governance)
 date: 2026-03-26
 authority: TEAM_00_TO_TEAM_170_AOS_V3_RENUMBERING_AND_CANON_MANDATE_v1.0.0.md
 activation: TEAM_170_ACTIVATION_PROMPT_RENUMBERING_v1.0.0.md
-status: AS_MADE — pending Team 190 constitutional validation
-correction_cycle: 0
+status: AS_MADE — Team 190 **PASS** (see `TEAM_190_AOS_V3_RENUMBERING_VALIDATION_VERDICT_v1.0.1.md`)
+correction_cycle: 1
 ---
 
 # AOS v3 Renumbering — Technical Completion Index
@@ -22,9 +22,9 @@ Roster semantics **team_101 → team_110**, **team_102 → team_111** in listed 
 | `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.1.md` | §5.1 Reporting Line + log |
 | `documentation/docs-governance/01-FOUNDATIONS/PRINCIPAL_AND_TEAM_00_MODEL_v1.0.0.md` | §2.1 D-03 DB semantics + log |
 | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md` | C3 backlog row; LOD200 authoring → Team 110 |
-| `documentation/docs-system/02-PIPELINE/AOS_PIPELINE_ARCHITECTURE_REFERENCE_v1.0.0.md` | GATE_2.3 actors → 110/111 |
-| `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_TEAM_ROSTER_v3.0.0.md` | Roster table, JSON, defaults, iron rules, naming row |
-| `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_ORG_AND_PIPELINE_ARCHITECTURE_v1.0.0.md` | §2.4 title, roster table, JSON, matrices, independence text |
+| `documentation/docs-system/02-PIPELINE/AOS_PIPELINE_ARCHITECTURE_REFERENCE_v1.0.0.md` | GATE_2.3; v1.0.3 + C-01 alignment |
+| `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_TEAM_ROSTER_v3.0.0.md` | Roster table, JSON, defaults, iron rules, naming row; **C-01:** TT `spec_author`/`arch_reviewer` ↔ **111** |
+| `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_ORG_AND_PIPELINE_ARCHITECTURE_v1.0.0.md` | §2.4 title, roster table, JSON, matrices, independence text; **C-01:** §4.2/§4.4 domain split |
 | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GATE_SEQUENCE_CANON_v1.0.0.md` | GATE_1.1 actors; `lod200_author_team` type string |
 | `_COMMUNICATION/team_101/TEAM_101_IDENTITY_v1.0.0.md` | RENUMBERED banner only (mandate §2ב) |
 
@@ -52,4 +52,5 @@ Roster semantics **team_101 → team_110**, **team_102 → team_111** in listed 
 
 ---
 
-**log_entry | TEAM_170 | AOS_V3_RENUMBERING | COMPLETE_INDEX | 2026-03-26**
+**log_entry | TEAM_170 | AOS_V3_RENUMBERING | COMPLETE_INDEX | 2026-03-26**  
+**log_entry | TEAM_170 | AOS_V3_RENUMBERING | T100_FINAL_REPORT_ISSUED | 2026-03-26**

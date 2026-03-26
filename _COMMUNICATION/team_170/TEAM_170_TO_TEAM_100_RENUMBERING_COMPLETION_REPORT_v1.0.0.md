@@ -6,17 +6,20 @@ date: 2026-03-26
 subject: דוח השלמה מפורט — AOS v3 renumbering + canon (ממתין חותמת Team 190)
 mandate: TEAM_170_ACTIVATION_PROMPT_RENUMBERING_v1.0.0.md + TEAM_00_TO_TEAM_170_AOS_V3_RENUMBERING_AND_CANON_MANDATE_v1.0.0.md
 t190_gate: TEAM_170_TO_TEAM_190_RENUMBERING_VALIDATION_REQUEST_v1.0.0.md
-status: COMPLETE_AS_MADE — **constitutional validation PENDING Team 190**
+status: SUPERSEDED — use **TEAM_170_TO_TEAM_100_RENUMBERING_FINAL_COMPLETION_REPORT_v1.0.0.md**
+superseded_by: TEAM_170_TO_TEAM_100_RENUMBERING_FINAL_COMPLETION_REPORT_v1.0.0.md
 correction_cycle: 0
 ---
 
-# דוח השלמה לצוות 100 — Renumbering AOS v3
+> **החלף בדוח הסופי:** `TEAM_170_TO_TEAM_100_RENUMBERING_FINAL_COMPLETION_REPORT_v1.0.0.md` (אחרי Team 190 **PASS** ב־`TEAM_190_AOS_V3_RENUMBERING_VALIDATION_VERDICT_v1.0.1.md`).
+
+# דוח השלמה לצוות 100 — Renumbering AOS v3 *(ביניים — superseded)*
 
 ## תקציר מנהלים
 
 צוות **170** השלים את סבב המנדט לעדכון **מזהי רוסטר** בתיעוד המהותי וה־ADRs שצוינו, הוספת **§5.1 Reporting Line** ל־`TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.1.md`, הרחבת **D-03** ב־`PRINCIPAL_AND_TEAM_00_MODEL_v1.0.0.md`, וכותרת **RENUMBERED** ב־`TEAM_101_IDENTITY_v1.0.0.md` בלבד.
 
-הוגשה בקשת **ולידציה חוקתית** לצוות **190** (`TEAM_170_TO_TEAM_190_RENUMBERING_VALIDATION_REQUEST_v1.0.0.md`). **דוח זה מהווה את דוח ההשלמה המפורט לצוות 100**; לאחר **PASS** מ־190 יש לצרף את ה-verdict לסגירת התהליך הרשמית.
+הוגשה בקשת **ולידציה חוקתית** לצוות **190** (`TEAM_170_TO_TEAM_190_RENUMBERING_VALIDATION_REQUEST_v1.0.0.md`). **דוח זה היה דוח ביניים**; הסגירה הרשמית ל־100 נמצאת בדוח ה**סופי** לעיל.
 
 ## החלטות נעולות שיושמו (תזכורת)
 

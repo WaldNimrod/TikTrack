@@ -47,7 +47,7 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | S003 | S003-P001 | Data Model Validator | AGENTS_OS | COMPLETE | FAST_4 CLOSED (WP001) 2026-03-11 — Data Model Validator deployed; FAST_0..FAST_3 completed; Team 170 closure per TEAM_61_TO_TEAM_170_S003_P001_WP001_FAST4_HANDOFF_PROMPT_v1.0.0 |
 | S003 | S003-P002 | Test Template Generator | AGENTS_OS | COMPLETE | FAST_4 CLOSED (WP001) 2026-03-12 — Test Template Generator deployed; G3.7 added; agents_os_v2/requirements.txt canonical |
 | S003 | S003-P003 | System Settings (D39+D40+D41) | TIKTRACK | COMPLETE | GATE_8; active_flow=S003-P003-WP001 — DOCUMENTATION_CLOSED (GATE_8 PASS + lock closed 2026-03-21). Lifecycle complete.; active_work_package_id=N/A |
-| S003 | S003-P004 | User Tickers (D33) | TIKTRACK | PLANNED | — (registered from integrated roadmap v1.1.0) |
+| S003 | S003-P004 | User Tickers (D33) | TIKTRACK | ACTIVE | GATE_0 pending — Team 100 authorization 2026-03-25 |
 | S003 | S003-P005 | Watch Lists (D26) | TIKTRACK | PLANNED | — (D38 tag_management relocated to S005 per ARCHITECT_DIRECTIVE_ROADMAP_AMENDMENT_v1.0.0 §A1; registered from integrated roadmap v1.1.0) |
 | S003 | S003-P006 | Admin Review S003 | TIKTRACK | PLANNED | — (Stage Governance Package; planning marker per integrated roadmap v1.1.0) |
 | S003 | S003-P007 | Agents_OS Command Bridge Lite (ADR-031 Stage B) | AGENTS_OS | MERGED | **MERGED_INTO_S003-P011-WP001** (2026-03-19). ADR-031 Stage B scope (approve-path desync, command bridge copy flow, model-B realignment) fully delivered through S003-P011-WP001. Authority: ARCHITECT_DIRECTIVE_AOS_ROADMAP_RESET_v1.0.0. |
@@ -97,14 +97,14 @@ Status: Team 11 producing Work Plan; next: Team 90 review (2.2v) → Team 100 si
 |---|---|---|---|
 | Role-Based Team Management | C1 | T190 Monitor Report v1.1 | `role_catalog.json` + `domain_role_defaults.json` + `wp_role_assignments/{wp}.json`; role→team resolution replacing `_DOMAIN_PHASE_ROUTING` nested dict |
 | Teams UI roster-driven | C2 | T190 GAP-A1 | Remove hardcoded `TEAMS` array from `pipeline-teams.js`; drive from `TEAMS_ROSTER_v1.0.0.json` at runtime |
-| TEAMS_ROSTER entries | C3 | T190 GAP-A2 | Add missing roster entries: `team_11`, `team_101`, `team_102` (team_191 is utility — assess at WP003 spec) |
+| TEAMS_ROSTER entries | C3 | T190 GAP-A2 | Roster: `team_11`, **`team_110`**, **`team_111`** (canonical; legacy aliases `team_101`/`team_102` for backward-compat reads where applicable). `team_191` utility — assess at WP003 spec. |
 | .cursorrules coverage | C4 | T190 GAP-A5 | `.cursorrules` team list is subset-only; expand to full active roster |
 | Engine editor role extension | C5 | T190 RBTM-F06 | Extend engine editor from team→engine to role→preferred_engine |
 | WP-level role override policy | C6 | T190 §5 | Define approval model for per-WP role overrides (after role catalog established) |
 | Multi-channel context parity | C7 | T190 GAP-A6 | CI checks for context construction parity across LLM channels |
 | TRACK_FAST variant | C8 | LLD400 §2 | `_DOMAIN_PHASE_ROUTING` spec drafted but TRACK_FAST implementation deferred; full routing chain for single-team execution |
 
-**LOD200 authoring:** requires Team 101; begins at WP002 GATE_8 PASS.
+**LOD200 authoring:** requires **Team 110** (AOS Domain Architect IDE; artifact path may remain `_COMMUNICATION/team_101/`); begins at WP002 GATE_8 PASS.
 **WP03 Directive source:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_DECISIONS_WP2_02_03_04_v1.0.0.md §DECISION-WP2-02`
 
 ---

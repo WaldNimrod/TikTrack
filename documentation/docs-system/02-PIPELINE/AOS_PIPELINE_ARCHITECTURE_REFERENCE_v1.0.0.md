@@ -1,9 +1,9 @@
 # AOS Pipeline Architecture Reference
 
-**Version:** 1.0.2  
+**Version:** 1.0.3  
 **Domain:** Agents_OS + TikTrack (parallel pipelines)  
-**Status:** Canonical (Team 170 — 2026-03-23)  
-**Code snapshot:** Verified against repository state as of 2026-03-23 (§3 per Team 190 BF-01; §4 BN-1 `PIPELINE_RELAXED_KB84` per Team 100 binding note).
+**Status:** Canonical (Team 170 — 2026-03-26)  
+**Code snapshot:** Verified against repository state as of 2026-03-23 (§3 per Team 190 BF-01; §4 BN-1 `PIPELINE_RELAXED_KB84` per Team 100 binding note). §3.3 GATE_2.3 row clarified for **team_111** / **team_110** alignment with ADR §4.2 (Team 190 C-01 remediation, 2026-03-26).
 
 This document is self-contained onboarding for operators and implementers. Primary engines: `pipeline_run.sh` (shell), `agents_os_v2/orchestrator/pipeline.py` (Python), `agents_os/ui/js/pipeline-dashboard.js` + `pipeline-config.js` (dashboard).
 
@@ -211,7 +211,7 @@ The subsections below cover **GATE_0, GATE_1, GATE_2, GATE_3, GATE_4, GATE_5, GA
 | **Purpose** | Architectural approval and **work-plan** production: phases **2.2** (plan), **2.2v** (Team 90 on `G3_5`), **2.3** (lod200 architect) per `GATE_PHASE_ORDER` / `GATE_PHASE_NAMES` (`pipeline-config.js:137-138`, `145-146`) and `_DOMAIN_PHASE_ROUTING` (`pipeline.py:89-112`). |
 | **Trigger** | Enters after `GATE_1` complete. |
 | **Phases** | `2.2` → `2.2v` → `2.3` (`GATE_PHASE_ORDER.GATE_2` — `pipeline-config.js:137`). |
-| **Who runs** | Team 10 (TikTrack) / Team 11 (AOS) for plan; Team 90 for `G3_5`; team_111 / team_110 / team_100 for 2.3 per domain (`lod200_author_team`; legacy 101/102 tolerated in old state). |
+| **Who runs** | Team 10 (TikTrack) / Team 11 (AOS) for plan; Team 90 for `G3_5`; **GATE_2.3** — `lod200_author_team` / `arch_reviewer` per domain: TikTrack **team_111** (with **team_100** per §4.2 TT columns in `ARCHITECT_DIRECTIVE_TEAM_ROSTER_v3.0.0.md`); AOS **team_110** (with **team_100**); legacy **101/102** tolerated in old state only. |
 | **Inputs** | LLD400; work plan drafts. |
 | **Outputs** | `TEAM_10_*_G3_PLAN_WORK_PLAN_*.md`; `TEAM_90_*_G3_5_*`; architect `GATE_2` verdict files. |
 | **PASS** | Each phase’s acceptance met; final `pass` advances toward `GATE_3`. |

@@ -112,6 +112,8 @@ Each Work Package carries a `program_department` block in pipeline_state, defini
 }
 ```
 
+> **Domain resolution (spec_author / arch_reviewer):** JSON values above are **schema placeholders**. For `program_department.domain: "tiktrack"`, default **`spec_author` = `team_111`** (TikTrack Domain Architect IDE). For `"agents_os"`, default **`spec_author` = `team_110`**. **`arch_reviewer`** and **GATE_2.3** (`lod200_author_team`) follow the variant columns in the table below — symmetric: TikTrack uses **team_111** where AOS uses **team_110** (see `AOS_PIPELINE_ARCHITECTURE_REFERENCE_v1.0.0.md` §3.3).
+
 ### Default Assignments per Variant
 
 | Role | TT+TRACK_FULL | TT+TRACK_FOCUSED | AOS+TRACK_FULL | AOS+TRACK_FOCUSED |
@@ -124,8 +126,8 @@ Each Work Package carries a `program_department` block in pipeline_state, defini
 | qa_authority | team_50 | team_50 | team_51 | team_51 |
 | validation_authority | team_90 | team_90 | team_90 | team_90 |
 | doc_closure | team_70 | team_70 | team_170 | team_170 |
-| spec_author | team_110 | team_110 | team_110 | team_110 |
-| arch_reviewer | team_100 | team_100 | team_100/110 | team_110 |
+| spec_author | team_111 | team_111 | team_110 | team_110 |
+| arch_reviewer | team_100/111 | team_111 | team_100/110 | team_110 |
 | adversarial_validator | **team_190 (fixed)** | **team_190 (fixed)** | **team_190 (fixed)** | **team_190 (fixed)** |
 
 *TikTrack TRACK_FOCUSED: default impl = team_30. LOD200 may override to team_20 if WP is backend-heavy.
@@ -206,4 +208,5 @@ Each Work Package carries a `program_department` block in pipeline_state, defini
 
 ---
 
-**log_entry | TEAM_00 | ARCHITECT_DIRECTIVE | TEAM_ROSTER_v3.0.0 | LOCKED | SUPERSEDES_v2.0.0 | TEAMS_21_31_41_ADDED | TEAM_61_REDEFINED | TEAM_60_CONDITIONAL | DEPARTMENT_DEFINITION_ADDED | IRON_RULES_UPDATED | NAMING_CONVENTION_LOCKED | 2026-03-21**
+**log_entry | TEAM_00 | ARCHITECT_DIRECTIVE | TEAM_ROSTER_v3.0.0 | LOCKED | SUPERSEDES_v2.0.0 | TEAMS_21_31_41_ADDED | TEAM_61_REDEFINED | TEAM_60_CONDITIONAL | DEPARTMENT_DEFINITION_ADDED | IRON_RULES_UPDATED | NAMING_CONVENTION_LOCKED | 2026-03-21**  
+**log_entry | TEAM_170 | ARCHITECT_DIRECTIVE_TEAM_ROSTER_v3 | T190_C01_ARCH_REVIEWER_111_SYNC | 2026-03-26**

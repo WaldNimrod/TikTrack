@@ -174,6 +174,8 @@ STATE_SNAPSHOT.json              ← auto-rebuilt בכל advance
 }
 ```
 
+> **Domain resolution:** כמו ב־`ARCHITECT_DIRECTIVE_TEAM_ROSTER_v3.0.0.md` §3 — `spec_author` ברירת־מחדל **`team_111`** ל־TikTrack ו־**`team_110`** ל־Agents_OS; `arch_reviewer` ו־**GATE_2.3** (`lod200_author_team`) לפי עמודות הטבלה (סימטריה 111↔110 מול `AOS_PIPELINE_ARCHITECTURE_REFERENCE_v1.0.0.md` §3.3).
+
 ### 4.2 Default Departments — טבלת התאמה
 
 | Role | TT+TRACK_FULL | TT+TRACK_FOCUSED | AOS+TRACK_FOCUSED | AOS+TRACK_FULL | AOS+TRACK_FAST |
@@ -186,8 +188,8 @@ STATE_SNAPSHOT.json              ← auto-rebuilt בכל advance
 | qa_authority | team_50 | team_50 | team_51 | team_51 | team_51 |
 | validation_authority | team_90 | team_90 | team_90 | team_90 | team_90 |
 | doc_closure | team_70 | team_70 | team_170 | team_170 | team_170 |
-| spec_author | team_110 | team_110 | team_110 | team_110 | team_110 |
-| arch_reviewer | team_100 | team_100 | team_100/110 | team_100/110 | team_110 |
+| spec_author | team_111 | team_111 | team_110 | team_110 | team_110 |
+| arch_reviewer | team_100/111 | team_111 | team_100/110 | team_100/110 | team_110 |
 | adversarial_validator | **team_190** | **team_190** | **team_190** | **team_190** | **team_190** |
 
 *`team_30` = default impl ב-TikTrack TRACK_FOCUSED; LOD200 יכול לציין team_20 אם WP backend-heavy.
@@ -213,12 +215,12 @@ STATE_SNAPSHOT.json              ← auto-rebuilt בכל advance
 | GATE_1 / 1.1 | spec_author | מי כותב LOD200 |
 | GATE_1 / 1.2 | adversarial_validator | team_190 (fixed) |
 | GATE_2 / 2.2 | domain_gateway | מי בונה work plan |
-| GATE_2 / 2.3 | arch_reviewer | מי מאשר spec |
+| GATE_2 / 2.3 | arch_reviewer | per §4.2 + `lod200_author_team`: TT **team_100/111** or **team_111**; AOS **team_100/110** or **team_110** |
 | GATE_3 / 3.1 | domain_gateway | מי מנפיק מנדטים |
 | GATE_3 / 3.2 | backend_impl, frontend_impl, [design_advisory], [devops] | impl teams |
 | GATE_3 / 3.3 | qa_authority | QA in-gate |
 | GATE_4 / 4.1 | validation_authority | team_90 |
-| GATE_4 / 4.2 | arch_reviewer | team_100/110 |
+| GATE_4 / 4.2 | arch_reviewer | TikTrack: **team_100/111**; AOS: **team_100/110** |
 | GATE_4 / 4.3 | arch_reviewer (senior) | team_100 |
 | GATE_5 / 5.1 | doc_closure | מי סוגר תיעוד |
 | GATE_5 / 5.2 | validation_authority | team_90 |
@@ -381,4 +383,5 @@ Constitution page חייב להציג:
 
 ---
 
-**log_entry | TEAM_00 | ARCHITECT_DIRECTIVE | ORG_AND_PIPELINE_ARCHITECTURE_v1.0.0 | LOCKED | SSOT+ROSTER_v3+ROLE_MODEL+TRACKS+QA_PROTOCOL+CONSTITUTION | 2026-03-21**
+**log_entry | TEAM_00 | ARCHITECT_DIRECTIVE | ORG_AND_PIPELINE_ARCHITECTURE_v1.0.0 | LOCKED | SSOT+ROSTER_v3+ROLE_MODEL+TRACKS+QA_PROTOCOL+CONSTITUTION | 2026-03-21**  
+**log_entry | TEAM_170 | ARCHITECT_DIRECTIVE_ORG_AND_PIPELINE_v1 | T190_C01_ARCH_REVIEWER_111_SYNC | 2026-03-26**

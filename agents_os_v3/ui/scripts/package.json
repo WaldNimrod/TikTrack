@@ -1,0 +1,9 @@
+{
+  "name": "aosv3-ui-capture-scripts",
+  "private": true,
+  "type": "module",
+  "description": "Optional Playwright capture for GATE_3 mock matrix (run from repo with mock HTTP server up).",
+  "devDependencies": {
+    "playwright": "^1.49.0"
+  }
+}

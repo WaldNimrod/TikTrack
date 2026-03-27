@@ -1,0 +1,110 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-03-27",
+  "entries": [
+    {
+      "path": "agents_os_v3/ui/app.js",
+      "status": "NEW",
+      "spec_ref": "AOS v3 UI",
+      "owner_team": "team_61",
+      "added_in_gate": "PRE_BUILD",
+      "notes": "Baseline seed — Team 191 / Team 61 maintain"
+    },
+    {
+      "path": "agents_os_v3/ui/config.html",
+      "status": "NEW",
+      "spec_ref": "AOS v3 UI",
+      "owner_team": "team_61",
+      "added_in_gate": "PRE_BUILD",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/ui/history.html",
+      "status": "NEW",
+      "spec_ref": "AOS v3 UI",
+      "owner_team": "team_61",
+      "added_in_gate": "PRE_BUILD",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/ui/index.html",
+      "status": "NEW",
+      "spec_ref": "AOS v3 UI",
+      "owner_team": "team_61",
+      "added_in_gate": "PRE_BUILD",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/ui/portfolio.html",
+      "status": "NEW",
+      "spec_ref": "AOS v3 UI",
+      "owner_team": "team_61",
+      "added_in_gate": "PRE_BUILD",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/ui/run_preflight.sh",
+      "status": "NEW",
+      "spec_ref": "AOS v3 UI",
+      "owner_team": "team_61",
+      "added_in_gate": "PRE_BUILD",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/ui/scripts/README_GATE3_MATRIX.md",
+      "status": "NEW",
+      "spec_ref": "AOS v3 UI",
+      "owner_team": "team_61",
+      "added_in_gate": "PRE_BUILD",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/ui/scripts/capture_gate3_matrix.mjs",
+      "status": "NEW",
+      "spec_ref": "AOS v3 UI",
+      "owner_team": "team_61",
+      "added_in_gate": "PRE_BUILD",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/ui/scripts/package-lock.json",
+      "status": "NEW",
+      "spec_ref": "AOS v3 UI",
+      "owner_team": "team_61",
+      "added_in_gate": "PRE_BUILD",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/ui/scripts/package.json",
+      "status": "NEW",
+      "spec_ref": "AOS v3 UI",
+      "owner_team": "team_61",
+      "added_in_gate": "PRE_BUILD",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/ui/style.css",
+      "status": "NEW",
+      "spec_ref": "AOS v3 UI",
+      "owner_team": "team_61",
+      "added_in_gate": "PRE_BUILD",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/ui/teams.html",
+      "status": "NEW",
+      "spec_ref": "AOS v3 UI",
+      "owner_team": "team_61",
+      "added_in_gate": "PRE_BUILD",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/ui/theme-init.js",
+      "status": "NEW",
+      "spec_ref": "AOS v3 UI",
+      "owner_team": "team_61",
+      "added_in_gate": "PRE_BUILD",
+      "notes": ""
+    }
+  ]
+}

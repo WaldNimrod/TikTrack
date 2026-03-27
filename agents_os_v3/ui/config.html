@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<!--
+id: TEAM_31_AOS_V3_UI_MOCKUPS
+team: Team 31
+domain: agents_os
+artifact: config.html
+mandate: TEAM_100_TO_TEAM_31_AOS_V3_UI_MOCKUPS_MANDATE_v2.0.0
+date: 2026-03-27
+status: MOCKUP
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agents OS v3 — Configuration (mock)</title>
+  <link rel="stylesheet" href="../../agents_os/ui/css/pipeline-shared.css" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="theme-init.js"></script>
+</head>
+<body data-aosv3-page="config">
+
+<header class="agents-header">
+  <div class="agents-header-left">
+    <h1 class="agents-header-title">Agents OS v3 — <span>Configuration</span></h1>
+    <span class="agents-refresh-label">Routing / templates / policies (mock)</span>
+  </div>
+  <div class="agents-header-right">
+    <button type="button" class="btn" onclick="AOSV3_onDomainSwitch('agents_os')">Dark</button>
+    <button type="button" class="btn" onclick="AOSV3_onDomainSwitch('tiktrack')">Light</button>
+  </div>
+</header>
+
+<nav class="pipeline-nav">
+  <a class="nav-link" href="index.html">Pipeline</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="history.html">History</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link active" href="config.html">Configuration</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="teams.html">Teams</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="portfolio.html">Portfolio</a>
+</nav>
+
+<div class="agents-page-layout">
+  <main class="agents-page-main aosv3-page-main--full">
+    <div class="aosv3-tabs" role="tablist" aria-label="Configuration sections">
+      <button type="button" class="aosv3-tab active" data-tab="routing" role="tab" aria-selected="true">Routing rules</button>
+      <button type="button" class="aosv3-tab" data-tab="templates" role="tab" aria-selected="false">Templates</button>
+      <button type="button" class="aosv3-tab" data-tab="policies" role="tab" aria-selected="false">Policies</button>
+    </div>
+
+    <div id="aosv3-panel-routing" class="aosv3-tab-panel active" role="tabpanel">
+      <p class="aosv3-mock-note">Read-only table — mock data from mandate.</p>
+      <div class="aosv3-table-wrap">
+        <table class="aosv3-table" aria-label="Routing rules">
+          <thead>
+            <tr>
+              <th>id</th>
+              <th>gate_id</th>
+              <th>phase_id</th>
+              <th>domain_id</th>
+              <th>variant</th>
+              <th>role_id</th>
+              <th>priority</th>
+            </tr>
+          </thead>
+          <tbody id="aosv3-routing-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="aosv3-panel-templates" class="aosv3-tab-panel" role="tabpanel">
+      <p class="aosv3-mock-note">Click “Preview body” to expand <code>body_markdown</code>. Edit disabled — team_00 only.</p>
+      <div id="aosv3-templates-list"></div>
+    </div>
+
+    <div id="aosv3-panel-policies" class="aosv3-tab-panel" role="tabpanel">
+      <p class="aosv3-mock-note">policy_value_json shown parsed. Edit disabled — team_00 only.</p>
+      <div class="aosv3-table-wrap">
+        <table class="aosv3-table" aria-label="Policies">
+          <thead>
+            <tr>
+              <th>policy_key</th>
+              <th>scope_type</th>
+              <th>policy_value (parsed)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="aosv3-policies-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

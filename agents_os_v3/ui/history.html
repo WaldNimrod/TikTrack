@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<!--
+id: TEAM_31_AOS_V3_UI_MOCKUPS
+team: Team 31
+domain: agents_os
+artifact: history.html
+mandate: TEAM_100_TO_TEAM_31_AOS_V3_UI_MOCKUPS_MANDATE_v2.0.0
+date: 2026-03-27
+status: MOCKUP
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agents OS v3 — History (mock)</title>
+  <link rel="stylesheet" href="../../agents_os/ui/css/pipeline-shared.css" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="theme-init.js"></script>
+</head>
+<body data-aosv3-page="history">
+
+<header class="agents-header">
+  <div class="agents-header-left">
+    <h1 class="agents-header-title">Agents OS v3 — <span>History</span></h1>
+    <span class="agents-refresh-label">GET /api/history (mock)</span>
+  </div>
+  <div class="agents-header-right">
+    <button type="button" class="btn" onclick="AOSV3_onDomainSwitch('agents_os')">Dark</button>
+    <button type="button" class="btn" onclick="AOSV3_onDomainSwitch('tiktrack')">Light</button>
+  </div>
+</header>
+
+<nav class="pipeline-nav">
+  <a class="nav-link" href="index.html">Pipeline</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link active" href="history.html">History</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="config.html">Configuration</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="teams.html">Teams</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="portfolio.html">Portfolio</a>
+</nav>
+
+<div class="agents-page-layout">
+  <main class="agents-page-main aosv3-page-main--full">
+
+    <section class="section-card aosv3-history-analytics">
+      <div class="section-title">Observability analytics (mock)</div>
+      <div class="aosv3-history-run-row">
+        <label class="aosv3-form-label">Run
+          <select id="aosv3-history-run-select" class="aosv3-input" aria-label="Run selector"></select>
+        </label>
+        <button type="button" class="btn btn-primary" id="aosv3-history-run-apply">Apply</button>
+      </div>
+      <p class="aosv3-mock-note">Apply sets the Run ID filter. Deep-link: <code>history.html?run_id=…</code></p>
+      <div class="aosv3-history-timeline" id="aosv3-history-timeline" aria-label="Event timeline visual mock">
+        <div class="aosv3-timeline-gates">GATE_0 — GATE_1 — GATE_2 — GATE_3 —▶ (current)</div>
+        <div class="aosv3-timeline-events">
+          <span>✓ RUN_INITIATED</span>
+          <span>✓ GATE_PASSED</span>
+          <span>✓ GATE_PASSED</span>
+          <span class="aosv3-timeline-fail">✗ GATE_FAILED</span>
+          <span class="aosv3-timeline-corr">↻ CORRECTION</span>
+        </div>
+        <div class="aosv3-timeline-actors">
+          <span>team_11</span>
+          <span>team_21</span>
+          <span>team_61</span>
+          <span>team_90</span>
+          <span>team_21</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="aosv3-filter-bar">
+      <label>run_id
+        <input type="text" id="aosv3-filter-run-id" placeholder="exact run ULID" aria-label="Filter by run_id" />
+      </label>
+      <label>domain_id
+        <select id="aosv3-filter-domain" aria-label="Filter by domain">
+          <option value="">(all)</option>
+          <option value="agents_os">agents_os</option>
+          <option value="tiktrack">tiktrack</option>
+        </select>
+      </label>
+      <label>gate_id
+        <select id="aosv3-filter-gate" aria-label="Filter by gate">
+          <option value="">(all)</option>
+        </select>
+      </label>
+      <label>event_type
+        <select id="aosv3-filter-event-type" aria-label="Filter by event type">
+          <option value="">(all — 15 registry types)</option>
+        </select>
+      </label>
+      <label>actor_team_id
+        <input type="text" id="aosv3-filter-actor" placeholder="e.g. team_61" aria-label="Filter by actor team id" />
+      </label>
+      <label>limit
+        <select id="aosv3-limit" aria-label="Page limit">
+          <option value="50" selected>50</option>
+          <option value="10">10</option>
+          <option value="200">200 (max)</option>
+        </select>
+      </label>
+      <label>order
+        <select id="aosv3-order" aria-label="Sort order">
+          <option value="desc" selected>desc (newest first)</option>
+          <option value="asc">asc</option>
+        </select>
+      </label>
+      <label>offset
+        <input type="number" id="aosv3-offset" value="0" min="0" step="1" aria-label="Pagination offset" />
+      </label>
+    </div>
+
+    <div class="aosv3-table-wrap">
+      <table class="aosv3-table" aria-label="Event timeline">
+        <thead>
+          <tr>
+            <th>occurred_at</th>
+            <th>event_type</th>
+            <th>gate / phase</th>
+            <th>actor</th>
+            <th>verdict</th>
+            <th>reason</th>
+          </tr>
+        </thead>
+        <tbody id="aosv3-history-tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="section-card aosv3-legend-card aosv3-legend-card--inline">
+      <div class="sidebar-label">Event badge color key</div>
+      <div class="aosv3-legend aosv3-legend--wrap">
+        <span class="aosv3-legend-item"><span class="aosv3-event-badge aosv3-event-badge--neutral">NEUTRAL</span> default</span>
+        <span class="aosv3-legend-item"><span class="aosv3-event-badge aosv3-event-badge--advisory">ADVISORY</span> non-blocking</span>
+        <span class="aosv3-legend-item"><span class="aosv3-event-badge aosv3-event-badge--blocking">BLOCK</span> blocking</span>
+      </div>
+    </div>
+
+    <div class="aosv3-pagination">
+      <span>Total (filtered): <strong id="aosv3-history-total">0</strong></span>
+      <span>
+        <button type="button" class="btn" id="aosv3-page-prev">Prev</button>
+        <button type="button" class="btn" id="aosv3-page-next">Next</button>
+      </span>
+    </div>
+  </main>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

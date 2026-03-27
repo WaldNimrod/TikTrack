@@ -7,12 +7,114 @@
 | Purpose | Document / path |
 |--------|------------------------------------------|
 | Squad ID list + mandatory files | `.cursorrules` (repo root) |
-| Role mapping (20/30/40/50/51/60/61/70/90/100/170/190/191) | `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md` |
+| Role mapping (all 21 teams: 00/10/11/20/21/30/31/40/50/51/60/61/70/71/90/100/110/111/170/190/191) | `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.1.md` |
+| Principal / Team 00 model + PFS | `documentation/docs-governance/01-FOUNDATIONS/PRINCIPAL_AND_TEAM_00_MODEL_v1.0.0.md` |
 | Active workflow & orchestration | `documentation/docs-governance/04-PROCEDURES/AGENTS_OS_V2_OPERATING_PROCEDURES_v1.0.0.md` |
 | **Gemini Code Assist environment procedure** | `_COMMUNICATION/team_101/TEAM_101_OPERATING_PROCEDURES_v1.0.0.md` |
 | Global entry + WSM | `00_MASTER_INDEX.md`, `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` |
 
 **Deprecated (do not use as active procedure):** References to `PHOENIX_MASTER_BIBLE` or `CURSOR_INTERNAL_PLAYBOOK` under `documentation/09-GOVERNANCE/standards/` or `06-GOVERNANCE_&_COMPLIANCE/standards/` — those paths are not in active use; superseded by the documents above and by V2 Operating Procedures.
+
+---
+
+## Active branch — AOS v3 (BUILD track)
+
+| Field | Value |
+|-------|--------|
+| **Branch** | `aos-v3` |
+| **Push** | `origin/aos-v3` (direct; no `codex/team191-integration` on this track) |
+| **Pipeline** | N/A for this project track (`pipeline_run.sh` not used here) |
+| **Default branch** | `main` remains the GitHub default; merge back after completion + data migration |
+| **Iron Rules** | `agents_os_v2/` **FROZEN**; every file under `agents_os_v3/` must appear in `agents_os_v3/FILE_INDEX.json` before commit — see `_COMMUNICATION/team_00/TEAM_00_TO_TEAM_191_AOS_V3_GIT_GOVERNANCE_CANONICAL_v1.1.0.md` |
+
+**Pre-commit:** `phoenix-aos-v3-file-index-v2-freeze` · **BUILD check:** `bash scripts/check_aos_v3_build_governance.sh`
+
+---
+
+## Organizational Structure (LOCKED — 2026-03-26)
+
+**Every agent MUST learn the organizational structure and fully adopt its assigned role at onboarding.** This is non-negotiable. Drift from role boundaries is a governance violation.
+
+### Full Team Roster — 21 Teams
+
+| ID | Name | Group | Domain | Engine |
+|---|---|---|---|---|
+| team_00 | Principal & Chief Architect | leadership/architecture | multi | claude-code |
+| team_10 | Execution Orchestrator | gateway | tiktrack | cursor |
+| team_11 | AOS Gateway / Execution Lead | gateway | agents_os | cursor |
+| team_20 | Backend Implementation | implementation | tiktrack | cursor |
+| team_21 | AOS Backend Implementation | implementation | agents_os | cursor |
+| team_30 | Frontend Implementation | implementation | tiktrack | cursor |
+| team_31 | AOS Frontend Implementation | implementation | agents_os | cursor |
+| team_40 | UI Assets & Design | design | tiktrack | cursor |
+| team_50 | QA & Functional Acceptance | qa | tiktrack | cursor |
+| team_51 | AOS QA & Functional Acceptance | qa | agents_os | cursor |
+| team_60 | DevOps & Platform | implementation | tiktrack | cursor |
+| team_61 | AOS DevOps & Platform | implementation | agents_os | cursor |
+| team_70 | TikTrack Documentation | documentation | tiktrack | codex |
+| team_71 | AOS Documentation | documentation | agents_os | codex |
+| team_90 | Dev Validator | governance | multi | codex |
+| team_100 | Chief System Architect / Chief R&D | architecture | agents_os | codex |
+| team_110 | TikTrack Domain Architect (IDE) | architecture | tiktrack | codex |
+| team_111 | AOS Domain Architect (IDE) | architecture | agents_os | codex |
+| team_170 | Spec & Governance | governance | multi | codex |
+| team_190 | Constitutional Validator | governance | multi | codex |
+| team_191 | Git-Governance Lane | governance | multi | cursor |
+
+### x0/x1 Domain Pattern
+
+Every functional role has a TikTrack (x0) and AOS (x1) mirror:
+
+```
+x0 (TikTrack)    x1 (AOS)         Function
+─────────────────────────────────────────
+team_10          team_11          Gateway
+team_20          team_21          Backend
+team_30          team_31          Frontend
+team_50          team_51          QA
+team_60          team_61          DevOps
+team_70          team_71          Documentation
+```
+
+**Rule:** x0 and x1 receive the same Layer 4 task template with a different domain parameter.
+
+### 4-Layer Context Model (mandatory for ALL agent sessions)
+
+| Layer | Content | Loaded From |
+|---|---|---|
+| **Layer 1 — Identity** | Team ID, name, role, domain, engine, parent/children | `TEAMS_ROSTER_v1.0.0.json` → `layer_1_identity` |
+| **Layer 2 — Governance** | writes_to, governed_by, gate_authority, Iron Rules | `TEAMS_ROSTER_v1.0.0.json` → `layer_2_authority` + `layer_4_procedure.iron_rules` |
+| **Layer 3 — Current State** | WSM, pipeline state, active WP/gate, relevant specs | WSM + `pipeline_state.json` + domain-specific SSOT |
+| **Layer 4 — Task** | Specific mandate, deliverables, acceptance criteria | Activation prompt from issuing team |
+
+**Iron Rule:** Context loaders MUST bind the specific team ID (e.g., `team_31` not `team_30`) so an agent never runs with a generic or wrong-domain identity.
+
+**Context size by profession:**
+
+| Profession | Layer 2 | Layer 3 | Rationale |
+|---|---|---|---|
+| backend/frontend/devops_engineer | SMALL | Current WP + gate | Focused execution scope |
+| gateway_orchestrator | MEDIUM | Full pipeline state | Coordination awareness |
+| qa_engineer | MEDIUM | Current WP + test state | QA protocols + domain |
+| domain_architect | LARGE | Full architecture state | LOD200/400 + all rules |
+| constitutional_validator | LARGE | Gate submission under review | Cross-domain constitution |
+| principal | FULL | All | Supreme authority |
+
+### SSOT Files for Org Structure
+
+```
+documentation/docs-governance/01-FOUNDATIONS/TEAM_TAXONOMY_v1.0.1.md         ← Group + Profession enums, x0/x1 map, context isolation rules
+documentation/docs-governance/01-FOUNDATIONS/TEAMS_ROSTER_v1.0.0.json        ← Canonical 4-layer definitions per team (SSOT for loaders)
+documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.1.md ← Roles, scope, registration records, domain split lock
+```
+
+### Principal (Team 00) — SSOT behavior (AOS v3 alignment)
+
+- **One human operator** in canon: **Team 00 / Principal** (see `PRINCIPAL_AND_TEAM_00_MODEL_v1.0.0.md` for D-01…D-14).
+- **No personal names** in SSOT identifiers or specs; use `Principal`, `Team 00`, `team_00`, `operator`, `human` as appropriate.
+- **Principal does not routinely author repository files** or **run routine test suites**; mandated squads produce artifacts, and tests run under human-gate or explicit request (same addendum).
+- **Team 100** receives AOS v3 spec handoffs from **Team 110** (IDE domain architect) under Principal-authorized programs; **Team 00** remains escalations + Iron Rules (`TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.1.md` §1.4–1.5).
+- **Pipeline Fidelity Suite (PFS):** canonical harness name for scripted pipeline+dashboard exercises — not new roster squads (`PRINCIPAL_AND_TEAM_00_MODEL_v1.0.0.md` §3).
 
 ---
 
@@ -104,6 +206,8 @@ S{NNN}-P{NNN}-WP{NNN}: Team 61 — [Category X-XX]: [brief description]
 ```
 
 **Branch naming:** Work on `main` for approved mandates. Use feature branches (`team61/feature-name`) for experimental work.
+
+**AOS v3 BUILD track:** Use branch **`aos-v3`**; push to **`origin/aos-v3`**. Maintain **`agents_os_v3/FILE_INDEX.json`** for every path under `agents_os_v3/` (see **Active branch — AOS v3** above). Do **not** modify `agents_os_v2/`.
 
 **Push rules:**
 - Always push to `main` for approved Phase 1 items

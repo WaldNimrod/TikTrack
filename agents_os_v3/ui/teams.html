@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<!--
+id: TEAM_31_AOS_V3_UI_MOCKUPS
+team: Team 31
+domain: agents_os
+artifact: teams.html
+mandate: TEAM_100_TO_TEAM_31_AOS_V3_UI_MOCKUPS_MANDATE_v2.0.0
+date: 2026-03-27
+status: MOCKUP
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agents OS v3 — Teams (mock)</title>
+  <link rel="stylesheet" href="../../agents_os/ui/css/pipeline-shared.css" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="theme-init.js"></script>
+</head>
+<body data-aosv3-page="teams">
+
+<header class="agents-header">
+  <div class="agents-header-left">
+    <h1 class="agents-header-title">Agents OS v3 — <span>Teams</span></h1>
+    <span class="agents-refresh-label">GET /api/teams (mock)</span>
+  </div>
+  <div class="agents-header-right">
+    <button type="button" class="btn" onclick="AOSV3_onDomainSwitch('agents_os')">Dark</button>
+    <button type="button" class="btn" onclick="AOSV3_onDomainSwitch('tiktrack')">Light</button>
+  </div>
+</header>
+
+<nav class="pipeline-nav">
+  <a class="nav-link" href="index.html">Pipeline</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="history.html">History</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="config.html">Configuration</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link active" href="teams.html">Teams</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="portfolio.html">Portfolio</a>
+</nav>
+
+<div class="agents-page-layout">
+  <aside class="agents-page-sidebar aosv3-teams-sidebar">
+    <div class="sidebar-section-card">
+      <div class="sidebar-label">Filters</div>
+      <label class="aosv3-form-label">Domain
+        <select id="aosv3-team-filter-domain" class="aosv3-input" aria-label="Filter by domain scope">
+          <option value="all">All</option>
+          <option value="agents_os">agents_os (+ all-scope)</option>
+          <option value="tiktrack">tiktrack (+ all-scope)</option>
+        </select>
+      </label>
+      <label class="aosv3-form-label">Group
+        <select id="aosv3-team-filter-group" class="aosv3-input" aria-label="Filter by group">
+          <option value="all">All</option>
+          <option value="aos">AOS + cross</option>
+          <option value="tiktrack">TikTrack lane</option>
+          <option value="cross">Cross-domain only</option>
+        </select>
+      </label>
+      <label class="aosv3-team-checkbox-label">
+        <input type="checkbox" id="aosv3-team-filter-current" />
+        Current actor only
+      </label>
+    </div>
+    <div class="sidebar-section-card">
+      <div class="sidebar-label">Organization tree</div>
+      <div id="aosv3-org-tree" class="aosv3-org-tree"></div>
+      <p class="aosv3-mock-note">Click a node to select · same as roster</p>
+    </div>
+    <div class="sidebar-label">All teams (compact)</div>
+    <div id="aosv3-team-list" class="aosv3-team-list aosv3-team-list--compact"></div>
+  </aside>
+  <main class="agents-page-main aosv3-teams-main">
+    <div id="aosv3-team-detail" class="section-card aosv3-team-detail-panel"></div>
+    <div id="aosv3-team-context" class="aosv3-team-context"></div>
+  </main>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

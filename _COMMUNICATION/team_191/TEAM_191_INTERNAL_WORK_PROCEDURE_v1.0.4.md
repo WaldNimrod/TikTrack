@@ -1,12 +1,11 @@
-# TEAM 191 INTERNAL WORK PROCEDURE v1.0.3
-
-> **SUPERSEDED** by `TEAM_191_INTERNAL_WORK_PROCEDURE_v1.0.4.md` (2026-03-27). Keep file for history only.
+# TEAM 191 INTERNAL WORK PROCEDURE v1.0.4
 
 **project_domain:** SHARED (TIKTRACK + AGENTS_OS)  
-**id:** TEAM_191_INTERNAL_WORK_PROCEDURE_v1.0.3  
+**id:** TEAM_191_INTERNAL_WORK_PROCEDURE_v1.0.4  
 **owner:** Team 191 (child team of Team 190)  
-**date:** 2026-03-24  
+**date:** 2026-03-27  
 **status:** ACTIVE  
+**supersedes:** `TEAM_191_INTERNAL_WORK_PROCEDURE_v1.0.3.md`  
 **authority_source:** `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md`
 
 ---
@@ -378,6 +377,35 @@ Subject lines and process-ID rules: see **§11) Process-ID Title Lock**.
 
 ---
 
+## 15) AOS v3 Git overlay — binding (Team 00 canonical)
+
+**מקור סמכות:** `_COMMUNICATION/team_00/TEAM_00_TO_TEAM_191_AOS_V3_GIT_GOVERNANCE_CANONICAL_v1.1.0.md` (מכסה גם סגירת `PENDING_TEAM_100_SIGNOFF`).
+
+**מסמך מצב ענף:** `_COMMUNICATION/team_191/TEAM_191_AOS_V3_PROJECT_BRANCH_WORK_MODE_v1.1.0.md` — **סטטוס: `APPROVED`** (הפניה לקנוני Team 00 לעיל).
+
+### 15.1 פרמטרים מחייבים (מסלול AOS v3)
+
+| נושא | ערך |
+|------|-----|
+| ענף עבודה | `aos-v3` |
+| upstream | `origin/aos-v3` (ישיר; ללא `codex/team191-integration` במסלול זה) |
+| פיפליין | לא בשימוש לפרויקט v3 בתקופה זו |
+| `agents_os_v2/` | **FREEZE** — אין שינויים; אכיפה: `scripts/lint_aos_v3_file_index_and_v2_freeze.sh` (pre-commit) + `scripts/check_aos_v3_build_governance.sh` (BUILD) |
+| `agents_os_v3/` | כל קובץ חייב רישום ב־`agents_os_v3/FILE_INDEX.json` לפני commit — אכיפה כנ"ל |
+| סיום | איחוד ל־`main` לפי `TEAM_00_TO_TEAM_191_AOS_V3_GIT_GOVERNANCE_CANONICAL_v1.1.0` §4 (כולל CLEANUP_REPORT) |
+
+### 15.2 מנגנוני אכיפה (Team 191)
+
+1. **Pre-commit (נבחר — אפשרות A):** hook ריפו `phoenix-aos-v3-file-index-v2-freeze` → `scripts/lint_aos_v3_file_index_and_v2_freeze.sh`
+2. **כל BUILD (191-B):** `bash scripts/check_aos_v3_build_governance.sh` — בדיקת FREEZE ל־`agents_os_v2/` בטווח קומיטים **רק בענף `aos-v3`**; ב־`main` מוצג `INFO` ודילוג; אכיפת שינויי v2 ב-working tree נשארת ב־pre-commit אם מבוצעים `git add` ל־`agents_os_v2/`.
+3. **Fallback (אפשרות B):** רשימת PR — `_COMMUNICATION/team_191/AOS_V3_FILE_INDEX_PR_CHECKLIST.md`
+
+### 15.3 מחוץ למסלול v3
+
+עבודה על `main` / TikTrack / מסלולים שאינם AOS v3: §10 נשאר כפי שהוא; אכיפת FREEZE על `agents_os_v2/` ו־FILE_INDEX ל־`agents_os_v3/` חלה על **כל קומיט** שיגע בנתיבים אלה (Iron Rule).
+
+---
+
 **log_entry | TEAM_190 | TEAM_191_INTERNAL_WORK_PROCEDURE | CREATED_AND_ACTIVATED | 2026-03-11**
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | DATE_LINT_RECURRING_PATTERN_POLICY_LOCKED | 2026-03-11**
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | HEBREW_LANGUAGE_LOCK_AND_191_HELP_PROMPT_LOCKED | 2026-03-11**
@@ -387,3 +415,4 @@ Subject lines and process-ID rules: see **§11) Process-ID Title Lock**.
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | PERMISSION_AND_TOKEN_EFFICIENCY_LOCK_ADDED_v1_0_2 | 2026-03-15**
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | PROCESS_FUNCTIONAL_SEPARATION_LANE_ADDED_v1_0_3 | 2026-03-15**
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | PRE_COMMIT_GUARD_SAFE_COMMIT_MANDATE_TEAM100 | 2026-03-24**
+**log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | AOS_V3_OVERLAY_SECTION_15_v1_0_4 | 2026-03-27**

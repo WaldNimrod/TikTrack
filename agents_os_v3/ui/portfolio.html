@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<!--
+id: TEAM_31_AOS_V3_UI_MOCKUPS
+team: Team 31
+domain: agents_os
+artifact: portfolio.html
+mandate: TEAM_100_TO_TEAM_31_AOS_V3_UI_MOCKUPS_MANDATE_v2.0.0
+date: 2026-03-27
+status: MOCKUP
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agents OS v3 — Portfolio (mock)</title>
+  <link rel="stylesheet" href="../../agents_os/ui/css/pipeline-shared.css" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="theme-init.js"></script>
+</head>
+<body data-aosv3-page="portfolio">
+
+<header class="agents-header">
+  <div class="agents-header-left">
+    <h1 class="agents-header-title">Agents OS v3 — <span>Portfolio</span></h1>
+    <span class="agents-refresh-label">Runs / WP / Ideas (mock)</span>
+  </div>
+  <div class="agents-header-right">
+    <button type="button" class="btn" onclick="AOSV3_onDomainSwitch('agents_os')">Dark</button>
+    <button type="button" class="btn" onclick="AOSV3_onDomainSwitch('tiktrack')">Light</button>
+  </div>
+</header>
+
+<nav class="pipeline-nav">
+  <a class="nav-link" href="index.html">Pipeline</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="history.html">History</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="config.html">Configuration</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="teams.html">Teams</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link active" href="portfolio.html">Portfolio</a>
+</nav>
+
+<div class="agents-page-layout">
+  <main class="agents-page-main aosv3-page-main--full">
+    <div class="section-card aosv3-portfolio-gate-filter-card">
+      <div class="sidebar-label">Portfolio filter (mock)</div>
+      <label class="aosv3-form-label">Milestone (Gate)
+        <select id="aosv3-portfolio-gate-filter" class="aosv3-input" aria-label="Filter active runs by gate">
+          <option value="">All Gates</option>
+          <option value="GATE_0">GATE_0</option>
+          <option value="GATE_1">GATE_1</option>
+          <option value="GATE_2">GATE_2</option>
+          <option value="GATE_3">GATE_3</option>
+          <option value="GATE_4">GATE_4</option>
+          <option value="GATE_5">GATE_5</option>
+        </select>
+      </label>
+      <button type="button" class="btn btn-primary" id="aosv3-portfolio-gate-apply">Apply</button>
+      <p class="aosv3-mock-note">Applies to Active Runs tab (Stage 8B §9.3).</p>
+    </div>
+
+    <div class="aosv3-tabs aosv3-portfolio-tabs" role="tablist">
+      <button type="button" class="aosv3-tab active" data-portfolio-tab="active">Active Runs</button>
+      <button type="button" class="aosv3-tab" data-portfolio-tab="completed">Completed Runs</button>
+      <button type="button" class="aosv3-tab" data-portfolio-tab="wp">Work Packages</button>
+      <button type="button" class="aosv3-tab" data-portfolio-tab="ideas">Ideas Pipeline</button>
+    </div>
+
+    <div class="section-card aosv3-legend-card aosv3-legend-card--inline">
+      <div class="sidebar-label">Badge color key (tables)</div>
+      <div class="aosv3-legend aosv3-legend--wrap">
+        <span class="aosv3-legend-item"><span class="aosv3-status-badge aosv3-status--in_progress">RUN</span> in progress / active WP</span>
+        <span class="aosv3-legend-item"><span class="aosv3-status-badge aosv3-status--correction">CORR</span> correction</span>
+        <span class="aosv3-legend-item"><span class="aosv3-status-badge aosv3-status--complete">DONE</span> complete</span>
+        <span class="aosv3-legend-item"><span class="aosv3-status-badge aosv3-status--not_started">PLAN</span> planned WP</span>
+        <span class="aosv3-legend-item"><span class="aosv3-domain-pill">domain</span> domain_id</span>
+        <span class="aosv3-legend-item"><span class="aosv3-status-badge aosv3-status--idea-new">NEW</span> idea · <span class="aosv3-status-badge aosv3-status--rejected">REJ</span> rejected</span>
+      </div>
+    </div>
+
+    <div id="aosv3-portfolio-panel-active" class="aosv3-tab-panel active" data-portfolio-panel="active" role="tabpanel">
+      <div class="aosv3-table-wrap">
+        <table class="aosv3-table">
+          <thead>
+            <tr>
+              <th>run_id</th>
+              <th>domain_id</th>
+              <th>work_package_id</th>
+              <th>status</th>
+              <th>current_gate</th>
+              <th>gate / phase</th>
+              <th>correction_cycle_count</th>
+              <th>started_at</th>
+              <th>current_actor</th>
+              <th>actions</th>
+            </tr>
+          </thead>
+          <tbody id="aosv3-portfolio-active-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="aosv3-portfolio-panel-completed" class="aosv3-tab-panel" data-portfolio-panel="completed" role="tabpanel">
+      <div class="aosv3-pagination">
+        <span>Total: <strong id="aosv3-completed-total">0</strong></span>
+        <label>offset <input type="number" id="aosv3-completed-offset" value="0" min="0" class="aosv3-input aosv3-input--narrow" readonly /></label>
+        <button type="button" class="btn" id="aosv3-completed-prev">Prev</button>
+        <button type="button" class="btn" id="aosv3-completed-next">Next</button>
+      </div>
+      <div class="aosv3-table-wrap">
+        <table class="aosv3-table">
+          <thead>
+            <tr>
+              <th>run_id</th>
+              <th>domain_id</th>
+              <th>work_package_id</th>
+              <th>status</th>
+              <th>gates_completed</th>
+              <th>started → completed</th>
+              <th>correction_cycle_count</th>
+              <th>actions</th>
+            </tr>
+          </thead>
+          <tbody id="aosv3-portfolio-completed-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="aosv3-portfolio-panel-wp" class="aosv3-tab-panel" data-portfolio-panel="wp" role="tabpanel">
+      <div class="aosv3-table-wrap">
+        <table class="aosv3-table">
+          <thead>
+            <tr>
+              <th>wp_id</th>
+              <th>label</th>
+              <th>domain_id</th>
+              <th>status</th>
+              <th>current_gate</th>
+              <th>linked_run_id</th>
+              <th>actions</th>
+            </tr>
+          </thead>
+          <tbody id="aosv3-portfolio-wp-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="aosv3-portfolio-panel-ideas" class="aosv3-tab-panel" data-portfolio-panel="ideas" role="tabpanel">
+      <p class="aosv3-mock-note">New Idea: title, description, domain_id, idea_type, priority (Stage 8B §9.1).</p>
+      <button type="button" class="btn btn-primary" id="aosv3-btn-new-idea">+ New Idea</button>
+      <div class="aosv3-table-wrap aosv3-ideas-table-wrap">
+        <table class="aosv3-table">
+          <thead>
+            <tr>
+              <th>idea_id</th>
+              <th>title</th>
+              <th>domain_id</th>
+              <th>idea_type</th>
+              <th>priority</th>
+              <th>status</th>
+              <th>submitted_by</th>
+              <th>submitted_at</th>
+              <th>actions</th>
+            </tr>
+          </thead>
+          <tbody id="aosv3-portfolio-ideas-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="aosv3-modal-new-idea" class="aosv3-modal-overlay" aria-hidden="true" role="dialog" aria-labelledby="aosv3-modal-new-title">
+  <div class="aosv3-modal-box">
+    <button type="button" class="aosv3-modal-close" data-aosv3-modal-close aria-label="Close">✕</button>
+    <h3 id="aosv3-modal-new-title">New Idea</h3>
+    <label class="aosv3-form-label">Title <span class="aosv3-req">*</span>
+      <input type="text" id="aosv3-new-title" class="aosv3-input" required />
+    </label>
+    <label class="aosv3-form-label">description
+      <textarea id="aosv3-new-description" class="aosv3-textarea" rows="4"></textarea>
+    </label>
+    <label class="aosv3-form-label">domain_id <span class="aosv3-req">*</span>
+      <select id="aosv3-new-domain" class="aosv3-input" required>
+        <option value="agents_os" selected>agents_os</option>
+        <option value="tiktrack">tiktrack</option>
+      </select>
+    </label>
+    <label class="aosv3-form-label">idea_type <span class="aosv3-req">*</span>
+      <select id="aosv3-new-idea-type" class="aosv3-input" required>
+        <option value="BUG">BUG</option>
+        <option value="FEATURE" selected>FEATURE</option>
+        <option value="IMPROVEMENT">IMPROVEMENT</option>
+        <option value="TECH_DEBT">TECH_DEBT</option>
+        <option value="RESEARCH">RESEARCH</option>
+      </select>
+    </label>
+    <label class="aosv3-form-label">priority
+      <select id="aosv3-new-priority" class="aosv3-input">
+        <option value="LOW">LOW</option>
+        <option value="MEDIUM" selected>MEDIUM</option>
+        <option value="HIGH">HIGH</option>
+        <option value="CRITICAL">CRITICAL</option>
+      </select>
+    </label>
+    <div class="aosv3-modal-actions">
+      <button type="button" class="btn" data-aosv3-modal-close>Cancel</button>
+      <button type="button" class="btn btn-primary" id="aosv3-new-submit">Submit Idea</button>
+    </div>
+  </div>
+</div>
+
+<div id="aosv3-modal-edit-idea" class="aosv3-modal-overlay" aria-hidden="true" role="dialog" aria-labelledby="aosv3-modal-edit-title">
+  <div class="aosv3-modal-box aosv3-modal-box--wide">
+    <button type="button" class="aosv3-modal-close" data-aosv3-modal-close aria-label="Close">✕</button>
+    <h3 id="aosv3-modal-edit-title">Edit Idea</h3>
+    <p class="aosv3-mock-note">Status: <strong id="aosv3-edit-status-display">—</strong></p>
+    <label class="aosv3-form-label">Title <span class="aosv3-req">*</span>
+      <input type="text" id="aosv3-edit-title" class="aosv3-input" />
+    </label>
+    <label class="aosv3-form-label">description
+      <textarea id="aosv3-edit-description" class="aosv3-textarea" rows="4"></textarea>
+    </label>
+    <label class="aosv3-form-label">priority
+      <select id="aosv3-edit-priority" class="aosv3-input">
+        <option value="LOW">LOW</option>
+        <option value="MEDIUM">MEDIUM</option>
+        <option value="HIGH">HIGH</option>
+        <option value="CRITICAL">CRITICAL</option>
+      </select>
+    </label>
+    <label class="aosv3-form-label">domain_id <span class="aosv3-req">*</span>
+      <select id="aosv3-edit-domain" class="aosv3-input">
+        <option value="agents_os">agents_os</option>
+        <option value="tiktrack">tiktrack</option>
+      </select>
+    </label>
+    <label class="aosv3-form-label">idea_type <span class="aosv3-req">*</span>
+      <select id="aosv3-edit-idea-type" class="aosv3-input">
+        <option value="BUG">BUG</option>
+        <option value="FEATURE">FEATURE</option>
+        <option value="IMPROVEMENT">IMPROVEMENT</option>
+        <option value="TECH_DEBT">TECH_DEBT</option>
+        <option value="RESEARCH">RESEARCH</option>
+      </select>
+    </label>
+    <label class="aosv3-form-label">decision_notes (team_00)
+      <textarea id="aosv3-edit-notes" class="aosv3-textarea" rows="3"></textarea>
+    </label>
+    <div id="aosv3-edit-target-row" class="aosv3-form-label" hidden>
+      <label>target_program_id
+        <input type="text" id="aosv3-edit-target-program" class="aosv3-input" />
+      </label>
+    </div>
+    <div class="aosv3-edit-transitions">
+      <span class="sidebar-label">Status transitions</span>
+      <button type="button" class="btn" id="aosv3-edit-approve">Approve</button>
+      <button type="button" class="btn" id="aosv3-edit-reject">Reject</button>
+      <button type="button" class="btn" id="aosv3-edit-defer">Defer</button>
+      <button type="button" class="btn" id="aosv3-edit-eval">Set Evaluating</button>
+    </div>
+    <div class="aosv3-modal-actions">
+      <button type="button" class="btn" data-aosv3-modal-close>Cancel</button>
+      <button type="button" class="btn btn-primary" id="aosv3-edit-save">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div id="aosv3-modal-wp-detail" class="aosv3-modal-overlay" aria-hidden="true" role="dialog" aria-labelledby="aosv3-modal-wp-title">
+  <div class="aosv3-modal-box aosv3-modal-box--wide">
+    <button type="button" class="aosv3-modal-close" data-aosv3-modal-close aria-label="Close">✕</button>
+    <h3 id="aosv3-modal-wp-title">Work Package Details</h3>
+    <div id="aosv3-wp-detail-body" class="aosv3-wp-detail-body"></div>
+    <div class="aosv3-modal-actions">
+      <button type="button" class="btn" data-aosv3-modal-close>Close</button>
+      <a class="btn btn-primary" id="aosv3-wp-detail-view-pipeline" href="index.html">View Pipeline</a>
+      <a class="btn" id="aosv3-wp-detail-view-history" href="history.html">View History</a>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

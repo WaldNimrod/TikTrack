@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<!--
+id: TEAM_31_AOS_V3_UI_MOCKUPS
+team: Team 31
+domain: agents_os
+artifact: index.html
+mandate: TEAM_100_TO_TEAM_31_AOS_V3_UI_MOCKUPS_MANDATE_v2.0.0
+date: 2026-03-27
+status: MOCKUP
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agents OS v3 — Pipeline View (mock)</title>
+  <link rel="stylesheet" href="../../agents_os/ui/css/pipeline-shared.css" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="theme-init.js"></script>
+</head>
+<body data-aosv3-page="pipeline">
+
+<header class="agents-header">
+  <div class="agents-header-left">
+    <h1 class="agents-header-title">Agents OS v3 — <span>Pipeline View</span></h1>
+    <span class="agents-refresh-label">GET /api/state?domain_id=… (mock)</span>
+  </div>
+  <div class="agents-header-right">
+    <span id="aosv3-sse-indicator" class="aosv3-sse-indicator aosv3-sse--polling" role="status" aria-live="polite"><span class="aosv3-sse-dot" aria-hidden="true"></span> Polling Mode</span>
+    <span class="agents-refresh-label">Mandate v2.0.0 mockup</span>
+  </div>
+</header>
+
+<nav class="pipeline-nav">
+  <a class="nav-link active" href="index.html">Pipeline</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="history.html">History</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="config.html">Configuration</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="teams.html">Teams</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="portfolio.html">Portfolio</a>
+</nav>
+
+<div class="agents-page-layout" id="agents-page-layout">
+  <aside class="agents-page-sidebar">
+    <div class="agents-domain-bar agents-domain-bar--sidebar">
+      <div class="sidebar-label">Theme / domain</div>
+      <div class="domain-selector">
+        <button type="button" class="domain-btn" onclick="AOSV3_onDomainSwitch('agents_os')">Agents OS (dark)</button>
+        <button type="button" class="domain-btn" onclick="AOSV3_onDomainSwitch('tiktrack')">TikTrack (light)</button>
+      </div>
+      <p class="aosv3-mock-note">Sets localStorage.pipeline_domain — same key as v1/v2 dashboard.</p>
+    </div>
+    <div class="sidebar-section-card">
+      <div class="sidebar-label">Mock state preset</div>
+      <div class="aosv3-preset-row">
+        <label for="aosv3-preset-select">Scenario</label>
+        <select id="aosv3-preset-select" aria-label="Mock state preset">
+          <option value="active">IN_PROGRESS (GATE_3)</option>
+          <option value="idle">IDLE — no active run</option>
+          <option value="paused">PAUSED (actor null)</option>
+          <option value="complete">COMPLETE</option>
+          <option value="escalated">CORRECTION + escalated banner</option>
+          <option value="human_gate">Human gate (APPROVE visible)</option>
+          <option value="sentinel">Sentinel active + override</option>
+          <option value="await_feedback">8B — AWAIT_FEEDBACK (team_90)</option>
+          <option value="feedback_fallback">8B — Mode B miss → fallback C+D (TC-16)</option>
+          <option value="feedback_pass">8B — FEEDBACK_PASS → CONFIRM_ADVANCE</option>
+          <option value="feedback_fail">8B — FEEDBACK_FAIL → CONFIRM_FAIL</option>
+          <option value="feedback_low">8B — IL-3 MANUAL_REVIEW</option>
+          <option value="correction_blocking">8B — CORRECTION blocking findings</option>
+          <option value="sse_connected">8B — SSE Connected (same as AWAIT + green)</option>
+        </select>
+      </div>
+    </div>
+    <div class="sidebar-section-card">
+      <div class="sidebar-label">Run metadata</div>
+      <div class="info-row"><span class="info-key">run_id</span><span class="info-val" id="aosv3-run-id">—</span></div>
+      <div class="info-row"><span class="info-key">work_package_id</span><span class="info-val" id="aosv3-wp-id">—</span></div>
+      <div class="info-row"><span class="info-key">domain_id</span><span class="info-val" id="aosv3-domain">—</span></div>
+      <div class="info-row"><span class="info-key">process_variant</span><span class="info-val" id="aosv3-variant">—</span></div>
+    </div>
+    <div class="sidebar-section-card">
+      <div class="sidebar-label">Gate map</div>
+      <div id="aosv3-gate-map" class="aosv3-gate-map" aria-label="Pipeline gates 0–5"></div>
+      <p class="aosv3-mock-note">Current gate highlighted · Phases for active gate below chips · COMPLETE = all gates done</p>
+      <p class="aosv3-mock-note">GATE_3 matrix (26): <code>?aosv3_preset=…&amp;aosv3_phase=phase_3_1|phase_3_2</code> — index <code>_COMMUNICATION/team_51/evidence/pipeline_gate3_matrix/gate3_matrix_index.md</code></p>
+    </div>
+    <div class="sidebar-section-card aosv3-program-control-card">
+      <div class="sidebar-label">Program control</div>
+      <button type="button" class="btn btn-warning aosv3-btn-stop" id="aosv3-btn-stop-run" hidden>Stop run</button>
+      <div id="aosv3-idle-activate-row" class="aosv3-idle-activate-row">
+        <label class="aosv3-form-label">Activate when idle
+          <select id="aosv3-activate-target" class="aosv3-input" aria-label="Program or WP to activate"></select>
+        </label>
+        <button type="button" class="btn btn-primary" id="aosv3-btn-activate-program">Activate</button>
+      </div>
+      <p class="aosv3-mock-note">Mock — no API calls.</p>
+    </div>
+    <div class="sidebar-section-card aosv3-legend-card">
+      <div class="sidebar-label">Status color key</div>
+      <div class="aosv3-legend">
+        <span class="aosv3-legend-item"><span class="aosv3-status-badge aosv3-status--in_progress">RUN</span> in progress / active</span>
+        <span class="aosv3-legend-item"><span class="aosv3-status-badge aosv3-status--correction">CORR</span> correction</span>
+        <span class="aosv3-legend-item"><span class="aosv3-status-badge aosv3-status--paused">PAUSE</span> paused</span>
+        <span class="aosv3-legend-item"><span class="aosv3-status-badge aosv3-status--complete">DONE</span> complete</span>
+        <span class="aosv3-legend-item"><span class="aosv3-status-badge aosv3-status--not_started">PLAN</span> planned</span>
+        <span class="aosv3-legend-item"><span class="aosv3-status-badge aosv3-status--idle">IDLE</span> idle / neutral</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="agents-page-main">
+    <div id="aosv3-escalation-banner" class="aosv3-escalation-banner" hidden>
+      Escalated: latest event is CORRECTION_ESCALATED — notify Team 00 (mock banner).
+    </div>
+
+    <div id="aosv3-empty-state" class="aosv3-empty-state aosv3-empty-state--idle" hidden>
+      <strong>No active run</strong>
+      <span class="aosv3-idle-sub">status: IDLE — use POST /api/runs to start (mock form below).</span>
+      <div class="aosv3-start-run-card section-card">
+        <div class="section-title">Start Run (§6.1.B — mock)</div>
+        <form id="aosv3-start-run-form" class="aosv3-start-run-form">
+          <label class="aosv3-form-label">Work Package ID <span class="aosv3-req">*</span>
+            <input type="text" name="work_package_id" required placeholder="S003-P002-WP001" class="aosv3-input" />
+          </label>
+          <label class="aosv3-form-label">Domain <span class="aosv3-req">*</span>
+            <select name="domain_id" required class="aosv3-input">
+              <option value="agents_os">agents_os</option>
+              <option value="tiktrack">tiktrack</option>
+            </select>
+          </label>
+          <label class="aosv3-form-label">Process Variant
+            <select name="process_variant" class="aosv3-input">
+              <option value="">(default)</option>
+              <option value="TRACK_FULL">TRACK_FULL</option>
+              <option value="TRACK_FOCUSED">TRACK_FOCUSED</option>
+              <option value="TRACK_FAST">TRACK_FAST</option>
+            </select>
+          </label>
+          <label class="aosv3-form-label">Execution Mode
+            <select name="execution_mode" class="aosv3-input">
+              <option value="">(default)</option>
+              <option value="MANUAL">MANUAL</option>
+              <option value="DASHBOARD">DASHBOARD</option>
+              <option value="AUTOMATIC">AUTOMATIC</option>
+            </select>
+          </label>
+          <button type="button" class="btn btn-primary aosv3-start-run-btn" disabled title="Mock — no API">Start Run →</button>
+        </form>
+        <p class="aosv3-mock-note">CTA disabled in mockup; fields satisfy layout contract.</p>
+      </div>
+    </div>
+
+    <div id="aosv3-pipeline-main">
+      <section id="aosv3-prompt-section" class="section-card aosv3-prompt-card" hidden aria-label="Assembled prompt">
+        <div class="section-title aosv3-prompt-title">Assembled prompt</div>
+        <p class="aosv3-mock-note">GET /api/runs/{run_id}/prompt (mock) — AD-S8A-01 prominence</p>
+        <div class="aosv3-prompt-meta">
+          <span id="aosv3-prompt-token-badge" class="status-pill pill-current">—</span>
+          <span id="aosv3-prompt-assembled" class="agents-refresh-label"></span>
+          <span id="aosv3-prompt-cache" class="agents-refresh-label"></span>
+        </div>
+        <pre id="aosv3-prompt-pre" class="aosv3-prompt-pre"></pre>
+        <div class="aosv3-prompt-blend">
+          <div class="sidebar-label">Copy — add blends</div>
+          <label class="aosv3-team-checkbox-label"><input type="checkbox" id="aosv3-prompt-blend-team" /> Team context (L1–L4 from Teams mock, current actor)</label>
+          <label class="aosv3-team-checkbox-label"><input type="checkbox" id="aosv3-prompt-blend-policies" /> Policies (governance mock)</label>
+        </div>
+        <div class="aosv3-prompt-actions">
+          <button type="button" class="btn btn-primary" id="aosv3-prompt-copy">Copy to clipboard</button>
+          <button type="button" class="btn" id="aosv3-prompt-regenerate" disabled title="Mock">Regenerate</button>
+        </div>
+      </section>
+
+      <section id="aosv3-correction-blocking" class="section-card aosv3-correction-blocking" hidden aria-label="Correction blocking findings">
+        <div class="section-title">CORRECTION — blocking findings</div>
+        <p class="aosv3-mock-note">Visible when status = CORRECTION (Stage 8B §5).</p>
+        <div id="aosv3-correction-blocking-body"></div>
+      </section>
+
+      <section id="aosv3-operator-handoff" class="section-card aosv3-operator-handoff" hidden aria-label="Operator handoff">
+        <div class="section-title">OPERATOR HANDOFF</div>
+        <p class="aosv3-mock-note">PREVIOUS / NEXT / CLI — Stage 8B §3. Between assembled prompt and run status.</p>
+        <div class="sidebar-label">PREVIOUS (last event for this run)</div>
+        <div id="aosv3-handoff-previous" class="aosv3-handoff-previous"></div>
+        <div class="sidebar-label">NEXT</div>
+        <div id="aosv3-handoff-next" class="aosv3-handoff-next"></div>
+        <div id="aosv3-handoff-ingestion-extra" class="aosv3-handoff-ingestion-extra" hidden></div>
+        <div id="aosv3-handoff-feedback-forms" class="aosv3-handoff-feedback-forms" hidden></div>
+        <div class="aosv3-handoff-cli-header">
+          <span class="sidebar-label">CLI COMMAND</span>
+          <button type="button" class="btn" id="aosv3-handoff-cli-copy">Copy CLI</button>
+        </div>
+        <pre id="aosv3-handoff-cli-pre" class="aosv3-prompt-pre aosv3-cli-pre"></pre>
+      </section>
+
+      <div class="section-card">
+        <div class="section-title">Run status</div>
+        <p><span id="aosv3-status-badge" class="aosv3-status-badge aosv3-status--in_progress">IN_PROGRESS</span></p>
+        <div class="info-row"><span class="info-key">current_gate_id</span><span class="info-val" id="aosv3-gate">—</span></div>
+        <div class="info-row"><span class="info-key">current_phase_id</span><span class="info-val" id="aosv3-phase">—</span></div>
+        <div class="info-row" id="aosv3-paused-at-row" hidden><span class="info-key">paused_at</span><span class="info-val" id="aosv3-paused-at">—</span></div>
+        <div class="info-row" id="aosv3-completed-at-row" hidden><span class="info-key">completed_at</span><span class="info-val" id="aosv3-completed-at">—</span></div>
+        <div class="info-row"><span class="info-key">correction_cycle_count</span><span class="info-val" id="aosv3-cc">—</span></div>
+        <div class="info-row"><span class="info-key">execution_mode</span><span class="info-val" id="aosv3-exec-mode">—</span></div>
+        <div class="info-row"><span class="info-key">started_at</span><span class="info-val" id="aosv3-started">—</span></div>
+        <div class="info-row"><span class="info-key">last_updated</span><span class="info-val" id="aosv3-updated">—</span></div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-title">Current actor</div>
+        <div class="info-row"><span class="info-key">actor</span><span id="aosv3-actor-block" class="info-val">—</span></div>
+        <p class="aosv3-mock-note">AD-S5-02: PAUSED → actor shown as null/—</p>
+      </div>
+
+      <div class="section-card" id="aosv3-sentinel-card">
+        <div class="section-title">Sentinel</div>
+        <div class="info-row"><span class="info-key">sentinel</span><span class="info-val" id="aosv3-sentinel">—</span></div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-title">Actions (mock — disabled)</div>
+        <div class="aosv3-actions">
+          <button type="button" class="btn btn-primary" disabled title="POST /advance">ADVANCE</button>
+          <button type="button" class="btn" disabled title="POST /resubmit" id="aosv3-btn-resubmit" hidden>RESUBMIT</button>
+          <button type="button" class="btn" disabled title="POST /fail">FAIL</button>
+          <button type="button" class="btn" disabled title="POST /approve" id="aosv3-btn-approve" hidden>APPROVE</button>
+          <button type="button" class="btn" disabled title="POST /pause" id="aosv3-btn-pause">PAUSE</button>
+          <button type="button" class="btn" disabled title="POST /resume" id="aosv3-btn-resume" hidden>RESUME</button>
+          <button type="button" class="btn" disabled title="POST /override — team_00">OVERRIDE (team_00)</button>
+        </div>
+        <p class="aosv3-mock-note">APPROVE visible only when is_human_gate=1 (mock preset).</p>
+      </div>
+    </div>
+
+    <section class="section-card aosv3-pipeline-run-log-main" id="aosv3-pipeline-footer-log" aria-label="Current run log">
+      <div class="section-title">Current run log</div>
+      <p class="aosv3-mock-note">All events for this run_id (newest first) — seq, gate/phase, actor, verdict, reason.</p>
+      <div class="aosv3-table-wrap">
+        <table class="aosv3-table aosv3-table--dense">
+          <thead>
+            <tr>
+              <th>seq</th>
+              <th>occurred_at</th>
+              <th>event_type</th>
+              <th>gate / phase</th>
+              <th>actor</th>
+              <th>verdict</th>
+              <th>reason</th>
+            </tr>
+          </thead>
+          <tbody id="aosv3-run-log-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="aosv3-modal-stop-run" class="aosv3-modal-overlay" aria-hidden="true" role="dialog" aria-labelledby="aosv3-modal-stop-title">
+  <div class="aosv3-modal-box">
+    <button type="button" class="aosv3-modal-close" data-aosv3-modal-close aria-label="Close">✕</button>
+    <h3 id="aosv3-modal-stop-title">Stop active run?</h3>
+    <p class="aosv3-mock-note">This would abort the current program run. In production, only authorized operators (e.g. Principal) should confirm.</p>
+    <p><strong>Mockup:</strong> no request is sent.</p>
+    <div class="aosv3-modal-actions">
+      <button type="button" class="btn" data-aosv3-modal-close>Cancel</button>
+      <button type="button" class="btn btn-warning" id="aosv3-modal-stop-confirm">Confirm stop</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

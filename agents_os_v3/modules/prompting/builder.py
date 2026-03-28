@@ -36,6 +36,13 @@ def assemble_prompt_for_run(
     run_id: str,
     bust_cache: bool = False,
 ) -> dict[str, Any]:
+    """
+    Build the 4-layer assembled prompt for ``GET /api/runs/{run_id}/prompt``.
+
+    Raises :class:`StateMachineError` for missing run, invalid state (e.g. PAUSED), missing
+    template, or unresolved actor. Raises :class:`GovernanceNotFoundError` when L2 markdown
+    for the actor team is missing under ``agents_os_v3/governance/{team_id}.md``.
+    """
     with conn.cursor() as cur:
         run = R.fetch_run(cur, run_id)
         if not run:

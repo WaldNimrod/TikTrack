@@ -1,4 +1,10 @@
-"""Canonical event_hash (Team 00 GATE_2 resolution) + append-only insert (AD-S7-01)."""
+"""
+Audit ledger — canonical ``event_hash`` (Team 00 GATE_2) and append-only ``events`` INSERT (AD-S7-01).
+
+:func:`append_event` computes hash from id, run, sequence, type, occurred_at ISO, and payload;
+links ``prev_hash`` to the previous row on the same run. Failures raise :class:`AuditLedgerError`
+so the state machine can roll back the enclosing transaction.
+"""
 
 from __future__ import annotations
 

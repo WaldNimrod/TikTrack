@@ -1,4 +1,15 @@
-"""Pipeline state transitions T01–T12 + A01–A10E — single DB transaction per mutation (IR-8)."""
+"""
+Pipeline state machine — run lifecycle and audit events (IR-8).
+
+Each public mutator (``initiate_run``, ``advance_run``, ``fail_run``, ``approve_run``,
+``pause_run``, ``resume_run``) runs work inside a single ``with conn:`` transaction,
+persists ``events`` via :mod:`agents_os_v3.modules.audit.ledger`, then calls
+``sync_pipeline_state`` and :func:`agents_os_v3.modules.audit.sse.notify_after_run_mutation`
+**after** commit.
+
+:func:`execute_transition` is the single entry used by :mod:`agents_os_v3.modules.management.use_cases`
+for INITIATE / ADVANCE / FAIL / APPROVE_GATE / PAUSE / RESUME.
+"""
 
 from __future__ import annotations
 
@@ -672,6 +683,178 @@ def resume_run(conn: Any, *, run_id: str, actor_team_id: str, resume_notes: str 
     }
 
 
+def principal_override_run(
+    conn: Any,
+    *,
+    run_id: str,
+    actor_team_id: str,
+    action: str,
+    reason: str,
+    snapshot: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """UC-12 — Principal override; emits ``PRINCIPAL_OVERRIDE`` only (Module Map §4.8)."""
+    if actor_team_id != C.TEAM_PRINCIPAL:
+        raise StateMachineError("INSUFFICIENT_AUTHORITY", 403, details={})
+    reason_s = (reason or "").strip()
+    if not reason_s:
+        raise StateMachineError("MISSING_REASON", 400, details={})
+    if action not in C.PRINCIPAL_OVERRIDE_ACTIONS:
+        raise StateMachineError("INVALID_ACTION", 400, details={"action": action})
+
+    with conn.cursor() as cur:
+        r0 = R.fetch_run(cur, run_id)
+    prev_status = str(r0["status"]) if r0 else None
+
+    from_st: str = ""
+    to_st: str = ""
+
+    with conn:
+        with conn.cursor() as cur:
+            run = R.fetch_run(cur, run_id)
+            if not run:
+                raise StateMachineError("NOT_FOUND", 404, details={"run_id": run_id})
+            from_st = str(run["status"])
+            if from_st == "COMPLETE":
+                raise StateMachineError("TERMINAL_STATE", 409, details={"status": from_st})
+            now = R.utc_now()
+            cg = str(run["current_gate_id"])
+            cp = str(run["current_phase_id"]) if run.get("current_phase_id") else None
+
+            if action == C.FORCE_PASS:
+                if from_st not in ("IN_PROGRESS", "CORRECTION"):
+                    raise StateMachineError("INVALID_STATE", 409, details={"status": from_st})
+                if not cp:
+                    raise StateMachineError("INVALID_STATE", 409, details={"phase": None})
+                if from_st == "IN_PROGRESS":
+                    if R.is_terminal_position(cur, cg, cp):
+                        R.update_run_position(
+                            cur,
+                            run_id,
+                            status="COMPLETE",
+                            completed_at=now,
+                            last_updated=now,
+                        )
+                        to_st = "COMPLETE"
+                    else:
+                        ng, np = R.next_gate_phase(cur, cg, cp)
+                        if not ng or not np:
+                            raise StateMachineError(
+                                "PHASE_SEQUENCE_ERROR",
+                                500,
+                                details={"from_gate": cg, "from_phase": cp},
+                            )
+                        R.update_run_position(
+                            cur,
+                            run_id,
+                            current_gate_id=ng,
+                            current_phase_id=np,
+                            last_updated=now,
+                        )
+                        to_st = "IN_PROGRESS"
+                else:
+                    ng, np = R.next_gate_phase(cur, cg, cp)
+                    if not ng or not np:
+                        raise StateMachineError(
+                            "PHASE_SEQUENCE_ERROR",
+                            500,
+                            details={"from_gate": cg, "from_phase": cp},
+                        )
+                    R.update_run_position(
+                        cur,
+                        run_id,
+                        status="IN_PROGRESS",
+                        current_gate_id=ng,
+                        current_phase_id=np,
+                        last_updated=now,
+                    )
+                    to_st = "IN_PROGRESS"
+
+            elif action in (C.FORCE_FAIL, C.FORCE_CORRECTION):
+                if from_st != "IN_PROGRESS":
+                    raise StateMachineError("INVALID_STATE", 409, details={"status": from_st})
+                cc = int(run["correction_cycle_count"]) + 1
+                R.update_run_position(
+                    cur,
+                    run_id,
+                    status="CORRECTION",
+                    correction_cycle_count=cc,
+                    last_updated=now,
+                )
+                to_st = "CORRECTION"
+
+            elif action == C.FORCE_PAUSE:
+                if snapshot is None:
+                    raise StateMachineError("SNAPSHOT_REQUIRED", 400, details={})
+                if from_st != "IN_PROGRESS":
+                    raise StateMachineError("INVALID_STATE", 409, details={"status": from_st})
+                try:
+                    jsonschema.Draft202012Validator(C.PAUSE_SNAPSHOT_SCHEMA).validate(snapshot)
+                except jsonschema.exceptions.ValidationError as e:
+                    raise StateMachineError(
+                        "SNAPSHOT_VALIDATION_FAILED",
+                        422,
+                        details={"error": str(e)},
+                    ) from e
+                snap_json = json.dumps(snapshot, sort_keys=True)
+                R.update_run_position(
+                    cur,
+                    run_id,
+                    status="PAUSED",
+                    paused_at=now,
+                    paused_routing_snapshot_json=snap_json,
+                    last_updated=now,
+                )
+                to_st = "PAUSED"
+
+            elif action == C.FORCE_RESUME:
+                if from_st != "PAUSED":
+                    raise StateMachineError("INVALID_STATE", 409, details={"status": from_st})
+                snap_raw = run.get("paused_routing_snapshot_json")
+                if not snap_raw:
+                    raise StateMachineError("SNAPSHOT_MISSING", 409, details={})
+                paused_at = run["paused_at"]
+                if not paused_at:
+                    raise StateMachineError("SNAPSHOT_MISSING", 409, details={})
+                cur.execute(
+                    """
+                    UPDATE runs
+                    SET status = 'IN_PROGRESS',
+                        paused_at = NULL,
+                        paused_routing_snapshot_json = NULL,
+                        last_updated = %s
+                    WHERE id = %s
+                    """,
+                    (now, run_id),
+                )
+                to_st = "IN_PROGRESS"
+            else:
+                raise StateMachineError("INVALID_ACTION", 400, details={"action": action})
+
+            run2 = R.fetch_run(cur, run_id)
+            assert run2
+            po_payload = {"action": action, "from_state": from_st, "to_state": to_st}
+            _emit(
+                cur,
+                run=run2,
+                event_type="PRINCIPAL_OVERRIDE",
+                actor_team_id=actor_team_id,
+                actor_type=C.ACTOR_TYPE_HUMAN,
+                verdict=None,
+                reason=reason_s,
+                payload=po_payload,
+            )
+
+    sync_pipeline_state(conn, run_id)
+    notify_after_run_mutation(conn, run_id, prev_status)
+    return {
+        "run_id": run_id,
+        "from_status": from_st,
+        "to_status": to_st,
+        "action": action,
+        "event_type": "PRINCIPAL_OVERRIDE",
+    }
+
+
 def _event_row_public(row: dict[str, Any]) -> dict[str, Any]:
     out = dict(row)
     for k, v in list(out.items()):
@@ -689,8 +872,13 @@ def execute_transition(
     payload: dict[str, Any] | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     """
-    Canonical mutation entry (Team 00 Q6). use_cases must call this only for state changes.
-    Returns (operation_summary_json, latest_event_row_or_empty).
+    Canonical mutation entry (Team 00 Q6). ``use_cases`` must call this only for state changes.
+
+    ``transition`` is one of ``TRANS_INITIATE``, ``TRANS_ADVANCE``, ``TRANS_FAIL``,
+    ``TRANS_APPROVE_GATE``, ``TRANS_PAUSE``, ``TRANS_RESUME`` (see ``constants``).
+
+    Returns:
+        Tuple of (operation summary dict, latest event row dict or empty dict for OpenAPI/logging).
     """
     pl = payload or {}
     rid = run_id or pl.get("run_id")

@@ -1,8 +1,28 @@
 """
-AOS v3 FastAPI — GATE_0 shell + GATE_1/GATE_2 business routes on ``business_router``.
+AOS v3 HTTP surface — FastAPI application and routers.
 
-GATE_3: full SSE (audit/sse.py), FIP feedback routes, GET /api/state, GET /api/history.
-Actor identity: X-Actor-Team-Id (BUILD stub — TODO AUTH_STUB).
+**Routers**
+
+* ``_api_router`` (prefix ``/api``): ``GET /health``, ``GET /events/stream`` (SSE).
+* ``business_router`` (prefix ``/api``): run lifecycle, portfolio, ideas, admin CRUD,
+  prompt assembly, FIP (feedback), and observability reads.
+
+**Run lifecycle (mutations require ``X-Actor-Team-Id``)**
+
+``POST /runs``, ``GET /runs``, ``GET /runs/{run_id}``, ``POST .../advance``, ``fail``,
+``approve``, ``pause``, ``resume``, ``POST .../override`` (UC-12),
+``POST .../feedback``, ``POST .../feedback/clear``.
+
+**Reads / operator handoff**
+
+``GET /state``, ``GET /history``, ``GET /runs/{run_id}/prompt``.
+
+**Portfolio / admin**
+
+Teams (list + ``GET /teams/{id}``), work packages, ideas, routing rules (incl. ``DELETE``),
+templates, policies (incl. ``PUT /policies/{id}``); ``PUT /teams/{id}/engine`` (Principal).
+
+Actor resolution for mutations is BUILD-stubbed in :mod:`agents_os_v3.modules.management.authority`.
 """
 
 from __future__ import annotations
@@ -32,6 +52,8 @@ from agents_os_v3.modules.definitions.models import (
     IdeaCreateBody,
     IdeaUpdateBody,
     PauseRunBody,
+    PolicyUpdateBody,
+    PrincipalOverrideBody,
     ResumeRunBody,
     RoutingRuleCreateBody,
     RoutingRuleUpdateBody,
@@ -42,7 +64,7 @@ from agents_os_v3.modules.management.authority import get_actor_team_id
 from agents_os_v3.modules.management.db import connection
 from agents_os_v3.modules.management import portfolio as PF
 from agents_os_v3.modules.management import use_cases as UC
-from agents_os_v3.modules.policy.settings import list_policies
+from agents_os_v3.modules.policy.settings import list_policies, update_policy_by_id
 from agents_os_v3.modules.prompting.builder import GovernanceNotFoundError, assemble_prompt_for_run
 from agents_os_v3.modules.state.errors import StateMachineError
 from agents_os_v3.modules.state import machine as state_machine
@@ -282,6 +304,35 @@ def post_resume(
         raise _sm_http(e) from e
 
 
+@business_router.post("/runs/{run_id}/override")
+def post_run_override(
+    run_id: str,
+    body: PrincipalOverrideBody,
+    actor_team_id: str = Depends(get_actor_team_id),
+    conn: Any = Depends(_db_conn),
+) -> dict[str, Any]:
+    if body.actor_team_id.strip() != actor_team_id:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "code": "ACTOR_MISMATCH",
+                "message": "body.actor_team_id must match X-Actor-Team-Id",
+                "details": {},
+            },
+        )
+    try:
+        return UC.uc_12_principal_override(
+            conn,
+            actor_team_id=actor_team_id,
+            run_id=run_id,
+            action=body.action,
+            reason=body.reason,
+            snapshot=body.snapshot,
+        )
+    except StateMachineError as e:
+        raise _sm_http(e) from e
+
+
 @business_router.get("/runs/{run_id}/prompt")
 def get_run_prompt(
     run_id: str,
@@ -306,6 +357,14 @@ def get_run_prompt(
 @business_router.get("/teams")
 def get_teams(conn: Any = Depends(_db_conn)) -> dict[str, Any]:
     return PF.list_teams_response(conn)
+
+
+@business_router.get("/teams/{team_id}")
+def get_team(team_id: str, conn: Any = Depends(_db_conn)) -> dict[str, Any]:
+    try:
+        return PF.get_team_detail(conn, team_id)
+    except StateMachineError as e:
+        raise _sm_http(e) from e
 
 
 @business_router.put("/teams/{team_id}/engine")
@@ -486,6 +545,36 @@ def put_routing_rule(
     return {"id": rule_id, "updated": True}
 
 
+@business_router.delete("/routing-rules/{rule_id}")
+def delete_routing_rule(
+    rule_id: str,
+    actor_team_id: str = Depends(get_actor_team_id),
+    conn: Any = Depends(_db_conn),
+) -> dict[str, Any]:
+    if actor_team_id != C.TEAM_PRINCIPAL:
+        raise HTTPException(
+            status_code=403,
+            detail={
+                "code": "INSUFFICIENT_AUTHORITY",
+                "message": "Only team_00 may delete routing rules",
+                "details": {},
+            },
+        )
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute("DELETE FROM routing_rules WHERE id = %s", (rule_id,))
+                if cur.rowcount == 0:
+                    raise StateMachineError(
+                        "NOT_FOUND",
+                        404,
+                        details={"rule_id": rule_id},
+                    )
+    except StateMachineError as e:
+        raise _sm_http(e) from e
+    return {"id": rule_id, "deleted": True}
+
+
 @business_router.get("/templates")
 def list_templates(conn: Any = Depends(_db_conn)) -> dict[str, Any]:
     """List templates for Configuration UI (GATE_4)."""
@@ -565,6 +654,35 @@ def get_policies(conn: Any = Depends(_db_conn)) -> dict[str, Any]:
     return {"policies": rows}
 
 
+@business_router.put("/policies/{policy_id}")
+def put_policy(
+    policy_id: str,
+    body: PolicyUpdateBody,
+    actor_team_id: str = Depends(get_actor_team_id),
+    conn: Any = Depends(_db_conn),
+) -> dict[str, Any]:
+    if actor_team_id != C.TEAM_PRINCIPAL:
+        raise HTTPException(
+            status_code=403,
+            detail={
+                "code": "INSUFFICIENT_AUTHORITY",
+                "message": "Only team_00 may update policies",
+                "details": {},
+            },
+        )
+    patch = body.model_dump(exclude_unset=True)
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                row = update_policy_by_id(cur, policy_id, patch)
+    except StateMachineError as e:
+        raise _sm_http(e) from e
+    r = dict(row)
+    if r.get("updated_at") is not None and hasattr(r["updated_at"], "isoformat"):
+        r["updated_at"] = r["updated_at"].isoformat().replace("+00:00", "Z")
+    return r
+
+
 _api_router = APIRouter()
 
 
@@ -625,6 +743,7 @@ def _allowed_origins() -> list[str]:
 
 
 def create_app() -> FastAPI:
+    """Build the FastAPI app with CORS, lifespan (SSE + scheduler), and both API routers."""
     application = FastAPI(
         title="Agents OS v3 API",
         version="3.0.0",

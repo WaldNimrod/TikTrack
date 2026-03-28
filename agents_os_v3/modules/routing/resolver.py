@@ -13,6 +13,13 @@ from agents_os_v3.modules.state import repository as R
 
 
 def resolve_actor_team_id(cur: Any, run: dict[str, Any]) -> str | None:
+    """
+    Resolve the active pipeline actor team for routing display and G02 checks.
+
+    Returns ``None`` when ``run.status`` is not ``IN_PROGRESS`` or ``CORRECTION`` (AD-S5-02:
+    not when ``PAUSED``). Uses the winning routing rule plus assignment or sentinel column
+    ``lod200_author_team`` when ``resolve_from_state_key`` is set.
+    """
     st = str(run["status"])
     if st not in ("IN_PROGRESS", "CORRECTION"):
         return None

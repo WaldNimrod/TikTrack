@@ -17,6 +17,8 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 
 @dataclass(frozen=True)
 class IngestSource:
+    """Inputs for :class:`FeedbackIngestor` (detection mode B/C/D/A and optional file or paste)."""
+
     run_id: str
     gate_id: str
     team_id: str

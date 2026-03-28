@@ -1,5 +1,9 @@
 """
-Server-Sent Events broadcaster — UI Spec Amendment v1.1.1 §10.4 (AD-S8B-10: post-commit only from callers).
+Server-Sent Events broadcaster — UI Spec Amendment v1.1.1 §10.4.
+
+Event kinds: ``pipeline_event``, ``heartbeat``, ``run_state_changed``, ``feedback_ingested``.
+Dispatch runs on the FastAPI event loop; sync code schedules work via
+:func:`schedule_sse` (post-commit only — AD-S8B-10).
 """
 
 from __future__ import annotations

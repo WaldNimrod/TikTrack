@@ -1,6 +1,17 @@
 """
-Use-case orchestration (UC-01..UC-15) — mutations call state.machine.execute_transition only.
-Reads use repository helpers; GET /api/state + /api/history + FIP (GATE_3).
+Use-case orchestration for AOS v3 (UC-01–UC-16, UC-12 Principal Override).
+
+**Mutations** must go through :func:`agents_os_v3.modules.state.machine.execute_transition`
+(``uc_01`` … ``uc_08``) so every state change stays in one DB transaction with ledger rules.
+
+**Reads / handoff**
+
+* ``uc_13_get_current_state`` — Module Map §4.9 + UI §10.7 (``previous_event``,
+  ``pending_feedback``, ``next_action``).
+* ``uc_14_get_history`` — §4.10 wrapper with ``total`` and structured ``actor``.
+* ``uc_15_ingest_feedback`` / ``uc_16_clear_pending_feedback`` — FIP (UI §10.1–10.2).
+
+Portfolio idea authority checks use :func:`can_change_idea_status`.
 """
 
 from __future__ import annotations
@@ -381,6 +392,26 @@ def uc_08_resume_run(
         payload={"resume_notes": resume_notes},
     )
     return out
+
+
+def uc_12_principal_override(
+    conn: Any,
+    *,
+    actor_team_id: str,
+    run_id: str,
+    action: str,
+    reason: str,
+    snapshot: dict[str, Any] | None,
+) -> dict[str, Any]:
+    """UC-12 — Module Map §4.8."""
+    return M.principal_override_run(
+        conn,
+        run_id=run_id,
+        actor_team_id=actor_team_id,
+        action=action.strip(),
+        reason=reason,
+        snapshot=snapshot,
+    )
 
 
 def uc_13_get_current_state(

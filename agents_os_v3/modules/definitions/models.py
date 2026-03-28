@@ -56,6 +56,26 @@ class ResumeRunBody(BaseModel):
     resume_notes: Optional[str] = None
 
 
+class PrincipalOverrideBody(BaseModel):
+    """UC-12 — Module Map §4.8; actor_team_id must match X-Actor-Team-Id."""
+
+    actor_team_id: str = Field(..., min_length=1)
+    action: str = Field(..., min_length=1)
+    reason: str = Field(..., min_length=1)
+    snapshot: Optional[dict[str, Any]] = None
+
+
+class PolicyUpdateBody(BaseModel):
+    """PUT /api/policies/{policy_id} — optional partial update (team_00 only)."""
+
+    policy_value_json: Optional[Any] = None
+    priority: Optional[int] = None
+    scope_type: Optional[str] = None
+    domain_id: Optional[str] = None
+    gate_id: Optional[str] = None
+    phase_id: Optional[str] = None
+
+
 ALLOWED_IDEA_TYPES = ("BUG", "FEATURE", "IMPROVEMENT", "TECH_DEBT", "RESEARCH")
 
 

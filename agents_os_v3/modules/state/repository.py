@@ -8,6 +8,9 @@ from typing import Any
 
 RunRow = dict[str, Any]
 
+# ``update_run_position``: omit paused_* kwargs to leave columns unchanged; pass ``None`` to SET NULL.
+_PAUSE_FIELDS_UNSET = object()
+
 
 def utc_now() -> datetime:
     return datetime.now(timezone.utc)
@@ -383,8 +386,8 @@ def update_run_position(
     current_phase_id: str | None = None,
     status: str | None = None,
     correction_cycle_count: int | None = None,
-    paused_at: datetime | None = None,
-    paused_routing_snapshot_json: str | None = None,
+    paused_at: datetime | None | object = _PAUSE_FIELDS_UNSET,
+    paused_routing_snapshot_json: str | None | object = _PAUSE_FIELDS_UNSET,
     completed_at: datetime | None = None,
     last_updated: datetime | None = None,
 ) -> None:
@@ -403,10 +406,10 @@ def update_run_position(
     if correction_cycle_count is not None:
         parts.append("correction_cycle_count = %s")
         vals.append(correction_cycle_count)
-    if paused_at is not None:
+    if paused_at is not _PAUSE_FIELDS_UNSET:
         parts.append("paused_at = %s")
         vals.append(paused_at)
-    if paused_routing_snapshot_json is not None:
+    if paused_routing_snapshot_json is not _PAUSE_FIELDS_UNSET:
         parts.append("paused_routing_snapshot_json = %s")
         vals.append(paused_routing_snapshot_json)
     if completed_at is not None:

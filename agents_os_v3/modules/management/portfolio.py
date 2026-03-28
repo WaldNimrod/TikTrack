@@ -1,4 +1,10 @@
-"""Stage 8A portfolio reads — teams, runs, work_packages, ideas (UI Spec v1.0.3)."""
+"""
+Portfolio and list reads backing HTTP routes under ``/api/teams``, ``/api/runs``,
+``/api/work-packages``, ``/api/ideas``.
+
+Aligned with Stage 8A UI spec: team list (with hierarchy hints from ``definition.yaml`` for
+seed teams), paginated runs, work packages, and ideas (used by ``api.py`` handlers).
+"""
 
 from __future__ import annotations
 
@@ -67,6 +73,49 @@ def list_teams_response(conn: Any) -> dict[str, Any]:
                 }
             )
         return {"teams": teams_out}
+
+
+def get_team_detail(conn: Any, team_id: str) -> dict[str, Any]:
+    """Single team — same shape as each element of ``list_teams_response`` ``teams`` list."""
+    from agents_os_v3.modules.state.errors import StateMachineError
+
+    hierarchy = _def_team_meta()
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT id, label, name, engine, "group", profession, domain_scope, in_gate_process
+            FROM teams
+            WHERE id = %s
+            """,
+            (team_id,),
+        )
+        r = cur.fetchone()
+        if not r:
+            raise StateMachineError("NOT_FOUND", 404, details={"team_id": team_id})
+        d = dict(r)
+        tid = str(d["id"])
+        h = hierarchy.get(tid, {})
+        cur.execute(
+            """
+            SELECT 1 FROM assignments
+            WHERE team_id = %s AND status = 'ACTIVE'
+            LIMIT 1
+            """,
+            (tid,),
+        )
+        has_asg = cur.fetchone() is not None
+        return {
+            "team_id": tid,
+            "label": str(d["label"]),
+            "name": str(d["name"]),
+            "engine": str(d["engine"]),
+            "group": str(d["group"]),
+            "profession": str(d["profession"]),
+            "domain_scope": str(d["domain_scope"]),
+            "parent_team_id": h.get("parent_team_id"),
+            "children": h.get("children") or [],
+            "has_active_assignment": bool(has_asg),
+        }
 
 
 def update_team_engine(conn: Any, *, team_id: str, engine: str) -> dict[str, Any]:

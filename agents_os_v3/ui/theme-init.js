@@ -8,6 +8,8 @@ date: 2026-03-27
 status: MOCKUP
 */
 (function () {
-  var d = localStorage.getItem("pipeline_domain") || "agents_os";
-  document.documentElement.classList.toggle("theme-tiktrack", d === "tiktrack");
+  /* Light by default; dark (root tokens) only when AOS domain is explicitly selected. */
+  var raw = localStorage.getItem("pipeline_domain");
+  var useLight = raw !== "agents_os";
+  document.documentElement.classList.toggle("theme-tiktrack", useLight);
 })();

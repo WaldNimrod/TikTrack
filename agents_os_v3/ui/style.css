@@ -37,6 +37,25 @@ status: MOCKUP
   min-width: 0;
 }
 
+/* Run status card — pipeline domain (uses shared .domain-btn + theme tokens for light/dark) */
+.aosv3-run-status-domain-block {
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.aosv3-run-status-domain-block .sidebar-label {
+  margin-bottom: 4px;
+}
+.aosv3-run-status-domain-block .domain-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.aosv3-run-status-domain-block .domain-btn {
+  flex: 1;
+  min-width: 140px;
+}
 
 .aosv3-status-badge {
   display: inline-block;

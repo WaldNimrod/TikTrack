@@ -5,14 +5,16 @@ team: Team 31
 domain: agents_os
 artifact: teams.html
 mandate: TEAM_100_TO_TEAM_31_AOS_V3_UI_MOCKUPS_MANDATE_v2.0.0
-date: 2026-03-27
+patch: TEAM_00 + TEAM_100 — is_current_actor removal / has_active_assignment (2026-03-28)
+date: 2026-03-28
 status: MOCKUP
 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agents OS v3 — Teams (mock)</title>
+  <meta name="aosv3-api-base" content="http://127.0.0.1:8090" />
+  <title>Agents OS v3 — Teams</title>
   <link rel="stylesheet" href="../../agents_os/ui/css/pipeline-shared.css" />
   <link rel="stylesheet" href="style.css" />
   <script src="theme-init.js"></script>
@@ -40,6 +42,8 @@ status: MOCKUP
   <a class="nav-link active" href="teams.html">Teams</a>
   <span class="nav-sep"></span>
   <a class="nav-link" href="portfolio.html">Portfolio</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="flow.html">System Map</a>
 </nav>
 
 <div class="agents-page-layout">
@@ -62,8 +66,8 @@ status: MOCKUP
         </select>
       </label>
       <label class="aosv3-team-checkbox-label">
-        <input type="checkbox" id="aosv3-team-filter-current" />
-        Current actor only
+        <input type="checkbox" id="aosv3-team-filter-current" aria-label="Show teams with active assignment only" />
+        Active assignment only
       </label>
     </div>
     <div class="sidebar-section-card">
@@ -80,6 +84,7 @@ status: MOCKUP
   </main>
 </div>
 
+<script src="api-client.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

@@ -12,7 +12,8 @@ status: MOCKUP
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agents OS v3 — Pipeline View (mock)</title>
+  <meta name="aosv3-api-base" content="http://127.0.0.1:8090" />
+  <title>Agents OS v3 — Pipeline View</title>
   <link rel="stylesheet" href="../../agents_os/ui/css/pipeline-shared.css" />
   <link rel="stylesheet" href="style.css" />
   <script src="theme-init.js"></script>
@@ -40,6 +41,8 @@ status: MOCKUP
   <a class="nav-link" href="teams.html">Teams</a>
   <span class="nav-sep"></span>
   <a class="nav-link" href="portfolio.html">Portfolio</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="flow.html">System Map</a>
 </nav>
 
 <div class="agents-page-layout" id="agents-page-layout">
@@ -47,10 +50,21 @@ status: MOCKUP
     <div class="agents-domain-bar agents-domain-bar--sidebar">
       <div class="sidebar-label">Theme / domain</div>
       <div class="domain-selector">
-        <button type="button" class="domain-btn" onclick="AOSV3_onDomainSwitch('agents_os')">Agents OS (dark)</button>
-        <button type="button" class="domain-btn" onclick="AOSV3_onDomainSwitch('tiktrack')">TikTrack (light)</button>
+        <button type="button" class="domain-btn" data-pipeline-domain="agents_os" onclick="AOSV3_onDomainSwitch('agents_os')">Agents OS (dark)</button>
+        <button type="button" class="domain-btn" data-pipeline-domain="tiktrack" onclick="AOSV3_onDomainSwitch('tiktrack')">TikTrack (light)</button>
       </div>
-      <p class="aosv3-mock-note">Sets localStorage.pipeline_domain — same key as v1/v2 dashboard.</p>
+      <p class="aosv3-mock-note">Sets <code>localStorage.pipeline_domain</code> (same key as v1/v2 dashboard). Default UI: light; dark theme only when Agents OS is selected.</p>
+    </div>
+    <div class="sidebar-section-card" id="aosv3-live-api-card" style="display:none">
+      <div class="sidebar-label">Live API (GATE_4)</div>
+      <label class="aosv3-form-label">X-Actor-Team-Id
+        <input type="text" id="aosv3-live-actor" class="aosv3-input" autocomplete="off" placeholder="team_61" />
+      </label>
+      <label class="aosv3-form-label">API base URL
+        <input type="text" id="aosv3-live-api-base" class="aosv3-input" autocomplete="off" placeholder="http://127.0.0.1:8090" />
+      </label>
+      <button type="button" class="btn btn-primary" id="aosv3-live-save-settings">Save &amp; reload state</button>
+      <p class="aosv3-mock-note">Persisted in localStorage. GET /api/state requires this header.</p>
     </div>
     <div class="sidebar-section-card">
       <div class="sidebar-label">Mock state preset</div>
@@ -198,7 +212,16 @@ status: MOCKUP
 
       <div class="section-card">
         <div class="section-title">Run status</div>
+        <div class="aosv3-run-status-domain-block">
+          <div class="sidebar-label">Pipeline domain (mock view)</div>
+          <p class="aosv3-mock-note">Same as sidebar — default light; dark only for Agents OS. Sets <code>domain_id</code> below.</p>
+          <div class="domain-selector">
+            <button type="button" class="domain-btn" data-pipeline-domain="agents_os" onclick="AOSV3_onDomainSwitch('agents_os')">Agents OS (dark)</button>
+            <button type="button" class="domain-btn" data-pipeline-domain="tiktrack" onclick="AOSV3_onDomainSwitch('tiktrack')">TikTrack (light)</button>
+          </div>
+        </div>
         <p><span id="aosv3-status-badge" class="aosv3-status-badge aosv3-status--in_progress">IN_PROGRESS</span></p>
+        <div class="info-row"><span class="info-key">domain_id</span><span class="info-val" id="aosv3-main-domain">—</span></div>
         <div class="info-row"><span class="info-key">current_gate_id</span><span class="info-val" id="aosv3-gate">—</span></div>
         <div class="info-row"><span class="info-key">current_phase_id</span><span class="info-val" id="aosv3-phase">—</span></div>
         <div class="info-row" id="aosv3-paused-at-row" hidden><span class="info-key">paused_at</span><span class="info-val" id="aosv3-paused-at">—</span></div>
@@ -223,13 +246,13 @@ status: MOCKUP
       <div class="section-card">
         <div class="section-title">Actions (mock — disabled)</div>
         <div class="aosv3-actions">
-          <button type="button" class="btn btn-primary" disabled title="POST /advance">ADVANCE</button>
+          <button type="button" class="btn btn-primary" disabled title="POST /advance" id="aosv3-btn-advance">ADVANCE</button>
           <button type="button" class="btn" disabled title="POST /resubmit" id="aosv3-btn-resubmit" hidden>RESUBMIT</button>
-          <button type="button" class="btn" disabled title="POST /fail">FAIL</button>
+          <button type="button" class="btn" disabled title="POST /fail" id="aosv3-btn-fail">FAIL</button>
           <button type="button" class="btn" disabled title="POST /approve" id="aosv3-btn-approve" hidden>APPROVE</button>
           <button type="button" class="btn" disabled title="POST /pause" id="aosv3-btn-pause">PAUSE</button>
           <button type="button" class="btn" disabled title="POST /resume" id="aosv3-btn-resume" hidden>RESUME</button>
-          <button type="button" class="btn" disabled title="POST /override — team_00">OVERRIDE (team_00)</button>
+          <button type="button" class="btn" disabled title="POST /override — team_00" id="aosv3-btn-override">OVERRIDE (team_00)</button>
         </div>
         <p class="aosv3-mock-note">APPROVE visible only when is_human_gate=1 (mock preset).</p>
       </div>
@@ -271,6 +294,7 @@ status: MOCKUP
   </div>
 </div>
 
+<script src="api-client.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

@@ -1,0 +1,220 @@
+# AOS v3 registry seed (GATE_0). SSOT for seed.py row payloads.
+# Aligns with TEAM_111_AOS_V3_DDL_SPEC_v1.0.1.md §3 (Seed Data) + fresh 001 embedded seed.
+# Entity coverage: TEAM_101_AOS_V3_ENTITY_DICTIONARY_v2.0.2.md (teams, domains, gates, phases, …).
+
+version: "1.0.0"
+spec_refs:
+  ddl_seed: "TEAM_111_AOS_V3_DDL_SPEC_v1.0.1.md §3"
+  entity_dictionary: "TEAM_101_AOS_V3_ENTITY_DICTIONARY_v2.0.2.md"
+
+# D-03 — Principal row (mandatory). Hierarchy (AD-S8A-05) — API SSOT; not in DB teams table.
+team_00:
+  id: team_00
+  label: Team 00
+  name: System Designer (Principal / human operator)
+  engine: human
+  domain_scope: multi
+  in_gate_process: 1
+  group: leadership
+  profession: principal
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: null
+  children:
+    - team_10
+    - team_11
+
+# Team 10 — Gateway (seed for GATE_0 routing / assignments; D-03 unchanged on team_00)
+team_10:
+  id: team_10
+  label: Team 10
+  name: Execution Orchestrator (Gateway)
+  engine: cursor
+  domain_scope: multi
+  in_gate_process: 1
+  group: gateway
+  profession: gateway_orchestrator
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_00
+  children: []
+
+# Team 11 — AOS Gateway (BUILD seed; hierarchy for GET /api/teams)
+team_11:
+  id: team_11
+  label: Team 11
+  name: AOS Gateway / Execution Lead
+  engine: cursor
+  domain_scope: agents_os
+  in_gate_process: 1
+  group: gateway
+  profession: gateway_orchestrator
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_00
+  children: []
+
+domains:
+  - id: "01JK8AOSV3DOMAIN00000001"
+    slug: agents_os
+    display_name: Agents OS
+    default_variant: TRACK_FULL
+    doc_team_id: null
+    is_active: 1
+  - id: "01JK8AOSV3DOMAIN00000002"
+    slug: tiktrack
+    display_name: TikTrack
+    default_variant: TRACK_FULL
+    doc_team_id: null
+    is_active: 1
+
+gates:
+  - id: GATE_0
+    sequence_order: 0
+    name: "Gate 0 — Assignment"
+    is_human_gate: 0
+    description: WP bootstrap and team assignment
+  - id: GATE_1
+    sequence_order: 1
+    name: "Gate 1 — Spec"
+    is_human_gate: 0
+    description: Specification delivery
+  - id: GATE_2
+    sequence_order: 2
+    name: "Gate 2 — Arch Approval"
+    is_human_gate: 0
+    description: Architecture approval (Team 100)
+  - id: GATE_3
+    sequence_order: 3
+    name: "Gate 3 — Implementation"
+    is_human_gate: 0
+    description: Implementation delivery
+  - id: GATE_4
+    sequence_order: 4
+    name: "Gate 4 — UX Sign-off"
+    is_human_gate: 1
+    description: UX/vision sign-off (Principal)
+  - id: GATE_5
+    sequence_order: 5
+    name: "Gate 5 — Lifecycle Close"
+    is_human_gate: 0
+    description: Lifecycle closure
+
+phases:
+  - id: "0.1"
+    gate_id: GATE_0
+    sequence_order: 1
+    name: Initialize
+    allow_auto: 0
+    display_in_ui: 1
+  - id: "0.2"
+    gate_id: GATE_0
+    sequence_order: 2
+    name: Assign
+    allow_auto: 0
+    display_in_ui: 1
+  - id: "1.1"
+    gate_id: GATE_1
+    sequence_order: 1
+    name: Gate 1 — primary phase
+    allow_auto: 0
+    display_in_ui: 1
+  - id: "2.1"
+    gate_id: GATE_2
+    sequence_order: 1
+    name: Gate 2 — primary phase
+    allow_auto: 0
+    display_in_ui: 1
+  - id: "3.1"
+    gate_id: GATE_3
+    sequence_order: 1
+    name: Gate 3 — primary phase
+    allow_auto: 0
+    display_in_ui: 1
+  - id: "4.1"
+    gate_id: GATE_4
+    sequence_order: 1
+    name: Gate 4 — primary phase
+    allow_auto: 0
+    display_in_ui: 1
+  - id: "5.1"
+    gate_id: GATE_5
+    sequence_order: 1
+    name: Gate 5 — primary phase
+    allow_auto: 0
+    display_in_ui: 1
+
+pipeline_roles:
+  - id: "01JK8AOSV3ROLE0000000001"
+    name: ORCHESTRATOR
+    display_name: Orchestrator
+    description: Routes work
+    can_block_gate: 0
+    is_seeded: 1
+  - id: IDEA_STATUS_AUTHORITY
+    name: IDEA_STATUS_AUTHORITY
+    display_name: Idea status authority (Tier 2 delegation)
+    description: Delegated idea pipeline status transitions (Authority Model v1.0.0)
+    can_block_gate: 0
+    is_seeded: 1
+
+policies:
+  - id: "01JK8AOSV3POL00000000001"
+    scope_type: GLOBAL
+    domain_id: null
+    gate_id: null
+    phase_id: null
+    policy_key: max_correction_cycles
+    policy_value_json: '{"max":5}'
+    priority: 100
+
+# GATE_0 routing — required for UC-01 InitiateRun (routing_rules → role_id → assignment team)
+routing_rules:
+  - id: "01JK8AOSV3RR0000000001"
+    gate_id: GATE_0
+    phase_id: null
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"
+    priority: 10
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000002"
+    gate_id: GATE_0
+    phase_id: null
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"
+    priority: 10
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000003"
+    gate_id: GATE_0
+    phase_id: null
+    domain_id: null
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"
+    priority: 100
+    resolve_from_state_key: null
+
+# Active prompt template for GATE_0 / phase 0.1 (GET /api/runs/{id}/prompt smoke)
+templates:
+  - id: "01JK8AOSV3TPL0000000001"
+    gate_id: GATE_0
+    phase_id: "0.1"
+    domain_id: null
+    name: Gate 0 bootstrap template
+    body_markdown: |
+      # L1 — Work package bootstrap
+      You are the assigned orchestrator. Follow governance (L2) and policies (L3).
+    version: 1
+    is_active: 1
+
+# Registry row for initiate smoke tests (G01 work_package_id exists)
+work_packages:
+  - id: "01JK8AOSV3WP0000000001"
+    label: "Bootstrap work package (seed)"
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    status: PLANNED
+    linked_run_id: null

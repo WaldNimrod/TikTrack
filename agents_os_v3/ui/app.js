@@ -4,7 +4,8 @@ team: Team 31
 domain: agents_os
 artifact: app.js
 mandate: TEAM_100_TO_TEAM_31_AOS_V3_UI_MOCKUPS_MANDATE_v2.0.0
-date: 2026-03-27
+patch: TEAM_00_TO_TEAM_31_AOS_V3_MOCKUP_AUTHORITY_MODEL_UPDATE_MANDATE_v1.0.0 + TEAM_100_TO_TEAM_31_AOS_V3_UI_IS_CURRENT_ACTOR_REMOVAL_MANDATE_v1.0.0 (AM-01 / §4.13)
+date: 2026-03-28
 status: MOCKUP
 */
 (function () {
@@ -562,7 +563,7 @@ status: MOCKUP
     phase_id: "phase_3_1",
     actor_team_id: "team_61",
     prompt_text:
-      "# Team 61 — Session Context\n\n## Layer 1 — Identity\n\n**Team:** Team 61\n**Name:** Cloud Agent / DevOps Automation\n**Engine:** Cursor\n**Domain:** agents_os\n**Group:** implementation\n**Profession:** devops_engineer\n\n## Layer 2 — Governance\n\n**Authority:** Agents_OS V2 infrastructure, CI/CD, quality scans\n**Writes to:** agents_os_v2/, _COMMUNICATION/team_61/\n**Iron Rules:**\n1. Run tests before push\n2. No force push to main\n\n## Layer 3 — Current State\n\n**Active Run:** S003-P002-WP001 (agents_os)\n**Gate:** GATE_3 / phase_3_1\n**Status:** IN_PROGRESS\n**Assignment:** You are the CURRENT ACTOR\n\n## Layer 4 — Task\n\n**Gate 3 Requirements:** Implementation per LOD400 spec.\n**Deliverables:** Production code + unit tests.\n**Acceptance Criteria:** All tests pass, no linter errors, code review by Team 100.",
+      "# Team 61 — Session Context\n\n## Layer 1 — Identity\n\n**Team:** Team 61\n**Name:** Cloud Agent / DevOps Automation\n**Engine:** Cursor\n**Domain:** agents_os\n**Group:** implementation\n**Profession:** devops_engineer\n\n## Layer 2 — Governance\n\n**Authority:** Agents_OS V2 infrastructure, CI/CD, quality scans\n**Writes to:** agents_os_v2/, _COMMUNICATION/team_61/\n**Iron Rules:**\n1. Run tests before push\n2. No force push to main\n\n## Layer 3 — Current State\n\n**Active Run:** S003-P002-WP001 (agents_os)\n**Gate:** GATE_3 / phase_3_1\n**Status:** IN_PROGRESS\n**Assignment:** Active (has_active_assignment)\n\n## Layer 4 — Task\n\n**Gate 3 Requirements:** Implementation per LOD400 spec.\n**Deliverables:** Production code + unit tests.\n**Acceptance Criteria:** All tests pass, no linter errors, code review by Team 100.",
     token_count: 247,
     assembled_at: "2026-03-26T14:30:00Z",
     cache_hit: false,
@@ -840,18 +841,18 @@ status: MOCKUP
 
   var MOCK_TEAMS = {
     teams: [
-      { team_id: "team_00", label: "Team 00 — System Designer", name: "System Designer", engine: "human", group: "cross_domain", profession: "principal", domain_scope: "all", parent_team_id: null, children: ["team_10", "team_11"], has_active_assignment: false, is_current_actor: false },
-      { team_id: "team_11", label: "Team 11 — AOS Gateway", name: "AOS Gateway", engine: "cursor", group: "x1_aos", profession: "gateway_lead", domain_scope: "agents_os", parent_team_id: "team_00", children: ["team_21", "team_31", "team_51", "team_61"], has_active_assignment: false, is_current_actor: false },
-      { team_id: "team_21", label: "Team 21 — AOS Backend", name: "AOS Backend Implementation", engine: "cursor", group: "x1_aos", profession: "backend_engineer", domain_scope: "agents_os", parent_team_id: "team_11", children: [], has_active_assignment: false, is_current_actor: false },
-      { team_id: "team_31", label: "Team 31 — AOS Frontend", name: "AOS Frontend Implementation", engine: "cursor", group: "x1_aos", profession: "frontend_engineer", domain_scope: "agents_os", parent_team_id: "team_11", children: [], has_active_assignment: false, is_current_actor: false },
-      { team_id: "team_51", label: "Team 51 — Agents_OS QA", name: "Agents_OS QA Agent", engine: "cursor", group: "x1_aos", profession: "qa_engineer", domain_scope: "agents_os", parent_team_id: "team_11", children: [], has_active_assignment: false, is_current_actor: false },
-      { team_id: "team_61", label: "Team 61 — Cloud Agent", name: "Cloud Agent / DevOps Automation", engine: "cursor", group: "x1_aos", profession: "devops_engineer", domain_scope: "agents_os", parent_team_id: "team_11", children: [], has_active_assignment: true, is_current_actor: true },
-      { team_id: "team_100", label: "Team 100 — Chief Architect", name: "Chief System Architect", engine: "claude_code", group: "cross_domain", profession: "system_architect", domain_scope: "all", parent_team_id: "team_00", children: [], has_active_assignment: false, is_current_actor: false },
-      { team_id: "team_110", label: "Team 110 — AOS Domain Architect", name: "AOS Domain Architect (IDE)", engine: "cursor", group: "x1_aos", profession: "domain_architect", domain_scope: "agents_os", parent_team_id: "team_100", children: [], has_active_assignment: false, is_current_actor: false },
-      { team_id: "team_10", label: "Team 10 — TikTrack Gateway", name: "TikTrack Gateway", engine: "cursor", group: "x0_tiktrack", profession: "gateway_lead", domain_scope: "tiktrack", parent_team_id: "team_00", children: ["team_30"], has_active_assignment: false, is_current_actor: false },
-      { team_id: "team_30", label: "Team 30 — TikTrack Frontend", name: "TikTrack Frontend Implementation", engine: "cursor", group: "x0_tiktrack", profession: "frontend_engineer", domain_scope: "tiktrack", parent_team_id: "team_10", children: [], has_active_assignment: false, is_current_actor: false },
-      { team_id: "team_190", label: "Team 190 — Constitutional Validator", name: "Constitutional Architectural Validator", engine: "claude_code", group: "cross_domain", profession: "validator", domain_scope: "all", parent_team_id: null, children: ["team_191"], has_active_assignment: false, is_current_actor: false },
-      { team_id: "team_191", label: "Team 191 — Git Governance", name: "Git Governance Operations", engine: "cursor", group: "cross_domain", profession: "git_governance", domain_scope: "all", parent_team_id: "team_190", children: [], has_active_assignment: false, is_current_actor: false },
+      { team_id: "team_00", label: "Team 00 — System Designer", name: "System Designer", engine: "human", group: "cross_domain", profession: "principal", domain_scope: "all", parent_team_id: null, children: ["team_10", "team_11"], has_active_assignment: false },
+      { team_id: "team_11", label: "Team 11 — AOS Gateway", name: "AOS Gateway", engine: "cursor", group: "x1_aos", profession: "gateway_lead", domain_scope: "agents_os", parent_team_id: "team_00", children: ["team_21", "team_31", "team_51", "team_61"], has_active_assignment: false },
+      { team_id: "team_21", label: "Team 21 — AOS Backend", name: "AOS Backend Implementation", engine: "cursor", group: "x1_aos", profession: "backend_engineer", domain_scope: "agents_os", parent_team_id: "team_11", children: [], has_active_assignment: false },
+      { team_id: "team_31", label: "Team 31 — AOS Frontend", name: "AOS Frontend Implementation", engine: "cursor", group: "x1_aos", profession: "frontend_engineer", domain_scope: "agents_os", parent_team_id: "team_11", children: [], has_active_assignment: false },
+      { team_id: "team_51", label: "Team 51 — Agents_OS QA", name: "Agents_OS QA Agent", engine: "cursor", group: "x1_aos", profession: "qa_engineer", domain_scope: "agents_os", parent_team_id: "team_11", children: [], has_active_assignment: false },
+      { team_id: "team_61", label: "Team 61 — Cloud Agent", name: "Cloud Agent / DevOps Automation", engine: "cursor", group: "x1_aos", profession: "devops_engineer", domain_scope: "agents_os", parent_team_id: "team_11", children: [], has_active_assignment: true },
+      { team_id: "team_100", label: "Team 100 — Chief Architect", name: "Chief System Architect", engine: "claude_code", group: "cross_domain", profession: "system_architect", domain_scope: "all", parent_team_id: "team_00", children: [], has_active_assignment: false },
+      { team_id: "team_110", label: "Team 110 — AOS Domain Architect", name: "AOS Domain Architect (IDE)", engine: "cursor", group: "x1_aos", profession: "domain_architect", domain_scope: "agents_os", parent_team_id: "team_100", children: [], has_active_assignment: false },
+      { team_id: "team_10", label: "Team 10 — TikTrack Gateway", name: "TikTrack Gateway", engine: "cursor", group: "x0_tiktrack", profession: "gateway_lead", domain_scope: "tiktrack", parent_team_id: "team_00", children: ["team_30"], has_active_assignment: false },
+      { team_id: "team_30", label: "Team 30 — TikTrack Frontend", name: "TikTrack Frontend Implementation", engine: "cursor", group: "x0_tiktrack", profession: "frontend_engineer", domain_scope: "tiktrack", parent_team_id: "team_10", children: [], has_active_assignment: false },
+      { team_id: "team_190", label: "Team 190 — Constitutional Validator", name: "Constitutional Architectural Validator", engine: "claude_code", group: "cross_domain", profession: "validator", domain_scope: "all", parent_team_id: null, children: ["team_191"], has_active_assignment: false },
+      { team_id: "team_191", label: "Team 191 — Git Governance", name: "Git Governance Operations", engine: "cursor", group: "cross_domain", profession: "git_governance", domain_scope: "all", parent_team_id: "team_190", children: [], has_active_assignment: false },
     ],
   };
 
@@ -934,6 +935,22 @@ status: MOCKUP
       .replace(/"/g, "&quot;");
   }
 
+  function readMetaAosv3(name) {
+    var m = document.querySelector('meta[name="' + name + '"]');
+    return m ? m.getAttribute("content") : null;
+  }
+
+  function aosv3UseMock() {
+    try {
+      if (readMetaAosv3("aosv3-use-mock") === "1") return true;
+      var q = new URLSearchParams(window.location.search || "");
+      if (q.get("mock") === "1" || q.get("aosv3_mock") === "1") return true;
+    } catch (e) {
+      /* ignore */
+    }
+    return false;
+  }
+
   function domainPillHtml(domainId, titleKey) {
     if (domainId == null || domainId === "") return "—";
     var tk = titleKey || "domain_id";
@@ -966,6 +983,14 @@ status: MOCKUP
   }
 
   var pipelineLastState = null;
+  var pipelineLiveHistoryCache = null;
+  var pipelineLivePollTimer = null;
+  var pipelineLiveEs = null;
+  var pipelineSseConnected = false;
+  var pipelineLiveSseKey = "";
+  var flowLiveEs = null;
+  var flowLivePollTimer = null;
+  var flowPageTransportState = null;
 
   function findTeamById(tid) {
     if (!tid) return null;
@@ -1063,9 +1088,18 @@ status: MOCKUP
         '<tr><td colspan="7" class="aosv3-run-log-empty">— No active run —</td></tr>';
       return;
     }
-    var evs = cloneEvents().filter(function (e) {
-      return e.run_id === runId;
-    });
+    var evs;
+    if (
+      pipelineLiveHistoryCache &&
+      pipelineLiveHistoryCache.runId === runId &&
+      pipelineLiveHistoryCache.events
+    ) {
+      evs = pipelineLiveHistoryCache.events;
+    } else {
+      evs = cloneEvents().filter(function (e) {
+        return e.run_id === runId;
+      });
+    }
     evs.sort(function (a, b) {
       return new Date(b.occurred_at) - new Date(a.occurred_at);
     });
@@ -1101,12 +1135,20 @@ status: MOCKUP
   function renderSseIndicator(state) {
     var el = document.getElementById("aosv3-sse-indicator");
     if (!el) return;
-    var connected =
-      state &&
-      state.run_id &&
-      state.status !== "IDLE" &&
-      state.status !== "COMPLETE" &&
-      state.sse_connected === true;
+    var flowPage =
+      document.body &&
+      document.body.getAttribute("data-aosv3-page") === "flow";
+    var connected;
+    if (flowPage) {
+      connected = state && state.sse_connected === true;
+    } else {
+      connected =
+        state &&
+        state.run_id &&
+        state.status !== "IDLE" &&
+        state.status !== "COMPLETE" &&
+        state.sse_connected === true;
+    }
     el.classList.toggle("aosv3-sse--connected", connected);
     el.classList.toggle("aosv3-sse--polling", !connected);
     el.innerHTML =
@@ -1536,9 +1578,51 @@ status: MOCKUP
     if (idleRow) idleRow.hidden = active;
   }
 
+  function getPipelineViewDomain() {
+    try {
+      var d = localStorage.getItem("pipeline_domain");
+      if (d === "agents_os") return "agents_os";
+      return "tiktrack";
+    } catch (err) {
+      return "tiktrack";
+    }
+  }
+
+  function updatePipelineDomainButtonStyles() {
+    var cur = getPipelineViewDomain();
+    document.querySelectorAll("[data-pipeline-domain]").forEach(function (btn) {
+      var v = btn.getAttribute("data-pipeline-domain");
+      btn.classList.toggle(
+        "active-agentsos",
+        v === "agents_os" && cur === "agents_os"
+      );
+      btn.classList.toggle(
+        "active-tiktrack",
+        v === "tiktrack" && cur === "tiktrack"
+      );
+    });
+  }
+
+  function syncStartRunFormDomainSelect() {
+    var form = document.getElementById("aosv3-start-run-form");
+    if (!form) return;
+    var sel = form.querySelector('select[name="domain_id"]');
+    if (!sel) return;
+    var d = getPipelineViewDomain();
+    if (sel.querySelector('option[value="' + d + '"]')) sel.value = d;
+  }
+
   function onDomainSwitch(domain) {
     localStorage.setItem("pipeline_domain", domain);
-    document.documentElement.classList.toggle("theme-tiktrack", domain === "tiktrack");
+    document.documentElement.classList.toggle(
+      "theme-tiktrack",
+      domain === "tiktrack"
+    );
+    updatePipelineDomainButtonStyles();
+    syncStartRunFormDomainSelect();
+    if (typeof window.AOSV3_reapplyPipelinePreset === "function") {
+      window.AOSV3_reapplyPipelinePreset();
+    }
   }
 
   window.AOSV3_onDomainSwitch = onDomainSwitch;
@@ -1653,6 +1737,11 @@ status: MOCKUP
       var resumeIdle = document.getElementById("aosv3-btn-resume");
       if (pauseIdle) pauseIdle.hidden = true;
       if (resumeIdle) resumeIdle.hidden = true;
+      var viewDom = getPipelineViewDomain();
+      var idleDomainEl = document.getElementById("aosv3-domain");
+      if (idleDomainEl) idleDomainEl.textContent = viewDom;
+      var mainDomIdle = document.getElementById("aosv3-main-domain");
+      if (mainDomIdle) mainDomIdle.textContent = viewDom;
       renderGateMap(null, null, "IDLE");
       renderRunLog(null);
       renderProgramControl(state);
@@ -1701,6 +1790,7 @@ status: MOCKUP
     setText("aosv3-run-id", state.run_id);
     setText("aosv3-wp-id", state.work_package_id);
     setText("aosv3-domain", state.domain_id);
+    setText("aosv3-main-domain", state.domain_id);
     setText("aosv3-variant", state.process_variant);
     setText("aosv3-gate", state.current_gate_id);
     setText("aosv3-phase", state.current_phase_id);
@@ -1748,7 +1838,11 @@ status: MOCKUP
 
     var approveBtn = document.getElementById("aosv3-btn-approve");
     if (approveBtn) {
-      approveBtn.hidden = state.is_human_gate !== 1;
+      var showAppr =
+        (state.next_action &&
+          state.next_action.type === "HUMAN_APPROVE") ||
+        state.is_human_gate === 1;
+      approveBtn.hidden = !showAppr;
     }
 
     var resubmitBtn = document.getElementById("aosv3-btn-resubmit");
@@ -1889,7 +1983,345 @@ status: MOCKUP
     }
   }
 
+  function initPipelinePageLive() {
+    if (typeof AOSV3_apiJson !== "function") {
+      showAosv3Toast("Load api-client.js before app.js");
+      return;
+    }
+    var ps = document.getElementById("aosv3-preset-select");
+    if (ps) {
+      var mockCard = ps.closest(".sidebar-section-card");
+      if (mockCard) mockCard.style.display = "none";
+    }
+    var liveCard = document.getElementById("aosv3-live-api-card");
+    if (liveCard) liveCard.style.display = "";
+
+    var actorIn = document.getElementById("aosv3-live-actor");
+    var baseIn = document.getElementById("aosv3-live-api-base");
+    if (actorIn) actorIn.value = AOSV3_getActorTeamId();
+    if (baseIn) baseIn.value = AOSV3_getApiBase();
+    var saveBtn = document.getElementById("aosv3-live-save-settings");
+    if (saveBtn) {
+      saveBtn.addEventListener("click", function () {
+        if (actorIn) AOSV3_setActorTeamId(actorIn.value);
+        if (baseIn) AOSV3_setApiBase(baseIn.value.trim());
+        teardownPipelineLiveTransport();
+        pipelineLiveSseKey = "";
+        loadPipelineStateFromApi(true);
+      });
+    }
+
+    var actionsHost = document.querySelector(".aosv3-actions");
+    if (actionsHost) {
+      var acard = actionsHost.closest(".section-card");
+      var st0 = acard && acard.querySelector(".section-title");
+      if (st0) st0.textContent = "Actions (live API)";
+    }
+
+    function teardownPipelineLiveTransport() {
+      if (pipelineLivePollTimer) {
+        clearInterval(pipelineLivePollTimer);
+        pipelineLivePollTimer = null;
+      }
+      if (pipelineLiveEs) {
+        try {
+          pipelineLiveEs.close();
+        } catch (e1) {
+          /* ignore */
+        }
+        pipelineLiveEs = null;
+      }
+    }
+
+    function attachSseListeners(es) {
+      var refresh = function () {
+        loadPipelineStateFromApi(false);
+      };
+      es.addEventListener("heartbeat", refresh);
+      es.addEventListener("pipeline_event", refresh);
+      es.addEventListener("run_state_changed", refresh);
+      es.addEventListener("feedback_ingested", refresh);
+    }
+
+    function maybeStartSse(st) {
+      var dom = getPipelineViewDomain();
+      var key = (st && st.run_id ? st.run_id : "") + "|" + dom;
+      if (key === pipelineLiveSseKey && pipelineLiveEs) return;
+      pipelineLiveSseKey = key;
+      teardownPipelineLiveTransport();
+      var url = AOSV3_buildEventStreamUrl({
+        domain_id: dom,
+        run_id: st && st.run_id ? st.run_id : undefined,
+      });
+      try {
+        var es = new EventSource(url);
+        pipelineLiveEs = es;
+        es.onopen = function () {
+          pipelineSseConnected = true;
+          if (pipelineLastState) {
+            pipelineLastState.sse_connected = true;
+            renderSseIndicator(pipelineLastState);
+          }
+        };
+        es.onerror = function () {
+          pipelineSseConnected = false;
+          if (pipelineLastState) {
+            pipelineLastState.sse_connected = false;
+            renderSseIndicator(pipelineLastState);
+          }
+        };
+        attachSseListeners(es);
+      } catch (e2) {
+        pipelineSseConnected = false;
+      }
+      pipelineLivePollTimer = setInterval(function () {
+        loadPipelineStateFromApi(false);
+      }, 15000);
+    }
+
+    function normalizeLiveState(raw) {
+      var s = Object.assign({}, raw);
+      if (!s.pending_feedback) s.pending_feedback = { has_pending: false };
+      if (s.next_action && s.next_action.type === "HUMAN_APPROVE")
+        s.is_human_gate = 1;
+      else if (s.is_human_gate == null) s.is_human_gate = 0;
+      if (s.escalated == null) s.escalated = false;
+      if (s.correction_blocking == null) s.correction_blocking = null;
+      s.sse_connected = pipelineSseConnected;
+      if (s.latest_event_type == null) s.latest_event_type = null;
+      return s;
+    }
+
+    function loadRunLogFromApi(runId) {
+      return AOSV3_apiJson(
+        "/api/history?run_id=" +
+          encodeURIComponent(runId) +
+          "&limit=100&order=desc"
+      )
+        .then(function (data) {
+          var events = (data && data.events) || [];
+          var mapped = events.map(function (ev) {
+            return {
+              sequence_no: ev.sequence_no,
+              occurred_at: ev.occurred_at,
+              event_type: ev.event_type,
+              gate_id: ev.gate_id,
+              phase_id: ev.phase_id,
+              run_id: ev.run_id,
+              actor: ev.actor
+                ? {
+                    team_id: ev.actor.team_id,
+                    label: ev.actor.label || "",
+                  }
+                : null,
+              verdict: ev.verdict,
+              reason: ev.reason,
+            };
+          });
+          pipelineLiveHistoryCache = { runId: runId, events: mapped };
+          renderRunLog(runId);
+        })
+        .catch(function () {
+          pipelineLiveHistoryCache = null;
+          renderRunLog(runId);
+        });
+    }
+
+    function checkEscalation(runId) {
+      return AOSV3_apiJson(
+        "/api/history?run_id=" +
+          encodeURIComponent(runId) +
+          "&limit=20&order=desc"
+      )
+        .then(function (data) {
+          var events = (data && data.events) || [];
+          var esc = events.some(function (e) {
+            return e.event_type === "CORRECTION_ESCALATED";
+          });
+          if (pipelineLastState && pipelineLastState.run_id === runId) {
+            pipelineLastState.escalated = esc;
+            pipelineLastState.latest_event_type =
+              events.length && events[0].event_type
+                ? events[0].event_type
+                : null;
+            var banner = document.getElementById("aosv3-escalation-banner");
+            if (banner) {
+              banner.hidden = !(
+                pipelineLastState.escalated ||
+                pipelineLastState.latest_event_type ===
+                  "CORRECTION_ESCALATED"
+              );
+            }
+          }
+        })
+        .catch(function () {
+          /* ignore */
+        });
+    }
+
+    function loadPipelineStateFromApi(showErr) {
+      var dom = getPipelineViewDomain();
+      return AOSV3_apiJson(
+        "/api/state?domain_id=" + encodeURIComponent(dom)
+      )
+        .then(function (data) {
+          var st = normalizeLiveState(data);
+          pipelineLastState = st;
+          renderPipelineState(st);
+          if (st.run_id) {
+            loadRunLogFromApi(st.run_id);
+            checkEscalation(st.run_id);
+          } else {
+            pipelineLiveHistoryCache = null;
+            renderRunLog(null);
+          }
+          maybeStartSse(st);
+        })
+        .catch(function (err) {
+          if (showErr) showAosv3Toast(err.message || String(err));
+        });
+    }
+
+    window.AOSV3_reapplyPipelinePreset = function () {
+      teardownPipelineLiveTransport();
+      pipelineLiveSseKey = "";
+      loadPipelineStateFromApi(true);
+    };
+
+    function wireLiveAction(btn, fn) {
+      if (!btn) return;
+      btn.removeAttribute("disabled");
+      btn.onclick = fn;
+    }
+
+    function postJson(path, body) {
+      return AOSV3_apiJson(path, {
+        method: "POST",
+        body: JSON.stringify(body || {}),
+      });
+    }
+
+    function rid() {
+      return pipelineLastState && pipelineLastState.run_id;
+    }
+
+    wireLiveAction(document.getElementById("aosv3-btn-advance"), function () {
+      var r = rid();
+      if (!r) return;
+      var sum = window.prompt("Advance summary", "Phase complete");
+      if (sum == null) return;
+      postJson("/api/runs/" + encodeURIComponent(r) + "/advance", {
+        verdict: "pass",
+        summary: sum,
+      })
+        .then(function () {
+          showAosv3Toast("Advance OK");
+          return loadPipelineStateFromApi(true);
+        })
+        .catch(function (e) {
+          showAosv3Toast(e.message || String(e));
+        });
+    });
+
+    wireLiveAction(document.getElementById("aosv3-btn-fail"), function () {
+      var r = rid();
+      if (!r) return;
+      var reason = window.prompt("Fail reason", "Blocking issue");
+      if (reason == null || !reason.trim()) return;
+      postJson("/api/runs/" + encodeURIComponent(r) + "/fail", {
+        reason: reason.trim(),
+        findings: null,
+      })
+        .then(function () {
+          showAosv3Toast("Fail recorded");
+          return loadPipelineStateFromApi(true);
+        })
+        .catch(function (e) {
+          showAosv3Toast(e.message || String(e));
+        });
+    });
+
+    wireLiveAction(document.getElementById("aosv3-btn-approve"), function () {
+      var r = rid();
+      if (!r) return;
+      var notes = window.prompt("Approval notes (optional)", "") || "";
+      postJson("/api/runs/" + encodeURIComponent(r) + "/approve", {
+        approval_notes: notes,
+      })
+        .then(function () {
+          showAosv3Toast("Approved");
+          return loadPipelineStateFromApi(true);
+        })
+        .catch(function (e) {
+          showAosv3Toast(e.message || String(e));
+        });
+    });
+
+    wireLiveAction(document.getElementById("aosv3-btn-pause"), function () {
+      var r = rid();
+      if (!r) return;
+      var pr = window.prompt("Pause reason", "operator pause");
+      if (pr == null || !pr.trim()) return;
+      postJson("/api/runs/" + encodeURIComponent(r) + "/pause", {
+        pause_reason: pr.trim(),
+      })
+        .then(function () {
+          showAosv3Toast("Paused");
+          return loadPipelineStateFromApi(true);
+        })
+        .catch(function (e) {
+          showAosv3Toast(e.message || String(e));
+        });
+    });
+
+    wireLiveAction(document.getElementById("aosv3-btn-resume"), function () {
+      var r = rid();
+      if (!r) return;
+      postJson("/api/runs/" + encodeURIComponent(r) + "/resume", {
+        resume_notes: "",
+      })
+        .then(function () {
+          showAosv3Toast("Resumed");
+          return loadPipelineStateFromApi(true);
+        })
+        .catch(function (e) {
+          showAosv3Toast(e.message || String(e));
+        });
+    });
+
+    wireLiveAction(document.getElementById("aosv3-btn-resubmit"), function () {
+      var r = rid();
+      if (!r) return;
+      var sum = window.prompt("Resubmit summary", "correction applied");
+      if (sum == null) return;
+      postJson("/api/runs/" + encodeURIComponent(r) + "/advance", {
+        verdict: "resubmit",
+        summary: sum,
+      })
+        .then(function () {
+          showAosv3Toast("Resubmit sent");
+          return loadPipelineStateFromApi(true);
+        })
+        .catch(function (e) {
+          showAosv3Toast(e.message || String(e));
+        });
+    });
+
+    wireLiveAction(document.getElementById("aosv3-btn-override"), function () {
+      showAosv3Toast("Principal override — use CLI from handoff block");
+    });
+
+    updatePipelineDomainButtonStyles();
+    syncStartRunFormDomainSelect();
+    loadPipelineStateFromApi(true);
+  }
+
+
   function initPipelinePage() {
+    if (!aosv3UseMock()) {
+      initPipelinePageLive();
+      return;
+    }
     var sel = document.getElementById("aosv3-preset-select");
     var copyBtn = document.getElementById("aosv3-prompt-copy");
     if (copyBtn) {
@@ -1975,18 +2407,22 @@ status: MOCKUP
     function applyPreset() {
       var key = sel ? sel.value : "active";
       var st = JSON.parse(JSON.stringify(PRESETS[key] || PRESETS.active));
+      st.domain_id = getPipelineViewDomain();
       var qp = readAosv3QueryParams();
       if (qp.phase === "phase_3_1" || qp.phase === "phase_3_2") {
         applyGate3PhaseOverride(st, qp.phase);
       }
       renderPipelineState(st);
     }
+    window.AOSV3_reapplyPipelinePreset = applyPreset;
     if (sel) {
       var iq = readAosv3QueryParams();
       if (iq.preset && PRESETS[iq.preset]) sel.value = iq.preset;
       sel.addEventListener("change", applyPreset);
     }
     wireHandoffManualFailOnce();
+    updatePipelineDomainButtonStyles();
+    syncStartRunFormDomainSelect();
     applyPreset();
   }
 
@@ -1996,7 +2432,212 @@ status: MOCKUP
     });
   }
 
+  function initHistoryPageLive() {
+    if (typeof AOSV3_apiJson !== "function") {
+      showAosv3Toast("Load api-client.js before app.js");
+      return;
+    }
+    var tbody = document.getElementById("aosv3-history-tbody");
+    var totalEl = document.getElementById("aosv3-history-total");
+    var filterDomain = document.getElementById("aosv3-filter-domain");
+    var filterGate = document.getElementById("aosv3-filter-gate");
+    var filterType = document.getElementById("aosv3-filter-event-type");
+    var filterActor = document.getElementById("aosv3-filter-actor");
+    var filterRunId = document.getElementById("aosv3-filter-run-id");
+    var limitEl = document.getElementById("aosv3-limit");
+    var offsetEl = document.getElementById("aosv3-offset");
+    var orderEl = document.getElementById("aosv3-order");
+    var prevBtn = document.getElementById("aosv3-page-prev");
+    var nextBtn = document.getElementById("aosv3-page-next");
+    var runSelect = document.getElementById("aosv3-history-run-select");
+    var runApply = document.getElementById("aosv3-history-run-apply");
+
+    if (filterType && filterType.options.length <= 1) {
+      EVENT_TYPES.forEach(function (t) {
+        var opt = document.createElement("option");
+        opt.value = t;
+        opt.textContent = t;
+        filterType.appendChild(opt);
+      });
+    }
+
+    function ensureGateOption(gid) {
+      if (!filterGate || !gid) return;
+      var found = false;
+      for (var i = 0; i < filterGate.options.length; i++) {
+        if (filterGate.options[i].value === gid) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        var opt = document.createElement("option");
+        opt.value = gid;
+        opt.textContent = gid;
+        filterGate.appendChild(opt);
+      }
+    }
+
+    function buildHistoryQuery() {
+      var order = orderEl && orderEl.value === "asc" ? "asc" : "desc";
+      var limit = parseInt(limitEl && limitEl.value, 10) || 50;
+      if (limit > 200) limit = 200;
+      var offset = parseInt(offsetEl && offsetEl.value, 10) || 0;
+      if (offset < 0) offset = 0;
+      var q = new URLSearchParams();
+      q.set("limit", String(limit));
+      q.set("offset", String(offset));
+      q.set("order", order);
+      if (filterDomain && filterDomain.value)
+        q.set("domain_id", filterDomain.value);
+      if (filterGate && filterGate.value) q.set("gate_id", filterGate.value);
+      if (filterType && filterType.value)
+        q.set("event_type", filterType.value);
+      if (filterActor && filterActor.value.trim())
+        q.set("actor_team_id", filterActor.value.trim());
+      if (filterRunId && filterRunId.value.trim())
+        q.set("run_id", filterRunId.value.trim());
+      return "/api/history?" + q.toString();
+    }
+
+    function renderRows(events) {
+      if (!tbody) return;
+      tbody.innerHTML = "";
+      (events || []).forEach(function (e) {
+        ensureGateOption(e.gate_id);
+        var tr = document.createElement("tr");
+        if (e.event_type === "GATE_FAILED_ADVISORY") {
+          tr.className = "aosv3-row--advisory";
+        } else if (e.event_type === "GATE_FAILED_BLOCKING") {
+          tr.className = "aosv3-row--blocking";
+        }
+        var badgeClass = eventLogBadgeClass(e.event_type);
+        var act = e.actor || {};
+        var actorTxt = act.team_id
+          ? esc(act.team_id) + " · " + esc(act.label || "")
+          : "—";
+        var verdict = e.verdict != null ? esc(e.verdict) : "—";
+        tr.innerHTML =
+          "<td>" +
+          esc(e.occurred_at) +
+          '</td><td><span class="' +
+          badgeClass +
+          '">' +
+          esc(e.event_type) +
+          "</span></td><td>" +
+          esc(e.gate_id || "—") +
+          " / " +
+          esc(e.phase_id || "—") +
+          "</td><td>" +
+          actorTxt +
+          "</td><td>" +
+          verdict +
+          "</td><td>" +
+          esc(e.reason) +
+          "</td>";
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderTable() {
+      AOSV3_apiJson(buildHistoryQuery())
+        .then(function (data) {
+          if (totalEl) totalEl.textContent = String(data.total || 0);
+          (data.events || []).forEach(function (e) {
+            ensureGateOption(e.gate_id);
+          });
+          renderRows(data.events || []);
+        })
+        .catch(function (err) {
+          showAosv3Toast(err.message || String(err));
+        });
+    }
+
+    function bind(el, ev, fn) {
+      if (el) el.addEventListener(ev, fn);
+    }
+
+    bind(filterDomain, "change", renderTable);
+    bind(filterGate, "change", renderTable);
+    bind(filterType, "change", renderTable);
+    bind(filterActor, "input", renderTable);
+    bind(filterRunId, "input", renderTable);
+    bind(limitEl, "change", renderTable);
+    bind(orderEl, "change", renderTable);
+    bind(offsetEl, "change", renderTable);
+
+    bind(prevBtn, "click", function () {
+      var limit = parseInt(limitEl && limitEl.value, 10) || 50;
+      if (limit > 200) limit = 200;
+      var off = parseInt(offsetEl && offsetEl.value, 10) || 0;
+      off = Math.max(0, off - limit);
+      if (offsetEl) offsetEl.value = String(off);
+      renderTable();
+    });
+    bind(nextBtn, "click", function () {
+      var limit = parseInt(limitEl && limitEl.value, 10) || 50;
+      if (limit > 200) limit = 200;
+      var off = parseInt(offsetEl && offsetEl.value, 10) || 0;
+      off += limit;
+      if (offsetEl) offsetEl.value = String(off);
+      renderTable();
+    });
+
+    if (runSelect && runSelect.options.length === 0) {
+      var place = document.createElement("option");
+      place.value = "";
+      place.textContent = "(loading runs…)";
+      runSelect.appendChild(place);
+      AOSV3_apiJson("/api/runs?limit=100&offset=0")
+        .then(function (d) {
+          runSelect.innerHTML = "";
+          var o0 = document.createElement("option");
+          o0.value = "";
+          o0.textContent = "(all runs)";
+          runSelect.appendChild(o0);
+          (d.runs || []).forEach(function (r) {
+            var opt = document.createElement("option");
+            opt.value = r.run_id;
+            opt.textContent =
+              runUlidSuffix(r.run_id) +
+              " · " +
+              esc(r.work_package_id || "") +
+              " · " +
+              esc(r.status || "");
+            runSelect.appendChild(opt);
+          });
+        })
+        .catch(function () {
+          runSelect.innerHTML = "";
+          var o0 = document.createElement("option");
+          o0.value = "";
+          o0.textContent = "(all runs)";
+          runSelect.appendChild(o0);
+        });
+    }
+    if (runApply && filterRunId) {
+      runApply.addEventListener("click", function () {
+        filterRunId.value = runSelect ? runSelect.value : "";
+        renderTable();
+      });
+    }
+
+    var qRun = "";
+    try {
+      qRun = new URLSearchParams(window.location.search).get("run_id") || "";
+    } catch (e1) {
+      qRun = "";
+    }
+    if (qRun && filterRunId) filterRunId.value = qRun;
+
+    renderTable();
+  }
+
   function initHistoryPage() {
+    if (!aosv3UseMock()) {
+      initHistoryPageLive();
+      return;
+    }
     var tbody = document.getElementById("aosv3-history-tbody");
     var totalEl = document.getElementById("aosv3-history-total");
     var filterDomain = document.getElementById("aosv3-filter-domain");
@@ -2200,7 +2841,70 @@ status: MOCKUP
     renderTable();
   }
 
+  function initConfigPageLive() {
+    if (typeof AOSV3_apiJson !== "function") {
+      showAosv3Toast("Load api-client.js before app.js");
+      return;
+    }
+    Promise.all([
+      AOSV3_apiJson("/api/routing-rules"),
+      AOSV3_apiJson("/api/policies"),
+      AOSV3_apiJson("/api/templates"),
+    ])
+      .then(function (pack) {
+        var rr = pack[0].routing_rules || [];
+        var policies = pack[1].policies || [];
+        var templates = pack[2].templates || [];
+        MOCK_ROUTING.routing_rules = rr.map(function (r) {
+          return {
+            id: r.id,
+            gate_id: r.gate_id,
+            phase_id: r.phase_id,
+            domain_id: r.domain_id,
+            variant: r.variant,
+            role_id: r.role_id,
+            priority: r.priority,
+          };
+        });
+        MOCK_POLICIES.policies = policies.map(function (p) {
+          var v = p.policy_value_json;
+          if (v != null && typeof v === "object") v = JSON.stringify(v);
+          return {
+            policy_key: p.policy_key,
+            scope_type: p.scope_type,
+            policy_value_json: typeof v === "string" ? v : String(v),
+          };
+        });
+        MOCK_TEMPLATES.templates = templates.map(function (t) {
+          var ia = t.is_active;
+          var active = ia === 1 || ia === "1" || ia === true;
+          return {
+            id: t.id,
+            name: t.name || t.id,
+            gate_id: t.gate_id,
+            phase_id: t.phase_id,
+            domain_id: t.domain_id,
+            version: t.version != null ? t.version : 1,
+            is_active: active,
+            body_markdown: t.body_markdown || "",
+          };
+        });
+        window.__aosv3ConfigPrefetched = true;
+        initConfigPage();
+      })
+      .catch(function (e) {
+        showAosv3Toast(e.message || String(e));
+      });
+  }
+
   function initConfigPage() {
+    if (!aosv3UseMock()) {
+      if (!window.__aosv3ConfigPrefetched) {
+        initConfigPageLive();
+        return;
+      }
+      window.__aosv3ConfigPrefetched = false;
+    }
     var tabs = document.querySelectorAll(".aosv3-tab");
     var panels = document.querySelectorAll(".aosv3-tab-panel");
 
@@ -2386,9 +3090,9 @@ status: MOCKUP
     );
     lines.push("Status: " + MOCK_STATE_ACTIVE.status);
     lines.push(
-      team.is_current_actor
-        ? "Assignment: You are the CURRENT ACTOR"
-        : "Assignment: Not the current actor for this mock run."
+      team.has_active_assignment
+        ? "Assignment: Active"
+        : "Assignment: None"
     );
     var recent = recentEventsForActor(team.team_id, 5);
     lines.push(
@@ -2439,10 +3143,46 @@ status: MOCKUP
 
   function buildTeamL4(team) {
     if (team.team_id === "team_61") return TEAM61_L4;
-    return "Not current actor.";
+    return "No Layer 4 task in this mock.";
+  }
+
+  function initTeamsPageLive() {
+    if (typeof AOSV3_apiJson !== "function") {
+      showAosv3Toast("Load api-client.js before app.js");
+      return;
+    }
+    AOSV3_apiJson("/api/teams")
+      .then(function (d) {
+        MOCK_TEAMS.teams = (d.teams || []).map(function (t) {
+          return {
+            team_id: t.team_id,
+            label: t.label,
+            name: t.name,
+            engine: t.engine,
+            group: t.group,
+            profession: t.profession,
+            domain_scope: t.domain_scope,
+            parent_team_id: t.parent_team_id,
+            children: t.children || [],
+            has_active_assignment: !!t.has_active_assignment,
+          };
+        });
+        window.__aosv3TeamsPrefetched = true;
+        initTeamsPage();
+      })
+      .catch(function (e) {
+        showAosv3Toast(e.message || String(e));
+      });
   }
 
   function initTeamsPage() {
+    if (!aosv3UseMock()) {
+      if (!window.__aosv3TeamsPrefetched) {
+        initTeamsPageLive();
+        return;
+      }
+      window.__aosv3TeamsPrefetched = false;
+    }
     var listEl = document.getElementById("aosv3-team-list");
     var ctxEl = document.getElementById("aosv3-team-context");
     var detailEl = document.getElementById("aosv3-team-detail");
@@ -2473,7 +3213,7 @@ status: MOCKUP
     }
 
     function filterTeam(t) {
-      if (curOnly && curOnly.checked && !t.is_current_actor) return false;
+      if (curOnly && curOnly.checked && !t.has_active_assignment) return false;
       var g = grp ? grp.value : "all";
       if (g === "aos") {
         if (t.group !== "x1_aos" && t.group !== "cross_domain") return false;
@@ -2606,11 +3346,6 @@ status: MOCKUP
           ? '<span class="aosv3-status-badge aosv3-status--in_progress">yes</span>'
           : '<span class="aosv3-status-badge aosv3-status--idle">no</span>') +
         "</dd>" +
-        "<dt>is_current_actor</dt><dd>" +
-        (team.is_current_actor
-          ? '<span class="aosv3-status-badge aosv3-status--in_progress">yes</span>'
-          : '<span class="aosv3-status-badge aosv3-status--idle">no</span>') +
-        "</dd>" +
         "</dl>";
     }
 
@@ -2624,16 +3359,37 @@ status: MOCKUP
         var tm = MOCK_TEAMS.teams.filter(function (x) {
           return x.team_id === id;
         })[0];
-        if (tm) {
-          var prev = tm.engine;
-          tm.engine = sel.value;
-          showAosv3Toast(
-            "Engine updated: " + id + " → " + sel.value + " (was " + prev + ")"
-          );
-          renderRoster();
-          renderDetail(tm);
-          renderContext(tm);
+        if (!tm) return;
+        var newEng = sel.value;
+        if (!aosv3UseMock()) {
+          if (typeof AOSV3_apiJson !== "function") return;
+          AOSV3_apiJson(
+            "/api/teams/" + encodeURIComponent(id) + "/engine",
+            {
+              method: "PUT",
+              body: JSON.stringify({ engine: newEng }),
+            }
+          )
+            .then(function () {
+              tm.engine = newEng;
+              showAosv3Toast("Engine persisted: " + id + " → " + newEng);
+              renderRoster();
+              renderDetail(tm);
+              renderContext(tm);
+            })
+            .catch(function (e) {
+              showAosv3Toast(e.message || String(e));
+            });
+          return;
         }
+        var prev = tm.engine;
+        tm.engine = newEng;
+        showAosv3Toast(
+          "Engine updated: " + id + " → " + newEng + " (was " + prev + ")"
+        );
+        renderRoster();
+        renderDetail(tm);
+        renderContext(tm);
       });
     }
 
@@ -2742,8 +3498,8 @@ status: MOCKUP
           "aosv3-team-row" +
           (t.team_id === selected ? " aosv3-team-row--selected" : "");
         btn.setAttribute("data-team-id", t.team_id);
-        var star = t.is_current_actor
-          ? '<span class="aosv3-team-row-star" title="current actor">★</span>'
+        var star = t.has_active_assignment
+          ? '<span class="aosv3-team-row-star" title="active assignment">★</span>'
           : "";
         var dot = t.has_active_assignment
           ? '<span class="aosv3-assign-dot aosv3-assign-dot--on" title="assignment"></span>'
@@ -2781,7 +3537,89 @@ status: MOCKUP
     renderRoster();
   }
 
+  function initPortfolioPageLive() {
+    if (typeof AOSV3_apiJson !== "function") {
+      showAosv3Toast("Load api-client.js before app.js");
+      return;
+    }
+    Promise.all([
+      AOSV3_apiJson(
+        "/api/runs?status=IN_PROGRESS,CORRECTION,PAUSED&limit=100&offset=0"
+      ),
+      AOSV3_apiJson("/api/runs?status=COMPLETE&limit=100&offset=0"),
+      AOSV3_apiJson("/api/work-packages"),
+      AOSV3_apiJson("/api/ideas?limit=200&offset=0"),
+    ])
+      .then(function (p) {
+        MOCK_PORTFOLIO_ACTIVE = {
+          total: p[0].total,
+          runs: p[0].runs || [],
+        };
+        MOCK_PORTFOLIO_COMPLETED = {
+          runs: (p[1].runs || []).map(function (r) {
+            return {
+              run_id: r.run_id,
+              work_package_id: r.work_package_id,
+              domain_id: r.domain_id,
+              status: r.status,
+              current_gate_id: r.current_gate_id,
+              current_phase_id: r.current_phase_id,
+              correction_cycle_count: r.correction_cycle_count,
+              started_at: r.started_at || "",
+              completed_at: r.completed_at || "",
+              gates_completed: "—",
+            };
+          }),
+        };
+        MOCK_WORK_PACKAGES = {
+          work_packages: (p[2].work_packages || []).map(function (w) {
+            return {
+              wp_id: w.wp_id,
+              label: w.label,
+              domain_id: w.domain_id,
+              status: w.status,
+              linked_run_id: w.linked_run_id,
+              linked_run_status: null,
+              current_gate_id: null,
+              current_phase_id: null,
+              linked_actor_team_id: null,
+              linked_run_started_at: null,
+              created_at: null,
+              updated_at: null,
+            };
+          }),
+        };
+        MOCK_IDEAS_SEED = (p[3].ideas || []).map(function (i) {
+          return {
+            idea_id: i.idea_id,
+            title: i.title,
+            description: i.description,
+            domain_id: i.domain_id || "agents_os",
+            idea_type: "FEATURE",
+            status: i.status,
+            priority: i.priority,
+            submitted_by: i.submitted_by,
+            submitted_at: i.submitted_at,
+            decision_notes: i.decision_notes,
+            target_program_id: i.target_program_id,
+          };
+        });
+        window.__aosv3PfPrefetched = true;
+        initPortfolioPage();
+      })
+      .catch(function (e) {
+        showAosv3Toast(e.message || String(e));
+      });
+  }
+
   function initPortfolioPage() {
+    if (!aosv3UseMock()) {
+      if (!window.__aosv3PfPrefetched) {
+        initPortfolioPageLive();
+        return;
+      }
+      window.__aosv3PfPrefetched = false;
+    }
     var ideas = MOCK_IDEAS_SEED.map(function (x) {
       return JSON.parse(JSON.stringify(x));
     });
@@ -3200,6 +4038,43 @@ status: MOCKUP
       btnSubmitNew.addEventListener("click", function () {
         var title = document.getElementById("aosv3-new-title").value.trim();
         if (!title) return;
+        if (!aosv3UseMock()) {
+          var dom = document.getElementById("aosv3-new-domain").value;
+          var pr = document.getElementById("aosv3-new-priority").value;
+          var desc = document
+            .getElementById("aosv3-new-description")
+            .value.trim();
+          AOSV3_apiJson("/api/ideas", {
+            method: "POST",
+            body: JSON.stringify({
+              title: title,
+              description: desc || null,
+              priority: pr,
+              domain_id: dom || null,
+            }),
+          })
+            .then(function (created) {
+              ideas.push({
+                idea_id: created.idea_id,
+                title: created.title,
+                description: created.description,
+                domain_id: dom || "agents_os",
+                idea_type: "FEATURE",
+                status: created.status,
+                priority: created.priority,
+                submitted_by: created.submitted_by,
+                submitted_at: created.submitted_at,
+                decision_notes: null,
+                target_program_id: null,
+              });
+              closeModal(modalNew);
+              renderIdeas();
+            })
+            .catch(function (e) {
+              showAosv3Toast(e.message || String(e));
+            });
+          return;
+        }
         ideas.push({
           idea_id: "01JRNEW" + String(Date.now()).slice(-10),
           title: title,
@@ -3250,6 +4125,43 @@ status: MOCKUP
             return x.idea_id === id;
           })[0];
           if (!idea) return;
+          if (!aosv3UseMock()) {
+            var patch = {
+              title: document.getElementById("aosv3-edit-title").value.trim(),
+              description: document.getElementById("aosv3-edit-description")
+                .value,
+              priority: document.getElementById("aosv3-edit-priority").value,
+              status: idea.status,
+              decision_notes: document.getElementById("aosv3-edit-notes").value,
+            };
+            if (idea.status === "APPROVED") {
+              patch.target_program_id =
+                document
+                  .getElementById("aosv3-edit-target-program")
+                  .value.trim() || null;
+            }
+            AOSV3_apiJson("/api/ideas/" + encodeURIComponent(id), {
+              method: "PUT",
+              body: JSON.stringify(patch),
+            })
+              .then(function (updated) {
+                if (updated.title != null) idea.title = updated.title;
+                if (updated.description !== undefined)
+                  idea.description = updated.description;
+                if (updated.priority != null) idea.priority = updated.priority;
+                if (updated.status != null) idea.status = updated.status;
+                if (updated.decision_notes !== undefined)
+                  idea.decision_notes = updated.decision_notes;
+                if (updated.target_program_id !== undefined)
+                  idea.target_program_id = updated.target_program_id;
+                closeModal(modalEdit);
+                renderIdeas();
+              })
+              .catch(function (e) {
+                showAosv3Toast(e.message || String(e));
+              });
+            return;
+          }
           idea.title = document.getElementById("aosv3-edit-title").value.trim();
           idea.description = document.getElementById(
             "aosv3-edit-description"
@@ -3337,6 +4249,66 @@ status: MOCKUP
     renderIdeas();
   }
 
+  function teardownFlowLiveTransport() {
+    if (flowLivePollTimer) {
+      clearInterval(flowLivePollTimer);
+      flowLivePollTimer = null;
+    }
+    if (flowLiveEs) {
+      try {
+        flowLiveEs.close();
+      } catch (eft) {
+        /* ignore */
+      }
+      flowLiveEs = null;
+    }
+  }
+
+  function initFlowPage() {
+    if (aosv3UseMock()) return;
+    if (typeof AOSV3_buildEventStreamUrl !== "function") return;
+    flowPageTransportState = {
+      run_id: "_flow_",
+      status: "IN_PROGRESS",
+      sse_connected: false,
+    };
+    function refreshChip() {
+      renderSseIndicator(flowPageTransportState);
+    }
+    teardownFlowLiveTransport();
+    refreshChip();
+    var dom = getPipelineViewDomain();
+    try {
+      var es = new EventSource(
+        AOSV3_buildEventStreamUrl({ domain_id: dom })
+      );
+      flowLiveEs = es;
+      es.onopen = function () {
+        flowPageTransportState.sse_connected = true;
+        refreshChip();
+      };
+      es.onerror = function () {
+        flowPageTransportState.sse_connected = false;
+        refreshChip();
+      };
+      es.addEventListener("heartbeat", function () {
+        flowPageTransportState.sse_connected = true;
+        refreshChip();
+      });
+    } catch (eft2) {
+      flowPageTransportState.sse_connected = false;
+      refreshChip();
+    }
+    flowLivePollTimer = setInterval(function () {
+      if (typeof AOSV3_apiFetch === "function") {
+        AOSV3_apiFetch("/api/health", {
+          method: "GET",
+          skipActorHeader: true,
+        }).catch(function () {});
+      }
+    }, 15000);
+  }
+
   function boot() {
     var page = document.body.getAttribute("data-aosv3-page");
     if (page === "pipeline") initPipelinePage();
@@ -3344,6 +4316,7 @@ status: MOCKUP
     else if (page === "config") initConfigPage();
     else if (page === "teams") initTeamsPage();
     else if (page === "portfolio") initPortfolioPage();
+    else if (page === "flow") initFlowPage();
   }
 
   if (document.readyState === "loading") {

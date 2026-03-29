@@ -3,7 +3,7 @@
 
 **project_domain:** AGENTS_OS  
 **owner:** Team 170 (Governance Documentation)  
-**date:** 2026-03-28  
+**date:** 2026-03-29  
 **status:** Active — canonical entry point per TEAM_00_TO_TEAM_170_AGENTS_OS_DOCS_MANDATE_v2.0.0 (v3 index § Agents OS v3)
 
 ---
@@ -33,6 +33,8 @@
 | **v3 Ports & `/` entry (LOCKED)** | [AGENTS_OS_V3_NETWORK_PORTS_AND_UI_ENTRY_v1.0.0.md](02-ARCHITECTURE/AGENTS_OS_V3_NETWORK_PORTS_AND_UI_ENTRY_v1.0.0.md) | Active — 2026-03-28 |
 | v3 Developer Runbook | [AGENTS_OS_V3_DEVELOPER_RUNBOOK.md](04-PROCEDURES/AGENTS_OS_V3_DEVELOPER_RUNBOOK.md) | Active — Team 71 |
 | v3 Templates | [AGENTS_OS_V3_LOCAL_VALIDATION_CHECKLIST.md](05-TEMPLATES/AGENTS_OS_V3_LOCAL_VALIDATION_CHECKLIST.md) (+ [05-TEMPLATES/](05-TEMPLATES/) index) | Active — Team 71 |
+
+**Post–UI-fix alignment (2026-03-29):** Team **170** canonical promotion pass — v2 UI port **8092**, v3 UI served from FastAPI **8090** (`/`, `/v3/*`), Runbook §7.2 documents UI `localStorage` key **`aosv3_ui_data_scope`**. Team **71** may perform editorial pass on long-form prose.
 
 **Traceability:** `_COMMUNICATION/team_100/TEAM_100_AOS_V3_BUILD_DOCUMENTATION_CANONICAL_DIRECTIVE_3B_v1.0.0.md`
 
@@ -163,3 +165,4 @@ Per [TEAM_170_AGENTS_OS_DOCUMENTATION_STATE_AND_WORK_PLAN_OPTIONS §2](../../_CO
 **log_entry | TEAM_170 | AGENTS_OS_MASTER_INDEX | EVENT_LOG_REFERENCE_ADDED | 2026-03-10**
 **log_entry | TEAM_11 | AOS_V3_BUILD | MASTER_INDEX_V3_SECTION_3B | SYNC | 2026-03-28**
 **log_entry | TEAM_71 | AOS_V3 | GATE_DOC_PHASE_B | MASTER_INDEX_V3_ACTIVE | 2026-03-28**
+**log_entry | TEAM_170 | AOS_V3 | CANONICAL_PROMOTION | MASTER_INDEX_ALIGNMENT_NOTE | 2026-03-29**

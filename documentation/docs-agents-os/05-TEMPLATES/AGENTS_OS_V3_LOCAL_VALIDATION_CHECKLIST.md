@@ -3,7 +3,7 @@
 
 **project_domain:** AGENTS_OS  
 **owner:** Team 71 (AOS Documentation)  
-**date:** 2026-03-28  
+**date:** 2026-03-29  
 **status:** Active — working template for operators / QA
 
 **Traceability:** Directive 3B · Team 11 → Team 71 GATE_DOC Phase B mandate (2026-03-28)
@@ -39,6 +39,7 @@ Copy this section into a dated evidence note under `_COMMUNICATION/team_<id>/` w
 
 - [ ] `bash agents_os_v3/ui/run_preflight.sh` exits 0
 - [ ] With API up: `AOS_V3_API_BASE=http://127.0.0.1:<PORT> bash agents_os_v3/ui/run_preflight.sh` exits 0
+- [ ] (Optional) In DevTools → Application → Local Storage: key **`aosv3_ui_data_scope`** set to **`all`**, **`agents_os`**, or **`tiktrack`**; lists respect scope (see Runbook §7.2)
 
 ## Governance (on branch `aos-v3`)
 
@@ -56,3 +57,4 @@ Copy this section into a dated evidence note under `_COMMUNICATION/team_<id>/` w
 ---
 
 **log_entry | TEAM_71 | AOS_V3 | GATE_DOC_PHASE_B | TEMPLATE_VALIDATION | 2026-03-28**
+**log_entry | TEAM_170 | AOS_V3 | CANONICAL_PROMOTION | CHECKLIST_UI_DATA_SCOPE | 2026-03-29**

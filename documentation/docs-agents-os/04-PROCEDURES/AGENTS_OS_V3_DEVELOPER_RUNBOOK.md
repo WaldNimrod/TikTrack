@@ -3,7 +3,7 @@
 
 **project_domain:** AGENTS_OS  
 **owner:** Team 71 (AOS Documentation)  
-**date:** 2026-03-28  
+**date:** 2026-03-29  
 **status:** Active
 
 **Traceability:** Directive 3B · Team 11 → Team 71 GATE_DOC Phase B mandate (2026-03-28)
@@ -152,6 +152,10 @@ AOS_V3_E2E_RUN=1 python3 -m pytest agents_os_v3/tests/e2e/ -v
 
 Details: `agents_os_v3/tests/e2e/README.md`. Stop static HTTP: `bash scripts/stop_aos_v3_e2e_static.sh`.
 
+### 7.2 UI data domain scope (browser `localStorage`)
+
+The Pipeline UI filters some lists (teams, history, portfolio) by **data domain**. Implementation: `agents_os_v3/ui/app.js` — key **`aosv3_ui_data_scope`**. Allowed values: **`all`** (default), **`agents_os`**, **`tiktrack`**. Team **71** may refine narrative; behavior is defined in code.
+
 ---
 
 ## 8. Dual-domain DB connectivity check
@@ -206,3 +210,4 @@ It does **not** modify **`canary-simulation-tests.yml`** (Agents OS v2). Browser
 ---
 
 **log_entry | TEAM_71 | AOS_V3 | GATE_DOC_PHASE_B | DEVELOPER_RUNBOOK | 2026-03-28**
+**log_entry | TEAM_170 | AOS_V3 | CANONICAL_PROMOTION | UI_DATA_SCOPE_LOCALSTORAGE | 2026-03-29**

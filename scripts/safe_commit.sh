@@ -18,6 +18,7 @@
 # Environment:
 #   PIPELINE_ACTION_LOG=0   — disable action log entry for this commit
 #   SKIP_SSOT_CHECK=1       — skip SSOT check (for emergency use only; logs a warning)
+#   SAFE_COMMIT_FORCE_SSOT=1 — on branch aos-v3, run SSOT anyway (default: skip SSOT on aos-v3)
 
 set -euo pipefail
 
@@ -63,8 +64,12 @@ echo -e "${C_BOLD}${C_CYAN}═════════════════�
 echo ""
 
 # ── Step 1: SSOT check ────────────────────────────────────────────────────────
+CURRENT_BRANCH_SC="$(git branch --show-current 2>/dev/null || echo "")"
 if [[ "${SKIP_SSOT_CHECK:-0}" == "1" ]]; then
   echo -e "  ${C_YELLOW}⚠️  SKIP_SSOT_CHECK=1 — bypassing SSOT check (emergency mode)${C_RESET}"
+elif [[ "$CURRENT_BRANCH_SC" == "aos-v3" && "${SAFE_COMMIT_FORCE_SSOT:-0}" != "1" ]]; then
+  echo -e "  ${C_YELLOW}⚠️  Branch is aos-v3 — SSOT check skipped (branch may diverge from main WSM).${C_RESET}"
+  echo -e "  ${C_YELLOW}    To run SSOT anyway: SAFE_COMMIT_FORCE_SSOT=1 bash scripts/safe_commit.sh ...${C_RESET}"
 else
   echo -e "  ${C_CYAN}[1/3] SSOT consistency check...${C_RESET}"
   SSOT_FAIL=0

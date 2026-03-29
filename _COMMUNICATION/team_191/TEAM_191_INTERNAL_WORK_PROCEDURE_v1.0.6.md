@@ -1,11 +1,11 @@
-# TEAM 191 INTERNAL WORK PROCEDURE v1.0.5
+# TEAM 191 INTERNAL WORK PROCEDURE v1.0.6
 
 **project_domain:** SHARED (TIKTRACK + AGENTS_OS)
-**id:** TEAM_191_INTERNAL_WORK_PROCEDURE_v1.0.5
+**id:** TEAM_191_INTERNAL_WORK_PROCEDURE_v1.0.6
 **owner:** Team 191 (child team of Team 190)
 **date:** 2026-03-29
-**status:** SUPERSEDED — use **`TEAM_191_INTERNAL_WORK_PROCEDURE_v1.0.6.md`**
-**supersedes:** `TEAM_191_INTERNAL_WORK_PROCEDURE_v1.0.4.md`
+**status:** ACTIVE
+**supersedes:** `TEAM_191_INTERNAL_WORK_PROCEDURE_v1.0.5.md`
 **authority_source:** `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md`
 
 ---
@@ -89,6 +89,11 @@ Every Team 191 closure note must include:
 4. Keep remediation minimal, reversible, and evidence-backed.
 5. Use exact dates in every new canonical message.
 6. Never auto-remediate content violations in `PROCESS-FUNCTIONAL-SEPARATION` lane; report exact `file:line` and block only.
+7. **IRON RULE — `agents_os_v3` pytest (Team 00 canonical feedback 2026-03-29):**
+   - Every full run of `agents_os_v3/tests/` for Team 191 sign-off **must** set:
+     `AOS_V3_E2E_RUN=1` and `AOS_V3_E2E_HEADLESS=1`.
+   - **"Green full"** for this suite = **141 passed, 0 skipped, 0 failed** only.
+   - Outcomes such as `107 passed, 22 skipped` are **NOT PASS** — must be reported as partial.
 
 ---
 
@@ -268,6 +273,8 @@ git status
 **Operational wrapper (mandatory default for guarded commits):** `bash scripts/safe_commit.sh "<message>" <path1> [path2] ...`
 Dry-run (guards + `git status` only): `bash scripts/safe_commit.sh`
 
+**ענף `aos-v3` — SSOT:** ב-`scripts/safe_commit.sh`, כאשר `git branch --show-current` הוא `aos-v3`, בדיקת SSOT (שלב 1) **מדולגת** אוטומטית (הענף אינו תמיד מסונכרן עם WSM הראשי). עדיין ניתן לאלץ בדיקה עם `SAFE_COMMIT_FORCE_SSOT=1`. על `main` / ענפים אחרים — SSOT נשאר חוסם כרגיל (או `SKIP_SSOT_CHECK=1` למצבי חירום).
+
 ---
 
 ## §COMMIT
@@ -299,6 +306,7 @@ Subject lines and process-ID rules: see **§11) Process-ID Title Lock**.
 7. Commit subject lock:
    - default: `<PROCESS_ID>: Team 191 — <context>`
    - with payload: `<PROCESS_ID>: <payload>`
+   - When AOS v3 commits occur during an active tiktrack pipeline run (states `IN_PROGRESS`, `CORRECTION`, `PAUSED`), append suffix last: `<PROCESS_ID>: <description> [run: <8chars>]` — see §15.5 and `scripts/suggest_run_suffix.sh`.
 8. Push report / handoff headline lock:
    - default: `<PROCESS_ID>: Team 191 Push Report`
    - with payload: `<PROCESS_ID>: <payload>`
@@ -404,7 +412,7 @@ Subject lines and process-ID rules: see **§11) Process-ID Title Lock**.
 
 עבודה על `main` / TikTrack / מסלולים שאינם AOS v3: §10 נשאר כפי שהוא; אכיפת FREEZE על `agents_os_v2/` ו־FILE_INDEX ל־`agents_os_v3/` חלה על **כל קומיט** שיגע בנתיבים אלה (Iron Rule).
 
-### 15.4 FILE_INDEX auto-update procedure (v1.0.5 — binding)
+### 15.4 FILE_INDEX auto-update procedure (v1.0.6 — binding)
 
 **בעיה:** כל קובץ חדש ב-`agents_os_v3/` שלא נרשם ב-`FILE_INDEX.json` חוסם commit בגלל governance hook.
 
@@ -422,29 +430,45 @@ python3 scripts/update_aos_v3_file_index.py
 bash scripts/check_aos_v3_build_governance.sh  # → PASS
 ```
 
-**Pre-commit hook (non-blocking):** hook `phoenix-aos-v3-file-index-auto-update` ב-`.pre-commit-config.yaml` מריץ את הסקריפט אוטומטית כשיש שינויים ב-Python files. אם מוסיף entries — יש לעיין בהם ולהוסיפם ל-staging לפני commit.
+**Pre-commit hook (non-blocking):** hook `phoenix-aos-v3-file-index-auto-update` ב-`.pre-commit-config.yaml` מריץ את הסקריפט כאשר קבצים תחת `agents_os_v3/` נכללים בקומיט (מסנן `files: '^agents_os_v3/'` — **לא** מוגבל ל-`types: python`). אם הסקריפט מוסיף entries — יש לעיין בהם ולהוסיף את `agents_os_v3/FILE_INDEX.json` ל-staging לפני commit.
 
 **הגבלות:**
 - הסקריפט מוסיף רק stub entries (`status: NEW`, `spec_ref: AUTO`).
 - יש לעדכן ידנית `spec_ref`, `owner_team`, `added_in_gate` בכל entry שנוסף.
 - הסקריפט לא מסיר entries ישנים — מחיקה ידנית בלבד.
 
-### 15.5 Active Run commit convention (v1.0.5 — binding)
+### 15.5 Active Run commit convention (v1.0.6 — binding)
 
-**כלל:** כל commit שמשנה `agents_os_v3/` בזמן ריצה פעילה של pipeline (סטטוס `IN_PROGRESS` / `CORRECTION` / `PAUSED`) חייב לכלול suffix ב-subject:
+**כלל:** commit שמשנה `agents_os_v3/` בזמן שדומיין **tiktrack** במצב `IN_PROGRESS` / `CORRECTION` / `PAUSED` צריך suffix אחרון בשורת הנושא:
 
 ```
 [run: <run_id_prefix_8_chars>]
 ```
 
+**פורמט קנוני מול §11:** `<PROCESS_ID>: <תיאור> [run: <8chars>]` (ה-suffix תמיד אחרון).
+
 **דוגמה:**
 ```
-AOS v3: fix domain slug resolution [run: 01KMX6Q8]
+S003_P005_GATE_0: AOS v3 fix domain slug resolution [run: 01KMX6Q8]
 ```
 
-**מטרה:** traceability — קישור בין commit לבין הריצה שבמהלכה בוצע.
+**מקור אמת לזיהוי מקומי (לא GET):** `_COMMUNICATION/agents_os/pipeline_state_tiktrack.json` — ראה החלטות מלאות ב-`_COMMUNICATION/team_00/TEAM_00_TO_TEAM_191_SECTION_15_5_ARCHITECTURAL_ANSWERS_v1.0.0.md`.
 
-**אכיפה:** לא אוטומטית — Team 191 מוסיף ידנית לפי `GET /api/state?domain_id=tiktrack` → `run_id`.
+**עזר:** `bash scripts/suggest_run_suffix.sh` — מדפיס את ה-suffix המוצע (או כלום אם אין ריצה פעילה / קובץ חסר).
+
+**אכיפה:** לא חוסמת אוטומטית. **Advisory (opt-in):** ניתן להתקין hook מקומי — ראו `scripts/git-hooks/README.md` (העתקה ל-`.git/hooks/prepare-commit-msg`).
+
+**משוב קנוני:** `_COMMUNICATION/team_191/TEAM_00_TO_TEAM_191_CANONICAL_FEEDBACK_v1.0.0.md`.
+
+### 15.6 אימות pytest מלא ל-`agents_os_v3` (binding)
+
+כל אישור Team 191 על "ירוק מלא" לסוויט `agents_os_v3/tests/` חייב לכלול ריצה עם:
+
+```bash
+AOS_V3_E2E_RUN=1 AOS_V3_E2E_HEADLESS=1 PYTHONPATH=. python3 -m pytest agents_os_v3/tests/ -q
+```
+
+**ציפייה:** `141 passed` — **אין** דילוג על 22 בדיקות E2E. קובץ טסט חדש חייב `pytest <path> -v --tb=short` עם 0 failed לפני קומיט.
 
 ---
 
@@ -459,3 +483,4 @@ AOS v3: fix domain slug resolution [run: 01KMX6Q8]
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | PRE_COMMIT_GUARD_SAFE_COMMIT_MANDATE_TEAM100 | 2026-03-24**
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | AOS_V3_OVERLAY_SECTION_15_v1_0_4 | 2026-03-27**
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | FILE_INDEX_AUTO_UPDATE_AND_RUN_SUFFIX_CONVENTION_v1_0_5 | 2026-03-29**
+**log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | v1_0_6_FILE_INDEX_TRIGGER_E2E_141_SAFE_COMMIT_AOS_V3_SSOT | 2026-03-29**

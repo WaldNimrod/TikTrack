@@ -809,6 +809,14 @@
       "owner_team": "team_51",
       "added_in_gate": "GATE_4",
       "notes": "Team 191 FILE_INDEX sync — governance check"
+    },
+    {
+      "path": "agents_os_v3/tests/test_update_aos_v3_file_index.py",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
     }
   ]
 }

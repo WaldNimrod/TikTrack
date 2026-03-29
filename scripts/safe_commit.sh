@@ -183,6 +183,38 @@ if [[ "$UNLOCK_PIPELINE" != "1" ]]; then
   fi
 fi
 
+# ── AOS v3 FILE_INDEX auto-update (§15.4) ────────────────────────────────────
+# If any of the paths touch agents_os_v3/ (but not FILE_INDEX.json itself),
+# run update_aos_v3_file_index.py to auto-stub any new files, then prompt
+# the operator to stage FILE_INDEX.json if it changed.
+_AOS_PATHS_FOUND=0
+for _p in "$@"; do
+  if [[ "$_p" == agents_os_v3/* && "$_p" != "agents_os_v3/FILE_INDEX.json" ]]; then
+    _AOS_PATHS_FOUND=1
+    break
+  fi
+done
+
+if [[ "$_AOS_PATHS_FOUND" -eq 1 ]]; then
+  echo -e "  ${C_CYAN}[§15.4] agents_os_v3/ paths detected — running FILE_INDEX auto-update...${C_RESET}"
+  _INDEX_BEFORE=$(python3 -c "import json,pathlib; d=json.loads(pathlib.Path('agents_os_v3/FILE_INDEX.json').read_text()); print(len(d.get('entries',[])))" 2>/dev/null || echo "?")
+  python3 scripts/update_aos_v3_file_index.py
+  _INDEX_AFTER=$(python3 -c "import json,pathlib; d=json.loads(pathlib.Path('agents_os_v3/FILE_INDEX.json').read_text()); print(len(d.get('entries',[])))" 2>/dev/null || echo "?")
+  if [[ "$_INDEX_BEFORE" != "$_INDEX_AFTER" ]]; then
+    echo ""
+    echo -e "  ${C_YELLOW}⚠️  FILE_INDEX.json was updated (${_INDEX_BEFORE} → ${_INDEX_AFTER} entries).${C_RESET}"
+    echo -e "  ${C_YELLOW}   Add it to your commit paths: agents_os_v3/FILE_INDEX.json${C_RESET}"
+    echo -e "  ${C_YELLOW}   Remember to set spec_ref + owner_team on new stubs before committing.${C_RESET}"
+    echo ""
+    # Auto-add FILE_INDEX.json to the staged set so the blocking governance hook passes
+    git add agents_os_v3/FILE_INDEX.json
+    echo -e "  ${C_GREEN}   Auto-staged agents_os_v3/FILE_INDEX.json${C_RESET}"
+    echo ""
+  else
+    echo -e "  ${C_GREEN}✓ FILE_INDEX.json up to date — no new entries needed${C_RESET}"
+  fi
+fi
+
 # ── Commit ────────────────────────────────────────────────────────────────────
 echo -e "  ${C_CYAN}Adding paths:${C_RESET} $*"
 git add "$@"

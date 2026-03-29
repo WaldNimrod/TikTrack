@@ -28,7 +28,7 @@ repos:
         pass_filenames: false
         stages: [pre-commit]
         always_run: false
-        types: [python]
+        files: '^agents_os_v3/'
 
       - id: phoenix-aos-v3-file-index-v2-freeze
         name: "AOS v3 — FILE_INDEX + agents_os_v2 FREEZE [BLOCKING when staged]"

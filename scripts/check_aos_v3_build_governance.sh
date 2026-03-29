@@ -50,7 +50,12 @@ fi
 
 LIST="$(mktemp)"
 trap 'rm -f "$LIST"' EXIT
-find agents_os_v3 -type f ! -path '*/node_modules/*' 2>/dev/null | sort >"$LIST"
+# Exclude local secrets and runtime state (never listed in FILE_INDEX.json; tests may create pipeline_state.json).
+find agents_os_v3 -type f \
+  ! -path '*/node_modules/*' \
+  ! -path 'agents_os_v3/.env' \
+  ! -path 'agents_os_v3/pipeline_state.json' \
+  2>/dev/null | sort >"$LIST"
 
 export ROOT LIST
 if ! python3 <<'PY'

@@ -43,17 +43,19 @@ def test_http_health_no_db() -> None:
     assert r.json().get("status") == "ok"
 
 
-def test_http_root_serves_v3_index_at_slash() -> None:
-    """Browser entry stays ``http://127.0.0.1:8090/`` (no redirect to /v3/...)."""
+def test_http_root_redirects_to_v3_mount() -> None:
+    """``GET /`` returns 302 to ``/v3/`` so HTML is served with correct relative asset URLs."""
     client = TestClient(create_app())
     r = client.get("/", follow_redirects=False)
-    assert r.status_code == 200
-    ct = r.headers.get("content-type", "")
+    assert r.status_code == 302
+    assert r.headers.get("location") == "/v3/"
+    r2 = client.get("/v3/", follow_redirects=False)
+    assert r2.status_code == 200
+    ct = r2.headers.get("content-type", "")
     assert "text/html" in ct
-    assert b"Agents OS v3" in r.content
-    # v3 HTML uses ``./`` (repo-relative + /v3/ mount); legacy ``/v3/`` base also accepted.
+    assert b"Agents OS v3" in r2.content
     assert (
-        b'<base href="/v3/"' in r.content or b'<base href="./"' in r.content
+        b'<base href="/v3/"' in r2.content or b'<base href="./"' in r2.content
     )
 
 

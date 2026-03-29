@@ -1,9 +1,8 @@
 """
 AOS v3 HTTP surface — FastAPI application and routers.
 
-**Browser entry (canonical port 8090):** ``GET /`` serves ``index.html`` directly so the address bar stays ``/``; pages use ``<base href="/v3/">`` for asset and nav resolution under ``/v3/*``.
-Static UI is served from ``/v3/*`` (``agents_os_v3/ui``). Shared v2-era CSS paths
-``/agents_os/ui/*`` mount ``agents_os/ui`` so existing ``../../agents_os/ui/...`` links work.
+**Browser entry (canonical port 8090):** ``GET /`` redirects (302) to ``/v3/`` so the Pipeline UI and its static assets resolve under the ``/v3/*`` mount (``agents_os_v3/ui``).
+Shared v2-era CSS paths ``/agents_os/ui/*`` mount ``agents_os/ui`` so existing ``../../agents_os/ui/...`` links work.
 
 **Routers**
 
@@ -790,14 +789,8 @@ def create_app() -> FastAPI:
 
     @application.get("/", include_in_schema=False, response_model=None)
     async def aos_v3_root_index() -> Response:
-        """Serve Pipeline View at ``/`` so the browser URL stays ``http://127.0.0.1:8090/``."""
-        if _idx.is_file():
-            return FileResponse(
-                str(_idx),
-                media_type="text/html; charset=utf-8",
-                headers={"Cache-Control": "no-store"},
-            )
-        return RedirectResponse(url="/v3/index.html", status_code=302)
+        """Redirect root to canonical /v3/ entry point (assets resolve correctly there)."""
+        return RedirectResponse(url="/v3/", status_code=302)
 
     shared_ui = repo / "agents_os" / "ui"
     if v3_ui.is_dir():

@@ -1,4 +1,5 @@
 ---
+date: 2026-02-22
 **provenance:** Governance consolidation (Team 170)
 **source_path:** _COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_TABLES_REACT.md
 **canonical_path:** documentation/docs-governance/PHOENIX_CANONICAL/07-DIRECTIVES_AND_DECISIONS/ARCHITECT_DIRECTIVE_TABLES_REACT.md
@@ -10,7 +11,7 @@
 # 📡 הודעה: אדריכלית ראשית ← צוות 10, צוות 30, צוות 31 (React Tables Framework)
 **project_domain:** TIKTRACK
 
-**From:** Chief Architect (Gemini)
+**From:** System Designer (Gemini)
 **To:** Team 10 (The Gateway), Team 30 (Frontend), Team 31 (Blueprint)
 **Date:** 2026-02-01
 **Session:** SESSION_01 - Phase 1.5

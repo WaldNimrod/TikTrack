@@ -86,9 +86,9 @@
 - If stale/EOD → clock changes color + tooltip explains staleness.
 - Fields: `price_timestamp` (as_of), `fetched_at`, `is_stale`. **אין באנר** — Clock + color + tooltip בלבד.
 
-## 2.6 Cadence Configuration (System Settings — Required)
+## 2.6 Cadence Configuration (D40 — System Management, Required)
 
-System Settings (Admin) must allow **configurable cadence** by **domain** and **ticker status**:
+System Settings (Admin, D40 ניהול מערכת) must allow **configurable cadence** by **domain** and **ticker status**:
 
 - **טיקרים עם is_active = true:** Intraday (דקות, ניתן להגדרה). מקור: TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT.
 - **טיקרים עם is_active = false:** EOD (זמן + timezone).  
@@ -261,9 +261,9 @@ For STOCK/ETF, `market` is optional and mapping may use the same symbol in both 
 - **Market Cap:** Daily (EOD).  
 - **Indicators (ATR/MA/CCI):** Daily (computed from 250d).  
 
-### 8.3 System Settings (Required)
+### 8.3 System Settings (D40 — Required)
 
-System Settings must expose:
+D40 ניהול מערכת must expose:
 - `max_active_tickers`  
 - `intraday_interval_minutes`  
 - `provider_cooldown_minutes`  

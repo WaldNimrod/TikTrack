@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-24T20:04:30.969859+00:00",
+  "generated_at_utc": "2026-03-29T14:08:16.596010+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -158,8 +158,8 @@
       "program_name": "User Tickers (D33)",
       "domain": "TIKTRACK",
       "stage_id": "S003",
-      "status": "PLANNED",
-      "current_gate_mirror": "— (registered from integrated roadmap v1.1.0)"
+      "status": "ACTIVE",
+      "current_gate_mirror": "GATE_0 pending — Team 100 authorization 2026-03-25"
     },
     {
       "program_id": "S003-P005",
@@ -830,8 +830,8 @@
           "program_id": "S003-P004",
           "program_name": "User Tickers (D33)",
           "domain": "TIKTRACK",
-          "status": "PLANNED",
-          "current_gate_mirror": "— (registered from integrated roadmap v1.1.0)",
+          "status": "ACTIVE",
+          "current_gate_mirror": "GATE_0 pending — Team 100 authorization 2026-03-25",
           "work_packages": []
         },
         {

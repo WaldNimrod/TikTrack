@@ -1,15 +1,14 @@
 {
   "_meta": {
-    "roster_version": "1.0.0",
-    "last_updated": "2026-03-15",
+    "roster_version": "v1.6.0",
+    "last_updated": "2026-03-26-r2",
+    "changelog": "v1.3.0 — Full org taxonomy finalization: team_31 redefined (AOS Frontend); team_61 redefined (AOS DevOps); team_21 created (AOS Backend); team_71 created (AOS Documentation); team_101 domain→agents_os; team_102 parent→team_100; team_170+team_190 advisory role added. group+profession ENUMs added. Taxonomy canonical file: TEAM_TAXONOMY_v1.0.0.md\nv1.4.0 — Team 191 role expanded: file governance + archiving + WP_ARTIFACT_INDEX maintenance. profession → git_and_file_governance. Iron rules updated. 2026-03-26\nv1.5.0 — Roster IDs team_101→team_110, team_102→team_111 (hub §9). Artifact folders unchanged (_COMMUNICATION/team_101, team_102). Team 100 = Chief System Architect narrative. Gateway teams: pipeline owns routine state (hub §12). Taxonomy v1.0.1.\nv1.5.0 — team_101→team_110 (AOS Domain Architect), team_102→team_111 (TT Domain Architect). Per hub §9. D-03: team_00 DB row confirmed. 2026-03-26\nv1.6.0 — DOMAIN CONVENTION FIX: x0=TikTrack, x1=AOS. team_110→TikTrack Domain Architect (legacy=team_102); team_111→AOS Domain Architect (legacy=team_101). Stage 4 DDL mandate routes to team_111. 2026-03-26",
     "authority": "Team 00 — System Designer",
     "source_directive": "ARCHITECT_DIRECTIVE_TEAM_ROSTER_LOCK_v1.0.0.md",
     "note": "This is the SINGLE SOURCE OF TRUTH for all team definitions. The UI reads from this file directly. Do NOT maintain team data in pipeline-teams.js or pipeline-config.js beyond what is needed to bootstrap loading. All substantive definitions live here.",
     "update_rule": "Any change to team definitions MUST be made here first. pipeline-teams.js pulls from this file at runtime."
   },
-
   "teams": [
-
     {
       "id": "team_00",
       "label": "Team 00",
@@ -18,10 +17,14 @@
       "domain": "multi",
       "status": "ACTIVE",
       "in_gate_process": true,
+      "group": "leadership",
+      "profession": "principal",
       "layer_1_identity": {
         "role": "Dual-nature authority: (A) Product Principal — defines WHAT and WHY, gives requirements, sets vision; (B) Constitutional Architect — sets all Iron Rules, holds final approval. Nimrod is the Principal; the Claude Code session is the architectural advisory instrument.",
         "parent": null,
-        "children": ["team_100"],
+        "children": [
+          "team_100"
+        ],
         "model": "D+C Hybrid (locked 2026-03-15): Layer A = Constitutional (Iron Rules, GATE_7, override power — undelegatable); Layer B = Strategic (LOD200 approval, portfolio decisions); Layer C = Advisory (architectural analysis, presenting alternatives, surfacing risks — NOT deciding for the Principal)",
         "principal_clarification": "Nimrod does not author documents — he provides requirements and definitions. The architectural advisory role (Team 100/Claude) translates these needs into specifications co-developed WITH Nimrod. Architects must be: professional, source-based, honest without sycophancy, realistic, and present well-founded opinions with long-term systemic view."
       },
@@ -35,8 +38,15 @@
           "GATE_8": "awareness_only"
         },
         "can_override": "all_gates",
-        "writes_to": ["_COMMUNICATION/team_00/", "_COMMUNICATION/_Architects_Decisions/"],
-        "governed_by": ["CLAUDE.md", "PHOENIX_MASTER_SSM_v1.0.0.md", "03_IRON_RULES_AND_GOVERNANCE_CONSTITUTION.md"]
+        "writes_to": [
+          "_COMMUNICATION/team_00/",
+          "_COMMUNICATION/_Architects_Decisions/"
+        ],
+        "governed_by": [
+          "CLAUDE.md",
+          "PHOENIX_MASTER_SSM_v1.0.0.md",
+          "03_IRON_RULES_AND_GOVERNANCE_CONSTITUTION.md"
+        ]
       },
       "layer_3_knowledge": {
         "mandatory_reads_on_startup": [
@@ -60,7 +70,53 @@
         ]
       }
     },
-
+    {
+      "id": "team_11",
+      "label": "Team 11",
+      "name": "AOS Gateway / Execution Lead",
+      "engine": "cursor",
+      "domain": "agents_os",
+      "status": "ACTIVE",
+      "in_gate_process": true,
+      "group": "gateway",
+      "profession": "gateway_orchestrator",
+      "layer_1_identity": {
+        "role": "AOS gateway — mirrors team_10 for agents_os. Routine pipeline/WSM state is owned by the pipeline engine, not manual per-step gateway mutation (hub §12).",
+        "parent": "team_00",
+        "children": []
+      },
+      "layer_2_authority": {
+        "gate_authority": {
+          "GATE_2": "phase_2.2_owner_aos",
+          "GATE_3": "owner",
+          "GATE_4": "submitter"
+        },
+        "writes_to": [
+          "_COMMUNICATION/team_11/"
+        ],
+        "governed_by": [
+          "SSM v1.0.0",
+          "TEAM_ROSTER_LOCK",
+          "PHOENIX_MASTER_WSM"
+        ]
+      },
+      "layer_3_knowledge": {
+        "mandatory_reads_on_startup": [
+          "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
+          "_COMMUNICATION/agents_os/pipeline_state.json"
+        ]
+      },
+      "layer_4_procedure": {
+        "sop_path": null,
+        "iron_rules": [
+          "AOS domain only — do not cross into tiktrack execution lane",
+          "No gate submission without all artifacts",
+          "Work plan must be versioned",
+          "Identity header mandatory on all outputs",
+          "Do not claim ownership of routine pipeline state mutations — pipeline orchestration owns transitions"
+        ]
+      }
+    },
     {
       "id": "team_10",
       "label": "Team 10",
@@ -69,8 +125,10 @@
       "domain": "tiktrack",
       "status": "ACTIVE",
       "in_gate_process": true,
+      "group": "gateway",
+      "profession": "gateway_orchestrator",
       "layer_1_identity": {
-        "role": "Gateway — Execution lead, team activation, gate submissions, WSM updates",
+        "role": "TikTrack gateway — execution lead, team activation, gate submissions. Routine pipeline/WSM state transitions are owned by the pipeline engine, not manual per-step Team 10 mutation (hub §12).",
         "parent": "team_00",
         "children": []
       },
@@ -79,8 +137,14 @@
           "GATE_3": "owner",
           "GATE_4": "submitter"
         },
-        "writes_to": ["_COMMUNICATION/team_10/"],
-        "governed_by": ["SSM v1.0.0", "TEAM_ROSTER_LOCK", "PHOENIX_MASTER_WSM"]
+        "writes_to": [
+          "_COMMUNICATION/team_10/"
+        ],
+        "governed_by": [
+          "SSM v1.0.0",
+          "TEAM_ROSTER_LOCK",
+          "PHOENIX_MASTER_WSM"
+        ]
       },
       "layer_3_knowledge": {
         "mandatory_reads_on_startup": [
@@ -93,11 +157,11 @@
         "iron_rules": [
           "No gate submission without all artifacts",
           "Work plan must be versioned",
-          "Identity header mandatory on all outputs"
+          "Identity header mandatory on all outputs",
+          "Do not claim ownership of routine pipeline state mutations — pipeline orchestration owns transitions"
         ]
       }
     },
-
     {
       "id": "team_20",
       "label": "Team 20",
@@ -106,14 +170,21 @@
       "domain": "tiktrack",
       "status": "ACTIVE",
       "in_gate_process": true,
+      "group": "implementation",
+      "profession": "backend_engineer",
       "layer_1_identity": {
-        "role": "API, logic, DB, services, runtime — backend execution only",
+        "role": "API, logic, DB, services, runtime — TikTrack backend execution only",
         "parent": "team_10",
         "children": []
       },
       "layer_2_authority": {
-        "writes_to": ["_COMMUNICATION/team_20/"],
-        "governed_by": ["SSM v1.0.0", "TEAM_ROSTER_LOCK"]
+        "writes_to": [
+          "_COMMUNICATION/team_20/"
+        ],
+        "governed_by": [
+          "SSM v1.0.0",
+          "TEAM_ROSTER_LOCK"
+        ]
       },
       "layer_3_knowledge": {},
       "layer_4_procedure": {
@@ -126,7 +197,42 @@
         ]
       }
     },
-
+    {
+      "id": "team_21",
+      "label": "Team 21",
+      "name": "AOS Backend Implementation",
+      "engine": "cursor",
+      "domain": "agents_os",
+      "status": "ACTIVE",
+      "in_gate_process": true,
+      "group": "implementation",
+      "profession": "backend_engineer",
+      "layer_1_identity": {
+        "role": "API, logic, DB, services, runtime — AOS backend execution only. Mirrors team_20 (TikTrack Backend) for the Agents_OS domain.",
+        "parent": "team_11",
+        "children": []
+      },
+      "layer_2_authority": {
+        "writes_to": [
+          "_COMMUNICATION/team_21/",
+          "agents_os/"
+        ],
+        "governed_by": [
+          "SSM v1.0.0",
+          "TEAM_ROSTER_LOCK"
+        ]
+      },
+      "layer_3_knowledge": {},
+      "layer_4_procedure": {
+        "sop_path": null,
+        "iron_rules": [
+          "AOS domain only — do not modify TikTrack code paths",
+          "maskedLog mandatory on all server-side logging",
+          "SQLite for AOS v3 (not PostgreSQL)",
+          "Submit completed work to Team 51 for QA"
+        ]
+      }
+    },
     {
       "id": "team_30",
       "label": "Team 30",
@@ -135,14 +241,21 @@
       "domain": "tiktrack",
       "status": "ACTIVE",
       "in_gate_process": true,
+      "group": "implementation",
+      "profession": "frontend_engineer",
       "layer_1_identity": {
         "role": "Components, pages, API integration, client-side logic",
         "parent": "team_10",
         "children": []
       },
       "layer_2_authority": {
-        "writes_to": ["_COMMUNICATION/team_30/"],
-        "governed_by": ["SSM v1.0.0", "TEAM_ROSTER_LOCK"]
+        "writes_to": [
+          "_COMMUNICATION/team_30/"
+        ],
+        "governed_by": [
+          "SSM v1.0.0",
+          "TEAM_ROSTER_LOCK"
+        ]
       },
       "layer_3_knowledge": {},
       "layer_4_procedure": {
@@ -155,167 +268,31 @@
         ]
       }
     },
-
     {
       "id": "team_31",
       "label": "Team 31",
-      "name": "Blueprint Maker",
+      "name": "AOS Frontend Implementation",
       "engine": "cursor",
-      "domain": "tiktrack",
+      "domain": "agents_os",
       "status": "ACTIVE",
-      "in_gate_process": false,
+      "in_gate_process": true,
+      "group": "implementation",
+      "profession": "frontend_engineer",
       "layer_1_identity": {
-        "role": "Receives designs → produces blueprint/mockup files in staging — OUTSIDE gate pipeline",
-        "parent": "team_40",
+        "role": "AOS domain frontend implementation — components, pages, API integration, client-side logic for Agents_OS. Mirrors team_30 (TikTrack Frontend) for the AOS domain.",
+        "parent": "team_11",
         "children": [],
-        "note": "Team 31 is part of the organization but operates entirely outside the SSM gate process. It has its own internal SOP."
+        "note": "Redefined 2026-03-26. Previous definition (Blueprint Maker, outside gate pipeline) is retired. team_31 now follows the x0=TT / x1=AOS naming pattern."
       },
       "layer_2_authority": {
-        "writes_to": ["staging/blueprints/"],
-        "governed_by": ["Team 31 Internal SOP", "TEAM_ROSTER_LOCK"]
-      },
-      "layer_3_knowledge": {},
-      "layer_4_procedure": {
-        "sop_path": "_COMMUNICATION/team_31/TEAM_31_INTERNAL_SOP_v1.0.0.md",
-        "iron_rules": [
-          "OUTSIDE gate pipeline — no GATE_0 or any gate submissions",
-          "Blueprint files are staging artifacts only — not production code",
-          "Handoff to Team 30 is visual reference only (not spec authority)",
-          "Follows own internal SOP — not the main SSM gate sequence"
+        "writes_to": [
+          "_COMMUNICATION/team_31/",
+          "agents_os/ui/"
+        ],
+        "governed_by": [
+          "SSM v1.0.0",
+          "TEAM_ROSTER_LOCK"
         ]
-      }
-    },
-
-    {
-      "id": "team_40",
-      "label": "Team 40",
-      "name": "UI Assets & Design",
-      "engine": "cursor",
-      "domain": "tiktrack",
-      "status": "ACTIVE",
-      "in_gate_process": true,
-      "layer_1_identity": {
-        "role": "Design tokens, CSS, visual consistency, UI assets — NO QA, NO testing",
-        "parent": "team_00",
-        "children": ["team_31"]
-      },
-      "layer_2_authority": {
-        "writes_to": ["_COMMUNICATION/team_40/"],
-        "governed_by": ["SSM v1.0.0", "TEAM_ROSTER_LOCK"]
-      },
-      "layer_3_knowledge": {},
-      "layer_4_procedure": {
-        "sop_path": null,
-        "iron_rules": [
-          "Team 40 = UI Assets ONLY (Iron Rule)",
-          "No testing, no QA — that is Team 50",
-          "FAV = QA activity → route to Team 50"
-        ]
-      }
-    },
-
-    {
-      "id": "team_50",
-      "label": "Team 50",
-      "name": "QA & Functional Acceptance",
-      "engine": "cursor",
-      "domain": "tiktrack",
-      "status": "ACTIVE",
-      "in_gate_process": true,
-      "layer_1_identity": {
-        "role": "Test scripts, E2E suites, regression, FAV, SOP-013 seals",
-        "parent": "team_00",
-        "children": ["team_51"]
-      },
-      "layer_2_authority": {
-        "gate_authority": {
-          "GATE_4": "owner"
-        },
-        "writes_to": ["_COMMUNICATION/team_50/"],
-        "governed_by": ["SSM v1.0.0", "TEAM_ROSTER_LOCK", "SOP-013"]
-      },
-      "layer_3_knowledge": {},
-      "layer_4_procedure": {
-        "sop_path": null,
-        "iron_rules": [
-          "Team 50 = QA (Iron Rule) — includes test scripts, E2E, FAV",
-          "GATE_4 requires PASS evidence: commands + outputs + exit codes",
-          "Selenium E2E in tests/ dir, API scripts in scripts/ dir"
-        ]
-      }
-    },
-
-    {
-      "id": "team_51",
-      "label": "Team 51",
-      "name": "AOS QA & Functional Acceptance",
-      "engine": "cursor",
-      "domain": "agents_os",
-      "status": "ACTIVE",
-      "in_gate_process": true,
-      "layer_1_identity": {
-        "role": "QA & FAV for Agents_OS domain — child of Team 50, scoped to AOS work",
-        "parent": "team_50",
-        "children": []
-      },
-      "layer_2_authority": {
-        "writes_to": ["_COMMUNICATION/team_51/"],
-        "governed_by": ["SSM v1.0.0", "TEAM_ROSTER_LOCK", "SOP-013"]
-      },
-      "layer_3_knowledge": {},
-      "layer_4_procedure": {
-        "sop_path": null,
-        "iron_rules": [
-          "Team 51 = QA for AOS domain (Iron Rule)",
-          "Every QA run must be a FRESH test — never repeat prior findings without re-execution",
-          "GATE_4 QA evidence required: commands + outputs + exit codes"
-        ]
-      }
-    },
-
-    {
-      "id": "team_60",
-      "label": "Team 60",
-      "name": "DevOps & Platform",
-      "engine": "cursor",
-      "domain": "tiktrack",
-      "status": "ACTIVE",
-      "in_gate_process": true,
-      "layer_1_identity": {
-        "role": "Infrastructure, runtimes, CI/CD, platform readiness",
-        "parent": "team_00",
-        "children": []
-      },
-      "layer_2_authority": {
-        "writes_to": ["_COMMUNICATION/team_60/"],
-        "governed_by": ["SSM v1.0.0", "TEAM_ROSTER_LOCK"]
-      },
-      "layer_3_knowledge": {},
-      "layer_4_procedure": {
-        "sop_path": null,
-        "iron_rules": [
-          "Infrastructure changes require Team 00 approval",
-          "No production deployments without GATE_7 pass"
-        ]
-      }
-    },
-
-    {
-      "id": "team_61",
-      "label": "Team 61",
-      "name": "AOS Local Cursor Implementation",
-      "engine": "cursor",
-      "domain": "agents_os",
-      "status": "ACTIVE",
-      "in_gate_process": true,
-      "layer_1_identity": {
-        "role": "PRIMARY AOS implementation team — hands on keyboard for Team 100; implements all AOS tasks via cursor-driven local execution",
-        "parent": "team_100",
-        "children": []
-      },
-      "layer_2_authority": {
-        "writes_to": ["_COMMUNICATION/team_61/", "agents_os/"],
-        "governed_by": ["SSM v1.0.0", "TEAM_ROSTER_LOCK"]
       },
       "layer_3_knowledge": {},
       "layer_4_procedure": {
@@ -329,23 +306,209 @@
         ]
       }
     },
-
     {
-      "id": "team_70",
-      "label": "Team 70",
-      "name": "Documentation",
-      "engine": "codex",
-      "domain": "multi",
+      "id": "team_40",
+      "label": "Team 40",
+      "name": "UI Assets & Design",
+      "engine": "cursor",
+      "domain": "tiktrack",
       "status": "ACTIVE",
       "in_gate_process": true,
+      "group": "design",
+      "profession": "ui_designer",
       "layer_1_identity": {
-        "role": "Technical writing, knowledge promotion, AS_MADE_REPORT",
+        "role": "Design tokens, CSS, visual consistency, UI assets — NO QA, NO testing",
         "parent": "team_00",
         "children": []
       },
       "layer_2_authority": {
-        "writes_to": ["_COMMUNICATION/team_70/", "documentation/"],
-        "governed_by": ["SSM v1.0.0", "TEAM_ROSTER_LOCK", "PHOENIX_PORTFOLIO_ROADMAP"]
+        "writes_to": [
+          "_COMMUNICATION/team_40/"
+        ],
+        "governed_by": [
+          "SSM v1.0.0",
+          "TEAM_ROSTER_LOCK"
+        ]
+      },
+      "layer_3_knowledge": {},
+      "layer_4_procedure": {
+        "sop_path": null,
+        "iron_rules": [
+          "Team 40 = UI Assets ONLY (Iron Rule)",
+          "No testing, no QA — that is Team 50",
+          "FAV = QA activity → route to Team 50"
+        ]
+      }
+    },
+    {
+      "id": "team_50",
+      "label": "Team 50",
+      "name": "QA & Functional Acceptance",
+      "engine": "cursor",
+      "domain": "tiktrack",
+      "status": "ACTIVE",
+      "in_gate_process": true,
+      "group": "qa",
+      "profession": "qa_engineer",
+      "layer_1_identity": {
+        "role": "Test scripts, E2E suites, regression, FAV, SOP-013 seals",
+        "parent": "team_00",
+        "children": [
+          "team_51"
+        ]
+      },
+      "layer_2_authority": {
+        "gate_authority": {
+          "GATE_4": "owner"
+        },
+        "writes_to": [
+          "_COMMUNICATION/team_50/"
+        ],
+        "governed_by": [
+          "SSM v1.0.0",
+          "TEAM_ROSTER_LOCK",
+          "SOP-013"
+        ]
+      },
+      "layer_3_knowledge": {},
+      "layer_4_procedure": {
+        "sop_path": null,
+        "iron_rules": [
+          "Team 50 = QA (Iron Rule) — includes test scripts, E2E, FAV",
+          "GATE_4 requires PASS evidence: commands + outputs + exit codes",
+          "Selenium E2E in tests/ dir, API scripts in scripts/ dir"
+        ]
+      }
+    },
+    {
+      "id": "team_51",
+      "label": "Team 51",
+      "name": "AOS QA & Functional Acceptance",
+      "engine": "cursor",
+      "domain": "agents_os",
+      "status": "ACTIVE",
+      "in_gate_process": true,
+      "group": "qa",
+      "profession": "qa_engineer",
+      "layer_1_identity": {
+        "role": "QA & FAV for Agents_OS domain — child of Team 50, scoped to AOS work",
+        "parent": "team_50",
+        "children": []
+      },
+      "layer_2_authority": {
+        "writes_to": [
+          "_COMMUNICATION/team_51/"
+        ],
+        "governed_by": [
+          "SSM v1.0.0",
+          "TEAM_ROSTER_LOCK",
+          "SOP-013"
+        ]
+      },
+      "layer_3_knowledge": {},
+      "layer_4_procedure": {
+        "sop_path": null,
+        "iron_rules": [
+          "Team 51 = QA for AOS domain (Iron Rule)",
+          "Every QA run must be a FRESH test — never repeat prior findings without re-execution",
+          "GATE_4 QA evidence required: commands + outputs + exit codes"
+        ]
+      }
+    },
+    {
+      "id": "team_60",
+      "label": "Team 60",
+      "name": "DevOps & Platform",
+      "engine": "cursor",
+      "domain": "tiktrack",
+      "status": "ACTIVE",
+      "in_gate_process": true,
+      "group": "implementation",
+      "profession": "devops_engineer",
+      "layer_1_identity": {
+        "role": "Infrastructure, runtimes, CI/CD, platform readiness",
+        "parent": "team_00",
+        "children": []
+      },
+      "layer_2_authority": {
+        "writes_to": [
+          "_COMMUNICATION/team_60/"
+        ],
+        "governed_by": [
+          "SSM v1.0.0",
+          "TEAM_ROSTER_LOCK"
+        ]
+      },
+      "layer_3_knowledge": {},
+      "layer_4_procedure": {
+        "sop_path": null,
+        "iron_rules": [
+          "Infrastructure changes require Team 00 approval",
+          "No production deployments without GATE_7 pass"
+        ]
+      }
+    },
+    {
+      "id": "team_61",
+      "label": "Team 61",
+      "name": "AOS DevOps & Platform",
+      "engine": "cursor",
+      "domain": "agents_os",
+      "status": "ACTIVE",
+      "in_gate_process": true,
+      "group": "implementation",
+      "profession": "devops_engineer",
+      "layer_1_identity": {
+        "role": "AOS infrastructure, runtimes, CI/CD, platform readiness — mirrors team_60 (TikTrack DevOps) for the Agents_OS domain. Does NOT implement application logic or UI.",
+        "parent": "team_11",
+        "children": [],
+        "note": "Redefined 2026-03-26. Previous definition ('AOS Local Cursor Implementation — hands on keyboard for Team 100') retired. Application logic → team_21 (backend) + team_31 (frontend)."
+      },
+      "layer_2_authority": {
+        "writes_to": [
+          "_COMMUNICATION/team_61/"
+        ],
+        "governed_by": [
+          "SSM v1.0.0",
+          "TEAM_ROSTER_LOCK"
+        ]
+      },
+      "layer_3_knowledge": {},
+      "layer_4_procedure": {
+        "sop_path": null,
+        "iron_rules": [
+          "AOS infrastructure ONLY — do not write application code",
+          "Infrastructure changes require Team 00 awareness",
+          "No production AOS deployments without gate PASS",
+          "Submit completed infrastructure work to Team 51 for validation"
+        ]
+      }
+    },
+    {
+      "id": "team_70",
+      "label": "Team 70",
+      "name": "TikTrack Documentation",
+      "engine": "codex",
+      "domain": "tiktrack",
+      "status": "ACTIVE",
+      "in_gate_process": true,
+      "group": "documentation",
+      "profession": "technical_writer",
+      "layer_1_identity": {
+        "role": "Technical writing for TikTrack domain — AS_MADE_REPORT, page specs, knowledge promotion. TikTrack domain only.",
+        "parent": "team_00",
+        "children": []
+      },
+      "layer_2_authority": {
+        "writes_to": [
+          "_COMMUNICATION/team_70/",
+          "documentation/docs-system/"
+        ],
+        "governed_by": [
+          "SSM v1.0.0",
+          "TEAM_ROSTER_LOCK",
+          "PHOENIX_PORTFOLIO_ROADMAP"
+        ]
       },
       "layer_3_knowledge": {},
       "layer_4_procedure": {
@@ -353,11 +516,48 @@
         "iron_rules": [
           "All docs require identity header",
           "AS_MADE_REPORT mandatory at GATE_8",
-          "Do NOT modify SSM/WSM without Team 00 instruction"
+          "Do NOT modify SSM/WSM without Team 00 instruction",
+          "TikTrack domain only — AOS documentation → team_71"
         ]
       }
     },
-
+    {
+      "id": "team_71",
+      "label": "Team 71",
+      "name": "AOS Documentation",
+      "engine": "codex",
+      "domain": "agents_os",
+      "status": "ACTIVE",
+      "in_gate_process": true,
+      "group": "documentation",
+      "profession": "technical_writer",
+      "layer_1_identity": {
+        "role": "Technical writing for Agents_OS domain — spec documentation, governance docs, AS_MADE_REPORT for AOS programs. Mirrors team_70 (TikTrack Documentation) for the AOS domain.",
+        "parent": "team_00",
+        "children": []
+      },
+      "layer_2_authority": {
+        "writes_to": [
+          "_COMMUNICATION/team_71/",
+          "documentation/docs-governance/"
+        ],
+        "governed_by": [
+          "SSM v1.0.0",
+          "TEAM_ROSTER_LOCK",
+          "PHOENIX_PORTFOLIO_ROADMAP"
+        ]
+      },
+      "layer_3_knowledge": {},
+      "layer_4_procedure": {
+        "sop_path": null,
+        "iron_rules": [
+          "All docs require identity header",
+          "AOS domain only — TikTrack documentation → team_70",
+          "Do NOT modify SSM/WSM without Team 00 instruction",
+          "Cross-domain consistency review → route to team_170"
+        ]
+      }
+    },
     {
       "id": "team_90",
       "label": "Team 90",
@@ -366,6 +566,8 @@
       "domain": "multi",
       "status": "ACTIVE",
       "in_gate_process": true,
+      "group": "governance",
+      "profession": "dev_validator",
       "layer_1_identity": {
         "role": "GATE_5–GATE_8 validation, blocking reports, route_recommendation",
         "parent": "team_00",
@@ -378,8 +580,13 @@
           "GATE_7": "orchestrator",
           "GATE_8": "owner"
         },
-        "writes_to": ["_COMMUNICATION/team_90/"],
-        "governed_by": ["SSM v1.0.0", "TEAM_ROSTER_LOCK"]
+        "writes_to": [
+          "_COMMUNICATION/team_90/"
+        ],
+        "governed_by": [
+          "SSM v1.0.0",
+          "TEAM_ROSTER_LOCK"
+        ]
       },
       "layer_3_knowledge": {},
       "layer_4_procedure": {
@@ -392,27 +599,39 @@
         ]
       }
     },
-
     {
       "id": "team_100",
       "label": "Team 100",
-      "name": "AOS Domain Architects",
+      "name": "Chief System Architect / Chief R&D",
       "engine": "codex",
       "domain": "agents_os",
       "status": "ACTIVE",
       "in_gate_process": true,
+      "group": "architecture",
+      "profession": "domain_architect",
       "layer_1_identity": {
-        "role": "Primary architectural authority for Agents_OS domain — under Team 00 authority; primary planning source for AOS domain; directs Team 61 implementation",
+        "role": "Program-level architecture and MERGED v3 synthesis under Principal (Team 00); coordinates domain IDE architects team_110 (AOS) and team_111 (TikTrack) and execution teams (e.g. team_61, team_51).",
         "parent": "team_00",
-        "children": ["team_61", "team_51"]
+        "children": [
+          "team_61",
+          "team_51",
+          "team_110",
+          "team_111"
+        ]
       },
       "layer_2_authority": {
         "gate_authority": {
           "GATE_2": "owner_for_aos_domain",
           "GATE_6": "owner_for_aos_domain"
         },
-        "writes_to": ["_COMMUNICATION/team_100/"],
-        "governed_by": ["SSM v1.0.0", "TEAM_ROSTER_LOCK", "CLAUDE.md Team 00 authority"]
+        "writes_to": [
+          "_COMMUNICATION/team_100/"
+        ],
+        "governed_by": [
+          "SSM v1.0.0",
+          "TEAM_ROSTER_LOCK",
+          "CLAUDE.md Team 00 authority"
+        ]
       },
       "layer_3_knowledge": {},
       "layer_4_procedure": {
@@ -425,7 +644,6 @@
         ]
       }
     },
-
     {
       "id": "team_170",
       "label": "Team 170",
@@ -434,14 +652,23 @@
       "domain": "multi",
       "status": "ACTIVE",
       "in_gate_process": true,
+      "group": "governance",
+      "profession": "spec_governance",
       "layer_1_identity": {
-        "role": "Canonical document maintenance, LOD200/LOD400 production, registry sync",
+        "role": "Canonical document maintenance, LOD200/LOD400 production, registry sync. DUAL MODE: (A) Gate mode — spec production and governance document updates per mandate; (B) Advisory mode — governance research and architectural consultation on request from team_00 or team_100.",
         "parent": "team_00",
         "children": []
       },
       "layer_2_authority": {
-        "writes_to": ["_COMMUNICATION/team_170/", "documentation/docs-governance/"],
-        "governed_by": ["SSM v1.0.0", "TEAM_ROSTER_LOCK", "PHOENIX_PORTFOLIO_ROADMAP"]
+        "writes_to": [
+          "_COMMUNICATION/team_170/",
+          "documentation/docs-governance/"
+        ],
+        "governed_by": [
+          "SSM v1.0.0",
+          "TEAM_ROSTER_LOCK",
+          "PHOENIX_PORTFOLIO_ROADMAP"
+        ]
       },
       "layer_3_knowledge": {},
       "layer_4_procedure": {
@@ -453,7 +680,6 @@
         ]
       }
     },
-
     {
       "id": "team_190",
       "label": "Team 190",
@@ -462,10 +688,14 @@
       "domain": "multi",
       "status": "ACTIVE",
       "in_gate_process": true,
+      "group": "governance",
+      "profession": "constitutional_validator",
       "layer_1_identity": {
-        "role": "Architectural integrity review, GATE_0–GATE_2 validation",
+        "role": "Architectural integrity review, GATE_0–GATE_2 validation. DUAL MODE: (A) Gate mode — constitutional validation, BLOCKER/PASS verdicts per gate checklist; (B) Advisory mode — architectural research, second-opinion analysis, spec review on request from team_00 or team_100.",
         "parent": "team_00",
-        "children": ["team_191"]
+        "children": [
+          "team_191"
+        ]
       },
       "layer_2_authority": {
         "gate_authority": {
@@ -473,8 +703,13 @@
           "GATE_1": "co_owner",
           "GATE_2": "validator"
         },
-        "writes_to": ["_COMMUNICATION/team_190/"],
-        "governed_by": ["SSM v1.0.0", "TEAM_ROSTER_LOCK"]
+        "writes_to": [
+          "_COMMUNICATION/team_190/"
+        ],
+        "governed_by": [
+          "SSM v1.0.0",
+          "TEAM_ROSTER_LOCK"
+        ]
       },
       "layer_3_knowledge": {},
       "layer_4_procedure": {
@@ -486,24 +721,108 @@
         ]
       }
     },
-
+    {
+      "id": "team_110",
+      "label": "Team 110",
+      "name": "TikTrack Domain Architect (IDE)",
+      "engine": "codex",
+      "domain": "tiktrack",
+      "status": "REGISTERED",
+      "in_gate_process": false,
+      "group": "architecture",
+      "profession": "domain_architect",
+      "layer_1_identity": {
+        "role": "TikTrack domain architect (IDE). x0=TikTrack convention. Delivers TikTrack spec packages to Team 100 under Principal-authorized programs. Artifact folder: _COMMUNICATION/team_102/. Previously known as team_102.",
+        "parent": "team_100",
+        "children": [],
+        "legacy_roster_alias": "team_102"
+      },
+      "layer_2_authority": {
+        "writes_to": [
+          "_COMMUNICATION/team_102/"
+        ],
+        "governed_by": [
+          "SSM v1.0.0",
+          "TEAM_ROSTER_LOCK"
+        ]
+      },
+      "layer_3_knowledge": {},
+      "layer_4_procedure": {
+        "sop_path": null,
+        "iron_rules": [
+          "TikTrack domain only — no AOS mandate execution",
+          "Activation requires explicit Team 00 instruction"
+        ]
+      }
+    },
+    {
+      "id": "team_111",
+      "label": "Team 111",
+      "name": "AOS Domain Architect (IDE)",
+      "engine": "codex",
+      "domain": "agents_os",
+      "status": "ACTIVE",
+      "in_gate_process": true,
+      "group": "architecture",
+      "profession": "domain_architect",
+      "layer_1_identity": {
+        "role": "AOS domain architect (IDE). x1=AOS convention. Delivers AOS v3 spec packages to Team 100 under Principal-authorized programs; must raise risks/alternatives (D-14). Artifact folder: _COMMUNICATION/team_101/. Previously known as team_101 — see context alignment in activation prompts.",
+        "parent": "team_100",
+        "children": [],
+        "legacy_roster_alias": "team_101"
+      },
+      "layer_2_authority": {
+        "writes_to": [
+          "_COMMUNICATION/team_101/"
+        ],
+        "governed_by": [
+          "SSM v1.0.0",
+          "TEAM_ROSTER_LOCK",
+          "ARCHITECTURAL_HOTFIX_PROCEDURE_v1.0.0"
+        ]
+      },
+      "layer_3_knowledge": {
+        "mandatory_reads_on_startup": [
+          "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md"
+        ]
+      },
+      "layer_4_procedure": {
+        "sop_path": null,
+        "iron_rules": [
+          "No-Guessing Rule — if ambiguous, issue CLARIFICATION_REQUEST to Team 00",
+          "Alternatives First — present alternatives before final recommendation",
+          "Maker-Checker — code changes require QA routing per ARCHITECTURAL_HOTFIX_PROCEDURE",
+          "Spec only in spec sessions — do not write production code unless mandate explicitly permits"
+        ]
+      }
+    },
     {
       "id": "team_191",
       "label": "Team 191",
-      "name": "Git-Governance Lane",
+      "name": "Git, Archive & File Governance",
       "engine": "cursor",
       "domain": "multi",
       "status": "ACTIVE",
       "in_gate_process": false,
+      "group": "governance",
+      "profession": "git_and_file_governance",
       "layer_1_identity": {
-        "role": "All git operations — pre-push guard triage, header normalization, registry sync. Currently autonomous. Child of Team 190.",
+        "role": "All git operations + file governance lane. Responsible for: (1) pre-push guard triage, header normalization, registry sync — existing scope; (2) runtime log archiving (test_cursor_prompt_*.md and equivalent auto-generated files); (3) per-WP artifact archiving at WP closure (NOTIFICATION + SUPERSEDED files); (4) WP_ARTIFACT_INDEX maintenance per mandate from Team 00. Does NOT make content decisions — executes file operations per explicit mandate only.",
         "parent": "team_190",
         "children": [],
-        "note": "Team 191 is GitHub ONLY. Currently operates autonomously. Will be integrated into processes later."
+        "note": "Role expanded 2026-03-26: file governance added. File operations always require explicit mandate from Team 00 specifying: source paths, target paths, file type classification, reason."
       },
       "layer_2_authority": {
-        "writes_to": ["_COMMUNICATION/team_191/"],
-        "governed_by": ["SSM v1.0.0", "TEAM_ROSTER_LOCK", "TEAM_191_INTERNAL_WORK_PROCEDURE_v1.0.0"]
+        "writes_to": [
+          "_COMMUNICATION/team_191/",
+          "_COMMUNICATION/99-ARCHIVE/"
+        ],
+        "governed_by": [
+          "SSM v1.0.0",
+          "TEAM_ROSTER_LOCK",
+          "TEAM_191_INTERNAL_WORK_PROCEDURE_v1.0.0",
+          "FILE_LIFECYCLE_POLICY_v1.0.0"
+        ]
       },
       "layer_3_knowledge": {},
       "layer_4_procedure": {
@@ -512,10 +831,12 @@
           "No constitutional gate verdicts — that is Team 190",
           "No architectural rulings — that is Team 00/100",
           "No business-logic changes under a Git fix mandate",
-          "No policy semantic overrides without explicit ruling from Team 00"
+          "No policy semantic overrides without explicit ruling from Team 00",
+          "NEVER permanent delete — only move to 99-ARCHIVE with timestamped folder",
+          "No content decisions — file classification is defined in the mandate, not decided by Team 191",
+          "No archiving without explicit Team 00 mandate specifying: source, target, file type, reason"
         ]
       }
     }
-
   ]
 }

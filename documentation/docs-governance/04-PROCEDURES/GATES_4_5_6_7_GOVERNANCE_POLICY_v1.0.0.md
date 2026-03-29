@@ -1,5 +1,7 @@
 # Gates 4/5/6/7 Governance Policy v1.0.0
 
+> ⚠️ **LEGACY — pipeline is GATE_0–GATE_5 only. GATE_6/7 sections are superseded.**
+
 project_domain: SHARED
 status: LOCKED
 owner: Team 170 (canonical); authority: Team 00
@@ -39,6 +41,8 @@ Phase 2 (agent overlay) uses the same contracts — no gate semantic change.
 
 ## 4) GATE_6 — Traceability Verdict (Reality Gate)
 
+> **LEGACY (2026-03-24):** **GATE_6** is **not** an active pipeline gate (organizational / historical construct).
+
 | Field | Value |
 |---|---|
 | Gate owner | Team 90 (execution); Team 100 (approval authority) |
@@ -49,6 +53,8 @@ Phase 2 (agent overlay) uses the same contracts — no gate semantic change.
 | Deviation handling | DOC_ONLY_LOOP / CODE_CHANGE_REQUIRED / ESCALATE_TO_TEAM_00 per rejection protocol |
 
 ## 5) GATE_7 — Human Residuals Sign-Off
+
+> **LEGACY (2026-03-24):** **GATE_7** does **not** exist as a pipeline gate (historical drift).
 
 | Field | Value |
 |---|---|

@@ -60,7 +60,9 @@
 | TEAM_10_GATE_ACTIONS_RUNBOOK | פעולות Team 10 לכל שער (GATE_3..GATE_8; G3.5 ולידציית תוכנית בתוך GATE_3) — מקור יחיד לפרט תפעולי | `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md` | v1.0.0 |
 | **AGENTS_OS_V2_OPERATING_PROCEDURES** | **נוהל פעיל יחיד** לתזרימת V2 — Pipeline CLI, הוראות לכל צוות, Context injection, MCP; כל האיגנטים משתמשים בזה | `documentation/docs-governance/04-PROCEDURES/AGENTS_OS_V2_OPERATING_PROCEDURES_v1.0.0.md` | v1.0.0 |
 | FAST_TRACK_EXECUTION_PROTOCOL | מסלול מקוצר (AGENTS_OS ברירת מחדל; TIKTRACK אופציונלי): FAST_0..FAST_4, בלעדיות מסלול, track_mode, SLA 48h, ורפרנס מחייב ל־GATE_3; §11 handoff, §12–13 domain precision | `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.2.0.md` | v1.2.0 (active); v1.0.0 superseded historical |
-| TEAM_DEVELOPMENT_ROLE_MAPPING | מיפוי קנוני 20/30/40/50/51/60/61/70/90/100/170/190/191 + אורקסטרציה Team 10; Team 191 = Git Governance Operations child of Team 190 | `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md` | v1.0.0 |
+| TEAM_DEVELOPMENT_ROLE_MAPPING | מיפוי קנוני + Team 110/111 (IDE architects) + Principal/pipeline §3; v1.0.0 superseded | `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.1.md` | v1.0.1 (active); v1.0.0 superseded |
+| PRINCIPAL_AND_TEAM_00_MODEL | D-01…D-14 + Pipeline Fidelity Suite (PFS) — תוספת קנונית | `documentation/docs-governance/01-FOUNDATIONS/PRINCIPAL_AND_TEAM_00_MODEL_v1.0.0.md` | v1.0.0 |
+| TEAM_TAXONOMY | טקסונומיית צוותים (x0/x1, professions); v1.0.0 superseded | `documentation/docs-governance/01-FOUNDATIONS/TEAM_TAXONOMY_v1.0.1.md` | v1.0.1 (active) |
 | TEAM_190_CANONICAL_MESSAGE_FORMAT_LOCK | נעילת פורמט הודעות קנוני — from/to/cc, identity header, log_entry (מסמכים כקבצים) | `_COMMUNICATION/team_190/TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK_v1.0.0.md` | v1.0.0 |
 | PHOENIX_CANONICAL_TEAM_MESSAGE_GUIDE | **פרונט יחיד** — מתי מסמך (קובץ) ומתי פרומט להעתקה (בלוק); מפנה ל־190 lock ול־G36 prompts | `_COMMUNICATION/PHOENIX_CANONICAL_TEAM_MESSAGE_GUIDE_v1.0.0.md` | v1.0.0 |
 
@@ -111,7 +113,7 @@
 
 ## 9. נהלים לפי צוות / תהליך (פעיל + ארכיון)
 
-**הנחיה פעילה לשערים ותפקידי צוות:** `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md`, `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md`.
+**הנחיה פעילה לשערים ותפקידי צוות:** `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md`, `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.1.md`.
 
 | שם קובץ | מה מגדיר | נתיב מדויק | גרסה |
 |---------|----------|-------------|------|

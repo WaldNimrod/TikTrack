@@ -14,6 +14,7 @@ from typing import Any
 import yaml
 
 from agents_os_v3.modules.management import use_cases as UC
+from agents_os_v3.modules.state import repository as R
 
 _ROOT = Path(__file__).resolve().parents[2]
 _DEFINITION = _ROOT / "definition.yaml"
@@ -181,8 +182,9 @@ def list_runs_paginated(
             where.append("r.status = ANY(%s)")
             args.append(statuses)
         if domain_id:
+            domain_ulid = R.resolve_domain_id(cur, domain_id)
             where.append("r.domain_id = %s")
-            args.append(domain_id)
+            args.append(domain_ulid)
         if current_gate_id:
             where.append("r.current_gate_id = %s")
             args.append(current_gate_id)

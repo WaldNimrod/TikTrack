@@ -511,9 +511,7 @@ def uc_14_get_history(
     if run_id is not None:
         conds.append("e.run_id = %s")
         filter_params.append(run_id)
-    if domain_id is not None:
-        conds.append("e.domain_id = %s")
-        filter_params.append(domain_id)
+    # domain_id: deferred — resolved inside cursor via resolve_domain_id
     if gate_id is not None:
         conds.append("e.gate_id = %s")
         filter_params.append(gate_id)
@@ -523,10 +521,14 @@ def uc_14_get_history(
     if actor_team_id is not None:
         conds.append("e.actor_team_id = %s")
         filter_params.append(actor_team_id)
-    wsql = " AND ".join(conds)
     ord_sql = "ASC" if o == "asc" else "DESC"
 
     with conn.cursor() as cur:
+        if domain_id is not None:
+            domain_ulid = R.resolve_domain_id(cur, domain_id)
+            conds.append("e.domain_id = %s")
+            filter_params.append(domain_ulid)
+        wsql = " AND ".join(conds)
         total = R.count_events_filtered(cur, wsql, list(filter_params))
         cur.execute(
             f"""

@@ -1,12 +1,12 @@
 /*
-id: TEAM_31_AOS_V3_UI_MOCKUPS
+id: TEAM_31_AOS_V3_UI
 team: Team 31
 domain: agents_os
 artifact: app.js
 mandate: TEAM_100_TO_TEAM_31_AOS_V3_UI_MOCKUPS_MANDATE_v2.0.0
 patch: TEAM_00_TO_TEAM_31_AOS_V3_MOCKUP_AUTHORITY_MODEL_UPDATE_MANDATE_v1.0.0 + TEAM_100_TO_TEAM_31_AOS_V3_UI_IS_CURRENT_ACTOR_REMOVAL_MANDATE_v1.0.0 (AM-01 / §4.13)
-date: 2026-03-28
-status: MOCKUP
+date: 2026-03-29
+status: ACTIVE
 */
 (function () {
   "use strict";
@@ -29,6 +29,72 @@ status: MOCKUP
     "PRINCIPAL_OVERRIDE",
     "ROUTING_FAILED",
   ];
+
+  var LS_UI_DOMAIN_SCOPE = "aosv3_ui_data_scope";
+
+  function getUiDomainScope() {
+    try {
+      var v = localStorage.getItem(LS_UI_DOMAIN_SCOPE);
+      if (v === "agents_os" || v === "tiktrack" || v === "all") return v;
+    } catch (e0) {
+      /* ignore */
+    }
+    return "all";
+  }
+
+  function setUiDomainScope(v) {
+    try {
+      if (v === "all" || v === "agents_os" || v === "tiktrack") {
+        localStorage.setItem(LS_UI_DOMAIN_SCOPE, v);
+      }
+    } catch (e0) {
+      /* ignore */
+    }
+  }
+
+  function matchesUiDataScope(rowDomainId, domainSlugOpt) {
+    var s = getUiDomainScope();
+    if (s === "all") return true;
+    var rid = String(rowDomainId || "");
+    var slug = domainSlugOpt != null ? String(domainSlugOpt) : "";
+    if (slug && slug === s) return true;
+    return rid === s;
+  }
+
+  function historyDomainQueryValue() {
+    var s = getUiDomainScope();
+    return s === "all" ? "" : s;
+  }
+
+  function notifyUiDomainScopeChildren() {
+    if (typeof window.__aosv3TeamsRerender === "function") {
+      window.__aosv3TeamsRerender();
+    }
+    if (typeof window.__aosv3HistoryRerender === "function") {
+      window.__aosv3HistoryRerender();
+    }
+    if (typeof window.__aosv3PortfolioRerender === "function") {
+      window.__aosv3PortfolioRerender();
+    }
+  }
+
+  function applyUiDomainScopeControl() {
+    var el = document.getElementById("aosv3-ui-domain-scope");
+    if (!el) return;
+    el.value = getUiDomainScope();
+    if (el._aosv3ScopeWired) return;
+    el._aosv3ScopeWired = true;
+    el.addEventListener("change", function () {
+      var v = el.value;
+      setUiDomainScope(v);
+      if (v === "agents_os" || v === "tiktrack") {
+        if (typeof window.AOSV3_onDomainSwitch === "function") {
+          window.AOSV3_onDomainSwitch(v);
+        }
+      }
+      notifyUiDomainScopeChildren();
+    });
+  }
 
   /** TC-M25-3: 26-char Crockford ULID-style mock run ids */
   var MOCK_RID_PRIMARY = "01JQXYZ123456789ABCDEFWXYZ";
@@ -935,9 +1001,111 @@ status: MOCKUP
       .replace(/"/g, "&quot;");
   }
 
+  function aosv3TableSortCompare(va, vb, mul) {
+    if (va == null && vb == null) return 0;
+    if (va == null) return 1 * mul;
+    if (vb == null) return -1 * mul;
+    var na = Number(va);
+    var nb = Number(vb);
+    if (
+      !isNaN(na) &&
+      !isNaN(nb) &&
+      String(va).trim() !== "" &&
+      String(vb).trim() !== ""
+    ) {
+      return mul * (na < nb ? -1 : na > nb ? 1 : 0);
+    }
+    return mul * String(va).localeCompare(String(vb), undefined, { numeric: true });
+  }
+
+  function historyEventSortValue(e, key) {
+    if (key === "occurred_at")
+      return new Date(e.occurred_at || 0).getTime();
+    if (key === "event_type") return e.event_type || "";
+    if (key === "gate_phase")
+      return (e.gate_id || "") + " " + (e.phase_id || "");
+    if (key === "actor") {
+      var ac = e.actor || {};
+      return ac.team_id || "";
+    }
+    if (key === "verdict")
+      return e.verdict != null ? String(e.verdict) : "";
+    if (key === "reason") return e.reason || "";
+    return "";
+  }
+
+  function historySortEventsList(arr, st) {
+    var k = st.key;
+    var mul = st.dir;
+    var copy = arr.slice();
+    copy.sort(function (a, b) {
+      var va = historyEventSortValue(a, k);
+      var vb = historyEventSortValue(b, k);
+      var c = 0;
+      if (typeof va === "number" && typeof vb === "number") {
+        c = va < vb ? -1 : va > vb ? 1 : 0;
+      } else {
+        c = String(va).localeCompare(String(vb), undefined, { numeric: true });
+      }
+      if (c === 0) {
+        var ta = new Date(a.occurred_at || 0).getTime();
+        var tb = new Date(b.occurred_at || 0).getTime();
+        c = ta < tb ? -1 : ta > tb ? 1 : 0;
+      }
+      return mul * c;
+    });
+    return copy;
+  }
+
+  function wireHistoryTableSort(tableId, renderPage) {
+    var tbl = document.getElementById(tableId);
+    if (!tbl || tbl._aosv3HistorySortWired) return;
+    tbl._aosv3HistorySortWired = true;
+    if (!window.__aosv3HistorySort) {
+      window.__aosv3HistorySort = { key: "occurred_at", dir: -1 };
+    }
+    tbl.querySelectorAll("thead th[data-sort-key]").forEach(function (th) {
+      th.style.cursor = "pointer";
+      th.addEventListener("click", function () {
+        var k = th.getAttribute("data-sort-key");
+        var st = window.__aosv3HistorySort;
+        if (st.key === k) st.dir = -st.dir;
+        else {
+          st.key = k;
+          st.dir = 1;
+        }
+        tbl.querySelectorAll("thead th[data-sort-key]").forEach(function (h) {
+          h.removeAttribute("aria-sort");
+        });
+        th.setAttribute(
+          "aria-sort",
+          st.dir > 0 ? "ascending" : "descending"
+        );
+        renderPage();
+      });
+    });
+  }
+
   function readMetaAosv3(name) {
     var m = document.querySelector('meta[name="' + name + '"]');
     return m ? m.getAttribute("content") : null;
+  }
+
+  function aosv3DevUiEnabled() {
+    try {
+      var q = new URLSearchParams(window.location.search || "");
+      if (q.get("dev") === "1") return true;
+      if (window.localStorage.getItem("aosv3_dev_ui") === "1") return true;
+    } catch (e) {
+      /* ignore */
+    }
+    return false;
+  }
+
+  function applyDevScenariosVisibility() {
+    var card = document.getElementById("aosv3-dev-scenarios-card");
+    if (!card) return;
+    card.style.display = aosv3DevUiEnabled() ? "" : "none";
   }
 
   function aosv3UseMock() {
@@ -951,14 +1119,84 @@ status: MOCKUP
     return false;
   }
 
+  function wpMetaById(wpId) {
+    if (!wpId || !MOCK_WORK_PACKAGES || !MOCK_WORK_PACKAGES.work_packages)
+      return {};
+    return (
+      MOCK_WORK_PACKAGES.work_packages.filter(function (w) {
+        return w.wp_id === wpId;
+      })[0] || {}
+    );
+  }
+
+  function domainDisplayLabel(slugOrId) {
+    if (slugOrId == null || slugOrId === "") return "—";
+    var s = String(slugOrId);
+    var map = {
+      agents_os: "Agents OS",
+      tiktrack: "TikTrack",
+      multi: "Multi",
+      all: "All lanes",
+    };
+    if (map[s]) return map[s];
+    var ulidMap = {
+      "01JK8AOSV3DOMAIN00000001": "Agents OS",
+      "01JK8AOSV3DOMAIN00000002": "TikTrack",
+    };
+    if (ulidMap[s]) return ulidMap[s];
+    if (s.length > 26) return "Domain";
+    return s;
+  }
+
+  function canonicalProgramFromWpId(wpId) {
+    var m = String(wpId || "").match(/^(S\d+-P\d+)-WP\d+$/i);
+    return m ? m[1] : "";
+  }
+
+  function programTableCell(wpId, programId) {
+    var pid = programId != null && String(programId).trim() !== "" ? String(programId).trim() : "";
+    var fromWp = canonicalProgramFromWpId(wpId);
+    if (pid) {
+      var show = fromWp || pid;
+      if (show.length > 22) show = runUlidSuffix(pid);
+      return (
+        '<span title="' +
+        esc(pid) +
+        '">' +
+        esc(show) +
+        "</span>"
+      );
+    }
+    if (fromWp)
+      return (
+        '<span title="Canonical program slice of ' +
+        esc(wpId) +
+        '">' +
+        esc(fromWp) +
+        "</span>"
+      );
+    return "—";
+  }
+
   function domainPillHtml(domainId, titleKey) {
     if (domainId == null || domainId === "") return "—";
-    var tk = titleKey || "domain_id";
+    var raw = String(domainId);
+    var isTeam = /^team_\d+$/.test(raw);
+    var display = isTeam
+      ? titleKey != null && titleKey !== ""
+        ? String(titleKey)
+        : raw
+      : domainDisplayLabel(raw);
+    var ttitle = isTeam
+      ? titleKey
+        ? raw + " — " + titleKey
+        : raw
+      : "domain_id: " + raw;
     return (
       '<span class="aosv3-domain-pill" title="' +
-      esc(tk) +
+      esc(ttitle) +
       '">' +
-      esc(domainId) +
+      esc(display) +
       "</span>"
     );
   }
@@ -1105,7 +1343,16 @@ status: MOCKUP
     });
     evs.forEach(function (e) {
       var tr = document.createElement("tr");
-      var actorTxt = e.actor ? esc(e.actor.team_id) : "—";
+      var actorTxt = "—";
+      if (e.actor && e.actor.team_id) {
+        var albl = e.actor.label;
+        if (!albl) {
+          var trow = findTeamById(e.actor.team_id);
+          if (trow) albl = trow.label;
+        }
+        actorTxt =
+          esc(e.actor.team_id) + (albl ? " · " + esc(albl) : "");
+      }
       var rsn = e.reason == null ? "—" : String(e.reason);
       if (rsn.length > 140) rsn = rsn.slice(0, 137) + "...";
       tr.innerHTML =
@@ -1173,7 +1420,7 @@ status: MOCKUP
           ":</strong> " +
           esc(f.description) +
           (f.evidence
-            ? " <span class=\"aosv3-mock-note\">| evidence: " +
+            ? " <span class=\"aosv3-sidebar-hint\">| evidence: " +
               esc(f.evidence) +
               "</span>"
             : "") +
@@ -1209,11 +1456,21 @@ status: MOCKUP
       "<br>" +
       "<strong>max_correction_cycles:</strong> " +
       esc(String(cb.max_correction_cycles || 3)) +
-      " <span class=\"aosv3-mock-note\">(policy: max_correction_cycles)</span></p>";
+      " <span class=\"aosv3-sidebar-hint\">(policy: max_correction_cycles)</span></p>";
   }
 
-  function handoffBtnHtml(cls, toastMsg, label) {
+  function handoffActionToast(mockMsg, liveMsg) {
+    if (aosv3UseMock()) return mockMsg;
+    if (liveMsg != null && String(liveMsg).length) return liveMsg;
+    return String(mockMsg || "")
+      .replace(/\s*—\s*mock\s*$/i, "")
+      .replace(/\s*mock\s*$/i, "")
+      .trim();
+  }
+
+  function handoffBtnHtml(cls, label, mockToast, liveToast) {
     var c = cls ? cls : "";
+    var toastMsg = handoffActionToast(mockToast, liveToast);
     if (toastMsg) {
       return (
         '<button type="button" class="btn ' +
@@ -1240,11 +1497,12 @@ status: MOCKUP
         '<div class="aosv3-handoff-btn-row">' +
         handoffBtnHtml(
           "btn-primary",
+          "Agent Completed",
           "Agent Completed — mock POST /feedback",
-          "Agent Completed"
+          "Agent verdict recorded (POST /feedback when connected)"
         ) +
-        handoffBtnHtml("", "", "Provide File Path") +
-        handoffBtnHtml("", "", "Paste Feedback") +
+        handoffBtnHtml("", "Provide File Path", "", "Show file path field") +
+        handoffBtnHtml("", "Paste Feedback", "", "Show paste field") +
         "</div>"
       );
     }
@@ -1254,8 +1512,18 @@ status: MOCKUP
         esc(na.label) +
         "</p>" +
         '<div class="aosv3-handoff-btn-row">' +
-        handoffBtnHtml("btn-primary", "Confirm Advance — mock", "✓ Confirm Advance") +
-        handoffBtnHtml("", "Clear pending feedback — mock", "Clear & Re-ingest") +
+        handoffBtnHtml(
+          "btn-primary",
+          "✓ Confirm Advance",
+          "Confirm Advance — mock",
+          "Confirm advance after feedback"
+        ) +
+        handoffBtnHtml(
+          "",
+          "Clear & Re-ingest",
+          "Clear pending feedback — mock",
+          "Clear pending feedback"
+        ) +
         "</div>"
       );
     }
@@ -1265,8 +1533,18 @@ status: MOCKUP
         esc(na.label) +
         "</p>" +
         '<div class="aosv3-handoff-btn-row">' +
-        handoffBtnHtml("btn-warning", "Confirm Fail — mock", "✗ Confirm Fail") +
-        handoffBtnHtml("", "Clear pending feedback — mock", "Clear & Re-ingest") +
+        handoffBtnHtml(
+          "btn-warning",
+          "✗ Confirm Fail",
+          "Confirm Fail — mock",
+          "Confirm fail after feedback"
+        ) +
+        handoffBtnHtml(
+          "",
+          "Clear & Re-ingest",
+          "Clear pending feedback — mock",
+          "Clear pending feedback"
+        ) +
         "</div>"
       );
     }
@@ -1276,12 +1554,17 @@ status: MOCKUP
         esc(na.label) +
         "</p>" +
         '<div class="aosv3-handoff-btn-row">' +
-        handoffBtnHtml("btn-primary", "Mark PASS — mock", "✓ Mark PASS") +
+        handoffBtnHtml(
+          "btn-primary",
+          "✓ Mark PASS",
+          "Mark PASS — mock",
+          "Mark manual review as pass"
+        ) +
         '<button type="button" class="btn btn-warning" data-handoff-manual-fail="1">✗ Mark FAIL</button>' +
         "</div>" +
         '<label class="aosv3-form-label" for="aosv3-handoff-manual-reason">Reason — <strong>required</strong> for Mark FAIL; optional for Mark PASS</label>' +
         '<textarea id="aosv3-handoff-manual-reason" class="aosv3-textarea" rows="2" aria-describedby="aosv3-handoff-manual-reason-hint" autocomplete="off"></textarea>' +
-        '<p id="aosv3-handoff-manual-reason-hint" class="aosv3-mock-note">Stage 8B: <code>POST /fail</code> requires <code>reason</code>; mock blocks Mark FAIL until this field is non-empty.</p>'
+        '<p id="aosv3-handoff-manual-reason-hint" class="aosv3-sidebar-hint"><code>POST /fail</code> requires a non-empty reason before Mark FAIL.</p>'
       );
     }
     if (t === "HUMAN_APPROVE") {
@@ -1290,7 +1573,12 @@ status: MOCKUP
         esc(na.label) +
         "</p>" +
         '<div class="aosv3-handoff-btn-row">' +
-        handoffBtnHtml("btn-primary", "APPROVE — mock", "✓ APPROVE") +
+        handoffBtnHtml(
+          "btn-primary",
+          "✓ APPROVE",
+          "APPROVE — mock",
+          "Approve human gate"
+        ) +
         "</div>"
       );
     }
@@ -1300,11 +1588,16 @@ status: MOCKUP
         esc(na.label) +
         "</p>" +
         '<div class="aosv3-handoff-btn-row">' +
-        handoffBtnHtml("btn-primary", "Resume Run — mock", "▶ Resume Run") +
+        handoffBtnHtml(
+          "btn-primary",
+          "▶ Resume Run",
+          "Resume Run — mock",
+          "Resume paused run"
+        ) +
         "</div>"
       );
     }
-    return "<p class=\"aosv3-mock-note\">—</p>";
+    return "<p class=\"aosv3-sidebar-hint\">No handoff action for this state.</p>";
   }
 
   function renderHandoffFeedbackForms(state) {
@@ -1333,8 +1626,17 @@ status: MOCKUP
         esc(sum) +
         '" /></label>' +
         '<div class="aosv3-handoff-btn-row">' +
-        '<button type="button" class="btn" data-mock-toast="Cancel advance — mock">Cancel</button> ' +
-        '<button type="button" class="btn btn-primary" data-mock-toast="Confirm Advance — mock">Confirm Advance →</button>' +
+        '<button type="button" class="btn" data-mock-toast="' +
+        esc(handoffActionToast("Cancel advance — mock", "Close")) +
+        '">Cancel</button> ' +
+        '<button type="button" class="btn btn-primary" data-mock-toast="' +
+        esc(
+          handoffActionToast(
+            "Confirm Advance — mock",
+            "Submit confirm advance"
+          )
+        ) +
+        '">Confirm Advance →</button>' +
         "</div>";
     } else {
       var bfs = pf.blocking_findings || [];
@@ -1373,8 +1675,14 @@ status: MOCKUP
         (route === "full" ? " selected" : "") +
         '>full</option></select></label>' +
         '<div class="aosv3-handoff-btn-row">' +
-        '<button type="button" class="btn" data-mock-toast="Cancel fail — mock">Cancel</button> ' +
-        '<button type="button" class="btn btn-warning" data-mock-toast="Confirm Fail — mock">Confirm Fail →</button>' +
+        '<button type="button" class="btn" data-mock-toast="' +
+        esc(handoffActionToast("Cancel fail — mock", "Close")) +
+        '">Cancel</button> ' +
+        '<button type="button" class="btn btn-warning" data-mock-toast="' +
+        esc(
+          handoffActionToast("Confirm Fail — mock", "Submit confirm fail")
+        ) +
+        '">Confirm Fail →</button>' +
         "</div>";
     }
   }
@@ -1393,7 +1701,11 @@ status: MOCKUP
     var fileHidden = fb ? "" : " hidden";
     var pasteHidden = fb ? "" : " hidden";
     var banner = fb
-      ? '<p class="aosv3-mock-note aosv3-fallback-banner">Mode B: no verdict file at canonical paths — <code>fallback_required: true</code> (mock). Use <strong>file path</strong> (Mode C) or <strong>paste</strong> (Mode D).</p>'
+      ? '<p class="aosv3-sidebar-hint aosv3-fallback-banner">' +
+        (aosv3UseMock()
+          ? "Mode B: no verdict file at canonical paths — <code>fallback_required: true</code>. Use <strong>file path</strong> or <strong>paste</strong>."
+          : "No verdict file at canonical paths (<code>fallback_required</code>). Use <strong>file path</strong> or <strong>paste</strong>.") +
+        "</p>"
       : "";
     ex.innerHTML =
       banner +
@@ -1401,12 +1713,26 @@ status: MOCKUP
       fileHidden +
       ">" +
       '<label class="aosv3-form-label">File path <input type="text" id="aosv3-ingest-file-path" class="aosv3-input" placeholder="/path/to/verdict.md" /> ' +
-      '<button type="button" class="btn" data-mock-toast="POST /feedback NATIVE_FILE — mock">Parse</button></label></div>' +
+      '<button type="button" class="btn" data-mock-toast="' +
+      esc(
+        handoffActionToast(
+          "POST /feedback NATIVE_FILE — mock",
+          "Parse feedback from file path"
+        )
+      ) +
+      '">Parse</button></label></div>' +
       '<div id="aosv3-ingest-paste-row" class="aosv3-ingest-row"' +
       pasteHidden +
       ">" +
       '<label class="aosv3-form-label">Paste feedback<textarea id="aosv3-ingest-paste" class="aosv3-textarea" rows="4" maxlength="10000"></textarea></label> ' +
-      '<button type="button" class="btn" data-mock-toast="POST /feedback RAW_PASTE — mock">Parse Feedback</button></div>';
+      '<button type="button" class="btn" data-mock-toast="' +
+      esc(
+        handoffActionToast(
+          "POST /feedback RAW_PASTE — mock",
+          "Parse pasted feedback"
+        )
+      ) +
+      '">Parse Feedback</button></div>';
   }
 
   function wireHandoffIngestionToggles() {
@@ -1545,12 +1871,17 @@ status: MOCKUP
             ta.focus();
           }
           showAosv3Toast(
-            "Reason is required for Mark FAIL (POST /fail — mock validation)"
+            handoffActionToast(
+              "Reason is required for Mark FAIL (POST /fail — mock validation)",
+              "Reason is required for Mark FAIL (POST /fail)"
+            )
           );
           return;
         }
         if (ta) ta.removeAttribute("aria-invalid");
-        showAosv3Toast("Mark FAIL — mock");
+        showAosv3Toast(
+          handoffActionToast("Mark FAIL — mock", "Mark FAIL submitted")
+        );
       },
       true
     );
@@ -1622,6 +1953,15 @@ status: MOCKUP
     syncStartRunFormDomainSelect();
     if (typeof window.AOSV3_reapplyPipelinePreset === "function") {
       window.AOSV3_reapplyPipelinePreset();
+    }
+    try {
+      document.dispatchEvent(
+        new CustomEvent("aosv3-workspace-domain-changed", {
+          detail: { domain: domain },
+        })
+      );
+    } catch (e) {
+      /* ignore */
     }
   }
 
@@ -2382,7 +2722,12 @@ status: MOCKUP
     if (stopConfirm) {
       stopConfirm.addEventListener("click", function () {
         closeStopModal();
-        showAosv3Toast("Stop run confirmed — mock (no API)");
+        showAosv3Toast(
+          handoffActionToast(
+            "Stop run confirmed — mock (no API)",
+            "Stop run confirmed"
+          )
+        );
       });
     }
     var cliCopy = document.getElementById("aosv3-handoff-cli-copy");
@@ -2421,6 +2766,7 @@ status: MOCKUP
       sel.addEventListener("change", applyPreset);
     }
     wireHandoffManualFailOnce();
+    applyDevScenariosVisibility();
     updatePipelineDomainButtonStyles();
     syncStartRunFormDomainSelect();
     applyPreset();
@@ -2439,7 +2785,6 @@ status: MOCKUP
     }
     var tbody = document.getElementById("aosv3-history-tbody");
     var totalEl = document.getElementById("aosv3-history-total");
-    var filterDomain = document.getElementById("aosv3-filter-domain");
     var filterGate = document.getElementById("aosv3-filter-gate");
     var filterType = document.getElementById("aosv3-filter-event-type");
     var filterActor = document.getElementById("aosv3-filter-actor");
@@ -2488,8 +2833,11 @@ status: MOCKUP
       q.set("limit", String(limit));
       q.set("offset", String(offset));
       q.set("order", order);
-      if (filterDomain && filterDomain.value)
-        q.set("domain_id", filterDomain.value);
+      var dScope = historyDomainQueryValue();
+      if (dScope === "agents_os")
+        q.set("domain_id", "01JK8AOSV3DOMAIN00000001");
+      else if (dScope === "tiktrack")
+        q.set("domain_id", "01JK8AOSV3DOMAIN00000002");
       if (filterGate && filterGate.value) q.set("gate_id", filterGate.value);
       if (filterType && filterType.value)
         q.set("event_type", filterType.value);
@@ -2546,7 +2894,13 @@ status: MOCKUP
           (data.events || []).forEach(function (e) {
             ensureGateOption(e.gate_id);
           });
-          renderRows(data.events || []);
+          if (!window.__aosv3HistorySort)
+            window.__aosv3HistorySort = { key: "occurred_at", dir: -1 };
+          var st = window.__aosv3HistorySort;
+          if (st.key === "occurred_at" && orderEl) {
+            st.dir = orderEl.value === "asc" ? 1 : -1;
+          }
+          renderRows(historySortEventsList(data.events || [], st));
         })
         .catch(function (err) {
           showAosv3Toast(err.message || String(err));
@@ -2557,7 +2911,6 @@ status: MOCKUP
       if (el) el.addEventListener(ev, fn);
     }
 
-    bind(filterDomain, "change", renderTable);
     bind(filterGate, "change", renderTable);
     bind(filterType, "change", renderTable);
     bind(filterActor, "input", renderTable);
@@ -2630,6 +2983,17 @@ status: MOCKUP
     }
     if (qRun && filterRunId) filterRunId.value = qRun;
 
+    document.addEventListener("aosv3-workspace-domain-changed", function (ev) {
+      var d = ev.detail && ev.detail.domain;
+      if (d !== "agents_os" && d !== "tiktrack") return;
+      setUiDomainScope(d);
+      var sel = document.getElementById("aosv3-ui-domain-scope");
+      if (sel) sel.value = d;
+      renderTable();
+    });
+
+    window.__aosv3HistoryRerender = renderTable;
+    wireHistoryTableSort("aosv3-history-table", renderTable);
     renderTable();
   }
 
@@ -2640,7 +3004,6 @@ status: MOCKUP
     }
     var tbody = document.getElementById("aosv3-history-tbody");
     var totalEl = document.getElementById("aosv3-history-total");
-    var filterDomain = document.getElementById("aosv3-filter-domain");
     var filterGate = document.getElementById("aosv3-filter-gate");
     var filterType = document.getElementById("aosv3-filter-event-type");
     var filterActor = document.getElementById("aosv3-filter-actor");
@@ -2679,8 +3042,8 @@ status: MOCKUP
 
     function filterEvents(all) {
       return all.filter(function (e) {
-        if (filterDomain && filterDomain.value && e.domain_id !== filterDomain.value)
-          return false;
+        var dScope = historyDomainQueryValue();
+        if (dScope && e.domain_id !== dScope) return false;
         if (filterGate && filterGate.value && e.gate_id !== filterGate.value)
           return false;
         if (filterType && filterType.value && e.event_type !== filterType.value)
@@ -2701,21 +3064,16 @@ status: MOCKUP
       });
     }
 
-    function sortEvents(arr, order) {
-      var copy = arr.slice();
-      copy.sort(function (a, b) {
-        var ta = new Date(a.occurred_at).getTime();
-        var tb = new Date(b.occurred_at).getTime();
-        return order === "asc" ? ta - tb : tb - ta;
-      });
-      return copy;
-    }
-
     function renderTable() {
       var all = cloneEvents();
       var filtered = filterEvents(all);
-      var order = orderEl && orderEl.value === "asc" ? "asc" : "desc";
-      var sorted = sortEvents(filtered, order);
+      if (!window.__aosv3HistorySort)
+        window.__aosv3HistorySort = { key: "occurred_at", dir: -1 };
+      var st = window.__aosv3HistorySort;
+      if (st.key === "occurred_at" && orderEl) {
+        st.dir = orderEl.value === "asc" ? 1 : -1;
+      }
+      var sorted = historySortEventsList(filtered, st);
       var limit = parseInt(limitEl && limitEl.value, 10) || 50;
       if (limit > 200) limit = 200;
       var offset = parseInt(offsetEl && offsetEl.value, 10) || 0;
@@ -2768,7 +3126,6 @@ status: MOCKUP
       if (el) el.addEventListener(ev, fn);
     }
 
-    bind(filterDomain, "change", renderTable);
     bind(filterGate, "change", renderTable);
     bind(filterType, "change", renderTable);
     bind(filterActor, "input", function () {
@@ -2791,7 +3148,11 @@ status: MOCKUP
       var limit = parseInt(limitEl && limitEl.value, 10) || 50;
       if (limit > 200) limit = 200;
       var off = parseInt(offsetEl && offsetEl.value, 10) || 0;
-      var all = sortEvents(filterEvents(cloneEvents()), orderEl && orderEl.value === "asc" ? "asc" : "desc");
+      var st = window.__aosv3HistorySort || { key: "occurred_at", dir: -1 };
+      if (st.key === "occurred_at" && orderEl) {
+        st.dir = orderEl.value === "asc" ? 1 : -1;
+      }
+      var all = historySortEventsList(filterEvents(cloneEvents()), st);
       if (off + limit < all.length) {
         off += limit;
         if (offsetEl) offsetEl.value = String(off);
@@ -2838,6 +3199,17 @@ status: MOCKUP
     }
     if (qRun && filterRunId) filterRunId.value = qRun;
 
+    document.addEventListener("aosv3-workspace-domain-changed", function (ev) {
+      var d = ev.detail && ev.detail.domain;
+      if (d !== "agents_os" && d !== "tiktrack") return;
+      setUiDomainScope(d);
+      var sel = document.getElementById("aosv3-ui-domain-scope");
+      if (sel) sel.value = d;
+      renderTable();
+    });
+
+    window.__aosv3HistoryRerender = renderTable;
+    wireHistoryTableSort("aosv3-history-table", renderTable);
     renderTable();
   }
 
@@ -2924,66 +3296,139 @@ status: MOCKUP
     });
 
     var rrBody = document.getElementById("aosv3-routing-tbody");
-    if (rrBody) {
-      MOCK_ROUTING.routing_rules.forEach(function (r) {
-        var tr = document.createElement("tr");
-        tr.innerHTML =
-          "<td>" +
-          esc(r.id) +
-          "</td><td>" +
-          esc(r.gate_id) +
-          "</td><td>" +
-          esc(r.phase_id) +
-          "</td><td>" +
-          esc(r.domain_id) +
-          "</td><td>" +
-          esc(r.variant) +
-          "</td><td>" +
-          esc(r.role_id) +
-          "</td><td>" +
-          esc(r.priority) +
-          "</td>";
-        rrBody.appendChild(tr);
+    var tmplRoot = document.getElementById("aosv3-templates-list");
+    var polBody = document.getElementById("aosv3-policies-tbody");
+
+    if (!window.__aosv3ConfigSort) {
+      window.__aosv3ConfigSort = {
+        routing: { key: "priority", dir: 1 },
+        policies: { key: "policy_key", dir: 1 },
+      };
+    }
+    var configSortState = window.__aosv3ConfigSort;
+
+    function wireConfigTableSort(tableId, scope, rerender) {
+      var tbl = document.getElementById(tableId);
+      if (!tbl || tbl._aosv3ConfigSortWired) return;
+      tbl._aosv3ConfigSortWired = true;
+      tbl.querySelectorAll("thead th[data-sort-key]").forEach(function (th) {
+        th.style.cursor = "pointer";
+        th.addEventListener("click", function () {
+          var k = th.getAttribute("data-sort-key");
+          var st = configSortState[scope];
+          if (st.key === k) st.dir = -st.dir;
+          else {
+            st.key = k;
+            st.dir = 1;
+          }
+          tbl.querySelectorAll("thead th[data-sort-key]").forEach(function (h) {
+            h.removeAttribute("aria-sort");
+          });
+          th.setAttribute(
+            "aria-sort",
+            st.dir > 0 ? "ascending" : "descending"
+          );
+          rerender();
+        });
       });
     }
 
-    var tmplRoot = document.getElementById("aosv3-templates-list");
-    if (tmplRoot) {
-      MOCK_TEMPLATES.templates.forEach(function (t, i) {
-        var div = document.createElement("div");
-        div.className = "aosv3-template-item";
-        var scope =
-          esc(t.gate_id) +
-          " / " +
-          esc(t.phase_id || "—") +
-          " / " +
-          esc(t.domain_id || "—");
-        div.innerHTML =
-          '<div class="aosv3-template-head">' +
-          "<strong>" +
-          esc(t.name) +
-          "</strong>" +
-          '<span class="status-pill pill-pending">v' +
-          esc(t.version) +
-          "</span>" +
-          (t.is_active
-            ? '<span class="status-pill pill-pass">active</span>'
-            : '<span class="status-pill pill-pending">inactive</span>') +
-          '<button type="button" class="btn aosv3-template-toggle" data-idx="' +
-          i +
-          '">Preview body</button>' +
-          '<button type="button" class="btn" disabled title="team_00 only">Edit (team_00 only)</button>' +
-          "</div>" +
-          '<div class="aosv3-kv"><dt>Scope</dt><dd>' +
-          scope +
-          "</dd></div>" +
-          '<div class="aosv3-template-preview" id="aosv3-tmpl-preview-' +
-          i +
-          '">' +
-          esc(t.body_markdown) +
-          "</div>";
-        tmplRoot.appendChild(div);
-      });
+    function renderConfigDomainTables() {
+      if (rrBody) {
+        rrBody.innerHTML = "";
+        var stR = configSortState.routing;
+        var rrRows = MOCK_ROUTING.routing_rules.slice().sort(function (a, b) {
+          return aosv3TableSortCompare(a[stR.key], b[stR.key], stR.dir);
+        });
+        rrRows.forEach(function (r) {
+          var tr = document.createElement("tr");
+          tr.innerHTML =
+            "<td>" +
+            esc(r.id) +
+            "</td><td>" +
+            esc(r.gate_id) +
+            "</td><td>" +
+            esc(r.phase_id) +
+            "</td><td>" +
+            esc(r.domain_id) +
+            "</td><td>" +
+            esc(r.variant) +
+            "</td><td>" +
+            esc(r.role_id) +
+            "</td><td>" +
+            esc(r.priority) +
+            "</td>";
+          rrBody.appendChild(tr);
+        });
+      }
+      if (polBody) {
+        polBody.innerHTML = "";
+        var stP = configSortState.policies;
+        var polRows = MOCK_POLICIES.policies.slice().sort(function (a, b) {
+          return aosv3TableSortCompare(a[stP.key], b[stP.key], stP.dir);
+        });
+        polRows.forEach(function (p) {
+          var parsed;
+          try {
+            parsed = JSON.stringify(JSON.parse(p.policy_value_json), null, 2);
+          } catch (e) {
+            parsed = p.policy_value_json;
+          }
+          var tr = document.createElement("tr");
+          tr.innerHTML =
+            "<td>" +
+            esc(p.policy_key) +
+            "</td><td>" +
+            esc(p.scope_type) +
+            "</td><td><pre class=\"aosv3-json-pre\">" +
+            esc(parsed) +
+            "</pre></td>" +
+            '<td><button type="button" class="btn" disabled title="team_00 only">Edit (team_00 only)</button></td>';
+          polBody.appendChild(tr);
+        });
+      }
+      if (tmplRoot) {
+        tmplRoot.innerHTML = "";
+        MOCK_TEMPLATES.templates.forEach(function (t, i) {
+          var div = document.createElement("div");
+          div.className = "aosv3-template-item";
+          var scope =
+            esc(t.gate_id) +
+            " / " +
+            esc(t.phase_id || "—") +
+            " / " +
+            esc(t.domain_id || "—");
+          div.innerHTML =
+            '<div class="aosv3-template-head">' +
+            "<strong>" +
+            esc(t.name) +
+            "</strong>" +
+            '<span class="status-pill pill-pending">v' +
+            esc(t.version) +
+            "</span>" +
+            (t.is_active
+              ? '<span class="status-pill pill-pass">active</span>'
+              : '<span class="status-pill pill-pending">inactive</span>') +
+            '<button type="button" class="btn aosv3-template-toggle" data-idx="' +
+            i +
+            '">Preview body</button>' +
+            '<button type="button" class="btn" disabled title="team_00 only">Edit (team_00 only)</button>' +
+            "</div>" +
+            '<div class="aosv3-kv"><dt>Scope</dt><dd>' +
+            scope +
+            "</dd></div>" +
+            '<div class="aosv3-template-preview" id="aosv3-tmpl-preview-' +
+            i +
+            '">' +
+            esc(t.body_markdown) +
+            "</div>";
+          tmplRoot.appendChild(div);
+        });
+      }
+    }
+
+    if (tmplRoot && !tmplRoot._aosv3TmplDelegated) {
+      tmplRoot._aosv3TmplDelegated = true;
       tmplRoot.addEventListener("click", function (ev) {
         var btn = ev.target.closest(".aosv3-template-toggle");
         if (!btn) return;
@@ -2992,28 +3437,9 @@ status: MOCKUP
       });
     }
 
-    var polBody = document.getElementById("aosv3-policies-tbody");
-    if (polBody) {
-      MOCK_POLICIES.policies.forEach(function (p) {
-        var parsed;
-        try {
-          parsed = JSON.stringify(JSON.parse(p.policy_value_json), null, 2);
-        } catch (e) {
-          parsed = p.policy_value_json;
-        }
-        var tr = document.createElement("tr");
-        tr.innerHTML =
-          "<td>" +
-          esc(p.policy_key) +
-          "</td><td>" +
-          esc(p.scope_type) +
-          "</td><td><pre class=\"aosv3-json-pre\">" +
-          esc(parsed) +
-          "</pre></td>" +
-          '<td><button type="button" class="btn" disabled title="team_00 only">Edit (team_00 only)</button></td>';
-        polBody.appendChild(tr);
-      });
-    }
+    wireConfigTableSort("aosv3-config-table-routing", "routing", renderConfigDomainTables);
+    wireConfigTableSort("aosv3-config-table-policies", "policies", renderConfigDomainTables);
+    renderConfigDomainTables();
 
     showTab("routing");
   }
@@ -3045,7 +3471,8 @@ status: MOCKUP
   function activeDomainsWithRuns() {
     var d = {};
     MOCK_PORTFOLIO_ACTIVE.runs.forEach(function (r) {
-      d[r.domain_id] = true;
+      if (matchesUiDataScope(r.domain_id, r.domain_slug))
+        d[r.domain_id] = true;
     });
     return d;
   }
@@ -3188,9 +3615,22 @@ status: MOCKUP
     var detailEl = document.getElementById("aosv3-team-detail");
     var orgEl = document.getElementById("aosv3-org-tree");
     var grp = document.getElementById("aosv3-team-filter-group");
-    var dom = document.getElementById("aosv3-team-filter-domain");
     var curOnly = document.getElementById("aosv3-team-filter-current");
     var selected = "team_61";
+
+    if (!initTeamsPage._workspaceDomainHooked) {
+      initTeamsPage._workspaceDomainHooked = true;
+      document.addEventListener("aosv3-workspace-domain-changed", function (ev) {
+        var d = ev.detail && ev.detail.domain;
+        if (d !== "agents_os" && d !== "tiktrack") return;
+        setUiDomainScope(d);
+        var sel = document.getElementById("aosv3-ui-domain-scope");
+        if (sel) sel.value = d;
+        if (typeof window.__aosv3TeamsRerender === "function") {
+          window.__aosv3TeamsRerender();
+        }
+      });
+    }
     var ENGINE_OPTIONS = [
       "cursor",
       "cursor_composer",
@@ -3223,7 +3663,7 @@ status: MOCKUP
       } else if (g === "cross") {
         if (t.group !== "cross_domain") return false;
       }
-      var d = dom ? dom.value : "all";
+      var d = getUiDomainScope();
       if (d === "agents_os") {
         if (t.domain_scope !== "agents_os" && t.domain_scope !== "all")
           return false;
@@ -3312,7 +3752,7 @@ status: MOCKUP
           : "—";
       detailEl.innerHTML =
         '<div class="section-title">Roster fields</div>' +
-        '<p class="aosv3-mock-note">Engine is edited under <strong>Layer 1 — Identity</strong> (mandate §7 / QA MJ-8B-02).</p>' +
+        '<p class="aosv3-sidebar-hint">Engine is edited under <strong>Layer 1 — Identity</strong>.</p>' +
         '<dl class="aosv3-team-detail-grid">' +
         "<dt>team_id</dt><dd>" +
         esc(team.team_id) +
@@ -3325,7 +3765,7 @@ status: MOCKUP
         "</dd>" +
         "<dt>engine</dt><dd>" +
         badgeEngine(team.engine) +
-        " <span class=\"aosv3-mock-note\">(see Layer 1)</span></dd>" +
+        " <span class=\"aosv3-sidebar-hint\">(see Layer 1)</span></dd>" +
         "<dt>group</dt><dd>" +
         esc(team.group) +
         "</dd>" +
@@ -3400,7 +3840,7 @@ status: MOCKUP
       var l3 = buildTeamL3(team);
       var l4 = buildTeamL4(team);
       ctxEl.innerHTML =
-        '<div class="section-card"><div class="section-title">Context layers</div><p class="aosv3-mock-note">Roster (left) = read-only fields. Engine dropdown lives in <strong>Layer 1 — Identity</strong>; Copy L1–L4 below.</p></div>' +
+        '<div class="section-card"><div class="section-title">Context layers</div><p class="aosv3-sidebar-hint">Roster fields are read-only here. Engine is under <strong>Layer 1 — Identity</strong>. Copy L1–L4 below.</p></div>' +
         '<div class="section-card aosv3-layer1-card"><div class="section-title">Layer 1 — Identity</div>' +
         '<div class="aosv3-layer1-engine-row">' +
         '<label class="aosv3-form-label" for="aosv3-layer1-engine-select">engine</label> ' +
@@ -3412,7 +3852,7 @@ status: MOCKUP
         '<button type="button" class="btn btn-primary aosv3-team-engine-save" data-team-id="' +
         esc(team.team_id) +
         '">Save</button> ' +
-        '<span class="aosv3-mock-note">Principal (team_00) mock</span></div>' +
+        '<span class="aosv3-sidebar-hint">Principal (team_00) only</span></div>' +
         '<pre class="aosv3-context-pre">' +
         esc(l1) +
         '</pre><button type="button" class="btn" id="aosv3-copy-l1">Copy L1</button></div>' +
@@ -3525,16 +3965,16 @@ status: MOCKUP
         renderContext(selTeam);
       } else if (detailEl) {
         detailEl.innerHTML =
-          '<p class="aosv3-mock-note">No team matches filters.</p>';
+          '<p class="aosv3-sidebar-hint">No team matches filters.</p>';
         if (ctxEl) ctxEl.innerHTML = "";
       }
     }
 
     if (grp) grp.addEventListener("change", renderRoster);
-    if (dom) dom.addEventListener("change", renderRoster);
     if (curOnly) curOnly.addEventListener("change", renderRoster);
     renderOrgTree();
     renderRoster();
+    window.__aosv3TeamsRerender = renderRoster;
   }
 
   function initPortfolioPageLive() {
@@ -3553,7 +3993,24 @@ status: MOCKUP
       .then(function (p) {
         MOCK_PORTFOLIO_ACTIVE = {
           total: p[0].total,
-          runs: p[0].runs || [],
+          runs: (p[0].runs || []).map(function (r) {
+            return {
+              run_id: r.run_id,
+              work_package_id: r.work_package_id,
+              domain_id: r.domain_id,
+              domain_slug: r.domain_slug || null,
+              work_package_label: r.work_package_label || null,
+              work_package_program_id: r.work_package_program_id || null,
+              status: r.status,
+              process_variant: r.process_variant,
+              current_gate_id: r.current_gate_id,
+              current_phase_id: r.current_phase_id,
+              correction_cycle_count: r.correction_cycle_count,
+              started_at: r.started_at || "",
+              completed_at: r.completed_at,
+              current_actor_team_id: r.current_actor_team_id,
+            };
+          }),
         };
         MOCK_PORTFOLIO_COMPLETED = {
           runs: (p[1].runs || []).map(function (r) {
@@ -3561,6 +4018,9 @@ status: MOCKUP
               run_id: r.run_id,
               work_package_id: r.work_package_id,
               domain_id: r.domain_id,
+              domain_slug: r.domain_slug || null,
+              work_package_label: r.work_package_label || null,
+              work_package_program_id: r.work_package_program_id || null,
               status: r.status,
               current_gate_id: r.current_gate_id,
               current_phase_id: r.current_phase_id,
@@ -3577,8 +4037,11 @@ status: MOCKUP
               wp_id: w.wp_id,
               label: w.label,
               domain_id: w.domain_id,
+              domain_slug: w.domain_slug || null,
               status: w.status,
               linked_run_id: w.linked_run_id,
+              stage_id: w.stage_id || null,
+              program_id: w.program_id || null,
               linked_run_status: null,
               current_gate_id: null,
               current_phase_id: null,
@@ -3595,6 +4058,7 @@ status: MOCKUP
             title: i.title,
             description: i.description,
             domain_id: i.domain_id || "agents_os",
+            domain_slug: i.domain_slug || null,
             idea_type: "FEATURE",
             status: i.status,
             priority: i.priority,
@@ -3631,6 +4095,53 @@ status: MOCKUP
     var completedLimit = 10;
     var selectedPortfolioGate = "";
 
+    var portfolioSortState = window.__aosv3PortfolioSort;
+    if (!portfolioSortState) {
+      portfolioSortState = {
+        active: { key: "started_at", dir: -1 },
+        completed: { key: "started_at", dir: -1 },
+        ideas: { key: "submitted_at", dir: -1 },
+        wp: { key: "label", dir: 1 },
+      };
+      window.__aosv3PortfolioSort = portfolioSortState;
+    }
+
+    function portfolioSortCompare(va, vb, mul) {
+      return aosv3TableSortCompare(va, vb, mul);
+    }
+
+    function wirePortfolioTableSort(tableId, scope, rerender) {
+      var tbl = document.getElementById(tableId);
+      if (!tbl || tbl._aosv3PortfolioSortWired) return;
+      tbl._aosv3PortfolioSortWired = true;
+      tbl.querySelectorAll("thead th[data-sort-key]").forEach(function (th) {
+        th.style.cursor = "pointer";
+        th.addEventListener("click", function () {
+          var k = th.getAttribute("data-sort-key");
+          var st = portfolioSortState[scope];
+          if (st.key === k) st.dir = -st.dir;
+          else {
+            st.key = k;
+            st.dir = 1;
+          }
+          tbl.querySelectorAll("thead th[data-sort-key]").forEach(function (h) {
+            h.removeAttribute("aria-sort");
+          });
+          th.setAttribute(
+            "aria-sort",
+            st.dir > 0 ? "ascending" : "descending"
+          );
+          rerender();
+        });
+      });
+    }
+
+    function portfolioFilteredCompletedRuns() {
+      return MOCK_PORTFOLIO_COMPLETED.runs.filter(function (r) {
+        return matchesUiDataScope(r.domain_id, r.domain_slug);
+      });
+    }
+
     var gateFilterEl = document.getElementById("aosv3-portfolio-gate-filter");
     var gateApplyBtn = document.getElementById("aosv3-portfolio-gate-apply");
     if (gateApplyBtn && gateFilterEl) {
@@ -3665,14 +4176,52 @@ status: MOCKUP
       var tb = document.getElementById("aosv3-portfolio-active-tbody");
       if (!tb) return;
       tb.innerHTML = "";
+      var rows = [];
       MOCK_PORTFOLIO_ACTIVE.runs.forEach(function (r) {
+        if (!matchesUiDataScope(r.domain_id, r.domain_slug)) return;
         if (
           selectedPortfolioGate &&
           r.current_gate_id !== selectedPortfolioGate
         )
           return;
+        var wp = wpMetaById(r.work_package_id);
+        rows.push({
+          run_id: r.run_id,
+          work_package_id: r.work_package_id,
+          wp_label: wp.label || "",
+          program_key:
+            canonicalProgramFromWpId(r.work_package_id) ||
+            String(wp.program_id || ""),
+          domain_id: r.domain_id,
+          status: r.status,
+          current_gate_id: r.current_gate_id,
+          current_phase_id: r.current_phase_id,
+          phase_key:
+            (r.current_gate_id || "") +
+            " " +
+            (r.current_phase_id || ""),
+          correction_cycle_count: r.correction_cycle_count,
+          started_at: r.started_at || "",
+          current_actor_team_id: r.current_actor_team_id || "",
+          __r: r,
+        });
+      });
+      var stA = portfolioSortState.active;
+      var skA = stA.key;
+      var mulA = stA.dir;
+      rows.sort(function (a, b) {
+        return portfolioSortCompare(a[skA], b[skA], mulA);
+      });
+      rows.forEach(function (row) {
+        var r = row.__r;
         var tr = document.createElement("tr");
         var actorLbl = teamLabelById(r.current_actor_team_id);
+        var wp = wpMetaById(r.work_package_id);
+        var wpLab = wp.label || r.work_package_label || "";
+        var wpProg =
+          wp.program_id != null && String(wp.program_id).trim() !== ""
+            ? wp.program_id
+            : r.work_package_program_id;
         tr.innerHTML =
           '<td><span title="' +
           esc(r.run_id) +
@@ -3680,9 +4229,13 @@ status: MOCKUP
           esc(runUlidSuffix(r.run_id)) +
           "</span></td><td>" +
           domainPillHtml(r.domain_id) +
-          "</td><td>" +
+          "</td><td><span title=\"" +
           esc(r.work_package_id) +
-          "</td><td><span class=\"aosv3-status-badge " +
+          '">' +
+          esc(wpLab || "—") +
+          "</span></td><td>" +
+          programTableCell(r.work_package_id, wpProg) +
+          '</td><td><span class="aosv3-status-badge ' +
           statusBadgeClass(r.status) +
           "\">" +
           esc(r.status) +
@@ -3694,11 +4247,17 @@ status: MOCKUP
           esc(r.current_phase_id) +
           "</td><td>" +
           esc(String(r.correction_cycle_count)) +
-          "</td><td>" +
+          '</td><td class="aosv3-mono" title="' +
           esc(formatRelativeTime(r.started_at)) +
+          '">' +
+          esc(r.started_at || "—") +
           "</td><td>" +
           domainPillHtml(r.current_actor_team_id, actorLbl) +
-          '</td><td><button type="button" class="btn" disabled>View</button> <button type="button" class="btn" disabled>Pause</button> <button type="button" class="btn" disabled>Override (team_00)</button></td>';
+          '</td><td class="aosv3-table-actions"><span class="aosv3-table-actions-inner">' +
+          '<button type="button" class="btn" disabled>View</button>' +
+          '<button type="button" class="btn" disabled>Pause</button>' +
+          '<button type="button" class="btn" disabled>Override (team_00)</button>' +
+          "</span></td>";
         tb.appendChild(tr);
       });
     }
@@ -3706,10 +4265,41 @@ status: MOCKUP
     function renderCompleted() {
       var tb = document.getElementById("aosv3-portfolio-completed-tbody");
       if (!tb) return;
-      var runs = MOCK_PORTFOLIO_COMPLETED.runs;
-      var slice = runs.slice(completedOffset, completedOffset + completedLimit);
+      var runs = portfolioFilteredCompletedRuns();
+      var rows = runs.map(function (r) {
+        var wp = wpMetaById(r.work_package_id);
+        return {
+          run_id: r.run_id,
+          work_package_id: r.work_package_id,
+          wp_label: wp.label || "",
+          program_key:
+            canonicalProgramFromWpId(r.work_package_id) ||
+            String(wp.program_id || ""),
+          domain_id: r.domain_id,
+          status: "COMPLETE",
+          gates_completed: r.gates_completed || "",
+          started_at: r.started_at || "",
+          completed_at: r.completed_at || "",
+          started_completed:
+            (r.started_at || "") + " " + (r.completed_at || ""),
+          correction_cycle_count: r.correction_cycle_count,
+          __r: r,
+        };
+      });
+      var stC = portfolioSortState.completed;
+      rows.sort(function (a, b) {
+        return portfolioSortCompare(a[stC.key], b[stC.key], stC.dir);
+      });
+      var slice = rows.slice(completedOffset, completedOffset + completedLimit);
       tb.innerHTML = "";
-      slice.forEach(function (r) {
+      slice.forEach(function (row) {
+        var r = row.__r;
+        var wp = wpMetaById(r.work_package_id);
+        var wpLabC = wp.label || r.work_package_label || "";
+        var wpProgC =
+          wp.program_id != null && String(wp.program_id).trim() !== ""
+            ? wp.program_id
+            : r.work_package_program_id;
         var tr = document.createElement("tr");
         tr.innerHTML =
           '<td><span title="' +
@@ -3718,8 +4308,12 @@ status: MOCKUP
           esc(runUlidSuffix(r.run_id)) +
           "</span></td><td>" +
           domainPillHtml(r.domain_id) +
-          "</td><td>" +
+          "</td><td><span title=\"" +
           esc(r.work_package_id) +
+          '">' +
+          esc(wpLabC || "—") +
+          "</span></td><td>" +
+          programTableCell(r.work_package_id, wpProgC) +
           "</td><td><span class=\"aosv3-status-badge aosv3-status--complete\">COMPLETE</span></td><td>" +
           esc(r.gates_completed || "5/5 gates") +
           "</td><td>" +
@@ -3812,67 +4406,110 @@ status: MOCKUP
       if (!tb) return;
       var activeDom = activeDomainsWithRuns();
       tb.innerHTML = "";
-      MOCK_WORK_PACKAGES.work_packages.forEach(function (w) {
-        var canStart = w.status === "PLANNED" && !activeDom[w.domain_id];
-        var tr = document.createElement("tr");
-        tr.className = "aosv3-wp-row aosv3-wp-row--clickable";
-        tr.setAttribute("data-wp-id", w.wp_id);
-        tr.title = "Click row for WP details (mock)";
-        var linkCell = "—";
-        if (w.linked_run_id) {
-          linkCell =
-            '<span class="aosv3-mono" title="' +
-            esc(w.linked_run_id) +
-            '">' +
-            esc(runUlidSuffix(w.linked_run_id)) +
-            "</span>";
-        }
-        var cg =
-          w.current_gate_id != null && w.current_gate_id !== ""
-            ? '<span class="aosv3-gate-pill">' + esc(w.current_gate_id) + "</span>"
-            : "—";
-        var actionsHtml = "";
-        if (w.status === "ACTIVE") {
-          actionsHtml =
-            '<button type="button" class="btn aosv3-wp-stopprop" title="Mock — no API">View Run</button>';
-        } else if (w.status === "PLANNED") {
-          actionsHtml =
-            '<button type="button" class="btn aosv3-wp-stopprop"' +
-            (canStart ? "" : " disabled") +
-            ' title="' +
-            esc(
-              canStart
-                ? "Mock — Start Run (no API)"
-                : "Active run exists for this domain"
-            ) +
-            '">Start Run</button>';
-        } else if (w.status === "COMPLETE") {
-          actionsHtml =
-            '<button type="button" class="btn aosv3-wp-stopprop" title="Mock — no API">View History</button>';
-        }
-        tr.innerHTML =
-          "<td>" +
-          esc(w.wp_id) +
-          "</td><td>" +
-          esc(w.label) +
-          "</td><td>" +
-          domainPillHtml(w.domain_id) +
-          '</td><td><span class="aosv3-status-badge ' +
-          wpStatusBadgeClass(w.status) +
-          '">' +
-          esc(w.status) +
-          "</span></td><td>" +
-          cg +
-          "</td><td>" +
-          linkCell +
-          "</td><td>" +
-          actionsHtml +
-          "</td>";
-        tr.addEventListener("click", function (ev) {
-          if (ev.target.closest(".aosv3-wp-stopprop")) return;
-          openWpDetailModal(w);
+
+      // Group WPs by stage_id; null stage_id goes to "Other"
+      var stageOrder = [];
+      var stageMap = {};
+      MOCK_WORK_PACKAGES.work_packages
+        .filter(function (w) {
+          return matchesUiDataScope(w.domain_id, w.domain_slug);
+        })
+        .forEach(function (w) {
+          var key = w.stage_id || "__other__";
+          if (!stageMap[key]) {
+            stageMap[key] = [];
+            stageOrder.push(key);
+          }
+          stageMap[key].push(w);
         });
-        tb.appendChild(tr);
+
+      stageOrder.forEach(function (stageKey) {
+        // Milestone section header row
+        var headerTr = document.createElement("tr");
+        headerTr.className = "aosv3-wp-milestone-header";
+        var stageLabel = stageKey === "__other__" ? "Other / No Milestone" : stageKey;
+        headerTr.innerHTML =
+          '<td colspan="8" class="aosv3-wp-milestone-label">' + esc(stageLabel) + "</td>";
+        tb.appendChild(headerTr);
+
+        var stW = portfolioSortState.wp;
+        var skW = stW.key;
+        var mulW = stW.dir;
+        stageMap[stageKey].sort(function (a, b) {
+          var va =
+            skW === "program_key"
+              ? canonicalProgramFromWpId(a.wp_id) ||
+                String(a.program_id || "")
+              : a[skW];
+          var vb =
+            skW === "program_key"
+              ? canonicalProgramFromWpId(b.wp_id) ||
+                String(b.program_id || "")
+              : b[skW];
+          return portfolioSortCompare(va, vb, mulW);
+        });
+        stageMap[stageKey].forEach(function (w) {
+          var canStart = w.status === "PLANNED" && !activeDom[w.domain_id];
+          var tr = document.createElement("tr");
+          tr.className = "aosv3-wp-row aosv3-wp-row--clickable";
+          tr.setAttribute("data-wp-id", w.wp_id);
+          tr.title = "Click row for WP details";
+          var linkCell = "—";
+          if (w.linked_run_id) {
+            linkCell =
+              '<span class="aosv3-mono" title="' +
+              esc(w.linked_run_id) +
+              '">' +
+              esc(runUlidSuffix(w.linked_run_id)) +
+              "</span>";
+          }
+          var actionsHtml = "";
+          if (w.status === "ACTIVE") {
+            actionsHtml =
+              '<button type="button" class="btn aosv3-wp-stopprop" title="View Run">View Run</button>';
+          } else if (w.status === "PLANNED") {
+            actionsHtml =
+              '<button type="button" class="btn aosv3-wp-stopprop"' +
+              (canStart ? "" : " disabled") +
+              ' title="' +
+              esc(
+                canStart
+                  ? "Start Run"
+                  : "Active run exists for this domain"
+              ) +
+              '">Start Run</button>';
+          } else if (w.status === "COMPLETE") {
+            actionsHtml =
+              '<button type="button" class="btn aosv3-wp-stopprop" title="View History">View History</button>';
+          }
+          tr.innerHTML =
+            "<td>" +
+            esc(w.stage_id || "—") +
+            "</td><td><strong>" +
+            esc(w.label) +
+            '</strong></td><td>' +
+            programTableCell(w.wp_id, w.program_id) +
+            '</td><td class="aosv3-mono" title="' +
+            esc(w.wp_id) +
+            '">' +
+            esc(runUlidSuffix(w.wp_id)) +
+            "</td><td>" +
+            domainPillHtml(w.domain_id) +
+            '</td><td><span class="aosv3-status-badge ' +
+            wpStatusBadgeClass(w.status) +
+            '">' +
+            esc(w.status) +
+            "</span></td><td>" +
+            linkCell +
+            '</td><td class="aosv3-table-actions"><span class="aosv3-table-actions-inner">' +
+            actionsHtml +
+            "</span></td>";
+          tr.addEventListener("click", function (ev) {
+            if (ev.target.closest(".aosv3-wp-stopprop")) return;
+            openWpDetailModal(w);
+          });
+          tb.appendChild(tr);
+        });
       });
     }
 
@@ -3911,20 +4548,44 @@ status: MOCKUP
       var tb = document.getElementById("aosv3-portfolio-ideas-tbody");
       if (!tb) return;
       tb.innerHTML = "";
+      var vis = [];
       ideas.forEach(function (idea, idx) {
+        if (!matchesUiDataScope(idea.domain_id, idea.domain_slug)) return;
+        vis.push({ idea: idea, idx: idx });
+      });
+      var stI = portfolioSortState.ideas;
+      var skI = stI.key;
+      var mulI = stI.dir;
+      vis.sort(function (x, y) {
+        var a = x.idea;
+        var b = y.idea;
+        var va = a[skI];
+        var vb = b[skI];
+        if (skI === "target_program_id") {
+          va = a.target_program_id || "";
+          vb = b.target_program_id || "";
+        }
+        return portfolioSortCompare(va, vb, mulI);
+      });
+      vis.forEach(function (row) {
+        var idea = row.idea;
+        var idx = row.idx;
         var tr = document.createElement("tr");
         var apEn = ideaRowAllowsTransition(idea, "approve");
         var rjEn = ideaRowAllowsTransition(idea, "reject");
         var dfEn = ideaRowAllowsTransition(idea, "defer");
+        var subAt = idea.submitted_at || "";
         tr.innerHTML =
-          "<td>" +
-          esc(runUlidSuffix(idea.idea_id)) +
-          '</td><td title="' +
+          '<td title="' +
           esc(idea.idea_id) +
-          '">' +
+          '"><span class="aosv3-mono">' +
+          esc(runUlidSuffix(idea.idea_id)) +
+          "</span></td><td>" +
           esc(idea.title) +
           "</td><td>" +
           domainPillHtml(idea.domain_id || "agents_os") +
+          "</td><td>" +
+          programTableCell(null, idea.target_program_id) +
           '</td><td><span class="' +
           ideaTypeBadgeClass(idea.idea_type) +
           '">' +
@@ -3942,26 +4603,29 @@ status: MOCKUP
             idea.submitted_by,
             teamLabelById(idea.submitted_by)
           ) +
-          "</td><td>" +
-          esc(formatRelativeTime(idea.submitted_at)) +
-          '</td><td><button type="button" class="btn aosv3-idea-edit" data-idx="' +
+          '</td><td class="aosv3-mono" title="' +
+          esc(formatRelativeTime(subAt)) +
+          '">' +
+          esc(subAt || "—") +
+          '</td><td class="aosv3-table-actions"><span class="aosv3-table-actions-inner">' +
+          '<button type="button" class="btn aosv3-idea-edit" data-idx="' +
           idx +
-          '">Edit</button> ' +
+          '">Edit</button>' +
           '<button type="button" class="btn aosv3-idea-approve" data-idx="' +
           idx +
           '"' +
           (apEn ? "" : " disabled") +
-          '>Approve</button> ' +
+          '>Approve</button>' +
           '<button type="button" class="btn aosv3-idea-reject" data-idx="' +
           idx +
           '"' +
           (rjEn ? "" : " disabled") +
-          '>Reject</button> ' +
+          '>Reject</button>' +
           '<button type="button" class="btn aosv3-idea-defer" data-idx="' +
           idx +
           '"' +
           (dfEn ? "" : " disabled") +
-          ">Defer</button></td>";
+          ">Defer</button></span></td>";
         tb.appendChild(tr);
       });
       tb.querySelectorAll(".aosv3-idea-edit").forEach(function (b) {
@@ -4233,14 +4897,30 @@ status: MOCKUP
       document
         .getElementById("aosv3-completed-next")
         .addEventListener("click", function () {
-          if (
-            completedOffset + completedLimit <
-            MOCK_PORTFOLIO_COMPLETED.runs.length
-          ) {
+          var cruns = portfolioFilteredCompletedRuns();
+          if (completedOffset + completedLimit < cruns.length) {
             completedOffset += completedLimit;
             renderCompleted();
           }
         });
+
+    function portfolioRerenderFromScope() {
+      completedOffset = 0;
+      renderActive();
+      renderCompleted();
+      renderWp();
+      renderIdeas();
+    }
+    window.__aosv3PortfolioRerender = portfolioRerenderFromScope;
+
+    wirePortfolioTableSort("aosv3-portfolio-table-active", "active", renderActive);
+    wirePortfolioTableSort(
+      "aosv3-portfolio-table-completed",
+      "completed",
+      renderCompleted
+    );
+    wirePortfolioTableSort("aosv3-portfolio-table-wp", "wp", renderWp);
+    wirePortfolioTableSort("aosv3-portfolio-table-ideas", "ideas", renderIdeas);
 
     showPortfolioTab("active");
     renderActive();
@@ -4310,6 +4990,7 @@ status: MOCKUP
   }
 
   function boot() {
+    applyUiDomainScopeControl();
     var page = document.body.getAttribute("data-aosv3-page");
     if (page === "pipeline") initPipelinePage();
     else if (page === "history") initHistoryPage();
@@ -4317,6 +4998,7 @@ status: MOCKUP
     else if (page === "teams") initTeamsPage();
     else if (page === "portfolio") initPortfolioPage();
     else if (page === "flow") initFlowPage();
+    updatePipelineDomainButtonStyles();
   }
 
   if (document.readyState === "loading") {

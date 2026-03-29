@@ -18,7 +18,7 @@ Canonical governance for agents is in the repo root **`AGENTS.md`**. Long-form d
 
 Optional runtime:
 
-- **`AOS_V3_SERVER_PORT`** — API listen port (default **8090**). Conflicts with v2 UI on the same port if both run locally.
+- **`AOS_V3_SERVER_PORT`** — API listen port (default **8090** — canonical). v2 pipeline UI uses **8092** (`agents_os/scripts/start_ui_server.sh`); no default conflict.
 - **`AOS_V3_PUBLIC_API_BASE`** — base URL embedded in `GET /api/state` `next_action.cli_command` (default `http://127.0.0.1:8090`).
 - **`ALLOWED_ORIGINS`** — comma-separated CORS origins (see `modules/management/api.py` for defaults).
 
@@ -52,9 +52,10 @@ Skip DB init: `AOS_V3_SKIP_DATABASE_INIT=1 bash scripts/bootstrap_aos_v3_local.s
 bash scripts/start-aos-v3-server.sh
 ```
 
-- Default URL: `http://127.0.0.1:8090`
+- Default URL: `http://127.0.0.1:8090/` — **`GET /` serves v3 Pipeline View** (address bar stays `/`; assets under `/v3/` via `<base>`)
 - Health: `GET /api/health` → `{"status":"ok"}`
 - OpenAPI: `/docs`, `/redoc`
+- Port policy: `documentation/docs-agents-os/02-ARCHITECTURE/AGENTS_OS_V3_NETWORK_PORTS_AND_UI_ENTRY_v1.0.0.md`
 
 Stop / restart:
 

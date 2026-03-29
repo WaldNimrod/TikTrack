@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <!--
-id: TEAM_31_AOS_V3_UI_MOCKUPS
+id: TEAM_31_AOS_V3_UI
 team: Team 31
 domain: agents_os
 artifact: index.html
 mandate: TEAM_100_TO_TEAM_31_AOS_V3_UI_MOCKUPS_MANDATE_v2.0.0
-date: 2026-03-27
-status: MOCKUP
+date: 2026-03-29
+status: ACTIVE
 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="./" />
   <meta name="aosv3-api-base" content="http://127.0.0.1:8090" />
   <title>Agents OS v3 — Pipeline View</title>
   <link rel="stylesheet" href="../../agents_os/ui/css/pipeline-shared.css" />
@@ -23,11 +24,9 @@ status: MOCKUP
 <header class="agents-header">
   <div class="agents-header-left">
     <h1 class="agents-header-title">Agents OS v3 — <span>Pipeline View</span></h1>
-    <span class="agents-refresh-label">GET /api/state?domain_id=… (mock)</span>
   </div>
   <div class="agents-header-right">
-    <span id="aosv3-sse-indicator" class="aosv3-sse-indicator aosv3-sse--polling" role="status" aria-live="polite"><span class="aosv3-sse-dot" aria-hidden="true"></span> Polling Mode</span>
-    <span class="agents-refresh-label">Mandate v2.0.0 mockup</span>
+    <span id="aosv3-sse-indicator" class="aosv3-sse-indicator aosv3-sse--polling" role="status" aria-live="polite" title="Live updates: SSE when connected, otherwise periodic refresh"><span class="aosv3-sse-dot" aria-hidden="true"></span> Polling Mode</span>
   </div>
 </header>
 
@@ -36,41 +35,43 @@ status: MOCKUP
   <span class="nav-sep"></span>
   <a class="nav-link" href="history.html">History</a>
   <span class="nav-sep"></span>
-  <a class="nav-link" href="config.html">Configuration</a>
-  <span class="nav-sep"></span>
   <a class="nav-link" href="teams.html">Teams</a>
   <span class="nav-sep"></span>
   <a class="nav-link" href="portfolio.html">Portfolio</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="config.html">Configuration</a>
   <span class="nav-sep"></span>
   <a class="nav-link" href="flow.html">System Map</a>
 </nav>
 
 <div class="agents-page-layout" id="agents-page-layout">
   <aside class="agents-page-sidebar">
-    <div class="agents-domain-bar agents-domain-bar--sidebar">
-      <div class="sidebar-label">Theme / domain</div>
-      <div class="domain-selector">
-        <button type="button" class="domain-btn" data-pipeline-domain="agents_os" onclick="AOSV3_onDomainSwitch('agents_os')">Agents OS (dark)</button>
-        <button type="button" class="domain-btn" data-pipeline-domain="tiktrack" onclick="AOSV3_onDomainSwitch('tiktrack')">TikTrack (light)</button>
+    <!-- Type A — single-domain UI: Pipeline only (see flow.html for System Map) -->
+    <div class="sidebar-section-card agents-domain-bar agents-domain-bar--sidebar">
+      <div class="sidebar-label aosv3-workspace-panel-title">Active workspace</div>
+      <div class="domain-selector" role="group" aria-label="Active product workspace">
+        <button type="button" class="domain-btn" data-pipeline-domain="agents_os" onclick="AOSV3_onDomainSwitch('agents_os')" title="Agents OS — dark theme; API context agents_os">Agents OS</button>
+        <button type="button" class="domain-btn" data-pipeline-domain="tiktrack" onclick="AOSV3_onDomainSwitch('tiktrack')" title="TikTrack — light theme; API context tiktrack">TikTrack</button>
       </div>
-      <p class="aosv3-mock-note">Sets <code>localStorage.pipeline_domain</code> (same key as v1/v2 dashboard). Default UI: light; dark theme only when Agents OS is selected.</p>
+      <p class="aosv3-sidebar-hint">This run and API calls use one lane at a time. Stored as <code>pipeline_domain</code>.</p>
     </div>
     <div class="sidebar-section-card" id="aosv3-live-api-card" style="display:none">
-      <div class="sidebar-label">Live API (GATE_4)</div>
+      <div class="sidebar-label">Connection</div>
       <label class="aosv3-form-label">X-Actor-Team-Id
-        <input type="text" id="aosv3-live-actor" class="aosv3-input" autocomplete="off" placeholder="team_61" />
+        <input type="text" id="aosv3-live-actor" class="aosv3-input" autocomplete="off" placeholder="team_61" title="Sent on API requests that mutate state" aria-label="Actor team id header" />
       </label>
       <label class="aosv3-form-label">API base URL
-        <input type="text" id="aosv3-live-api-base" class="aosv3-input" autocomplete="off" placeholder="http://127.0.0.1:8090" />
+        <input type="text" id="aosv3-live-api-base" class="aosv3-input" autocomplete="off" placeholder="http://127.0.0.1:8090" title="Agents OS v3 API origin" aria-label="API base URL" />
       </label>
-      <button type="button" class="btn btn-primary" id="aosv3-live-save-settings">Save &amp; reload state</button>
-      <p class="aosv3-mock-note">Persisted in localStorage. GET /api/state requires this header.</p>
+      <button type="button" class="btn btn-primary" id="aosv3-live-save-settings" title="Save settings and reload pipeline state from the API">Save &amp; reload state</button>
+      <p class="aosv3-sidebar-hint">Stored in localStorage. Mutations require <code>X-Actor-Team-Id</code>.</p>
     </div>
-    <div class="sidebar-section-card">
-      <div class="sidebar-label">Mock state preset</div>
+    <div class="sidebar-section-card" id="aosv3-dev-scenarios-card" style="display:none">
+      <div class="sidebar-label">Developer scenarios</div>
+      <p class="aosv3-sidebar-hint">Shown when <code>?dev=1</code> or <code>localStorage.aosv3_dev_ui=1</code>. Offline UI rehearsal only.</p>
       <div class="aosv3-preset-row">
         <label for="aosv3-preset-select">Scenario</label>
-        <select id="aosv3-preset-select" aria-label="Mock state preset">
+        <select id="aosv3-preset-select" aria-label="Developer scenario preset">
           <option value="active">IN_PROGRESS (GATE_3)</option>
           <option value="idle">IDLE — no active run</option>
           <option value="paused">PAUSED (actor null)</option>
@@ -97,20 +98,19 @@ status: MOCKUP
     </div>
     <div class="sidebar-section-card">
       <div class="sidebar-label">Gate map</div>
-      <div id="aosv3-gate-map" class="aosv3-gate-map" aria-label="Pipeline gates 0–5"></div>
-      <p class="aosv3-mock-note">Current gate highlighted · Phases for active gate below chips · COMPLETE = all gates done</p>
-      <p class="aosv3-mock-note">GATE_3 matrix (26): <code>?aosv3_preset=…&amp;aosv3_phase=phase_3_1|phase_3_2</code> — index <code>_COMMUNICATION/team_51/evidence/pipeline_gate3_matrix/gate3_matrix_index.md</code></p>
+      <div id="aosv3-gate-map" class="aosv3-gate-map" aria-label="Pipeline gates 0–5" title="Current gate highlighted; sub-phases when applicable"></div>
+      <p class="aosv3-sidebar-hint">Current gate highlighted. When a run completes all gates, status shows COMPLETE.</p>
     </div>
     <div class="sidebar-section-card aosv3-program-control-card">
       <div class="sidebar-label">Program control</div>
-      <button type="button" class="btn btn-warning aosv3-btn-stop" id="aosv3-btn-stop-run" hidden>Stop run</button>
+      <button type="button" class="btn btn-warning aosv3-btn-stop" id="aosv3-btn-stop-run" hidden title="Stop the active run">Stop run</button>
       <div id="aosv3-idle-activate-row" class="aosv3-idle-activate-row">
         <label class="aosv3-form-label">Activate when idle
           <select id="aosv3-activate-target" class="aosv3-input" aria-label="Program or WP to activate"></select>
         </label>
-        <button type="button" class="btn btn-primary" id="aosv3-btn-activate-program">Activate</button>
+        <button type="button" class="btn btn-primary" id="aosv3-btn-activate-program" title="Start the selected program or work package when no run is active">Activate</button>
       </div>
-      <p class="aosv3-mock-note">Mock — no API calls.</p>
+      <p class="aosv3-sidebar-hint">Live API: activation calls the server. Mock mode (<code>?mock=1</code>): simulated only.</p>
     </div>
     <div class="sidebar-section-card aosv3-legend-card">
       <div class="sidebar-label">Status color key</div>
@@ -126,15 +126,15 @@ status: MOCKUP
   </aside>
 
   <main class="agents-page-main">
-    <div id="aosv3-escalation-banner" class="aosv3-escalation-banner" hidden>
-      Escalated: latest event is CORRECTION_ESCALATED — notify Team 00 (mock banner).
+    <div id="aosv3-escalation-banner" class="aosv3-escalation-banner" hidden title="Escalation to Principal">
+      Escalated: latest event is CORRECTION_ESCALATED — notify Team 00.
     </div>
 
     <div id="aosv3-empty-state" class="aosv3-empty-state aosv3-empty-state--idle" hidden>
       <strong>No active run</strong>
-      <span class="aosv3-idle-sub">status: IDLE — use POST /api/runs to start (mock form below).</span>
+      <span class="aosv3-idle-sub">Status IDLE — start a run with the form below (or POST <code>/api/runs</code>).</span>
       <div class="aosv3-start-run-card section-card">
-        <div class="section-title">Start Run (§6.1.B — mock)</div>
+        <div class="section-title">Start run</div>
         <form id="aosv3-start-run-form" class="aosv3-start-run-form">
           <label class="aosv3-form-label">Work Package ID <span class="aosv3-req">*</span>
             <input type="text" name="work_package_id" required placeholder="S003-P002-WP001" class="aosv3-input" />
@@ -161,16 +161,16 @@ status: MOCKUP
               <option value="AUTOMATIC">AUTOMATIC</option>
             </select>
           </label>
-          <button type="button" class="btn btn-primary aosv3-start-run-btn" disabled title="Mock — no API">Start Run →</button>
+          <button type="button" class="btn btn-primary aosv3-start-run-btn" disabled title="Enabled when API client is connected (live mode)">Start Run →</button>
         </form>
-        <p class="aosv3-mock-note">CTA disabled in mockup; fields satisfy layout contract.</p>
+        <p class="aosv3-sidebar-hint">Button is enabled in live API mode when the client is ready.</p>
       </div>
     </div>
 
     <div id="aosv3-pipeline-main">
       <section id="aosv3-prompt-section" class="section-card aosv3-prompt-card" hidden aria-label="Assembled prompt">
         <div class="section-title aosv3-prompt-title">Assembled prompt</div>
-        <p class="aosv3-mock-note">GET /api/runs/{run_id}/prompt (mock) — AD-S8A-01 prominence</p>
+        <p class="aosv3-sidebar-hint">Assembled operator prompt for this run (<code>GET /api/runs/{run_id}/prompt</code>).</p>
         <div class="aosv3-prompt-meta">
           <span id="aosv3-prompt-token-badge" class="status-pill pill-current">—</span>
           <span id="aosv3-prompt-assembled" class="agents-refresh-label"></span>
@@ -179,24 +179,24 @@ status: MOCKUP
         <pre id="aosv3-prompt-pre" class="aosv3-prompt-pre"></pre>
         <div class="aosv3-prompt-blend">
           <div class="sidebar-label">Copy — add blends</div>
-          <label class="aosv3-team-checkbox-label"><input type="checkbox" id="aosv3-prompt-blend-team" /> Team context (L1–L4 from Teams mock, current actor)</label>
-          <label class="aosv3-team-checkbox-label"><input type="checkbox" id="aosv3-prompt-blend-policies" /> Policies (governance mock)</label>
+          <label class="aosv3-team-checkbox-label"><input type="checkbox" id="aosv3-prompt-blend-team" title="Include L1–L4 team context" /> Team context (L1–L4, current actor)</label>
+          <label class="aosv3-team-checkbox-label"><input type="checkbox" id="aosv3-prompt-blend-policies" title="Include governance policies" /> Policies</label>
         </div>
         <div class="aosv3-prompt-actions">
-          <button type="button" class="btn btn-primary" id="aosv3-prompt-copy">Copy to clipboard</button>
-          <button type="button" class="btn" id="aosv3-prompt-regenerate" disabled title="Mock">Regenerate</button>
+          <button type="button" class="btn btn-primary" id="aosv3-prompt-copy" title="Copy prompt text to clipboard">Copy to clipboard</button>
+          <button type="button" class="btn" id="aosv3-prompt-regenerate" disabled title="Re-fetch prompt from API (when available)">Regenerate</button>
         </div>
       </section>
 
       <section id="aosv3-correction-blocking" class="section-card aosv3-correction-blocking" hidden aria-label="Correction blocking findings">
         <div class="section-title">CORRECTION — blocking findings</div>
-        <p class="aosv3-mock-note">Visible when status = CORRECTION (Stage 8B §5).</p>
+        <p class="aosv3-sidebar-hint">Shown when the run is in CORRECTION with blocking items.</p>
         <div id="aosv3-correction-blocking-body"></div>
       </section>
 
       <section id="aosv3-operator-handoff" class="section-card aosv3-operator-handoff" hidden aria-label="Operator handoff">
         <div class="section-title">OPERATOR HANDOFF</div>
-        <p class="aosv3-mock-note">PREVIOUS / NEXT / CLI — Stage 8B §3. Between assembled prompt and run status.</p>
+        <p class="aosv3-sidebar-hint">Previous event, required next action, and CLI helper.</p>
         <div class="sidebar-label">PREVIOUS (last event for this run)</div>
         <div id="aosv3-handoff-previous" class="aosv3-handoff-previous"></div>
         <div class="sidebar-label">NEXT</div>
@@ -212,14 +212,6 @@ status: MOCKUP
 
       <div class="section-card">
         <div class="section-title">Run status</div>
-        <div class="aosv3-run-status-domain-block">
-          <div class="sidebar-label">Pipeline domain (mock view)</div>
-          <p class="aosv3-mock-note">Same as sidebar — default light; dark only for Agents OS. Sets <code>domain_id</code> below.</p>
-          <div class="domain-selector">
-            <button type="button" class="domain-btn" data-pipeline-domain="agents_os" onclick="AOSV3_onDomainSwitch('agents_os')">Agents OS (dark)</button>
-            <button type="button" class="domain-btn" data-pipeline-domain="tiktrack" onclick="AOSV3_onDomainSwitch('tiktrack')">TikTrack (light)</button>
-          </div>
-        </div>
         <p><span id="aosv3-status-badge" class="aosv3-status-badge aosv3-status--in_progress">IN_PROGRESS</span></p>
         <div class="info-row"><span class="info-key">domain_id</span><span class="info-val" id="aosv3-main-domain">—</span></div>
         <div class="info-row"><span class="info-key">current_gate_id</span><span class="info-val" id="aosv3-gate">—</span></div>
@@ -235,7 +227,7 @@ status: MOCKUP
       <div class="section-card">
         <div class="section-title">Current actor</div>
         <div class="info-row"><span class="info-key">actor</span><span id="aosv3-actor-block" class="info-val">—</span></div>
-        <p class="aosv3-mock-note">AD-S5-02: PAUSED → actor shown as null/—</p>
+        <p class="aosv3-sidebar-hint">When status is PAUSED, actor may appear empty.</p>
       </div>
 
       <div class="section-card" id="aosv3-sentinel-card">
@@ -244,23 +236,23 @@ status: MOCKUP
       </div>
 
       <div class="section-card">
-        <div class="section-title">Actions (mock — disabled)</div>
+        <div class="section-title">Actions</div>
         <div class="aosv3-actions">
-          <button type="button" class="btn btn-primary" disabled title="POST /advance" id="aosv3-btn-advance">ADVANCE</button>
-          <button type="button" class="btn" disabled title="POST /resubmit" id="aosv3-btn-resubmit" hidden>RESUBMIT</button>
-          <button type="button" class="btn" disabled title="POST /fail" id="aosv3-btn-fail">FAIL</button>
-          <button type="button" class="btn" disabled title="POST /approve" id="aosv3-btn-approve" hidden>APPROVE</button>
-          <button type="button" class="btn" disabled title="POST /pause" id="aosv3-btn-pause">PAUSE</button>
-          <button type="button" class="btn" disabled title="POST /resume" id="aosv3-btn-resume" hidden>RESUME</button>
-          <button type="button" class="btn" disabled title="POST /override — team_00" id="aosv3-btn-override">OVERRIDE (team_00)</button>
+          <button type="button" class="btn btn-primary" disabled title="Advance run (POST /advance)" id="aosv3-btn-advance">ADVANCE</button>
+          <button type="button" class="btn" disabled title="Resubmit after correction (POST)" id="aosv3-btn-resubmit" hidden>RESUBMIT</button>
+          <button type="button" class="btn" disabled title="Fail run (POST /fail)" id="aosv3-btn-fail">FAIL</button>
+          <button type="button" class="btn" disabled title="Human gate approval (POST /approve)" id="aosv3-btn-approve" hidden>APPROVE</button>
+          <button type="button" class="btn" disabled title="Pause run (POST /pause)" id="aosv3-btn-pause">PAUSE</button>
+          <button type="button" class="btn" disabled title="Resume run (POST /resume)" id="aosv3-btn-resume" hidden>RESUME</button>
+          <button type="button" class="btn" disabled title="Principal override (POST /override, team_00)" id="aosv3-btn-override">OVERRIDE (team_00)</button>
         </div>
-        <p class="aosv3-mock-note">APPROVE visible only when is_human_gate=1 (mock preset).</p>
+        <p class="aosv3-sidebar-hint">APPROVE appears only on human gates. Buttons enable when the API allows the transition.</p>
       </div>
     </div>
 
     <section class="section-card aosv3-pipeline-run-log-main" id="aosv3-pipeline-footer-log" aria-label="Current run log">
       <div class="section-title">Current run log</div>
-      <p class="aosv3-mock-note">All events for this run_id (newest first) — seq, gate/phase, actor, verdict, reason.</p>
+      <p class="aosv3-sidebar-hint">Events for this run (newest first): sequence, gate/phase, actor, verdict, reason.</p>
       <div class="aosv3-table-wrap">
         <table class="aosv3-table aosv3-table--dense">
           <thead>
@@ -285,11 +277,11 @@ status: MOCKUP
   <div class="aosv3-modal-box">
     <button type="button" class="aosv3-modal-close" data-aosv3-modal-close aria-label="Close">✕</button>
     <h3 id="aosv3-modal-stop-title">Stop active run?</h3>
-    <p class="aosv3-mock-note">This would abort the current program run. In production, only authorized operators (e.g. Principal) should confirm.</p>
-    <p><strong>Mockup:</strong> no request is sent.</p>
+    <p class="aosv3-sidebar-hint">Aborts the current run. Only authorized operators should confirm.</p>
+    <p class="aosv3-sidebar-hint">In developer scenario mode, no API request is sent.</p>
     <div class="aosv3-modal-actions">
-      <button type="button" class="btn" data-aosv3-modal-close>Cancel</button>
-      <button type="button" class="btn btn-warning" id="aosv3-modal-stop-confirm">Confirm stop</button>
+      <button type="button" class="btn" data-aosv3-modal-close title="Close without stopping">Cancel</button>
+      <button type="button" class="btn btn-warning" id="aosv3-modal-stop-confirm" title="Confirm stop run">Confirm stop</button>
     </div>
   </div>
 </div>

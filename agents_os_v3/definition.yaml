@@ -21,9 +21,6 @@ team_00:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: null
-  children:
-    - team_10
-    - team_11
 
 # Team 10 — Gateway (seed for GATE_0 routing / assignments; D-03 unchanged on team_00)
 team_10:
@@ -39,7 +36,6 @@ team_10:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: team_00
-  children: []
 
 # Team 11 — AOS Gateway (BUILD seed; hierarchy for GET /api/teams)
 team_11:
@@ -55,7 +51,259 @@ team_11:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: team_00
-  children: []
+
+# Remaining roster (TEAMS_ROSTER_v1.0.0.json) — API derives ``children`` from ``parent_team_id``.
+team_20:
+  id: team_20
+  label: Team 20
+  name: Backend Implementation
+  engine: cursor
+  domain_scope: tiktrack
+  in_gate_process: 1
+  group: implementation
+  profession: backend_engineer
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_10
+
+team_21:
+  id: team_21
+  label: Team 21
+  name: AOS Backend Implementation
+  engine: cursor
+  domain_scope: agents_os
+  in_gate_process: 1
+  group: implementation
+  profession: backend_engineer
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_11
+
+team_30:
+  id: team_30
+  label: Team 30
+  name: Frontend Implementation
+  engine: cursor
+  domain_scope: tiktrack
+  in_gate_process: 1
+  group: implementation
+  profession: frontend_engineer
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_10
+
+team_31:
+  id: team_31
+  label: Team 31
+  name: AOS Frontend Implementation
+  engine: cursor
+  domain_scope: agents_os
+  in_gate_process: 1
+  group: implementation
+  profession: frontend_engineer
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_11
+
+team_40:
+  id: team_40
+  label: Team 40
+  name: UI Assets & Design
+  engine: cursor
+  domain_scope: tiktrack
+  in_gate_process: 1
+  group: design
+  profession: ui_designer
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_00
+
+team_50:
+  id: team_50
+  label: Team 50
+  name: QA & Functional Acceptance
+  engine: cursor
+  domain_scope: tiktrack
+  in_gate_process: 1
+  group: qa
+  profession: qa_engineer
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_00
+
+team_51:
+  id: team_51
+  label: Team 51
+  name: AOS QA & Functional Acceptance
+  engine: cursor
+  domain_scope: agents_os
+  in_gate_process: 1
+  group: qa
+  profession: qa_engineer
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_50
+
+team_60:
+  id: team_60
+  label: Team 60
+  name: DevOps & Platform
+  engine: cursor
+  domain_scope: tiktrack
+  in_gate_process: 1
+  group: implementation
+  profession: devops_engineer
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_00
+
+team_61:
+  id: team_61
+  label: Team 61
+  name: AOS DevOps & Platform
+  engine: cursor
+  domain_scope: agents_os
+  in_gate_process: 1
+  group: implementation
+  profession: devops_engineer
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_11
+
+team_70:
+  id: team_70
+  label: Team 70
+  name: TikTrack Documentation
+  engine: codex
+  domain_scope: tiktrack
+  in_gate_process: 1
+  group: documentation
+  profession: technical_writer
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_00
+
+team_71:
+  id: team_71
+  label: Team 71
+  name: AOS Documentation
+  engine: codex
+  domain_scope: agents_os
+  in_gate_process: 1
+  group: documentation
+  profession: technical_writer
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_00
+
+team_90:
+  id: team_90
+  label: Team 90
+  name: Dev Validator
+  engine: codex
+  domain_scope: multi
+  in_gate_process: 1
+  group: governance
+  profession: dev_validator
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_00
+
+team_100:
+  id: team_100
+  label: Team 100
+  name: Chief System Architect / Chief R&D
+  engine: codex
+  domain_scope: agents_os
+  in_gate_process: 1
+  group: architecture
+  profession: domain_architect
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_00
+
+team_110:
+  id: team_110
+  label: Team 110
+  name: TikTrack Domain Architect (IDE)
+  engine: codex
+  domain_scope: tiktrack
+  in_gate_process: 0
+  group: architecture
+  profession: domain_architect
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_100
+
+team_111:
+  id: team_111
+  label: Team 111
+  name: AOS Domain Architect (IDE)
+  engine: codex
+  domain_scope: agents_os
+  in_gate_process: 1
+  group: architecture
+  profession: domain_architect
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_100
+
+team_170:
+  id: team_170
+  label: Team 170
+  name: Spec & Governance
+  engine: codex
+  domain_scope: multi
+  in_gate_process: 1
+  group: governance
+  profession: spec_governance
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_00
+
+team_190:
+  id: team_190
+  label: Team 190
+  name: Constitutional Validator
+  engine: codex
+  domain_scope: multi
+  in_gate_process: 1
+  group: governance
+  profession: constitutional_validator
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_00
+
+team_191:
+  id: team_191
+  label: Team 191
+  name: Git, Archive & File Governance
+  engine: cursor
+  domain_scope: multi
+  in_gate_process: 0
+  group: governance
+  profession: git_and_file_governance
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_190
 
 domains:
   - id: "01JK8AOSV3DOMAIN00000001"
@@ -211,10 +459,407 @@ templates:
     version: 1
     is_active: 1
 
-# Registry row for initiate smoke tests (G01 work_package_id exists)
+# ---------------------------------------------------------------------------
+# Work Packages
+# ---------------------------------------------------------------------------
+# Bootstrap: AOS smoke-test placeholder (keep for run smoke-tests)
+# TikTrack roadmap: all 21 programs from PHOENIX_PROGRAM_REGISTRY, seeded 2026-03-29
+#   id = program_id (readable, matches run.work_package_id when WP enters pipeline)
+#   stage_id = Milestone (S001-S006 per PHOENIX_PORTFOLIO_ROADMAP)
+#   status: COMPLETE | ACTIVE | PLANNED
+# ---------------------------------------------------------------------------
 work_packages:
   - id: "01JK8AOSV3WP0000000001"
     label: "Bootstrap work package (seed)"
     domain_id: "01JK8AOSV3DOMAIN00000001"
     status: PLANNED
     linked_run_id: null
+    stage_id: null
+    program_id: null
+
+  # ── S001 — Foundations Sealed ─────────────────────────────────────────────
+  - id: "S001-P002"
+    label: "Alerts POC (D34 widget)"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: ACTIVE
+    linked_run_id: null
+    stage_id: "S001"
+    program_id: "S001-P002"
+
+  # ── S002 — Core Pipeline (TikTrack lane) ──────────────────────────────────
+  - id: "S002-P002"
+    label: "MCP-QA Transition (Full Pipeline Orchestrator)"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: COMPLETE
+    linked_run_id: null
+    stage_id: "S002"
+    program_id: "S002-P002"
+
+  - id: "S002-P003"
+    label: "TikTrack Alignment (D22 + D33 + D34 + D35)"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: COMPLETE
+    linked_run_id: null
+    stage_id: "S002"
+    program_id: "S002-P003"
+
+  - id: "S002-P004"
+    label: "Admin Review S002"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S002"
+    program_id: "S002-P004"
+
+  # ── S003 — Essential Data ─────────────────────────────────────────────────
+  - id: "S003-P003"
+    label: "System Settings (D39 Preferences + D40 System Mgmt + D41 User Mgmt)"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: COMPLETE
+    linked_run_id: null
+    stage_id: "S003"
+    program_id: "S003-P003"
+
+  - id: "S003-P004"
+    label: "User Tickers (D33) — live price display, display_name Iron Rule"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: ACTIVE
+    linked_run_id: null
+    stage_id: "S003"
+    program_id: "S003-P004"
+
+  - id: "S003-P005"
+    label: "Watch Lists (D26) — CRUD watchlists + live prices"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S003"
+    program_id: "S003-P005"
+
+  - id: "S003-P006"
+    label: "Admin Review S003"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S003"
+    program_id: "S003-P006"
+
+  # ── S004 — Financial Execution ────────────────────────────────────────────
+  - id: "S004-P004"
+    label: "Executions (D36)"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S004"
+    program_id: "S004-P004"
+
+  - id: "S004-P005"
+    label: "Data Import (D37) — Delta-Reset policy (Option B)"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S004"
+    program_id: "S004-P005"
+
+  - id: "S004-P006"
+    label: "Admin Review S004"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S004"
+    program_id: "S004-P006"
+
+  - id: "S004-P007"
+    label: "Indicators Infrastructure (ATR/MA/CCI, ticker_indicators table)"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S004"
+    program_id: "S004-P007"
+
+  # ── S005 — Complex Entities (requires AOS Completion Gate) ────────────────
+  - id: "S005-P002"
+    label: "Trade Entities (D29 Trades + D24 Trade Plans)"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S005"
+    program_id: "S005-P002"
+
+  - id: "S005-P003"
+    label: "Market Intelligence (D27 Ticker Dashboard + D25 AI Analysis)"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S005"
+    program_id: "S005-P003"
+
+  - id: "S005-P004"
+    label: "Journal & History (D28 Trading Journal + D31 Trade History)"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S005"
+    program_id: "S005-P004"
+
+  - id: "S005-P005"
+    label: "Admin Review S005"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S005"
+    program_id: "S005-P005"
+
+  # ── S006 — Advanced Analytics ─────────────────────────────────────────────
+  - id: "S006-P001"
+    label: "Portfolio State (D32)"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S006"
+    program_id: "S006-P001"
+
+  - id: "S006-P002"
+    label: "Analysis & Closure (D30)"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S006"
+    program_id: "S006-P002"
+
+  - id: "S006-P003"
+    label: "Level-1 Dashboards"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S006"
+    program_id: "S006-P003"
+
+  - id: "S006-P004"
+    label: "Admin Review S006 FINAL"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S006"
+    program_id: "S006-P004"
+
+# ---------------------------------------------------------------------------
+# V2 → V3 Migration: Ideas
+# Seeded 2026-03-29 by Team 00 (Nimrod).
+#
+# DOMAIN IDs:
+#   tiktrack   = 01JK8AOSV3DOMAIN00000002
+#   agents_os  = 01JK8AOSV3DOMAIN00000001
+#
+# TikTrack ideas (status: NEW) — feature requirements, accurate and transferred as-is.
+# AOS ideas (status: DEFERRED) — from v2; marked [V2_LEGACY]; require separate discussion.
+# ---------------------------------------------------------------------------
+ideas:
+
+  # ── TikTrack domain ──────────────────────────────────────────────────────
+
+  - id: "IDEA-023"
+    title: "Manual/Visual approval checkpoint closure verification"
+    description: "Approval UX completeness check — Batch 3 readiness. Visual approval steps need explicit closure verification mechanism in the UI."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "Migrated from v2 CARRY-001. Owner: Team 40+10."
+
+  - id: "IDEA-024"
+    title: "Cash Flows response schema verification status closure"
+    description: "D-CashFlows backend schema accuracy verification. Response schema fields need alignment confirmation before batch 3."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "Migrated from v2 CARRY-002. Owner: Team 20."
+
+  - id: "IDEA-025"
+    title: "Data loader update for currency_conversions"
+    description: "currency_conversions data loader fix — Batch 3 readiness. Loader needs update to handle currency conversion data correctly."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "Migrated from v2 CARRY-003. Owner: Team 30."
+
+  - id: "IDEA-026"
+    title: "D22 Tickers: data-integrity widget + integration completion"
+    description: "D22 admin page data-integrity widget implementation. Widget shows data health, highlights missing/stale ticker data."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "Migrated from v2 CARRY-004. Owner: Team 30+20."
+
+  - id: "IDEA-027"
+    title: "D23 Data Dashboard: template/draft to functional scope"
+    description: "D23 needs full implementation beyond current template. Functional dashboard with real data, charts, and summary panels."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "Migrated from v2 CARRY-005. Owner: Team 30."
+
+  - id: "IDEA-028"
+    title: "D24 Trade Plans: implementation planning and execution gate"
+    description: "D24 Trade Plans full spec + build. Page for creating, editing, and managing trade plans before execution."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "Migrated from v2 CARRY-006. Batch 5. Owner: Team 31+30+20."
+
+  - id: "IDEA-029"
+    title: "D25 AI Analysis: detailed spec before build"
+    description: "D25 AI Analysis requires detailed spec (S005-P003 scope). Page for AI-driven trade analysis, pattern recognition, recommendations."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "Migrated from v2 CARRY-007. Batch 5/6. Owner: Team 31+30+70."
+
+  - id: "IDEA-031"
+    title: "D27 Ticker Dashboard: spec + historical data dependencies"
+    description: "D27 Ticker Dashboard requires historical data infrastructure. Per-ticker page with price history, technicals, linked trades."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "Migrated from v2 CARRY-009. Batch 6. Owner: Team 31+30+20."
+
+  - id: "IDEA-032"
+    title: "D28 Trading Journal: spec + implementation plan"
+    description: "D28 Trading Journal — rich-text per-trade notes with date, mood, lessons-learned fields."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "Migrated from v2 CARRY-010. Batch 6. Owner: Team 31+30."
+
+  - id: "IDEA-033"
+    title: "D30-D32 advanced research pages: full specs"
+    description: "D30 Analysis & Closure, D31 Trade History, D32 Portfolio State — all require full specs before build. Advanced analytics layer."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "Migrated from v2 CARRY-011. Batch 6. Owner: Team 31+30+70."
+
+  - id: "IDEA-034"
+    title: "D37 Data Import: Delta-Reset policy locked (Option B)"
+    description: "D37 Data Import — Option B (Delta-Reset via enhanced D37 import) locked per ARCHITECT_DIRECTIVE_PL_RECONCILIATION_POLICY. Import CSV/broker data with P&L reconciliation."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "MEDIUM"
+    submitted_by: "team_00"
+    decision_notes: "Migrated from v2 CARRY-012. Batch 4. Owner: Team 31+30+20. Policy locked: Option B (Delta-Reset). Option C (Direct Broker API) deferred to S006+."
+
+  - id: "IDEA-035"
+    title: "D38 Tag Management: spec + implementation (S005)"
+    description: "D38 Tag Management (route: /tag_management) — system-wide tag registry page. Admin page for creating, editing, deleting tag definitions across all entity types."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "Scope updated 2026-03-29: D39 (User Preferences) is COMPLETE (S003-P003 GATE_8 PASS). D40 admin settings tracked in IDEA-054. This idea = D38 only. D38 is deferred to S005 — depends on D29/D30/D36 existing so tags can be applied to trade entities. Owner: Team 31+30+70."
+    target_program_id: "S005"
+
+  - id: "IDEA-054"
+    title: "D40 System Management: complete sections 4-7"
+    description: "D40 System Management page (route: /system_management) — sections 4-7 completion. S003-P003 delivered sections 1-3 (Market Data Settings, Background Jobs, Feature Flags). Sections 4-7 have skeleton HTML, no backend: (4) Alert Conditions Config, (5) System Health, (6) Recent Activity, (7) Active System Configuration."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "MEDIUM"
+    submitted_by: "team_00"
+    decision_notes: "NEW 2026-03-29. Distinct from D39 (User Preferences = personal per-user settings, COMPLETE) and D38 (Tag Management, S005). D40 = admin-level system configuration. Section 4 needs alert rule CRUD API; Section 5 needs health check aggregation endpoint; Section 6 uses job_run_log + system_settings.updated_by/at (no new table); Section 7 is display-only overview of system_settings. Stage TBD — candidate for S004 or S003-P003 extension WP."
+
+  # ── AOS domain — V2_LEGACY ──────────────────────────────────────────────
+  # All items below came from AOS v2 pipeline. Transferred as-is for information.
+  # Each requires SEPARATE DISCUSSION and RE-EVALUATION against AOS v3 design.
+  # DO NOT act on these items without explicit Team 00 + Team 100 session decision.
+
+  - id: "IDEA-001"
+    title: "Standalone PIPELINE_HELP.html — dedicated help page (Option B)"
+    description: "Dedicated help/documentation page for the AOS pipeline UI, separate from the dashboard modal. Option A (modal upgrade) was handled in v2. Option B = standalone page."
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    idea_type: "FEATURE"
+    status: "DEFERRED"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "[V2_LEGACY] Requires separate discussion and re-evaluation for AOS v3. Original fate_target: S003-P007 (now MERGED into S003-P011, COMPLETE). The standalone help page concept may apply to v3 UI but scope/approach must be reassessed for v3 architecture."
+
+  - id: "IDEA-007"
+    title: "Ideas Pipeline Phase 2 — grooming automation, UI fate-decision interface"
+    description: "Phase 2 of the ideas pipeline: automated grooming (idea_groom.sh), UI fate-decision interface in dashboard, dedup warnings, registry auto-integration."
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    idea_type: "FEATURE"
+    status: "DEFERRED"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "[V2_LEGACY] Requires separate discussion. Original: S002-P005-WP004 candidate in v2. v3 has ideas table in DB — Phase 2 automation concept is valid but must be scoped against v3 REST API (POST /api/ideas, PUT /api/ideas/{id}) rather than v2 bash scripts."
+
+  - id: "IDEA-008"
+    title: "Help modal 4-tab upgrade — Option A immediate (context banner, Three Modes, domain section)"
+    description: "Upgrade the pipeline dashboard help modal to 4 tabs: (1) Context Banner, (2) Three Operating Modes, (3) Domain Section, (4) Quick Reference."
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    idea_type: "IMPROVEMENT"
+    status: "DEFERRED"
+    priority: "HIGH"
+    submitted_by: "team_00"
+    decision_notes: "[V2_LEGACY] Requires re-evaluation. v3 has a new UI (portfolio.html, config.html, runs.html). The 4-tab help modal concept may apply to v3 dashboard but needs scope assessment against v3 UI structure. Do not implement against v2 modal."
+
+  - id: "IDEA-018"
+    title: "Pipeline stage transitions + roadmap management UI"
+    description: "Stage transition scripts and management UI: ability to open/close stages, view stage history, manage the roadmap from within the AOS dashboard."
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    idea_type: "FEATURE"
+    status: "DEFERRED"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "[V2_LEGACY] Requires re-evaluation. Was S004 candidate in v2 (stage transition scripts + management UI). v3 REST API has /api/work-packages and /api/runs but no stage-management endpoints. Full scope assessment needed before WP assignment."
+
+  - id: "IDEA-021"
+    title: "Model B file structure definition (ADR-031 Stage B)"
+    description: "Define the Model B file output structure for the AOS command bridge — how model outputs are structured, validated, and consumed."
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    idea_type: "TECH_DEBT"
+    status: "DEFERRED"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "[V2_LEGACY] Requires re-evaluation. Original fate_target: S003-P007 (ADR-031 Stage B, now MERGED into S003-P011, COMPLETE). Model B file structure concept may be relevant to v3 Operator Handoff design (FIP modes, feedback ingestion). Needs reassessment against v3 FeedbackIngestor architecture."
+
+  - id: "IDEA-043"
+    title: "WP Lifecycle Manager: init/hold/resume/cancel/close as CLI + Dashboard UI"
+    description: "WP lifecycle management: CLI commands for init/hold/resume/cancel/close work packages, and a dashboard panel for lifecycle control."
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    idea_type: "FEATURE"
+    status: "DEFERRED"
+    priority: "HIGH"
+    submitted_by: "team_00"
+    decision_notes: "[V2_LEGACY] Partially addressed by v3 REST API (POST /api/runs creates WP, PUT /api/runs/{id} updates, DELETE cancels). However, CLI wrapper (pipeline_run.sh equivalent) and dashboard lifecycle panel are not yet built. Requires v3-specific scoping: which lifecycle operations are needed beyond the existing REST API?"
+
+  - id: "IDEA-051"
+    title: "AOS Scheduler reclassification + research-based architecture direction"
+    description: "Reclassify and define the AOS scheduler architecture. Should it be APScheduler, Celery, a DB-polling loop, or something else? Research-based decision needed."
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    idea_type: "RESEARCH"
+    status: "DEFERRED"
+    priority: "HIGH"
+    submitted_by: "team_00"
+    decision_notes: "[V2_LEGACY] Architectural decision still pending. v3 currently uses APScheduler for background tasks. Team 190 research report exists: TEAM_190_TO_TEAM_100_IDEA_051_AOS_SCHEDULER_RESEARCH_REPORT_v1.0.0.md. Requires Team 100 architecture direction before any scheduler changes."

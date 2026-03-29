@@ -20,16 +20,31 @@ _DEFINITION = _ROOT / "definition.yaml"
 
 
 def _def_team_meta() -> dict[str, dict[str, Any]]:
+    """Hierarchy hints for GET /api/teams — children derived from ``parent_team_id`` in YAML."""
     data = yaml.safe_load(_DEFINITION.read_text(encoding="utf-8"))
+    blocks: list[dict[str, Any]] = []
+    for ykey, block in data.items():
+        if not str(ykey).startswith("team_") or not isinstance(block, dict):
+            continue
+        tid = block.get("id")
+        if not tid:
+            continue
+        blocks.append(block)
+    child_lists: dict[str, list[str]] = {str(b["id"]): [] for b in blocks}
+    for b in blocks:
+        tid = str(b["id"])
+        pid = b.get("parent_team_id")
+        if pid is not None and str(pid) in child_lists:
+            child_lists[str(pid)].append(tid)
+    for ck, lst in child_lists.items():
+        lst.sort()
     out: dict[str, dict[str, Any]] = {}
-    for key in ("team_00", "team_10", "team_11"):
-        block = data.get(key)
-        if isinstance(block, dict) and block.get("id"):
-            tid = str(block["id"])
-            out[tid] = {
-                "parent_team_id": block.get("parent_team_id"),
-                "children": list(block.get("children") or []),
-            }
+    for b in blocks:
+        tid = str(b["id"])
+        out[tid] = {
+            "parent_team_id": b.get("parent_team_id"),
+            "children": child_lists.get(tid, []),
+        }
     return out
 
 
@@ -163,23 +178,28 @@ def list_runs_paginated(
         where = ["1=1"]
         args: list[Any] = []
         if statuses:
-            where.append("status = ANY(%s)")
+            where.append("r.status = ANY(%s)")
             args.append(statuses)
         if domain_id:
-            where.append("domain_id = %s")
+            where.append("r.domain_id = %s")
             args.append(domain_id)
         if current_gate_id:
-            where.append("current_gate_id = %s")
+            where.append("r.current_gate_id = %s")
             args.append(current_gate_id)
         wsql = " AND ".join(where)
-        cur.execute(f"SELECT COUNT(*) AS c FROM runs WHERE {wsql}", args)
+        cur.execute(f"SELECT COUNT(*) AS c FROM runs r WHERE {wsql}", args)
         total = int(cur.fetchone()["c"])
         cur.execute(
             f"""
             SELECT r.id, r.work_package_id, r.domain_id, r.status, r.process_variant,
                    r.current_gate_id, r.current_phase_id, r.correction_cycle_count,
-                   r.started_at, r.completed_at
+                   r.started_at, r.completed_at,
+                   d.slug AS domain_slug,
+                   w.label AS work_package_label,
+                   w.program_id AS work_package_program_id
             FROM runs r
+            LEFT JOIN domains d ON d.id = r.domain_id
+            LEFT JOIN work_packages w ON w.id = r.work_package_id
             WHERE {wsql}
             ORDER BY r.last_updated DESC
             LIMIT %s OFFSET %s
@@ -202,11 +222,17 @@ def list_runs_paginated(
                     return None
                 return v.isoformat().replace("+00:00", "Z") if hasattr(v, "isoformat") else str(v)
 
+            dslug = r.get("domain_slug")
+            wplab = r.get("work_package_label")
+            wpprog = r.get("work_package_program_id")
             runs_out.append(
                 {
                     "run_id": rid,
                     "work_package_id": str(r["work_package_id"]),
                     "domain_id": str(r["domain_id"]),
+                    "domain_slug": str(dslug) if dslug else None,
+                    "work_package_label": str(wplab) if wplab else None,
+                    "work_package_program_id": str(wpprog) if wpprog else None,
                     "status": str(r["status"]),
                     "process_variant": str(r["process_variant"]),
                     "current_gate_id": str(r["current_gate_id"]) if r.get("current_gate_id") else None,
@@ -224,21 +250,27 @@ def list_work_packages(conn: Any) -> dict[str, Any]:
     with conn.cursor() as cur:
         cur.execute(
             """
-            SELECT w.id, w.label, w.domain_id, w.status, w.linked_run_id
+            SELECT w.id, w.label, w.domain_id, w.status, w.linked_run_id, w.stage_id, w.program_id,
+                   d.slug AS domain_slug
             FROM work_packages w
-            ORDER BY w.id ASC
+            LEFT JOIN domains d ON d.id = w.domain_id
+            ORDER BY w.stage_id NULLS LAST, w.id ASC
             """
         )
         wps: list[dict[str, Any]] = []
         for row in cur.fetchall() or []:
             w = dict(row)
+            dslug = w.get("domain_slug")
             wps.append(
                 {
                     "wp_id": str(w["id"]),
                     "label": str(w["label"]),
                     "domain_id": str(w["domain_id"]),
+                    "domain_slug": str(dslug) if dslug else None,
                     "status": str(w["status"]),
                     "linked_run_id": str(w["linked_run_id"]) if w.get("linked_run_id") else None,
+                    "stage_id": str(w["stage_id"]) if w.get("stage_id") else None,
+                    "program_id": str(w["program_id"]) if w.get("program_id") else None,
                 }
             )
         return {"work_packages": wps}
@@ -302,21 +334,23 @@ def list_ideas(
         where = ["1=1"]
         args: list[Any] = []
         if status:
-            where.append("status = %s")
+            where.append("i.status = %s")
             args.append(status)
         if priority:
-            where.append("priority = %s")
+            where.append("i.priority = %s")
             args.append(priority)
         wsql = " AND ".join(where)
-        cur.execute(f"SELECT COUNT(*) AS c FROM ideas WHERE {wsql}", args)
+        cur.execute(f"SELECT COUNT(*) AS c FROM ideas i WHERE {wsql}", args)
         total = int(cur.fetchone()["c"])
         cur.execute(
             f"""
-            SELECT id, title, description, domain_id, idea_type, status, priority, submitted_by, submitted_at,
-                   decision_notes, target_program_id, updated_at
-            FROM ideas
+            SELECT i.id, i.title, i.description, i.domain_id, i.idea_type, i.status, i.priority,
+                   i.submitted_by, i.submitted_at, i.decision_notes, i.target_program_id, i.updated_at,
+                   d.slug AS domain_slug
+            FROM ideas i
+            LEFT JOIN domains d ON d.id = i.domain_id
             WHERE {wsql}
-            ORDER BY updated_at DESC
+            ORDER BY i.updated_at DESC
             LIMIT %s OFFSET %s
             """,
             [*args, limit, offset],
@@ -324,12 +358,14 @@ def list_ideas(
         ideas: list[dict[str, Any]] = []
         for row in cur.fetchall() or []:
             i = dict(row)
+            dslug = i.get("domain_slug")
             ideas.append(
                 {
                     "idea_id": str(i["id"]),
                     "title": str(i["title"]),
                     "description": i.get("description"),
                     "domain_id": str(i["domain_id"]) if i.get("domain_id") else None,
+                    "domain_slug": str(dslug) if dslug else None,
                     "idea_type": str(i["idea_type"]) if i.get("idea_type") else "FEATURE",
                     "status": str(i["status"]),
                     "priority": str(i["priority"]),

@@ -12,7 +12,9 @@
 
 | Task | Link / Command |
 |------|----------------|
-| Start UI server | `./agents_os/scripts/start_ui_server.sh` → open http://localhost:8090/ (dashboard) + monitor pages: `/static/PIPELINE_CONSTITUTION.html`, `/static/PIPELINE_MONITOR.html` (**port is policy-locked to 8090**) |
+| **AOS v3 (canonical)** | `bash scripts/start-aos-v3-server.sh` → **`http://127.0.0.1:8090/`** (Pipeline UI served at `/`) + `/api/health` |
+| **v2 pipeline UI (frozen)** | `./agents_os/scripts/start_ui_server.sh` → **`http://localhost:8092/`** — dashboard `/static/PIPELINE_DASHBOARD.html`, constitution `/static/PIPELINE_CONSTITUTION.html`, monitor `/static/PIPELINE_MONITOR.html` (**port locked to 8092**) |
+| Port policy SSOT | [AGENTS_OS_V3_NETWORK_PORTS_AND_UI_ENTRY_v1.0.0.md](02-ARCHITECTURE/AGENTS_OS_V3_NETWORK_PORTS_AND_UI_ENTRY_v1.0.0.md) |
 | Seed Event Log | `python3 agents_os/scripts/seed_event_log.py` (optional — adds sample events for dev/E2E) |
 | Run pipeline | `./pipeline_run.sh --domain agents_os` |
 | Check status | `./pipeline_run.sh --domain agents_os status` or `./pipeline_run.sh domain` |
@@ -28,6 +30,7 @@
 | v3 Overview | [AGENTS_OS_V3_OVERVIEW.md](01-OVERVIEW/AGENTS_OS_V3_OVERVIEW.md) | Active — Team 71 GATE_DOC Phase B (2026-03-28) |
 | v3 Architecture | [AGENTS_OS_V3_ARCHITECTURE_OVERVIEW.md](02-ARCHITECTURE/AGENTS_OS_V3_ARCHITECTURE_OVERVIEW.md) | Active — Team 71 |
 | v3 API Reference | [AGENTS_OS_V3_API_REFERENCE.md](02-ARCHITECTURE/AGENTS_OS_V3_API_REFERENCE.md) | Active — Team 71 |
+| **v3 Ports & `/` entry (LOCKED)** | [AGENTS_OS_V3_NETWORK_PORTS_AND_UI_ENTRY_v1.0.0.md](02-ARCHITECTURE/AGENTS_OS_V3_NETWORK_PORTS_AND_UI_ENTRY_v1.0.0.md) | Active — 2026-03-28 |
 | v3 Developer Runbook | [AGENTS_OS_V3_DEVELOPER_RUNBOOK.md](04-PROCEDURES/AGENTS_OS_V3_DEVELOPER_RUNBOOK.md) | Active — Team 71 |
 | v3 Templates | [AGENTS_OS_V3_LOCAL_VALIDATION_CHECKLIST.md](05-TEMPLATES/AGENTS_OS_V3_LOCAL_VALIDATION_CHECKLIST.md) (+ [05-TEMPLATES/](05-TEMPLATES/) index) | Active — Team 71 |
 

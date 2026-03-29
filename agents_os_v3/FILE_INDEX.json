@@ -1,6 +1,6 @@
 {
-  "version": "1.1.10",
-  "last_updated": "2026-03-28",
+  "version": "1.1.28",
+  "last_updated": "2026-03-29",
   "entries": [
     {
       "path": "agents_os_v3/CLEANUP_REPORT.md",
@@ -25,6 +25,78 @@
       "owner_team": "team_21",
       "added_in_gate": "GATE_DOC_B",
       "notes": "Local runbook; aligned with AGENTS.md; no agents_os_v3/docs/"
+    },
+    {
+      "path": "agents_os_v3/requirements-e2e.txt",
+      "status": "NEW",
+      "spec_ref": "TEAM_11 Remediation Phase 3a — browser E2E deps (Selenium)",
+      "owner_team": "team_61",
+      "added_in_gate": "REMEDIATION_P3A",
+      "notes": "pip install -r when running agents_os_v3/tests/e2e/"
+    },
+    {
+      "path": "agents_os_v3/tests/e2e/README.md",
+      "status": "MODIFIED",
+      "spec_ref": "TEAM_11 Remediation Phase 3a — E2E run instructions",
+      "owner_team": "team_61",
+      "added_in_gate": "REMEDIATION_P3A",
+      "notes": "Stack script + pytest env vars; AOS_V3_E2E_UI_MOCK; documents test_e2e_full_ui_survey.py full page/tab checklist (2026-03-28)"
+    },
+    {
+      "path": "agents_os_v3/tests/e2e/conftest.py",
+      "status": "MODIFIED",
+      "spec_ref": "TEAM_11 Remediation Phase 3a/3b — Selenium fixtures",
+      "owner_team": "team_61",
+      "added_in_gate": "REMEDIATION_P3A",
+      "notes": "browser_driver; default base 8090/v3/index.html; _e2e_ui_dir_from_base_page(); legacy 8778 via AOS_V3_E2E_BASE_URL (Team 51 Phase 3b; aligned tasks/scripts 2026-03-28)"
+    },
+    {
+      "path": "agents_os_v3/tests/e2e/test_phase3b_browser_scenarios.py",
+      "status": "NEW",
+      "spec_ref": "TEAM_11 → Team 51 REMEDIATION_PHASE3_BROWSER_E2E_MANDATE v1.0.0 §7.3",
+      "owner_team": "team_51",
+      "added_in_gate": "REMEDIATION_P3B",
+      "notes": "Selenium 3.1–3.6; 3_6 System Map asserts hash #gates after subnav (headless-safe; 2026-03-28)"
+    },
+    {
+      "path": "agents_os_v3/tests/e2e/test_e2e_full_ui_survey.py",
+      "status": "MODIFIED",
+      "spec_ref": "AOS v3 UI — full page/tab survey + Type A/B domain controls",
+      "owner_team": "team_51",
+      "added_in_gate": "REMEDIATION_P3B",
+      "notes": "Type B excludes config.html; test_e2e_config_page_solo_main_no_domain_scope (2026-03-28)"
+    },
+    {
+      "path": "agents_os_v3/tests/e2e/test_smoke_index.py",
+      "status": "NEW",
+      "spec_ref": "TEAM_11 Remediation Phase 3a — smoke load index.html",
+      "owner_team": "team_61",
+      "added_in_gate": "REMEDIATION_P3A",
+      "notes": "Requires AOS_V3_E2E_RUN=1; Team 51 extends scenarios"
+    },
+    {
+      "path": "agents_os_v3/tests/canary_simulation/README.md",
+      "status": "NEW",
+      "spec_ref": "TEAM_11 Remediation Phase 5 — F-05 canary contract",
+      "owner_team": "team_61",
+      "added_in_gate": "REMEDIATION_P5",
+      "notes": "M1/M2/M3 pointer; paired with Team 51 completion"
+    },
+    {
+      "path": "agents_os_v3/tests/canary_simulation/conftest.py",
+      "status": "NEW",
+      "spec_ref": "TEAM_11 Remediation Phase 5 — canary fixtures + marker",
+      "owner_team": "team_61",
+      "added_in_gate": "REMEDIATION_P5",
+      "notes": "api_client; aos_v3_canary_sim marker"
+    },
+    {
+      "path": "agents_os_v3/tests/canary_simulation/test_phase5_canary_pipeline.py",
+      "status": "NEW",
+      "spec_ref": "TEAM_11 Remediation Phase 5 — happy-path canary (C-03)",
+      "owner_team": "team_61",
+      "added_in_gate": "REMEDIATION_P5",
+      "notes": "DB pipeline E2E via TestClient; Team 51 may add scenarios"
     },
     {
       "path": "agents_os_v3/cli/__init__.py",
@@ -67,6 +139,14 @@
       "notes": "Delta migration: v1.0.1 → v1.0.2. Pre-flight data checks required before FK backfill. Team 61 applies."
     },
     {
+      "path": "agents_os_v3/db/migrations/002_add_stage_program_to_work_packages.sql",
+      "status": "NEW",
+      "spec_ref": "WP work_packages stage/program columns",
+      "owner_team": "team_61",
+      "added_in_gate": "GATE_0",
+      "notes": "Additive migration for stage_id / program_id on work_packages when applied out-of-band from numbered delta."
+    },
+    {
       "path": "agents_os_v3/db/run_migration.py",
       "status": "NEW",
       "spec_ref": "Team 61 — migration apply helper (psycopg2)",
@@ -88,7 +168,7 @@
       "spec_ref": "DDL Spec §3 + Entity Dictionary v2.0.2 + UC-01 routing seed",
       "owner_team": "team_21",
       "added_in_gate": "GATE_0",
-      "notes": "GATE_2: team_11 seed, hierarchy parent_team_id/children, IDEA_STATUS_AUTHORITY role, templates seed, GATE_1 routing/WP"
+      "notes": "Full team_* roster seed (21 teams); parent_team_id per TEAMS_ROSTER; API derives children; routing/WP/ideas unchanged (2026-03-28)"
     },
     {
       "path": "agents_os_v3/modules/__init__.py",
@@ -168,7 +248,7 @@
       "spec_ref": "WP D.6 — GATE_1 run lifecycle on business_router",
       "owner_team": "team_21",
       "added_in_gate": "GATE_0",
-      "notes": "GATE_2: X-Actor-Team-Id, portfolio 8A, admin, GET prompt; GATE_3: SSE stream, GET /state /history, POST feedback + clear, lifespan SSE init; GATE_4: PUT /teams/{id}/engine, CORS UI ports, GET /templates list GATE_4: GET /runs current_gate_id query; POST /ideas idea_type. Remediation P1: POST /runs/{id}/override, GET /teams/{id}, DELETE /routing-rules/{id}, PUT /policies/{id}."
+      "notes": "GATE_2: X-Actor-Team-Id, portfolio 8A, admin, GET prompt; GATE_3: SSE stream, GET /state /history, POST feedback + clear, lifespan SSE init; GATE_4: PUT /teams/{id}/engine, CORS UI ports, GET /templates list GATE_4: GET /runs current_gate_id query; POST /ideas idea_type. Remediation P1: POST /runs/{id}/override, GET /teams/{id}, DELETE /routing-rules/{id}, PUT /policies/{id}. 2026-03-28: GET / serves index.html (address bar /); `<base href=/v3/>` in v3 HTML; StaticFiles /v3 + /agents_os/ui; CORS +8092; port policy SSOT AGENTS_OS_V3_NETWORK_PORTS_AND_UI_ENTRY_v1.0.0.md."
     },
     {
       "path": "agents_os_v3/modules/management/db.py",
@@ -192,7 +272,7 @@
       "spec_ref": "WP D.3 + GATE_1 routing_rules + work_packages",
       "owner_team": "team_21",
       "added_in_gate": "GATE_0",
-      "notes": "GATE_2: team_11, templates from definition.yaml; idempotent upserts"
+      "notes": "Upserts all definition.yaml team_* keys (sorted); idempotent (2026-03-28)"
     },
     {
       "path": "agents_os_v3/tests/__init__.py",
@@ -236,11 +316,11 @@
     },
     {
       "path": "agents_os_v3/tests/conftest.py",
-      "status": "NEW",
+      "status": "MODIFIED",
       "spec_ref": "Process Map §6 — Team 51 GATE_2 pytest fixtures",
       "owner_team": "team_51",
       "added_in_gate": "GATE_2",
-      "notes": "AOS_V3_DATABASE_URL from agents_os_v3/.env; aos_db_conn fixture"
+      "notes": "AOS_V3_DATABASE_URL from agents_os_v3/.env; aos_db_conn; pytest marker aos_v3_phase5_canary (Remediation P5)"
     },
     {
       "path": "agents_os_v3/tests/gate2_db_helpers.py",
@@ -252,11 +332,11 @@
     },
     {
       "path": "agents_os_v3/tests/test_api_gate2_http.py",
-      "status": "NEW",
+      "status": "MODIFIED",
       "spec_ref": "Team 11 GATE_2 QA handoff — HTTP / portfolio / admin / ideas / prompt",
       "owner_team": "team_51",
       "added_in_gate": "GATE_2",
-      "notes": "FastAPI TestClient; fresh DB connection per request"
+      "notes": "Root index: accept base href ./ or /v3/ (Team 11 UI alignment 2026-03-29)"
     },
     {
       "path": "agents_os_v3/tests/test_integration_gate2.py",
@@ -353,6 +433,14 @@
       "owner_team": "team_51",
       "added_in_gate": "REMEDIATION_P2",
       "notes": "Contract matrix: override (FORCE_PASS/PAUSE/RESUME/FAIL/terminal), GET /teams/{id} fields, DELETE routing-rules, PUT /policies — Option B paths"
+    },
+    {
+      "path": "agents_os_v3/tests/test_remediation_phase5_canary_simulation.py",
+      "status": "NEW",
+      "spec_ref": "TEAM_11_TO_TEAM_51_AOS_V3_REMEDIATION_PHASE5_CANARY_SIM_MANDATE v1.0.0 (M2/M3)",
+      "owner_team": "team_51",
+      "added_in_gate": "REMEDIATION_P5",
+      "notes": "Five pipeline steps on one run: initiate → advance (GATE_0 0.1→0.2) → pause → resume → advance to GATE_1; isolated domain+wp (ULID); complements canary_simulation/ happy path"
     },
     {
       "path": "agents_os_v3/modules/state/__init__.py",
@@ -536,7 +624,7 @@
       "spec_ref": "UI Spec Amendment v1.0.3 Stage 8A",
       "owner_team": "team_21",
       "added_in_gate": "GATE_2",
-      "notes": "teams without is_current_actor; ideas INSUFFICIENT_AUTHORITY GATE_4 QA: idea_type create; list_ideas domain+type; get_work_package linked_run; list_runs_paginated current_gate_id. Remediation P1: get_team_detail."
+      "notes": "_def_team_meta: all team_* YAML, children from parent_team_id; runs/WP/ideas list joins domains slug + run WP label/program; list_ideas i. alias WHERE fix (2026-03-28)"
     },
     {
       "path": "agents_os_v3/ui/api-client.js",
@@ -552,15 +640,15 @@
       "spec_ref": "§6",
       "owner_team": "team_31",
       "added_in_gate": "pre-BUILD",
-      "notes": "GATE_4: live pipeline/history/config/teams/portfolio + flow SSE chip; mock via ?mock=1 or meta aosv3-use-mock=1"
+      "notes": "Portfolio domain_slug scope + WP/program columns + thead sort; history/config sortable tables; matchesUiDataScope(slug); ULID domain labels; live run WP hints from SQL join (2026-03-28)"
     },
     {
       "path": "agents_os_v3/ui/config.html",
-      "status": "NEW",
+      "status": "MODIFIED",
       "spec_ref": "§6.3",
       "owner_team": "team_31",
       "added_in_gate": "pre-BUILD",
-      "notes": ""
+      "notes": "Solo main aosv3-config-main--solo; sortable routing/policies tables; no sidebar scope (2026-03-28)"
     },
     {
       "path": "agents_os_v3/ui/flow.html",
@@ -568,39 +656,39 @@
       "spec_ref": "TEAM_111_AOS_V3_DDL_SPEC_v1.0.2 + pipeline_flow.html (verbatim diagrams)",
       "owner_team": "team_31",
       "added_in_gate": "GATE_4",
-      "notes": "System Map: api-client + SSE status chip (live); Mermaid SSOT unchanged; domain switch reload preserved."
+      "notes": "System Map: api-client + SSE status chip (live); Mermaid SSOT unchanged; domain switch reload preserved. base href ./ (2026-03-27)."
     },
     {
       "path": "agents_os_v3/ui/history.html",
-      "status": "NEW",
+      "status": "MODIFIED",
       "spec_ref": "§6.2",
       "owner_team": "team_31",
       "added_in_gate": "pre-BUILD",
-      "notes": ""
+      "notes": "Run overview in sidebar; sortable event table aosv3-history-table (2026-03-28)"
     },
     {
       "path": "agents_os_v3/ui/index.html",
-      "status": "NEW",
+      "status": "MODIFIED",
       "spec_ref": "§6.1",
       "owner_team": "team_31",
       "added_in_gate": "pre-BUILD",
-      "notes": ""
+      "notes": "base href ./ (2026-03-27)"
     },
     {
       "path": "agents_os_v3/ui/portfolio.html",
-      "status": "NEW",
+      "status": "MODIFIED",
       "spec_ref": "§6.5",
       "owner_team": "team_31",
       "added_in_gate": "pre-BUILD",
-      "notes": ""
+      "notes": "Gate filter in sidebar; sortable portfolio tables; WP/program/domain columns; base href ./ (2026-03-28)"
     },
     {
       "path": "agents_os_v3/ui/pipeline_flow.html",
-      "status": "NEW",
+      "status": "MODIFIED",
       "spec_ref": "GATE_3 pipeline / FIP diagram (reference UI)",
       "owner_team": "team_31",
       "added_in_gate": "GATE_3",
-      "notes": "Mermaid flow; governance index registration"
+      "notes": "Mermaid flow; governance index registration. base href ./ (2026-03-27)."
     },
     {
       "path": "agents_os_v3/ui/run_preflight.sh",
@@ -627,6 +715,22 @@
       "notes": ""
     },
     {
+      "path": "agents_os_v3/ui/scripts/capture_ui_review_screenshots.mjs",
+      "status": "NEW",
+      "spec_ref": "Team 31 — UI review screenshots (Playwright)",
+      "owner_team": "team_31",
+      "added_in_gate": "POST_BUILD",
+      "notes": "Six pages ?mock=1 fullPage PNG → _COMMUNICATION/team_31/evidence/ui_review_screenshots/; optional AOSV3_SCREENSHOT_BASE; temp python http.server from repo root (2026-03-27)"
+    },
+    {
+      "path": "agents_os_v3/ui/scripts/verify_table_header_contract.mjs",
+      "status": "NEW",
+      "spec_ref": "Team 31 — table thead vs render contract (static)",
+      "owner_team": "team_31",
+      "added_in_gate": "POST_BUILD",
+      "notes": "Node: portfolio <th> counts + app.js markers; npm run verify:table-contracts from ui/scripts"
+    },
+    {
       "path": "agents_os_v3/ui/scripts/package-lock.json",
       "status": "NEW",
       "spec_ref": "AOS v3 UI tooling",
@@ -636,27 +740,27 @@
     },
     {
       "path": "agents_os_v3/ui/scripts/package.json",
-      "status": "NEW",
+      "status": "MODIFIED",
       "spec_ref": "AOS v3 UI tooling",
       "owner_team": "team_61",
       "added_in_gate": "PRE_BUILD",
-      "notes": ""
+      "notes": "script verify:table-contracts → verify_table_header_contract.mjs"
     },
     {
       "path": "agents_os_v3/ui/style.css",
-      "status": "NEW",
+      "status": "MODIFIED",
       "spec_ref": "§6",
       "owner_team": "team_31",
       "added_in_gate": "pre-BUILD",
-      "notes": ""
+      "notes": "aosv3-table: sticky th, min-width wrap, border-separate; aosv3-table-actions-inner flex (2026-03-27)"
     },
     {
       "path": "agents_os_v3/ui/teams.html",
-      "status": "NEW",
+      "status": "MODIFIED",
       "spec_ref": "§6.4",
       "owner_team": "team_31",
       "added_in_gate": "pre-BUILD",
-      "notes": ""
+      "notes": "base href ./ (2026-03-27)"
     },
     {
       "path": "agents_os_v3/ui/theme-init.js",

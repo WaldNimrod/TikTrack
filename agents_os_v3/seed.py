@@ -37,9 +37,12 @@ def main() -> None:
     conn.autocommit = True
     try:
         with conn.cursor() as cur:
-            for team_key in ("team_00", "team_10", "team_11"):
+            team_keys = sorted(
+                k for k in data if str(k).startswith("team_") and isinstance(data.get(k), dict)
+            )
+            for team_key in team_keys:
                 t = data.get(team_key)
-                if not t:
+                if not t or not t.get("id"):
                     continue
                 cur.execute(
                     """
@@ -143,13 +146,42 @@ def main() -> None:
                 cur.execute(
                     """
                     INSERT INTO work_packages (
-                      id, label, domain_id, status, linked_run_id, created_at, updated_at
+                      id, label, domain_id, status, linked_run_id, stage_id, program_id, created_at, updated_at
                     ) VALUES (
-                      %(id)s, %(label)s, %(domain_id)s, %(status)s, %(linked_run_id)s, NOW(), NOW()
+                      %(id)s, %(label)s, %(domain_id)s, %(status)s, %(linked_run_id)s,
+                      %(stage_id)s, %(program_id)s, NOW(), NOW()
                     )
                     ON CONFLICT (id) DO NOTHING
                     """,
                     wp,
+                )
+
+            for idea in data.get("ideas", []):
+                cur.execute(
+                    """
+                    INSERT INTO ideas (
+                      id, title, description, domain_id, idea_type, status,
+                      priority, submitted_by, decision_notes, target_program_id,
+                      submitted_at, updated_at
+                    ) VALUES (
+                      %(id)s, %(title)s, %(description)s, %(domain_id)s, %(idea_type)s, %(status)s,
+                      %(priority)s, %(submitted_by)s, %(decision_notes)s, %(target_program_id)s,
+                      NOW(), NOW()
+                    )
+                    ON CONFLICT (id) DO NOTHING
+                    """,
+                    {
+                        "id": idea["id"],
+                        "title": idea["title"],
+                        "description": idea.get("description"),
+                        "domain_id": idea["domain_id"],
+                        "idea_type": idea.get("idea_type", "FEATURE"),
+                        "status": idea["status"],
+                        "priority": idea["priority"],
+                        "submitted_by": idea.get("submitted_by", "team_00"),
+                        "decision_notes": idea.get("decision_notes"),
+                        "target_program_id": idea.get("target_program_id"),
+                    },
                 )
 
             cur.execute("SELECT id FROM teams WHERE id = %s", ("team_00",))

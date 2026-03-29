@@ -5,7 +5,7 @@ domain: agents_os
 artifact: style.css
 mandate: TEAM_100_TO_TEAM_31_AOS_V3_UI_MOCKUPS_MANDATE_v2.0.0
 date: 2026-03-27
-status: MOCKUP
+status: ACTIVE
 */
 
 /* v3 mockup additions — tokens from pipeline-shared.css */
@@ -27,6 +27,23 @@ status: MOCKUP
   margin-top: 6px;
 }
 
+/* Neutral helper under sidebar controls (not mock-specific) */
+.aosv3-sidebar-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+/* Central workspace / domain panel title (Type A two-button + Type B scope) */
+.aosv3-workspace-panel-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text, inherit);
+  margin-bottom: 2px;
+}
+
 .aosv3-tab-panel > .aosv3-mock-note {
   margin-bottom: 12px;
 }
@@ -35,6 +52,17 @@ status: MOCKUP
   flex: 1 1 100%;
   max-width: 100%;
   min-width: 0;
+}
+
+/* Configuration page — no sidebar; main spans layout row */
+.agents-page-layout .aosv3-config-main--solo {
+  flex: 1 1 100%;
+  max-width: 100%;
+}
+
+.agents-page-sidebar .aosv3-portfolio-gate-filter-card--sidebar .btn {
+  width: 100%;
+  margin-top: 8px;
 }
 
 /* Run status card — pipeline domain (uses shared .domain-btn + theme tokens for light/dark) */
@@ -163,6 +191,7 @@ status: MOCKUP
 
 .aosv3-table-wrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface);
@@ -170,8 +199,11 @@ status: MOCKUP
 
 .aosv3-table {
   width: 100%;
-  border-collapse: collapse;
+  min-width: 720px;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 13px;
+  table-layout: auto;
 }
 
 .aosv3-table th,
@@ -183,15 +215,34 @@ status: MOCKUP
 }
 
 .aosv3-table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
   background: var(--surface2);
   color: var(--text-muted);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  white-space: normal;
+  line-height: 1.25;
+  word-break: break-word;
+  box-shadow: 0 1px 0 var(--border);
 }
 
 .aosv3-table tr:last-child td {
   border-bottom: none;
+}
+
+.aosv3-table td.aosv3-table-actions {
+  vertical-align: middle;
+}
+
+.aosv3-table .aosv3-table-actions-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .aosv3-event-badge {
@@ -1366,6 +1417,38 @@ status: MOCKUP
   border-color: rgba(210, 153, 34, 0.45) !important;
 }
 
+/* History — Run overview in narrow sidebar */
+.agents-page-sidebar .aosv3-history-analytics--sidebar {
+  margin-bottom: 0;
+}
+.agents-page-sidebar .aosv3-history-analytics--sidebar .aosv3-history-run-row {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  margin-top: 8px;
+}
+.agents-page-sidebar .aosv3-history-analytics--sidebar .aosv3-history-run-row .btn {
+  width: 100%;
+}
+.agents-page-sidebar .aosv3-history-analytics--sidebar .aosv3-history-timeline {
+  margin-top: 10px;
+  padding: 8px 10px;
+  font-size: 10px;
+}
+.agents-page-sidebar .aosv3-history-analytics--sidebar .aosv3-timeline-gates {
+  font-size: 9px;
+  word-break: break-word;
+}
+.agents-page-sidebar .aosv3-history-analytics--sidebar .aosv3-timeline-events,
+.agents-page-sidebar .aosv3-history-analytics--sidebar .aosv3-timeline-actors {
+  gap: 6px 8px;
+}
+.agents-page-sidebar .aosv3-history-analytics--sidebar .aosv3-timeline-events span,
+.agents-page-sidebar .aosv3-history-analytics--sidebar .aosv3-timeline-actors span {
+  font-size: 10px;
+  padding: 3px 6px;
+}
+
 /* Portfolio — gate filter + WP row */
 .aosv3-portfolio-gate-filter {
   margin-bottom: 14px;
@@ -1396,6 +1479,20 @@ status: MOCKUP
 
 .aosv3-wp-row--clickable:hover {
   background: rgba(88, 166, 255, 0.06);
+}
+
+/* Work Packages — milestone section header */
+.aosv3-wp-milestone-header {
+  background: var(--bg-card, #161b22);
+}
+.aosv3-wp-milestone-label {
+  padding: 6px 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent, #58a6ff);
+  border-top: 2px solid var(--border, #30363d);
 }
 
 /* Ideas — idea_type badges */

@@ -26,6 +26,14 @@ def _load_aos_v3_dotenv() -> None:
 
 _load_aos_v3_dotenv()
 
+
+def pytest_configure(config: pytest.Config) -> None:
+    config.addinivalue_line(
+        "markers",
+        "aos_v3_phase5_canary: Remediation Phase 5 — DB canary simulation (Team 51 F-05)",
+    )
+
+
 # Re-export for test modules
 requires_aos_db = pytest.mark.skipif(
     not (os.environ.get("AOS_V3_DATABASE_URL") or "").strip(),

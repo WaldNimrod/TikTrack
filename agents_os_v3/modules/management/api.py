@@ -1,6 +1,10 @@
 """
 AOS v3 HTTP surface — FastAPI application and routers.
 
+**Browser entry (canonical port 8090):** ``GET /`` serves ``index.html`` directly so the address bar stays ``/``; pages use ``<base href="/v3/">`` for asset and nav resolution under ``/v3/*``.
+Static UI is served from ``/v3/*`` (``agents_os_v3/ui``). Shared v2-era CSS paths
+``/agents_os/ui/*`` mount ``agents_os/ui`` so existing ``../../agents_os/ui/...`` links work.
+
 **Routers**
 
 * ``_api_router`` (prefix ``/api``): ``GET /health``, ``GET /events/stream`` (SSE).
@@ -32,12 +36,15 @@ import logging
 import os
 from collections.abc import AsyncIterator, Generator
 from contextlib import asynccontextmanager
-from typing import Any
+from pathlib import Path
+from typing import Any, Optional
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query
+from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Request
+from starlette.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse, RedirectResponse, StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from ulid import ULID
 
 from agents_os_v3.modules.audit.sse import get_broadcaster, init_sse, shutdown_sse
@@ -70,6 +77,11 @@ from agents_os_v3.modules.state.errors import StateMachineError
 from agents_os_v3.modules.state import machine as state_machine
 
 logger = logging.getLogger(__name__)
+
+
+def _repo_root() -> Path:
+    """Repository root (parent of ``agents_os_v3/``)."""
+    return Path(__file__).resolve().parent.parent.parent.parent
 
 
 def _db_conn() -> Generator[Any, None, None]:
@@ -242,8 +254,8 @@ def post_run_feedback_clear(
 
 @business_router.get("/state")
 def get_api_state(
-    run_id: str | None = Query(default=None),
-    domain_id: str | None = Query(default=None),
+    run_id: Optional[str] = Query(default=None),
+    domain_id: Optional[str] = Query(default=None),
     actor_team_id: str = Depends(get_actor_team_id),
     conn: Any = Depends(_db_conn),
 ) -> dict[str, Any]:
@@ -260,11 +272,11 @@ def get_api_state(
 
 @business_router.get("/history")
 def get_api_history(
-    run_id: str | None = Query(default=None),
-    domain_id: str | None = Query(default=None),
-    gate_id: str | None = Query(default=None),
-    event_type: str | None = Query(default=None),
-    actor_team_id: str | None = Query(default=None),
+    run_id: Optional[str] = Query(default=None),
+    domain_id: Optional[str] = Query(default=None),
+    gate_id: Optional[str] = Query(default=None),
+    event_type: Optional[str] = Query(default=None),
+    actor_team_id: Optional[str] = Query(default=None),
     limit: int = Query(default=50, ge=1, le=200),
     offset: int = Query(default=0, ge=0),
     order: str = Query(default="desc"),
@@ -391,9 +403,9 @@ def put_team_engine(
 
 @business_router.get("/runs")
 def get_runs_list(
-    status: str | None = Query(default=None),
-    domain_id: str | None = Query(default=None),
-    current_gate_id: str | None = Query(default=None),
+    status: Optional[str] = Query(default=None),
+    domain_id: Optional[str] = Query(default=None),
+    current_gate_id: Optional[str] = Query(default=None),
     limit: int = Query(default=20, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
     conn: Any = Depends(_db_conn),
@@ -426,8 +438,8 @@ def get_work_package(wp_id: str, conn: Any = Depends(_db_conn)) -> dict[str, Any
 
 @business_router.get("/ideas")
 def get_ideas(
-    status: str | None = Query(default=None),
-    priority: str | None = Query(default=None),
+    status: Optional[str] = Query(default=None),
+    priority: Optional[str] = Query(default=None),
     limit: int = Query(default=50, ge=1, le=200),
     offset: int = Query(default=0, ge=0),
     conn: Any = Depends(_db_conn),
@@ -693,8 +705,8 @@ async def health() -> dict[str, str]:
 
 @_api_router.get("/events/stream")
 async def events_stream(
-    run_id: str | None = Query(default=None),
-    domain_id: str | None = Query(default=None),
+    run_id: Optional[str] = Query(default=None),
+    domain_id: Optional[str] = Query(default=None),
 ) -> StreamingResponse:
     """SSE — UI §10.4 (pipeline_event, heartbeat, run_state_changed, feedback_ingested)."""
 
@@ -731,6 +743,8 @@ def _allowed_origins() -> list[str]:
     return [
         "http://localhost:8090",
         "http://127.0.0.1:8090",
+        "http://localhost:8092",
+        "http://127.0.0.1:8092",
         "http://localhost:8080",
         "http://127.0.0.1:8080",
         "http://localhost:8778",
@@ -761,6 +775,43 @@ def create_app() -> FastAPI:
     )
     application.include_router(_api_router, prefix="/api")
     application.include_router(business_router, prefix="/api")
+
+    @application.get("/api", include_in_schema=False, response_model=None)
+    @application.get("/api/", include_in_schema=False, response_model=None)
+    async def aos_v3_redirect_bare_api_prefix(request: Request) -> Response:
+        """Avoid raw ``{"detail":"Not Found"}`` when users open ``/api`` in a browser."""
+        accept = (request.headers.get("accept") or "").lower()
+        target = "/" if "text/html" in accept else "/docs"
+        return RedirectResponse(url=target, status_code=307)
+
+    repo = _repo_root()
+    v3_ui = repo / "agents_os_v3" / "ui"
+    _idx = v3_ui / "index.html"
+
+    @application.get("/", include_in_schema=False, response_model=None)
+    async def aos_v3_root_index() -> Response:
+        """Serve Pipeline View at ``/`` so the browser URL stays ``http://127.0.0.1:8090/``."""
+        if _idx.is_file():
+            return FileResponse(
+                str(_idx),
+                media_type="text/html; charset=utf-8",
+                headers={"Cache-Control": "no-store"},
+            )
+        return RedirectResponse(url="/v3/index.html", status_code=302)
+
+    shared_ui = repo / "agents_os" / "ui"
+    if v3_ui.is_dir():
+        application.mount(
+            "/v3",
+            StaticFiles(directory=str(v3_ui), html=True),
+            name="aos_v3_ui",
+        )
+    if shared_ui.is_dir():
+        application.mount(
+            "/agents_os/ui",
+            StaticFiles(directory=str(shared_ui)),
+            name="agents_os_shared_ui",
+        )
     return application
 
 

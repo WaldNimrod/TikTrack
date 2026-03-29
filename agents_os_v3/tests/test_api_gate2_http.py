@@ -43,6 +43,38 @@ def test_http_health_no_db() -> None:
     assert r.json().get("status") == "ok"
 
 
+def test_http_root_serves_v3_index_at_slash() -> None:
+    """Browser entry stays ``http://127.0.0.1:8090/`` (no redirect to /v3/...)."""
+    client = TestClient(create_app())
+    r = client.get("/", follow_redirects=False)
+    assert r.status_code == 200
+    ct = r.headers.get("content-type", "")
+    assert "text/html" in ct
+    assert b"Agents OS v3" in r.content
+    # v3 HTML uses ``./`` (repo-relative + /v3/ mount); legacy ``/v3/`` base also accepted.
+    assert (
+        b'<base href="/v3/"' in r.content or b'<base href="./"' in r.content
+    )
+
+
+def test_http_v3_index_and_shared_css_served() -> None:
+    client = TestClient(create_app())
+    r = client.get("/v3/index.html")
+    assert r.status_code == 200
+    r2 = client.get("/agents_os/ui/css/pipeline-shared.css")
+    assert r2.status_code == 200
+
+
+def test_http_bare_api_prefix_redirects_not_404() -> None:
+    client = TestClient(create_app())
+    r = client.get("/api", follow_redirects=False, headers={"Accept": "text/html"})
+    assert r.status_code == 307
+    assert r.headers.get("location") == "/"
+    r2 = client.get("/api/", follow_redirects=False, headers={"Accept": "application/json"})
+    assert r2.status_code == 307
+    assert r2.headers.get("location") == "/docs"
+
+
 def test_http_missing_actor_header_post_runs() -> None:
     client = TestClient(create_app())
     r = client.post(

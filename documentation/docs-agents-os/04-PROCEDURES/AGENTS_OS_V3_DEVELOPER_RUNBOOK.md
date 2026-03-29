@@ -78,14 +78,16 @@ Expected: `{"status":"ok"}` (adjust host/port if overridden).
 
 **OpenAPI:** `http://127.0.0.1:8090/docs`
 
+**Browser (no path):** `http://127.0.0.1:8090/` serves the Pipeline View HTML directly (same process as API; `<base href="/v3/">` resolves `/v3/*` assets).
+
 ---
 
-## 5. Port 8090 conflict (v2 vs v3)
+## 5. Port policy (LOCKED)
 
-`agents_os/scripts/start_ui_server.sh` (Agents OS **v2** UI) also uses **8090**. Only one listener per port.
+- **8090** — **AOS v3 only** (canonical). See [AGENTS_OS_V3_NETWORK_PORTS_AND_UI_ENTRY_v1.0.0.md](../02-ARCHITECTURE/AGENTS_OS_V3_NETWORK_PORTS_AND_UI_ENTRY_v1.0.0.md).
+- **8092** — Agents OS **v2** frozen pipeline UI: `./agents_os/scripts/start_ui_server.sh`. No conflict with v3.
 
-- Stop the v2 UI first, **or**
-- Run v3 on another port: `AOS_V3_SERVER_PORT=8091 bash scripts/start-aos-v3-server.sh`
+Non-canonical v3 override (emergency local only): `AOS_V3_SERVER_PORT=8091 bash scripts/start-aos-v3-server.sh`
 
 ---
 
@@ -107,13 +109,11 @@ AOS_V3_SKIP_DATABASE_INIT=1 bash scripts/bootstrap_aos_v3_local.sh
 
 ## 7. Static UI (v3)
 
-The FastAPI app does **not** serve `agents_os_v3/ui/` as static files. For local testing, use a simple HTTP server from repo root, e.g.:
+**Primary:** served by the same FastAPI process on **8090**: **`GET /`** returns Pipeline HTML; static files also under `/v3/*`. Same-origin with `/api/*` — no CORS setup needed for typical local use.
 
-```bash
-python3 -m http.server 8778
-```
+**Optional alternate (e.g. Playwright isolation):** from repo root, `python3 -m http.server 8778` and open `http://127.0.0.1:8778/agents_os_v3/ui/` — still point API base to `http://127.0.0.1:8090` (meta or `localStorage`; see `api-client.js`).
 
-Then open paths under `http://127.0.0.1:8778/agents_os_v3/ui/` (e.g. `index.html`). The UI expects the API at a configurable base URL (see `agents_os_v3/ui/api-client.js`).
+**Cursor / VS Code:** `.vscode/tasks.json` — v3 **:8090** (שרת API+UI), Bootstrap, הכנת E2E; v2 pipeline dashboard **:8092** בלבד.
 
 **Team 31 preflight** (serves pages and optionally checks API health):
 
@@ -127,12 +127,14 @@ Default static server port for the script is **8778**.
 
 ### 7.1 Browser E2E stack (Selenium — Remediation Phase 3a)
 
-One script prepares **API + static UI** (DB migrate/seed optional):
+**Default:** `scripts/run_aos_v3_e2e_stack.sh` ensures **only** the v3 server on **8090** (checks `/api/health`, `/`, `/v3/index.html`). Pytest defaults to `AOS_V3_E2E_BASE_URL=http://127.0.0.1:8090/v3/index.html` (same-origin).
+
+**Legacy second server:** `AOS_V3_E2E_SEPARATE_STATIC=1 bash scripts/run_aos_v3_e2e_stack.sh` also starts **8778** — see `agents_os_v3/tests/e2e/README.md`.
 
 ```bash
-# Optional: include DB init (001 + seed) before serving
+# Optional: include DB init (001 + seed) first
 AOS_V3_E2E_PREPARE_DB=1 bash scripts/run_aos_v3_e2e_stack.sh
-# Or (API + static only, DB already migrated):
+# Or (DB already migrated):
 bash scripts/run_aos_v3_e2e_stack.sh
 ```
 

@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <!--
-id: TEAM_31_AOS_V3_UI_MOCKUPS
+id: TEAM_31_AOS_V3_UI
 team: Team 31
 domain: agents_os
 artifact: portfolio.html
 mandate: TEAM_100_TO_TEAM_31_AOS_V3_UI_MOCKUPS_MANDATE_v2.0.0
-date: 2026-03-27
-status: MOCKUP
+date: 2026-03-29
+status: ACTIVE
 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="./" />
   <meta name="aosv3-api-base" content="http://127.0.0.1:8090" />
   <title>Agents OS v3 — Portfolio</title>
   <link rel="stylesheet" href="../../agents_os/ui/css/pipeline-shared.css" />
@@ -23,11 +24,6 @@ status: MOCKUP
 <header class="agents-header">
   <div class="agents-header-left">
     <h1 class="agents-header-title">Agents OS v3 — <span>Portfolio</span></h1>
-    <span class="agents-refresh-label">Runs / WP / Ideas (mock)</span>
-  </div>
-  <div class="agents-header-right">
-    <button type="button" class="btn" onclick="AOSV3_onDomainSwitch('agents_os')">Dark</button>
-    <button type="button" class="btn" onclick="AOSV3_onDomainSwitch('tiktrack')">Light</button>
   </div>
 </header>
 
@@ -36,19 +32,31 @@ status: MOCKUP
   <span class="nav-sep"></span>
   <a class="nav-link" href="history.html">History</a>
   <span class="nav-sep"></span>
-  <a class="nav-link" href="config.html">Configuration</a>
-  <span class="nav-sep"></span>
   <a class="nav-link" href="teams.html">Teams</a>
   <span class="nav-sep"></span>
   <a class="nav-link active" href="portfolio.html">Portfolio</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="config.html">Configuration</a>
   <span class="nav-sep"></span>
   <a class="nav-link" href="flow.html">System Map</a>
 </nav>
 
 <div class="agents-page-layout">
-  <main class="agents-page-main aosv3-page-main--full">
-    <div class="section-card aosv3-portfolio-gate-filter-card">
-      <div class="sidebar-label">Portfolio filter (mock)</div>
+  <aside class="agents-page-sidebar">
+    <!-- Type B — domain scope -->
+    <div class="sidebar-section-card aosv3-workspace-scope-card">
+      <div class="sidebar-label aosv3-workspace-panel-title">Workspace &amp; domain scope</div>
+      <label class="aosv3-form-label">Show data for
+        <select id="aosv3-ui-domain-scope" class="aosv3-input" aria-label="Domain scope for portfolio tables" title="All domains or filter runs, WP, and ideas">
+          <option value="all">All domains</option>
+          <option value="agents_os">Agents OS</option>
+          <option value="tiktrack">TikTrack</option>
+        </select>
+      </label>
+      <p class="aosv3-sidebar-hint">Tables below filter to the selected lane. All domains shows every row.</p>
+    </div>
+    <div class="sidebar-section-card aosv3-portfolio-gate-filter-card aosv3-portfolio-gate-filter-card--sidebar">
+      <div class="sidebar-label">Active runs — gate filter</div>
       <label class="aosv3-form-label">Milestone (Gate)
         <select id="aosv3-portfolio-gate-filter" class="aosv3-input" aria-label="Filter active runs by gate">
           <option value="">All Gates</option>
@@ -60,15 +68,17 @@ status: MOCKUP
           <option value="GATE_5">GATE_5</option>
         </select>
       </label>
-      <button type="button" class="btn btn-primary" id="aosv3-portfolio-gate-apply">Apply</button>
-      <p class="aosv3-mock-note">Applies to Active Runs tab (Stage 8B §9.3).</p>
+      <button type="button" class="btn btn-primary" id="aosv3-portfolio-gate-apply" title="Filter the Active Runs table by milestone">Apply</button>
+      <p class="aosv3-sidebar-hint">Applies to the Active Runs tab only.</p>
     </div>
+  </aside>
+  <main class="agents-page-main aosv3-page-main--full">
 
     <div class="aosv3-tabs aosv3-portfolio-tabs" role="tablist">
-      <button type="button" class="aosv3-tab active" data-portfolio-tab="active">Active Runs</button>
-      <button type="button" class="aosv3-tab" data-portfolio-tab="completed">Completed Runs</button>
-      <button type="button" class="aosv3-tab" data-portfolio-tab="wp">Work Packages</button>
-      <button type="button" class="aosv3-tab" data-portfolio-tab="ideas">Ideas Pipeline</button>
+      <button type="button" class="aosv3-tab active" data-portfolio-tab="active" title="Runs in progress">Active Runs</button>
+      <button type="button" class="aosv3-tab" data-portfolio-tab="completed" title="Finished runs">Completed Runs</button>
+      <button type="button" class="aosv3-tab" data-portfolio-tab="wp" title="Work packages">Work Packages</button>
+      <button type="button" class="aosv3-tab" data-portfolio-tab="ideas" title="Ideas backlog">Ideas Pipeline</button>
     </div>
 
     <div class="section-card aosv3-legend-card aosv3-legend-card--inline">
@@ -78,26 +88,27 @@ status: MOCKUP
         <span class="aosv3-legend-item"><span class="aosv3-status-badge aosv3-status--correction">CORR</span> correction</span>
         <span class="aosv3-legend-item"><span class="aosv3-status-badge aosv3-status--complete">DONE</span> complete</span>
         <span class="aosv3-legend-item"><span class="aosv3-status-badge aosv3-status--not_started">PLAN</span> planned WP</span>
-        <span class="aosv3-legend-item"><span class="aosv3-domain-pill">domain</span> domain_id</span>
+        <span class="aosv3-legend-item"><span class="aosv3-domain-pill">domain</span> product lane</span>
         <span class="aosv3-legend-item"><span class="aosv3-status-badge aosv3-status--idea-new">NEW</span> idea · <span class="aosv3-status-badge aosv3-status--rejected">REJ</span> rejected</span>
       </div>
     </div>
 
     <div id="aosv3-portfolio-panel-active" class="aosv3-tab-panel active" data-portfolio-panel="active" role="tabpanel">
       <div class="aosv3-table-wrap">
-        <table class="aosv3-table">
+        <table class="aosv3-table aosv3-table--sortable" id="aosv3-portfolio-table-active" data-aosv3-sort-scope="portfolio-active">
           <thead>
             <tr>
-              <th>run_id</th>
-              <th>domain_id</th>
-              <th>work_package_id</th>
-              <th>status</th>
-              <th>current_gate</th>
-              <th>gate / phase</th>
-              <th>correction_cycle_count</th>
-              <th>started_at</th>
-              <th>current_actor</th>
-              <th>actions</th>
+              <th data-sort-key="run_id" title="Click to sort">Run</th>
+              <th data-sort-key="domain_id" title="Click to sort">Domain</th>
+              <th data-sort-key="wp_label" title="Click to sort">Work package</th>
+              <th data-sort-key="program_key" title="Click to sort">Program</th>
+              <th data-sort-key="status" title="Click to sort">Status</th>
+              <th data-sort-key="current_gate_id" title="Click to sort">Current gate</th>
+              <th data-sort-key="phase_key" title="Click to sort">Gate / phase</th>
+              <th data-sort-key="correction_cycle_count" title="Click to sort">Corrections</th>
+              <th data-sort-key="started_at" title="Click to sort">Started</th>
+              <th data-sort-key="current_actor_team_id" title="Click to sort">Actor</th>
+              <th class="aosv3-th-nosort">actions</th>
             </tr>
           </thead>
           <tbody id="aosv3-portfolio-active-tbody"></tbody>
@@ -113,17 +124,18 @@ status: MOCKUP
         <button type="button" class="btn" id="aosv3-completed-next">Next</button>
       </div>
       <div class="aosv3-table-wrap">
-        <table class="aosv3-table">
+        <table class="aosv3-table aosv3-table--sortable" id="aosv3-portfolio-table-completed" data-aosv3-sort-scope="portfolio-completed">
           <thead>
             <tr>
-              <th>run_id</th>
-              <th>domain_id</th>
-              <th>work_package_id</th>
-              <th>status</th>
-              <th>gates_completed</th>
-              <th>started → completed</th>
-              <th>correction_cycle_count</th>
-              <th>actions</th>
+              <th data-sort-key="run_id" title="Click to sort">Run</th>
+              <th data-sort-key="domain_id" title="Click to sort">Domain</th>
+              <th data-sort-key="wp_label" title="Click to sort">Work package</th>
+              <th data-sort-key="program_key" title="Click to sort">Program</th>
+              <th data-sort-key="status" title="Click to sort">Status</th>
+              <th data-sort-key="gates_completed" title="Click to sort">Gates</th>
+              <th data-sort-key="started_at" title="Click to sort">Started → completed</th>
+              <th data-sort-key="correction_cycle_count" title="Click to sort">Corrections</th>
+              <th class="aosv3-th-nosort">actions</th>
             </tr>
           </thead>
           <tbody id="aosv3-portfolio-completed-tbody"></tbody>
@@ -133,16 +145,17 @@ status: MOCKUP
 
     <div id="aosv3-portfolio-panel-wp" class="aosv3-tab-panel" data-portfolio-panel="wp" role="tabpanel">
       <div class="aosv3-table-wrap">
-        <table class="aosv3-table">
+        <table class="aosv3-table aosv3-table--sortable" id="aosv3-portfolio-table-wp" data-aosv3-sort-scope="portfolio-wp">
           <thead>
             <tr>
-              <th>wp_id</th>
-              <th>label</th>
-              <th>domain_id</th>
-              <th>status</th>
-              <th>current_gate</th>
-              <th>linked_run_id</th>
-              <th>actions</th>
+              <th data-sort-key="stage_id" title="Click to sort">Milestone</th>
+              <th data-sort-key="label" title="Click to sort">Work package</th>
+              <th data-sort-key="program_key" title="Click to sort">Program</th>
+              <th data-sort-key="wp_id" title="Click to sort">WP id</th>
+              <th data-sort-key="domain_id" title="Click to sort">Domain</th>
+              <th data-sort-key="status" title="Click to sort">Status</th>
+              <th data-sort-key="linked_run_id" title="Click to sort">Linked run</th>
+              <th class="aosv3-th-nosort">actions</th>
             </tr>
           </thead>
           <tbody id="aosv3-portfolio-wp-tbody"></tbody>
@@ -151,21 +164,22 @@ status: MOCKUP
     </div>
 
     <div id="aosv3-portfolio-panel-ideas" class="aosv3-tab-panel" data-portfolio-panel="ideas" role="tabpanel">
-      <p class="aosv3-mock-note">New Idea: title, description, domain_id, idea_type, priority (Stage 8B §9.1).</p>
+      <p class="aosv3-sidebar-hint">Required: title, description, domain, type, priority.</p>
       <button type="button" class="btn btn-primary" id="aosv3-btn-new-idea">+ New Idea</button>
       <div class="aosv3-table-wrap aosv3-ideas-table-wrap">
-        <table class="aosv3-table">
+        <table class="aosv3-table aosv3-table--sortable" id="aosv3-portfolio-table-ideas" data-aosv3-sort-scope="portfolio-ideas">
           <thead>
             <tr>
-              <th>idea_id</th>
-              <th>title</th>
-              <th>domain_id</th>
-              <th>idea_type</th>
-              <th>priority</th>
-              <th>status</th>
-              <th>submitted_by</th>
-              <th>submitted_at</th>
-              <th>actions</th>
+              <th data-sort-key="idea_id" title="Click to sort">Idea</th>
+              <th data-sort-key="title" title="Click to sort">Title</th>
+              <th data-sort-key="domain_id" title="Click to sort">Domain</th>
+              <th data-sort-key="target_program_id" title="Click to sort">Target program</th>
+              <th data-sort-key="idea_type" title="Click to sort">Type</th>
+              <th data-sort-key="priority" title="Click to sort">Priority</th>
+              <th data-sort-key="status" title="Click to sort">Status</th>
+              <th data-sort-key="submitted_by" title="Click to sort">Submitted by</th>
+              <th data-sort-key="submitted_at" title="Click to sort">Submitted at</th>
+              <th class="aosv3-th-nosort">actions</th>
             </tr>
           </thead>
           <tbody id="aosv3-portfolio-ideas-tbody"></tbody>
@@ -219,7 +233,7 @@ status: MOCKUP
   <div class="aosv3-modal-box aosv3-modal-box--wide">
     <button type="button" class="aosv3-modal-close" data-aosv3-modal-close aria-label="Close">✕</button>
     <h3 id="aosv3-modal-edit-title">Edit Idea</h3>
-    <p class="aosv3-mock-note">Status: <strong id="aosv3-edit-status-display">—</strong></p>
+    <p class="aosv3-sidebar-hint">Status: <strong id="aosv3-edit-status-display">—</strong></p>
     <label class="aosv3-form-label">Title <span class="aosv3-req">*</span>
       <input type="text" id="aosv3-edit-title" class="aosv3-input" />
     </label>

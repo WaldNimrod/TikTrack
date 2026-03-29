@@ -3,6 +3,9 @@
   "private": true,
   "type": "module",
   "description": "Optional Playwright capture for GATE_3 mock matrix (run from repo with mock HTTP server up).",
+  "scripts": {
+    "verify:table-contracts": "node verify_table_header_contract.mjs"
+  },
   "devDependencies": {
     "playwright": "^1.49.0"
   }

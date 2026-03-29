@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <!--
-id: TEAM_31_AOS_V3_UI_MOCKUPS
+id: TEAM_31_AOS_V3_UI
 team: Team 31
 domain: agents_os
 artifact: flow.html
 mandate: TEAM_31_AOS_V3_PIPELINE_FLOW_INTEGRATION_MANDATE_v1.0.0
-date: 2026-03-28
-status: MOCKUP
+date: 2026-03-29
+status: ACTIVE
 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="./" />
   <meta name="aosv3-api-base" content="http://127.0.0.1:8090" />
   <title>Agents OS v3 — System Map</title>
   <link rel="stylesheet" href="../../agents_os/ui/css/pipeline-shared.css" />
@@ -161,9 +162,7 @@ status: MOCKUP
     <span class="agents-refresh-label">Pipeline Flow Reference — v1.1.0</span>
   </div>
   <div class="agents-header-right">
-    <span id="aosv3-sse-indicator" class="aosv3-sse-indicator aosv3-sse--polling" role="status" aria-live="polite"><span class="aosv3-sse-dot" aria-hidden="true"></span> Polling Mode</span>
-    <button type="button" class="btn" onclick="AOSV3_onDomainSwitch('agents_os')">Dark</button>
-    <button type="button" class="btn" onclick="AOSV3_onDomainSwitch('tiktrack')">Light</button>
+    <span id="aosv3-sse-indicator" class="aosv3-sse-indicator aosv3-sse--polling" role="status" aria-live="polite" title="Live updates: SSE when connected, otherwise periodic refresh"><span class="aosv3-sse-dot" aria-hidden="true"></span> Polling Mode</span>
   </div>
 </header>
 
@@ -172,16 +171,27 @@ status: MOCKUP
   <span class="nav-sep"></span>
   <a class="nav-link" href="history.html">History</a>
   <span class="nav-sep"></span>
-  <a class="nav-link" href="config.html">Configuration</a>
-  <span class="nav-sep"></span>
   <a class="nav-link" href="teams.html">Teams</a>
   <span class="nav-sep"></span>
   <a class="nav-link" href="portfolio.html">Portfolio</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="config.html">Configuration</a>
   <span class="nav-sep"></span>
   <a class="nav-link active" href="flow.html">System Map</a>
 </nav>
 
 <div class="agents-page-layout">
+  <aside class="agents-page-sidebar">
+    <!-- Type A — single-domain UI: System Map only (see index.html for Pipeline) -->
+    <div class="sidebar-section-card agents-domain-bar agents-domain-bar--sidebar">
+      <div class="sidebar-label aosv3-workspace-panel-title">Active workspace</div>
+      <div class="domain-selector" role="group" aria-label="Active product workspace">
+        <button type="button" class="domain-btn" data-pipeline-domain="agents_os" onclick="AOSV3_onDomainSwitch('agents_os')" title="Agents OS — dark theme; SSE context agents_os">Agents OS</button>
+        <button type="button" class="domain-btn" data-pipeline-domain="tiktrack" onclick="AOSV3_onDomainSwitch('tiktrack')" title="TikTrack — light theme; SSE context tiktrack">TikTrack</button>
+      </div>
+      <p class="aosv3-sidebar-hint">Theme and live connection context. Diagrams describe the full program.</p>
+    </div>
+  </aside>
   <main class="agents-page-main aosv3-page-main--full aosv3-flow-main">
 <nav class="flow-subnav" aria-label="System Map sections">
   <a href="#gates">1 · Gate Sequence</a>

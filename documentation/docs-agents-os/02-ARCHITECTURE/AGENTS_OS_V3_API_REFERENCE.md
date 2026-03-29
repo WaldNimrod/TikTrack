@@ -132,7 +132,7 @@ Other explicit HTTP errors include **400** validation, **403** `INSUFFICIENT_AUT
 
 ## 12. CORS
 
-If **`ALLOWED_ORIGINS`** is set (comma-separated), it replaces the default origin list. Otherwise defaults include localhost/127.0.0.1 ports **8090**, **8080**, **8778**, **8766**, **3000** — see `_allowed_origins()` in `api.py`.
+If **`ALLOWED_ORIGINS`** is set (comma-separated), it replaces the default origin list. Otherwise defaults include localhost/127.0.0.1 ports **8090** (v3), **8092** (v2 UI), **8080**, **8778**, **8766**, **3000** — see `_allowed_origins()` in `api.py`. Port policy: [AGENTS_OS_V3_NETWORK_PORTS_AND_UI_ENTRY_v1.0.0.md](AGENTS_OS_V3_NETWORK_PORTS_AND_UI_ENTRY_v1.0.0.md).
 
 ---
 

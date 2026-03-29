@@ -3,8 +3,8 @@
 
 **project_domain:** AGENTS_OS  
 **owner:** Team 170 (Governance Documentation)  
-**date:** 2026-03-16  
-**status:** Active — canonical entry point per TEAM_00_TO_TEAM_170_AGENTS_OS_DOCS_MANDATE_v2.0.0
+**date:** 2026-03-28  
+**status:** Active — canonical entry point per TEAM_00_TO_TEAM_170_AGENTS_OS_DOCS_MANDATE_v2.0.0 (v3 index § Agents OS v3)
 
 ---
 
@@ -12,10 +12,26 @@
 
 | Task | Link / Command |
 |------|----------------|
-| Start UI server | `./agents_os/scripts/start_ui_server.sh` → open http://localhost:8090/ (redirects to dashboard) or http://localhost:8090/static/PIPELINE_DASHBOARD.html |
+| Start UI server | `./agents_os/scripts/start_ui_server.sh` → open http://localhost:8090/ (dashboard) + monitor pages: `/static/PIPELINE_CONSTITUTION.html`, `/static/PIPELINE_MONITOR.html` (**port is policy-locked to 8090**) |
 | Seed Event Log | `python3 agents_os/scripts/seed_event_log.py` (optional — adds sample events for dev/E2E) |
 | Run pipeline | `./pipeline_run.sh --domain agents_os` |
 | Check status | `./pipeline_run.sh --domain agents_os status` or `./pipeline_run.sh domain` |
+
+---
+
+## Agents OS v3 (BUILD track — branch `aos-v3`)
+
+**Canonical target (Team 100 — Directive 3B):** All **v3** domain documentation lives under this same `documentation/docs-agents-os/` tree using the **`AGENTS_OS_V3_`** filename prefix. **Do not** add `agents_os_v3/docs/`; code-adjacent docs are **`agents_os_v3/README.md`** plus handler **docstrings** only. **Do not** modify or remove existing **v2** documents in this index without a separate governance erratum.
+
+| v3 document | Path | Status |
+|-------------|------|--------|
+| v3 Overview | [AGENTS_OS_V3_OVERVIEW.md](01-OVERVIEW/AGENTS_OS_V3_OVERVIEW.md) | Active — Team 71 GATE_DOC Phase B (2026-03-28) |
+| v3 Architecture | [AGENTS_OS_V3_ARCHITECTURE_OVERVIEW.md](02-ARCHITECTURE/AGENTS_OS_V3_ARCHITECTURE_OVERVIEW.md) | Active — Team 71 |
+| v3 API Reference | [AGENTS_OS_V3_API_REFERENCE.md](02-ARCHITECTURE/AGENTS_OS_V3_API_REFERENCE.md) | Active — Team 71 |
+| v3 Developer Runbook | [AGENTS_OS_V3_DEVELOPER_RUNBOOK.md](04-PROCEDURES/AGENTS_OS_V3_DEVELOPER_RUNBOOK.md) | Active — Team 71 |
+| v3 Templates | [AGENTS_OS_V3_LOCAL_VALIDATION_CHECKLIST.md](05-TEMPLATES/AGENTS_OS_V3_LOCAL_VALIDATION_CHECKLIST.md) (+ [05-TEMPLATES/](05-TEMPLATES/) index) | Active — Team 71 |
+
+**Traceability:** `_COMMUNICATION/team_100/TEAM_100_AOS_V3_BUILD_DOCUMENTATION_CANONICAL_DIRECTIVE_3B_v1.0.0.md`
 
 ---
 
@@ -55,7 +71,9 @@ Use this tooling when running a full Agents OS audit that must produce a multi-d
 
 | Document | Description |
 |----------|-------------|
-| [PIPELINE_DASHBOARD_UI_REGISTRY_v1.0.0.md](../../agents_os/ui/docs/PIPELINE_DASHBOARD_UI_REGISTRY_v1.0.0.md) | buildCurrentStepBanner, mandate tab phase auto-selection, PWA scaffold, Event Log (DOC-04, DOC-05, DOC-06, DOC-07) |
+| [PIPELINE_DASHBOARD_UI_REGISTRY_v2.0.0.md](../../agents_os/ui/docs/PIPELINE_DASHBOARD_UI_REGISTRY_v2.0.0.md) | buildCurrentStepBanner, mandate tab phase auto-selection, PWA scaffold, Event Log (DOC-04, DOC-05, DOC-06, DOC-07); supersedes v1.0.0 |
+| [PIPELINE_MONITOR_ARCHITECTURE_v1.1.0.md](../../agents_os/ui/docs/PIPELINE_MONITOR_ARCHITECTURE_v1.1.0.md) | Canonical split: `PIPELINE_CONSTITUTION.html` (structure/governance) + `PIPELINE_MONITOR.html` (live runtime), script split contract (`core` + mode selectors) |
+| [PIPELINE_TEAMS_CONTEXT_MONITOR_ARCHITECTURE_v1.0.0.md](../../agents_os/ui/docs/PIPELINE_TEAMS_CONTEXT_MONITOR_ARCHITECTURE_v1.0.0.md) | Teams page upgrade: context-structure monitor, cross-source matrix, full-content drilldown, and Team Management north-star roadmap |
 
 ---
 
@@ -140,3 +158,5 @@ Per [TEAM_170_AGENTS_OS_DOCUMENTATION_STATE_AND_WORK_PLAN_OPTIONS §2](../../_CO
 **log_entry | TEAM_170 | AGENTS_OS_MASTER_INDEX | DELIVERED | 2026-03-14**
 **log_entry | TEAM_170 | AGENTS_OS_MASTER_INDEX | REVIEW_TOOLING_ADDED_AGENTS_OS_REVIEW_SKILL | 2026-03-16**
 **log_entry | TEAM_170 | AGENTS_OS_MASTER_INDEX | EVENT_LOG_REFERENCE_ADDED | 2026-03-10**
+**log_entry | TEAM_11 | AOS_V3_BUILD | MASTER_INDEX_V3_SECTION_3B | SYNC | 2026-03-28**
+**log_entry | TEAM_71 | AOS_V3 | GATE_DOC_PHASE_B | MASTER_INDEX_V3_ACTIVE | 2026-03-28**

@@ -105,20 +105,21 @@ Team 170 must revise and re-submit LLD400 before Phase 2 can re-start.
 Before every `pass`, `phase2`, and `next` (generate), the script runs `_auto_store_gate1_artifact()`:
 
 1. Checks if `current_gate == GATE_1`
-2. Searches for `_COMMUNICATION/team_170/TEAM_170_{WP_ID}_LLD400_v*.md` (latest version by glob)
-3. If file exists and content differs from stored → runs `$CLI --store-artifact GATE_1 <file>` automatically
-4. Prints: `🔄 AC-10 auto-store: <file>` + `✅ lld400_content updated`
+2. **Tier 1:** Searches for `_COMMUNICATION/team_170/TEAM_170_{WP_ID}_LLD400_v*.md` (latest version by glob)
+3. **Tier 2:** If no match, globs `_COMMUNICATION/**/TEAM_170_*{WP_fragment}*LLD400*.md` (recursive)
+4. **Tier 3:** If no file found, prints guidance; user runs `./pipeline_run.sh store GATE_1 <path>` manually
+5. If file exists and content differs from stored → runs `$CLI --store-artifact GATE_1 <file>` automatically
+6. Prints: `🔄 AC-10 auto-store: <file>` + `✅ lld400_content updated`
 
 ### Purpose
-Eliminates the need for manual `./pipeline_run.sh store GATE_1 <file>` before `pass`.
+Eliminates the need for manual `./pipeline_run.sh store GATE_1 <file>` before `pass` when file is at standard or Tier-2 paths.
 
 ### Usage Example
 ```
 AC-10 auto-store:
   At GATE_1, pipeline_run.sh auto-detects the latest LLD400 file
-  (_COMMUNICATION/team_170/TEAM_170_{WP}_LLD400_v*.md) and stores it
-  before prompt generation and before pass validation.
-  Manual `store GATE_1` still works as override if needed.
+  (Tier 1: team_170/; Tier 2: full _COMMUNICATION/ tree).
+  Manual `store GATE_1` still works as override for Tier 3 (non-standard path).
 ```
 
 ---

@@ -12,22 +12,32 @@
 | Active workflow & orchestration | `documentation/docs-governance/04-PROCEDURES/AGENTS_OS_V2_OPERATING_PROCEDURES_v1.0.0.md` |
 | **Gemini Code Assist environment procedure** | `_COMMUNICATION/team_101/TEAM_101_OPERATING_PROCEDURES_v1.0.0.md` |
 | Global entry + WSM | `00_MASTER_INDEX.md`, `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` |
+| **AOS v3 — תיעוד קנוני (Directive 3B)** | `documentation/docs-agents-os/00_AGENTS_OS_MASTER_INDEX.md` → קבצי `AGENTS_OS_V3_*` |
 
 **Deprecated (do not use as active procedure):** References to `PHOENIX_MASTER_BIBLE` or `CURSOR_INTERNAL_PLAYBOOK` under `documentation/09-GOVERNANCE/standards/` or `06-GOVERNANCE_&_COMPLIANCE/standards/` — those paths are not in active use; superseded by the documents above and by V2 Operating Procedures.
 
 ---
 
-## Active branch — AOS v3 (BUILD track)
+## AOS v3 — branch `aos-v3` (post-BUILD + documentation)
 
 | Field | Value |
 |-------|--------|
 | **Branch** | `aos-v3` |
 | **Push** | `origin/aos-v3` (direct; no `codex/team191-integration` on this track) |
 | **Pipeline** | N/A for this project track (`pipeline_run.sh` not used here) |
-| **Default branch** | `main` remains the GitHub default; merge back after completion + data migration |
+| **BUILD status** | **COMPLETE** — `_COMMUNICATION/team_00/TEAM_00_TO_TEAM_11_AOS_V3_GATE_5_BUILD_COMPLETE_VERDICT_v1.0.0.md` (GATE_5 PASS, 2026-03-28) |
+| **GATE_DOC (phase B)** | **COMPLETE** — `_COMMUNICATION/team_190/TEAM_190_AOS_V3_GATE_DOC_PHASE_B_REVIEW_v1.0.0.md` (**PASS**) + `_COMMUNICATION/team_11/TEAM_11_RECEIPT_AOS_V3_GATE_DOC_PHASE_B_CLOSURE_v1.0.0.md`. תיעוד v3: `documentation/docs-agents-os/**/AGENTS_OS_V3_*` (Directive **3B**; no `agents_os_v3/docs/`) |
+| **REMEDIATION (Team 100 audit)** | **PASS (סגור 2026-03-28)** — דוח מקור `_COMMUNICATION/team_100/TEAM_100_AOS_V3_BUILD_COMPLETENESS_AUDIT_AND_GAP_PLAN_v1.0.0.md`; **Phase 0–5 PASS**; מפת שלבים §**0.11**; דוח סגירה ל-**100**: `_COMMUNICATION/team_11/TEAM_11_TO_TEAM_100_AOS_V3_REMEDIATION_CLOSURE_REPORT_v1.0.0.md`; ל-**00**: `_COMMUNICATION/team_11/TEAM_11_TO_TEAM_00_AOS_V3_REMEDIATION_CLOSURE_REPORT_v1.0.1.md` (**FINAL**); CI: `.github/workflows/aos-v3-tests.yml` (כולל שלב **F-05** `scripts/run_aos_v3_canary_simulation.sh`) + runner נפרד ל-51 `scripts/run_aos_v3_phase5_canary_sim.sh` |
+| **Default branch** | `main` remains the GitHub default; merge when Principal approves + data migration is ready |
 | **Iron Rules** | `agents_os_v2/` **FROZEN**; every file under `agents_os_v3/` must appear in `agents_os_v3/FILE_INDEX.json` before commit — see `_COMMUNICATION/team_00/TEAM_00_TO_TEAM_191_AOS_V3_GIT_GOVERNANCE_CANONICAL_v1.1.0.md` |
 
 **Pre-commit:** `phoenix-aos-v3-file-index-v2-freeze` · **BUILD check:** `bash scripts/check_aos_v3_build_governance.sh`
+
+**Local AOS v3 DB (GATE_0):** Configure **`agents_os_v3/.env`** with **`AOS_V3_DATABASE_URL`** only (isolated from TikTrack `api/.env` / `DATABASE_URL`). Optional: `AOS_V3_DOCKER_PG_CONTAINER` when multiple Postgres containers exist. Then `bash scripts/init_aos_v3_database.sh` — applies `001`, runs `seed.py`.
+
+**AOS v3 API (local):** `bash scripts/start-aos-v3-server.sh` (default **8090**; PID file `/tmp/aos_v3_server.pid`). Health: `curl -s http://127.0.0.1:8090/api/health`. Stop: `bash scripts/stop-aos-v3-server.sh`. Restart: `bash scripts/restart-aos-v3-server.sh`. DB + API in one go: `bash scripts/bootstrap_aos_v3_local.sh` (skip DB with `AOS_V3_SKIP_DATABASE_INIT=1`). **8090 conflict:** `agents_os/scripts/start_ui_server.sh` (agents_os_v2) also uses 8090 — stop one before starting the other, or set `AOS_V3_SERVER_PORT` for dev.
+
+**Dual-domain DB health (TikTrack + AOS, isolated URLs):** `python3 scripts/verify_dual_domain_database_connectivity.py` (needs `psycopg2`; uses `api/.env` + `agents_os_v3/.env`).
 
 ---
 
@@ -135,6 +145,7 @@ TikTrack Phoenix is a full-stack stock/portfolio tracking web app:
 2. **Backend**: From workspace root: `source api/venv/bin/activate && PYTHONPATH="/workspace/api:/workspace" uvicorn api.main:app --reload --host 0.0.0.0 --port 8082`
 3. **Frontend**: From `ui/`: `npm run dev`
 4. **Health check**: `curl http://localhost:8082/health` should return `{"status":"ok"}`
+5. **AOS v3 (BUILD track):** From workspace root: `bash scripts/bootstrap_aos_v3_local.sh` or `bash scripts/start-aos-v3-server.sh` after DB init. Health: `curl -s http://127.0.0.1:8090/api/health` → `{"status":"ok"}`. VS Code / Cursor: **Tasks** include Init AOS v3 DB, Start/Stop/Restart AOS v3 API, Bootstrap.
 
 ### Database Setup Gotchas
 

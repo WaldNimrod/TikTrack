@@ -29,9 +29,9 @@ ASCII flow (authoritative: `GATE_SEQUENCE` and `GATE_CONFIG` in `agents_os_v2/or
 
 ```
 GATE_0 (Scope) → GATE_1 (LLD400) → GATE_2 / WAITING_GATE2_APPROVAL (Human) →
-G3_PLAN (Work Plan) → G3_5 (Validate Plan) → G3_6_MANDATES (Mandates) →
-CURSOR_IMPLEMENTATION → GATE_4 (QA) → GATE_5 (Dev Validation) [doc→G5_DOC_FIX] →
-GATE_6 / WAITING_GATE6_APPROVAL (Human) → GATE_7 (UX Sign-off) → GATE_8 (Closure)
+G3_PLAN (Work Plan) → G3_5 (Validate Plan) → G3_REMEDIATION (BF deadlock fix) →
+G3_6_MANDATES (Mandates) → CURSOR_IMPLEMENTATION → GATE_4 (QA) → GATE_5 (Dev Validation) [doc→CURSOR_IMPLEMENTATION] →
+GATE_6 (Human) → GATE_7 (UX Sign-off) → GATE_8 (Closure)
 ```
 
 **Gate types and owners (GATE_CONFIG):**
@@ -44,13 +44,12 @@ GATE_6 / WAITING_GATE6_APPROVAL (Human) → GATE_7 (UX Sign-off) → GATE_8 (Clo
 | WAITING_GATE2_APPROVAL | team_00 | human | Nimrod reviews GATE_2 analysis |
 | G3_PLAN | team_10 | cursor | Build work plan from approved spec |
 | G3_5 | team_90 | codex | Validate work plan |
+| G3_REMEDIATION | team_10 | cursor | Multi-team BF deadlock → remediation_work_plan.md |
 | G3_6_MANDATES | team_10 | orchestrator | Generate per-team mandates |
 | CURSOR_IMPLEMENTATION | teams_20_30 | cursor | Implement + MCP test |
 | GATE_4 | team_10 | cursor | QA coordination |
-| GATE_5 | team_90 | codex | Dev validation (code vs spec) |
-| G5_DOC_FIX | team_10 | cursor | Doc/artifact fix → GATE_5 re-validation |
-| GATE_6 | team_100 | codex+human | Architectural reality review |
-| WAITING_GATE6_APPROVAL | team_00 | human | Nimrod reviews GATE_6 |
+| GATE_5 | team_90 | codex | Dev validation (code vs spec); doc route → CURSOR_IMPLEMENTATION |
+| GATE_6 | team_100 | codex | Architectural reality review |
 | GATE_7 | team_90 | human | Team 90 + Nimrod UX approval |
 | GATE_8 | team_90 | codex | Documentation closure |
 
@@ -115,7 +114,7 @@ When a gate fails, routing is determined by `FAIL_ROUTING` and `default_fail_rou
 
 | Route | Target | Use case |
 |-------|--------|----------|
-| **doc** | Same gate or G5_DOC_FIX | Documentation/artifact issues only — no code changes |
+| **doc** | Same gate or CURSOR_IMPLEMENTATION | Documentation/artifact issues only — targeted fix, no full re-plan |
 | **full** | G3_PLAN or G3_6_MANDATES | Substantial code/design issues — full re-plan → mandates → implementation |
 
 **GATE_8 example:** On FAIL, GATE_8 routes doc→GATE_8 (fix doc gaps and re-validate) or full→G3_PLAN (major revision). `advance_gate()` in `pipeline.py` applies the chosen route; `fail` case in `pipeline_run.sh` displays options and waits for `route doc|full [notes]`.
@@ -124,7 +123,21 @@ When a gate fails, routing is determined by `FAIL_ROUTING` and `default_fail_rou
 
 ---
 
-## 6. Event Log
+## 6. Pipeline Resilience (WSM Auto-Write)
+
+**Source:** `agents_os_v2/orchestrator/wsm_writer.py` — `write_wsm_state()`
+
+On every gate advance (PASS or FAIL), `advance_gate()` invokes `write_wsm_state(state, gate_id, result)`. This updates `PHOENIX_MASTER_WSM_v1.0.0.md` with the current pipeline state (gate, WP, domain, last event) so that governance docs stay in sync with runtime state.
+
+| Aspect | Value |
+|--------|-------|
+| Module | `agents_os_v2/orchestrator/wsm_writer.py` |
+| Invocation | Called from `pipeline.py` `advance_gate()` after state save |
+| Target | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md` |
+
+---
+
+## 7. Event Log
 
 **Source:** [EVENT_LOG_REFERENCE_v1.0.0.md](EVENT_LOG_REFERENCE_v1.0.0.md)
 
@@ -140,4 +153,4 @@ Append-only audit trail of pipeline events (gate passes, init, snapshot, server 
 ---
 
 **log_entry | TEAM_170 | AGENTS_OS_ARCHITECTURE_OVERVIEW | DELIVERED | 2026-03-14**
-**log_entry | TEAM_170 | AGENTS_OS_ARCHITECTURE_OVERVIEW | EVENT_LOG_SECTION_ADDED | 2026-03-10**
+**log_entry | TEAM_170 | AGENTS_OS_ARCHITECTURE_OVERVIEW | GAP_REPORT_REMEDIATION | 2026-02-19 | G5_DOC_FIX removed; G3_REMEDIATION added; wsm_writer §6 added**

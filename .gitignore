@@ -41,3 +41,8 @@ _COMMUNICATION/team_101/simulation_mocks/*/mirror/
 # Pipeline runtime artifacts — volatile, never source-of-truth (S003-P016)
 _COMMUNICATION/agents_os/STATE_SNAPSHOT.json
 _COMMUNICATION/agents_os/logs/pipeline_events.jsonl
+
+# Google Workspace local stub files — not source, never commit
+*.gdoc
+*.gsheet
+*.gslides

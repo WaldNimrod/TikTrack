@@ -205,3 +205,25 @@ def test_http_put_idea_status_forbidden_without_authority(api_client: TestClient
         with aos_db_conn.cursor() as cur:
             cur.execute("DELETE FROM ideas WHERE id = %s", (iid,))
         aos_db_conn.commit()
+
+
+@requires_aos_db
+def test_http_state_invalid_domain_returns_404(api_client: TestClient) -> None:
+    r = api_client.get(
+        "/api/state",
+        params={"domain_id": "NONEXISTENT_XXX"},
+        headers={"X-Actor-Team-Id": "team_00"},
+    )
+    assert r.status_code == 404
+    assert r.json()["detail"]["code"] == "DOMAIN_NOT_FOUND"
+
+
+@requires_aos_db
+def test_http_runs_invalid_domain_returns_404(api_client: TestClient) -> None:
+    r = api_client.get(
+        "/api/runs",
+        params={"domain_id": "NONEXISTENT_XXX"},
+        headers={"X-Actor-Team-Id": "team_00"},
+    )
+    assert r.status_code == 404
+    assert r.json()["detail"]["code"] == "DOMAIN_NOT_FOUND"

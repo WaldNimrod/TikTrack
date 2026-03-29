@@ -6,6 +6,8 @@ import json
 from datetime import datetime, timezone
 from typing import Any
 
+from agents_os_v3.modules.state.errors import StateMachineError
+
 RunRow = dict[str, Any]
 
 # ``update_run_position``: omit paused_* kwargs to leave columns unchanged; pass ``None`` to SET NULL.
@@ -22,8 +24,26 @@ def fetch_run(cur: Any, run_id: str) -> RunRow | None:
     return dict(row) if row else None
 
 
+def resolve_domain_id(cur: Any, domain_id_or_slug: str) -> str:
+    """Return the canonical ULID for a domain, accepting either ULID or slug.
+
+    Raises StateMachineError("DOMAIN_NOT_FOUND", 404) for unknown values.
+    """
+    cur.execute(
+        "SELECT id FROM domains WHERE id = %s OR slug = %s",
+        (domain_id_or_slug, domain_id_or_slug),
+    )
+    row = cur.fetchone()
+    if not row:
+        raise StateMachineError(
+            "DOMAIN_NOT_FOUND", 404, details={"domain_id": domain_id_or_slug}
+        )
+    return str(row["id"])
+
+
 def fetch_domain(cur: Any, domain_id: str) -> RunRow | None:
-    cur.execute("SELECT * FROM domains WHERE id = %s", (domain_id,))
+    resolved = resolve_domain_id(cur, domain_id)
+    cur.execute("SELECT * FROM domains WHERE id = %s", (resolved,))
     row = cur.fetchone()
     return dict(row) if row else None
 
@@ -35,9 +55,10 @@ def fetch_work_package(cur: Any, wp_id: str) -> RunRow | None:
 
 
 def in_progress_run_for_domain(cur: Any, domain_id: str) -> RunRow | None:
+    domain_ulid = resolve_domain_id(cur, domain_id)
     cur.execute(
         "SELECT id, status, current_gate_id FROM runs WHERE domain_id = %s AND status = 'IN_PROGRESS'",
-        (domain_id,),
+        (domain_ulid,),
     )
     row = cur.fetchone()
     return dict(row) if row else None

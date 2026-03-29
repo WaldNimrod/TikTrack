@@ -437,6 +437,7 @@ def uc_13_get_current_state(
                 raise StateMachineError("RUN_NOT_FOUND", 404, details={"run_id": run_id})
         else:
             assert domain_id is not None
+            domain_ulid = R.resolve_domain_id(cur, domain_id)
             cur.execute(
                 """
                 SELECT * FROM runs
@@ -444,7 +445,7 @@ def uc_13_get_current_state(
                 ORDER BY last_updated DESC
                 LIMIT 1
                 """,
-                (domain_id,),
+                (domain_ulid,),
             )
             r = cur.fetchone()
             row = dict(r) if r else None
@@ -452,7 +453,7 @@ def uc_13_get_current_state(
                 return {
                     "run_id": None,
                     "work_package_id": None,
-                    "domain_id": domain_id,
+                    "domain_id": domain_ulid,
                     "process_variant": None,
                     "status": "IDLE",
                     "current_gate_id": None,

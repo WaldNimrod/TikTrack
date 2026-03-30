@@ -253,9 +253,11 @@ def list_work_packages(conn: Any) -> dict[str, Any]:
         cur.execute(
             """
             SELECT w.id, w.label, w.domain_id, w.status, w.linked_run_id, w.stage_id, w.program_id,
-                   d.slug AS domain_slug
+                   d.slug AS domain_slug,
+                   r.status AS run_status, r.current_gate_id AS run_gate
             FROM work_packages w
             LEFT JOIN domains d ON d.id = w.domain_id
+            LEFT JOIN runs r ON r.id = w.linked_run_id
             ORDER BY w.stage_id NULLS LAST, w.id ASC
             """
         )
@@ -263,19 +265,75 @@ def list_work_packages(conn: Any) -> dict[str, Any]:
         for row in cur.fetchall() or []:
             w = dict(row)
             dslug = w.get("domain_slug")
+            wp_status = str(w["status"])
+            run_status = w.get("run_status")
+            run_status_str = str(run_status) if run_status is not None else None
+
+            if wp_status == "CANCELLED":
+                effective_status = "CANCELLED"
+            elif wp_status == "COMPLETE":
+                effective_status = "COMPLETE"
+            elif wp_status == "PLANNED":
+                effective_status = "PLANNED"
+            elif wp_status == "ACTIVE":
+                if run_status_str == "IN_PROGRESS":
+                    effective_status = "IN_PROGRESS"
+                elif run_status_str == "CORRECTION":
+                    effective_status = "CORRECTION"
+                elif run_status_str == "PAUSED":
+                    effective_status = "PAUSED"
+                else:
+                    effective_status = "ACTIVE"
+            else:
+                effective_status = wp_status
+
             wps.append(
                 {
                     "wp_id": str(w["id"]),
                     "label": str(w["label"]),
                     "domain_id": str(w["domain_id"]),
                     "domain_slug": str(dslug) if dslug else None,
-                    "status": str(w["status"]),
+                    "status": wp_status,
                     "linked_run_id": str(w["linked_run_id"]) if w.get("linked_run_id") else None,
                     "stage_id": str(w["stage_id"]) if w.get("stage_id") else None,
                     "program_id": str(w["program_id"]) if w.get("program_id") else None,
+                    "run_status": run_status_str,
+                    "effective_status": effective_status,
                 }
             )
         return {"work_packages": wps}
+
+
+def cancel_work_package(conn: Any, wp_id: str) -> dict[str, Any]:
+    """Cancel a work package. Only allowed if status is PLANNED or ACTIVE (with no IN_PROGRESS run)."""
+    with conn.cursor() as cur:
+        cur.execute("SELECT id, status, linked_run_id FROM work_packages WHERE id = %s", (wp_id,))
+        row = cur.fetchone()
+    if not row:
+        from agents_os_v3.modules.state.errors import StateMachineError
+        raise StateMachineError("UNKNOWN_WP", 400, details={"work_package_id": wp_id})
+    wp = dict(row)
+    if str(wp["status"]) == "COMPLETE":
+        from agents_os_v3.modules.state.errors import StateMachineError
+        raise StateMachineError("WP_ALREADY_COMPLETE", 409, details={"work_package_id": wp_id})
+    if str(wp["status"]) == "CANCELLED":
+        from agents_os_v3.modules.state.errors import StateMachineError
+        raise StateMachineError("WP_ALREADY_CANCELLED", 409, details={"work_package_id": wp_id})
+    # If ACTIVE, check no IN_PROGRESS run
+    if str(wp["status"]) == "ACTIVE" and wp.get("linked_run_id"):
+        with conn.cursor() as cur:
+            cur.execute("SELECT status FROM runs WHERE id = %s", (str(wp["linked_run_id"]),))
+            run_row = cur.fetchone()
+        if run_row and str(dict(run_row)["status"]) == "IN_PROGRESS":
+            from agents_os_v3.modules.state.errors import StateMachineError
+            raise StateMachineError("WP_RUN_IN_PROGRESS", 409, details={"hint": "Stop the active run first, then cancel"})
+    with conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE work_packages SET status = 'CANCELLED', updated_at = NOW() WHERE id = %s",
+                (wp_id,)
+            )
+    return {"wp_id": wp_id, "status": "CANCELLED"}
 
 
 def get_work_package(conn: Any, wp_id: str) -> dict[str, Any]:

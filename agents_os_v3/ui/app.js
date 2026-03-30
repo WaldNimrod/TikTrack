@@ -1214,10 +1214,20 @@ status: ACTIVE
   }
 
   function wpStatusBadgeClass(st) {
-    if (st === "ACTIVE") return "aosv3-status--in_progress";
-    if (st === "PLANNED") return "aosv3-status--not_started";
-    if (st === "COMPLETE") return "aosv3-status--complete";
+    if (st === "IN_PROGRESS") return "aosv3-status--in_progress";
+    if (st === "CORRECTION")  return "aosv3-status--correction";
+    if (st === "PAUSED")      return "aosv3-status--paused";
+    if (st === "ACTIVE")      return "aosv3-status--in_progress";
+    if (st === "PLANNED")     return "aosv3-status--not_started";
+    if (st === "COMPLETE")    return "aosv3-status--complete";
+    if (st === "CANCELLED")   return "aosv3-status--cancelled";
     return "aosv3-status--idle";
+  }
+
+  /** Returns the effective_status string to display in the WP table.
+   *  Uses server-provided effective_status when available, falls back to wp.status. */
+  function wpEffectiveStatus(w) {
+    return w.effective_status || w.status;
   }
 
   var pipelineLastState = null;
@@ -4230,11 +4240,13 @@ status: ACTIVE
               domain_id: w.domain_id,
               domain_slug: w.domain_slug || null,
               status: w.status,
+              effective_status: w.effective_status || w.status,
+              run_status: w.run_status || null,
               linked_run_id: w.linked_run_id,
               stage_id: w.stage_id || null,
               program_id: w.program_id || null,
-              linked_run_status: null,
-              current_gate_id: null,
+              linked_run_status: w.run_status || null,
+              current_gate_id: w.run_gate || null,
               current_phase_id: null,
               linked_actor_team_id: null,
               linked_run_started_at: null,
@@ -4640,7 +4652,9 @@ status: ACTIVE
           return portfolioSortCompare(va, vb, mulW);
         });
         stageMap[stageKey].forEach(function (w) {
+          var effStatus = wpEffectiveStatus(w);
           var canStart = w.status === "PLANNED" && !activeDom[w.domain_id];
+          var isActiveRun = w.status === "ACTIVE" && w.linked_run_id;
           var tr = document.createElement("tr");
           tr.className = "aosv3-wp-row aosv3-wp-row--clickable";
           tr.setAttribute("data-wp-id", w.wp_id);
@@ -4654,25 +4668,48 @@ status: ACTIVE
               esc(runUlidSuffix(w.linked_run_id)) +
               "</span>";
           }
-          var actionsHtml = "";
-          if (w.status === "ACTIVE") {
-            actionsHtml =
-              '<button type="button" class="btn aosv3-wp-stopprop" title="View Run">View Run</button>';
-          } else if (w.status === "PLANNED") {
-            actionsHtml =
-              '<button type="button" class="btn aosv3-wp-stopprop"' +
+
+          // ── Action buttons — functional per WP lifecycle state ──────────
+          var btns = [];
+          if (w.status === "PLANNED") {
+            btns.push(
+              '<button type="button" class="btn btn-primary aosv3-wp-stopprop aosv3-wp-btn-start"' +
               (canStart ? "" : " disabled") +
-              ' title="' +
-              esc(
-                canStart
-                  ? "Start Run"
-                  : "Active run exists for this domain"
-              ) +
-              '">Start Run</button>';
+              ' data-wp-id="' + esc(w.wp_id) + '" data-domain="' + esc(w.domain_id) + '"' +
+              ' title="' + esc(canStart ? "Start Run" : "Another run is active for this domain") + '">' +
+              'Start Run</button>'
+            );
+            btns.push(
+              '<button type="button" class="btn aosv3-wp-stopprop aosv3-wp-btn-cancel"' +
+              ' data-wp-id="' + esc(w.wp_id) + '" title="Cancel this work package">Cancel</button>'
+            );
+          } else if (w.status === "ACTIVE") {
+            btns.push(
+              '<button type="button" class="btn aosv3-wp-stopprop aosv3-wp-btn-viewrun"' +
+              ' data-wp-id="' + esc(w.wp_id) + '" data-run-id="' + esc(w.linked_run_id || "") + '"' +
+              ' title="Switch to Pipeline view for this run">View Run</button>'
+            );
+            btns.push(
+              '<button type="button" class="btn btn-warning aosv3-wp-stopprop aosv3-wp-btn-stop"' +
+              ' data-wp-id="' + esc(w.wp_id) + '" data-run-id="' + esc(w.linked_run_id || "") + '"' +
+              ' title="Stop the active run (FORCE_FAIL)">Stop Run</button>'
+            );
           } else if (w.status === "COMPLETE") {
-            actionsHtml =
-              '<button type="button" class="btn aosv3-wp-stopprop" title="View History">View History</button>';
+            btns.push(
+              '<span class="aosv3-status-badge aosv3-status--complete" style="font-size:11px">✓ Done</span>'
+            );
+          } else if (w.status === "CANCELLED") {
+            btns.push(
+              '<span class="aosv3-status-badge aosv3-status--cancelled" style="font-size:11px">Cancelled</span>'
+            );
           }
+          var actionsHtml = btns.join(" ");
+
+          // ── Status cell: show effective_status (reflects run state) ─────
+          var statusCell =
+            '<span class="aosv3-status-badge ' + wpStatusBadgeClass(effStatus) + '">' +
+            esc(effStatus) + '</span>';
+
           tr.innerHTML =
             "<td>" +
             esc(w.stage_id || "—") +
@@ -4686,19 +4723,92 @@ status: ACTIVE
             esc(runUlidSuffix(w.wp_id)) +
             "</td><td>" +
             domainPillHtml(w.domain_id) +
-            '</td><td><span class="aosv3-status-badge ' +
-            wpStatusBadgeClass(w.status) +
-            '">' +
-            esc(w.status) +
-            "</span></td><td>" +
+            '</td><td>' + statusCell +
+            "</td><td>" +
             linkCell +
             '</td><td class="aosv3-table-actions"><span class="aosv3-table-actions-inner">' +
             actionsHtml +
             "</span></td>";
+
+          // ── Row click → modal; button clicks handled below ───────────────
           tr.addEventListener("click", function (ev) {
             if (ev.target.closest(".aosv3-wp-stopprop")) return;
             openWpDetailModal(w);
           });
+
+          // Start Run button
+          var startBtn = tr.querySelector(".aosv3-wp-btn-start");
+          if (startBtn && !startBtn.disabled) {
+            startBtn.addEventListener("click", function () {
+              var wpId = this.getAttribute("data-wp-id");
+              var domainSlug = this.getAttribute("data-domain");
+              // domain_id field is the ULID; resolve to slug if needed
+              AOSV3_apiJson("/api/work-packages/" + encodeURIComponent(wpId) + "/start", {
+                method: "POST",
+                body: JSON.stringify({ work_package_id: wpId, domain_id: domainSlug }),
+              }).then(function () {
+                showAosv3Toast("ריצה הופעלה ✓");
+                initPortfolioPageLive();
+              }).catch(function (e) {
+                var code = e.body && e.body.detail && e.body.detail.code;
+                var details = e.body && e.body.detail && e.body.detail.details;
+                showAosv3Toast(_friendlyErr(code, details, e.message), { level: "error", duration: 8000 });
+                if (code === "DOMAIN_ALREADY_ACTIVE") initPortfolioPageLive();
+              });
+            });
+          }
+
+          // Cancel button
+          var cancelBtn = tr.querySelector(".aosv3-wp-btn-cancel");
+          if (cancelBtn) {
+            cancelBtn.addEventListener("click", function () {
+              var wpId = this.getAttribute("data-wp-id");
+              if (!window.confirm("ביטול חבילה " + wpId + "?\nפעולה זו אינה ניתנת לביטול.")) return;
+              AOSV3_apiJson("/api/work-packages/" + encodeURIComponent(wpId) + "/cancel", {
+                method: "POST",
+              }).then(function () {
+                showAosv3Toast("חבילה בוטלה.");
+                initPortfolioPageLive();
+              }).catch(function (e) {
+                var code = e.body && e.body.detail && e.body.detail.code;
+                var details = e.body && e.body.detail && e.body.detail.details;
+                showAosv3Toast(_friendlyErr(code, details, e.message), { level: "error", duration: 6000 });
+              });
+            });
+          }
+
+          // View Run button → navigate to Pipeline page
+          var viewBtn = tr.querySelector(".aosv3-wp-btn-viewrun");
+          if (viewBtn) {
+            viewBtn.addEventListener("click", function () {
+              document.querySelector('[data-page="pipeline"]') &&
+                document.querySelector('[data-page="pipeline"]').click();
+            });
+          }
+
+          // Stop Run button → FORCE_FAIL override (same as pipeline Stop Run modal)
+          var stopBtn = tr.querySelector(".aosv3-wp-btn-stop");
+          if (stopBtn) {
+            stopBtn.addEventListener("click", function () {
+              var runId = this.getAttribute("data-run-id");
+              var wpId = this.getAttribute("data-wp-id");
+              if (!runId) { showAosv3Toast("Run ID לא נמצא.", { level: "error" }); return; }
+              if (!window.confirm("לעצור את ריצת החבילה " + wpId + "?\nהריצה תעבור למצב CORRECTION.")) return;
+              AOSV3_apiFetch("/api/runs/" + encodeURIComponent(runId) + "/override", {
+                method: "POST",
+                body: JSON.stringify({ actor_team_id: "team_00", action: "FORCE_FAIL", reason: "Stopped by operator via Portfolio" }),
+                headers: { "Content-Type": "application/json", "X-Actor-Team-Id": "team_00" },
+                skipActorHeader: true,
+              }).then(function (r) { return r.json(); })
+              .then(function () {
+                showAosv3Toast("ריצה עצורה ✓");
+                initPortfolioPageLive();
+              }).catch(function (e) {
+                showAosv3Toast("שגיאה בעצירה: " + (e.message || String(e)), { level: "error", duration: 6000 });
+              });
+            });
+          }
+
           tb.appendChild(tr);
         });
       });

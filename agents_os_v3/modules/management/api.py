@@ -442,6 +442,44 @@ def get_work_package(wp_id: str, conn: Any = Depends(_db_conn)) -> dict[str, Any
         raise _sm_http(e) from e
 
 
+@business_router.post("/work-packages/{wp_id}/cancel", status_code=200)
+def post_wp_cancel(
+    wp_id: str,
+    actor_team_id: str = Depends(get_actor_team_id),
+    conn: Any = Depends(_db_conn),
+) -> dict[str, Any]:
+    try:
+        return PF.cancel_work_package(conn, wp_id)
+    except StateMachineError as e:
+        raise _sm_http(e) from e
+
+
+@business_router.post("/work-packages/{wp_id}/start", status_code=201)
+def post_wp_start(
+    wp_id: str,
+    body: CreateRunBody,
+    actor_team_id: str = Depends(get_actor_team_id),
+    conn: Any = Depends(_db_conn),
+) -> dict[str, Any]:
+    """Convenience endpoint: start a run for a specific WP (equivalent to POST /api/runs)."""
+    try:
+        return UC.uc_01_initiate_run(
+            conn,
+            actor_team_id=actor_team_id,
+            work_package_id=wp_id,
+            domain_id=body.domain_id,
+            process_variant=body.process_variant,
+        )
+    except StateMachineError as e:
+        raise _sm_http(e) from e
+    except psycopg2.Error as e:
+        logging.getLogger(__name__).error("DB error in post_wp_start: %s", e, exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail={"code": "DB_ERROR", "message": str(e).split("\n")[0], "details": {}},
+        ) from e
+
+
 @business_router.get("/ideas")
 def get_ideas(
     status: Optional[str] = Query(default=None),

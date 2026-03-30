@@ -32,6 +32,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import psycopg2
 import os
 from collections.abc import AsyncIterator, Generator
 from contextlib import asynccontextmanager
@@ -117,6 +118,12 @@ def post_run(
         )
     except StateMachineError as e:
         raise _sm_http(e) from e
+    except psycopg2.Error as e:
+        logging.getLogger(__name__).error("DB error in post_run: %s", e, exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail={"code": "DB_ERROR", "message": str(e).split("\n")[0], "details": {}},
+        ) from e
 
 
 @business_router.get("/runs/{run_id}")

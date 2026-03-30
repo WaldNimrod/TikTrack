@@ -300,6 +300,11 @@ def insert_assignment(
           %s, %s, %s, %s, %s,
           %s, 'team_00', 'ACTIVE', NULL, NULL, %s
         )
+        ON CONFLICT (work_package_id, role_id) WHERE status = 'ACTIVE'
+        DO UPDATE SET
+          team_id     = EXCLUDED.team_id,
+          domain_id   = EXCLUDED.domain_id,
+          assigned_at = EXCLUDED.assigned_at
         """,
         (
             assignment_id,

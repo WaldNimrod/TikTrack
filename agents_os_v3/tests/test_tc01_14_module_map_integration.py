@@ -131,7 +131,7 @@ def test_tc02_blocking_fail_correction_resubmit_advance(api_client: TestClient, 
         rid = r0.json()["run_id"]
         rf = api_client.post(
             f"/api/runs/{rid}/fail",
-            headers=hdr("team_10"),
+            headers=hdr("team_11"),
             json={"reason": "blocking TC-02", "findings": []},
         )
         assert rf.status_code == 200, rf.text
@@ -139,7 +139,7 @@ def test_tc02_blocking_fail_correction_resubmit_advance(api_client: TestClient, 
         assert rf.json()["correction_cycle_count"] == 1
         rr = api_client.post(
             f"/api/runs/{rid}/advance",
-            headers=hdr("team_10"),
+            headers=hdr("team_11"),
             json={"verdict": "resubmit"},
         )
         assert rr.status_code == 200, rr.text
@@ -169,7 +169,7 @@ def test_tc03_advisory_fail_stays_in_progress(api_client: TestClient, aos_db_con
         rid = r0.json()["run_id"]
         rf = api_client.post(
             f"/api/runs/{rid}/fail",
-            headers=hdr("team_10"),
+            headers=hdr("team_11"),
             json={"reason": "advisory TC-03", "findings": []},
         )
         assert rf.status_code == 200, rf.text
@@ -274,7 +274,7 @@ def test_tc06_paused_state_actor_null_sentinel(api_client: TestClient, aos_db_co
                 ("team_00", rid),
             )
         aos_db_conn.commit()
-        rs = api_client.get(f"/api/state?run_id={rid}", headers=hdr("team_10"))
+        rs = api_client.get(f"/api/state?run_id={rid}", headers=hdr("team_11"))
         assert rs.status_code == 200, rs.text
         sj = rs.json()
         assert sj["actor"] is None
@@ -361,7 +361,7 @@ def test_tc10_principal_override_force_pass_from_correction(api_client: TestClie
         rid = r0.json()["run_id"]
         api_client.post(
             f"/api/runs/{rid}/fail",
-            headers=hdr("team_10"),
+            headers=hdr("team_11"),
             json={"reason": "TC-10 block", "findings": []},
         )
         ro = api_client.post(
@@ -454,12 +454,12 @@ def test_tc12_max_correction_cycles_escalation_on_resubmit(api_client: TestClien
         rid = r0.json()["run_id"]
         api_client.post(
             f"/api/runs/{rid}/fail",
-            headers=hdr("team_10"),
+            headers=hdr("team_11"),
             json={"reason": "TC-12", "findings": []},
         )
         rs = api_client.post(
             f"/api/runs/{rid}/advance",
-            headers=hdr("team_10"),
+            headers=hdr("team_11"),
             json={"verdict": "resubmit"},
         )
         assert rs.status_code == 200, rs.text
@@ -532,7 +532,7 @@ def test_tc14_wrong_actor_advance_forbidden(api_client: TestClient, aos_db_conn:
         http_feedback_pass(api_client, rid)
         rx = api_client.post(
             f"/api/runs/{rid}/advance",
-            headers=hdr("team_11"),
+            headers=hdr("team_10"),
             json={"verdict": "pass"},
         )
         assert rx.status_code == 403

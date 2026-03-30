@@ -22,7 +22,7 @@ from .gate2_db_helpers import clear_in_progress_runs_for_domain, insert_temp_wp,
 # TC-19..TC-21: see test_gate3_tc15_21_api.py (GATE_3 suite; not re-imported to avoid duplicate collection).
 
 
-def _hdr(team_id: str = "team_10") -> dict[str, str]:
+def _hdr(team_id: str = "team_11") -> dict[str, str]:
     return {"X-Actor-Team-Id": team_id}
 
 

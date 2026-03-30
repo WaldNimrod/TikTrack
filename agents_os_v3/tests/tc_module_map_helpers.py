@@ -11,6 +11,7 @@ from fastapi.testclient import TestClient
 from ulid import ULID
 
 from agents_os_v3.modules.audit.ledger import AuditLedgerError, append_event
+from agents_os_v3.modules.definitions import constants as C
 from agents_os_v3.modules.routing.resolver import resolve_actor_team_id
 from agents_os_v3.modules.state import machine as M
 from agents_os_v3.modules.state.errors import StateMachineError
@@ -59,7 +60,9 @@ def hdr(team_id: str) -> dict[str, str]:
     return {"X-Actor-Team-Id": team_id}
 
 
-def http_feedback_pass(client: TestClient, run_id: str, actor: str = "team_10") -> None:
+def http_feedback_pass(
+    client: TestClient, run_id: str, actor: str = C.AOS_GATEWAY_TEAM_ID
+) -> None:
     body = """```json
 {"verdict": "PASS", "summary": "tc module map"}
 ```
@@ -72,7 +75,9 @@ def http_feedback_pass(client: TestClient, run_id: str, actor: str = "team_10") 
     assert r.status_code == 200, r.text
 
 
-def http_advance_pass(client: TestClient, run_id: str, actor: str = "team_10") -> dict[str, Any]:
+def http_advance_pass(
+    client: TestClient, run_id: str, actor: str = C.AOS_GATEWAY_TEAM_ID
+) -> dict[str, Any]:
     r = client.post(
         f"/api/runs/{run_id}/advance",
         headers=hdr(actor),
@@ -82,7 +87,9 @@ def http_advance_pass(client: TestClient, run_id: str, actor: str = "team_10") -
     return r.json()
 
 
-def http_clear_pending_feedback(client: TestClient, run_id: str, actor: str = "team_10") -> None:
+def http_clear_pending_feedback(
+    client: TestClient, run_id: str, actor: str = C.AOS_GATEWAY_TEAM_ID
+) -> None:
     """Clear Mode B/C/D pending row after advance so the next phase can ingest new feedback."""
     r = client.post(f"/api/runs/{run_id}/feedback/clear", headers=hdr(actor))
     assert r.status_code == 200, r.text
@@ -211,6 +218,11 @@ def seed_extra_phase_passed_events(
 ) -> None:
     """Append synthetic PHASE_PASSED rows for history pagination (TC-13)."""
     now_base = datetime.now(timezone.utc)
+    orch_actor = (
+        C.AOS_GATEWAY_TEAM_ID
+        if domain_id == C.DOMAIN_ULID_AGENTS_OS
+        else C.ORCHESTRATOR_TEAM_ID
+    )
     with conn:
         with conn.cursor() as cur:
             for i in range(count):
@@ -226,7 +238,7 @@ def seed_extra_phase_passed_events(
                     phase_id="1.1",
                     domain_id=domain_id,
                     work_package_id=work_package_id,
-                    actor_team_id="team_10",
+                    actor_team_id=orch_actor,
                     actor_type="AGENT",
                     verdict="PASS",
                     reason=None,

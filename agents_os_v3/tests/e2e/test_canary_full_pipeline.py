@@ -5,7 +5,7 @@ Simulates the complete operator experience end-to-end:
   - Drives a real browser (Selenium) for UI assertions.
   - Validates live assembled prompts at every gate (GET /api/runs/{id}/prompt).
   - Uses dummy advance/approve — no real agents required.
-  - Isolated: inserts a canary WP for tiktrack domain, purges it after the run.
+  - Isolated: inserts canary WPs per domain (tiktrack + agents_os), purges after each module.
 
 Requirements:
   AOS_V3_E2E_RUN=1         — enable browser tests (skip by default)
@@ -33,12 +33,16 @@ BASE_URL = "http://127.0.0.1:8090"
 PIPELINE_URL = BASE_URL + "/v3/index.html"
 TIKTRACK_DOMAIN = "01JK8AOSV3DOMAIN00000002"
 TIKTRACK_SLUG = "tiktrack"
+AGENTS_OS_DOMAIN = "01JK8AOSV3DOMAIN00000001"
+AGENTS_OS_SLUG = "agents_os"
 ACTOR_HDR = {"X-Actor-Team-Id": "team_10"}
+AOS_ACTOR_HDR = {"X-Actor-Team-Id": "team_11"}
 PRINCIPAL_HDR = {"X-Actor-Team-Id": "team_00"}
 SELENIUM_TIMEOUT = 20
 
-# Module-level state shared across tests in the class
+# Module-level state — separate dicts so tiktrack vs agents_os canaries never share run_id
 _STATE: dict[str, Any] = {"run_id": None}
+_STATE_AOS: dict[str, Any] = {"run_id": None}
 
 # ── Markers ──────────────────────────────────────────────────────────────────
 
@@ -107,6 +111,37 @@ def canary_wp(canary_db: Any) -> Generator[str, None, None]:
         cur.execute("DELETE FROM work_packages WHERE id = %s", (wp_id,))
 
 
+@pytest.fixture(scope="module")
+def canary_wp_aos(canary_db: Any) -> Generator[str, None, None]:
+    """Insert agents_os canary WP; teardown deletes only this wp_id (tiktrack WP untouched)."""
+    import ulid as _ulid_mod
+
+    try:
+        wp_id = str(_ulid_mod.new())
+    except AttributeError:
+        wp_id = str(_ulid_mod.ULID())
+
+    with canary_db.cursor() as cur:
+        cur.execute(
+            """INSERT INTO work_packages (id, label, domain_id, status, linked_run_id,
+               stage_id, program_id, created_at, updated_at)
+               VALUES (%s, %s, %s, 'PLANNED', NULL, NULL, NULL, NOW(), NOW())""",
+            (wp_id, "CANARY-AOS — full pipeline E2E test", AGENTS_OS_DOMAIN),
+        )
+
+    yield wp_id
+
+    with canary_db.cursor() as cur:
+        cur.execute(
+            "DELETE FROM events WHERE run_id IN "
+            "(SELECT id FROM runs WHERE work_package_id = %s)",
+            (wp_id,),
+        )
+        cur.execute("DELETE FROM assignments WHERE work_package_id = %s", (wp_id,))
+        cur.execute("DELETE FROM runs WHERE work_package_id = %s", (wp_id,))
+        cur.execute("DELETE FROM work_packages WHERE id = %s", (wp_id,))
+
+
 # ── Module-scoped browser ─────────────────────────────────────────────────────
 
 @pytest.fixture(scope="module")
@@ -156,21 +191,32 @@ def _wait_gate(driver: Any, gate_id: str, timeout: int = SELENIUM_TIMEOUT) -> No
 
 # ── API helpers ───────────────────────────────────────────────────────────────
 
-def _advance(run_id: str) -> dict[str, Any]:
+def _advance(
+    run_id: str,
+    *,
+    headers: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    hdr = headers or ACTOR_HDR
     r = requests.post(
         f"{BASE_URL}/api/runs/{run_id}/advance",
-        headers=ACTOR_HDR,
+        headers=hdr,
         json={"verdict": "pass", "summary": "Canary dummy advance — no real agent"},
     )
     assert r.status_code == 200, f"advance({run_id}) → {r.status_code}: {r.text}"
     return r.json()
 
 
-def _advance_to_gate(run_id: str, target_gate: str, max_advances: int = 5) -> dict[str, Any]:
+def _advance_to_gate(
+    run_id: str,
+    target_gate: str,
+    max_advances: int = 5,
+    *,
+    headers: dict[str, str] | None = None,
+) -> dict[str, Any]:
     """Advance (up to max_advances times) until current_gate_id == target_gate."""
     result: dict[str, Any] = {}
-    for i in range(max_advances):
-        result = _advance(run_id)
+    for _i in range(max_advances):
+        result = _advance(run_id, headers=headers)
         if result["current_gate_id"] == target_gate:
             return result
     raise AssertionError(
@@ -189,11 +235,63 @@ def _approve(run_id: str) -> dict[str, Any]:
     return r.json()
 
 
-def _assert_prompt(run_id: str, expected_gate: str) -> None:
+def _get_run_json(run_id: str) -> dict[str, Any]:
+    """GET /api/runs/{run_id} — route has no actor dependency."""
+    r = requests.get(f"{BASE_URL}/api/runs/{run_id}")
+    assert r.status_code == 200, f"get_run({run_id}) → {r.status_code}: {r.text}"
+    return r.json()
+
+
+def _assert_l1_template_quality(
+    l1: str,
+    expected_gate: str,
+    l1_domain: str,
+) -> None:
+    """Mandate AC-8: ORCHESTRATOR / HITL language; no executor phrasing; domain team hints."""
+    low = l1.lower()
+    assert "your task: implement" not in low, (
+        f"L1 at {expected_gate} uses executor language — expected coordinator routing"
+    )
+    if expected_gate == "GATE_4":
+        assert (
+            "human" in low or "hitl" in low or "approve" in low or "principal" in low
+        ), f"GATE_4 L1 should describe human gate; got head: {l1[:200]!r}"
+    else:
+        assert "orchestrator" in low, (
+            f"L1 at {expected_gate} should identify ORCHESTRATOR; head: {l1[:200]!r}"
+        )
+    if l1_domain == "agents_os":
+        if expected_gate == "GATE_0":
+            assert "agents_os" in low and "track_focused" in low, (
+                "agents_os GATE_0 L1 should describe agents_os → TRACK_FOCUSED lane"
+            )
+        if expected_gate == "GATE_3":
+            assert "TRACK_FOCUSED" in l1 or "team 61" in low, (
+                "agents_os GATE_3 L1 should reference TRACK_FOCUSED / Team 61"
+            )
+    elif l1_domain == "tiktrack":
+        if expected_gate == "GATE_0":
+            assert "team 10" in low or "teams 10" in low or "tiktrack" in low, (
+                "tiktrack GATE_0 L1 should reference Team 10 / tiktrack lane"
+            )
+        if expected_gate == "GATE_3":
+            assert "TRACK_FULL" in l1 or "team 20" in low or "team 50" in low, (
+                "tiktrack GATE_3 L1 should reference TRACK_FULL / implementation lane"
+            )
+
+
+def _assert_prompt(
+    run_id: str,
+    expected_gate: str,
+    *,
+    headers: dict[str, str] | None = None,
+    l1_domain: str | None = None,
+) -> None:
     """Call real prompt API and verify all 4 layers are non-empty."""
+    hdr = headers or ACTOR_HDR
     r = requests.get(
         f"{BASE_URL}/api/runs/{run_id}/prompt?bust_cache=true",
-        headers=ACTOR_HDR,
+        headers=hdr,
     )
     assert r.status_code == 200, f"Prompt API failed at {expected_gate}: {r.text}"
     d = r.json()
@@ -209,6 +307,8 @@ def _assert_prompt(run_id: str, expected_gate: str) -> None:
     assert len(layers["L1_template"] or "") > 30, (
         f"L1 template too short at {expected_gate} — likely empty placeholder"
     )
+    if l1_domain:
+        _assert_l1_template_quality(layers["L1_template"], expected_gate, l1_domain)
 
 
 # ── Tests ──────────────────────────────────────────────────────────────────────
@@ -291,7 +391,7 @@ class TestCanaryFullPipeline:
         """API: GATE_0 prompt has real L1–L4 layers; all non-empty."""
         run_id = _STATE.get("run_id")
         assert run_id, "run_id not set — test_02 must pass first"
-        _assert_prompt(run_id, "GATE_0")
+        _assert_prompt(run_id, "GATE_0", l1_domain="tiktrack")
 
     def test_04_browser_prompt_panel_shows_live_data(self, live_browser: Any) -> None:
         """UI: prompt panel shows live API data — not the stale mock (2026-03-26)."""
@@ -321,7 +421,7 @@ class TestCanaryFullPipeline:
         assert r["current_gate_id"] == "GATE_1"
         live_browser.refresh()
         _wait_gate(live_browser, "GATE_1")
-        _assert_prompt(run_id, "GATE_1")
+        _assert_prompt(run_id, "GATE_1", l1_domain="tiktrack")
 
     def test_06_advance_gate1_to_gate2(self, live_browser: Any) -> None:
         """API+UI: advance GATE_1 → UI shows GATE_2; prompt valid."""
@@ -330,7 +430,7 @@ class TestCanaryFullPipeline:
         assert r["current_gate_id"] == "GATE_2"
         live_browser.refresh()
         _wait_gate(live_browser, "GATE_2")
-        _assert_prompt(run_id, "GATE_2")
+        _assert_prompt(run_id, "GATE_2", l1_domain="tiktrack")
 
     def test_07_advance_gate2_to_gate3(self, live_browser: Any) -> None:
         """API+UI: advance GATE_2 → UI shows GATE_3; prompt valid."""
@@ -339,7 +439,7 @@ class TestCanaryFullPipeline:
         assert r["current_gate_id"] == "GATE_3"
         live_browser.refresh()
         _wait_gate(live_browser, "GATE_3")
-        _assert_prompt(run_id, "GATE_3")
+        _assert_prompt(run_id, "GATE_3", l1_domain="tiktrack")
 
     def test_08_advance_gate3_to_gate4_approve_visible(self, live_browser: Any) -> None:
         """API+UI: advance to GATE_4; APPROVE button visible (human gate); prompt valid."""
@@ -351,7 +451,7 @@ class TestCanaryFullPipeline:
         assert r["current_gate_id"] == "GATE_4"
         live_browser.refresh()
         _wait_gate(live_browser, "GATE_4")
-        _assert_prompt(run_id, "GATE_4")
+        _assert_prompt(run_id, "GATE_4", l1_domain="tiktrack")
 
         # APPROVE button must become visible at the human gate
         approve_btn = _wait(
@@ -376,7 +476,7 @@ class TestCanaryFullPipeline:
         )
         live_browser.refresh()
         _wait_gate(live_browser, "GATE_5")
-        _assert_prompt(run_id, "GATE_5")
+        _assert_prompt(run_id, "GATE_5", l1_domain="tiktrack")
 
         # Final advance at GATE_5 (terminal) → COMPLETE
         r = _advance(run_id)
@@ -408,4 +508,215 @@ class TestCanaryFullPipeline:
         phase_passed = [e for e in events if e == "PHASE_PASSED"]
         assert len(phase_passed) >= 5, (
             f"Expected ≥5 PHASE_PASSED (gates 0→3 + gate 5), got {len(phase_passed)}: {events}"
+        )
+
+
+@_requires_e2e
+@_requires_db
+class TestCanaryFullPipelineAgentsOS:
+    """agents_os mirror: IDLE → GATE_0–5 → COMPLETE (team_11 actor; isolated WP + run_id)."""
+
+    def test_01_wp_dropdown_is_populated(self, live_browser: Any, canary_wp_aos: str) -> None:
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.support.ui import Select
+
+        live_browser.get(PIPELINE_URL)
+        _wait(live_browser, lambda d: d.find_element(By.ID, "aosv3-wp-select"))
+        live_browser.find_element(
+            By.CSS_SELECTOR, f'[data-pipeline-domain="{AGENTS_OS_SLUG}"]'
+        ).click()
+        time.sleep(0.5)
+        sel = Select(live_browser.find_element(By.ID, "aosv3-wp-select"))
+        values = [o.get_attribute("value") for o in sel.options]
+        assert len(values) > 1, "WP dropdown empty after switching to agents_os"
+        assert canary_wp_aos in values, (
+            f"Canary AOS WP {canary_wp_aos} not in dropdown. Sample: {values[:8]}"
+        )
+
+    def test_02_start_run_agents_os(self, live_browser: Any, canary_wp_aos: str) -> None:
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.support.ui import Select
+
+        live_browser.find_element(
+            By.CSS_SELECTOR, f'[data-pipeline-domain="{AGENTS_OS_SLUG}"]'
+        ).click()
+        time.sleep(0.5)
+        start_btn = live_browser.find_element(By.CSS_SELECTOR, ".aosv3-start-run-btn")
+        assert not start_btn.get_attribute("disabled"), "Start Run disabled on agents_os lane"
+        Select(live_browser.find_element(By.ID, "aosv3-wp-select")).select_by_value(
+            canary_wp_aos
+        )
+        domain_el = live_browser.find_element(By.NAME, "domain_id")
+        if Select(domain_el).first_selected_option.get_attribute("value") != AGENTS_OS_SLUG:
+            Select(domain_el).select_by_value(AGENTS_OS_SLUG)
+        start_btn.click()
+        _wait_status(live_browser, "aosv3-status--in_progress")
+        _wait_gate(live_browser, "GATE_0")
+        gate_text = live_browser.find_element(By.ID, "aosv3-gate").text
+        assert "GATE_0" in gate_text, f"Expected GATE_0 after start, got: {gate_text!r}"
+        state = requests.get(
+            f"{BASE_URL}/api/state",
+            headers=AOS_ACTOR_HDR,
+            params={"domain_id": AGENTS_OS_SLUG},
+        ).json()
+        run_id = state.get("run_id")
+        assert run_id, f"run_id not in agents_os state: {state}"
+        _STATE_AOS["run_id"] = run_id
+
+    def test_03_gate0_prompt_live_aos(self) -> None:
+        run_id = _STATE_AOS.get("run_id")
+        assert run_id, "run_id not set — test_02 must pass first"
+        _assert_prompt(
+            run_id,
+            "GATE_0",
+            headers=AOS_ACTOR_HDR,
+            l1_domain="agents_os",
+        )
+        pr_meta = requests.get(
+            f"{BASE_URL}/api/runs/{run_id}/prompt?bust_cache=true",
+        )
+        assert pr_meta.status_code == 200, pr_meta.text
+        aid = (pr_meta.json().get("meta") or {}).get("actor_team_id")
+        assert aid == "team_11", (
+            f"agents_os orchestrator in prompt meta must be team_11, got {aid!r}"
+        )
+        run_data = _get_run_json(run_id)
+        assert str(run_data.get("domain_id")) == AGENTS_OS_DOMAIN, (
+            f"Run domain_id must be agents_os ULID; got {run_data.get('domain_id')}"
+        )
+
+    def test_04_browser_prompt_not_stale_aos(self, live_browser: Any) -> None:
+        from selenium.webdriver.common.by import By
+
+        live_browser.get(PIPELINE_URL)
+        live_browser.find_element(
+            By.CSS_SELECTOR, f'[data-pipeline-domain="{AGENTS_OS_SLUG}"]'
+        ).click()
+        time.sleep(0.5)
+        live_browser.refresh()
+        time.sleep(1.5)
+        pre_text = live_browser.find_element(By.ID, "aosv3-prompt-pre").text or ""
+        assembled_text = live_browser.find_element(By.ID, "aosv3-prompt-assembled").text or ""
+        # Real agents_os L1 may mention Team 61 — do not forbid; only reject known mock markers.
+        assert "MOCK_ASSEMBLED_PROMPT" not in (pre_text + assembled_text).upper(), (
+            "Prompt panel still using mock assembled payload"
+        )
+        assert "2026-03-26T14:30:00Z" not in assembled_text, (
+            f"Stale mock assembled_at in agents_os view: {assembled_text}"
+        )
+        assert len(pre_text) > 80, f"Prompt text too short ({len(pre_text)})"
+
+    def test_05_advance_gate0_to_gate1_aos(self, live_browser: Any) -> None:
+        run_id = _STATE_AOS["run_id"]
+        r = _advance_to_gate(run_id, "GATE_1", headers=AOS_ACTOR_HDR)
+        assert r["current_gate_id"] == "GATE_1"
+        run_data = _get_run_json(run_id)
+        pv = run_data.get("process_variant")
+        if pv is not None:
+            assert pv == "TRACK_FOCUSED", (
+                f"agents_os run should use TRACK_FOCUSED, got process_variant={pv!r}"
+            )
+        else:
+            pr = requests.get(
+                f"{BASE_URL}/api/runs/{run_id}/prompt?bust_cache=true",
+            )
+            assert pr.status_code == 200
+            l4 = pr.json()["layers"].get("L4_run_json") or ""
+            assert "TRACK_FOCUSED" in l4, (
+                "TRACK_FOCUSED must appear in L4 when process_variant column absent"
+            )
+        live_browser.refresh()
+        _wait_gate(live_browser, "GATE_1")
+        _assert_prompt(
+            run_id,
+            "GATE_1",
+            headers=AOS_ACTOR_HDR,
+            l1_domain="agents_os",
+        )
+
+    def test_06_advance_gate1_to_gate2_aos(self, live_browser: Any) -> None:
+        run_id = _STATE_AOS["run_id"]
+        r = _advance_to_gate(run_id, "GATE_2", headers=AOS_ACTOR_HDR)
+        assert r["current_gate_id"] == "GATE_2"
+        live_browser.refresh()
+        _wait_gate(live_browser, "GATE_2")
+        _assert_prompt(
+            run_id,
+            "GATE_2",
+            headers=AOS_ACTOR_HDR,
+            l1_domain="agents_os",
+        )
+
+    def test_07_advance_gate2_to_gate3_aos(self, live_browser: Any) -> None:
+        run_id = _STATE_AOS["run_id"]
+        r = _advance_to_gate(run_id, "GATE_3", headers=AOS_ACTOR_HDR)
+        assert r["current_gate_id"] == "GATE_3"
+        live_browser.refresh()
+        _wait_gate(live_browser, "GATE_3")
+        _assert_prompt(
+            run_id,
+            "GATE_3",
+            headers=AOS_ACTOR_HDR,
+            l1_domain="agents_os",
+        )
+
+    def test_08_advance_gate3_to_gate4_approve_visible_aos(self, live_browser: Any) -> None:
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.support import expected_conditions as EC
+
+        run_id = _STATE_AOS["run_id"]
+        r = _advance_to_gate(run_id, "GATE_4", headers=AOS_ACTOR_HDR)
+        assert r["current_gate_id"] == "GATE_4"
+        live_browser.refresh()
+        _wait_gate(live_browser, "GATE_4")
+        _assert_prompt(
+            run_id,
+            "GATE_4",
+            headers=AOS_ACTOR_HDR,
+            l1_domain="agents_os",
+        )
+        approve_btn = _wait(
+            live_browser,
+            EC.visibility_of_element_located((By.ID, "aosv3-btn-approve")),
+            timeout=10,
+        )
+        assert approve_btn.is_displayed(), "APPROVE not visible at GATE_4 (agents_os)"
+
+    def test_09_approve_gate4_advance_gate5_complete_aos(self, live_browser: Any) -> None:
+        from selenium.webdriver.common.by import By
+
+        run_id = _STATE_AOS["run_id"]
+        apr = _approve(run_id)
+        assert apr.get("current_gate_id") == "GATE_5", f"Expected GATE_5 after approve: {apr}"
+        live_browser.refresh()
+        _wait_gate(live_browser, "GATE_5")
+        _assert_prompt(
+            run_id,
+            "GATE_5",
+            headers=AOS_ACTOR_HDR,
+            l1_domain="agents_os",
+        )
+        r = _advance(run_id, headers=AOS_ACTOR_HDR)
+        assert r.get("status") == "COMPLETE", f"Expected COMPLETE: {r}"
+        live_browser.refresh()
+        _wait_status(live_browser, "aosv3-status--complete")
+        badge = live_browser.find_element(By.CLASS_NAME, "aosv3-status--complete")
+        assert badge.is_displayed(), "COMPLETE badge not visible (agents_os)"
+
+    def test_10_run_log_events_aos(self) -> None:
+        run_id = _STATE_AOS.get("run_id")
+        assert run_id, "run_id not set"
+        r = requests.get(
+            f"{BASE_URL}/api/history",
+            headers=AOS_ACTOR_HDR,
+            params={"run_id": run_id, "limit": 50},
+        )
+        assert r.status_code == 200
+        events = [e["event_type"] for e in r.json()["events"]]
+        assert "RUN_INITIATED" in events, f"Missing RUN_INITIATED: {events}"
+        assert "RUN_COMPLETED" in events, f"Missing RUN_COMPLETED: {events}"
+        assert "GATE_APPROVED" in events, f"Missing GATE_APPROVED: {events}"
+        phase_passed = [e for e in events if e == "PHASE_PASSED"]
+        assert len(phase_passed) >= 5, (
+            f"Expected ≥5 PHASE_PASSED, got {len(phase_passed)}: {events}"
         )

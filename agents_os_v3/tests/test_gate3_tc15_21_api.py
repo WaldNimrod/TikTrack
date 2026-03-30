@@ -30,7 +30,7 @@ from .conftest import requires_aos_db
 from .gate2_db_helpers import clear_in_progress_runs_for_domain, insert_temp_wp, purge_work_package
 
 
-def _hdr(team_id: str = "team_10") -> dict[str, str]:
+def _hdr(team_id: str = "team_11") -> dict[str, str]:
     return {"X-Actor-Team-Id": team_id}
 
 

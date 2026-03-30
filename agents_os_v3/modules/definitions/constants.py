@@ -25,9 +25,14 @@ PRINCIPAL_OVERRIDE_ACTIONS = frozenset(
     {FORCE_PASS, FORCE_FAIL, FORCE_PAUSE, FORCE_RESUME, FORCE_CORRECTION}
 )
 
-# Bootstrap routing (definition.yaml seed — ORCHESTRATOR → Team 10)
+# Bootstrap routing (definition.yaml seed — ORCHESTRATOR → gateway per domain)
 ORCHESTRATOR_ROLE_ID = "01JK8AOSV3ROLE0000000001"
-ORCHESTRATOR_TEAM_ID = "team_10"
+ORCHESTRATOR_TEAM_ID = "team_10"  # TikTrack gateway
+AOS_GATEWAY_TEAM_ID = "team_11"  # agents_os gateway (mirror of team_10)
+
+# Domain ULIDs (seed — must match definition.yaml domains.id)
+DOMAIN_ULID_AGENTS_OS = "01JK8AOSV3DOMAIN00000001"
+DOMAIN_ULID_TIKTRACK = "01JK8AOSV3DOMAIN00000002"
 
 # Tier-2 delegation role for idea status (Authority Model v1.0.0 §4)
 IDEA_STATUS_AUTHORITY_ROLE_ID = "IDEA_STATUS_AUTHORITY"

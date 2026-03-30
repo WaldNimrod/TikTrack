@@ -3,6 +3,19 @@
 **Owner:** Team 61 (infra) / Team 51 (scenarios)  
 **Gate:** Remediation Phase 3a (infra) + **Phase 3b** (browser scenarios in `test_phase3b_browser_scenarios.py`)
 
+## Why `pytest agents_os_v3/tests/` shows ~42 skipped
+
+Those skips are **only** tests under `agents_os_v3/tests/e2e/`. They are gated by **`AOS_V3_E2E_RUN`** (unset by default) so the full tree stays green on machines without Chrome and without a running v3 stack.
+
+| Layer | What skips | Condition |
+|-------|------------|-----------|
+| **E2E (Selenium)** | All of `tests/e2e/` (~42 tests) | Skip unless `AOS_V3_E2E_RUN=1` |
+| **DB / API integration** | Tests using `@requires_aos_db` | Skip unless `AOS_V3_DATABASE_URL` is set |
+
+Skipped here means **explicit opt-in for browser tests**, not a hidden failure in the API suite. To run **zero skips** under `agents_os_v3/tests/`, set both the DB URL and `AOS_V3_E2E_RUN=1`, ensure the stack is up, then run pytest (see below).
+
+**Live HTTP drift:** Canary tests call `http://127.0.0.1:8090`. After you change server-side code (e.g. state machine / assignments), **restart** the v3 server so the process matches the repo; otherwise E2E can fail with `WRONG_ACTOR` or wrong `meta.actor_team_id` while unit/API tests (in-process) still pass.
+
 ## Prerequisites
 
 1. **Chrome** installed (Selenium 4 manages ChromeDriver via Selenium Manager when possible).
@@ -24,6 +37,17 @@ AOS_V3_E2E_PREPARE_DB=1 bash scripts/run_aos_v3_e2e_stack.sh
 ## Run tests
 
 Default: E2E tests are **skipped** unless explicitly enabled (keeps `pytest agents_os_v3/tests/` green without Chrome).
+
+**Full tree including E2E (no E2E skips)** — from repo root, with DB URL loaded:
+
+```bash
+bash scripts/run_aos_v3_e2e_stack.sh
+set -a && [ -f agents_os_v3/.env ] && . agents_os_v3/.env && set +a
+export AOS_V3_E2E_RUN=1 AOS_V3_E2E_UI_MOCK=0 AOS_V3_E2E_HEADLESS=1
+PYTHONPATH=. python3 -m pytest agents_os_v3/tests/ -v
+```
+
+E2E-only (faster iteration):
 
 ```bash
 AOS_V3_E2E_RUN=1 python3 -m pytest agents_os_v3/tests/e2e/ -v

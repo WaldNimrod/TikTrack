@@ -15,6 +15,7 @@ import pytest
 from fastapi.testclient import TestClient
 from ulid import ULID
 
+from agents_os_v3.modules.definitions import constants as C_const
 from agents_os_v3.modules.management.api import _db_conn, create_app
 from agents_os_v3.modules.management.db import connection as db_connection
 
@@ -161,7 +162,10 @@ def test_phase2_override_force_pause_with_valid_snapshot(api_client: TestClient,
             "gate_id": "GATE_0",
             "phase_id": "0.1",
             "assignments": {
-                ORCH_ROLE_ID: {"assignment_id": str(ULID()), "team_id": "team_10"},
+                ORCH_ROLE_ID: {
+                    "assignment_id": str(ULID()),
+                    "team_id": C_const.AOS_GATEWAY_TEAM_ID,
+                },
             },
         }
         ro = _principal_override(api_client, rid, action="FORCE_PAUSE", snapshot=snap)

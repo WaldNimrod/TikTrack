@@ -104,9 +104,9 @@ def test_phase5_canary_five_pipeline_steps_single_run(
         assert s0["current_phase_id"] == "0.1"
 
         # Step 2 — first feedback / advance / clear (TRACK_FULL: GATE_0 0.1 → 0.2)
-        http_feedback_pass(api_client, rid)
-        http_advance_pass(api_client, rid)
-        http_clear_pending_feedback(api_client, rid)
+        http_feedback_pass(api_client, rid, actor="team_10")
+        http_advance_pass(api_client, rid, actor="team_10")
+        http_clear_pending_feedback(api_client, rid, actor="team_10")
         s1 = api_client.get(f"/api/runs/{rid}").json()
         assert s1["status"] == "IN_PROGRESS"
         assert s1["current_gate_id"] == "GATE_0"
@@ -138,9 +138,9 @@ def test_phase5_canary_five_pipeline_steps_single_run(
         assert s_resume["current_phase_id"] == phase_after_first
 
         # Step 5 — second advance cycle (0.2 → GATE_1 / 1.1)
-        http_feedback_pass(api_client, rid)
-        http_advance_pass(api_client, rid)
-        http_clear_pending_feedback(api_client, rid)
+        http_feedback_pass(api_client, rid, actor="team_10")
+        http_advance_pass(api_client, rid, actor="team_10")
+        http_clear_pending_feedback(api_client, rid, actor="team_10")
         s2 = api_client.get(f"/api/runs/{rid}").json()
         assert s2["status"] == "IN_PROGRESS"
         assert s2["current_gate_id"] == "GATE_1"

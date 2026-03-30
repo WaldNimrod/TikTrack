@@ -55,8 +55,14 @@ def _merge_pipeline_state(domain_id: str, snapshot: dict[str, Any]) -> None:
     )
 
 
-def _team_for_role(role_id: str) -> str:
+def _team_for_role(role_id: str, domain_id: str) -> str:
+    """Resolve default assignment team for a pipeline role at run initiation.
+
+    ORCHESTRATOR is domain-scoped: TikTrack → team_10, agents_os → team_11.
+    """
     if role_id == C.ORCHESTRATOR_ROLE_ID:
+        if domain_id == C.DOMAIN_ULID_AGENTS_OS:
+            return C.AOS_GATEWAY_TEAM_ID
         return C.ORCHESTRATOR_TEAM_ID
     return C.TEAM_PRINCIPAL
 
@@ -181,7 +187,7 @@ def initiate_run(conn: Any, *, work_package_id: str, domain_id: str, process_var
             run_id = str(ULID())
             now = R.utc_now()
             role_id = str(rule["role_id"])
-            team_id = _team_for_role(role_id)
+            team_id = _team_for_role(role_id, domain_id)
             R.insert_run(
                 cur,
                 run_id=run_id,

@@ -3325,6 +3325,8 @@ status: ACTIVE
           return {
             policy_key: p.policy_key,
             scope_type: p.scope_type,
+            domain_id: p.domain_id || null,
+            gate_id: p.gate_id || null,
             policy_value_json: typeof v === "string" ? v : String(v),
           };
         });
@@ -3421,26 +3423,37 @@ status: ACTIVE
         var rrRows = MOCK_ROUTING.routing_rules.slice().sort(function (a, b) {
           return aosv3TableSortCompare(a[stR.key], b[stR.key], stR.dir);
         });
-        rrRows.forEach(function (r) {
-          var tr = document.createElement("tr");
-          tr.innerHTML =
-            "<td>" +
-            esc(r.id) +
-            "</td><td>" +
-            esc(r.gate_id) +
-            "</td><td>" +
-            esc(r.phase_id) +
-            "</td><td>" +
-            esc(r.domain_id) +
-            "</td><td>" +
-            esc(r.variant) +
-            "</td><td>" +
-            esc(r.role_id) +
-            "</td><td>" +
-            esc(r.priority) +
-            "</td>";
-          rrBody.appendChild(tr);
-        });
+        var _DOMAIN_SLUG = {
+          "01JK8AOSV3DOMAIN00000001": "agents_os",
+          "01JK8AOSV3DOMAIN00000002": "tiktrack",
+        };
+        if (!rrRows.length) {
+          rrBody.innerHTML = '<tr><td colspan="7" class="aosv3-empty-state">No routing rules defined</td></tr>';
+        } else {
+          rrRows.forEach(function (r) {
+            var domLabel = r.domain_id
+              ? (_DOMAIN_SLUG[r.domain_id] || r.domain_id)
+              : "(all domains)";
+            var tr = document.createElement("tr");
+            tr.innerHTML =
+              "<td>" +
+              esc(r.id) +
+              "</td><td>" +
+              esc(r.gate_id) +
+              "</td><td>" +
+              esc(r.phase_id) +
+              "</td><td>" +
+              esc(domLabel) +
+              "</td><td>" +
+              esc(r.variant) +
+              "</td><td>" +
+              esc(r.role_id) +
+              "</td><td>" +
+              esc(r.priority) +
+              "</td>";
+            rrBody.appendChild(tr);
+          });
+        }
       }
       if (polBody) {
         polBody.innerHTML = "";
@@ -3448,28 +3461,46 @@ status: ACTIVE
         var polRows = MOCK_POLICIES.policies.slice().sort(function (a, b) {
           return aosv3TableSortCompare(a[stP.key], b[stP.key], stP.dir);
         });
-        polRows.forEach(function (p) {
-          var parsed;
-          try {
-            parsed = JSON.stringify(JSON.parse(p.policy_value_json), null, 2);
-          } catch (e) {
-            parsed = p.policy_value_json;
-          }
-          var tr = document.createElement("tr");
-          tr.innerHTML =
-            "<td>" +
-            esc(p.policy_key) +
-            "</td><td>" +
-            esc(p.scope_type) +
-            "</td><td><pre class=\"aosv3-json-pre\">" +
-            esc(parsed) +
-            "</pre></td>" +
-            '<td><button type="button" class="btn" disabled title="team_00 only">Edit (team_00 only)</button></td>';
-          polBody.appendChild(tr);
-        });
+        var _DOMAIN_SLUG_POL = {
+          "01JK8AOSV3DOMAIN00000001": "agents_os",
+          "01JK8AOSV3DOMAIN00000002": "tiktrack",
+        };
+        if (!polRows.length) {
+          polBody.innerHTML = '<tr><td colspan="5" class="aosv3-empty-state">No policies defined</td></tr>';
+        } else {
+          polRows.forEach(function (p) {
+            var parsed;
+            try {
+              parsed = JSON.stringify(JSON.parse(p.policy_value_json), null, 2);
+            } catch (e) {
+              parsed = p.policy_value_json;
+            }
+            var domLabel = p.domain_id
+              ? (_DOMAIN_SLUG_POL[p.domain_id] || p.domain_id)
+              : "—";
+            var tr = document.createElement("tr");
+            tr.innerHTML =
+              "<td>" +
+              esc(p.policy_key) +
+              "</td><td>" +
+              esc(p.scope_type) +
+              "</td><td>" +
+              esc(domLabel) +
+              "</td><td>" +
+              esc(p.gate_id || "—") +
+              "</td><td><pre class=\"aosv3-json-pre\">" +
+              esc(parsed) +
+              "</pre></td>" +
+              '<td><button type="button" class="btn" disabled title="team_00 only">Edit (team_00 only)</button></td>';
+            polBody.appendChild(tr);
+          });
+        }
       }
       if (tmplRoot) {
         tmplRoot.innerHTML = "";
+        if (!MOCK_TEMPLATES.templates.length) {
+          tmplRoot.innerHTML = '<p class="aosv3-empty-state">No templates defined</p>';
+        }
         MOCK_TEMPLATES.templates.forEach(function (t, i) {
           var div = document.createElement("div");
           div.className = "aosv3-template-item";

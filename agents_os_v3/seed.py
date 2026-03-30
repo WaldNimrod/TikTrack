@@ -95,7 +95,11 @@ def main() -> None:
                     """
                     INSERT INTO domains (id, slug, display_name, default_variant, doc_team_id, is_active, created_at)
                     VALUES (%(id)s, %(slug)s, %(display_name)s, %(default_variant)s, %(doc_team_id)s, %(is_active)s, NOW())
-                    ON CONFLICT (id) DO NOTHING
+                    ON CONFLICT (id) DO UPDATE SET
+                      display_name    = EXCLUDED.display_name,
+                      default_variant = EXCLUDED.default_variant,
+                      doc_team_id     = EXCLUDED.doc_team_id,
+                      is_active       = EXCLUDED.is_active
                     """,
                     d,
                 )
@@ -125,7 +129,10 @@ def main() -> None:
                     """
                     INSERT INTO pipeline_roles (id, name, display_name, description, can_block_gate, is_seeded, created_at)
                     VALUES (%(id)s, %(name)s, %(display_name)s, %(description)s, %(can_block_gate)s, %(is_seeded)s, NOW())
-                    ON CONFLICT (id) DO NOTHING
+                    ON CONFLICT (id) DO UPDATE SET
+                      display_name  = EXCLUDED.display_name,
+                      description   = EXCLUDED.description,
+                      can_block_gate = EXCLUDED.can_block_gate
                     """,
                     pr,
                 )
@@ -139,7 +146,12 @@ def main() -> None:
                       %(id)s, %(gate_id)s, %(phase_id)s, %(domain_id)s, %(name)s, %(body_markdown)s,
                       %(version)s, %(is_active)s, NOW()
                     )
-                    ON CONFLICT (id) DO NOTHING
+                    ON CONFLICT (id) DO UPDATE SET
+                      name          = EXCLUDED.name,
+                      body_markdown = EXCLUDED.body_markdown,
+                      version       = EXCLUDED.version,
+                      is_active     = EXCLUDED.is_active,
+                      updated_at    = NOW()
                     """,
                     tpl,
                 )
@@ -154,7 +166,15 @@ def main() -> None:
                       %(id)s, %(scope_type)s, %(domain_id)s, %(gate_id)s, %(phase_id)s,
                       %(policy_key)s, %(policy_value_json)s, %(priority)s, NOW()
                     )
-                    ON CONFLICT (id) DO NOTHING
+                    ON CONFLICT (id) DO UPDATE SET
+                      scope_type        = EXCLUDED.scope_type,
+                      domain_id         = EXCLUDED.domain_id,
+                      gate_id           = EXCLUDED.gate_id,
+                      phase_id          = EXCLUDED.phase_id,
+                      policy_key        = EXCLUDED.policy_key,
+                      policy_value_json = EXCLUDED.policy_value_json,
+                      priority          = EXCLUDED.priority,
+                      updated_at        = NOW()
                     """,
                     pol,
                 )

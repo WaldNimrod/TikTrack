@@ -560,7 +560,7 @@ domains:
   - id: "01JK8AOSV3DOMAIN00000001"
     slug: agents_os
     display_name: Agents OS
-    default_variant: TRACK_FULL
+    default_variant: TRACK_FOCUSED
     doc_team_id: null
     is_active: 1
   - id: "01JK8AOSV3DOMAIN00000002"
@@ -650,7 +650,7 @@ pipeline_roles:
   - id: "01JK8AOSV3ROLE0000000001"
     name: ORCHESTRATOR
     display_name: Orchestrator
-    description: Routes work
+    description: "Domain gateway team: team_10 (tiktrack) or team_11 (agents_os). Coordinates spec writing, routes to implementation teams per process variant (TRACK_FULL/TRACK_FOCUSED), and submits QA packages. Does not implement directly."
     can_block_gate: 0
     is_seeded: 1
   - id: IDEA_STATUS_AUTHORITY
@@ -668,6 +668,30 @@ policies:
     phase_id: null
     policy_key: max_correction_cycles
     policy_value_json: '{"max":5}'
+    priority: 100
+  - id: "01JK8AOSV3POL00000000002"
+    scope_type: DOMAIN
+    domain_id: "01JK8AOSV3DOMAIN00000001"   # agents_os
+    gate_id: null
+    phase_id: null
+    policy_key: default_process_variant
+    policy_value_json: '{"variant":"TRACK_FOCUSED"}'
+    priority: 50
+  - id: "01JK8AOSV3POL00000000003"
+    scope_type: DOMAIN
+    domain_id: "01JK8AOSV3DOMAIN00000002"   # tiktrack
+    gate_id: null
+    phase_id: null
+    policy_key: default_process_variant
+    policy_value_json: '{"variant":"TRACK_FULL"}'
+    priority: 50
+  - id: "01JK8AOSV3POL00000000004"
+    scope_type: GATE
+    domain_id: null
+    gate_id: GATE_4
+    phase_id: null
+    policy_key: gate_type
+    policy_value_json: '{"is_human_gate":true,"requires_principal":"team_00"}'
     priority: 100
 
 # GATE_0 routing — required for UC-01 InitiateRun (routing_rules → role_id → assignment team)
@@ -737,6 +761,88 @@ routing_rules:
     role_id: "01JK8AOSV3ROLE0000000001"
     priority: 10
     resolve_from_state_key: null
+  # GATE_1-5 agents_os domain (ORCHESTRATOR → team_11 AOS Gateway)
+  - id: "01JK8AOSV3RR0000000015"
+    gate_id: GATE_1
+    phase_id: "1.1"
+    domain_id: "01JK8AOSV3DOMAIN00000001"   # agents_os
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"
+    priority: 10
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000016"
+    gate_id: GATE_2
+    phase_id: "2.1"
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"
+    priority: 10
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000017"
+    gate_id: GATE_3
+    phase_id: "3.1"
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"
+    priority: 10
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000018"
+    gate_id: GATE_4
+    phase_id: "4.1"
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"
+    priority: 10
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000019"
+    gate_id: GATE_5
+    phase_id: "5.1"
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"
+    priority: 10
+    resolve_from_state_key: null
+  # GATE_1-5 global fallbacks (domain=null, priority=100 — catches any unlisted domain)
+  - id: "01JK8AOSV3RR0000000020"
+    gate_id: GATE_1
+    phase_id: null
+    domain_id: null
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"
+    priority: 100
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000021"
+    gate_id: GATE_2
+    phase_id: null
+    domain_id: null
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"
+    priority: 100
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000022"
+    gate_id: GATE_3
+    phase_id: null
+    domain_id: null
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"
+    priority: 100
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000023"
+    gate_id: GATE_4
+    phase_id: null
+    domain_id: null
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"
+    priority: 100
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000024"
+    gate_id: GATE_5
+    phase_id: null
+    domain_id: null
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"
+    priority: 100
+    resolve_from_state_key: null
 
 # Active prompt template for GATE_0 / phase 0.1 (GET /api/runs/{id}/prompt smoke)
 templates:
@@ -744,77 +850,135 @@ templates:
     gate_id: GATE_0
     phase_id: null
     domain_id: null
-    name: Gate 0 bootstrap template
+    name: Gate 0 — Bootstrap & Assignment
     body_markdown: |
       # L1 — Task: Work Package Bootstrap (GATE_0)
-      You are the assigned orchestrator for the work package identified in L4.
-      **Your task:** Confirm scope alignment, verify team availability, and initiate
-      the specification request. Route the LOD200 specification request to the
-      spec-writing team. Advance when the work package is accepted and routing confirmed.
-    version: 1
+      You are the **ORCHESTRATOR** for the work package identified in L4.
+
+      **Phase 0.1 — Initialize:**
+      - Confirm WP scope alignment with the LOD200 brief in L4
+      - Detect domain (tiktrack / agents_os) and select process variant:
+        - tiktrack → TRACK_FULL (Teams 10, 20/30/40/60, 50)
+        - agents_os → TRACK_FOCUSED (Teams 11, 61, 51)
+      - Route constitutional validation request to Team 190
+
+      **Phase 0.2 — Assign:**
+      - Confirm Team 190 constitutional validation passed
+      - Register team assignments for this WP in pipeline state
+      - Advance when: domain confirmed, variant selected, team assignments registered
+    version: 2
     is_active: 1
   - id: "01JK8AOSV3TPL0000000002"
     gate_id: GATE_1
     phase_id: "1.1"
     domain_id: null
-    name: Gate 1 — Specification delivery
+    name: Gate 1 — Specification Routing
     body_markdown: |
-      # L1 — Task: Specification Delivery (GATE_1)
-      **Your task:** Produce the LOD200/LOD400 specification for the work package
-      identified in L4. The spec must cover: scope, acceptance criteria, architecture
-      constraints, and team assignments for GATE_3 implementation.
-      Deliver to: `_COMMUNICATION/team_00/` with header `[GATE_1-SPEC]`.
-      Advance when the spec document is complete and all ACs are measurable.
-    version: 1
+      # L1 — Task: Specification Routing (GATE_1)
+      You are the **ORCHESTRATOR** for the work package in L4.
+
+      **Your role:** Coordinate and route the specification process. You do NOT write the spec.
+
+      **Actions:**
+      1. Route LOD200/LOD400 spec request to Team 170 (Spec & Governance)
+      2. Receive spec draft from Team 170; verify it covers: scope, ACs, architecture
+         constraints, and team assignments for GATE_3 implementation
+      3. Route to Team 190 for constitutional validation
+      4. Confirm spec is delivered to `_COMMUNICATION/team_00/` with header `[GATE_1-SPEC]`
+      5. Advance when: spec is complete, all ACs are measurable, Team 190 confirms compliance
+    version: 2
     is_active: 1
   - id: "01JK8AOSV3TPL0000000003"
     gate_id: GATE_2
     phase_id: "2.1"
     domain_id: null
-    name: Gate 2 — Architecture approval
+    name: Gate 2 — Architecture Approval Coordination
     body_markdown: |
-      # L1 — Task: Architecture Approval (GATE_2)
-      **Your task:** Review the specification delivered at GATE_1 (see L4 for run context).
-      Approve (advance) only if: scope is complete, ACs are measurable, no architectural
-      violations, and team assignments are valid.
-      Reject (fail) with specific blocking findings if any criterion is unmet.
-    version: 1
+      # L1 — Task: Architecture Approval Coordination (GATE_2)
+      You are the **ORCHESTRATOR** for the work package in L4.
+
+      **Your role:** Route the spec to the appropriate architectural reviewer. You do NOT approve.
+
+      **Domain-aware reviewer routing (see L4 for domain):**
+      - tiktrack domain → Team 00 (Nimrod) is the approving authority
+      - agents_os domain → Team 100 (Chief System Architect) is the approving authority
+
+      **Actions:**
+      1. Deliver spec package from GATE_1 to the domain reviewer
+      2. If PASS: record approval decision, advance to GATE_3
+      3. If FAIL: classify finding type (doc / code / architectural), route back to Team 170
+         for revision, then re-submit for review
+    version: 2
     is_active: 1
   - id: "01JK8AOSV3TPL0000000004"
     gate_id: GATE_3
     phase_id: "3.1"
     domain_id: null
-    name: Gate 3 — Implementation delivery
+    name: Gate 3 — Implementation Coordination
     body_markdown: |
-      # L1 — Task: Implementation Delivery (GATE_3)
-      **Your task:** Implement per the approved LOD400 spec from GATE_2.
-      Deliverables: production code, unit tests (all pass), no linter errors.
-      Iron rule: run full test suite before submitting. Advance when all ACs are met.
-    version: 1
+      # L1 — Task: Implementation Coordination (GATE_3)
+      You are the **ORCHESTRATOR** for the work package in L4.
+
+      **Your role:** Coordinate implementation. You do NOT implement directly.
+      Team assignments depend on the process variant (see L4).
+
+      **TRACK_FULL (tiktrack default):**
+      - Generate mandates for: Team 20 (backend), Team 30 (frontend), Team 40 (UI assets),
+        Team 60 (DevOps) — as applicable per WP scope
+      - Route QA package to Team 50 for full E2E acceptance testing
+      - Advance when: Team 50 E2E PASS + all GATE_2 ACs confirmed met
+
+      **TRACK_FOCUSED (agents_os default):**
+      - Generate mandate for Team 61 (full-stack implementation, all layers)
+      - Route QA package to Team 51 for E2E acceptance testing
+      - Advance when: Team 51 E2E PASS + all GATE_2 ACs confirmed met
+
+      Iron Rule: Full test suite must pass (0 failures) before submitting QA package.
+    version: 2
     is_active: 1
   - id: "01JK8AOSV3TPL0000000005"
     gate_id: GATE_4
     phase_id: "4.1"
     domain_id: null
-    name: Gate 4 — UX sign-off (human gate)
+    name: Gate 4 — UX / Vision Sign-off (Human Gate)
     body_markdown: |
       # L1 — Awaiting Human Approval (GATE_4)
-      **This is a human gate.** Principal (Nimrod) reviews the implementation
-      in browser and approves or rejects via the APPROVE button in the pipeline UI.
-      Agents do not advance this gate. Await operator action.
-    version: 1
+      **This is a HITL (Human-In-The-Loop) gate.**
+
+      The Principal (Nimrod / Team 00) reviews the implementation directly in browser
+      and approves or rejects via the **APPROVE** button in the Agents OS pipeline UI.
+
+      Agents **do not advance this gate**. Await operator action.
+
+      Reviewing criteria:
+      - UX/vision alignment with original LOD200 intent
+      - All GATE_3 acceptance criteria verified in browser
+      - No functional regressions introduced
+      - Iron Rule adherence (financial precision, status model, page template)
+    version: 2
     is_active: 1
   - id: "01JK8AOSV3TPL0000000006"
     gate_id: GATE_5
     phase_id: "5.1"
     domain_id: null
-    name: Gate 5 — Lifecycle close
+    name: Gate 5 — Lifecycle Closure
     body_markdown: |
       # L1 — Task: Lifecycle Closure (GATE_5)
-      **Your task:** Perform lifecycle closure for the work package identified in L4.
-      Update registry entries, close open documentation items, verify all downstream
-      artifacts are committed. Advance when lifecycle closure is confirmed.
-    version: 1
+      You are the **ORCHESTRATOR** for the work package in L4.
+
+      **Your role:** Coordinate documentation closure and registry updates.
+
+      **Actions:**
+      1. Route documentation closure mandate to the domain documentation team:
+         - tiktrack domain → Team 70 (TikTrack Documentation)
+         - agents_os domain → Team 71 (AOS Documentation)
+      2. Route validation to Team 90 (Dev Validator) — confirms all artifacts committed
+         and all AS_MADE documentation is complete
+      3. Update program registry entries (PHOENIX_PROGRAM_REGISTRY) with final status
+      4. Emit final WORK_PACKAGE_CLOSED event
+      5. Advance when: documentation committed and signed off, Team 90 validates,
+         registry updated, no open blocking items remain
+    version: 2
     is_active: 1
 
 # ---------------------------------------------------------------------------

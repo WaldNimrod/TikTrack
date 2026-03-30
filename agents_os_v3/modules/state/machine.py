@@ -22,8 +22,15 @@ import jsonschema
 import ulid as _ulid_mod
 
 def ULID() -> object:  # noqa: N802
-    """Compat shim: ulid-py 1.x uses ulid.new(); python-ulid 3.x uses ULID()."""
-    return _ulid_mod.new()
+    """Compat shim: works with both ulid-py 1.x (ulid.new()) and python-ulid 3.x (ULID()).
+
+    api/venv uses ulid-py 1.x → ulid.new(); system Python / test venv uses python-ulid 3.x →
+    ulid.ULID(). Try both so the code runs in either environment without import-time detection.
+    """
+    try:
+        return _ulid_mod.new()  # ulid-py 1.x (api/venv)
+    except AttributeError:
+        return _ulid_mod.ULID()  # python-ulid 3.x (system Python / test venv)
 
 from agents_os_v3.modules.audit.ledger import AuditLedgerError, append_event
 from agents_os_v3.modules.audit.ingestion import FeedbackIngestor, IngestSource

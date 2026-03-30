@@ -696,17 +696,124 @@ routing_rules:
     role_id: "01JK8AOSV3ROLE0000000001"
     priority: 100
     resolve_from_state_key: null
+  # GATE_1-5 tiktrack domain (ORCHESTRATOR → team_10 for all gates)
+  - id: "01JK8AOSV3RR0000000010"
+    gate_id: GATE_1
+    phase_id: "1.1"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"
+    priority: 10
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000011"
+    gate_id: GATE_2
+    phase_id: "2.1"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"
+    priority: 10
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000012"
+    gate_id: GATE_3
+    phase_id: "3.1"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"
+    priority: 10
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000013"
+    gate_id: GATE_4
+    phase_id: "4.1"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"
+    priority: 10
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000014"
+    gate_id: GATE_5
+    phase_id: "5.1"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"
+    priority: 10
+    resolve_from_state_key: null
 
 # Active prompt template for GATE_0 / phase 0.1 (GET /api/runs/{id}/prompt smoke)
 templates:
   - id: "01JK8AOSV3TPL0000000001"
     gate_id: GATE_0
-    phase_id: "0.1"
+    phase_id: null
     domain_id: null
     name: Gate 0 bootstrap template
     body_markdown: |
-      # L1 — Work package bootstrap
-      You are the assigned orchestrator. Follow governance (L2) and policies (L3).
+      # L1 — Task: Work Package Bootstrap (GATE_0)
+      You are the assigned orchestrator for the work package identified in L4.
+      **Your task:** Confirm scope alignment, verify team availability, and initiate
+      the specification request. Route the LOD200 specification request to the
+      spec-writing team. Advance when the work package is accepted and routing confirmed.
+    version: 1
+    is_active: 1
+  - id: "01JK8AOSV3TPL0000000002"
+    gate_id: GATE_1
+    phase_id: "1.1"
+    domain_id: null
+    name: Gate 1 — Specification delivery
+    body_markdown: |
+      # L1 — Task: Specification Delivery (GATE_1)
+      **Your task:** Produce the LOD200/LOD400 specification for the work package
+      identified in L4. The spec must cover: scope, acceptance criteria, architecture
+      constraints, and team assignments for GATE_3 implementation.
+      Deliver to: `_COMMUNICATION/team_00/` with header `[GATE_1-SPEC]`.
+      Advance when the spec document is complete and all ACs are measurable.
+    version: 1
+    is_active: 1
+  - id: "01JK8AOSV3TPL0000000003"
+    gate_id: GATE_2
+    phase_id: "2.1"
+    domain_id: null
+    name: Gate 2 — Architecture approval
+    body_markdown: |
+      # L1 — Task: Architecture Approval (GATE_2)
+      **Your task:** Review the specification delivered at GATE_1 (see L4 for run context).
+      Approve (advance) only if: scope is complete, ACs are measurable, no architectural
+      violations, and team assignments are valid.
+      Reject (fail) with specific blocking findings if any criterion is unmet.
+    version: 1
+    is_active: 1
+  - id: "01JK8AOSV3TPL0000000004"
+    gate_id: GATE_3
+    phase_id: "3.1"
+    domain_id: null
+    name: Gate 3 — Implementation delivery
+    body_markdown: |
+      # L1 — Task: Implementation Delivery (GATE_3)
+      **Your task:** Implement per the approved LOD400 spec from GATE_2.
+      Deliverables: production code, unit tests (all pass), no linter errors.
+      Iron rule: run full test suite before submitting. Advance when all ACs are met.
+    version: 1
+    is_active: 1
+  - id: "01JK8AOSV3TPL0000000005"
+    gate_id: GATE_4
+    phase_id: "4.1"
+    domain_id: null
+    name: Gate 4 — UX sign-off (human gate)
+    body_markdown: |
+      # L1 — Awaiting Human Approval (GATE_4)
+      **This is a human gate.** Principal (Nimrod) reviews the implementation
+      in browser and approves or rejects via the APPROVE button in the pipeline UI.
+      Agents do not advance this gate. Await operator action.
+    version: 1
+    is_active: 1
+  - id: "01JK8AOSV3TPL0000000006"
+    gate_id: GATE_5
+    phase_id: "5.1"
+    domain_id: null
+    name: Gate 5 — Lifecycle close
+    body_markdown: |
+      # L1 — Task: Lifecycle Closure (GATE_5)
+      **Your task:** Perform lifecycle closure for the work package identified in L4.
+      Update registry entries, close open documentation items, verify all downstream
+      artifacts are committed. Advance when lifecycle closure is confirmed.
     version: 1
     is_active: 1
 

@@ -2030,7 +2030,7 @@ status: ACTIVE
     );
   }
 
-  function renderPromptSection(state) {
+  function renderPromptSection(state, bustCache) {
     var sec = document.getElementById("aosv3-prompt-section");
     if (!sec) return;
     var show =
@@ -2040,17 +2040,38 @@ status: ACTIVE
         state.status === "PAUSED");
     sec.hidden = !show;
     if (!show) return;
-    var p = MOCK_ASSEMBLED_PROMPT;
-    var pre = document.getElementById("aosv3-prompt-pre");
-    var tok = document.getElementById("aosv3-prompt-token-badge");
-    var ass = document.getElementById("aosv3-prompt-assembled");
-    var cch = document.getElementById("aosv3-prompt-cache");
-    if (pre) pre.textContent = assembledPromptBodyForState(state);
-    if (tok)
-      tok.textContent =
-        "token count: " + String(p.token_count) + " tokens";
-    if (ass) ass.textContent = "assembled_at: " + p.assembled_at;
-    if (cch) cch.textContent = "cache_hit: " + String(p.cache_hit);
+
+    var runId = state.run_id;
+    var url = "/api/runs/" + runId + "/prompt" + (bustCache ? "?bust_cache=true" : "");
+    AOSV3_apiJson(url)
+      .then(function (data) {
+        var pre = document.getElementById("aosv3-prompt-pre");
+        var tok = document.getElementById("aosv3-prompt-token-badge");
+        var ass = document.getElementById("aosv3-prompt-assembled");
+        var cch = document.getElementById("aosv3-prompt-cache");
+        var layers = data.layers || {};
+        var meta = data.meta || {};
+        var parts = [];
+        if (layers.L1_template) parts.push(layers.L1_template);
+        if (layers.L2_governance) parts.push(layers.L2_governance);
+        if (layers.L3_policies_json) parts.push("### Policies\n" + layers.L3_policies_json);
+        if (layers.L4_run_json) parts.push("### Run\n" + layers.L4_run_json);
+        if (pre) pre.textContent = parts.join("\n\n---\n\n");
+        if (tok) tok.textContent = "token count: " + (meta.token_count || "\u2014") + " tokens";
+        if (ass) ass.textContent = "assembled_at: " + (meta.assembled_at || new Date().toISOString());
+        if (cch) cch.textContent = "cache_hit: " + String(meta.cache_hit || false);
+      })
+      .catch(function () {
+        var p = MOCK_ASSEMBLED_PROMPT;
+        var pre = document.getElementById("aosv3-prompt-pre");
+        var tok = document.getElementById("aosv3-prompt-token-badge");
+        var ass = document.getElementById("aosv3-prompt-assembled");
+        var cch = document.getElementById("aosv3-prompt-cache");
+        if (pre) pre.textContent = assembledPromptBodyForState(state);
+        if (tok) tok.textContent = "token count: " + String(p.token_count) + " tokens";
+        if (ass) ass.textContent = "assembled_at: " + p.assembled_at + " (fallback/mock)";
+        if (cch) cch.textContent = "cache_hit: " + String(p.cache_hit);
+      });
   }
 
   function renderPipelineState(state) {
@@ -2650,6 +2671,17 @@ status: ACTIVE
     wireLiveAction(document.getElementById("aosv3-btn-override"), function () {
       showAosv3Toast("Principal override — use CLI from handoff block");
     });
+
+    // ── Prompt: wire Regenerate button ─────────────────────────────────────
+    var regenBtn = document.getElementById("aosv3-prompt-regenerate");
+    if (regenBtn) {
+      regenBtn.disabled = false;
+      regenBtn.onclick = function () {
+        if (pipelineLastState && pipelineLastState.run_id) {
+          renderPromptSection(pipelineLastState, true);
+        }
+      };
+    }
 
     // ── Start Run: populate WP select ──────────────────────────────────────
     function populateWpSelect() {

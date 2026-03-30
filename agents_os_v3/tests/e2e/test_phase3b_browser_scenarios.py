@@ -56,8 +56,13 @@ def test_e2e_3_1_pipeline_preset_updates_handoff_and_sse_chip(
     """3.1 — Pipeline: mock preset drives operator handoff / SSE indicator (UI contract)."""
     By, EC, WebDriverWait = _by(), _ec(), _wait()
     driver = browser_driver
-    sep = "&" if "?" in e2e_base_url else "?"
-    driver.get(f"{e2e_base_url}{sep}aosv3_preset={preset}")
+    # Preset tests always require mock mode (they test mock UI state, not live API).
+    base = e2e_base_url
+    if "aosv3_mock=1" not in base:
+        sep0 = "&" if "?" in base else "?"
+        base = f"{base}{sep0}aosv3_mock=1"
+    sep = "&" if "?" in base else "?"
+    driver.get(f"{base}{sep}aosv3_preset={preset}")
 
     WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
     ind = WebDriverWait(driver, 15).until(
@@ -108,11 +113,16 @@ def test_e2e_3_2_config_tabs_routing_templates_policies(
     )
 
 
-def test_e2e_3_3_teams_list_and_filters(browser_driver: object, e2e_ui_page) -> None:
-    """3.3 — Teams: roster chrome + list host (mock roster when ``aosv3_mock=1``)."""
+def test_e2e_3_3_teams_list_and_filters(browser_driver: object, e2e_ui_page, e2e_ui_dir: str) -> None:
+    """3.3 — Teams: roster chrome + list host (mock roster required — always aosv3_mock=1)."""
     By, EC, WebDriverWait = _by(), _ec(), _wait()
     d = browser_driver
-    d.get(e2e_ui_page("teams.html"))
+    # This test requires mock mode to populate the team list; force aosv3_mock=1 regardless of env.
+    url = e2e_ui_page("teams.html")
+    if "aosv3_mock=1" not in url:
+        sep = "&" if "?" in url else "?"
+        url = f"{url}{sep}aosv3_mock=1"
+    d.get(url)
     WebDriverWait(d, 20).until(
         EC.presence_of_element_located((By.CSS_SELECTOR, "[data-aosv3-page='teams']"))
     )

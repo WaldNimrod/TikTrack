@@ -318,6 +318,17 @@ status: ACTIVE
   transform: translateX(-50%) translateY(0);
 }
 
+/* Error-level toast — red border + tinted background */
+.aosv3-toast--error {
+  border-color: #f87171;
+  background: #2d1515;
+  color: #fca5a5;
+  max-width: 480px;
+  white-space: pre-wrap;
+  line-height: 1.5;
+  pointer-events: auto;  /* allow user to read long messages */
+}
+
 .aosv3-pagination {
   display: flex;
   flex-wrap: wrap;

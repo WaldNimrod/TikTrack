@@ -1996,7 +1996,16 @@ status: ACTIVE
     copyToClipboard(t || "");
   };
 
-  function showAosv3Toast(message) {
+  /**
+   * Show a toast notification.
+   * @param {string} message
+   * @param {object} [opts]
+   * @param {number} [opts.duration]  ms visible (default 2200; errors use 6000)
+   * @param {string} [opts.level]     "info" | "error" — adds CSS modifier
+   */
+  function showAosv3Toast(message, opts) {
+    var duration = (opts && opts.duration) || 2200;
+    var level = (opts && opts.level) || "info";
     var el = document.getElementById("aosv3-toast");
     if (!el) {
       el = document.createElement("div");
@@ -2006,11 +2015,46 @@ status: ACTIVE
       document.body.appendChild(el);
     }
     el.textContent = message;
+    el.className = "aosv3-toast aosv3-toast--" + level;
     el.classList.add("aosv3-toast--visible");
     if (el._hideTimer) clearTimeout(el._hideTimer);
     el._hideTimer = setTimeout(function () {
       el.classList.remove("aosv3-toast--visible");
-    }, 2200);
+    }, duration);
+  }
+
+  /**
+   * Map API error codes to human-readable messages.
+   * Returns a string the user can act on.
+   */
+  function _friendlyErr(code, details, fallback) {
+    var d = details || {};
+    switch (code) {
+      case "DOMAIN_ALREADY_ACTIVE":
+        return (
+          "דומיין זה כבר מריץ חבילה פעילה" +
+          (d.existing_run_id ? " (Run …" + String(d.existing_run_id).slice(-8) + ")" : "") +
+          ". עצרו את הריצה הפעילה תחת 'Stop run' ואז הפעילו מחדש."
+        );
+      case "UNKNOWN_WP":
+        return "חבילת עבודה לא נמצאה. בחרו חבילה תקינה מהרשימה.";
+      case "DOMAIN_NOT_FOUND":
+        return "דומיין לא נמצא — בדקו את בחירת הדומיין.";
+      case "DOMAIN_INACTIVE":
+        return "הדומיין אינו פעיל — פנו למנהל.";
+      case "ROUTING_UNRESOLVED":
+        return "אין כלל ניתוב עבור GATE_0. בדקו את הגדרות ה-pipeline.";
+      case "WRONG_ACTOR":
+        return "צוות שגוי — ה-X-Actor-Team-Id אינו מורשה לפעולה זו.";
+      case "INSUFFICIENT_AUTHORITY":
+        return "אין הרשאה לפעולה זו — נדרש team_00.";
+      case "PHASE_SEQUENCE_ERROR":
+        return "שגיאת רצף שלב פנימית — פנו לאדריכל (PHASE_SEQUENCE_ERROR).";
+      case "D03_VIOLATION":
+        return "team_00 חסר מה-DB — הריצו seed מחדש.";
+      default:
+        return fallback || (code ? code + ": שגיאה לא צפויה." : "שגיאה לא צפויה.");
+    }
   }
 
   /** Team 00 GATE_3 matrix: gate/phase line tracks current_gate_id / current_phase_id (body placeholder OK). */
@@ -2576,11 +2620,12 @@ status: ACTIVE
         summary: sum,
       })
         .then(function () {
-          showAosv3Toast("Advance OK");
+          showAosv3Toast("שלב הועבר בהצלחה ✓");
           return loadPipelineStateFromApi(true);
         })
         .catch(function (e) {
-          showAosv3Toast(e.message || String(e));
+          var code = e.body && e.body.detail && e.body.detail.code;
+          showAosv3Toast(_friendlyErr(code, e.body && e.body.detail && e.body.detail.details, e.message), { level: "error", duration: 6000 });
         });
     });
 
@@ -2594,11 +2639,12 @@ status: ACTIVE
         findings: null,
       })
         .then(function () {
-          showAosv3Toast("Fail recorded");
+          showAosv3Toast("כישלון שלב נרשם.");
           return loadPipelineStateFromApi(true);
         })
         .catch(function (e) {
-          showAosv3Toast(e.message || String(e));
+          var code = e.body && e.body.detail && e.body.detail.code;
+          showAosv3Toast(_friendlyErr(code, e.body && e.body.detail && e.body.detail.details, e.message), { level: "error", duration: 6000 });
         });
     });
 
@@ -2610,11 +2656,12 @@ status: ACTIVE
         approval_notes: notes,
       })
         .then(function () {
-          showAosv3Toast("Approved");
+          showAosv3Toast("אושר ✓");
           return loadPipelineStateFromApi(true);
         })
         .catch(function (e) {
-          showAosv3Toast(e.message || String(e));
+          var code = e.body && e.body.detail && e.body.detail.code;
+          showAosv3Toast(_friendlyErr(code, e.body && e.body.detail && e.body.detail.details, e.message), { level: "error", duration: 6000 });
         });
     });
 
@@ -2627,11 +2674,12 @@ status: ACTIVE
         pause_reason: pr.trim(),
       })
         .then(function () {
-          showAosv3Toast("Paused");
+          showAosv3Toast("ריצה הושהתה.");
           return loadPipelineStateFromApi(true);
         })
         .catch(function (e) {
-          showAosv3Toast(e.message || String(e));
+          var code = e.body && e.body.detail && e.body.detail.code;
+          showAosv3Toast(_friendlyErr(code, e.body && e.body.detail && e.body.detail.details, e.message), { level: "error", duration: 6000 });
         });
     });
 
@@ -2642,11 +2690,12 @@ status: ACTIVE
         resume_notes: "",
       })
         .then(function () {
-          showAosv3Toast("Resumed");
+          showAosv3Toast("ריצה חודשה ✓");
           return loadPipelineStateFromApi(true);
         })
         .catch(function (e) {
-          showAosv3Toast(e.message || String(e));
+          var code = e.body && e.body.detail && e.body.detail.code;
+          showAosv3Toast(_friendlyErr(code, e.body && e.body.detail && e.body.detail.details, e.message), { level: "error", duration: 6000 });
         });
     });
 
@@ -2724,11 +2773,19 @@ status: ACTIVE
         process_variant: variant || null,
       })
         .then(function () {
-          showAosv3Toast("Run started");
+          showAosv3Toast("ריצה הופעלה בהצלחה ✓");
           return loadPipelineStateFromApi(true);
         })
         .catch(function (e) {
-          showAosv3Toast(e.message || String(e));
+          var code = e.body && e.body.detail && e.body.detail.code;
+          var details = e.body && e.body.detail && e.body.detail.details;
+          var msg = _friendlyErr(code, details, e.message || String(e));
+          showAosv3Toast(msg, { duration: 8000, level: "error" });
+          // For DOMAIN_ALREADY_ACTIVE also force-load pipeline state so the
+          // active run and Stop Run button become visible immediately.
+          if (code === "DOMAIN_ALREADY_ACTIVE") {
+            loadPipelineStateFromApi(true);
+          }
         });
     });
 
@@ -2803,12 +2860,34 @@ status: ACTIVE
     if (stopConfirm) {
       stopConfirm.addEventListener("click", function () {
         closeStopModal();
-        showAosv3Toast(
-          handoffActionToast(
-            "Stop run confirmed — mock (no API)",
-            "Stop run confirmed"
-          )
-        );
+        if (aosv3UseMock()) {
+          showAosv3Toast("Stop run confirmed (mock — no API call)");
+          return;
+        }
+        var runId = rid();
+        if (!runId) {
+          showAosv3Toast("לא נמצאה ריצה פעילה לעצירה.", { level: "error", duration: 5000 });
+          return;
+        }
+        // Principal override FORCE_FAIL — stops the active run (→ CORRECTION, unblocks domain).
+        // X-Actor-Team-Id is team_00 for principal overrides.
+        AOSV3_apiFetch("/api/runs/" + encodeURIComponent(runId) + "/override", {
+          method: "POST",
+          body: JSON.stringify({ actor_team_id: "team_00", action: "FORCE_FAIL", reason: "Stopped by operator via UI" }),
+          headers: { "Content-Type": "application/json", "X-Actor-Team-Id": "team_00" },
+          skipActorHeader: true,
+        })
+          .then(function (r) { return r.json(); })
+          .then(function () {
+            showAosv3Toast("ריצה עצורה. ניתן כעת להפעיל חבילה חדשה.");
+            return loadPipelineStateFromApi(true);
+          })
+          .catch(function (e) {
+            showAosv3Toast(
+              "שגיאה בעצירת הריצה: " + (e.message || String(e)),
+              { level: "error", duration: 6000 }
+            );
+          });
       });
     }
     var cliCopy = document.getElementById("aosv3-handoff-cli-copy");

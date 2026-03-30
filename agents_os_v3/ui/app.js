@@ -4813,8 +4813,8 @@ status: ACTIVE
         });
         stageMap[stageKey].forEach(function (w) {
           var effStatus = wpEffectiveStatus(w);
-          var canStart = w.status === "PLANNED" && !activeDom[w.domain_id];
-          var isActiveRun = w.status === "ACTIVE" && w.linked_run_id;
+          var canStart = effStatus === "PLANNED" && !activeDom[w.domain_id];
+          var isActiveRun = (effStatus === "IN_PROGRESS" || effStatus === "CORRECTION" || effStatus === "PAUSED") && w.linked_run_id;
           var tr = document.createElement("tr");
           tr.className = "aosv3-wp-row aosv3-wp-row--clickable";
           tr.setAttribute("data-wp-id", w.wp_id);
@@ -4829,9 +4829,9 @@ status: ACTIVE
               "</span>";
           }
 
-          // ── Action buttons — functional per WP lifecycle state ──────────
+          // ── Action buttons — functional per WP lifecycle state (uses effStatus) ──
           var btns = [];
-          if (w.status === "PLANNED") {
+          if (effStatus === "PLANNED") {
             btns.push(
               '<button type="button" class="btn btn-primary aosv3-wp-stopprop aosv3-wp-btn-start"' +
               (canStart ? "" : " disabled") +
@@ -4843,7 +4843,7 @@ status: ACTIVE
               '<button type="button" class="btn aosv3-wp-stopprop aosv3-wp-btn-cancel"' +
               ' data-wp-id="' + esc(w.wp_id) + '" title="Cancel this work package">Cancel</button>'
             );
-          } else if (w.status === "ACTIVE") {
+          } else if (effStatus === "IN_PROGRESS" || effStatus === "CORRECTION" || effStatus === "PAUSED") {
             btns.push(
               '<button type="button" class="btn aosv3-wp-stopprop aosv3-wp-btn-viewrun"' +
               ' data-wp-id="' + esc(w.wp_id) + '" data-run-id="' + esc(w.linked_run_id || "") + '" data-domain-slug="' + esc(w.domain_slug || w.domain_id) + '"' +
@@ -4854,11 +4854,11 @@ status: ACTIVE
               ' data-wp-id="' + esc(w.wp_id) + '" data-run-id="' + esc(w.linked_run_id || "") + '"' +
               ' title="Stop the active run (FORCE_FAIL)">Stop Run</button>'
             );
-          } else if (w.status === "COMPLETE") {
+          } else if (effStatus === "COMPLETE") {
             btns.push(
               '<span class="aosv3-status-badge aosv3-status--complete" style="font-size:11px">✓ Done</span>'
             );
-          } else if (w.status === "CANCELLED") {
+          } else if (effStatus === "CANCELLED") {
             btns.push(
               '<span class="aosv3-status-badge aosv3-status--cancelled" style="font-size:11px">Cancelled</span>'
             );

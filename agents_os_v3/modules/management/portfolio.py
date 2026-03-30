@@ -290,6 +290,7 @@ def list_work_packages(conn: Any) -> dict[str, Any]:
             else:
                 effective_status = wp_status
 
+            run_gate = w.get("run_gate")
             wps.append(
                 {
                     "wp_id": str(w["id"]),
@@ -301,6 +302,7 @@ def list_work_packages(conn: Any) -> dict[str, Any]:
                     "stage_id": str(w["stage_id"]) if w.get("stage_id") else None,
                     "program_id": str(w["program_id"]) if w.get("program_id") else None,
                     "run_status": run_status_str,
+                    "run_gate": str(run_gate) if run_gate is not None else None,
                     "effective_status": effective_status,
                 }
             )

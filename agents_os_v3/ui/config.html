@@ -43,14 +43,18 @@ status: ACTIVE
 
 <div class="agents-page-layout">
   <main class="agents-page-main aosv3-page-main--full aosv3-config-main--solo">
+    <div class="section-card" style="margin-bottom:12px;padding:12px 16px">
+      <div class="section-title" style="margin-bottom:4px">System configuration — database-backed pipeline rules</div>
+      <p class="aosv3-sidebar-hint" style="margin:0">דף זה מציג את ה-seed data שמגדיר כיצד הפייפליין פועל: <strong>Routing rules</strong> (מי מטפל בכל gate), <strong>Templates</strong> (מה כותבים לאגנט), <strong>Policies</strong> (מגבלות ו-defaults). כל שינוי דורש עדכון ב-<code>definition.yaml</code> ו-reseed.</p>
+    </div>
     <div class="aosv3-tabs" role="tablist" aria-label="Configuration sections">
-      <button type="button" class="aosv3-tab active" data-tab="routing" role="tab" aria-selected="true" title="Routing rules">Routing rules</button>
-      <button type="button" class="aosv3-tab" data-tab="templates" role="tab" aria-selected="false" title="Prompt templates">Templates</button>
-      <button type="button" class="aosv3-tab" data-tab="policies" role="tab" aria-selected="false" title="Governance policies">Policies</button>
+      <button type="button" class="aosv3-tab active" data-tab="routing" role="tab" aria-selected="true" title="Routing rules — who handles each gate">Routing rules</button>
+      <button type="button" class="aosv3-tab" data-tab="templates" role="tab" aria-selected="false" title="Prompt templates — instructions sent to agents at each gate">Templates</button>
+      <button type="button" class="aosv3-tab" data-tab="policies" role="tab" aria-selected="false" title="Governance policies — runtime constraints and defaults">Policies</button>
     </div>
 
     <div id="aosv3-panel-routing" class="aosv3-tab-panel active" role="tabpanel">
-      <p class="aosv3-sidebar-hint">Routing rules from the API (read-only in UI).</p>
+      <p class="aosv3-sidebar-hint"><strong>Routing rules</strong> — קובעות לאיזה צוות (role) יגיע כל שלב בפייפליין, לפי gate + domain + variant. ה-ORCHESTRATOR נבחר כאן לפי ה-rule עם ה-priority הנמוכה ביותר שמתאים ל-WP. Read-only.</p>
       <div class="aosv3-table-wrap">
         <table class="aosv3-table aosv3-table--sortable" id="aosv3-config-table-routing" aria-label="Routing rules">
           <thead>
@@ -69,13 +73,13 @@ status: ACTIVE
       </div>
     </div>
 
-    <div id="aosv3-panel-templates" class="aosv3-tab-panel" role="tabpanel">
-      <p class="aosv3-sidebar-hint">Use “Preview body” to expand <code>body_markdown</code>. Editing is restricted to Principal (team_00).</p>
-      <div id="aosv3-templates-list"></div>
+    <div id=”aosv3-panel-templates” class=”aosv3-tab-panel” role=”tabpanel”>
+      <p class=”aosv3-sidebar-hint”><strong>Templates</strong> — הוראות הפעולה שה-ORCHESTRATOR מקבל בכל gate. הפרומפט שנוצר ב-pipeline הוא template של ה-gate הנוכחי + context דינמי מ-DB (state, actor, WP). לחץ “Preview body” לקריאה. Read-only.</p>
+      <div id=”aosv3-templates-list”></div>
     </div>
 
-    <div id="aosv3-panel-policies" class="aosv3-tab-panel" role="tabpanel">
-      <p class="aosv3-sidebar-hint"><code>policy_value_json</code> is shown parsed. Editing is restricted to Principal (team_00).</p>
+    <div id=”aosv3-panel-policies” class=”aosv3-tab-panel” role=”tabpanel”>
+      <p class=”aosv3-sidebar-hint”><strong>Policies</strong> — הגדרות שמשפיעות על התנהגות ה-pipeline בזמן ריצה: מספר מחזורי correction מקסימלי, ה-variant הברירת מחדל לפי domain, סוג gate (human/auto). מוחלות לפי scope: GLOBAL &gt; DOMAIN &gt; GATE. Read-only.</p>
       <div class="aosv3-table-wrap">
         <table class="aosv3-table aosv3-table--sortable" id="aosv3-config-table-policies" aria-label="Policies">
           <thead>

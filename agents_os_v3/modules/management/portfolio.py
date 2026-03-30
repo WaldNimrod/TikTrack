@@ -282,6 +282,9 @@ def list_work_packages(conn: Any) -> dict[str, Any]:
                     effective_status = "CORRECTION"
                 elif run_status_str == "PAUSED":
                     effective_status = "PAUSED"
+                elif w.get("linked_run_id") is None:
+                    # ACTIVE with no linked run = data inconsistency; treat as PLANNED
+                    effective_status = "PLANNED"
                 else:
                     effective_status = "ACTIVE"
             else:

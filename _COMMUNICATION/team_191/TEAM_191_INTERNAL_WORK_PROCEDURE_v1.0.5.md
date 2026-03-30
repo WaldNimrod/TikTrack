@@ -4,6 +4,7 @@
 **id:** TEAM_191_INTERNAL_WORK_PROCEDURE_v1.0.5
 **owner:** Team 191 (child team of Team 190)
 **date:** 2026-03-29
+**historical_record:** true
 **status:** SUPERSEDED — use **`TEAM_191_INTERNAL_WORK_PROCEDURE_v1.0.6.md`**
 **supersedes:** `TEAM_191_INTERNAL_WORK_PROCEDURE_v1.0.4.md`
 **authority_source:** `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md`

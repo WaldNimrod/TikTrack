@@ -4,6 +4,7 @@
 **from:** Team 00 (Nimrod — System Designer)
 **to:** Team 191
 **date:** 2026-03-29
+**historical_record:** true
 **status:** DECISIONS_ISSUED
 **context:** Response to Team 191 §15.5 open questions (plan file team_191_§15.4–15.5_0bf3d05f)
 ---

@@ -138,18 +138,35 @@ def sync_pipeline_state(conn: Any, run_id: str) -> None:
         if not run:
             return
         actor_team_id: str | None = None
-        if str(run["status"]) in ("IN_PROGRESS", "CORRECTION"):
+        run_status = str(run["status"])
+        if run_status in ("IN_PROGRESS", "CORRECTION"):
             actor_team_id = resolve_actor_team_id(cur, run)
         snap = {
             "run_id": str(run["id"]),
             "work_package_id": str(run["work_package_id"]),
-            "status": str(run["status"]),
+            "status": run_status,
             "current_gate_id": str(run["current_gate_id"]),
             "current_phase_id": str(run["current_phase_id"]) if run.get("current_phase_id") else None,
             "actor_team_id": actor_team_id,
             "last_updated": R.utc_now().astimezone(timezone.utc).isoformat().replace("+00:00", "Z"),
         }
     _merge_pipeline_state(str(run["domain_id"]), snap)
+
+    # ── Keep work_package.status in sync with run terminal/active state ──────
+    # Iron Rule: work_packages.status is a DERIVED VALUE from runs.status.
+    # This is the ONLY code path that should set wp.status after run initiation.
+    # Never bypass this by writing directly to the runs table in DB.
+    wp_id = str(run["work_package_id"])
+    if run_status == "COMPLETE":
+        wp_target = "COMPLETE"
+    elif run_status in ("IN_PROGRESS", "CORRECTION", "PAUSED"):
+        wp_target = "ACTIVE"
+    else:
+        wp_target = None
+    if wp_target:
+        with conn:
+            with conn.cursor() as cur2:
+                R.update_work_package_status(cur2, wp_id, wp_target)
 
 
 def initiate_run(conn: Any, *, work_package_id: str, domain_id: str, process_variant: str | None) -> dict[str, Any]:

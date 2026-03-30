@@ -281,6 +281,23 @@ def update_work_package_linked_run(cur: Any, wp_id: str, run_id: str) -> None:
     )
 
 
+def update_work_package_status(cur: Any, wp_id: str, status: str) -> None:
+    """Sync work_package.status to match the terminal/active state of its linked run.
+
+    Called by sync_pipeline_state after every run mutation commit.
+    Allowed target statuses: 'ACTIVE', 'COMPLETE'.
+    Uses idempotent guard (AND status != target) to avoid spurious updates.
+    """
+    cur.execute(
+        """
+        UPDATE work_packages
+        SET status = %s, updated_at = NOW()
+        WHERE id = %s AND status != %s
+        """,
+        (status, wp_id, status),
+    )
+
+
 def insert_assignment(
     cur: Any,
     *,

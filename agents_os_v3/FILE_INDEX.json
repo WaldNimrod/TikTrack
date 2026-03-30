@@ -817,6 +817,14 @@
       "owner_team": "team_61",
       "added_in_gate": "PENDING",
       "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/db/migrations/003_add_team_context_columns.sql",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
     }
   ]
 }

@@ -8,6 +8,7 @@ spec_refs:
   entity_dictionary: "TEAM_101_AOS_V3_ENTITY_DICTIONARY_v2.0.2.md"
 
 # D-03 — Principal row (mandatory). Hierarchy (AD-S8A-05) — API SSOT; not in DB teams table.
+# context layers: role_description (L1), gate_authority (L2), writes_to (L2), iron_rules (L4), mandatory_reads (L3)
 team_00:
   id: team_00
   label: Team 00
@@ -21,14 +22,36 @@ team_00:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: null
+  role_description: "Dual-nature authority: (A) Product Principal — defines WHAT and WHY, gives requirements, sets vision; (B) Constitutional Architect — sets all Iron Rules, holds final approval. Nimrod is the single human operator. The Claude Code session is the architectural advisory instrument."
+  gate_authority:
+    GATE_0: awareness_only
+    GATE_1: awareness_only
+    GATE_2: delegated_to_team_100_for_aos__team_00_approval_for_tiktrack
+    GATE_6: delegated_to_team_100_for_aos__team_00_approval_for_tiktrack
+    GATE_7: personal_approval_required__nimrod_browser_signoff__cannot_delegate
+    GATE_8: awareness_only
+    ALL: can_override
+  writes_to:
+    - "_COMMUNICATION/team_00/"
+    - "_COMMUNICATION/_Architects_Decisions/"
+  iron_rules:
+    - "No guessing — read the file first"
+    - "You are an Architect, not a Development Team"
+    - "GATE_7 requires personal Nimrod approval — never delegate"
+    - "All Iron Rules are set by Team 00 — no other team can modify them"
+    - "Writing authority: team_00/ and _Architects_Decisions/ ONLY"
+  mandatory_reads:
+    - "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md"
+    - "_COMMUNICATION/team_00/TEAM_00_CONSTITUTION_v1.0.0.md"
+    - "_COMMUNICATION/team_00/TEAM_00_DOCUMENT_PRIORITY_MAP_v1.0.0.md"
 
-# Team 10 — Gateway (seed for GATE_0 routing / assignments; D-03 unchanged on team_00)
+# Team 10 — TikTrack Gateway
 team_10:
   id: team_10
   label: Team 10
   name: Execution Orchestrator (Gateway)
   engine: cursor
-  domain_scope: multi
+  domain_scope: tiktrack
   in_gate_process: 1
   group: gateway
   profession: gateway_orchestrator
@@ -36,8 +59,23 @@ team_10:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: team_00
+  role_description: "TikTrack gateway — execution lead, team activation, gate submissions, WSM updates. TikTrack domain only. Routine pipeline state transitions are owned by the pipeline engine, not by Team 10 directly."
+  gate_authority:
+    GATE_3: owner
+    GATE_4: submitter
+  writes_to:
+    - "_COMMUNICATION/team_10/"
+  iron_rules:
+    - "TikTrack domain only — never activate AOS teams or cross into AOS lane"
+    - "No gate submission without all required artifacts"
+    - "Work plan must be versioned before submission"
+    - "Identity header mandatory on all outputs"
+    - "Do not claim ownership of routine pipeline state mutations"
+  mandatory_reads:
+    - "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md"
+    - "_COMMUNICATION/agents_os/pipeline_state_tiktrack.json"
 
-# Team 11 — AOS Gateway (BUILD seed; hierarchy for GET /api/teams)
+# Team 11 — AOS Gateway
 team_11:
   id: team_11
   label: Team 11
@@ -51,6 +89,22 @@ team_11:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: team_00
+  role_description: "AOS gateway — mirrors team_10 for agents_os domain. Phase 2.2 work plan generation + Phase 3.1 mandate generation for all AOS packages. Gate submissions, WSM updates for AOS domain only. Does not cross into TikTrack domain."
+  gate_authority:
+    GATE_2: phase_2.2_owner_aos
+    GATE_3: owner
+    GATE_4: submitter
+  writes_to:
+    - "_COMMUNICATION/team_11/"
+  iron_rules:
+    - "AOS domain only — do not cross into TikTrack execution lane"
+    - "No gate submission without all required artifacts"
+    - "Work plan must be versioned before submission"
+    - "Identity header mandatory on all outputs"
+    - "Do not claim ownership of routine pipeline state mutations"
+  mandatory_reads:
+    - "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md"
+    - "_COMMUNICATION/agents_os/pipeline_state.json"
 
 # Remaining roster (TEAMS_ROSTER_v1.0.0.json) — API derives ``children`` from ``parent_team_id``.
 team_20:
@@ -66,6 +120,16 @@ team_20:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: team_10
+  role_description: "API, business logic, DB, services, runtime — TikTrack backend execution only. Server-side implementation; no frontend work."
+  gate_authority: {}
+  writes_to:
+    - "_COMMUNICATION/team_20/"
+  iron_rules:
+    - "maskedLog mandatory on all server-side logging"
+    - "NUMERIC(20,8) for all financial data — Iron Rule, zero rounding"
+    - "4-state status model everywhere: pending/active/inactive/cancelled"
+    - "FastAPI port 8082, /api/v1/ prefix"
+  mandatory_reads: []
 
 team_21:
   id: team_21
@@ -80,6 +144,16 @@ team_21:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: team_11
+  role_description: "API, logic, DB, services, runtime — AOS backend execution only. Mirrors team_20 for the Agents_OS domain. Does not touch TikTrack code paths."
+  gate_authority: {}
+  writes_to:
+    - "_COMMUNICATION/team_21/"
+    - "agents_os/"
+  iron_rules:
+    - "AOS domain only — do not modify TikTrack code paths"
+    - "maskedLog mandatory on all server-side logging"
+    - "Submit completed work to Team 51 for QA before gate submission"
+  mandatory_reads: []
 
 team_30:
   id: team_30
@@ -94,6 +168,16 @@ team_30:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: team_10
+  role_description: "UI components, pages, API integration, client-side logic — TikTrack frontend. Client-side only; no backend work."
+  gate_authority: {}
+  writes_to:
+    - "_COMMUNICATION/team_30/"
+  iron_rules:
+    - "collapsible-container Iron Rule on ALL pages"
+    - "maskedLog mandatory on all client-side logging"
+    - "Rich text: ONE unified rich-text object — no per-entity customization"
+    - "Frontend port 8080"
+  mandatory_reads: []
 
 team_31:
   id: team_31
@@ -108,6 +192,18 @@ team_31:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: team_11
+  role_description: "AOS domain frontend — components, pages, API integration, client-side logic. Mirrors team_30 for the AOS domain. No backend work, no TikTrack code."
+  gate_authority: {}
+  writes_to:
+    - "_COMMUNICATION/team_31/"
+    - "agents_os/ui/"
+  iron_rules:
+    - "Classic <script src> only — no ES modules (Iron Rule)"
+    - "All AOS HTML pages must use agents-page-layout + agents-header contract"
+    - "No inline <style> or <script> blocks in final deliverables"
+    - "Preflight URL test mandatory before QA submission"
+    - "Submit completed work to Team 51 for QA"
+  mandatory_reads: []
 
 team_40:
   id: team_40
@@ -122,6 +218,15 @@ team_40:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: team_00
+  role_description: "Design tokens, CSS, visual consistency, UI assets for TikTrack domain. Advisory unless new design assets explicitly required. NO QA, NO testing — that is Team 50."
+  gate_authority: {}
+  writes_to:
+    - "_COMMUNICATION/team_40/"
+  iron_rules:
+    - "Team 40 = UI Assets ONLY (Iron Rule)"
+    - "No testing, no QA — that is Team 50"
+    - "FAV = QA activity → route to Team 50, never Team 40"
+  mandatory_reads: []
 
 team_50:
   id: team_50
@@ -136,6 +241,17 @@ team_50:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: team_00
+  role_description: "All TikTrack quality assurance: E2E suites, test scripts, regression, FAV, SOP-013 seals. Every GATE_4 submission requires PASS evidence with commands, outputs, and exit codes."
+  gate_authority:
+    GATE_4: owner
+  writes_to:
+    - "_COMMUNICATION/team_50/"
+  iron_rules:
+    - "Team 50 = QA (Iron Rule) — includes all test scripts, E2E, FAV"
+    - "GATE_4 requires PASS evidence: commands + outputs + exit codes"
+    - "Selenium E2E in tests/ dir, API scripts in scripts/ dir"
+    - "Never repeat prior findings without fresh re-execution"
+  mandatory_reads: []
 
 team_51:
   id: team_51
@@ -150,6 +266,17 @@ team_51:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: team_50
+  role_description: "QA & FAV for Agents_OS domain — child of Team 50, scoped to AOS work. Every QA run must be a FRESH test with full evidence. Never repeat prior findings without re-execution."
+  gate_authority:
+    GATE_4: owner_aos
+  writes_to:
+    - "_COMMUNICATION/team_51/"
+  iron_rules:
+    - "Team 51 = QA for AOS domain (Iron Rule)"
+    - "Every QA run must be a FRESH test — never repeat prior findings without re-execution"
+    - "GATE_4 QA evidence required: commands + outputs + exit codes"
+    - "All pytest runs: AOS_V3_E2E_RUN=1 AOS_V3_E2E_HEADLESS=1 — expected: 141 passed, 0 skipped, 0 failed"
+  mandatory_reads: []
 
 team_60:
   id: team_60
@@ -164,6 +291,14 @@ team_60:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: team_00
+  role_description: "Infrastructure, runtimes, CI/CD, platform readiness for TikTrack domain. Runtime evidence required at gate submissions."
+  gate_authority: {}
+  writes_to:
+    - "_COMMUNICATION/team_60/"
+  iron_rules:
+    - "Infrastructure changes require Team 00 approval"
+    - "No production deployments without GATE_7 pass"
+  mandatory_reads: []
 
 team_61:
   id: team_61
@@ -178,6 +313,16 @@ team_61:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: team_11
+  role_description: "AOS infrastructure, runtimes, CI/CD, platform readiness. Mirrors team_60 for AOS domain. Does NOT implement application logic or UI — that is team_21 (backend) and team_31 (frontend)."
+  gate_authority: {}
+  writes_to:
+    - "_COMMUNICATION/team_61/"
+  iron_rules:
+    - "AOS infrastructure ONLY — do not write application code"
+    - "Infrastructure changes require Team 00 awareness"
+    - "No production AOS deployments without gate PASS"
+    - "Submit completed infrastructure work to Team 51 for validation"
+  mandatory_reads: []
 
 team_70:
   id: team_70
@@ -192,6 +337,18 @@ team_70:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: team_00
+  role_description: "Technical writing for TikTrack domain — AS_MADE_REPORT, page specs, knowledge promotion. TikTrack domain only. GATE_5 Phase 5.1 owner for TikTrack."
+  gate_authority:
+    GATE_5: phase_5.1_owner_tiktrack
+  writes_to:
+    - "_COMMUNICATION/team_70/"
+    - "documentation/docs-system/"
+  iron_rules:
+    - "All docs require identity header"
+    - "AS_MADE_REPORT mandatory at GATE_8"
+    - "Do NOT modify SSM/WSM without Team 00 instruction"
+    - "TikTrack domain only — AOS documentation routes to team_71"
+  mandatory_reads: []
 
 team_71:
   id: team_71
@@ -206,6 +363,18 @@ team_71:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: team_00
+  role_description: "Technical writing for Agents_OS domain — spec documentation, governance docs, AS_MADE_REPORT for AOS programs. Mirrors team_70 for AOS. GATE_5 Phase 5.1 owner for AOS documentation."
+  gate_authority:
+    GATE_5: phase_5.1_owner_aos
+  writes_to:
+    - "_COMMUNICATION/team_71/"
+    - "documentation/docs-governance/"
+  iron_rules:
+    - "All docs require identity header"
+    - "AOS domain only — TikTrack documentation routes to team_70"
+    - "Do NOT modify SSM/WSM without Team 00 instruction"
+    - "Cross-domain consistency review → route to team_170"
+  mandatory_reads: []
 
 team_90:
   id: team_90
@@ -220,13 +389,27 @@ team_90:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: team_00
+  role_description: "GATE_5–GATE_8 validation, blocking reports, route_recommendation. Validates both TikTrack and AOS domains. Fresh validation every run — never repeat prior findings without full re-execution."
+  gate_authority:
+    GATE_5: owner
+    GATE_6: validator
+    GATE_7: orchestrator
+    GATE_8: owner
+  writes_to:
+    - "_COMMUNICATION/team_90/"
+  iron_rules:
+    - "CRITICAL: Every GATE_5 run MUST be a FRESH validation — never repeat prior findings"
+    - "route_recommendation MANDATORY in every BLOCKING_REPORT"
+    - "Do NOT return template or placeholder responses"
+    - "Identity header mandatory on all outputs"
+  mandatory_reads: []
 
 team_100:
   id: team_100
   label: Team 100
   name: Chief System Architect / Chief R&D
-  engine: codex
-  domain_scope: agents_os
+  engine: claude-code
+  domain_scope: multi
   in_gate_process: 1
   group: architecture
   profession: domain_architect
@@ -234,6 +417,18 @@ team_100:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: team_00
+  role_description: "Program-level architecture and synthesis under Principal (Team 00). GATE_2 + GATE_6 owner for AOS domain. Coordinates domain IDE architects team_110 (TikTrack) and team_111 (AOS) and execution teams (team_61, team_51). Covers both TikTrack and AOS domains."
+  gate_authority:
+    GATE_2: owner_for_aos_domain
+    GATE_6: owner_for_aos_domain
+  writes_to:
+    - "_COMMUNICATION/team_100/"
+  iron_rules:
+    - "GATE_6 approval requires explicit evidence review — no rubber-stamping"
+    - "route_recommendation mandatory if REJECTED"
+    - "LOD400 must be fully specified before issuing to execution teams"
+    - "Never issue mandates without Nimrod context or Team 00 strategic alignment"
+  mandatory_reads: []
 
 team_110:
   id: team_110
@@ -248,6 +443,15 @@ team_110:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: team_100
+  role_description: "TikTrack domain architect (IDE). x0=TikTrack convention. Delivers TikTrack spec packages to Team 100 under Principal-authorized programs. Activation requires explicit Team 00 instruction. Previously known as team_102; artifact folder: _COMMUNICATION/team_102/."
+  gate_authority: {}
+  writes_to:
+    - "_COMMUNICATION/team_102/"
+  iron_rules:
+    - "TikTrack domain only — no AOS mandate execution"
+    - "Activation requires explicit Team 00 instruction"
+    - "Deliver spec packages to team_100, not directly to implementation teams"
+  mandatory_reads: []
 
 team_111:
   id: team_111
@@ -262,6 +466,17 @@ team_111:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: team_100
+  role_description: "AOS domain architect (IDE). x1=AOS convention. Delivers AOS v3 spec packages to Team 100. Must always raise risks and alternatives before final recommendation. Previously known as team_101; artifact folder: _COMMUNICATION/team_101/."
+  gate_authority: {}
+  writes_to:
+    - "_COMMUNICATION/team_101/"
+  iron_rules:
+    - "No-Guessing Rule — if ambiguous, issue CLARIFICATION_REQUEST to Team 00"
+    - "Alternatives First — present alternatives before final recommendation"
+    - "Maker-Checker — code changes require QA routing per ARCHITECTURAL_HOTFIX_PROCEDURE"
+    - "Spec only in spec sessions — do not write production code unless mandate explicitly permits"
+  mandatory_reads:
+    - "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md"
 
 team_170:
   id: team_170
@@ -276,6 +491,16 @@ team_170:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: team_00
+  role_description: "Canonical document maintenance, LOD200/LOD400 production, registry sync. DUAL MODE: (A) Gate mode — spec production and governance document updates per mandate; (B) Advisory mode — governance research and architectural consultation on request from team_00 or team_100."
+  gate_authority: {}
+  writes_to:
+    - "_COMMUNICATION/team_170/"
+    - "documentation/docs-governance/"
+  iron_rules:
+    - "DDL is documentation only — production DB is source of truth"
+    - "Registry updates require Team 00 awareness"
+    - "All governance docs must have identity header"
+  mandatory_reads: []
 
 team_190:
   id: team_190
@@ -290,6 +515,19 @@ team_190:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: team_00
+  role_description: "Architectural integrity review, GATE_0–GATE_2 validation. ADVERSARIAL — must NOT be aware of Teams 100/101/102 conclusions before producing own validation. Independence is mandatory. DUAL MODE: Gate mode (BLOCKER/PASS verdicts) and Advisory mode (second-opinion analysis on request)."
+  gate_authority:
+    GATE_0: owner
+    GATE_1: co_owner
+    GATE_2: validator
+  writes_to:
+    - "_COMMUNICATION/team_190/"
+  iron_rules:
+    - "GATE_0 BLOCK stops all downstream work — absolute rule"
+    - "Independence is mandatory — do NOT review other architects' conclusions before own validation"
+    - "Identity header mandatory on all outputs"
+    - "route_recommendation mandatory in all BLOCK reports"
+  mandatory_reads: []
 
 team_191:
   id: team_191
@@ -304,6 +542,19 @@ team_191:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: team_190
+  role_description: "All git operations + file governance: pre-push guard, header normalization, registry sync, runtime log archiving, per-WP artifact archiving at WP closure, WP_ARTIFACT_INDEX maintenance. Does NOT make content decisions — executes file operations per explicit mandate from Team 00 only."
+  gate_authority: {}
+  writes_to:
+    - "_COMMUNICATION/team_191/"
+    - "_COMMUNICATION/99-ARCHIVE/"
+  iron_rules:
+    - "No constitutional gate verdicts — that is Team 190"
+    - "No architectural rulings — that is Team 00/100"
+    - "No business-logic changes under a Git fix mandate"
+    - "NEVER permanent delete — only move to 99-ARCHIVE with timestamped folder"
+    - "No content decisions — file classification is defined in the mandate, not decided by Team 191"
+    - "No archiving without explicit Team 00 mandate specifying: source, target, file type, reason"
+  mandatory_reads: []
 
 domains:
   - id: "01JK8AOSV3DOMAIN00000001"

@@ -37,6 +37,8 @@ def main() -> None:
     conn.autocommit = True
     try:
         with conn.cursor() as cur:
+            import json as _json
+
             team_keys = sorted(
                 k for k in data if str(k).startswith("team_") and isinstance(data.get(k), dict)
             )
@@ -44,18 +46,48 @@ def main() -> None:
                 t = data.get(team_key)
                 if not t or not t.get("id"):
                     continue
+                # Serialise JSONB fields (dicts/lists → JSON strings for psycopg2)
+                gate_authority = t.get("gate_authority") or {}
+                writes_to = t.get("writes_to") or []
+                iron_rules = t.get("iron_rules") or []
+                mandatory_reads = t.get("mandatory_reads") or []
                 cur.execute(
                     """
                     INSERT INTO teams (
                       id, label, name, engine, domain_scope, in_gate_process,
-                      "group", profession, operating_mode, roster_version, created_at
+                      "group", profession, operating_mode, roster_version,
+                      role_description, gate_authority, writes_to, iron_rules,
+                      mandatory_reads, created_at
                     ) VALUES (
                       %(id)s, %(label)s, %(name)s, %(engine)s, %(domain_scope)s, %(in_gate_process)s,
-                      %(group)s, %(profession)s, %(operating_mode)s, %(roster_version)s, %(created_at)s::timestamptz
+                      %(group)s, %(profession)s, %(operating_mode)s, %(roster_version)s,
+                      %(role_description)s, %(gate_authority)s::jsonb, %(writes_to)s::jsonb,
+                      %(iron_rules)s::jsonb, %(mandatory_reads)s::jsonb, %(created_at)s::timestamptz
                     )
-                    ON CONFLICT (id) DO NOTHING
+                    ON CONFLICT (id) DO UPDATE SET
+                      name             = EXCLUDED.name,
+                      engine           = EXCLUDED.engine,
+                      domain_scope     = EXCLUDED.domain_scope,
+                      in_gate_process  = EXCLUDED.in_gate_process,
+                      "group"          = EXCLUDED."group",
+                      profession       = EXCLUDED.profession,
+                      operating_mode   = EXCLUDED.operating_mode,
+                      roster_version   = EXCLUDED.roster_version,
+                      role_description = EXCLUDED.role_description,
+                      gate_authority   = EXCLUDED.gate_authority,
+                      writes_to        = EXCLUDED.writes_to,
+                      iron_rules       = EXCLUDED.iron_rules,
+                      mandatory_reads  = EXCLUDED.mandatory_reads
                     """,
-                    {**t, "group": t["group"]},
+                    {
+                        **t,
+                        "group": t["group"],
+                        "role_description": t.get("role_description"),
+                        "gate_authority": _json.dumps(gate_authority),
+                        "writes_to": _json.dumps(writes_to),
+                        "iron_rules": _json.dumps(iron_rules),
+                        "mandatory_reads": _json.dumps(mandatory_reads),
+                    },
                 )
 
             for d in data["domains"]:

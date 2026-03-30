@@ -19,7 +19,11 @@ from pathlib import Path
 from typing import Any
 
 import jsonschema
-from ulid import ULID
+import ulid as _ulid_mod
+
+def ULID() -> object:  # noqa: N802
+    """Compat shim: ulid-py 1.x uses ulid.new(); python-ulid 3.x uses ULID()."""
+    return _ulid_mod.new()
 
 from agents_os_v3.modules.audit.ledger import AuditLedgerError, append_event
 from agents_os_v3.modules.audit.ingestion import FeedbackIngestor, IngestSource
@@ -146,6 +150,7 @@ def initiate_run(conn: Any, *, work_package_id: str, domain_id: str, process_var
             dom = R.fetch_domain(cur, domain_id)
             if not dom:
                 raise StateMachineError("DOMAIN_NOT_FOUND", 400, details={"domain_id": domain_id})
+            domain_id = str(dom["id"])  # resolve slug → canonical ULID for all downstream FK refs
             if int(dom["is_active"]) != 1:
                 raise StateMachineError("DOMAIN_INACTIVE", 400, details={"domain_id": domain_id})
             active = R.in_progress_run_for_domain(cur, domain_id)

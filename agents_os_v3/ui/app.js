@@ -4835,7 +4835,7 @@ status: ACTIVE
             btns.push(
               '<button type="button" class="btn btn-primary aosv3-wp-stopprop aosv3-wp-btn-start"' +
               (canStart ? "" : " disabled") +
-              ' data-wp-id="' + esc(w.wp_id) + '" data-domain="' + esc(w.domain_id) + '"' +
+              ' data-wp-id="' + esc(w.wp_id) + '" data-domain="' + esc(w.domain_id) + '" data-domain-slug="' + esc(w.domain_slug || w.domain_id) + '"' +
               ' title="' + esc(canStart ? "Start Run" : "Another run is active for this domain") + '">' +
               'Start Run</button>'
             );
@@ -4846,7 +4846,7 @@ status: ACTIVE
           } else if (w.status === "ACTIVE") {
             btns.push(
               '<button type="button" class="btn aosv3-wp-stopprop aosv3-wp-btn-viewrun"' +
-              ' data-wp-id="' + esc(w.wp_id) + '" data-run-id="' + esc(w.linked_run_id || "") + '"' +
+              ' data-wp-id="' + esc(w.wp_id) + '" data-run-id="' + esc(w.linked_run_id || "") + '" data-domain-slug="' + esc(w.domain_slug || w.domain_id) + '"' +
               ' title="Switch to Pipeline view for this run">View Run</button>'
             );
             btns.push(
@@ -4901,14 +4901,15 @@ status: ACTIVE
           if (startBtn && !startBtn.disabled) {
             startBtn.addEventListener("click", function () {
               var wpId = this.getAttribute("data-wp-id");
-              var domainSlug = this.getAttribute("data-domain");
-              // domain_id field is the ULID; resolve to slug if needed
+              var domainId = this.getAttribute("data-domain");
+              var domainSlug = this.getAttribute("data-domain-slug") || domainId;
               AOSV3_apiJson("/api/work-packages/" + encodeURIComponent(wpId) + "/start", {
                 method: "POST",
-                body: JSON.stringify({ work_package_id: wpId, domain_id: domainSlug }),
+                body: JSON.stringify({ work_package_id: wpId, domain_id: domainId }),
               }).then(function () {
-                showAosv3Toast("ריצה הופעלה ✓");
-                initPortfolioPageLive();
+                showAosv3Toast("ריצה הופעלה ✓ — עובר לפייפליין...");
+                try { localStorage.setItem("pipeline_domain", domainSlug); } catch (ex) {}
+                setTimeout(function () { window.location.href = "index.html"; }, 700);
               }).catch(function (e) {
                 var code = e.body && e.body.detail && e.body.detail.code;
                 var details = e.body && e.body.detail && e.body.detail.details;
@@ -4941,8 +4942,9 @@ status: ACTIVE
           var viewBtn = tr.querySelector(".aosv3-wp-btn-viewrun");
           if (viewBtn) {
             viewBtn.addEventListener("click", function () {
-              document.querySelector('[data-page="pipeline"]') &&
-                document.querySelector('[data-page="pipeline"]').click();
+              var domainSlug = this.getAttribute("data-domain-slug") || "";
+              try { if (domainSlug) localStorage.setItem("pipeline_domain", domainSlug); } catch (ex) {}
+              window.location.href = "index.html";
             });
           }
 

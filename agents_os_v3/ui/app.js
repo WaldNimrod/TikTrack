@@ -2095,6 +2095,25 @@ status: ACTIVE
     sec.hidden = !show;
     if (!show) return;
 
+    // Actor banner — show who the prompt is for
+    var actorBanner = document.getElementById("aosv3-prompt-actor-banner");
+    if (actorBanner) {
+      actorBanner.hidden = !show;
+      var actorState = pipelineLastState && pipelineLastState.actor;
+      var actPill = document.getElementById("aosv3-prompt-actor-pill");
+      var actName = document.getElementById("aosv3-prompt-actor-name");
+      var actEng = document.getElementById("aosv3-prompt-actor-engine");
+      if (actorState) {
+        if (actPill) actPill.textContent = actorState.team_id;
+        if (actName) actName.textContent = actorState.label || actorState.team_id;
+        if (actEng) actEng.textContent = "· " + (actorState.engine || "—");
+      } else {
+        if (actPill) actPill.textContent = "—";
+        if (actName) actName.textContent = "";
+        if (actEng) actEng.textContent = "";
+      }
+    }
+
     var runId = state.run_id;
     var url = "/api/runs/" + runId + "/prompt" + (bustCache ? "?bust_cache=true" : "");
     AOSV3_apiJson(url)
@@ -2157,6 +2176,8 @@ status: ACTIVE
       if (idleDomainEl) idleDomainEl.textContent = viewDom;
       var mainDomIdle = document.getElementById("aosv3-main-domain");
       if (mainDomIdle) mainDomIdle.textContent = viewDom;
+      var sidebarRunStatusIdle = document.getElementById("aosv3-sidebar-run-status");
+      if (sidebarRunStatusIdle) sidebarRunStatusIdle.hidden = true;
       renderGateMap(null, null, "IDLE");
       renderRunLog(null);
       renderProgramControl(state);
@@ -2204,8 +2225,9 @@ status: ACTIVE
 
     setText("aosv3-run-id", state.run_id);
     setText("aosv3-wp-id", state.work_package_id);
-    setText("aosv3-domain", state.domain_id);
-    setText("aosv3-main-domain", state.domain_id);
+    var domainDisplay = state.domain_slug || state.domain_id;
+    setText("aosv3-domain", domainDisplay);
+    setText("aosv3-main-domain", domainDisplay);
     setText("aosv3-variant", state.process_variant);
     setText("aosv3-gate", state.current_gate_id);
     setText("aosv3-phase", state.current_phase_id);
@@ -2283,6 +2305,25 @@ status: ACTIVE
       }
     }
 
+    // Sidebar status chip — "current run" above the color legend
+    var sidebarRunStatus = document.getElementById("aosv3-sidebar-run-status");
+    var sidebarStatusBadge = document.getElementById("aosv3-sidebar-status-badge");
+    var sidebarGateBadge = document.getElementById("aosv3-sidebar-gate-badge");
+    if (sidebarRunStatus) {
+      var isIdle = state.status === "IDLE" || !state.run_id;
+      sidebarRunStatus.hidden = isIdle;
+      if (!isIdle) {
+        if (sidebarStatusBadge) {
+          sidebarStatusBadge.textContent = state.status;
+          sidebarStatusBadge.className = "aosv3-status-badge " + statusBadgeClass(state.status);
+        }
+        if (sidebarGateBadge) {
+          sidebarGateBadge.textContent = state.current_gate_id || "";
+          sidebarGateBadge.style.display = state.current_gate_id ? "" : "none";
+        }
+      }
+    }
+
     renderGateMap(
       state.current_gate_id,
       state.current_phase_id,
@@ -2302,11 +2343,30 @@ status: ACTIVE
     var parts = [base];
     var inclTeam = document.getElementById("aosv3-prompt-blend-team");
     var inclPol = document.getElementById("aosv3-prompt-blend-policies");
+    var inclActivation = document.getElementById("aosv3-prompt-blend-activation");
     var actorId =
       pipelineLastState &&
       pipelineLastState.actor &&
       pipelineLastState.actor.team_id;
     var team = findTeamById(actorId || "team_61");
+    // Activation context — prepend, not append
+    if (inclActivation && inclActivation.checked && pipelineLastState && pipelineLastState.run_id) {
+      var st = pipelineLastState;
+      var actInfo = st.actor || {};
+      var activationHeader =
+        "# Agent Activation — " + (actInfo.team_id || "—") + " | " + (actInfo.label || actInfo.team_id || "—") + "\n" +
+        "**Date:** " + new Date().toISOString().slice(0, 10) + "\n" +
+        "**Domain:** " + (st.domain_slug || st.domain_id || "—") + "\n" +
+        "**Work Package:** " + (st.work_package_id || "—") + "\n" +
+        "**Current Gate:** " + (st.current_gate_id || "—") + " / " + (st.current_phase_id || "—") + "\n" +
+        "**Process Variant:** " + (st.process_variant || "—") + "\n" +
+        "**Run ID:** " + (st.run_id || "—") + "\n" +
+        "**Engine:** " + (actInfo.engine || "—") + "\n\n" +
+        "You are **" + (actInfo.label || actInfo.team_id || "—") + "** (" + (actInfo.team_id || "—") + "). " +
+        "Pick up your current task from the prompt below.\n\n" +
+        "---\n\n";
+      parts[0] = activationHeader + base;
+    }
     if (inclTeam && inclTeam.checked && team) {
       var l1 = buildTeamL1(team);
       var l2 = buildTeamL2(team);
@@ -2496,6 +2556,13 @@ status: ACTIVE
 
     function normalizeLiveState(raw) {
       var s = Object.assign({}, raw);
+      if (!s.domain_slug && s.domain_id) {
+        var _DOMAIN_SLUG_MAP = {
+          "01JK8AOSV3DOMAIN00000001": "agents_os",
+          "01JK8AOSV3DOMAIN00000002": "tiktrack",
+        };
+        s.domain_slug = _DOMAIN_SLUG_MAP[s.domain_id] || s.domain_id;
+      }
       if (!s.pending_feedback) s.pending_feedback = { has_pending: false };
       if (s.next_action && s.next_action.type === "HUMAN_APPROVE")
         s.is_human_gate = 1;
@@ -2801,6 +2868,99 @@ status: ACTIVE
 
     updatePipelineDomainButtonStyles();
     syncStartRunFormDomainSelect();
+
+    // ── Copy button (live mode) ────────────────────────────────────────────
+    var copyBtnLive = document.getElementById("aosv3-prompt-copy");
+    if (copyBtnLive && !copyBtnLive._wiredLive) {
+      copyBtnLive._wiredLive = true;
+      copyBtnLive.addEventListener("click", function () {
+        var payload = buildPromptCopyPayload();
+        var blendTeam = document.getElementById("aosv3-prompt-blend-team");
+        var blendPol = document.getElementById("aosv3-prompt-blend-policies");
+        var blendAct = document.getElementById("aosv3-prompt-blend-activation");
+        var blended = (blendTeam && blendTeam.checked) || (blendPol && blendPol.checked) || (blendAct && blendAct.checked);
+        copyToClipboard(payload).then(function (ok) {
+          showAosv3Toast(
+            ok
+              ? blended
+                ? "Copied (prompt + blends) ✓"
+                : "Prompt copied to clipboard ✓"
+              : "Copy failed — try selecting manually"
+          );
+        });
+      });
+    }
+
+    // ── CLI copy (live mode) ───────────────────────────────────────────────
+    var cliCopyLive = document.getElementById("aosv3-handoff-cli-copy");
+    if (cliCopyLive && !cliCopyLive._wiredLive) {
+      cliCopyLive._wiredLive = true;
+      cliCopyLive.addEventListener("click", function () {
+        var pre = document.getElementById("aosv3-handoff-cli-pre");
+        var t = pre ? pre.textContent : "";
+        copyToClipboard(t).then(function (ok) {
+          showAosv3Toast(ok ? "CLI command copied" : "Copy failed");
+        });
+      });
+    }
+
+    // ── Stop Run modal (live mode) ─────────────────────────────────────────
+    var stopModalLive = document.getElementById("aosv3-modal-stop-run");
+    function _openStopModal() {
+      if (stopModalLive) {
+        stopModalLive.classList.add("open");
+        stopModalLive.setAttribute("aria-hidden", "false");
+      }
+    }
+    function _closeStopModal() {
+      if (stopModalLive) {
+        stopModalLive.classList.remove("open");
+        stopModalLive.setAttribute("aria-hidden", "true");
+      }
+    }
+    var stopRunLive = document.getElementById("aosv3-btn-stop-run");
+    if (stopRunLive && !stopRunLive._wiredLive) {
+      stopRunLive._wiredLive = true;
+      stopRunLive.addEventListener("click", _openStopModal);
+    }
+    if (stopModalLive && !stopModalLive._wiredLive) {
+      stopModalLive._wiredLive = true;
+      stopModalLive.addEventListener("click", function (ev) {
+        if (ev.target === stopModalLive) _closeStopModal();
+      });
+      stopModalLive.querySelectorAll("[data-aosv3-modal-close]").forEach(function (b) {
+        b.addEventListener("click", _closeStopModal);
+      });
+      var stopConfirmLive = document.getElementById("aosv3-modal-stop-confirm");
+      if (stopConfirmLive) {
+        stopConfirmLive.addEventListener("click", function () {
+          _closeStopModal();
+          var runId = rid();
+          if (!runId) {
+            showAosv3Toast("לא נמצאה ריצה פעילה לעצירה.", { level: "error", duration: 5000 });
+            return;
+          }
+          AOSV3_apiFetch("/api/runs/" + encodeURIComponent(runId) + "/override", {
+            method: "POST",
+            body: JSON.stringify({ actor_team_id: "team_00", action: "FORCE_FAIL", reason: "Stopped by operator via UI" }),
+            headers: { "Content-Type": "application/json", "X-Actor-Team-Id": "team_00" },
+            skipActorHeader: true,
+          })
+            .then(function (r) { return r.json(); })
+            .then(function () {
+              showAosv3Toast("ריצה עצורה. ניתן כעת להפעיל חבילה חדשה.");
+              return loadPipelineStateFromApi(true);
+            })
+            .catch(function (e) {
+              showAosv3Toast(
+                "שגיאה בעצירת הריצה: " + (e.message || String(e)),
+                { level: "error", duration: 6000 }
+              );
+            });
+        });
+      }
+    }
+
     loadPipelineStateFromApi(true);
   }
 

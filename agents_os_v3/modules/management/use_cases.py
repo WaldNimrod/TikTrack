@@ -259,10 +259,16 @@ def _assemble_state_body(
     ev = R.fetch_latest_event(cur, rid)
     prev_ev = _previous_event_from_row(dict(ev) if ev else None)
 
+    # Resolve domain slug for UI display
+    cur.execute("SELECT slug FROM domains WHERE id = %s", (str(row["domain_id"]),))
+    _dom_row = cur.fetchone()
+    _domain_slug = str(_dom_row["slug"]) if _dom_row else str(row["domain_id"])
+
     return {
         "run_id": rid,
         "work_package_id": str(row["work_package_id"]),
         "domain_id": str(row["domain_id"]),
+        "domain_slug": _domain_slug,
         "process_variant": str(row["process_variant"]),
         "status": st,
         "current_gate_id": str(row["current_gate_id"]) if row.get("current_gate_id") else None,
@@ -450,10 +456,14 @@ def uc_13_get_current_state(
             r = cur.fetchone()
             row = dict(r) if r else None
             if not row:
+                cur.execute("SELECT slug FROM domains WHERE id = %s", (domain_ulid,))
+                _slug_row = cur.fetchone()
+                _idle_slug = str(_slug_row["slug"]) if _slug_row else domain_ulid
                 return {
                     "run_id": None,
                     "work_package_id": None,
                     "domain_id": domain_ulid,
+                    "domain_slug": _idle_slug,
                     "process_variant": None,
                     "status": "IDLE",
                     "current_gate_id": None,

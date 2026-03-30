@@ -58,13 +58,13 @@ status: ACTIVE
     <div class="sidebar-section-card" id="aosv3-live-api-card" style="display:none">
       <div class="sidebar-label">Connection</div>
       <label class="aosv3-form-label">X-Actor-Team-Id
-        <input type="text" id="aosv3-live-actor" class="aosv3-input" autocomplete="off" placeholder="team_61" title="Sent on API requests that mutate state" aria-label="Actor team id header" />
+        <input type="text" id="aosv3-live-actor" class="aosv3-input" autocomplete="off" placeholder="team_00" title="מזהה הצוות שלך לפעולות API — כברירת מחדל team_00 (המפעיל הראשי / Nimrod)" aria-label="Actor team id header" />
       </label>
       <label class="aosv3-form-label">API base URL
         <input type="text" id="aosv3-live-api-base" class="aosv3-input" autocomplete="off" placeholder="http://127.0.0.1:8090" title="Agents OS v3 API origin" aria-label="API base URL" />
       </label>
       <button type="button" class="btn btn-primary" id="aosv3-live-save-settings" title="Save settings and reload pipeline state from the API">Save &amp; reload state</button>
-      <p class="aosv3-sidebar-hint">Stored in localStorage. Mutations require <code>X-Actor-Team-Id</code>.</p>
+      <p class="aosv3-sidebar-hint">מזהה צוות ה-API שלך. המפעיל הראשי (Nimrod) = <code>team_00</code>. נשמר ב-localStorage. נדרש לכל פעולת מוטציה.</p>
     </div>
     <div class="sidebar-section-card" id="aosv3-dev-scenarios-card" style="display:none">
       <div class="sidebar-label">Developer scenarios</div>
@@ -93,7 +93,7 @@ status: ACTIVE
       <div class="sidebar-label">Run metadata</div>
       <div class="info-row"><span class="info-key">run_id</span><span class="info-val" id="aosv3-run-id">—</span></div>
       <div class="info-row"><span class="info-key">work_package_id</span><span class="info-val" id="aosv3-wp-id">—</span></div>
-      <div class="info-row"><span class="info-key">domain_id</span><span class="info-val" id="aosv3-domain">—</span></div>
+      <div class="info-row"><span class="info-key">Domain</span><span class="info-val" id="aosv3-domain">—</span></div>
       <div class="info-row"><span class="info-key">process_variant</span><span class="info-val" id="aosv3-variant">—</span></div>
     </div>
     <div class="sidebar-section-card">
@@ -114,6 +114,11 @@ status: ACTIVE
     </div>
     <div class="sidebar-section-card aosv3-legend-card">
       <div class="sidebar-label">Status color key</div>
+      <div id="aosv3-sidebar-run-status" class="aosv3-sidebar-run-status" hidden>
+        <span class="info-key">סטטוס נוכחי:</span>
+        <span id="aosv3-sidebar-status-badge" class="aosv3-status-badge aosv3-status--idle">—</span>
+        <span id="aosv3-sidebar-gate-badge" class="aosv3-gate-pill aosv3-gate-pill--active" style="margin-left:4px"></span>
+      </div>
       <div class="aosv3-legend">
         <span class="aosv3-legend-item"><span class="aosv3-status-badge aosv3-status--in_progress">RUN</span> in progress / active</span>
         <span class="aosv3-legend-item"><span class="aosv3-status-badge aosv3-status--correction">CORR</span> correction</span>
@@ -172,6 +177,12 @@ status: ACTIVE
     <div id="aosv3-pipeline-main">
       <section id="aosv3-prompt-section" class="section-card aosv3-prompt-card" hidden aria-label="Assembled prompt">
         <div class="section-title aosv3-prompt-title">Assembled prompt</div>
+        <div id="aosv3-prompt-actor-banner" class="aosv3-prompt-actor-banner" hidden>
+          <span class="sidebar-label">מיועד לצוות:</span>
+          <span id="aosv3-prompt-actor-pill" class="aosv3-domain-pill aosv3-prompt-actor-pill"></span>
+          <span id="aosv3-prompt-actor-name" class="aosv3-prompt-actor-name"></span>
+          <span id="aosv3-prompt-actor-engine" class="aosv3-prompt-actor-engine"></span>
+        </div>
         <p class="aosv3-sidebar-hint">Assembled operator prompt for this run (<code>GET /api/runs/{run_id}/prompt</code>).</p>
         <div class="aosv3-prompt-meta">
           <span id="aosv3-prompt-token-badge" class="status-pill pill-current">—</span>
@@ -181,12 +192,13 @@ status: ACTIVE
         <pre id="aosv3-prompt-pre" class="aosv3-prompt-pre"></pre>
         <div class="aosv3-prompt-blend">
           <div class="sidebar-label">Copy — add blends</div>
-          <label class="aosv3-team-checkbox-label"><input type="checkbox" id="aosv3-prompt-blend-team" title="Include L1–L4 team context" /> Team context (L1–L4, current actor)</label>
+          <label class="aosv3-team-checkbox-label"><input type="checkbox" id="aosv3-prompt-blend-activation" title="הוסף כותרת הפעלה לצוות הנמען — מתאים להפעלת אגנט חדש" /> הקשר הפעלה לצוות (activation context)</label>
+          <label class="aosv3-team-checkbox-label"><input type="checkbox" id="aosv3-prompt-blend-team" title="Include L1–L4 team context" /> Team context (L1–L4)</label>
           <label class="aosv3-team-checkbox-label"><input type="checkbox" id="aosv3-prompt-blend-policies" title="Include governance policies" /> Policies</label>
         </div>
         <div class="aosv3-prompt-actions">
           <button type="button" class="btn btn-primary" id="aosv3-prompt-copy" title="Copy prompt text to clipboard">Copy to clipboard</button>
-          <button type="button" class="btn" id="aosv3-prompt-regenerate" disabled title="Re-fetch prompt from API (when available)">Regenerate</button>
+          <button type="button" class="btn" id="aosv3-prompt-regenerate" disabled title="רענן את הפרומט מהשרת (bust cache) — שימושי לאחר שינוי state">Refresh prompt</button>
         </div>
       </section>
 
@@ -215,26 +227,27 @@ status: ACTIVE
       <div class="section-card">
         <div class="section-title">Run status</div>
         <p><span id="aosv3-status-badge" class="aosv3-status-badge aosv3-status--in_progress">IN_PROGRESS</span></p>
-        <div class="info-row"><span class="info-key">domain_id</span><span class="info-val" id="aosv3-main-domain">—</span></div>
-        <div class="info-row"><span class="info-key">current_gate_id</span><span class="info-val" id="aosv3-gate">—</span></div>
-        <div class="info-row"><span class="info-key">current_phase_id</span><span class="info-val" id="aosv3-phase">—</span></div>
-        <div class="info-row" id="aosv3-paused-at-row" hidden><span class="info-key">paused_at</span><span class="info-val" id="aosv3-paused-at">—</span></div>
-        <div class="info-row" id="aosv3-completed-at-row" hidden><span class="info-key">completed_at</span><span class="info-val" id="aosv3-completed-at">—</span></div>
-        <div class="info-row"><span class="info-key">correction_cycle_count</span><span class="info-val" id="aosv3-cc">—</span></div>
-        <div class="info-row"><span class="info-key">execution_mode</span><span class="info-val" id="aosv3-exec-mode">—</span></div>
-        <div class="info-row"><span class="info-key">started_at</span><span class="info-val" id="aosv3-started">—</span></div>
-        <div class="info-row"><span class="info-key">last_updated</span><span class="info-val" id="aosv3-updated">—</span></div>
+        <div class="info-row"><span class="info-key">Domain</span><span class="info-val" id="aosv3-main-domain">—</span></div>
+        <div class="info-row"><span class="info-key">Current Gate</span><span class="info-val" id="aosv3-gate">—</span></div>
+        <div class="info-row"><span class="info-key">Phase</span><span class="info-val" id="aosv3-phase">—</span></div>
+        <div class="info-row" id="aosv3-paused-at-row" hidden><span class="info-key">Paused at</span><span class="info-val" id="aosv3-paused-at">—</span></div>
+        <div class="info-row" id="aosv3-completed-at-row" hidden><span class="info-key">Completed at</span><span class="info-val" id="aosv3-completed-at">—</span></div>
+        <div class="info-row"><span class="info-key">Corrections</span><span class="info-val" id="aosv3-cc">—</span></div>
+        <div class="info-row"><span class="info-key">Mode</span><span class="info-val" id="aosv3-exec-mode">—</span></div>
+        <div class="info-row"><span class="info-key">Started</span><span class="info-val" id="aosv3-started">—</span></div>
+        <div class="info-row"><span class="info-key">Last updated</span><span class="info-val" id="aosv3-updated">—</span></div>
       </div>
 
       <div class="section-card">
-        <div class="section-title">Current actor</div>
-        <div class="info-row"><span class="info-key">actor</span><span id="aosv3-actor-block" class="info-val">—</span></div>
-        <p class="aosv3-sidebar-hint">When status is PAUSED, actor may appear empty.</p>
+        <div class="section-title">Current actor — הצוות הפעיל</div>
+        <div class="info-row"><span id="aosv3-actor-block" class="info-val aosv3-actor-display">—</span></div>
+        <p class="aosv3-sidebar-hint">הצוות שמטפל בשלב הנוכחי. מזוהה ע"י role (ORCHESTRATOR) ובחירת domain. כשהסטטוס PAUSED — הצוות ריק.</p>
       </div>
 
       <div class="section-card" id="aosv3-sentinel-card">
-        <div class="section-title">Sentinel</div>
-        <div class="info-row"><span class="info-key">sentinel</span><span class="info-val" id="aosv3-sentinel">—</span></div>
+        <div class="section-title">Sentinel — מנגנון חירום</div>
+        <div class="info-row"><span class="info-val" id="aosv3-sentinel">—</span></div>
+        <p class="aosv3-sidebar-hint">Sentinel פעיל = חבילה זו הוקפאה ידנית ע"י צוות מסויים (LOD200 override). לרוב: inactive.</p>
       </div>
 
       <div class="section-card">

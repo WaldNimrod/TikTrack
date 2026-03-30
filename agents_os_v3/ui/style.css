@@ -1545,3 +1545,47 @@ status: ACTIVE
 .aosv3-idea-type--other {
   color: var(--text-muted);
 }
+
+/* Prompt actor banner */
+.aosv3-prompt-actor-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(88, 166, 255, 0.08);
+  border-left: 3px solid var(--accent, #58a6ff);
+  border-radius: 4px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.aosv3-prompt-actor-pill {
+  font-weight: 700;
+  font-size: 12px;
+}
+.aosv3-prompt-actor-name {
+  font-weight: 600;
+  color: var(--text-primary, #e6edf3);
+  font-size: 13px;
+}
+.aosv3-prompt-actor-engine {
+  color: var(--text-muted, #8b949e);
+  font-size: 11px;
+}
+
+/* Sidebar current run status chip */
+.aosv3-sidebar-run-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 4px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+/* Actor display in main panel */
+.aosv3-actor-display {
+  font-size: 14px;
+  font-weight: 500;
+}

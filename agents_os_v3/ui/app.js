@@ -2651,6 +2651,55 @@ status: ACTIVE
       showAosv3Toast("Principal override — use CLI from handoff block");
     });
 
+    // ── Start Run: populate WP select ──────────────────────────────────────
+    function populateWpSelect() {
+      var sel = document.getElementById("aosv3-wp-select");
+      if (!sel) return;
+      AOSV3_apiJson("/api/work-packages")
+        .then(function (data) {
+          var wps = (data && data.work_packages) || [];
+          sel.innerHTML = '<option value="">— select work package —</option>';
+          wps.forEach(function (wp) {
+            var id = wp.wp_id || wp.id;
+            var opt = document.createElement("option");
+            opt.value = id;
+            opt.textContent = id + (wp.label ? " \u2014 " + wp.label : "");
+            sel.appendChild(opt);
+          });
+        })
+        .catch(function () {
+          var sel2 = document.getElementById("aosv3-wp-select");
+          if (sel2) sel2.innerHTML = '<option value="">— failed to load —</option>';
+        });
+    }
+    populateWpSelect();
+
+    document.addEventListener("aosv3-workspace-domain-changed", function () {
+      populateWpSelect();
+    });
+
+    // ── Start Run: wire button ──────────────────────────────────────────────
+    wireLiveAction(document.querySelector(".aosv3-start-run-btn"), function () {
+      var form = document.getElementById("aosv3-start-run-form");
+      if (!form) return;
+      var wpId = (form.querySelector('[name="work_package_id"]').value || "").trim();
+      var domainId = form.querySelector('[name="domain_id"]').value;
+      var variant = form.querySelector('[name="process_variant"]').value || null;
+      if (!wpId) { showAosv3Toast("Work Package ID is required"); return; }
+      postJson("/api/runs", {
+        work_package_id: wpId,
+        domain_id: domainId,
+        process_variant: variant || null,
+      })
+        .then(function () {
+          showAosv3Toast("Run started");
+          return loadPipelineStateFromApi(true);
+        })
+        .catch(function (e) {
+          showAosv3Toast(e.message || String(e));
+        });
+    });
+
     updatePipelineDomainButtonStyles();
     syncStartRunFormDomainSelect();
     loadPipelineStateFromApi(true);

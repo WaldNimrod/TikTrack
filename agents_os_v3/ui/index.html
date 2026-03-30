@@ -137,7 +137,9 @@ status: ACTIVE
         <div class="section-title">Start run</div>
         <form id="aosv3-start-run-form" class="aosv3-start-run-form">
           <label class="aosv3-form-label">Work Package ID <span class="aosv3-req">*</span>
-            <input type="text" name="work_package_id" required placeholder="S003-P002-WP001" class="aosv3-input" />
+            <select name="work_package_id" id="aosv3-wp-select" required class="aosv3-input">
+              <option value="">— select work package —</option>
+            </select>
           </label>
           <label class="aosv3-form-label">Domain <span class="aosv3-req">*</span>
             <select name="domain_id" required class="aosv3-input">

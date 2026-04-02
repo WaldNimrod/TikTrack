@@ -1,5 +1,7 @@
 # TEAM 191 INTERNAL WORK PROCEDURE v1.0.3
 
+> **SUPERSEDED** by `TEAM_191_INTERNAL_WORK_PROCEDURE_v1.0.4.md` (2026-03-27). Keep file for history only.
+
 **project_domain:** SHARED (TIKTRACK + AGENTS_OS)  
 **id:** TEAM_191_INTERNAL_WORK_PROCEDURE_v1.0.3  
 **owner:** Team 191 (child team of Team 190)  

@@ -1,0 +1,1 @@
+{"ts": "2026-03-24T18:23:00Z", "domain": "tiktrack", "wp": "S003-P013-WP001", "gate": "COMPLETE", "phase": "", "gate_state": "OPEN", "ssot_ok": true, "ssot_detail": "CONSISTENT", "test_count": 223, "test_ok": true, "wsm_gate": "GATE_3", "wsm_wp": "S003-P011-WP099", "event": "GATE_CHANGE: START → COMPLETE"}

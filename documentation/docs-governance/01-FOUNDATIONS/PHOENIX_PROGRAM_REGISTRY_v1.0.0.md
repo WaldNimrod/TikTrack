@@ -1,3 +1,6 @@
+date: 2026-03-10
+historical_record: true
+
 
 # PHOENIX_PROGRAM_REGISTRY_v1.0.0
 
@@ -48,7 +51,7 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | S003 | S003-P002 | Test Template Generator | AGENTS_OS | COMPLETE | FAST_4 CLOSED (WP001) 2026-03-12 — Test Template Generator deployed; G3.7 added; agents_os_v2/requirements.txt canonical |
 | S003 | S003-P003 | System Settings (D39+D40+D41) | TIKTRACK | COMPLETE | GATE_8; active_flow=S003-P003-WP001 — DOCUMENTATION_CLOSED (GATE_8 PASS + lock closed 2026-03-21). Lifecycle complete.; active_work_package_id=N/A |
 | S003 | S003-P004 | User Tickers (D33) | TIKTRACK | ACTIVE | GATE_0 pending — Team 100 authorization 2026-03-25 |
-| S003 | S003-P005 | Watch Lists (D26) | TIKTRACK | PLANNED | — (D38 tag_management relocated to S005 per ARCHITECT_DIRECTIVE_ROADMAP_AMENDMENT_v1.0.0 §A1; registered from integrated roadmap v1.1.0) |
+| S003 | S003-P005 | Watch Lists (D26) | TIKTRACK | ACTIVE | GATE_0 — activated per Principal mandate 2026-03-31; first flight through AOS v3; active_work_package_id=S003-P005-WP001 |
 | S003 | S003-P006 | Admin Review S003 | TIKTRACK | PLANNED | — (Stage Governance Package; planning marker per integrated roadmap v1.1.0) |
 | S003 | S003-P007 | Agents_OS Command Bridge Lite (ADR-031 Stage B) | AGENTS_OS | MERGED | **MERGED_INTO_S003-P011-WP001** (2026-03-19). ADR-031 Stage B scope (approve-path desync, command bridge copy flow, model-B realignment) fully delivered through S003-P011-WP001. Authority: ARCHITECT_DIRECTIVE_AOS_ROADMAP_RESET_v1.0.0. |
 | S003 | S003-P008 | Agents_OS Pipeline Governance Hardening | AGENTS_OS | SUPERSEDED | **SUPERSEDED_BY_S003-P010** (2026-03-19). LOD200 acknowledged as historical reference. Scope absorbed: STATE_VIEW.json + date governance → P010-WP003; JSON verdict protocol → P010-WP002. Authority: ARCHITECT_DIRECTIVE_AOS_ROADMAP_RESET_v1.0.0. |
@@ -158,9 +161,9 @@ Source directives:
 
 ---
 
-**current_gate_mirror source:** pipeline_state_*.json via wsm_sync (S003-P016 — COS removed from WSM; last update 2026-03-24). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
+**current_gate_mirror source:** pipeline_state_*.json via wsm_sync (S003-P016 — COS removed from WSM; last update 2026-04-02). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
 
-**WSM mirror (2026-03-24):** active_stage_id=S003; active_program_id=S003-P015; current_gate=COMPLETE; active_work_package_id=S003-P015-WP001; active_flow=S003-P015-WP001 — AOS DM-005 SC Verification Run. Documentation-only pipeline run (GATE_0→GATE_5, TRACK_FOCUSED) to verify AOS pipeline engine readiness for DM-005 closure. No code changes. Authority: DM-005 v1.2.0..
+**WSM mirror (2026-04-02):** active_stage_id=S003; active_program_id=S003-P015; current_gate=COMPLETE; active_work_package_id=S003-P015-WP001; active_flow=S003-P015-WP001 — AOS DM-005 SC Verification Run. Documentation-only pipeline run (GATE_0→GATE_5, TRACK_FOCUSED) to verify AOS pipeline engine readiness for DM-005 closure. No code changes. Authority: DM-005 v1.2.0..
 
 ---
 
@@ -206,3 +209,4 @@ Source directives:
 **log_entry | TEAM_90 | PHOENIX_PROGRAM_REGISTRY | S003_P003_WP001_GATE8_PASS_DOCUMENTATION_CLOSED | TEAM_90_REVALIDATION_LOCK_CLOSED | LIFECYCLE_COMPLETE | 2026-03-21**
 **log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S003_P011_WP003_BACKLOG_REGISTERED | C1_C8_DEFERRED_ITEMS_CAPTURED | AUTHORITY_DECISIONS_WP2_02_03_04 | 2026-03-20**
 **log_entry | TEAM_00 | PHOENIX_PROGRAM_REGISTRY | S003_P012_REGISTERED_ACTIVE | AOS_PIPELINE_OPERATOR_RELIABILITY | 5_WPs | SSOT+PROMPT+DASHBOARD+CI+TESTKIT | PRE_CONDITION_ALL_SUBSEQUENT | 2026-03-21**
+**log_entry | TEAM_110 | PHOENIX_PROGRAM_REGISTRY | S003_P005_PLANNED_TO_ACTIVE | D26_WATCH_LISTS_FIRST_FLIGHT | PRINCIPAL_MANDATE | WP001_GATE_0_ENTRY | 2026-03-31**

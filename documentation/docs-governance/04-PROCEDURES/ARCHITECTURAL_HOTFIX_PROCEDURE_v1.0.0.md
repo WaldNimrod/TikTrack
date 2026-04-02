@@ -4,7 +4,7 @@
 # Architectural Hotfix & Maker-Checker Protocol
 **id:** `ARCHITECTURAL_HOTFIX_PROCEDURE_v1.0.0`
 **domain:** SHARED
-**owner:** Team 00 (Chief Architect) / Team 100 & 101 (Architecture Authority)
+**owner:** Team 00 (System Designer) / Team 100 & 101 (Architecture Authority)
 
 ## 1. Purpose
 To maximize token efficiency and agility without sacrificing governance. This procedure defines how Architectural Teams (Team 100, Team 101) can issue direct code corrections (Hotfixes) while strictly adhering to the **Maker-Checker Principle (עקרון צמדי צוותים)**.

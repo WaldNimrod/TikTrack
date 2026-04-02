@@ -1,0 +1,983 @@
+{
+  "01JK8AOSV3DOMAIN00000001": {
+    "actor_team_id": "team_190",
+    "current_gate_id": "GATE_0",
+    "current_phase_id": "0.1",
+    "last_updated": "2026-04-01T22:21:00.718979Z",
+    "run_id": "01KN5J5EX9K66EA566FXP474YA",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN5J5EWXXJHKJED565B3NV1F"
+  },
+  "01JK8AOSV3DOMAIN00000002": {
+    "actor_team_id": "team_190",
+    "current_gate_id": "GATE_0",
+    "current_phase_id": "0.1",
+    "last_updated": "2026-04-01T22:21:00.204615Z",
+    "run_id": "01KN5J5ED8Z8MFFVDQ66AEFN7B",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN5J5ED315GX2AJA45NP05GN"
+  },
+  "01KMTX5NVW75GB5G4DPR7X7YBB": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_0",
+    "current_phase_id": "0.1",
+    "last_updated": "2026-03-28T19:01:43.439122Z",
+    "run_id": "01KMTX5NW8N48XYTNHG4P7JGYM",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMTX5NVW75GB5G4DPR7X7YBC"
+  },
+  "01KMV00FQSVWCAX7GQX9CMQA03": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_0",
+    "current_phase_id": "0.2",
+    "last_updated": "2026-03-28T19:51:19.299621Z",
+    "run_id": "01KMV00FV3KNYV7M8V6670X586",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMV00FQSVWCAX7GQX9CMQA04"
+  },
+  "01KMV01DF6D0G4GEWYV5V1FX8E": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_2",
+    "current_phase_id": "2.1",
+    "last_updated": "2026-03-28T19:51:50.094393Z",
+    "run_id": "01KMV01DH3JVBEFCX4R39C2WBF",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMV01DF6D0G4GEWYV5V1FX8F"
+  },
+  "01KMV02CGET10HJFTP9QQ7NA9K": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-28T19:52:21.570299Z",
+    "run_id": "01KMV02CJ14VZT48K40VZ0P9CA",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMV02CGET10HJFTP9QQ7NA9M"
+  },
+  "01KMV0368GT2653FP8ZTM8D1H5": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-28T19:52:47.870948Z",
+    "run_id": "01KMV0369EQMPBA5WX6GR91173",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMV0368GT2653FP8ZTM8D1H6"
+  },
+  "01KMV06H2XMJRV3W0K6K9FACA7": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-28T19:54:37.162153Z",
+    "run_id": "01KMV06H3CDZ99548S7G3W48X9",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMV06H2XMJRV3W0K6K9FACA8"
+  },
+  "01KMV0ENQXNNN3QPDW75SB0V1W": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-28T19:59:04.068238Z",
+    "run_id": "01KMV0ENRBWGBN54WN77D6WJWH",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMV0ENQXNNN3QPDW75SB0V1X"
+  },
+  "01KMWBQHQYNEWFZWRSD55ZQTBV": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-29T08:35:23.657810Z",
+    "run_id": "01KMWBQHREETGA9X410D0GW3B1",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMWBQHQYNEWFZWRSD55ZQTBW"
+  },
+  "01KMWC123RBCBBMK1136NMAM47": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-29T08:40:35.336142Z",
+    "run_id": "01KMWC124AXV6HGBDCDAD8NZCP",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMWC123RBCBBMK1136NMAM48"
+  },
+  "01KMWC8N4M6AE18N65NYT1ST5Y": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-29T08:44:44.188009Z",
+    "run_id": "01KMWC8N524HZVK4AX3AFW6A8V",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMWC8N4M6AE18N65NYT1ST5Z"
+  },
+  "01KMWDNXFSNAMTQKSEPDXX5M40": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-29T09:09:27.298254Z",
+    "run_id": "01KMWDNXG7Z5CPGHPF5XMY4Y0B",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMWDNXFSNAMTQKSEPDXX5M41"
+  },
+  "01KMWJF2DCDVAWC5XKD1SENXP9": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-29T10:33:05.842522Z",
+    "run_id": "01KMWJF2DTHDHCS9Z340G59T2K",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMWJF2DCDVAWC5XKD1SENXPA"
+  },
+  "01KMWPQJ3CPCSDB7HM24M4N658": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-29T11:47:38.375499Z",
+    "run_id": "01KMWPQJ3Y7J8Q1XZ2J8JJKTRY",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMWPQJ3CPCSDB7HM24M4N659"
+  },
+  "01KMWPTA2QKBZ2SMYG3R027FFY": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-29T11:49:08.445259Z",
+    "run_id": "01KMWPTA353QEFZSTY8V1SP90Z",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMWPTA2QKBZ2SMYG3R027FFZ"
+  },
+  "01KMWYTMJ0ADHXTZE0W5KHB5Y5": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-29T14:09:07.781228Z",
+    "run_id": "01KMWYTMJD8W6KPXW0J2P2J2BG",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMWYTMJ0ADHXTZE0W5KHB5Y6"
+  },
+  "01KMWZ2KPXPAT3AWCGJ47TE0JT": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-29T14:13:29.079401Z",
+    "run_id": "01KMWZ2KQCEGBTWJMEWK2H2045",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMWZ2KPXPAT3AWCGJ47TE0JV"
+  },
+  "01KMXA3HMB857BPZFMPDXMS3RK": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-29T17:26:14.041895Z",
+    "run_id": "01KMXA3HMT0SSQ535F8SWDY818",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMXA3HMB857BPZFMPDXMS3RM"
+  },
+  "01KMXACQ0TB70CZGJEMX1MJ4QH": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-29T17:31:14.485210Z",
+    "run_id": "01KMXACQ1BZDKFKCMQGZCYRHG4",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMXACQ0TB70CZGJEMX1MJ4QJ"
+  },
+  "01KMXAHS0GEW9EH22HJ6E90DMW": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-29T17:34:00.352466Z",
+    "run_id": "01KMXAHS0YRDBS0NNJAQ7KTEFM",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMXAHS0GEW9EH22HJ6E90DMX"
+  },
+  "01KMXB0HWNHR9S5JYQKESWT0N6": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-29T17:42:04.583620Z",
+    "run_id": "01KMXB0HX4M6VP57X0PS7JYZAA",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMXB0HWNHR9S5JYQKESWT0N7"
+  },
+  "01KMXB23GXK4PBKTND0W4MTTH7": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-29T17:42:55.415952Z",
+    "run_id": "01KMXB23HCZ4133AWCV0RPBMDN",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMXB23GXJ87RVZSE88G3CYR8"
+  },
+  "01KMXB495ZKGJTTQZ8AN6FXM9F": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-29T17:44:06.739608Z",
+    "run_id": "01KMXB496EBPAFB69EFWZ4KC3Z",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMXB495ZKGJTTQZ8AN6FXM9G"
+  },
+  "01KMXB4D4NSWAVY4TPYQ8BGVG5": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-29T17:44:10.847931Z",
+    "run_id": "01KMXB4D5EEJBTNWAAYJGNPXVB",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMXB4D4NSWAVY4TPYQ8BGVG6"
+  },
+  "01KMXB9S108ZX4D660GHBARHHV": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-29T17:47:06.795304Z",
+    "run_id": "01KMXB9S1FB1AZZT4W6KCPDYS8",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMXB9S108ZX4D660GHBARHHW"
+  },
+  "01KMXTV4111CJE8KWR9SZ3YRA3": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-29T22:18:43.792548Z",
+    "run_id": "01KMXTV41GQ2B52RMT7H2XJ11E",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMXTV4111CJE8KWR9SZ3YRA4"
+  },
+  "01KMXXV76FG67G2FDJAKQFAYWH": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-29T23:11:12.852125Z",
+    "run_id": "01KMXXV770Z5RDS8634EQZBH75",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMXXV76FG67G2FDJAKQFAYWJ"
+  },
+  "01KMXXXFAT4S8G9AMXEAY4T22N": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-29T23:12:26.601264Z",
+    "run_id": "01KMXXXFBBXT7QV870XYH2YKEB",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMXXXFAT4S8G9AMXEAY4T22P"
+  },
+  "01KMXXYWN3ZJXG5K9641T61GPS": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-29T23:13:13.002592Z",
+    "run_id": "01KMXXYWNHJARMRX925V6HT2BM",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMXXYWN3ZJXG5K9641T61GPT"
+  },
+  "01KMXZA9B5XJ9T5J59C2M2X2XK": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-29T23:36:55.015298Z",
+    "run_id": "01KMXZA9BMJN6KF5MMZV9D6CJ4",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMXZA9B5XJ9T5J59C2M2X2XM"
+  },
+  "01KMXZDY9C980CAPQN26CYJ9ST": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-29T23:38:54.786239Z",
+    "run_id": "01KMXZDY9V8S0VTKB10FHD5HEV",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMXZDY9C980CAPQN26CYJ9SV"
+  },
+  "01KMY058XWH8ZK2P7S9SYH6JE7": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-29T23:51:39.424085Z",
+    "run_id": "01KMY058YTC3MQZ8TYAYSVK694",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMY058XWH8ZK2P7S9SYH6JE8"
+  },
+  "01KMY7DWPX8Q0G5A08P467AQBE": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T01:58:41.771401Z",
+    "run_id": "01KMY7DWQCQABAEXR7NBC2JZH8",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMY7DWPX8Q0G5A08P467AQBF"
+  },
+  "01KMYATHYSN7B25519QHMWSDKV": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T02:58:02.461174Z",
+    "run_id": "01KMYATHZ804AZ5V8XB5BEGDE6",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMYATHYSN7B25519QHMWSDKW"
+  },
+  "01KMYB9TS047MTTVH0YW5092N7": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T03:06:23.024166Z",
+    "run_id": "01KMYB9TSFCP023X6XB0R39DNY",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMYB9TS047MTTVH0YW5092N8"
+  },
+  "01KMYBNR72PYYAKF52CZ56RCDE": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T03:12:53.609582Z",
+    "run_id": "01KMYBNR7HSS2C8W8YZF73GR7J",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMYBNR72PYYAKF52CZ56RCDF"
+  },
+  "01KMYBW79VY8N6RG8EA1CSXKKR": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T03:16:25.664450Z",
+    "run_id": "01KMYBW7A9H86CEPK55S2MMDZG",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMYBW79VY8N6RG8EA1CSXKKS"
+  },
+  "01KMZ0TPZZDZ6D905BWA1WK1CP": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T09:22:36.301516Z",
+    "run_id": "01KMZ0TQ0FN1A036Z213JDKX7H",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMZ0TPZZDZ6D905BWA1WK1CQ"
+  },
+  "01KMZSKVZ6MPMRSDM0HSQSPM31": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T16:35:46.428685Z",
+    "run_id": "01KMZSKVZPPG451148ADAPYTC9",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMZSKVZ6MPMRSDM0HSQSPM32"
+  },
+  "01KMZSQBEJ2RKXD0Q9TSMTAE33": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T16:37:40.590014Z",
+    "run_id": "01KMZSQBF3JQPH643ENMHY115C",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMZSQBEJ2RKXD0Q9TSMTAE34"
+  },
+  "01KMZSX235PPF9EJ1XSJ5RSSS7": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T16:40:47.607246Z",
+    "run_id": "01KMZSX23MFP7JY3EVC28BCKXN",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMZSX235PPF9EJ1XSJ5RSSS8"
+  },
+  "01KMZSZYZQ0CHBZ4C6EBZ8T2TQ": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T16:42:22.745716Z",
+    "run_id": "01KMZSZZ07Y0F1QC2KKH9QVSPN",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMZSZYZRRZGKGNYPTGM17CVH"
+  },
+  "01KMZTTT42DCKD3WJWD03MV7Z8": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T16:57:02.486713Z",
+    "run_id": "01KMZTTT4H3WND9GG454S8FHFQ",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMZTTT42DCKD3WJWD03MV7Z9"
+  },
+  "01KMZTYYZ1X4MG412TFK2XNXFB": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T16:59:18.789120Z",
+    "run_id": "01KMZTYYZQ42X48DVD7RF5A830",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KMZTYYZ1X4MG412TFK2XNXFC"
+  },
+  "01KN004WFV65KFSFKRJJDV0W74": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T18:29:55.463228Z",
+    "run_id": "01KN004WG9DT95BFXF07T4KX0A",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN004WFV65KFSFKRJJDV0W75"
+  },
+  "01KN008ADJQFZ8RTXS3SC36779": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T18:31:48.026521Z",
+    "run_id": "01KN008AE1ACWYM09V9XE4QR4G",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN008ADJQFZ8RTXS3SC3677A"
+  },
+  "01KN00D840T2NGR2SG6TDPAB86": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T18:34:29.514240Z",
+    "run_id": "01KN00D84FDRYA2V3Q5418SAR8",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN00D840T2NGR2SG6TDPAB87"
+  },
+  "01KN00NTAGEPD7TA1674Z20BPX": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T18:39:10.298236Z",
+    "run_id": "01KN00NTB070EG368KCK5YH0C5",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN00NTAGEPD7TA1674Z20BPY"
+  },
+  "01KN03DP6RZT0GCJ2CFSD389VB": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T19:27:09.667885Z",
+    "run_id": "01KN03DP7741G8H981ZE4GKTTH",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN03DP6S6AK52DTDPPS0D2TF"
+  },
+  "01KN03TWNXEG3RAX2YF063XRYJ": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T19:34:22.283245Z",
+    "run_id": "01KN03TWPCBTVPF47H9FEP0TTE",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN03TWNXEG3RAX2YF063XRYK"
+  },
+  "01KN04Z39K4XMWVAJYDZBPQZE6": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T19:54:08.712269Z",
+    "run_id": "01KN04Z3A40Z16B6HH55RSHAD6",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN04Z39K4XMWVAJYDZBPQZE7"
+  },
+  "01KN06KE6NM1Z6WG8Y011CA9P0": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T20:22:43.808579Z",
+    "run_id": "01KN06KE73BT5AVAMEWM80NP0F",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN06KE6NM1Z6WG8Y011CA9P1"
+  },
+  "01KN08Y5WCWTRV05R41XP4D6FJ": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T21:03:32.921332Z",
+    "run_id": "01KN08Y5WWDKWPWPC3B8WG4H3G",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN08Y5WCWTRV05R41XP4D6FK"
+  },
+  "01KN0AZ1QKNBR7AFCT99W8YXG2": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T21:38:58.556685Z",
+    "run_id": "01KN0AZ1R2RGX68ZMJ75N86GSS",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN0AZ1QKNBR7AFCT99W8YXG3"
+  },
+  "01KN0CKGN4955M040BCPYXWB6C": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T22:07:37.833834Z",
+    "run_id": "01KN0CKGNPSDGT85P1P3G49K1B",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN0CKGN4955M040BCPYXWB6D"
+  },
+  "01KN0CW92N1GH9XS6P154JRA59": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T22:12:24.929179Z",
+    "run_id": "01KN0CW9348M56Z11J1J5J77GR",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN0CW92N1GH9XS6P154JRA5A"
+  },
+  "01KN0DZCH8QBCZFNZZSVQVAED6": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T22:31:35.339962Z",
+    "run_id": "01KN0DZCHP5212HWZ0TX1NXFJD",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN0DZCH8QBCZFNZZSVQVAED7"
+  },
+  "01KN0E7C9ZHQ1GTXKN35SRWP48": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T22:35:57.285011Z",
+    "run_id": "01KN0E7CAF3G739J3F33FH9ANG",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN0E7C9ZHQ1GTXKN35SRWP49"
+  },
+  "01KN0G31V3Y7RAHCZBD1K82VXP": {
+    "actor_team_id": "team_190",
+    "current_gate_id": "GATE_0",
+    "current_phase_id": "0.1",
+    "last_updated": "2026-03-30T23:08:32.501595Z",
+    "run_id": "01KN0G31VGJZ52KPMVVH6HGVKF",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN0G31V3Y7RAHCZBD1K82VXQ"
+  },
+  "01KN0GN43SJ08WWAHHJZ8VK714": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_0",
+    "current_phase_id": "0.2",
+    "last_updated": "2026-03-30T23:18:24.733381Z",
+    "run_id": "01KN0GN447NVEBTZ17T83DMTT9",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN0GN43SJ08WWAHHJZ8VK715"
+  },
+  "01KN0GRD8QB8WXM8AZRVJHXPF5": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T23:20:12.451396Z",
+    "run_id": "01KN0GRD96Z754G89DBXJX9KE0",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN0GRD8QB8WXM8AZRVJHXPF6"
+  },
+  "01KN0H2KEJN8KZPN29F73R0R1N": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T23:25:46.474551Z",
+    "run_id": "01KN0H2KF18PJ9PEH5YNG17GWG",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN0H2KEJN8KZPN29F73R0R1P"
+  },
+  "01KN0H92HH0PAHMZ5ZA3VCFMPP": {
+    "actor_team_id": "team_190",
+    "current_gate_id": "GATE_0",
+    "current_phase_id": "0.1",
+    "last_updated": "2026-03-30T23:29:18.405488Z",
+    "run_id": "01KN0H92J0JDYGKJK7153V1Z6N",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN0H92HH0PAHMZ5ZA3VCFMPQ"
+  },
+  "01KN0H98YVHDBGGSBWA4ZPKA8D": {
+    "actor_team_id": "team_190",
+    "current_gate_id": "GATE_0",
+    "current_phase_id": "0.1",
+    "last_updated": "2026-03-30T23:29:24.990296Z",
+    "run_id": "01KN0H98ZRF5Q0XGDBQE22Q602",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN0H98YVHDBGGSBWA4ZPKA8E"
+  },
+  "01KN0HB959EWYA157273BWYH6R": {
+    "actor_team_id": "team_190",
+    "current_gate_id": "GATE_0",
+    "current_phase_id": "0.2",
+    "last_updated": "2026-03-30T23:30:30.807468Z",
+    "run_id": "01KN0HB95SVD1590DJXKD8VKQA",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN0HB959EWYA157273BWYH6S"
+  },
+  "01KN0HBGXB1T9VP6CRJ77YJEWD": {
+    "actor_team_id": "team_190",
+    "current_gate_id": "GATE_0",
+    "current_phase_id": "0.2",
+    "last_updated": "2026-03-30T23:30:38.781925Z",
+    "run_id": "01KN0HBGY43Q1JY2S5RGTHVDV4",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN0HBGXB1T9VP6CRJ77YJEWE"
+  },
+  "01KN0HDGFV1M9WX14JX98WDMMB": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T23:31:43.897959Z",
+    "run_id": "01KN0HDGGAA85GZD3R6TC3REPE",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN0HDGFV1M9WX14JX98WDMMC"
+  },
+  "01KN0HF29A61GSXGKNPE8WFH46": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-30T23:32:34.879120Z",
+    "run_id": "01KN0HF29T5D0WZRZ7QB3ARZWD",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN0HF29A61GSXGKNPE8WFH47"
+  },
+  "01KN0KSM39F4T3P78S7X8038E8": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T00:13:17.937276Z",
+    "run_id": "01KN0KSM3Q7GYTCH0PA9X0PGQA",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN0KSM39F4T3P78S7X8038E9"
+  },
+  "01KN0P3BARDR9XHZZKY11AEFG9": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T00:53:33.798539Z",
+    "run_id": "01KN0P3BB8MZGT04R4SD11MKS1",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN0P3BARDR9XHZZKY11AEFGA"
+  },
+  "01KN0P6PGJEGVVMRZ6WA5T8K8M": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T00:55:23.562873Z",
+    "run_id": "01KN0P6PH7TG6K2B8JEQD04H7F",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN0P6PGJEGVVMRZ6WA5T8K8N"
+  },
+  "01KN1X73K701Z92G56Y7CJSRG6": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T12:17:11.411519Z",
+    "run_id": "01KN1X73KPKFRXTCH3KEV395RY",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN1X73K701Z92G56Y7CJSRG7"
+  },
+  "01KN1XBF493WTRSEQVFY88HQG0": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T12:19:34.294397Z",
+    "run_id": "01KN1XBF4RK12K063E4CX247TB",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN1XBF493WTRSEQVFY88HQG1"
+  },
+  "01KN21A5NZT8D4E2PH35V8RCJ6": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T13:28:46.078253Z",
+    "run_id": "01KN21A5PJY7X1H7Y9KMHKBJ83",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN21A5NZT8D4E2PH35V8RCJ7"
+  },
+  "01KN21F0YHVQ5FXEMFMD0N205M": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T13:31:25.109965Z",
+    "run_id": "01KN21F0Z22PHWNHQXBPZBR47F",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN21F0YHVQ5FXEMFMD0N205N"
+  },
+  "01KN21GHMC8686SNQE1JY876ST": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T13:32:14.964514Z",
+    "run_id": "01KN21GHMWB91N91YKESMTXVR9",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN21GHMC8686SNQE1JY876SV"
+  },
+  "01KN22252DRZGQ54PR18EJWXNK": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T13:41:51.940445Z",
+    "run_id": "01KN22252ZNM891F85TTNB9VPM",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN22252DRZGQ54PR18EJWXNM"
+  },
+  "01KN229PXAYZQ3GQNH3KEA1Z2M": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T13:45:59.573053Z",
+    "run_id": "01KN229PXSTFD0QC4N02PMDW88",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN229PXAYZQ3GQNH3KEA1Z2N"
+  },
+  "01KN22Q57PVGBEVY33JWE8DJ2C": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T13:53:20.221259Z",
+    "run_id": "01KN22Q585JTK86059YH1SH1BZ",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN22Q57PVGBEVY33JWE8DJ2D"
+  },
+  "01KN27MF3PKTVSN19FHA6MQZ6G": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T15:19:14.915631Z",
+    "run_id": "01KN27MF467RQYFWZCE90PFX5R",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN27MF3PKTVSN19FHA6MQZ6H"
+  },
+  "01KN2AEABXCJX86WRWGCQEH5J5": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T16:08:19.175929Z",
+    "run_id": "01KN2AEACCK7BAK1EVX33THRY5",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN2AEABXCJX86WRWGCQEH5J6"
+  },
+  "01KN2AN756KS5DZMQ8PS7XC9K4": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T16:12:05.265551Z",
+    "run_id": "01KN2AN75NF64QAAPR2Q6VNFD9",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN2AN756KS5DZMQ8PS7XC9K5"
+  },
+  "01KN2CDG2JNT74KVFAHKEJGJT6": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T16:42:49.412210Z",
+    "run_id": "01KN2CDG31VE1J810Z34WXP1DJ",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN2CDG2JNT74KVFAHKEJGJT7"
+  },
+  "01KN2CM00FKQGRYEJ1E8F2G4RF": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T16:46:22.332292Z",
+    "run_id": "01KN2CM00Y2VMDBAV4V5QRR7WX",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN2CM00FKQGRYEJ1E8F2G4RG"
+  },
+  "01KN2CVE5WWCGZ4H39K1TZPCKD": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T16:50:26.221658Z",
+    "run_id": "01KN2CVE6CKE4P1C0BJ5GB96Y2",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN2CVE5WWCGZ4H39K1TZPCKE"
+  },
+  "01KN2FWJDXDFA0D11F0GHJ4Z33": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T17:43:29.062343Z",
+    "run_id": "01KN2FWJEDBTRQ98XA4B936CBQ",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN2FWJDXDFA0D11F0GHJ4Z34"
+  },
+  "01KN2GXPKD6V2EK03TXP780BHJ": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T18:01:34.700002Z",
+    "run_id": "01KN2GXPKZV7AFFNWZGXRCSCNE",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN2GXPKD6V2EK03TXP780BHK"
+  },
+  "01KN2PQZE4HY1XAWDV2T7BPWSB": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T19:43:18.575738Z",
+    "run_id": "01KN2PQZEKSJ8Y70TRM5X569D7",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN2PQZE4HY1XAWDV2T7BPWSC"
+  },
+  "01KN2PVGM6QX7K0T2KNRQX1F10": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T19:45:14.494662Z",
+    "run_id": "01KN2PVGMM1J9SXM2VBN9XEMZ3",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN2PVGM6QX7K0T2KNRQX1F11"
+  },
+  "01KN2QG3GCFQPMRCWDSM1SGJ7H": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T19:56:29.182982Z",
+    "run_id": "01KN2QG3GXGZ969GFJHD7PH48E",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN2QG3GCFQPMRCWDSM1SGJ7J"
+  },
+  "01KN2RD6EWF58GCWEXPW5YS4PM": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T20:12:22.460300Z",
+    "run_id": "01KN2RD6F9YV3G8P0V546ZPJHY",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN2RD6EWF58GCWEXPW5YS4PN"
+  },
+  "01KN2RF0TXS0T0KFDCJE9N28JK": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T20:13:22.263332Z",
+    "run_id": "01KN2RF0VD2K1223NYDHSA8N3R",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN2RF0TXS0T0KFDCJE9N28JM"
+  },
+  "01KN2VP5RTMAP30ED41YDWC6DA": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T21:09:42.443843Z",
+    "run_id": "01KN2VP5SFPGY38GAXN93J7BG3",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN2VP5RTMAP30ED41YDWC6DB"
+  },
+  "01KN2VS5WVXB4Q128660ZDG4VS": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T21:11:20.849588Z",
+    "run_id": "01KN2VS5XBEGZHH39EPV1GPNGM",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN2VS5WVXB4Q128660ZDG4VT"
+  },
+  "01KN309WNQS5ZREMJVHTRB4BB5": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-03-31T22:30:22.753877Z",
+    "run_id": "01KN309WP6CBNMXVEC9RQHZSGR",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN309WNQS5ZREMJVHTRB4BB6"
+  },
+  "01KN4B0CFNP694HRFB9XDCKS0F": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-04-01T10:56:40.033535Z",
+    "run_id": "01KN4B0CG455S5EFJSF2SBT7BQ",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN4B0CFNP694HRFB9XDCKS0G"
+  },
+  "01KN4B2WA9FWHE448V96CPZJED": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-04-01T10:58:01.822161Z",
+    "run_id": "01KN4B2WAS93AKK33DVPF49KM6",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN4B2WA9FWHE448V96CPZJEE"
+  },
+  "01KN4KYX6MX2SFBWJ58B447K91": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-04-01T13:33:08.738215Z",
+    "run_id": "01KN4KYX72HVANR8VEWS4ZY3HF",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN4KYX6MX2SFBWJ58B447K92"
+  },
+  "01KN4M2QW8XKK34MD1ARQ8FTJA": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-04-01T13:35:14.420219Z",
+    "run_id": "01KN4M2QWQG51N3TEMA7VD1V8X",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN4M2QW8XKK34MD1ARQ8FTJB"
+  },
+  "01KN4M7FYPT8KACNMM3GTRQDS0": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-04-01T13:37:50.142775Z",
+    "run_id": "01KN4M7FZ52KRVT8BCA91E06PS",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN4M7FYP5GQZRC8XPPCV9D5W"
+  },
+  "01KN4MFT5HDBJ0A5K7P4YTWQQP": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-04-01T13:42:22.747638Z",
+    "run_id": "01KN4MFT606G7N5YEHR4DBH77R",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN4MFT5HDBJ0A5K7P4YTWQQQ"
+  },
+  "01KN4MQCDMH6N72RTPKYT6CX5W": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-04-01T13:46:30.812013Z",
+    "run_id": "01KN4MQCE1VA2WEN363VTCWZ39",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN4MQCDMH6N72RTPKYT6CX5X"
+  },
+  "01KN4MVT1WYZ952TZX9GCW9KXX": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-04-01T13:48:55.847056Z",
+    "run_id": "01KN4MVT2BKQDXRY9N2G8XFT6Z",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN4MVT1WYZ952TZX9GCW9KXY"
+  },
+  "01KN5GDK0FNT1A1HE0NAD717YJ": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-04-01T21:50:30.020704Z",
+    "run_id": "01KN5GDK11HF3DKBPMGWTKXZ81",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN5GDK0FNT1A1HE0NAD717YK"
+  },
+  "01KN5H5XPAX7YM4TXZFFP6KDEN": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-04-01T22:03:47.388251Z",
+    "run_id": "01KN5H5XPT0AGDAQYBQAXMQSA6",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN5H5XPAX7YM4TXZFFP6KDEP"
+  },
+  "01KN5HQ91DF2HA2Q63AFQEY5RV": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-04-01T22:13:16.063259Z",
+    "run_id": "01KN5HQ91XSKB700GMXMAPQ89K",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN5HQ91DF2HA2Q63AFQEY5RW"
+  },
+  "01KN5HWY4B7P2ZG5Z19HAW4ZSR": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-04-01T22:16:21.487080Z",
+    "run_id": "01KN5HWY4SFCKJE8JY78CW6TY9",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN5HWY4B7P2ZG5Z19HAW4ZSS"
+  },
+  "01KN5J5CZSQ8QD24GQVG2DZ7X3": {
+    "actor_team_id": "team_10",
+    "current_gate_id": "GATE_1",
+    "current_phase_id": "1.1",
+    "last_updated": "2026-04-01T22:20:58.858880Z",
+    "run_id": "01KN5J5D0AXTGAFM4BTW9CHP1J",
+    "status": "IN_PROGRESS",
+    "work_package_id": "01KN5J5CZSQ8QD24GQVG2DZ7X4"
+  }
+}

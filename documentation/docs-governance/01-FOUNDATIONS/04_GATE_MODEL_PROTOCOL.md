@@ -1,4 +1,5 @@
 ---
+date: 2026-02-22
 **provenance:** Governance consolidation (Team 170)
 **source_path:** _COMMUNICATION/team_100/DEV_OS_TARGET_MODEL_CANONICAL_v1.3.1/04_GATE_MODEL_PROTOCOL.md
 **canonical_path:** documentation/docs-governance/PHOENIX_CANONICAL/01-FOUNDATIONS/04_GATE_MODEL_PROTOCOL.md
@@ -13,6 +14,11 @@
 **status:** **SUPERSEDED** as of 2026-02-22. **Single canonical source:** `04_GATE_MODEL_PROTOCOL_v2.3.0.md` in this folder. Gate Model v2.3.0 (GATE_0..GATE_8 + PRE_GATE_3 reserved marker). No backward mapping. This file is historical only.
 
 ---
+
+> ⚠️ **LEGACY DOCUMENT — DO NOT USE IN NEW WORK**
+> This document references GATE_6, GATE_7, or GATE_8, which are NOT active pipeline gates.
+> Active pipeline: GATE_0 through GATE_5 only (2026-03-24).
+> Preserved for historical reference only.
 
 **Previous content (SUPERSEDED):**
 

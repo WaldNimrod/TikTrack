@@ -9,6 +9,13 @@ scope: GATE_7
 
 ---
 
+> ⚠️ **LEGACY DOCUMENT — DO NOT USE IN NEW WORK**
+> This document references GATE_6, GATE_7, or GATE_8, which are NOT active pipeline gates.
+> Active pipeline: GATE_0 through GATE_5 only (2026-03-24).
+> Preserved for historical reference only.
+
+---
+
 ## 1) Purpose
 
 Define deterministic artifacts and routing for GATE_7 (HUMAN_UX_APPROVAL), including reject routing and transition readiness to GATE_8.

@@ -1,0 +1,3 @@
+# AOS v3 browser E2E (Team 61 Phase 3a). Install when running agents_os_v3/tests/e2e/
+#   pip install -r agents_os_v3/requirements-e2e.txt
+selenium>=4.15.0

@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<base href="./" />
+<title>AOS v3 — Pipeline Flow Diagrams</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; direction: ltr; }
+
+  nav {
+    background: #1a2332;
+    padding: 12px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    border-bottom: 3px solid #3498db;
+  }
+  nav span { color: #7fb3d3; font-size: 13px; font-weight: bold; margin-right: 8px; }
+  nav a {
+    color: #bcd6ed;
+    text-decoration: none;
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    background: #263447;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+  nav a:hover { background: #3498db; color: #fff; }
+
+  main { max-width: 1600px; margin: 0 auto; padding: 24px; }
+
+  .header {
+    background: linear-gradient(135deg, #1a2332, #2c3e50);
+    color: #ecf0f1;
+    padding: 32px 40px;
+    border-radius: 10px;
+    margin-bottom: 28px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  }
+  .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  .header p { color: #95a5a6; font-size: 14px; line-height: 1.6; }
+  .header .ssot-list { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .badge {
+    background: rgba(52,152,219,0.25);
+    border: 1px solid #3498db;
+    color: #7fb3d3;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+  }
+
+  .section {
+    background: #fff;
+    border-radius: 10px;
+    padding: 28px 32px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    border-top: 4px solid #3498db;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #eee;
+  }
+  .section-num {
+    background: #3498db;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .section h2 { font-size: 20px; color: #1a2332; }
+  .section p.desc { color: #666; font-size: 13px; margin-bottom: 20px; line-height: 1.5; }
+
+  .mermaid-wrap {
+    overflow-x: auto;
+    background: #fafbfc;
+    border: 1px solid #e8eaed;
+    border-radius: 8px;
+    padding: 20px;
+    min-height: 100px;
+  }
+  .mermaid { text-align: center; }
+
+  .info-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .info-card {
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #444;
+    flex: 1;
+    min-width: 180px;
+  }
+  .info-card strong { display: block; color: #1a2332; margin-bottom: 4px; font-size: 13px; }
+
+  .legend {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+    font-size: 12px;
+    color: #555;
+    line-height: 1.8;
+  }
+  .legend strong { color: #333; }
+
+  footer {
+    text-align: center;
+    padding: 20px;
+    color: #95a5a6;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <span>AOS v3 Pipeline</span>
+  <a href="#gates">1 · Gate Sequence</a>
+  <a href="#sm">2 · State Machine</a>
+  <a href="#init">3 · Initialization</a>
+  <a href="#loop">4 · Gate Loop</a>
+  <a href="#correction">5 · Correction</a>
+  <a href="#pause">6 · Pause/Resume</a>
+  <a href="#override">7 · Override</a>
+  <a href="#fip">8 · FIP</a>
+</nav>
+
+<main>
+
+<div class="header">
+  <h1>AOS v3 — Pipeline Flow Diagrams</h1>
+  <p>תיעוד ויזואלי מלא של מסלול חיים, לוגיקת ניתוב, מחזורי תיקון, FIP ורצף שערים.<br>
+  מסודר מהכללי לפרטי לפי סדר שערי ביצוע.</p>
+  <div class="ssot-list">
+    <span class="badge">State Machine v1.0.2</span>
+    <span class="badge">Use Case Catalog v1.0.4</span>
+    <span class="badge">Routing Spec v1.0.1</span>
+    <span class="badge">UI Spec v1.1.1 §13</span>
+    <span class="badge">Authority Model v1.0.0</span>
+    <span class="badge">DDL v1.0.2</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     DIAGRAM 1 — GATE SEQUENCE (MACRO)
+════════════════════════════════════════════ -->
+<div class="section" id="gates">
+  <div class="section-header">
+    <div class="section-num">1</div>
+    <h2>Gate Sequence — מבט מאקרו (GATE_0 → GATE_5)</h2>
+  </div>
+  <p class="desc">
+    6 שערים, סדר ביצוע קבוע. GATE_2 = conditional HITL (רק ב-PENDING_REVIEW). GATE_4 = permanent HITL (Nimrod תמיד מאשר).
+    כל דומיין עובר את אותם שערים עם routing rules משלו.
+  </p>
+
+  <div class="info-row">
+    <div class="info-card">
+      <strong>Domain Isolation</strong>
+      כל Run שייך ל-domain_id אחד. מותר run אחד בו-זמנית per domain.
+      דומיינים שונים רצים במקביל ללא תלות.
+    </div>
+    <div class="info-card">
+      <strong>Team Assignment</strong>
+      teams מוקצים per WP via assignments table.
+      routing_rules מסנן לפי domain_id — כל דומיין עם כללים משלו.
+    </div>
+    <div class="info-card">
+      <strong>HITL Gates</strong>
+      GATE_2: team_100 מאשר ארכיטקטורה; team_00 נדרש רק אם verdict=PENDING_REVIEW.
+      GATE_4: team_00 (Nimrod) מאשר UX תמיד.
+    </div>
+  </div>
+
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+flowchart LR
+    G0(["GATE_0\nInfrastructure"])
+    G1(["GATE_1\nCore API"])
+    G2(["GATE_2\nArch Review\nConditional HITL"])
+    G3(["GATE_3\nFIP + SSE"])
+    G4(["GATE_4\nUX Sign-off\n🔒 Permanent HITL"])
+    G5(["GATE_5\nCleanup + Closure"])
+
+    G0 --> G1 --> G2 --> G3 --> G4 --> G5
+
+    T0["team_61: DB migrations, env, dual-domain\nteam_11: Gateway approval\nteam_191: branch + hooks"]
+    T1["team_21: state machine + routing\nteam_51: pytest QA\nteam_100: arch review"]
+    T2["team_21: full UCs + authority model\nteam_51: QA\nteam_100: verdict\nteam_00: HITL if PENDING_REVIEW"]
+    T3["team_21: FIP + SSE + routing\nteam_51: TC-15 to TC-18\nteam_190: constitutional"]
+    T4["team_31: UI + System Map\nteam_51: E2E TC-19 to TC-26\nteam_00: UX — ALWAYS"]
+    T5["team_51: full TC-01 to TC-26\nteam_61: cleanup\nteam_11: BUILD COMPLETE\nteam_00: final sign-off"]
+
+    G0 -.- T0
+    G1 -.- T1
+    G2 -.- T2
+    G3 -.- T3
+    G4 -.- T4
+    G5 -.- T5
+    </div>
+  </div>
+  <div class="legend">
+    <strong>BUILD COMPLETE (2026-03-28) — GATE_0→GATE_5 all PASS.</strong>
+    GATE_2 = Conditional HITL (team_00 only when verdict=PENDING_REVIEW).
+    GATE_4 🔒 = Permanent HITL (team_00 always approves UX).
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     DIAGRAM 2 — STATE MACHINE (READABLE)
+════════════════════════════════════════════ -->
+<div class="section" id="sm">
+  <div class="section-header">
+    <div class="section-num">2</div>
+    <h2>State Machine — 5 States, 12 Transitions (T01–T12)</h2>
+  </div>
+  <p class="desc">
+    מסלול חיים מלא של Run. IN_PROGRESS הוא המצב הפעיל — כל gate review מתרחש בו.
+    CORRECTION ו-PAUSED הם מצבי עצירה זמניים. COMPLETE יחיד ומסופי.
+  </p>
+
+  <div class="info-row">
+    <div class="info-card">
+      <strong>5 States</strong>
+      NOT_STARTED → IN_PROGRESS → COMPLETE (happy path).
+      CORRECTION: gate נכשל, team מתקן.
+      PAUSED: הקפאה מכוונת ע"י team_00.
+    </div>
+    <div class="info-card">
+      <strong>Self-transitions on IN_PROGRESS</strong>
+      T02: pass() non-final — advance phase.<br>
+      T05: fail() advisory — log only.<br>
+      T06: approve() HITL — team_00 advances.<br>
+      T12: principal_override() — emergency.
+    </div>
+    <div class="info-card">
+      <strong>Iron Rules</strong>
+      Max 1 IN_PROGRESS per domain.<br>
+      PAUSED snapshot חובה ATOMIC.<br>
+      cycle_count לא מאופס — audit trail.<br>
+      HITL gates = team_00 בלבד.
+    </div>
+  </div>
+
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+flowchart LR
+    START(["▶ Run\ncreated"]) --> NS
+
+    NS["NOT_STARTED"]
+
+    NS -->|"T01: initiate()\nG01: domain free + wp valid + domain active\nA01: INSERT runs + assignments"| GR
+
+    subgraph INPROGRESS["IN_PROGRESS — active execution"]
+        direction TB
+        GR{"Gate Review\ncurrent_gate_id\ncurrent_phase_id\nactor via routing_rules"}
+
+        T02n["T02: pass() non-final\nG02: actor = current_team\nA02: advance phase"]
+        T05n["T05: fail() advisory\nG02 + NOT G03\nA05: log only, no state change"]
+        T06n["T06: approve() HITL\nG04: is_human_gate AND actor=team_00\nA02: advance phase"]
+        T12n["T12: principal_override()\nG09: actor=team_00\nA10A-E per action type"]
+
+        GR -->|"pass non-final"| T02n --> GR
+        GR -->|"fail advisory"| T05n --> GR
+        GR -->|"HITL gate"| T06n --> GR
+        GR -->|"override"| T12n --> GR
+    end
+
+    GR -->|"T03: pass() FINAL GATE\nG02: actor=current_team\nA03: status=COMPLETE\ncompleted_at=now()"| CM
+
+    GR -->|"T04: fail() BLOCKING\nG02 + G03: can_block + GRA row\nA04: status=CORRECTION\ncycle_count++"| CO
+
+    GR -->|"T07: pause()\nG05: IN_PROGRESS AND actor=team_00\nA06: snapshot ATOMIC"| PA
+
+    subgraph CORRECTION["CORRECTION"]
+        direction TB
+        CO["status = CORRECTION\ngatePhase preserved\ncycle_count tracked"]
+        CO_ESC["BLOCKED\ncycle ≥ max → T10 ESCALATED\nawait team_00 only"]
+        CO --> CO_ESC --> CO
+    end
+
+    PA["PAUSED\nrouting snapshot saved\npaused_at recorded"]
+
+    CO -->|"T09: resubmit() cycle < max\nG07: A08 same gate/phase"| GR
+    CO -->|"T11: reviewer pass()\nG02: A02 advance phase"| GR
+    CO -->|"T12: FORCE_PASS or FORCE_CORRECTION\nG09: actor=team_00"| GR
+
+    PA -->|"T08: resume()\nG06: snapshot NOT NULL AND actor=team_00\nA07: restore gate/phase"| GR
+    PA -->|"T12: FORCE_RESUME\nG09: actor=team_00"| GR
+
+    CM(["✅ COMPLETE\ndomain slot released"]) --> FIN(["■"])
+    </div>
+  </div>
+  <div class="legend">
+    <strong>Guards Summary:</strong>
+    G01=domain free+wp exists+domain active |
+    G02=actor=current_team via Assignment |
+    G03=can_block_gate=1 AND GRA row exists |
+    G04=is_human_gate=1 AND actor=team_00 |
+    G05=IN_PROGRESS AND team_00 |
+    G06=snapshot NOT NULL AND team_00 |
+    G07=cycle&lt;max |
+    G08=cycle&ge;max |
+    G09=team_00 AND valid FORCE action
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     DIAGRAM 3 — RUN INITIALIZATION
+════════════════════════════════════════════ -->
+<div class="section" id="init">
+  <div class="section-header">
+    <div class="section-num">3</div>
+    <h2>UC-01: InitiateRun — Pre-conditions &amp; Routing Resolution</h2>
+  </div>
+  <p class="desc">
+    שלב האתחול: בדיקות G01 ב-3 שלבים, רזולוציית ניתוב 2-שלבית (Sentinel DEPRECATED → Standard), יצירת Run ו-Assignments.
+    הניתוב domain-scoped — routing_rules מסנן לפי domain_id של ה-Run.
+  </p>
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+flowchart TD
+    START(["UC-01: InitiateRun\ntriggered by CLI / scheduler / dashboard"])
+
+    G01{"G01: Pre-conditions — 3 checks\nscoped to domain_id of this Run"}
+
+    E1["DOMAIN_ALREADY_ACTIVE 409\nמחזיר: active run_id"]
+    E2["UNKNOWN_WP 400\nwp_id not in registry"]
+    E3["DOMAIN_INACTIVE 400\ndomain.is_active = 0"]
+
+    subgraph ROUTING["Routing Resolution — 2 Stages (domain-scoped)"]
+        direction TB
+        NOTE["Every rule match filters by domain_id\nRuns in different domains use different rule sets"]
+        SA["⚠ Stage A — Sentinel [INACTIVE IN PROD]\nresolve_from_state_key: all NULL before PROD\nLegacy path — not used in current deployment"]
+        SB1["Stage B.1 — Rule Resolution\nrouting_rules WHERE gate+phase+domain+variant\nreturns role_id\norder: exact > domain+phase > domain > variant > default"]
+        SB2["Stage B.2 — Team Resolution\nassignments WHERE work_package_id + role_id + ACTIVE\nreturns team_id for this specific WP+domain"]
+        EROU["ROUTING_UNRESOLVED 500\nescalate to team_00"]
+
+        NOTE --> SA
+        SA -.->|"legacy: sentinel found"| SB2
+        SA -.->|"legacy: no sentinel"| SB1
+        SB1 -->|"no rule match at any level"| EROU
+        SB1 -->|"role_id found"| SB2
+        SB2 -->|"no active assignment"| EROU
+    end
+
+    A01["A01: INSERT runs\nstatus=IN_PROGRESS, domain_id=:domain\ncurrent_gate_id=GATE_0\ncycle_count=0, snapshot=NULL"]
+
+    EV1(["EVENT: RUN_INITIATED\nsequence_no=1"])
+
+    NEXT(["→ Gate Execution Loop"])
+
+    START --> G01
+    G01 -->|"check 1: domain IN_PROGRESS"| E1
+    G01 -->|"check 2: wp_id unknown"| E2
+    G01 -->|"check 3: domain inactive"| E3
+    G01 -->|"ALL 3 PASS"| SA
+
+    SB2 -->|"team_id resolved"| A01
+    A01 --> EV1 --> NEXT
+    </div>
+  </div>
+  <div class="legend">
+    <strong>Domain isolation:</strong> G01 check 1 is <code>WHERE domain_id=:domain AND status='IN_PROGRESS'</code> — domain-scoped, not global.
+    Two domains (e.g., agents_os + tiktrack) can each have 1 active run simultaneously.
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     DIAGRAM 4 — GATE EXECUTION LOOP
+════════════════════════════════════════════ -->
+<div class="section" id="loop">
+  <div class="section-header">
+    <div class="section-num">4</div>
+    <h2>Gate Execution Loop — Agent &amp; HITL Paths</h2>
+  </div>
+  <p class="desc">
+    הלב של הפייפליין: בכל gate בודקים האם HITL, הצוות המוקצה (per domain, per WP) מוציא verdict, ומקדמים/נכשלים בהתאם.
+  </p>
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+flowchart TD
+    ENTRY(["Gate Loop Entry\ncurrent_gate_id + current_phase_id\nactor: team resolved for THIS domain + WP"])
+
+    ISHITL{"gates.is_human_gate = 1?"}
+
+    subgraph HITL_PATH["HITL Gate — Human-in-the-Loop"]
+        direction TB
+        HW["Dashboard surfaces gate\nawait team_00 action\nGATE-4: ALWAYS HITL\nGATE-2: only on PENDING_REVIEW verdict"]
+        HA{"team_00 action"}
+        H_APP["A02: advance gate\nG04: is_human_gate=1\nAND actor=team_00"]
+        H_ERR["INSUFFICIENT_AUTHORITY 403\nif actor != team_00"]
+        H_PAUSE["UC-07: PauseRun"]
+        H_OVR["UC-12: PrincipalOverride"]
+        EV_APP(["EVENT: GATE_APPROVED"])
+
+        HW --> HA
+        HA -->|"approve"| H_APP
+        HA -->|"wrong actor"| H_ERR
+        HA -->|"pause"| H_PAUSE
+        HA -->|"override"| H_OVR
+        H_APP --> EV_APP
+    end
+
+    subgraph AGENT_PATH["Agent Gate — assigned team for this domain+WP"]
+        direction TB
+        AG["Assigned team executes\nteam_id from routing_rules+assignments\nscoped to: domain_id + work_package_id"]
+        VD{"verdict"}
+        V_PNF["A02: advance phase\nG02: actor=current_team\nnon-final phase"]
+        V_PF["A03: status=COMPLETE\ncompleted_at=now()\nG02: final phase"]
+        V_FB["A04: status=CORRECTION\ncycle_count++\nG02+G03: can_block + GRA row"]
+        V_FA["A05: advisory log only\nIN_PROGRESS unchanged\nG02 + NOT G03"]
+        V_WA["WRONG_ACTOR 403\nor INVALID_STATE 409"]
+        EV_PNF(["EVENT: PHASE_PASSED"])
+        EV_PF(["EVENT: RUN_COMPLETED"])
+        EV_FB(["EVENT: GATE_FAILED_BLOCKING"])
+        EV_FA(["EVENT: GATE_FAILED_ADVISORY"])
+
+        AG --> VD
+        VD -->|"pass non-final G02"| V_PNF
+        VD -->|"pass FINAL G02"| V_PF
+        VD -->|"fail blocking G02+G03"| V_FB
+        VD -->|"fail advisory NOT G03"| V_FA
+        VD -->|"actor mismatch"| V_WA
+        V_PNF --> EV_PNF
+        V_PF --> EV_PF
+        V_FB --> EV_FB
+        V_FA --> EV_FA
+    end
+
+    DONE(["Run: COMPLETE\ndomain slot released\nother domains unaffected"])
+    CORR(["Correction Cycle — see Diagram 5"])
+
+    ENTRY --> ISHITL
+    ISHITL -->|"Yes"| HW
+    ISHITL -->|"No"| AG
+
+    EV_APP --> ENTRY
+    EV_PNF --> ENTRY
+    EV_FA --> ENTRY
+    EV_PF --> DONE
+    EV_FB --> CORR
+    </div>
+  </div>
+  <div class="legend">
+    <strong>Blocking fail (T04):</strong> requires BOTH <code>pipeline_roles.can_block_gate=1</code> AND a <code>gate_role_authorities</code> row for (gate, phase, domain, role).
+    Missing either → advisory only (T05). Run stays IN_PROGRESS. Domain isolation: only THIS domain's run is blocked.
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     DIAGRAM 5 — CORRECTION CYCLE
+════════════════════════════════════════════ -->
+<div class="section" id="correction">
+  <div class="section-header">
+    <div class="section-num">5</div>
+    <h2>Correction Cycle — UC-09 / UC-10 / UC-11</h2>
+  </div>
+  <p class="desc">
+    Run במצב CORRECTION: current_gate/phase נשמרים. cycle_count לא מאופס לאורך כל חיי ה-Run (audit trail).
+    כשמגיעים ל-max — BLOCK עד Principal intervention. מאפשר: resubmit (current_team), resolve (reviewer), override (team_00).
+  </p>
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+flowchart TD
+    CS(["Run: status = CORRECTION\ncurrent_gate + phase preserved\ncycle_count tracked — not reset"])
+
+    WHO{"who acts?"}
+
+    subgraph RESUBMIT_PATH["current_team: resubmit()"]
+        direction TB
+        G07{"G07: cycle_count\n< max_correction_cycles\nfrom policies table?"}
+        R_OK["UC-09: A08\nstatus=IN_PROGRESS\nsame gate/phase\ncycle_count NOT reset"]
+        R_MAX["UC-10: A09\nstatus=CORRECTION unchanged\nBLOCKED — no progression"]
+        EV_RS(["EVENT: CORRECTION_RESUBMITTED"])
+        EV_ESC(["EVENT: CORRECTION_ESCALATED\nREQUIRES Principal intervention"])
+        BLOCKED["Run BLOCKED\nawait team_00\nonly UC-12 can unblock"]
+
+        G07 -->|"YES cycle < max"| R_OK
+        G07 -->|"NO cycle >= max"| R_MAX
+        R_OK --> EV_RS
+        R_MAX --> EV_ESC --> BLOCKED
+    end
+
+    subgraph REVIEWER_PATH["reviewer team: pass() — T11"]
+        direction TB
+        REV_G02{"G02: actor = reviewer\nteam via Assignment?\nfor this domain+WP"}
+        REV_ADV["A02: advance phase\ncycle_count preserved"]
+        EV_RES(["EVENT: CORRECTION_RESOLVED"])
+        REV_ERR["WRONG_ACTOR 403"]
+
+        REV_G02 -->|"PASS"| REV_ADV --> EV_RES
+        REV_G02 -->|"FAIL"| REV_ERR
+    end
+
+    subgraph OVERRIDE_PATH["team_00: principal_override()"]
+        direction TB
+        OVR_FORCE["FORCE_PASS: advance gate\nFORCE_CORRECTION: re-set to CORRECTION\n(cycle_count NOT incremented on FORCE_CORRECTION)"]
+        EV_OVR(["EVENT: PRINCIPAL_OVERRIDE\npayload: action, from_state, reason"])
+
+        OVR_FORCE --> EV_OVR
+    end
+
+    LOOP(["Back to Gate Loop"])
+
+    CS --> WHO
+    WHO -->|"current_team"| G07
+    WHO -->|"reviewer"| REV_G02
+    WHO -->|"team_00"| OVR_FORCE
+
+    EV_RS --> LOOP
+    EV_RES --> LOOP
+    EV_OVR --> LOOP
+    </div>
+  </div>
+  <div class="legend">
+    <strong>max_correction_cycles</strong> from:
+    <code>SELECT (policy_value_json::jsonb->>'max')::int FROM policies WHERE policy_key='max_correction_cycles' AND scope_type='GLOBAL' ORDER BY priority DESC LIMIT 1</code>
+    <br><strong>A10B vs A10E:</strong> FORCE_FAIL (A10B) → cycle_count++ (counted as a blocking fail). FORCE_CORRECTION (A10E) → cycle_count unchanged (manual operator action, not a team failure).
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     DIAGRAM 6 — PAUSE / RESUME
+════════════════════════════════════════════ -->
+<div class="section" id="pause">
+  <div class="section-header">
+    <div class="section-num">6</div>
+    <h2>Pause / Resume — UC-07 / UC-08 (team_00 only)</h2>
+  </div>
+  <p class="desc">
+    Pause כותב routing snapshot ATOMIC — אם TX נכשל, Run נשאר IN_PROGRESS.
+    Resume משחזר gate/phase מהsnapshot (Branch A) — אלא אם TEAM_ASSIGNMENT_CHANGED event קיים אחרי paused_at (Branch B: re-resolve).
+    מותר: כמה PAUSED runs לאותו domain. אסור: IN_PROGRESS כאשר יש כבר IN_PROGRESS לאותו domain.
+  </p>
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+flowchart LR
+    subgraph PAUSE_FLOW["UC-07: PauseRun — team_00 only"]
+        direction TB
+        P_G05{"G05:\nstatus=IN_PROGRESS\nAND actor=team_00?"}
+        P_ERR1["INVALID_STATE_TRANSITION 409\nor INSUFFICIENT_AUTHORITY 403"]
+        P_SNAP["Compute snapshot JSON\ncaptured_at, gate_id, phase_id\nassignments map: role_id to team_id"]
+        P_TX["A06: ATOMIC TRANSACTION\nUPDATE runs:\nstatus=PAUSED\npaused_at=now()\npaused_routing_snapshot_json=snapshot\nIF TX fails: full rollback"]
+        P_ERR2["SNAPSHOT_WRITE_FAILED 500\nrun stays IN_PROGRESS"]
+        P_EV(["EVENT: RUN_PAUSED"])
+
+        P_G05 -->|"FAIL"| P_ERR1
+        P_G05 -->|"PASS"| P_SNAP
+        P_SNAP --> P_TX
+        P_TX -->|"TX fails"| P_ERR2
+        P_TX -->|"TX OK"| P_EV
+    end
+
+    subgraph RESUME_FLOW["UC-08: ResumeRun — team_00 only"]
+        direction TB
+        R_G06{"G06:\nsnapshot IS NOT NULL\nAND actor=team_00?"}
+        R_ERR1["SNAPSHOT_MISSING 409\nuse UC-12 FORCE_RESUME"]
+        R_ERR2["INSUFFICIENT_AUTHORITY 403"]
+        R_CHK{"TEAM_ASSIGNMENT_CHANGED\nevent exists after paused_at?"}
+        R_A["Branch A — No new assignment\nA07: routing from snapshot\ngate_id+phase_id unchanged\npaused_at=NULL"]
+        R_B["Branch B — New assignment\nA07: re-resolve from assignments table\nuses current Assignment (not snapshot)\npaused_at=NULL"]
+        R_EV1(["EVENT: RUN_RESUMED"])
+        R_EV2(["EVENT:\nRUN_RESUMED_WITH_NEW_ASSIGNMENT"])
+
+        R_G06 -->|"snapshot NULL"| R_ERR1
+        R_G06 -->|"actor != team_00"| R_ERR2
+        R_G06 -->|"PASS"| R_CHK
+        R_CHK -->|"No event"| R_A
+        R_CHK -->|"Yes event"| R_B
+        R_A --> R_EV1
+        R_B --> R_EV2
+    end
+
+    BACK(["Back to Gate Loop\nsame gate/phase as at pause time"])
+
+    P_EV -->|"status=PAUSED"| R_G06
+    R_EV1 --> BACK
+    R_EV2 --> BACK
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     DIAGRAM 7 — PRINCIPAL OVERRIDE
+════════════════════════════════════════════ -->
+<div class="section" id="override">
+  <div class="section-header">
+    <div class="section-num">7</div>
+    <h2>UC-12: PrincipalOverride — team_00 Emergency Controls</h2>
+  </div>
+  <p class="desc">
+    5 פעולות FORCE. חלות על כל Run שאינו COMPLETE. כל FORCE מסתיים ב-event PRINCIPAL_OVERRIDE עם audit trail מלא.
+    זהו המנגנון של Nimrod להתערב בכל שלב ובכל מצב.
+  </p>
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+flowchart TD
+    IN(["UC-12: PrincipalOverride\nactor: team_00 ONLY"])
+
+    G09{"G09 Checks:\n1. actor = team_00?\n2. action in allowed set?\n3. status != COMPLETE?\n4. reason not empty?"}
+
+    E1["INSUFFICIENT_AUTHORITY 403\nactor != team_00"]
+    E2["INVALID_ACTION 400\naction not in enum"]
+    E3["TERMINAL_STATE 409\nrun already COMPLETE"]
+    E4["MISSING_REASON 400\naudit trail required"]
+
+    ACT{"action"}
+
+    A_FP["FORCE_PASS\nA10A\nnon-final: advance gate/phase\nfinal: status=COMPLETE"]
+    A_FF["⚠ FORCE_FAIL\nA10B: status=CORRECTION\ncycle_count++ ← counts as team failure"]
+    A_FPZ["FORCE_PAUSE\nA10C\nATOMIC: status=PAUSED + snapshot\nidentical to UC-07 mechanism"]
+    A_FR["FORCE_RESUME\nA10D\nstatus=IN_PROGRESS\nrouting from snapshot or re-resolve"]
+    A_FC["FORCE_CORRECTION\nA10E: status=CORRECTION\ncycle_count unchanged ← operator action\nno fail event logged"]
+
+    EV(["EVENT: PRINCIPAL_OVERRIDE\nactor_type=human\npayload: action, from_status\nto_status, reason, timestamp"])
+
+    IN --> G09
+    G09 -->|"1 fail"| E1
+    G09 -->|"2 fail"| E2
+    G09 -->|"3 fail"| E3
+    G09 -->|"4 fail"| E4
+    G09 -->|"ALL PASS"| ACT
+
+    ACT -->|"FORCE_PASS"| A_FP
+    ACT -->|"FORCE_FAIL"| A_FF
+    ACT -->|"FORCE_PAUSE"| A_FPZ
+    ACT -->|"FORCE_RESUME"| A_FR
+    ACT -->|"FORCE_CORRECTION"| A_FC
+
+    A_FP & A_FF & A_FPZ & A_FR & A_FC --> EV
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     DIAGRAM 8 — FIP
+════════════════════════════════════════════ -->
+<div class="section" id="fip">
+  <div class="section-header">
+    <div class="section-num">8</div>
+    <h2>FIP — Feedback Ingestion Pipeline (GATE_3, Stage 8B)</h2>
+  </div>
+  <p class="desc">
+    מיושם ב-GATE_3. 4 מצבי זיהוי × 3 שכבות עיבוד. FeedbackRecord נשמר ב-pending_feedbacks.
+    verdict+confidence קובעים: auto-trigger UC או MANUAL_REVIEW דרך Dashboard.
+  </p>
+  <div class="mermaid-wrap">
+    <div class="mermaid">
+flowchart TD
+    subgraph DETECT["Detection Modes — How is feedback detected?"]
+        direction LR
+        D1["CANONICAL_AUTO\nstructured JSON\nfrom AOS agent"]
+        D2["OPERATOR_NOTIFY\nmanual dashboard\nalert by operator"]
+        D3["NATIVE_FILE\nartifacts/ directory\nBLOCKING_FINDINGS_v*.json"]
+        D4["RAW_PASTE\nfree text fallback\nno structure"]
+    end
+
+    subgraph INGEST["Ingestion Layers — How is it processed?"]
+        direction LR
+        L1["JSON_BLOCK\nexact schema\nparsing"]
+        L2["REGEX_EXTRACT\nregex on\nsemi-structured text"]
+        L3["RAW_DISPLAY\nstore raw text\nhuman review only"]
+    end
+
+    D1 --> L1
+    D2 --> L1
+    D2 --> L2
+    D3 --> L1
+    D3 --> L2
+    D4 --> L3
+
+    FR["FeedbackRecord\nid: ULID — run_id: FK runs — detection_mode — ingestion_layer\nverdict: PASS / FAIL / PENDING_REVIEW\nconfidence: HIGH / MEDIUM / LOW\nproposed_action: ADVANCE / FAIL / MANUAL_REVIEW\nblocking_findings_json: JSON array"]
+
+    L1 & L2 & L3 --> FR
+
+    STORE["INSERT INTO pending_feedbacks\ningested_at=now()"]
+    FR --> STORE
+
+    VRD{"verdict + confidence"}
+    STORE --> VRD
+
+    AUTO_ADV["proposed_action=ADVANCE\nUC-02 AdvanceGate\nor UC-03 CompleteRun\nauto-triggered"]
+    AUTO_FAIL["proposed_action=FAIL\nUC-04 FailGate Blocking\nauto if GRA row exists"]
+    MANUAL["proposed_action=MANUAL_REVIEW\nDashboard surfaces to team_00\nawait human decision"]
+
+    VRD -->|"PASS + HIGH confidence"| AUTO_ADV
+    VRD -->|"FAIL + HIGH + GRA row"| AUTO_FAIL
+    VRD -->|"PENDING_REVIEW or LOW or ambiguous"| MANUAL
+
+    ND{"team_00 decides"}
+    MANUAL --> ND
+
+    UC6["UC-06\nHumanApprove\n(HITL gate)"]
+    UC2["UC-02\nAdvanceGate"]
+    UC4["UC-04\nFailGate\nBlocking"]
+    UC7["UC-07\nPauseRun"]
+    UC12["UC-12\nPrincipalOverride"]
+
+    ND -->|"approve HITL gate"| UC6
+    ND -->|"advance"| UC2
+    ND -->|"fail"| UC4
+    ND -->|"pause"| UC7
+    ND -->|"override"| UC12
+
+    CLR["UPDATE pending_feedbacks\nSET cleared_at=now()"]
+    AUTO_ADV & AUTO_FAIL & UC6 & UC2 & UC4 & UC7 & UC12 --> CLR
+    </div>
+  </div>
+  <div class="legend">
+    <strong>Timing:</strong> FIP implemented in GATE_3 by team_21. pending_feedbacks table created in DDL v1.0.2 (GATE_0 migration).
+    GATE_3 also adds: SSE stream for real-time feedback push, advanced routing, TC-15 to TC-18.
+  </div>
+</div>
+
+</main>
+
+<footer>
+  AOS v3 Pipeline Flow Diagrams — Team 111 (AOS Domain Architect) — v1.1.0 — 2026-03-28<br>
+  Dashboard integration: GATE_4 mandate → team_31 (Pipeline Flow tab in agents_os_v3/ui/)
+</footer>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default',
+    flowchart: {
+      htmlLabels: true,
+      curve: 'basis',
+      padding: 20
+    },
+    securityLevel: 'loose',
+    fontSize: 14
+  });
+</script>
+
+</body>
+</html>

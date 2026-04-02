@@ -344,7 +344,7 @@
 | 341 | `documentation/docs-system/02-SERVER/ADR_015_GOVERNANCE_MESSAGE_SSOT.md` | `documentation/docs-system/02-SERVER/ADR_015_GOVERNANCE_MESSAGE_SSOT.md` | REVIEW_REQUIRED | 07-DIRECTIVES_AND_DECISIONS |
 | 342 | `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md` | `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md` | CANONICAL_RETAIN | 04-PROCEDURES |
 | 343 | `documentation/docs-governance/05-CONTRACTS/GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.0.0.md` | `documentation/docs-governance/05-CONTRACTS/GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.0.0.md` | CANONICAL_ADDITION | 05-CONTRACTS |
-| 344 | `documentation/docs-governance/05-CONTRACTS/GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.0.0.md` | `documentation/docs-governance/05-CONTRACTS/GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.0.0.md` | CANONICAL_ADDITION | 05-CONTRACTS |
+| 344 | `documentation/docs-governance/05-CONTRACTS/GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.0.0.md` | `documentation/docs-governance/05-CONTRACTS/GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.0.0.md` | CANONICAL_ADDITION *(LEGACY — GATE_7 not an active pipeline gate)* | 05-CONTRACTS |
 | 345 | `documentation/docs-governance/00-INDEX/PORTFOLIO_INDEX.md` | `documentation/docs-governance/00-INDEX/PORTFOLIO_INDEX.md` | CANONICAL_ADDITION | 00-INDEX |
 | 346 | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md` | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md` | CANONICAL_ADDITION | 01-FOUNDATIONS |
 | 347 | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md` | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md` | CANONICAL_ADDITION | 01-FOUNDATIONS |

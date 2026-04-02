@@ -9,6 +9,13 @@ authority: ARCHITECT_DECISION_GATE_QUALITY_GOVERNANCE_HARDENING_v1.0.0
 
 ---
 
+> ⚠️ **LEGACY DOCUMENT — DO NOT USE IN NEW WORK**
+> This document references GATE_6, GATE_7, or GATE_8, which are NOT active pipeline gates.
+> Active pipeline: GATE_0 through GATE_5 only (2026-03-24).
+> Preserved for historical reference only.
+
+---
+
 ## 1) Purpose
 
 Define the canonical template and scope for `G7_HUMAN_RESIDUALS_MATRIX.md`. This artifact is the mandatory evidence for GATE_7 (Human Residuals Sign-Off). Scope restriction: **HUMAN_ONLY tagged items only**. AUTO_TESTABLE items are explicitly prohibited from this matrix. PASS condition: all rows PASS + Nimrod sign-off (אישור).

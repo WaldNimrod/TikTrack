@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://phoenix.tiktrack/agents_os_v2/schemas/pipeline_state_ui_contract.json",
+  "title": "PipelineStateUIReadContract",
+  "description": "WP004 KB-67 / R1 — minimum fields the dashboard and monitors read from pipeline_state_*.json",
+  "type": "object",
+  "required": [
+    "project_domain",
+    "work_package_id",
+    "current_gate"
+  ],
+  "properties": {
+    "project_domain": { "type": "string", "minLength": 1 },
+    "work_package_id": { "type": "string" },
+    "stage_id": { "type": "string" },
+    "current_gate": { "type": "string", "minLength": 1 },
+    "gates_completed": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "gates_failed": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "current_phase": { "type": ["string", "null"] },
+    "process_variant": { "type": ["string", "null"] },
+    "spec_path": { "type": "string" },
+    "gate_state": {},
+    "pending_actions": {
+      "type": "array"
+    },
+    "spec_brief": { "type": "string" },
+    "override_reason": { "type": ["string", "null"] },
+    "pipe_run_id": { "type": "string" },
+    "last_updated": { "type": "string" }
+  },
+  "additionalProperties": true
+}

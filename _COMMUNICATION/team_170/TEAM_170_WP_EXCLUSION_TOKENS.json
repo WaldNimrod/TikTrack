@@ -1,0 +1,66 @@
+{
+  "id": "TEAM_170_WP_EXCLUSION_TOKENS",
+  "version": "1.0.0",
+  "as_of_date": "2026-02-19",
+  "scope": "_COMMUNICATION/ — exclusion pass 2 (work package / program signatures)",
+  "authority_notes": [
+    "PRIMARY: documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md — CURRENT_OPERATIONAL_STATE + STAGE_PARALLEL_TRACKS (Team 100 gate-owner updates).",
+    "SECONDARY: _COMMUNICATION/team_00/TEAM_00_CLEAN_TABLE_DECLARATION_2026-03-15_v1.0.0.md — Backlog — Registered but NOT Active.",
+    "COMMUNICATION: _COMMUNICATION/FLIGHT_LOG_S003_P003_WP001.md; STAGE_ACTIVE_PORTFOLIO_S002.md is S002 supplementary — may be stale vs S003; WSM wins for S003.",
+    "Reconcile conflicts: agents_os/STATE_SNAPSHOT.json may drift from WSM — exclusion list follows WSM + explicit backlog rows below."
+  ],
+  "active_by_domain": [
+    {
+      "domain": "AGENTS_OS",
+      "program_id": "S003-P011",
+      "work_package_ids": ["S003-P011-WP002", "S003-P011-WP099"],
+      "status_note": "STAGE_PARALLEL_TRACKS: WP002 GATE_5 Phase 5.1 lane; WSM active_work_package_id S003-P011-WP099",
+      "source": "PHOENIX_MASTER_WSM_v1.0.0.md 2026-03-20/21"
+    },
+    {
+      "domain": "TIKTRACK",
+      "program_id": "S003-P003",
+      "work_package_ids": ["S003-P003-WP001"],
+      "status_note": "HOLD at G3_PLAN — System Settings flight; still in_progress_work_package_id in WSM",
+      "source": "PHOENIX_MASTER_WSM_v1.0.0.md"
+    }
+  ],
+  "recently_closed_reference": [
+    "S003-P011-WP001"
+  ],
+  "planned_or_backlog": [
+    {
+      "program_or_wp": "S002-P005-WP003",
+      "note": "Backlog candidate — TEAM_00_CLEAN_TABLE §Backlog",
+      "domain": "AGENTS_OS"
+    },
+    {
+      "program_or_wp": "S002-P005-WP004",
+      "note": "IDEA-007 — trigger WP002 GATE_8; LOD200 before GATE_0",
+      "domain": "AGENTS_OS"
+    },
+    {
+      "program_or_wp": "S001-P002",
+      "note": "Alerts Widget — awaiting Team 100 placement",
+      "domain": "TIKTRACK"
+    },
+    {
+      "program_or_wp": "S003-P001",
+      "note": "AGENTS_OS Data Model Validator — FAST_0 pending",
+      "domain": "AGENTS_OS"
+    },
+    {
+      "program_or_wp": "S003-P002",
+      "note": "Test Template Generator — after P001 FAST_4",
+      "domain": "AGENTS_OS"
+    },
+    {
+      "program_or_wp": "S003-P012-WP001",
+      "note": "Evidence: _COMMUNICATION/team_101 AOS scheduler LOD200 — treat as registered WP comms until registry sync",
+      "domain": "AGENTS_OS"
+    }
+  ],
+  "program_ids_supplemental": [
+    "S003-P012"
+  ]
+}

@@ -18,6 +18,7 @@
 # Environment:
 #   PIPELINE_ACTION_LOG=0   — disable action log entry for this commit
 #   SKIP_SSOT_CHECK=1       — skip SSOT check (for emergency use only; logs a warning)
+#   SAFE_COMMIT_FORCE_SSOT=1 — on branch aos-v3, run SSOT anyway (default: skip SSOT on aos-v3)
 
 set -euo pipefail
 
@@ -63,8 +64,12 @@ echo -e "${C_BOLD}${C_CYAN}═════════════════�
 echo ""
 
 # ── Step 1: SSOT check ────────────────────────────────────────────────────────
+CURRENT_BRANCH_SC="$(git branch --show-current 2>/dev/null || echo "")"
 if [[ "${SKIP_SSOT_CHECK:-0}" == "1" ]]; then
   echo -e "  ${C_YELLOW}⚠️  SKIP_SSOT_CHECK=1 — bypassing SSOT check (emergency mode)${C_RESET}"
+elif [[ "$CURRENT_BRANCH_SC" == "aos-v3" && "${SAFE_COMMIT_FORCE_SSOT:-0}" != "1" ]]; then
+  echo -e "  ${C_YELLOW}⚠️  Branch is aos-v3 — SSOT check skipped (branch may diverge from main WSM).${C_RESET}"
+  echo -e "  ${C_YELLOW}    To run SSOT anyway: SAFE_COMMIT_FORCE_SSOT=1 bash scripts/safe_commit.sh ...${C_RESET}"
 else
   echo -e "  ${C_CYAN}[1/3] SSOT consistency check...${C_RESET}"
   SSOT_FAIL=0
@@ -180,6 +185,38 @@ if [[ "$UNLOCK_PIPELINE" != "1" ]]; then
     echo -e "  ${C_YELLOW}If you MUST include them (emergency): UNLOCK_PIPELINE_FILES=1 bash scripts/safe_commit.sh ...${C_RESET}"
     echo ""
     exit 1
+  fi
+fi
+
+# ── AOS v3 FILE_INDEX auto-update (§15.4) ────────────────────────────────────
+# If any of the paths touch agents_os_v3/ (but not FILE_INDEX.json itself),
+# run update_aos_v3_file_index.py to auto-stub any new files, then prompt
+# the operator to stage FILE_INDEX.json if it changed.
+_AOS_PATHS_FOUND=0
+for _p in "$@"; do
+  if [[ "$_p" == agents_os_v3/* && "$_p" != "agents_os_v3/FILE_INDEX.json" ]]; then
+    _AOS_PATHS_FOUND=1
+    break
+  fi
+done
+
+if [[ "$_AOS_PATHS_FOUND" -eq 1 ]]; then
+  echo -e "  ${C_CYAN}[§15.4] agents_os_v3/ paths detected — running FILE_INDEX auto-update...${C_RESET}"
+  _INDEX_BEFORE=$(python3 -c "import json,pathlib; d=json.loads(pathlib.Path('agents_os_v3/FILE_INDEX.json').read_text()); print(len(d.get('entries',[])))" 2>/dev/null || echo "?")
+  python3 scripts/update_aos_v3_file_index.py
+  _INDEX_AFTER=$(python3 -c "import json,pathlib; d=json.loads(pathlib.Path('agents_os_v3/FILE_INDEX.json').read_text()); print(len(d.get('entries',[])))" 2>/dev/null || echo "?")
+  if [[ "$_INDEX_BEFORE" != "$_INDEX_AFTER" ]]; then
+    echo ""
+    echo -e "  ${C_YELLOW}⚠️  FILE_INDEX.json was updated (${_INDEX_BEFORE} → ${_INDEX_AFTER} entries).${C_RESET}"
+    echo -e "  ${C_YELLOW}   Add it to your commit paths: agents_os_v3/FILE_INDEX.json${C_RESET}"
+    echo -e "  ${C_YELLOW}   Remember to set spec_ref + owner_team on new stubs before committing.${C_RESET}"
+    echo ""
+    # Auto-add FILE_INDEX.json to the staged set so the blocking governance hook passes
+    git add agents_os_v3/FILE_INDEX.json
+    echo -e "  ${C_GREEN}   Auto-staged agents_os_v3/FILE_INDEX.json${C_RESET}"
+    echo ""
+  else
+    echo -e "  ${C_GREEN}✓ FILE_INDEX.json up to date — no new entries needed${C_RESET}"
   fi
 fi
 

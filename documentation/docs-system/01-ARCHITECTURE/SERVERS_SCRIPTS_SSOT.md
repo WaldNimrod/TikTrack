@@ -17,6 +17,9 @@
 | **Backend (FastAPI/Uvicorn)** | 8082 | API + Health |
 | **Legacy** | 8081 | אם קיים |
 | **PostgreSQL** | 5432 | Docker / local |
+| **AOS v3** (API + UI) | **8090** | Canonical BUILD — `scripts/start-aos-v3-server.sh`; `http://127.0.0.1:8090/` → v3 UI |
+| **Agents OS v2** (pipeline UI) | **8092** | Frozen — `agents_os/scripts/start_ui_server.sh` |
+| **AOS port policy SSOT** | — | `documentation/docs-agents-os/02-ARCHITECTURE/AGENTS_OS_V3_NETWORK_PORTS_AND_UI_ENTRY_v1.0.0.md` |
 
 ---
 
@@ -52,7 +55,7 @@
 
 | סקריפט | תפקיד |
 |--------|--------|
-| `scripts/check-ports.sh` | בדיקת פורטים 8080, 8082, 8081 |
+| `scripts/check-ports.sh` | בדיקת פורטים 8080, 8082, 8090 (v3), 8092 (v2 AOS UI), 8081 |
 | `scripts/fix-port-8082.sh` | שחרור פורט 8082 (דיאלוג) |
 
 ---
@@ -129,6 +132,12 @@
 | 🧪 Run User Tickers QA (API) | `scripts/run-user-tickers-qa-api.sh` | דורש Backend 8082 |
 | 🔄 Verify User Tickers Fix (Team 20) | `scripts/verify-user-tickers-fix.sh` | restart + QA — **חובה לפני הגשה** אחרי שינוי קוד |
 | ⚙️ Ensure Skip Live Data Check | `scripts/ensure-skip-live-data-check.sh` | dev/QA bypass |
+| 🧱 Init AOS v3 Database | `scripts/init_aos_v3_database.sh` | `agents_os_v3/.env` בלבד |
+| 🚀 Start AOS v3 (API+UI, :8090) | `scripts/start-aos-v3-server.sh` | קנוני BUILD |
+| 🛑 Stop / 🔄 Restart AOS v3 | `scripts/stop-aos-v3-server.sh` / `scripts/restart-aos-v3-server.sh` | |
+| 🌱 Bootstrap AOS v3 | `scripts/bootstrap_aos_v3_local.sh` | DB (אופציונלי) + שרת |
+| 🧪 Prepare AOS v3 E2E stack | `scripts/run_aos_v3_e2e_stack.sh` | בדיקת 8090; סטטי 8778 רק עם `AOS_V3_E2E_SEPARATE_STATIC=1` |
+| 🚀 Start Agents_OS v2 UI (:8092) | `agents_os/scripts/start_ui_server.sh` | pipeline קפוא — לא 8090 |
 
 ### 7.2 סקריפטים ללא משימה (שימוש ישיר / cron / Make)
 
@@ -139,6 +148,8 @@
 | `scripts/run-smoke-external-data.sh` | tests/package.json |
 | `scripts/run-nightly-external-data.sh` | tests/package.json |
 | `scripts/sync_market_data_eod.sh` | legacy; מומלץ run_market_data_job.sh |
+| `scripts/run_aos_v3_phase5_canary_sim.sh` / `scripts/run_aos_v3_canary_simulation.sh` | canary pytest (remediation / F-05) |
+| `scripts/stop_aos_v3_e2e_static.sh` | עצירת http.server על 8778 (מצב legacy E2E בלבד) |
 
 ---
 

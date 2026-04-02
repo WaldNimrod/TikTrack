@@ -1,0 +1,25 @@
+{
+  "id": "TEAM_90_S003_P009_WP001_G5_AUTOMATION_EVIDENCE",
+  "work_package_id": "S003-P009-WP001",
+  "gate_id": "GATE_5",
+  "date": "2026-03-16",
+  "phase_owner": "Team 90",
+  "validation_response_path": "_COMMUNICATION/team_90/TEAM_90_TO_TEAM_10_S003_P009_WP001_GATE5_VALIDATION_RESPONSE_v1.0.0.md",
+  "runs": [
+    {
+      "suite": "FAST_3",
+      "command": "python3 -m pytest agents_os_v2/tests/ -v -k \"not OpenAI and not Gemini\"",
+      "exit_code": 0,
+      "passed": 108,
+      "deselected": 8
+    },
+    {
+      "suite": "server",
+      "command": "python3 -m pytest agents_os_v2/server/tests/test_server.py -q",
+      "exit_code": 0,
+      "passed": 10,
+      "warnings": 1
+    }
+  ],
+  "verdict": "PASS"
+}

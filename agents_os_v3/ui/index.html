@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<!--
+id: TEAM_31_AOS_V3_UI
+team: Team 31
+domain: agents_os
+artifact: index.html
+mandate: TEAM_100_TO_TEAM_31_AOS_V3_UI_MOCKUPS_MANDATE_v2.0.0
+date: 2026-03-29
+status: ACTIVE
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="./" />
+  <meta name="aosv3-api-base" content="http://127.0.0.1:8090" />
+  <title>Agents OS v3 — Pipeline View</title>
+  <link rel="stylesheet" href="../../agents_os/ui/css/pipeline-shared.css" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="theme-init.js"></script>
+</head>
+<body data-aosv3-page="pipeline">
+
+<header class="agents-header">
+  <div class="agents-header-left">
+    <h1 class="agents-header-title">Agents OS v3 — <span>Pipeline View</span></h1>
+  </div>
+  <div class="agents-header-right">
+    <span id="aosv3-sse-indicator" class="aosv3-sse-indicator aosv3-sse--polling" role="status" aria-live="polite" title="Live updates: SSE when connected, otherwise periodic refresh"><span class="aosv3-sse-dot" aria-hidden="true"></span> Polling Mode</span>
+  </div>
+</header>
+
+<!-- P2-F04: Feedback Ingested Banner — shown on SSE feedback_ingested events -->
+<div id="aosv3-feedback-banner" class="aosv3-feedback-banner" role="alert" aria-live="assertive" hidden>
+  <span id="aosv3-feedback-banner-msg" class="aosv3-feedback-banner-msg"></span>
+  <button type="button" class="aosv3-feedback-banner-close" onclick="document.getElementById('aosv3-feedback-banner').hidden=true" aria-label="Dismiss">✕</button>
+</div>
+
+<nav class="pipeline-nav">
+  <a class="nav-link active" href="index.html">Pipeline</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="history.html">History</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="teams.html">Teams</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="portfolio.html">Portfolio</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="config.html">Configuration</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="flow.html">System Map</a>
+</nav>
+
+<div class="agents-page-layout" id="agents-page-layout">
+  <aside class="agents-page-sidebar">
+    <!-- Type A — single-domain UI: Pipeline only (see flow.html for System Map) -->
+    <div class="sidebar-section-card agents-domain-bar agents-domain-bar--sidebar">
+      <div class="sidebar-label aosv3-workspace-panel-title">Active workspace</div>
+      <div class="domain-selector" role="group" aria-label="Active product workspace">
+        <button type="button" class="domain-btn" data-pipeline-domain="agents_os" onclick="AOSV3_onDomainSwitch('agents_os')" title="Agents OS — dark theme; API context agents_os">Agents OS</button>
+        <button type="button" class="domain-btn" data-pipeline-domain="tiktrack" onclick="AOSV3_onDomainSwitch('tiktrack')" title="TikTrack — light theme; API context tiktrack">TikTrack</button>
+      </div>
+      <p class="aosv3-sidebar-hint">This run and API calls use one lane at a time. Stored as <code>pipeline_domain</code>.</p>
+    </div>
+    <div class="sidebar-section-card" id="aosv3-live-api-card" style="display:none">
+      <div class="sidebar-label">Connection — API settings</div>
+      <label class="aosv3-form-label">X-Actor-Team-Id
+        <input type="text" id="aosv3-live-actor" class="aosv3-input" autocomplete="off" placeholder="team_00" title="מזהה הצוות שלך לפעולות API — כברירת מחדל team_00 (המפעיל הראשי / Nimrod)" aria-label="Actor team id header" />
+      </label>
+      <label class="aosv3-form-label">API base URL
+        <input type="text" id="aosv3-live-api-base" class="aosv3-input" autocomplete="off" placeholder="http://127.0.0.1:8090" title="Agents OS v3 API origin" aria-label="API base URL" />
+      </label>
+      <button type="button" class="btn btn-primary" id="aosv3-live-save-settings" title="Save settings and reload pipeline state from the API">Save &amp; reload state</button>
+      <p class="aosv3-sidebar-hint">מזהה צוות ה-API שלך. המפעיל הראשי (Nimrod) = <code>team_00</code>. נשמר ב-localStorage. נדרש לכל פעולת מוטציה.</p>
+      <a href="config.html" class="aosv3-sidebar-hint" style="display:block;margin-top:6px;color:var(--aos-accent-blue);" title="System configuration — routing rules, templates, policies">→ System configuration (routing, templates, policies)</a>
+    </div>
+    <div class="sidebar-section-card" id="aosv3-dev-scenarios-card" style="display:none">
+      <div class="sidebar-label">Developer scenarios</div>
+      <p class="aosv3-sidebar-hint">Shown when <code>?dev=1</code> or <code>localStorage.aosv3_dev_ui=1</code>. Offline UI rehearsal only.</p>
+      <div class="aosv3-preset-row">
+        <label for="aosv3-preset-select">Scenario</label>
+        <select id="aosv3-preset-select" aria-label="Developer scenario preset">
+          <option value="active">IN_PROGRESS (GATE_3)</option>
+          <option value="idle">IDLE — no active run</option>
+          <option value="paused">PAUSED (actor null)</option>
+          <option value="complete">COMPLETE</option>
+          <option value="escalated">CORRECTION + escalated banner</option>
+          <option value="human_gate">Human gate (APPROVE visible)</option>
+          <option value="sentinel">Sentinel active + override</option>
+          <option value="await_feedback">8B — AWAIT_FEEDBACK (team_90)</option>
+          <option value="feedback_fallback">8B — Mode B miss → fallback C+D (TC-16)</option>
+          <option value="feedback_pass">8B — FEEDBACK_PASS → CONFIRM_ADVANCE</option>
+          <option value="feedback_fail">8B — FEEDBACK_FAIL → CONFIRM_FAIL</option>
+          <option value="feedback_low">8B — IL-3 MANUAL_REVIEW</option>
+          <option value="correction_blocking">8B — CORRECTION blocking findings</option>
+          <option value="sse_connected">8B — SSE Connected (same as AWAIT + green)</option>
+        </select>
+      </div>
+    </div>
+    <div class="sidebar-section-card">
+      <div class="sidebar-label">Run metadata</div>
+      <div class="info-row"><span class="info-key">run_id</span><span class="info-val" id="aosv3-run-id">—</span></div>
+      <div class="info-row"><span class="info-key">work_package_id</span><span class="info-val" id="aosv3-wp-id">—</span></div>
+      <div class="info-row"><span class="info-key">Domain</span><span class="info-val" id="aosv3-domain">—</span></div>
+      <div class="info-row"><span class="info-key">process_variant</span><span class="info-val" id="aosv3-variant">—</span></div>
+    </div>
+    <div class="sidebar-section-card">
+      <div class="sidebar-label">Gate map</div>
+      <div id="aosv3-gate-map" class="aosv3-gate-map" aria-label="Pipeline gates 0–5" title="Current gate highlighted; sub-phases when applicable"></div>
+      <p class="aosv3-sidebar-hint">Current gate highlighted. When a run completes all gates, status shows COMPLETE.</p>
+    </div>
+    <div class="sidebar-section-card aosv3-program-control-card">
+      <div class="sidebar-label">Program control</div>
+      <button type="button" class="btn btn-warning aosv3-btn-stop" id="aosv3-btn-stop-run" hidden title="Stop the active run">Stop run</button>
+      <div id="aosv3-idle-activate-row" class="aosv3-idle-activate-row">
+        <label class="aosv3-form-label">Activate when idle
+          <select id="aosv3-activate-target" class="aosv3-input" aria-label="Program or WP to activate"></select>
+        </label>
+        <button type="button" class="btn btn-primary" id="aosv3-btn-activate-program" title="Start the selected program or work package when no run is active">Activate</button>
+      </div>
+      <p class="aosv3-sidebar-hint">Live API: activation calls the server. Mock mode (<code>?mock=1</code>): simulated only.</p>
+    </div>
+    <div class="sidebar-section-card aosv3-legend-card">
+      <div class="sidebar-label">Status color key</div>
+      <div id="aosv3-sidebar-run-status" class="aosv3-sidebar-run-status" hidden>
+        <span class="info-key">סטטוס נוכחי:</span>
+        <span id="aosv3-sidebar-status-badge" class="aosv3-status-badge aosv3-status--idle">—</span>
+        <span id="aosv3-sidebar-gate-badge" class="aosv3-gate-pill aosv3-gate-pill--active" style="margin-left:4px"></span>
+      </div>
+      <div class="aosv3-legend">
+        <span class="aosv3-legend-item"><span class="aosv3-status-badge aosv3-status--in_progress">RUN</span> in progress / active</span>
+        <span class="aosv3-legend-item"><span class="aosv3-status-badge aosv3-status--correction">CORR</span> correction</span>
+        <span class="aosv3-legend-item"><span class="aosv3-status-badge aosv3-status--paused">PAUSE</span> paused</span>
+        <span class="aosv3-legend-item"><span class="aosv3-status-badge aosv3-status--complete">DONE</span> complete</span>
+        <span class="aosv3-legend-item"><span class="aosv3-status-badge aosv3-status--not_started">PLAN</span> planned</span>
+        <span class="aosv3-legend-item"><span class="aosv3-status-badge aosv3-status--idle">IDLE</span> idle / neutral</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="agents-page-main">
+    <div id="aosv3-escalation-banner" class="aosv3-escalation-banner" hidden title="Escalation to Principal">
+      Escalated: latest event is CORRECTION_ESCALATED — notify Team 00.
+    </div>
+
+    <div id="aosv3-empty-state" class="aosv3-empty-state aosv3-empty-state--idle" hidden>
+      <strong>No active run</strong>
+      <span class="aosv3-idle-sub">Status IDLE — start a run with the form below (or POST <code>/api/runs</code>).</span>
+      <div class="aosv3-start-run-card section-card">
+        <div class="section-title">Start run</div>
+        <form id="aosv3-start-run-form" class="aosv3-start-run-form">
+          <label class="aosv3-form-label">Work Package ID <span class="aosv3-req">*</span>
+            <select name="work_package_id" id="aosv3-wp-select" required class="aosv3-input">
+              <option value="">— select work package —</option>
+            </select>
+          </label>
+          <label class="aosv3-form-label">Domain <span class="aosv3-req">*</span>
+            <select name="domain_id" required class="aosv3-input">
+              <option value="agents_os">agents_os</option>
+              <option value="tiktrack">tiktrack</option>
+            </select>
+          </label>
+          <label class="aosv3-form-label">Process Variant
+            <select name="process_variant" class="aosv3-input">
+              <option value="">(default)</option>
+              <option value="TRACK_FULL">TRACK_FULL</option>
+              <option value="TRACK_FOCUSED">TRACK_FOCUSED</option>
+              <option value="TRACK_FAST">TRACK_FAST</option>
+            </select>
+          </label>
+          <label class="aosv3-form-label">Execution Mode
+            <select name="execution_mode" class="aosv3-input">
+              <option value="">(default)</option>
+              <option value="MANUAL">MANUAL</option>
+              <option value="DASHBOARD">DASHBOARD</option>
+              <option value="AUTOMATIC">AUTOMATIC</option>
+            </select>
+          </label>
+          <button type="button" class="btn btn-primary aosv3-start-run-btn" disabled title="Enabled when API client is connected (live mode)">Start Run →</button>
+        </form>
+        <p class="aosv3-sidebar-hint">Button is enabled in live API mode when the client is ready.</p>
+      </div>
+    </div>
+
+    <div id="aosv3-pipeline-main">
+      <section id="aosv3-prompt-section" class="section-card aosv3-prompt-card" hidden aria-label="Assembled prompt">
+        <div class="section-title aosv3-prompt-title">Assembled prompt</div>
+        <div id="aosv3-prompt-actor-banner" class="aosv3-prompt-actor-banner" hidden>
+          <span class="sidebar-label">מיועד לצוות:</span>
+          <span id="aosv3-prompt-actor-pill" class="aosv3-domain-pill aosv3-prompt-actor-pill"></span>
+          <span id="aosv3-prompt-actor-name" class="aosv3-prompt-actor-name"></span>
+          <span id="aosv3-prompt-actor-engine" class="aosv3-prompt-actor-engine"></span>
+        </div>
+        <p class="aosv3-sidebar-hint">Assembled operator prompt for this run (<code>GET /api/runs/{run_id}/prompt</code>).</p>
+        <div class="aosv3-prompt-meta">
+          <span id="aosv3-prompt-token-badge" class="status-pill pill-current">—</span>
+          <span id="aosv3-prompt-assembled" class="agents-refresh-label"></span>
+          <span id="aosv3-prompt-cache" class="agents-refresh-label"></span>
+        </div>
+        <div id="aosv3-prompt-error-banner" class="aosv3-escalation-banner" hidden role="alert" aria-live="assertive"></div>
+        <pre id="aosv3-prompt-pre" class="aosv3-prompt-pre"></pre>
+        <div class="aosv3-prompt-blend">
+          <div class="sidebar-label">Copy — optional additions</div>
+          <p class="aosv3-sidebar-hint" style="margin-bottom:8px">הפרומפט הבסיסי תמיד מועתק. סמן להוסיף שכבות נוספות לפי הצורך:</p>
+
+          <label class="aosv3-team-checkbox-label" style="margin-bottom:2px">
+            <input type="checkbox" id="aosv3-prompt-blend-activation" />
+            <strong>Activation context</strong>
+          </label>
+          <p class="aosv3-sidebar-hint" style="margin:0 0 8px 20px">מוסיף כותרת זיהוי לפני הפרומפט: שם הצוות, domain, gate, run ID. <em>מתי: הפעלת session חדש של האגנט.</em></p>
+
+          <label class="aosv3-team-checkbox-label" style="margin-bottom:2px">
+            <input type="checkbox" id="aosv3-prompt-blend-team" />
+            <strong>Team context (L1–L4)</strong>
+          </label>
+          <p class="aosv3-sidebar-hint" style="margin:0 0 8px 20px">מצרף אחרי הפרומפט את 4 שכבות ה-role (L1=role, L2=authority, L3=principles, L4=gate). <em>מתי: כשהאגנט זקוק לתזכורת מלאה על תפקידו.</em></p>
+
+          <label class="aosv3-team-checkbox-label" style="margin-bottom:2px">
+            <input type="checkbox" id="aosv3-prompt-blend-policies" />
+            <strong>Policies</strong>
+          </label>
+          <p class="aosv3-sidebar-hint" style="margin:0 0 4px 20px">מצרף policies של ה-domain (max retries, variant defaults). <em>מתי: ולידציה חוקתית או debugging של pipeline.</em></p>
+        </div>
+        <div class="aosv3-prompt-actions">
+          <button type="button" class="btn btn-primary" id="aosv3-prompt-copy" title="Copy prompt text to clipboard">Copy to clipboard</button>
+          <button type="button" class="btn" id="aosv3-prompt-regenerate" disabled title="רענן את הפרומט מהשרת (bust cache) — שימושי לאחר שינוי state">Refresh prompt</button>
+        </div>
+      </section>
+
+      <section id="aosv3-correction-blocking" class="section-card aosv3-correction-blocking" hidden aria-label="Correction blocking findings">
+        <div class="section-title">CORRECTION — blocking findings</div>
+        <p class="aosv3-sidebar-hint">Shown when the run is in CORRECTION with blocking items.</p>
+        <div id="aosv3-correction-blocking-body"></div>
+      </section>
+
+      <section id="aosv3-operator-handoff" class="section-card aosv3-operator-handoff" hidden aria-label="Operator handoff">
+        <div class="section-title">OPERATOR HANDOFF</div>
+        <p class="aosv3-sidebar-hint">Previous event, required next action, and CLI helper.</p>
+        <div class="sidebar-label">PREVIOUS (last event for this run)</div>
+        <div id="aosv3-handoff-previous" class="aosv3-handoff-previous"></div>
+        <div class="sidebar-label">NEXT</div>
+        <div id="aosv3-handoff-next" class="aosv3-handoff-next"></div>
+        <div id="aosv3-handoff-ingestion-extra" class="aosv3-handoff-ingestion-extra" hidden></div>
+        <div id="aosv3-handoff-feedback-forms" class="aosv3-handoff-feedback-forms" hidden></div>
+        <div class="aosv3-handoff-cli-header">
+          <span class="sidebar-label">CLI COMMAND</span>
+          <button type="button" class="btn" id="aosv3-handoff-cli-copy">Copy CLI</button>
+        </div>
+        <pre id="aosv3-handoff-cli-pre" class="aosv3-prompt-pre aosv3-cli-pre"></pre>
+      </section>
+
+      <div class="section-card">
+        <div class="section-title">Run status</div>
+        <p><span id="aosv3-status-badge" class="aosv3-status-badge aosv3-status--in_progress">IN_PROGRESS</span></p>
+        <div class="info-row"><span class="info-key">Domain</span><span class="info-val" id="aosv3-main-domain">—</span></div>
+        <div class="info-row"><span class="info-key">Current Gate</span><span class="info-val" id="aosv3-gate">—</span></div>
+        <div class="info-row"><span class="info-key">Phase</span><span class="info-val" id="aosv3-phase">—</span></div>
+        <div class="info-row" id="aosv3-paused-at-row" hidden><span class="info-key">Paused at</span><span class="info-val" id="aosv3-paused-at">—</span></div>
+        <div class="info-row" id="aosv3-completed-at-row" hidden><span class="info-key">Completed at</span><span class="info-val" id="aosv3-completed-at">—</span></div>
+        <div class="info-row"><span class="info-key">Corrections</span><span class="info-val" id="aosv3-cc">—</span></div>
+        <div class="info-row"><span class="info-key">Mode</span><span class="info-val" id="aosv3-exec-mode">—</span></div>
+        <div class="info-row"><span class="info-key">Started</span><span class="info-val" id="aosv3-started">—</span></div>
+        <div class="info-row"><span class="info-key">Last updated</span><span class="info-val" id="aosv3-updated">—</span></div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-title">Current actor — הצוות הפעיל</div>
+        <div class="info-row"><span id="aosv3-actor-block" class="info-val aosv3-actor-display">—</span></div>
+        <p class="aosv3-sidebar-hint">הצוות שמטפל בשלב הנוכחי. מזוהה ע"י role (ORCHESTRATOR) ובחירת domain. כשהסטטוס PAUSED — הצוות ריק.</p>
+      </div>
+
+      <div class="section-card" id="aosv3-sentinel-card">
+        <div class="section-title">Sentinel — מנגנון חירום</div>
+        <div class="info-row"><span class="info-val" id="aosv3-sentinel">—</span></div>
+        <p class="aosv3-sidebar-hint">Sentinel פעיל = חבילה זו הוקפאה ידנית ע"י צוות מסויים (LOD200 override). לרוב: inactive.</p>
+      </div>
+
+      <div class="section-card">
+        <div class="section-title">Actions</div>
+        <div class="aosv3-actions">
+          <button type="button" class="btn btn-primary" disabled title="Advance run (POST /advance)" id="aosv3-btn-advance">ADVANCE</button>
+          <button type="button" class="btn" disabled title="Resubmit after correction (POST)" id="aosv3-btn-resubmit" hidden>RESUBMIT</button>
+          <button type="button" class="btn" disabled title="Fail run (POST /fail)" id="aosv3-btn-fail">FAIL</button>
+          <button type="button" class="btn" disabled title="Human gate approval (POST /approve)" id="aosv3-btn-approve" hidden>APPROVE</button>
+          <button type="button" class="btn" disabled title="Pause run (POST /pause)" id="aosv3-btn-pause">PAUSE</button>
+          <button type="button" class="btn" disabled title="Resume run (POST /resume)" id="aosv3-btn-resume" hidden>RESUME</button>
+          <button type="button" class="btn" disabled title="Principal override (POST /override, team_00)" id="aosv3-btn-override">OVERRIDE (team_00)</button>
+        </div>
+        <p class="aosv3-sidebar-hint">APPROVE appears only on human gates. Buttons enable when the API allows the transition.</p>
+      </div>
+    </div>
+
+    <section class="section-card aosv3-pipeline-run-log-main" id="aosv3-pipeline-footer-log" aria-label="Current run log">
+      <div class="section-title">Current run log</div>
+      <p class="aosv3-sidebar-hint">Events for this run (newest first): sequence, gate/phase, actor, verdict, reason.</p>
+      <div class="aosv3-table-wrap">
+        <table class="aosv3-table aosv3-table--dense">
+          <thead>
+            <tr>
+              <th>seq</th>
+              <th>occurred_at</th>
+              <th>event_type</th>
+              <th>gate / phase</th>
+              <th>actor</th>
+              <th>verdict</th>
+              <th>reason</th>
+            </tr>
+          </thead>
+          <tbody id="aosv3-run-log-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="aosv3-modal-stop-run" class="aosv3-modal-overlay" aria-hidden="true" role="dialog" aria-labelledby="aosv3-modal-stop-title">
+  <div class="aosv3-modal-box">
+    <button type="button" class="aosv3-modal-close" data-aosv3-modal-close aria-label="Close">✕</button>
+    <h3 id="aosv3-modal-stop-title">Stop active run?</h3>
+    <p class="aosv3-sidebar-hint">Aborts the current run. Only authorized operators should confirm.</p>
+    <p class="aosv3-sidebar-hint">In developer scenario mode, no API request is sent.</p>
+    <div class="aosv3-modal-actions">
+      <button type="button" class="btn" data-aosv3-modal-close title="Close without stopping">Cancel</button>
+      <button type="button" class="btn btn-warning" id="aosv3-modal-stop-confirm" title="Confirm stop run">Confirm stop</button>
+    </div>
+  </div>
+</div>
+
+<script src="api-client.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

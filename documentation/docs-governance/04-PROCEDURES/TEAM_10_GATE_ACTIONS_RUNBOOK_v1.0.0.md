@@ -24,7 +24,7 @@ Single deterministic runbook for Team 10 (Gateway) gate execution. Gate Protocol
 - Cross-owner gate artifact contracts are mandatory references:
   - `documentation/docs-governance/05-CONTRACTS/GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.1.0.md`
   - `documentation/docs-governance/05-CONTRACTS/GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.1.0.md`
-  - **Phase 0 (GATE_4/5/6/7):** `documentation/docs-governance/04-PROCEDURES/GATES_4_5_6_7_GOVERNANCE_POLICY_v1.0.0.md`; `G5_AUTOMATION_EVIDENCE_CONTRACT`, `G6_TRACEABILITY_MATRIX_CONTRACT`, `G7_HUMAN_RESIDUALS_MATRIX_CONTRACT` (05-CONTRACTS).
+  - **Phase 0 (GATE_4/5/6/7):** `documentation/docs-governance/04-PROCEDURES/GATES_4_5_6_7_GOVERNANCE_POLICY_v1.0.0.md`; `G5_AUTOMATION_EVIDENCE_CONTRACT`, `G6_TRACEABILITY_MATRIX_CONTRACT`, `G7_HUMAN_RESIDUALS_MATRIX_CONTRACT` (05-CONTRACTS). *(**LEGACY:** GATE_6/7 in policy name — not active pipeline gates; active: GATE_0–GATE_5.)*
 
 ---
 
@@ -77,6 +77,8 @@ Internal sub-stage sequence: _COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION
 | **WSM** | Gate Owner (Team 90 for GATE_5) updates WSM; Team 10 updates lists. |
 
 ---
+
+> **LEGACY (2026-03-24):** Sections **6–8** below (**GATE_6 / GATE_7 / GATE_8**) are **not** active pipeline gates. **Active pipeline:** GATE_0–GATE_5 only. Content preserved for historical reference.
 
 ## 6) GATE_6 (ARCHITECTURAL_DEV_VALIDATION — Reality gate)
 

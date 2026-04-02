@@ -1,0 +1,4 @@
+﻿source_rel_path,archive_action,archive_reason,size_bytes,mtime_utc,suggested_tier
+_SIMULATION_ARCHIVE/S003-P013-WP002/README.md,ARCHIVE_ROUND2,deep_review_subtree,500,2026-03-23T19:11:26Z,ROUND2_DEEP_REVIEW
+team_60/evidence/runtime/check_alert_conditions.launchd.stderr.log,ARCHIVE,unclassified_stale,491400,2026-03-23T18:36:31Z,UNCLASSIFIED_REVIEW
+team_60/evidence/runtime/check_alert_conditions.launchd.stdout.log,ARCHIVE,unclassified_stale,0,2026-03-23T18:36:27Z,UNCLASSIFIED_REVIEW

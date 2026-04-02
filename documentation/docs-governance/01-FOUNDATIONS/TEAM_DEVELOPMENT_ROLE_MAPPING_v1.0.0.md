@@ -1,5 +1,7 @@
 # TEAM_DEVELOPMENT_ROLE_MAPPING v1.0.0
 
+> **SUPERSEDED (2026-03-26)** — use **`TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.1.md`** for roster **110/111**, Principal model alignment, parent/child x0/x1 pattern, Team 10 vs pipeline orchestration, and PFS definition cross-refs.
+
 **project_domain:** SHARED (TIKTRACK + AGENTS_OS)  
 **id:** TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0  
 **owner:** Team 170 (canonical); consumed by Team 10 for scope and orchestration  

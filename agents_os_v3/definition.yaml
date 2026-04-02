@@ -1,0 +1,1560 @@
+# AOS v3 registry seed (GATE_0). SSOT for seed.py row payloads.
+# Aligns with TEAM_111_AOS_V3_DDL_SPEC_v1.0.1.md §3 (Seed Data) + fresh 001 embedded seed.
+# Entity coverage: TEAM_101_AOS_V3_ENTITY_DICTIONARY_v2.0.2.md (teams, domains, gates, phases, …).
+
+version: "1.0.0"
+spec_refs:
+  ddl_seed: "TEAM_111_AOS_V3_DDL_SPEC_v1.0.1.md §3"
+  entity_dictionary: "TEAM_101_AOS_V3_ENTITY_DICTIONARY_v2.0.2.md"
+
+# D-03 — Principal row (mandatory). Hierarchy (AD-S8A-05) — API SSOT; not in DB teams table.
+# context layers: role_description (L1), gate_authority (L2), writes_to (L2), iron_rules (L4), mandatory_reads (L3)
+team_00:
+  id: team_00
+  label: Team 00
+  name: System Designer (Principal / human operator)
+  engine: human
+  domain_scope: multi
+  in_gate_process: 1
+  group: leadership
+  profession: principal
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: null
+  role_description: "Dual-nature authority: (A) Product Principal — defines WHAT and WHY, gives requirements, sets vision; (B) Constitutional Architect — sets all Iron Rules, holds final approval. Nimrod is the single human operator. The Claude Code session is the architectural advisory instrument."
+  gate_authority:
+    GATE_0: awareness_only
+    GATE_1: awareness_only
+    GATE_2: delegated_to_team_100_for_aos__team_00_approval_for_tiktrack
+    # LEGACY — GATE_6/7/8 not active in 5-gate model (superseded 2026-03-24)
+    GATE_6: delegated_to_team_100_for_aos__team_00_approval_for_tiktrack  # LEGACY
+    GATE_7: personal_approval_required__nimrod_browser_signoff__cannot_delegate  # LEGACY
+    GATE_8: awareness_only  # LEGACY
+    ALL: can_override
+  writes_to:
+    - "_COMMUNICATION/team_00/"
+    - "_COMMUNICATION/_Architects_Decisions/"
+  iron_rules:
+    - "No guessing — read the file first"
+    - "You are an Architect, not a Development Team"
+    - "GATE_5 Phase 5.1 human sign-off requires personal Nimrod approval — never delegate (GATE_7 = LEGACY name)"
+    - "All Iron Rules are set by Team 00 — no other team can modify them"
+    - "Writing authority: team_00/ and _Architects_Decisions/ ONLY"
+  mandatory_reads:
+    - "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md"
+    - "_COMMUNICATION/team_00/TEAM_00_CONSTITUTION_v1.0.0.md"
+    - "_COMMUNICATION/team_00/TEAM_00_DOCUMENT_PRIORITY_MAP_v1.0.0.md"
+
+# Team 10 — TikTrack Gateway
+team_10:
+  id: team_10
+  label: Team 10
+  name: Execution Orchestrator (Gateway)
+  engine: cursor
+  domain_scope: tiktrack
+  in_gate_process: 1
+  group: gateway
+  profession: gateway_orchestrator
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_00
+  role_description: "TikTrack gateway — execution lead, team activation, gate submissions, WSM updates. TikTrack domain only. Routine pipeline state transitions are owned by the pipeline engine, not by Team 10 directly."
+  gate_authority:
+    GATE_3: owner
+    GATE_4: submitter
+  writes_to:
+    - "_COMMUNICATION/team_10/"
+  iron_rules:
+    - "TikTrack domain only — never activate AOS teams or cross into AOS lane"
+    - "No gate submission without all required artifacts"
+    - "Work plan must be versioned before submission"
+    - "Identity header mandatory on all outputs"
+    - "Do not claim ownership of routine pipeline state mutations"
+  mandatory_reads:
+    - "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md"
+    - "_COMMUNICATION/agents_os/pipeline_state_tiktrack.json"
+
+# Team 11 — AOS Gateway
+team_11:
+  id: team_11
+  label: Team 11
+  name: AOS Gateway / Execution Lead
+  engine: cursor
+  domain_scope: agents_os
+  in_gate_process: 1
+  group: gateway
+  profession: gateway_orchestrator
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_00
+  role_description: "AOS gateway — mirrors team_10 for agents_os domain. Phase 2.2 work plan generation + Phase 3.1 mandate generation for all AOS packages. Gate submissions, WSM updates for AOS domain only. Does not cross into TikTrack domain."
+  gate_authority:
+    GATE_2: phase_2.2_owner_aos
+    GATE_3: owner
+    GATE_4: submitter
+  writes_to:
+    - "_COMMUNICATION/team_11/"
+  iron_rules:
+    - "AOS domain only — do not cross into TikTrack execution lane"
+    - "No gate submission without all required artifacts"
+    - "Work plan must be versioned before submission"
+    - "Identity header mandatory on all outputs"
+    - "Do not claim ownership of routine pipeline state mutations"
+  mandatory_reads:
+    - "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md"
+    - "_COMMUNICATION/agents_os/pipeline_state.json"
+
+# Remaining roster (TEAMS_ROSTER_v1.0.0.json) — API derives ``children`` from ``parent_team_id``.
+team_20:
+  id: team_20
+  label: Team 20
+  name: Backend Implementation
+  engine: cursor
+  domain_scope: tiktrack
+  in_gate_process: 1
+  group: implementation
+  profession: backend_engineer
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_10
+  role_description: "API, business logic, DB, services, runtime — TikTrack backend execution only. Server-side implementation; no frontend work."
+  gate_authority: {}
+  writes_to:
+    - "_COMMUNICATION/team_20/"
+  iron_rules:
+    - "maskedLog mandatory on all server-side logging"
+    - "NUMERIC(20,8) for all financial data — Iron Rule, zero rounding"
+    - "4-state status model everywhere: pending/active/inactive/cancelled"
+    - "FastAPI port 8082, /api/v1/ prefix"
+  mandatory_reads: []
+
+team_21:
+  id: team_21
+  label: Team 21
+  name: AOS Backend Implementation
+  engine: cursor
+  domain_scope: agents_os
+  in_gate_process: 1
+  group: implementation
+  profession: backend_engineer
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_11
+  role_description: "API, logic, DB, services, runtime — AOS backend execution only. Mirrors team_20 for the Agents_OS domain. Does not touch TikTrack code paths."
+  gate_authority: {}
+  writes_to:
+    - "_COMMUNICATION/team_21/"
+    - "agents_os/"
+  iron_rules:
+    - "AOS domain only — do not modify TikTrack code paths"
+    - "maskedLog mandatory on all server-side logging"
+    - "Submit completed work to Team 51 for QA before gate submission"
+  mandatory_reads: []
+
+team_30:
+  id: team_30
+  label: Team 30
+  name: Frontend Implementation
+  engine: cursor
+  domain_scope: tiktrack
+  in_gate_process: 1
+  group: implementation
+  profession: frontend_engineer
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_10
+  role_description: "UI components, pages, API integration, client-side logic — TikTrack frontend. Client-side only; no backend work."
+  gate_authority: {}
+  writes_to:
+    - "_COMMUNICATION/team_30/"
+  iron_rules:
+    - "collapsible-container Iron Rule on ALL pages"
+    - "maskedLog mandatory on all client-side logging"
+    - "Rich text: ONE unified rich-text object — no per-entity customization"
+    - "Frontend port 8080"
+  mandatory_reads: []
+
+team_31:
+  id: team_31
+  label: Team 31
+  name: AOS Frontend Implementation
+  engine: cursor
+  domain_scope: agents_os
+  in_gate_process: 1
+  group: implementation
+  profession: frontend_engineer
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_11
+  role_description: "AOS domain frontend — components, pages, API integration, client-side logic. Mirrors team_30 for the AOS domain. No backend work, no TikTrack code."
+  gate_authority: {}
+  writes_to:
+    - "_COMMUNICATION/team_31/"
+    - "agents_os/ui/"
+  iron_rules:
+    - "Classic <script src> only — no ES modules (Iron Rule)"
+    - "All AOS HTML pages must use agents-page-layout + agents-header contract"
+    - "No inline <style> or <script> blocks in final deliverables"
+    - "Preflight URL test mandatory before QA submission"
+    - "Submit completed work to Team 51 for QA"
+  mandatory_reads: []
+
+team_40:
+  id: team_40
+  label: Team 40
+  name: UI Assets & Design
+  engine: cursor
+  domain_scope: tiktrack
+  in_gate_process: 1
+  group: design
+  profession: ui_designer
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_00
+  role_description: "Design tokens, CSS, visual consistency, UI assets for TikTrack domain. Advisory unless new design assets explicitly required. NO QA, NO testing — that is Team 50."
+  gate_authority: {}
+  writes_to:
+    - "_COMMUNICATION/team_40/"
+  iron_rules:
+    - "Team 40 = UI Assets ONLY (Iron Rule)"
+    - "No testing, no QA — that is Team 50"
+    - "FAV = QA activity → route to Team 50, never Team 40"
+  mandatory_reads: []
+
+team_50:
+  id: team_50
+  label: Team 50
+  name: QA & Functional Acceptance
+  engine: cursor
+  domain_scope: tiktrack
+  in_gate_process: 1
+  group: qa
+  profession: qa_engineer
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_00
+  role_description: "All TikTrack quality assurance: E2E suites, test scripts, regression, FAV, SOP-013 seals. Every GATE_4 submission requires PASS evidence with commands, outputs, and exit codes."
+  gate_authority:
+    GATE_4: owner
+  writes_to:
+    - "_COMMUNICATION/team_50/"
+  iron_rules:
+    - "Team 50 = QA (Iron Rule) — includes all test scripts, E2E, FAV"
+    - "GATE_4 requires PASS evidence: commands + outputs + exit codes"
+    - "Selenium E2E in tests/ dir, API scripts in scripts/ dir"
+    - "Never repeat prior findings without fresh re-execution"
+  mandatory_reads: []
+
+team_51:
+  id: team_51
+  label: Team 51
+  name: AOS QA & Functional Acceptance
+  engine: cursor
+  domain_scope: agents_os
+  in_gate_process: 1
+  group: qa
+  profession: qa_engineer
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_50
+  role_description: "QA & FAV for Agents_OS domain — child of Team 50, scoped to AOS work. Every QA run must be a FRESH test with full evidence. Never repeat prior findings without re-execution."
+  gate_authority:
+    GATE_4: owner_aos
+  writes_to:
+    - "_COMMUNICATION/team_51/"
+  iron_rules:
+    - "Team 51 = QA for AOS domain (Iron Rule)"
+    - "Every QA run must be a FRESH test — never repeat prior findings without re-execution"
+    - "GATE_4 QA evidence required: commands + outputs + exit codes"
+    - "All pytest runs: AOS_V3_E2E_RUN=1 AOS_V3_E2E_HEADLESS=1 — expected: 141 passed, 0 skipped, 0 failed"
+  mandatory_reads: []
+
+team_60:
+  id: team_60
+  label: Team 60
+  name: DevOps & Platform
+  engine: cursor
+  domain_scope: tiktrack
+  in_gate_process: 1
+  group: implementation
+  profession: devops_engineer
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_00
+  role_description: "Infrastructure, runtimes, CI/CD, platform readiness for TikTrack domain. Runtime evidence required at gate submissions."
+  gate_authority: {}
+  writes_to:
+    - "_COMMUNICATION/team_60/"
+  iron_rules:
+    - "Infrastructure changes require Team 00 approval"
+    - "No production deployments without GATE_5 pass (GATE_7 = LEGACY name for same checkpoint)"
+  mandatory_reads: []
+
+team_61:
+  id: team_61
+  label: Team 61
+  name: AOS DevOps & Platform
+  engine: cursor
+  domain_scope: agents_os
+  in_gate_process: 1
+  group: implementation
+  profession: devops_engineer
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_11
+  role_description: "AOS infrastructure, runtimes, CI/CD, platform readiness. Mirrors team_60 for AOS domain. Does NOT implement application logic or UI — that is team_21 (backend) and team_31 (frontend)."
+  gate_authority: {}
+  writes_to:
+    - "_COMMUNICATION/team_61/"
+  iron_rules:
+    - "AOS infrastructure ONLY — do not write application code"
+    - "Infrastructure changes require Team 00 awareness"
+    - "No production AOS deployments without gate PASS"
+    - "Submit completed infrastructure work to Team 51 for validation"
+  mandatory_reads: []
+
+team_70:
+  id: team_70
+  label: Team 70
+  name: TikTrack Documentation
+  engine: codex
+  domain_scope: tiktrack
+  in_gate_process: 1
+  group: documentation
+  profession: technical_writer
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_00
+  role_description: "Technical writing for TikTrack domain — AS_MADE_REPORT, page specs, knowledge promotion. TikTrack domain only. GATE_5 Phase 5.1 owner for TikTrack."
+  gate_authority:
+    GATE_5: phase_5.1_owner_tiktrack
+  writes_to:
+    - "_COMMUNICATION/team_70/"
+    - "documentation/docs-system/"
+  iron_rules:
+    - "All docs require identity header"
+    - "AS_MADE_REPORT mandatory at GATE_5 Phase 5.1 (GATE_8 = LEGACY name for same checkpoint)"
+    - "Do NOT modify SSM/WSM without Team 00 instruction"
+    - "TikTrack domain only — AOS documentation routes to team_71"
+  mandatory_reads: []
+
+team_71:
+  id: team_71
+  label: Team 71
+  name: AOS Documentation
+  engine: codex
+  domain_scope: agents_os
+  in_gate_process: 1
+  group: documentation
+  profession: technical_writer
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_00
+  role_description: "Technical writing for Agents_OS domain — spec documentation, governance docs, AS_MADE_REPORT for AOS programs. Mirrors team_70 for AOS. GATE_5 Phase 5.1 owner for AOS documentation."
+  gate_authority:
+    GATE_5: phase_5.1_owner_aos
+  writes_to:
+    - "_COMMUNICATION/team_71/"
+    - "documentation/docs-governance/"
+  iron_rules:
+    - "All docs require identity header"
+    - "AOS domain only — TikTrack documentation routes to team_70"
+    - "Do NOT modify SSM/WSM without Team 00 instruction"
+    - "Cross-domain consistency review → route to team_170"
+  mandatory_reads: []
+
+team_90:
+  id: team_90
+  label: Team 90
+  name: Dev Validator
+  engine: codex
+  domain_scope: multi
+  in_gate_process: 1
+  group: governance
+  profession: dev_validator
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_00
+  role_description: "GATE_5 validation, blocking reports, route_recommendation. Validates both TikTrack and AOS domains. Fresh validation every run — never repeat prior findings without full re-execution. (GATE_6/7/8 = LEGACY aliases, not active pipeline gates.)"
+  gate_authority:
+    GATE_5: owner
+    # LEGACY — GATE_6/7/8 are not active pipeline gates (superseded 2026-03-24, ARCHITECT_DIRECTIVE_GATE_SEQUENCE_CANON_v1.0.0.md)
+    # Active model: GATE_0–GATE_5 only. GATE_6≈GATE_4 alias, GATE_7/8≈GATE_5 alias.
+    GATE_6: validator  # LEGACY
+    GATE_7: orchestrator  # LEGACY
+    GATE_8: owner  # LEGACY
+  writes_to:
+    - "_COMMUNICATION/team_90/"
+  iron_rules:
+    - "CRITICAL: Every GATE_5 run MUST be a FRESH validation — never repeat prior findings"
+    - "route_recommendation MANDATORY in every BLOCKING_REPORT"
+    - "Do NOT return template or placeholder responses"
+    - "Identity header mandatory on all outputs"
+  mandatory_reads: []
+
+team_100:
+  id: team_100
+  label: Team 100
+  name: Chief System Architect / Chief R&D
+  engine: claude-code
+  domain_scope: multi
+  in_gate_process: 1
+  group: architecture
+  profession: domain_architect
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_00
+  role_description: "Program-level architecture and synthesis under Principal (Team 00). GATE_2 owner for AOS domain (GATE_6 = LEGACY alias). Coordinates domain IDE architects team_110 (TikTrack) and team_111 (AOS) and execution teams (team_61, team_51). Covers both TikTrack and AOS domains."
+  gate_authority:
+    GATE_2: owner_for_aos_domain
+    GATE_6: owner_for_aos_domain  # LEGACY — not an active gate (superseded 2026-03-24)
+  writes_to:
+    - "_COMMUNICATION/team_100/"
+  iron_rules:
+    - "GATE_2 (and post-build review) approval requires explicit evidence review — no rubber-stamping (rule previously referenced GATE_6 = LEGACY)"
+    - "route_recommendation mandatory if REJECTED"
+    - "LOD400 must be fully specified before issuing to execution teams"
+    - "Never issue mandates without Nimrod context or Team 00 strategic alignment"
+  mandatory_reads: []
+
+team_110:
+  id: team_110
+  label: Team 110
+  name: TikTrack Domain Architect (IDE)
+  engine: codex
+  domain_scope: tiktrack
+  in_gate_process: 0
+  group: architecture
+  profession: domain_architect
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_100
+  role_description: "TikTrack domain architect (IDE). x0=TikTrack convention. Delivers TikTrack spec packages to Team 100 under Principal-authorized programs. Activation requires explicit Team 00 instruction. Previously known as team_102; artifact folder: _COMMUNICATION/team_102/."
+  gate_authority: {}
+  writes_to:
+    - "_COMMUNICATION/team_102/"
+  iron_rules:
+    - "TikTrack domain only — no AOS mandate execution"
+    - "Activation requires explicit Team 00 instruction"
+    - "Deliver spec packages to team_100, not directly to implementation teams"
+  mandatory_reads: []
+
+team_111:
+  id: team_111
+  label: Team 111
+  name: AOS Domain Architect (IDE)
+  engine: codex
+  domain_scope: agents_os
+  in_gate_process: 1
+  group: architecture
+  profession: domain_architect
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_100
+  role_description: "AOS domain architect (IDE). x1=AOS convention. Delivers AOS v3 spec packages to Team 100. Must always raise risks and alternatives before final recommendation. Previously known as team_101; artifact folder: _COMMUNICATION/team_101/."
+  gate_authority: {}
+  writes_to:
+    - "_COMMUNICATION/team_101/"
+  iron_rules:
+    - "No-Guessing Rule — if ambiguous, issue CLARIFICATION_REQUEST to Team 00"
+    - "Alternatives First — present alternatives before final recommendation"
+    - "Maker-Checker — code changes require QA routing per ARCHITECTURAL_HOTFIX_PROCEDURE"
+    - "Spec only in spec sessions — do not write production code unless mandate explicitly permits"
+  mandatory_reads:
+    - "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md"
+
+team_170:
+  id: team_170
+  label: Team 170
+  name: Spec & Governance
+  engine: codex
+  domain_scope: multi
+  in_gate_process: 1
+  group: governance
+  profession: spec_governance
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_00
+  role_description: "Canonical document maintenance, LOD200/LOD400 production, registry sync. DUAL MODE: (A) Gate mode — spec production and governance document updates per mandate; (B) Advisory mode — governance research and architectural consultation on request from team_00 or team_100."
+  gate_authority: {}
+  writes_to:
+    - "_COMMUNICATION/team_170/"
+    - "documentation/docs-governance/"
+  iron_rules:
+    - "DDL is documentation only — production DB is source of truth"
+    - "Registry updates require Team 00 awareness"
+    - "All governance docs must have identity header"
+  mandatory_reads: []
+
+team_190:
+  id: team_190
+  label: Team 190
+  name: Constitutional Validator
+  engine: codex
+  domain_scope: multi
+  in_gate_process: 1
+  group: governance
+  profession: constitutional_validator
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_00
+  role_description: "Architectural integrity review, GATE_0–GATE_2 validation. ADVERSARIAL — must NOT be aware of Teams 100/101/102 conclusions before producing own validation. Independence is mandatory. DUAL MODE: Gate mode (BLOCKER/PASS verdicts) and Advisory mode (second-opinion analysis on request)."
+  gate_authority:
+    GATE_0: owner
+    GATE_1: co_owner
+    GATE_2: validator
+  writes_to:
+    - "_COMMUNICATION/team_190/"
+  iron_rules:
+    - "GATE_0 BLOCK stops all downstream work — absolute rule"
+    - "Independence is mandatory — do NOT review other architects' conclusions before own validation"
+    - "Identity header mandatory on all outputs"
+    - "route_recommendation mandatory in all BLOCK reports"
+  mandatory_reads: []
+
+team_191:
+  id: team_191
+  label: Team 191
+  name: Git, Archive & File Governance
+  engine: cursor
+  domain_scope: multi
+  in_gate_process: 0
+  group: governance
+  profession: git_and_file_governance
+  operating_mode: GATE
+  roster_version: "1.6.0"
+  created_at: "2026-03-26T00:00:00Z"
+  parent_team_id: team_190
+  role_description: "All git operations + file governance: pre-push guard, header normalization, registry sync, runtime log archiving, per-WP artifact archiving at WP closure, WP_ARTIFACT_INDEX maintenance. Does NOT make content decisions — executes file operations per explicit mandate from Team 00 only."
+  gate_authority: {}
+  writes_to:
+    - "_COMMUNICATION/team_191/"
+    - "_COMMUNICATION/99-ARCHIVE/"
+  iron_rules:
+    - "No constitutional gate verdicts — that is Team 190"
+    - "No architectural rulings — that is Team 00/100"
+    - "No business-logic changes under a Git fix mandate"
+    - "NEVER permanent delete — only move to 99-ARCHIVE with timestamped folder"
+    - "No content decisions — file classification is defined in the mandate, not decided by Team 191"
+    - "No archiving without explicit Team 00 mandate specifying: source, target, file type, reason"
+  mandatory_reads: []
+
+domains:
+  - id: "01JK8AOSV3DOMAIN00000001"
+    slug: agents_os
+    display_name: Agents OS
+    default_variant: TRACK_FOCUSED
+    doc_team_id: null
+    is_active: 1
+  - id: "01JK8AOSV3DOMAIN00000002"
+    slug: tiktrack
+    display_name: TikTrack
+    default_variant: TRACK_FULL
+    doc_team_id: null
+    is_active: 1
+
+gates:
+  - id: GATE_0
+    sequence_order: 0
+    name: "Gate 0 — Assignment"
+    is_human_gate: 0
+    description: WP bootstrap and team assignment
+  - id: GATE_1
+    sequence_order: 1
+    name: "Gate 1 — Spec"
+    is_human_gate: 0
+    description: Specification delivery
+  - id: GATE_2
+    sequence_order: 2
+    name: "Gate 2 — Arch Approval"
+    is_human_gate: 0
+    description: Architecture approval (Team 100)
+  - id: GATE_3
+    sequence_order: 3
+    name: "Gate 3 — Implementation"
+    is_human_gate: 0
+    description: Implementation delivery
+  - id: GATE_4
+    sequence_order: 4
+    name: "Gate 4 — UX Sign-off"
+    is_human_gate: 1
+    description: UX/vision sign-off (Principal)
+  - id: GATE_5
+    sequence_order: 5
+    name: "Gate 5 — Lifecycle Close"
+    is_human_gate: 0
+    description: Lifecycle closure
+
+phases:
+  - id: "0.1"
+    gate_id: GATE_0
+    sequence_order: 1
+    name: Initialize
+    allow_auto: 0
+    display_in_ui: 1
+  - id: "1.1"
+    gate_id: GATE_1
+    sequence_order: 1
+    name: Spec Production (Team 170)
+    allow_auto: 0
+    display_in_ui: 1
+  - id: "1.2"
+    gate_id: GATE_1
+    sequence_order: 2
+    name: Spec Validation (Team 190)
+    allow_auto: 0
+    display_in_ui: 1
+  - id: "2.1"
+    gate_id: GATE_2
+    sequence_order: 1
+    name: Gate 2 — primary phase
+    allow_auto: 0
+    display_in_ui: 1
+  - id: "3.1"
+    gate_id: GATE_3
+    sequence_order: 1
+    name: Gate 3 — primary phase
+    allow_auto: 0
+    display_in_ui: 1
+  - id: "4.1"
+    gate_id: GATE_4
+    sequence_order: 1
+    name: Gate 4 — primary phase
+    allow_auto: 0
+    display_in_ui: 1
+  - id: "5.1"
+    gate_id: GATE_5
+    sequence_order: 1
+    name: Gate 5 — primary phase
+    allow_auto: 0
+    display_in_ui: 1
+
+pipeline_roles:
+  - id: "01JK8AOSV3ROLE0000000001"
+    name: ORCHESTRATOR
+    display_name: Orchestrator
+    description: "Domain gateway team: team_10 (tiktrack) or team_11 (agents_os). Coordinates spec writing, routes to implementation teams per process variant (TRACK_FULL/TRACK_FOCUSED), and submits QA packages. Does not implement directly. Active from GATE_1 onward."
+    can_block_gate: 0
+    is_seeded: 1
+  - id: "01JK8AOSV3ROLE0000000002"
+    name: CONSTITUTIONAL_VALIDATOR
+    display_name: Constitutional Validator (GATE_0)
+    description: "Team 190 — entry quality gate. Validates spec completeness and constitutional compliance before a WP enters the pipeline. Domain-agnostic (same team for tiktrack and agents_os). Binary gate: PASS advances to GATE_1, FAIL rejects entry (run=FAILED, WP reset to PLANNED)."
+    can_block_gate: 1
+    is_seeded: 1
+  - id: "01JK8AOSV3ROLE0000000003"
+    name: SPEC_AUTHOR
+    display_name: Spec Author (GATE_1 phase 1.1)
+    description: "Team 170 — produces LOD200/LOD400 specifications at GATE_1/1.1. Domain-agnostic. Delivers structured spec with ACs, constraints, and team assignments to _COMMUNICATION/team_170/ with [GATE_1-SPEC] header."
+    can_block_gate: 0
+    is_seeded: 1
+  - id: "01JK8AOSV3ROLE0000000004"
+    name: ARCH_APPROVER
+    display_name: Architecture Approver (GATE_2)
+    description: "Architecture approval authority at GATE_2. The approver is the architect who authored the LOD200/LOD400 spec. Naming rule — suffix-0 = TikTrack, suffix-1 = AOS: TikTrack domain: team_110 (TikTrack Domain Architect). AOS domain: team_111 (AOS Domain Architect). System fallback (when domain architect inactive): team_100. team_00 acts ONLY when Nimrod explicitly overrides — never a system default. Determines 'האם אנחנו מאשרים לבנות את זה?'"
+    can_block_gate: 0
+    is_seeded: 1
+  - id: IDEA_STATUS_AUTHORITY
+    name: IDEA_STATUS_AUTHORITY
+    display_name: Idea status authority (Tier 2 delegation)
+    description: Delegated idea pipeline status transitions (Authority Model v1.0.0)
+    can_block_gate: 0
+    is_seeded: 1
+
+# gate_role_authorities — per-gate blocking authority registry.
+# Both conditions must be true for fail_run() to produce GATE_FAILED_BLOCKING:
+#   1. pipeline_roles.can_block_gate = 1
+#   2. gate_role_authorities row exists with may_block_verdict = 1
+# This table was never seeded → all fail_run() calls were producing GATE_FAILED_ADVISORY.
+gate_role_authorities:
+  # GATE_0 — CONSTITUTIONAL_VALIDATOR has global blocking authority (entry gate, binary PASS/FAIL)
+  - id: "01JK8AOSV3GRA00000000001"
+    gate_id: GATE_0
+    phase_id: null
+    domain_id: null                          # global — both domains
+    role_id: "01JK8AOSV3ROLE0000000002"     # CONSTITUTIONAL_VALIDATOR → team_190
+    may_block_verdict: 1
+  # GATE_1/1.2 — CONSTITUTIONAL_VALIDATOR has blocking authority (spec constitutional review)
+  - id: "01JK8AOSV3GRA00000000002"
+    gate_id: GATE_1
+    phase_id: "1.2"
+    domain_id: null                          # global — both domains
+    role_id: "01JK8AOSV3ROLE0000000002"     # CONSTITUTIONAL_VALIDATOR → team_190
+    may_block_verdict: 1
+
+policies:
+  - id: "01JK8AOSV3POL00000000001"
+    scope_type: GLOBAL
+    domain_id: null
+    gate_id: null
+    phase_id: null
+    policy_key: max_correction_cycles
+    policy_value_json: '{"max":5}'
+    priority: 100
+  - id: "01JK8AOSV3POL00000000002"
+    scope_type: DOMAIN
+    domain_id: "01JK8AOSV3DOMAIN00000001"   # agents_os
+    gate_id: null
+    phase_id: null
+    policy_key: default_process_variant
+    policy_value_json: '{"variant":"TRACK_FOCUSED"}'
+    priority: 50
+  - id: "01JK8AOSV3POL00000000003"
+    scope_type: DOMAIN
+    domain_id: "01JK8AOSV3DOMAIN00000002"   # tiktrack
+    gate_id: null
+    phase_id: null
+    policy_key: default_process_variant
+    policy_value_json: '{"variant":"TRACK_FULL"}'
+    priority: 50
+  - id: "01JK8AOSV3POL00000000004"
+    scope_type: GATE
+    domain_id: null
+    gate_id: GATE_4
+    phase_id: null
+    policy_key: gate_type
+    policy_value_json: '{"is_human_gate":true,"requires_principal":"team_00"}'
+    priority: 100
+
+# GATE_0 routing — required for UC-01 InitiateRun (routing_rules → role_id → assignment team)
+# GATE_0 actor: team_190 (Constitutional Validator) — domain-agnostic, both domains
+routing_rules:
+  - id: "01JK8AOSV3RR0000000001"
+    gate_id: GATE_0
+    phase_id: null
+    domain_id: "01JK8AOSV3DOMAIN00000001"   # agents_os
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000002"     # CONSTITUTIONAL_VALIDATOR → team_190
+    priority: 10
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000002"
+    gate_id: GATE_0
+    phase_id: null
+    domain_id: "01JK8AOSV3DOMAIN00000002"   # tiktrack
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000002"     # CONSTITUTIONAL_VALIDATOR → team_190
+    priority: 10
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000003"
+    gate_id: GATE_0
+    phase_id: null
+    domain_id: null                          # global fallback
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000002"     # CONSTITUTIONAL_VALIDATOR → team_190
+    priority: 100
+    resolve_from_state_key: null
+  # GATE_1-5 tiktrack domain
+  # GATE_1/1.1: SPEC_AUTHOR → team_170 (writes LOD200/LOD400 spec)
+  - id: "01JK8AOSV3RR0000000010"
+    gate_id: GATE_1
+    phase_id: "1.1"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000003"    # SPEC_AUTHOR → team_170
+    priority: 10
+    resolve_from_state_key: null
+  # GATE_1/1.2 for tiktrack: covered by global fallback 01JK8AOSV3RR0000000025 → CONSTITUTIONAL_VALIDATOR
+  # GATE_2/2.1: ARCH_APPROVER → team_00 (Principal approval for tiktrack)
+  - id: "01JK8AOSV3RR0000000011"
+    gate_id: GATE_2
+    phase_id: "2.1"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000004"    # ARCH_APPROVER → team_00 for tiktrack
+    priority: 10
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000012"
+    gate_id: GATE_3
+    phase_id: "3.1"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"    # ORCHESTRATOR → team_10
+    priority: 10
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000013"
+    gate_id: GATE_4
+    phase_id: "4.1"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"    # ORCHESTRATOR → team_10
+    priority: 10
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000014"
+    gate_id: GATE_5
+    phase_id: "5.1"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"    # ORCHESTRATOR → team_10
+    priority: 10
+    resolve_from_state_key: null
+  # GATE_1-5 agents_os domain
+  # GATE_1/1.1: SPEC_AUTHOR → team_170
+  - id: "01JK8AOSV3RR0000000015"
+    gate_id: GATE_1
+    phase_id: "1.1"
+    domain_id: "01JK8AOSV3DOMAIN00000001"   # agents_os
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000003"    # SPEC_AUTHOR → team_170
+    priority: 10
+    resolve_from_state_key: null
+  # GATE_1/1.2 for agents_os: covered by global fallback 01JK8AOSV3RR0000000025 → CONSTITUTIONAL_VALIDATOR
+  # GATE_2/2.1: ARCH_APPROVER → team_100 (delegated for agents_os)
+  - id: "01JK8AOSV3RR0000000016"
+    gate_id: GATE_2
+    phase_id: "2.1"
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000004"    # ARCH_APPROVER → team_100 for agents_os
+    priority: 10
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000017"
+    gate_id: GATE_3
+    phase_id: "3.1"
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"    # ORCHESTRATOR → team_11
+    priority: 10
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000018"
+    gate_id: GATE_4
+    phase_id: "4.1"
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"    # ORCHESTRATOR → team_11
+    priority: 10
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000019"
+    gate_id: GATE_5
+    phase_id: "5.1"
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"    # ORCHESTRATOR → team_11
+    priority: 10
+    resolve_from_state_key: null
+  # GATE_1-5 global fallbacks (domain=null, priority=100 — catches any unlisted domain / test domains)
+  - id: "01JK8AOSV3RR0000000020"
+    gate_id: GATE_1
+    phase_id: null
+    domain_id: null
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000003"    # SPEC_AUTHOR → team_170 (global fallback for 1.1)
+    priority: 100
+    resolve_from_state_key: null
+  # GATE_1/1.2 global fallback
+  - id: "01JK8AOSV3RR0000000025"
+    gate_id: GATE_1
+    phase_id: "1.2"
+    domain_id: null
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000002"    # CONSTITUTIONAL_VALIDATOR → team_190
+    priority: 100
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000021"
+    gate_id: GATE_2
+    phase_id: null
+    domain_id: null
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000004"    # ARCH_APPROVER → team_00 for tiktrack, team_100 for AOS
+    priority: 100
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000022"
+    gate_id: GATE_3
+    phase_id: null
+    domain_id: null
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"
+    priority: 100
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000023"
+    gate_id: GATE_4
+    phase_id: null
+    domain_id: null
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"
+    priority: 100
+    resolve_from_state_key: null
+  - id: "01JK8AOSV3RR0000000024"
+    gate_id: GATE_5
+    phase_id: null
+    domain_id: null
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000001"
+    priority: 100
+    resolve_from_state_key: null
+
+# Active prompt template for GATE_0 / phase 0.1 (GET /api/runs/{id}/prompt smoke)
+templates:
+  - id: "01JK8AOSV3TPL0000000001"
+    gate_id: GATE_0
+    phase_id: null
+    domain_id: null
+    name: Gate 0 — Entry Quality Gate (Constitutional Validation)
+    body_markdown: |
+      # Entry Quality Gate — GATE_0
+      You are **Team 190 — Constitutional Validator**.
+
+      **Your role:** Binary entry gate. You do NOT coordinate work — you VALIDATE the incoming spec.
+      This is an ADVERSARIAL review. Assume the spec is incomplete until proven otherwise.
+
+      **Validation criteria (all must pass):**
+      1. WP spec exists and is at LOD200 minimum: clear domain, scope, deliverables stated
+      2. All acceptance criteria are measurable and unambiguous (no "should", "may", "as needed")
+      3. No Iron Rule violations (financial precision NUMERIC(20,8), single human, cross-engine validation)
+      4. Domain and process variant are correctly identified in the WP
+      5. Spec is sufficient for an implementation team to begin GATE_1 without requesting clarification
+
+      **If PASS** — submit via `POST /api/runs/{run_id}/advance` with verdict=pass.
+      The WP enters GATE_1; the ORCHESTRATOR takes over.
+
+      **If FAIL** — submit via `POST /api/runs/{run_id}/reject-entry` with a precise reason.
+      The run is terminated immediately (status=FAILED). The WP returns to PLANNED.
+      The authoring architect must produce a revised spec and resubmit the WP.
+
+      Iron Rule: **GATE_0 BLOCK stops all downstream work. No correction cycles. No second chances.**
+
+      ## TRIGGER PROTOCOL
+
+      PASS: `POST /api/runs/{run_id}/advance` with `{"verdict": "pass", "summary": "Entry validated — all 5 criteria PASS"}`
+      FAIL (terminal): `POST /api/runs/{run_id}/reject-entry` with `{"reason": "<precise actionable reason>"}`
+
+      Identity header format: `# GATE_0 — team_190 | Run {run_id} | WP: {work_package_id}`
+    version: 4
+    is_active: 1
+  - id: "01JK8AOSV3TPL0000000002"
+    gate_id: GATE_1
+    phase_id: "1.1"
+    domain_id: null
+    name: Gate 1 Phase 1.1 — Spec Production (Team 170)
+    body_markdown: |
+      # L1 — Task: Specification Production (GATE_1 / Phase 1.1)
+      You are **Team 170 — Spec & Governance**.
+
+      **Your role:** Produce the LOD200/LOD400 specification for this work package.
+      You write the spec. You do NOT route or coordinate other teams.
+
+      **Deliverables (ALL required before advancing):**
+      1. Spec document stored in `_COMMUNICATION/team_170/` with identity header `[GATE_1-SPEC]`
+      2. **Scope:** domain (tiktrack / agents_os), feature boundaries, what is explicitly excluded
+      3. **Acceptance criteria:** measurable and unambiguous — no "should", "may", "as needed"
+      4. **Architecture constraints:** Iron Rules applicable to this WP (NUMERIC(20,8), status model, etc.)
+      5. **Team assignments for GATE_3:** domain-aware
+         - TikTrack domain (TRACK_FULL): Team 20 (backend), Team 30 (frontend), Team 40 (assets), Team 50 (QA)
+         - Agents OS domain (TRACK_FOCUSED): Team 61 (full-stack), Team 51 (QA)
+      6. **Open questions:** any CLARIFICATION_REQUIRED items flagged for Team 00 before advancing
+
+      **If CLARIFICATION_REQUIRED items exist:** do NOT advance — flag and await Team 00 response.
+
+      **Advance when:** spec is complete, all items above present, no open clarifications.
+      Submit: `POST /api/runs/{run_id}/advance` with `{"verdict": "pass", "summary": "Spec complete"}`
+
+      The spec advances to Phase 1.2 (Team 190 validation).
+
+      ## TRIGGER PROTOCOL
+
+      Preferred (CANONICAL_AUTO / Mode A):
+      ```
+      POST /api/runs/{run_id}/feedback
+      X-Actor-Team-Id: team_170
+      {"detection_mode": "CANONICAL_AUTO", "structured_json": {"schema_version": "1", "verdict": "PASS", "confidence": "HIGH", "summary": "Spec complete", "blocking_findings": [], "route_recommendation": null}}
+      ```
+      Legacy: `POST /api/runs/{run_id}/advance` with `{"verdict": "pass", "summary": "Spec complete"}`
+      FAIL: `POST /api/runs/{run_id}/fail` with findings. `route_recommendation`: `"doc"` | `"impl"` | `"arch"`.
+    version: 4
+    is_active: 1
+  - id: "01JK8AOSV3TPL0000000007"
+    gate_id: GATE_1
+    phase_id: "1.2"
+    domain_id: null
+    name: Gate 1 Phase 1.2 — Spec Validation (Team 190)
+    body_markdown: |
+      # L1 — Task: Spec Validation (GATE_1 / Phase 1.2)
+      You are **Team 190 — Constitutional Validator**.
+
+      **Your role:** ADVERSARIAL review of the spec produced at Phase 1.1 by Team 170.
+      Independence is MANDATORY — do not review other architects' conclusions before your own validation.
+
+      **Validation criteria (ALL must pass):**
+      1. Spec exists at LOD200 minimum: scope, domain, deliverables clearly stated
+      2. All ACs are measurable and unambiguous (no "should", "may", "as needed")
+      3. No Iron Rule violations (NUMERIC(20,8), single human principal, cross-engine validation)
+      4. Implementation team assignments are correct (TRACK_FULL / TRACK_FOCUSED per domain)
+      5. Spec is self-sufficient — GATE_3 implementation teams can begin without requesting clarification
+
+      **If PASS:**
+      Submit: `POST /api/runs/{run_id}/advance` with `{"verdict": "pass", "summary": "Spec validated"}`
+      Run advances to GATE_2 for architecture approval.
+
+      **If FAIL (blocking findings):**
+      Submit: `POST /api/runs/{run_id}/fail` with blocking findings listed precisely.
+      The run enters CORRECTION mode — spec returns to Team 170 for revision.
+      Iron Rule: every FAIL report MUST include a `route_recommendation` field.
+
+      ## TRIGGER PROTOCOL
+
+      Preferred (CANONICAL_AUTO / Mode A):
+      ```
+      POST /api/runs/{run_id}/feedback
+      X-Actor-Team-Id: team_190
+      {"detection_mode": "CANONICAL_AUTO", "structured_json": {"schema_version": "1", "verdict": "PASS", "confidence": "HIGH", "summary": "Spec validated — all 5 criteria PASS", "blocking_findings": [], "route_recommendation": null}}
+      ```
+      Legacy PASS: `POST /api/runs/{run_id}/advance` with `{"verdict": "pass", "summary": "Spec validated"}`
+      FAIL: `POST /api/runs/{run_id}/fail`. `route_recommendation`: `"doc"` | `"impl"` | `"arch"` (NOT "full").
+    version: 2
+    is_active: 1
+  - id: "01JK8AOSV3TPL0000000003"
+    gate_id: GATE_2
+    phase_id: "2.1"
+    domain_id: null
+    name: Gate 2 — Architecture Approval
+    body_markdown: |
+      # L1 — Task: Architecture Approval (GATE_2 / Phase 2.1)
+
+      **The approver is the architect who authored the LOD200/LOD400 spec (see L4 current_actor).**
+
+      Actor resolution (domain-aware, naming rule: suffix-0 = TikTrack, suffix-1 = AOS):
+      - **TikTrack domain → team_110** (TikTrack Domain Architect, suffix-0); system fallback: team_100
+      - **Agents OS domain → team_111** (AOS Domain Architect, suffix-1); system fallback: team_100
+      - team_00 acts ONLY when Nimrod explicitly overrides — never a system default
+      - `is_human_gate = 0` — ADVANCE button (not APPROVE). Human approval is NOT required.
+
+      ---
+
+      ## Validation checklist (ALL must pass before advancing)
+
+      ### Layer 1 — Strategic alignment
+      1. Spec aligns with the active Stage and approved roadmap program
+      2. All ACs are achievable within the current Stage constraints (no out-of-scope scope creep)
+
+      ### Layer 2 — Architectural integrity
+      3. No Iron Rule violations (NUMERIC(20,8), single human principal, 4-state status model, cross-engine validation)
+      4. No architectural anti-patterns (no per-entity customization, no bundler, no direct DB write outside ORM)
+
+      ### Layer 3 — Execution readiness
+      5. Implementation team assignments are correct for the domain and process variant:
+         - TRACK_FULL (TikTrack): Team 20 (backend) + Team 30 (frontend) + Team 40 (assets) + Team 50 (QA)
+         - TRACK_FOCUSED (AOS): Team 61 (full-stack) + Team 51 (QA)
+      6. LOD200/LOD400 sufficiency — GATE_3 implementation team can begin without requesting clarification
+
+      ### Layer 4 — AOS-specific (agents_os domain only)
+      7. Gate model compliance — spec correctly describes gate interactions, phase structure, and actor assignments
+      8. TRACK_FOCUSED adherence — only Team 61 + Team 51 assigned (no TRACK_FULL teams)
+
+      ---
+
+      **If PASS (all 8 checks GREEN):**
+      Use the **ADVANCE** button in the pipeline UI, or:
+      `POST /api/runs/{run_id}/advance` with `{"verdict": "pass", "summary": "Architecture approved — [brief reason]"}`
+
+      **If FAIL (any blocking finding):**
+      `POST /api/runs/{run_id}/fail` with `{"verdict": "fail", "summary": "...", "route_recommendation": "team_170"}`
+      Spec returns to Team 170 for revision (Correction Cycle). `route_recommendation` is MANDATORY on every FAIL.
+
+      ## TRIGGER PROTOCOL
+
+      Preferred (CANONICAL_AUTO / Mode A):
+      ```
+      POST /api/runs/{run_id}/feedback
+      X-Actor-Team-Id: {actor_team_id}
+      {"detection_mode": "CANONICAL_AUTO", "structured_json": {"schema_version": "1", "verdict": "PASS", "confidence": "HIGH", "summary": "Architecture approved — [brief reason]", "blocking_findings": [], "route_recommendation": null}}
+      ```
+      Legacy PASS: `POST /api/runs/{run_id}/advance` with `{"verdict": "pass", "summary": "Architecture approved — [brief reason]"}`
+      FAIL: `POST /api/runs/{run_id}/fail`. `route_recommendation`: `"doc"` | `"impl"` | `"arch"` (NOT "full").
+    version: 5
+    is_active: 1
+  - id: "01JK8AOSV3TPL0000000004"
+    gate_id: GATE_3
+    phase_id: "3.1"
+    domain_id: null
+    name: Gate 3 — Implementation Coordination
+    body_markdown: |
+      # L1 — Task: Implementation Coordination (GATE_3)
+      You are the **ORCHESTRATOR** for the work package in L4.
+
+      **Your role:** Coordinate implementation. You do NOT implement directly.
+      Team assignments depend on the process variant (see L4).
+
+      **TRACK_FULL (tiktrack default):**
+      - Generate mandates for: Team 20 (backend), Team 30 (frontend), Team 40 (UI assets),
+        Team 60 (DevOps) — as applicable per WP scope
+      - Route QA package to Team 50 for full E2E acceptance testing
+      - Advance when: Team 50 E2E PASS + all GATE_2 ACs confirmed met
+
+      **TRACK_FOCUSED (agents_os default):**
+      - Generate mandate for Team 61 (full-stack implementation, all layers)
+      - Route QA package to Team 51 for E2E acceptance testing
+      - Advance when: Team 51 E2E PASS + all GATE_2 ACs confirmed met
+
+      Iron Rule: Full test suite must pass (0 failures) before submitting QA package.
+    version: 2
+    is_active: 1
+  - id: "01JK8AOSV3TPL0000000005"
+    gate_id: GATE_4
+    phase_id: "4.1"
+    domain_id: null
+    name: Gate 4 — UX / Vision Sign-off (Human Gate)
+    body_markdown: |
+      # L1 — Awaiting Human Approval (GATE_4)
+      **This is a HITL (Human-In-The-Loop) gate.**
+
+      The Principal (Nimrod / Team 00) reviews the implementation directly in browser
+      and approves or rejects via the **APPROVE** button in the Agents OS pipeline UI.
+
+      Agents **do not advance this gate**. Await operator action.
+
+      Reviewing criteria:
+      - UX/vision alignment with original LOD200 intent
+      - All GATE_3 acceptance criteria verified in browser
+      - No functional regressions introduced
+      - Iron Rule adherence (financial precision, status model, page template)
+    version: 2
+    is_active: 1
+  - id: "01JK8AOSV3TPL0000000006"
+    gate_id: GATE_5
+    phase_id: "5.1"
+    domain_id: null
+    name: Gate 5 — Lifecycle Closure
+    body_markdown: |
+      # L1 — Task: Lifecycle Closure (GATE_5)
+      You are the **ORCHESTRATOR** for the work package in L4.
+
+      **Your role:** Coordinate documentation closure and registry updates.
+
+      **Actions:**
+      1. Route documentation closure mandate to the domain documentation team:
+         - tiktrack domain → Team 70 (TikTrack Documentation)
+         - agents_os domain → Team 71 (AOS Documentation)
+      2. Route validation to Team 90 (Dev Validator) — confirms all artifacts committed
+         and all AS_MADE documentation is complete
+      3. Update program registry entries (PHOENIX_PROGRAM_REGISTRY) with final status
+      4. Emit final WORK_PACKAGE_CLOSED event
+      5. Advance when: documentation committed and signed off, Team 90 validates,
+         registry updated, no open blocking items remain
+    version: 2
+    is_active: 1
+
+# ---------------------------------------------------------------------------
+# Work Packages
+# ---------------------------------------------------------------------------
+# Bootstrap: AOS smoke-test placeholder (keep for run smoke-tests)
+# TikTrack roadmap: all 21 programs from PHOENIX_PROGRAM_REGISTRY, seeded 2026-03-29
+#   id = work_package_id in canonical 3-level format: S{NNN}-P{NNN}-WP{NNN}
+#   Even single-WP programs must use WP001 suffix — never use program-level IDs as WP IDs.
+#   Directive: ARCHITECT_DIRECTIVE_WP_ID_NAMING_CONVENTION_v1.0.0.md
+#   stage_id = Milestone (S001-S006 per PHOENIX_PORTFOLIO_ROADMAP)
+#   status: COMPLETE | ACTIVE | PLANNED
+# ---------------------------------------------------------------------------
+work_packages:
+  - id: "01JK8AOSV3WP0000000001"
+    label: "Bootstrap work package (seed)"
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: null
+    program_id: null
+
+  # ── S001 — Foundations Sealed ─────────────────────────────────────────────
+  - id: "S001-P002-WP001"
+    label: "Alerts POC (D34 widget)"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: ACTIVE
+    linked_run_id: null
+    stage_id: "S001"
+    program_id: "S001-P002"
+
+  # ── S002 — Core Pipeline (TikTrack lane) ──────────────────────────────────
+  - id: "S002-P002-WP001"
+    label: "MCP-QA Transition (Full Pipeline Orchestrator)"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: COMPLETE
+    linked_run_id: null
+    stage_id: "S002"
+    program_id: "S002-P002"
+
+  - id: "S002-P003-WP001"
+    label: "TikTrack Alignment (D22 + D33 + D34 + D35)"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: COMPLETE
+    linked_run_id: null
+    stage_id: "S002"
+    program_id: "S002-P003"
+
+  - id: "S002-P004-WP001"
+    label: "Admin Review S002"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S002"
+    program_id: "S002-P004"
+
+  # ── S003 — Essential Data ─────────────────────────────────────────────────
+  - id: "S003-P003-WP001"
+    label: "System Settings (D39 Preferences + D40 System Mgmt + D41 User Mgmt)"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: COMPLETE
+    linked_run_id: null
+    stage_id: "S003"
+    program_id: "S003-P003"
+
+  - id: "S003-P004-WP001"
+    label: "User Tickers (D33) — live price display, display_name Iron Rule"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: ACTIVE
+    linked_run_id: null
+    stage_id: "S003"
+    program_id: "S003-P004"
+
+  - id: "S003-P005-WP001"
+    label: "Watch Lists (D26) — CRUD watchlists + live prices"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S003"
+    program_id: "S003-P005"
+
+  - id: "S003-P006-WP001"
+    label: "Admin Review S003"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S003"
+    program_id: "S003-P006"
+
+  # ── S004 — Financial Execution ────────────────────────────────────────────
+  - id: "S004-P004-WP001"
+    label: "Executions (D36)"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S004"
+    program_id: "S004-P004"
+
+  - id: "S004-P005-WP001"
+    label: "Data Import (D37) — Delta-Reset policy (Option B)"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S004"
+    program_id: "S004-P005"
+
+  - id: "S004-P006-WP001"
+    label: "Admin Review S004"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S004"
+    program_id: "S004-P006"
+
+  - id: "S004-P007-WP001"
+    label: "Indicators Infrastructure (ATR/MA/CCI, ticker_indicators table)"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S004"
+    program_id: "S004-P007"
+
+  # ── S005 — Complex Entities (requires AOS Completion Gate) ────────────────
+  - id: "S005-P002-WP001"
+    label: "Trade Entities (D29 Trades + D24 Trade Plans)"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S005"
+    program_id: "S005-P002"
+
+  - id: "S005-P003-WP001"
+    label: "Market Intelligence (D27 Ticker Dashboard + D25 AI Analysis)"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S005"
+    program_id: "S005-P003"
+
+  - id: "S005-P004-WP001"
+    label: "Journal & History (D28 Trading Journal + D31 Trade History)"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S005"
+    program_id: "S005-P004"
+
+  - id: "S005-P005-WP001"
+    label: "Admin Review S005"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S005"
+    program_id: "S005-P005"
+
+  # ── S006 — Advanced Analytics ─────────────────────────────────────────────
+  - id: "S006-P001-WP001"
+    label: "Portfolio State (D32)"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S006"
+    program_id: "S006-P001"
+
+  - id: "S006-P002-WP001"
+    label: "Analysis & Closure (D30)"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S006"
+    program_id: "S006-P002"
+
+  - id: "S006-P003-WP001"
+    label: "Level-1 Dashboards"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S006"
+    program_id: "S006-P003"
+
+  - id: "S006-P004-WP001"
+    label: "Admin Review S006 FINAL"
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S006"
+    program_id: "S006-P004"
+
+# ---------------------------------------------------------------------------
+# V2 → V3 Migration: Ideas
+# Seeded 2026-03-29 by Team 00 (Nimrod).
+#
+# DOMAIN IDs:
+#   tiktrack   = 01JK8AOSV3DOMAIN00000002
+#   agents_os  = 01JK8AOSV3DOMAIN00000001
+#
+# TikTrack ideas (status: NEW) — feature requirements, accurate and transferred as-is.
+# AOS ideas (status: DEFERRED) — from v2; marked [V2_LEGACY]; require separate discussion.
+# ---------------------------------------------------------------------------
+ideas:
+
+  # ── TikTrack domain ──────────────────────────────────────────────────────
+
+  - id: "IDEA-023"
+    title: "Manual/Visual approval checkpoint closure verification"
+    description: "Approval UX completeness check — Batch 3 readiness. Visual approval steps need explicit closure verification mechanism in the UI."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "Migrated from v2 CARRY-001. Owner: Team 40+10."
+
+  - id: "IDEA-024"
+    title: "Cash Flows response schema verification status closure"
+    description: "D-CashFlows backend schema accuracy verification. Response schema fields need alignment confirmation before batch 3."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "Migrated from v2 CARRY-002. Owner: Team 20."
+
+  - id: "IDEA-025"
+    title: "Data loader update for currency_conversions"
+    description: "currency_conversions data loader fix — Batch 3 readiness. Loader needs update to handle currency conversion data correctly."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "Migrated from v2 CARRY-003. Owner: Team 30."
+
+  - id: "IDEA-026"
+    title: "D22 Tickers: data-integrity widget + integration completion"
+    description: "D22 admin page data-integrity widget implementation. Widget shows data health, highlights missing/stale ticker data."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "Migrated from v2 CARRY-004. Owner: Team 30+20."
+
+  - id: "IDEA-027"
+    title: "D23 Data Dashboard: template/draft to functional scope"
+    description: "D23 needs full implementation beyond current template. Functional dashboard with real data, charts, and summary panels."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "Migrated from v2 CARRY-005. Owner: Team 30."
+
+  - id: "IDEA-028"
+    title: "D24 Trade Plans: implementation planning and execution gate"
+    description: "D24 Trade Plans full spec + build. Page for creating, editing, and managing trade plans before execution."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "Migrated from v2 CARRY-006. Batch 5. Owner: Team 31+30+20."
+
+  - id: "IDEA-029"
+    title: "D25 AI Analysis: detailed spec before build"
+    description: "D25 AI Analysis requires detailed spec (S005-P003 scope). Page for AI-driven trade analysis, pattern recognition, recommendations."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "Migrated from v2 CARRY-007. Batch 5/6. Owner: Team 31+30+70."
+
+  - id: "IDEA-031"
+    title: "D27 Ticker Dashboard: spec + historical data dependencies"
+    description: "D27 Ticker Dashboard requires historical data infrastructure. Per-ticker page with price history, technicals, linked trades."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "Migrated from v2 CARRY-009. Batch 6. Owner: Team 31+30+20."
+
+  - id: "IDEA-032"
+    title: "D28 Trading Journal: spec + implementation plan"
+    description: "D28 Trading Journal — rich-text per-trade notes with date, mood, lessons-learned fields."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "Migrated from v2 CARRY-010. Batch 6. Owner: Team 31+30."
+
+  - id: "IDEA-033"
+    title: "D30-D32 advanced research pages: full specs"
+    description: "D30 Analysis & Closure, D31 Trade History, D32 Portfolio State — all require full specs before build. Advanced analytics layer."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "Migrated from v2 CARRY-011. Batch 6. Owner: Team 31+30+70."
+
+  - id: "IDEA-034"
+    title: "D37 Data Import: Delta-Reset policy locked (Option B)"
+    description: "D37 Data Import — Option B (Delta-Reset via enhanced D37 import) locked per ARCHITECT_DIRECTIVE_PL_RECONCILIATION_POLICY. Import CSV/broker data with P&L reconciliation."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "MEDIUM"
+    submitted_by: "team_00"
+    decision_notes: "Migrated from v2 CARRY-012. Batch 4. Owner: Team 31+30+20. Policy locked: Option B (Delta-Reset). Option C (Direct Broker API) deferred to S006+."
+
+  - id: "IDEA-035"
+    title: "D38 Tag Management: spec + implementation (S005)"
+    description: "D38 Tag Management (route: /tag_management) — system-wide tag registry page. Admin page for creating, editing, deleting tag definitions across all entity types."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "Scope updated 2026-03-29: D39 (User Preferences) is COMPLETE (S003-P003 GATE_8 PASS). D40 admin settings tracked in IDEA-054. This idea = D38 only. D38 is deferred to S005 — depends on D29/D30/D36 existing so tags can be applied to trade entities. Owner: Team 31+30+70."
+    target_program_id: "S005"
+
+  - id: "IDEA-054"
+    title: "D40 System Management: complete sections 4-7"
+    description: "D40 System Management page (route: /system_management) — sections 4-7 completion. S003-P003 delivered sections 1-3 (Market Data Settings, Background Jobs, Feature Flags). Sections 4-7 have skeleton HTML, no backend: (4) Alert Conditions Config, (5) System Health, (6) Recent Activity, (7) Active System Configuration."
+    domain_id: "01JK8AOSV3DOMAIN00000002"
+    idea_type: "FEATURE"
+    status: "NEW"
+    priority: "MEDIUM"
+    submitted_by: "team_00"
+    decision_notes: "NEW 2026-03-29. Distinct from D39 (User Preferences = personal per-user settings, COMPLETE) and D38 (Tag Management, S005). D40 = admin-level system configuration. Section 4 needs alert rule CRUD API; Section 5 needs health check aggregation endpoint; Section 6 uses job_run_log + system_settings.updated_by/at (no new table); Section 7 is display-only overview of system_settings. Stage TBD — candidate for S004 or S003-P003 extension WP."
+
+  # ── AOS domain — V2_LEGACY ──────────────────────────────────────────────
+  # All items below came from AOS v2 pipeline. Transferred as-is for information.
+  # Each requires SEPARATE DISCUSSION and RE-EVALUATION against AOS v3 design.
+  # DO NOT act on these items without explicit Team 00 + Team 100 session decision.
+
+  - id: "IDEA-001"
+    title: "Standalone PIPELINE_HELP.html — dedicated help page (Option B)"
+    description: "Dedicated help/documentation page for the AOS pipeline UI, separate from the dashboard modal. Option A (modal upgrade) was handled in v2. Option B = standalone page."
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    idea_type: "FEATURE"
+    status: "DEFERRED"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "[V2_LEGACY] Requires separate discussion and re-evaluation for AOS v3. Original fate_target: S003-P007 (now MERGED into S003-P011, COMPLETE). The standalone help page concept may apply to v3 UI but scope/approach must be reassessed for v3 architecture."
+
+  - id: "IDEA-007"
+    title: "Ideas Pipeline Phase 2 — grooming automation, UI fate-decision interface"
+    description: "Phase 2 of the ideas pipeline: automated grooming (idea_groom.sh), UI fate-decision interface in dashboard, dedup warnings, registry auto-integration."
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    idea_type: "FEATURE"
+    status: "DEFERRED"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "[V2_LEGACY] Requires separate discussion. Original: S002-P005-WP004 candidate in v2. v3 has ideas table in DB — Phase 2 automation concept is valid but must be scoped against v3 REST API (POST /api/ideas, PUT /api/ideas/{id}) rather than v2 bash scripts."
+
+  - id: "IDEA-008"
+    title: "Help modal 4-tab upgrade — Option A immediate (context banner, Three Modes, domain section)"
+    description: "Upgrade the pipeline dashboard help modal to 4 tabs: (1) Context Banner, (2) Three Operating Modes, (3) Domain Section, (4) Quick Reference."
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    idea_type: "IMPROVEMENT"
+    status: "DEFERRED"
+    priority: "HIGH"
+    submitted_by: "team_00"
+    decision_notes: "[V2_LEGACY] Requires re-evaluation. v3 has a new UI (portfolio.html, config.html, runs.html). The 4-tab help modal concept may apply to v3 dashboard but needs scope assessment against v3 UI structure. Do not implement against v2 modal."
+
+  - id: "IDEA-018"
+    title: "Pipeline stage transitions + roadmap management UI"
+    description: "Stage transition scripts and management UI: ability to open/close stages, view stage history, manage the roadmap from within the AOS dashboard."
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    idea_type: "FEATURE"
+    status: "DEFERRED"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "[V2_LEGACY] Requires re-evaluation. Was S004 candidate in v2 (stage transition scripts + management UI). v3 REST API has /api/work-packages and /api/runs but no stage-management endpoints. Full scope assessment needed before WP assignment."
+
+  - id: "IDEA-021"
+    title: "Model B file structure definition (ADR-031 Stage B)"
+    description: "Define the Model B file output structure for the AOS command bridge — how model outputs are structured, validated, and consumed."
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    idea_type: "TECH_DEBT"
+    status: "DEFERRED"
+    priority: "LOW"
+    submitted_by: "team_00"
+    decision_notes: "[V2_LEGACY] Requires re-evaluation. Original fate_target: S003-P007 (ADR-031 Stage B, now MERGED into S003-P011, COMPLETE). Model B file structure concept may be relevant to v3 Operator Handoff design (FIP modes, feedback ingestion). Needs reassessment against v3 FeedbackIngestor architecture."
+
+  - id: "IDEA-043"
+    title: "WP Lifecycle Manager: init/hold/resume/cancel/close as CLI + Dashboard UI"
+    description: "WP lifecycle management: CLI commands for init/hold/resume/cancel/close work packages, and a dashboard panel for lifecycle control."
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    idea_type: "FEATURE"
+    status: "DEFERRED"
+    priority: "HIGH"
+    submitted_by: "team_00"
+    decision_notes: "[V2_LEGACY] Partially addressed by v3 REST API (POST /api/runs creates WP, PUT /api/runs/{id} updates, DELETE cancels). However, CLI wrapper (pipeline_run.sh equivalent) and dashboard lifecycle panel are not yet built. Requires v3-specific scoping: which lifecycle operations are needed beyond the existing REST API?"
+
+  - id: "IDEA-051"
+    title: "AOS Scheduler reclassification + research-based architecture direction"
+    description: "Reclassify and define the AOS scheduler architecture. Should it be APScheduler, Celery, a DB-polling loop, or something else? Research-based decision needed."
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    idea_type: "RESEARCH"
+    status: "DEFERRED"
+    priority: "HIGH"
+    submitted_by: "team_00"
+    decision_notes: "[V2_LEGACY] Architectural decision still pending. v3 currently uses APScheduler for background tasks. Team 190 research report exists: TEAM_190_TO_TEAM_100_IDEA_051_AOS_SCHEDULER_RESEARCH_REPORT_v1.0.0.md. Requires Team 100 architecture direction before any scheduler changes."

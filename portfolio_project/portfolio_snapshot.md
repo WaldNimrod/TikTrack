@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-24T20:04:30.969859+00:00`
+- Generated (UTC): `2026-04-02T09:25:42.568433+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -17,7 +17,7 @@
 
 - stages: `6`
 - programs: `40`
-- work_packages: `22`
+- work_packages: `23`
 
 ## Roadmap (hierarchical)
 
@@ -64,9 +64,10 @@
     ├── **Program** `S003-P003` — System Settings (D39+D40+D41) | COMPLETE | domain: **TIKTRACK**
         └── **WP** `S003-P003-WP001` | CLOSED | gate: GATE_8 (PASS) | domain: **TIKTRACK**
 
-    ├── **Program** `S003-P004` — User Tickers (D33) | PLANNED | domain: **TIKTRACK**
+    ├── **Program** `S003-P004` — User Tickers (D33) | ACTIVE | domain: **TIKTRACK**
 
-    ├── **Program** `S003-P005` — Watch Lists (D26) | PLANNED | domain: **TIKTRACK**
+    ├── **Program** `S003-P005` — Watch Lists (D26) | ACTIVE | domain: **TIKTRACK**
+        └── **WP** `S003-P005-WP001` | IN_PROGRESS | gate: GATE_0 | domain: **TIKTRACK**
 
     ├── **Program** `S003-P006` — Admin Review S003 | PLANNED | domain: **TIKTRACK**
 

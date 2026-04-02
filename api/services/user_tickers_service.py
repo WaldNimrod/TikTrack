@@ -25,6 +25,22 @@ from ..schemas.tickers import TickerResponse
 
 logger = logging.getLogger(__name__)
 
+
+def sort_ticker_responses_for_list(
+    items: List[TickerResponse], sort_by: str, sort_dir: str
+) -> List[TickerResponse]:
+    """Sort in-memory ticker rows for /me/tickers (display_name; null placement per sort_dir)."""
+    if sort_by != "display_name":
+        return list(items)
+    with_name = [r for r in items if r.display_name is not None]
+    without = [r for r in items if r.display_name is None]
+    reverse = sort_dir == "desc"
+    with_name.sort(key=lambda r: (r.display_name or "").lower(), reverse=reverse)
+    if sort_dir == "asc":
+        return with_name + without
+    return without + with_name
+
+
 # Per TT2_TICKER_STATUS_MARKET_DATA_LOADING_SSOT — new ticker from "הטיקרים שלי" = pending
 _USER_CREATED_TICKER_STATUS = "pending"
 

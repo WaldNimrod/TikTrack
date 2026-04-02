@@ -41,7 +41,7 @@ This addendum locks **human / Principal / Team 00** semantics for agent-loaded g
 **מטרה:** FK integrity בלבד —
 
 - `Assignment.assigned_by` → team_00 (כשה-Principal יוצר Assignment)
-- `Event.actor_id` (כאשר `actor_type='human'`) → team_00
+- `Event.actor_team_id` (כאשר `actor_type='human'`) → team_00 — שם העמודה לפי Entity Dictionary §Event + DDL AOS v3
 
 **חשוב:** זה ייצוג DB של human operator — לא agent, לא team בפייפליין.  
 **Iron Rule:** אין לנתב pipeline tasks ל-`team_00` ב-`routing_rules`.
@@ -59,9 +59,10 @@ This addendum locks **human / Principal / Team 00** semantics for agent-loaded g
 
 - Hub (merge desk): `_COMMUNICATION/team_100/TEAM_101_TO_TEAM_100_AOS_V3_CONSOLIDATED_FEEDBACK_FOR_CHIEF_ARCHITECT_v1.1.0.md`  
 - Principal / communication model (working prose): `_COMMUNICATION/team_101/TEAM_101_PRINCIPAL_TEAM_00_AND_COMMUNICATION_MODEL_v1.0.0.md`  
-- Entity Dictionary (ER): `_COMMUNICATION/team_101/TEAM_101_AOS_V3_ENTITY_DICTIONARY_v2.0.0.md`  
+- Entity Dictionary (ER): `_COMMUNICATION/team_101/TEAM_101_AOS_V3_ENTITY_DICTIONARY_v2.0.2.md`  
 
 ---
 
 **log_entry | TEAM_170 | PRINCIPAL_AND_TEAM_00_MODEL | v1.0.0_CANONICAL | 2026-03-26**  
-**log_entry | TEAM_170 | PRINCIPAL_AND_TEAM_00_MODEL | D03_DB_SECTION_EXPANDED | 2026-03-26**
+**log_entry | TEAM_170 | PRINCIPAL_AND_TEAM_00_MODEL | D03_DB_SECTION_EXPANDED | 2026-03-26**  
+**log_entry | TEAM_170 | PRINCIPAL_AND_TEAM_00_MODEL | D03_EVENT_ACTOR_TEAM_ID_ALIGNMENT | 2026-03-26**

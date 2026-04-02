@@ -1,0 +1,6 @@
+id: scenario_04_remediation_alias
+description: G3_REMEDIATION → GATE_3 (SSOT parity Python/JS)
+expect:
+  alias_check:
+    legacy: G3_REMEDIATION
+    canonical: GATE_3

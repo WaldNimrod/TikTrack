@@ -1,0 +1,4 @@
+# Keep database credentials out of Cursor indexing / file reads by the AI.
+# Local terminal commands can still: source agents_os_v3/.env && …
+api/.env
+agents_os_v3/.env

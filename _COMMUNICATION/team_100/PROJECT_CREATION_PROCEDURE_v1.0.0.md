@@ -356,15 +356,17 @@ echo "v[new-version] (updated [date])" >> LEAN_KIT_VERSION.md
 
 ## Part 6 — Index Links
 
-This procedure must be referenced from:
-- [ ] `documentation/docs-governance/01-FOUNDATIONS/` procedure index
-- [ ] `TEAM_100_LOD_STANDARD_v0.3.md` §Lean overlay
-- [ ] `ARCHITECT_DIRECTIVE_METHODOLOGY_DEPLOYMENT_SPLIT_v1.0.0.md` §3
-- [ ] `agents_os_v3/AGENTS.md` project setup section
-- [ ] `00_MASTER_INDEX.md`
+Cross-references (canonical paths relative to repository root). Indexed **2026-04-02** (Team 170 — session indexing).
 
-> **TODO for Team 170:** Add this document to the governance procedure index
-> and the master index. Link from LOD Standard §Lean.1.
+| Reference | Link |
+|-----------|------|
+| Governance procedures index | [GOVERNANCE_PROCEDURES_INDEX.md](../../documentation/docs-governance/00-INDEX/GOVERNANCE_PROCEDURES_INDEX.md) |
+| LOD Standard (canonical v1.0.0; Lean overlay) | [LOD_STANDARD_v1.0.0.md](../../documentation/docs-governance/01-FOUNDATIONS/LOD_STANDARD_v1.0.0.md) — source snapshot: [TEAM_100_LOD_STANDARD_v0.3.md](TEAM_100_LOD_STANDARD_v0.3.md) |
+| Methodology / Deployment Split (Iron Rule) §3 | [ARCHITECT_DIRECTIVE_METHODOLOGY_DEPLOYMENT_SPLIT_v1.0.0.md](../_Architects_Decisions/ARCHITECT_DIRECTIVE_METHODOLOGY_DEPLOYMENT_SPLIT_v1.0.0.md) |
+| AOS v3 agent context / setup | [AGENTS.md](../../AGENTS.md) |
+| Repository master index | [00_MASTER_INDEX.md](../../00_MASTER_INDEX.md) |
+
+This procedure is also listed under **§ _COMMUNICATION — indexed session 2026-04-02** in the governance procedures index.
 
 ---
 

@@ -1,0 +1,51 @@
+# Team 61 — agents_os_v2: gate-map codegen, full pytest (WP004+WP005 testkit), ssot_check.
+name: Agents OS V2 — Quality & Testkit
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "agents_os_v2/**"
+      - "_COMMUNICATION/agents_os/pipeline_state*.json"
+      - ".github/workflows/agents-os-v2.yml"
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "agents_os_v2/**"
+      - "_COMMUNICATION/agents_os/pipeline_state*.json"
+      - ".github/workflows/agents-os-v2.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  agents-os-v2-tests:
+    name: Gate map + full pytest + ssot_check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip -q
+          pip install -q -r agents_os_v2/requirements.txt pytest pydantic
+
+      - name: Generate gate map from SSOT (check-only drift guard)
+        run: python3 agents_os_v2/tools/generate_gate_map_assets.py
+
+      - name: Full agents_os_v2 test suite (WP004 + WP005 testkit + SSOT)
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          python3 -m pytest agents_os_v2/tests/ -q --tb=short
+
+      - name: ssot_check (both domains — must exit 0)
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          python3 -m agents_os_v2.tools.ssot_check --domain agents_os
+          python3 -m agents_os_v2.tools.ssot_check --domain tiktrack

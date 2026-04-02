@@ -14,12 +14,45 @@ for INITIATE / ADVANCE / FAIL / APPROVE_GATE / PAUSE / RESUME.
 from __future__ import annotations
 
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 import jsonschema
 import ulid as _ulid_mod
+
+# ── Work Package ID format validation ─────────────────────────────────────────
+_WP_ID_CANONICAL_RE = re.compile(r"^S\d{3}-P\d{3}-WP\d{3}$")
+_WP_ID_ULID_RE = re.compile(r"^[0-9A-Z]{20,26}$")  # 26-char real ULID or 22-char bootstrap IDs
+
+
+def _validate_wp_id_format(work_package_id: str) -> None:
+    """Raise StateMachineError if work_package_id is not the canonical 3-level format.
+
+    Accepts:
+      - ``S{NNN}-P{NNN}-WP{NNN}``  (canonical, e.g. ``S003-P005-WP001``)
+      - 26-char uppercase ULID       (bootstrap/smoke-test records)
+
+    Rejects:
+      - Program-level IDs like ``S003-P005`` (missing WP number)
+      - Any other malformed string
+
+    Directive: ARCHITECT_DIRECTIVE_WP_ID_NAMING_CONVENTION_v1.0.0.md
+    """
+    if _WP_ID_CANONICAL_RE.match(work_package_id):
+        return
+    if _WP_ID_ULID_RE.match(work_package_id):  # ULID bootstrap WPs
+        return
+    raise StateMachineError(
+        "INVALID_WP_ID_FORMAT",
+        400,
+        details={
+            "work_package_id": work_package_id,
+            "expected": "S{NNN}-P{NNN}-WP{NNN}  e.g. S003-P005-WP001",
+            "hint": "Program-level IDs (S003-P005) are not valid work_package_ids.",
+        },
+    )
 
 def ULID() -> object:  # noqa: N802
     """Compat shim: works with both ulid-py 1.x (ulid.new()) and python-ulid 3.x (ULID()).
@@ -56,10 +89,26 @@ def _merge_pipeline_state(domain_id: str, snapshot: dict[str, Any]) -> None:
 
 
 def _team_for_role(role_id: str, domain_id: str) -> str:
-    """Resolve default assignment team for a pipeline role at run initiation.
+    """Resolve default assignment team for a pipeline role.
 
-    ORCHESTRATOR is domain-scoped: TikTrack → team_10, agents_os → team_11.
+    CONSTITUTIONAL_VALIDATOR (GATE_0 + GATE_1/1.2): team_190, domain-agnostic.
+    SPEC_AUTHOR (GATE_1/1.1): team_170, domain-agnostic.
+    ARCH_APPROVER (GATE_2): the architect who authored the LOD200/LOD400 spec.
+        Naming convention — suffix-0 = TikTrack, suffix-1 = AOS:
+        TikTrack → team_110 (TikTrack Domain Architect, suffix-0).
+        AOS      → team_111 (AOS Domain Architect, suffix-1).
+        Fallback (system only, when domain architect inactive): team_100 (neutral Chief Architect).
+        team_00 is NEVER a system default — only active when Nimrod explicitly overrides.
+    ORCHESTRATOR (GATE_3+): team_10 (tiktrack) or team_11 (agents_os).
     """
+    if role_id == C.CONSTITUTIONAL_VALIDATOR_ROLE_ID:
+        return C.CONSTITUTIONAL_VALIDATOR_TEAM_ID  # team_190, domain-agnostic
+    if role_id == C.SPEC_AUTHOR_ROLE_ID:
+        return C.SPEC_AUTHOR_TEAM_ID  # team_170, domain-agnostic
+    if role_id == C.ARCH_APPROVER_ROLE_ID:
+        if domain_id == C.DOMAIN_ULID_AGENTS_OS:
+            return C.ARCH_APPROVER_TEAM_ID_AOS   # team_111 (AOS Domain Architect, suffix-1)
+        return C.ARCH_APPROVER_TEAM_ID_TT        # team_110 (TikTrack Domain Architect, suffix-0)
     if role_id == C.ORCHESTRATOR_ROLE_ID:
         if domain_id == C.DOMAIN_ULID_AGENTS_OS:
             return C.AOS_GATEWAY_TEAM_ID
@@ -161,18 +210,24 @@ def sync_pipeline_state(conn: Any, run_id: str) -> None:
         wp_target = "COMPLETE"
     elif run_status in ("IN_PROGRESS", "CORRECTION", "PAUSED"):
         wp_target = "ACTIVE"
+    elif run_status == "FAILED":
+        wp_target = "ACTIVE"  # GATE_0 rejection: keep WP ACTIVE + linked so history is visible
     else:
         wp_target = None
     if wp_target:
         with conn:
             with conn.cursor() as cur2:
                 R.update_work_package_status(cur2, wp_id, wp_target)
+                # Do NOT unlink on FAILED — keep the run linked so rejection history is visible.
+                # initiate_run() will overwrite linked_run_id when a new run is created.
 
 
 def initiate_run(conn: Any, *, work_package_id: str, domain_id: str, process_variant: str | None) -> dict[str, Any]:
     run_id: str = ""
     gate0 = "GATE_0"
     first_phase: str | None = None
+    # Stateless format validation first — no DB round-trip needed
+    _validate_wp_id_format(work_package_id)
     with conn:
         with conn.cursor() as cur:
             if not R.principal_row_exists(cur):
@@ -250,6 +305,72 @@ def initiate_run(conn: Any, *, work_package_id: str, domain_id: str, process_var
         "current_gate_id": gate0,
         "current_phase_id": first_phase,
         "status": "IN_PROGRESS",
+    }
+
+
+def reject_entry_run(
+    conn: Any,
+    *,
+    run_id: str,
+    actor_team_id: str,
+    reason: str,
+) -> dict[str, Any]:
+    """Terminal GATE_0 rejection (Entry Quality Gate).
+
+    Allowed only when current_gate_id=GATE_0 and run.status=IN_PROGRESS.
+    Actor must be team_190 (constitutional validator) or team_00 (principal override).
+    Sets run.status=FAILED (terminal), WP.status=ACTIVE (linked, effective=GATE0_REJECTED).
+    WP.linked_run_id is retained so rejection history remains visible.
+    initiate_run() will overwrite linked_run_id when a corrected run is created.
+    Emits GATE0_REJECTED event.
+    """
+    _allowed_actors = {C.CONSTITUTIONAL_VALIDATOR_TEAM_ID, C.TEAM_PRINCIPAL}
+    run: dict[str, Any] = {}
+    with conn:
+        with conn.cursor() as cur:
+            _run = R.fetch_run(cur, run_id)
+            if not _run:
+                raise StateMachineError("UNKNOWN_RUN", 404, details={"run_id": run_id})
+            run = dict(_run)
+            if str(run["current_gate_id"]) != "GATE_0":
+                raise StateMachineError(
+                    "GATE0_REJECT_ONLY_AT_GATE0",
+                    409,
+                    details={"current_gate_id": str(run["current_gate_id"]), "need": "GATE_0"},
+                )
+            if str(run["status"]) != "IN_PROGRESS":
+                raise StateMachineError(
+                    "INVALID_STATE",
+                    409,
+                    details={"status": str(run["status"]), "need": "IN_PROGRESS"},
+                )
+            if actor_team_id not in _allowed_actors:
+                raise StateMachineError(
+                    "UNAUTHORIZED_ACTOR",
+                    403,
+                    details={"actor": actor_team_id, "allowed": sorted(_allowed_actors)},
+                )
+            now = R.utc_now()
+            R.update_run_position(cur, run_id, status="FAILED", last_updated=now)
+            _emit(
+                cur,
+                run=R.fetch_run(cur, run_id),
+                event_type="GATE0_REJECTED",
+                actor_team_id=actor_team_id,
+                actor_type=C.ACTOR_TYPE_HUMAN if actor_team_id == C.TEAM_PRINCIPAL else C.ACTOR_TYPE_AGENT,
+                verdict=C.VERDICT_FAIL,
+                reason=reason,
+                payload={"gate_id": "GATE_0", "rejection_reason": reason},
+            )
+    # sync_pipeline_state: FAILED → WP=PLANNED + unlink
+    sync_pipeline_state(conn, run_id)
+    notify_after_run_mutation(conn, run_id, "IN_PROGRESS")
+    return {
+        "run_id": run_id,
+        "status": "FAILED",
+        "work_package_id": str(run["work_package_id"]),
+        "wp_status": "GATE0_REJECTED",
+        "reason": reason,
     }
 
 
@@ -393,6 +514,24 @@ def advance_run(
                         current_phase_id=np,
                         last_updated=R.utc_now(),
                     )
+                    # Handoff: update assignment when gate changes OR when same-gate phase changes to a different role.
+                    next_rule = R.resolve_routing_rule(cur, ng, dom, np)
+                    if next_rule:
+                        next_role_id = str(next_rule["role_id"])
+                        current_rule = R.resolve_routing_rule(cur, cg, dom, cp)
+                        current_role_id = str(current_rule["role_id"]) if current_rule else None
+                        if ng != cg or next_role_id != current_role_id:
+                            next_team_id = _team_for_role(next_role_id, dom)
+                            R.deactivate_all_assignments_for_wp(cur, wp)
+                            R.insert_assignment(
+                                cur,
+                                assignment_id=str(ULID()),
+                                work_package_id=wp,
+                                domain_id=dom,
+                                role_id=next_role_id,
+                                team_id=next_team_id,
+                                assigned_at=R.utc_now(),
+                            )
                     run2 = R.fetch_run(cur, run_id)
                     assert run2
                     _emit(

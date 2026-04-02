@@ -1,0 +1,86 @@
+{
+  "GATE_1": {
+    "1.1": {
+      "default": "team_170",
+      "TRACK_FOCUSED": "team_170",
+      "TRACK_FULL": "team_170"
+    },
+    "1.2": {
+      "default": "team_190"
+    }
+  },
+  "GATE_2": {
+    "2.1": {
+      "default": "team_170"
+    },
+    "2.1v": {
+      "default": "team_190"
+    },
+    "2.2": {
+      "tiktrack+TRACK_FOCUSED": "team_10",
+      "TRACK_FOCUSED": "team_11",
+      "agents_os": "team_11",
+      "tiktrack": "team_10",
+      "TRACK_FULL": "team_10",
+      "default": "team_10"
+    },
+    "2.2v": {
+      "default": "team_90"
+    },
+    "2.3": {
+      "TRACK_FOCUSED": "lod200_author_team",
+      "agents_os": "lod200_author_team",
+      "TRACK_FULL": "lod200_author_team",
+      "tiktrack": "lod200_author_team",
+      "default": "lod200_author_team"
+    }
+  },
+  "GATE_3": {
+    "3.1": {
+      "TRACK_FOCUSED": "team_11",
+      "agents_os": "team_11",
+      "tiktrack": "team_10",
+      "default": "team_11"
+    },
+    "3.2": {
+      "TRACK_FOCUSED": "team_61",
+      "agents_os": "team_61",
+      "TRACK_FULL": "teams_20_30_40_60",
+      "tiktrack": "teams_20_30_40_60",
+      "tiktrack+TRACK_FOCUSED": "teams_20_30",
+      "default": "team_61"
+    },
+    "3.3": {
+      "tiktrack+TRACK_FOCUSED": "team_50",
+      "tiktrack+TRACK_FULL": "team_50",
+      "agents_os+TRACK_FULL": "team_51",
+      "TRACK_FOCUSED": "team_51",
+      "agents_os": "team_51",
+      "tiktrack": "team_50",
+      "default": "team_51"
+    }
+  },
+  "GATE_4": {
+    "4.1": {
+      "default": "team_90"
+    },
+    "4.2": {
+      "default": "lod200_author_team"
+    },
+    "4.3": {
+      "default": "team_00"
+    }
+  },
+  "GATE_5": {
+    "5.1": {
+      "TRACK_FOCUSED": "team_170",
+      "agents_os": "team_170",
+      "TRACK_FULL": "team_70",
+      "tiktrack": "team_70",
+      "default": "team_170"
+    },
+    "5.2": {
+      "default": "team_90"
+    }
+  }
+}

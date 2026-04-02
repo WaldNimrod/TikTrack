@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-03-29T14:08:16.596010+00:00",
+  "generated_at_utc": "2026-04-02T09:25:42.568433+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -166,8 +166,8 @@
       "program_name": "Watch Lists (D26)",
       "domain": "TIKTRACK",
       "stage_id": "S003",
-      "status": "PLANNED",
-      "current_gate_mirror": "— (D38 tag_management relocated to S005 per ARCHITECT_DIRECTIVE_ROADMAP_AMENDMENT_v1.0.0 §A1; registered from integrated roadmap v1.1.0)"
+      "status": "ACTIVE",
+      "current_gate_mirror": "GATE_0 — activated per Principal mandate 2026-03-31; first flight through AOS v3; active_work_package_id=S003-P005-WP001"
     },
     {
       "program_id": "S003-P006",
@@ -504,6 +504,15 @@
       "active_marker_reason": "Lifecycle complete 2026-03-21"
     },
     {
+      "work_package_id": "S003-P005-WP001",
+      "program_id": "S003-P005",
+      "domain": "TIKTRACK",
+      "status": "IN_PROGRESS",
+      "current_gate": "GATE_0",
+      "is_active": false,
+      "active_marker_reason": "D26 Watch Lists — first flight through AOS v3. GATE_0 entry (Principal mandate 2026-03-31). LOD200: `TEAM_00_TO_TEAM_10_S003_P005_D26_LOD200_v1.0.0.md`."
+    },
+    {
       "work_package_id": "S003-P009-WP001",
       "program_id": "S003-P009",
       "domain": "AGENTS_OS",
@@ -838,9 +847,19 @@
           "program_id": "S003-P005",
           "program_name": "Watch Lists (D26)",
           "domain": "TIKTRACK",
-          "status": "PLANNED",
-          "current_gate_mirror": "— (D38 tag_management relocated to S005 per ARCHITECT_DIRECTIVE_ROADMAP_AMENDMENT_v1.0.0 §A1; registered from integrated roadmap v1.1.0)",
-          "work_packages": []
+          "status": "ACTIVE",
+          "current_gate_mirror": "GATE_0 — activated per Principal mandate 2026-03-31; first flight through AOS v3; active_work_package_id=S003-P005-WP001",
+          "work_packages": [
+            {
+              "work_package_id": "S003-P005-WP001",
+              "program_id": "S003-P005",
+              "domain": "TIKTRACK",
+              "status": "IN_PROGRESS",
+              "current_gate": "GATE_0",
+              "is_active": false,
+              "active_marker_reason": "D26 Watch Lists — first flight through AOS v3. GATE_0 entry (Principal mandate 2026-03-31). LOD200: `TEAM_00_TO_TEAM_10_S003_P005_D26_LOD200_v1.0.0.md`."
+            }
+          ]
         },
         {
           "program_id": "S003-P006",

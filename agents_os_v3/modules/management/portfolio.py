@@ -282,6 +282,9 @@ def list_work_packages(conn: Any) -> dict[str, Any]:
                     effective_status = "CORRECTION"
                 elif run_status_str == "PAUSED":
                     effective_status = "PAUSED"
+                elif run_status_str == "FAILED":
+                    # GATE_0 rejection: WP stays ACTIVE + linked; surface as GATE0_REJECTED
+                    effective_status = "GATE0_REJECTED"
                 elif w.get("linked_run_id") is None:
                     # ACTIVE with no linked run = data inconsistency; treat as PLANNED
                     effective_status = "PLANNED"

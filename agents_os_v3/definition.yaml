@@ -609,16 +609,16 @@ phases:
     name: Initialize
     allow_auto: 0
     display_in_ui: 1
-  - id: "0.2"
-    gate_id: GATE_0
-    sequence_order: 2
-    name: Assign
-    allow_auto: 0
-    display_in_ui: 1
   - id: "1.1"
     gate_id: GATE_1
     sequence_order: 1
-    name: Gate 1 — primary phase
+    name: Spec Production (Team 170)
+    allow_auto: 0
+    display_in_ui: 1
+  - id: "1.2"
+    gate_id: GATE_1
+    sequence_order: 2
+    name: Spec Validation (Team 190)
     allow_auto: 0
     display_in_ui: 1
   - id: "2.1"
@@ -650,7 +650,25 @@ pipeline_roles:
   - id: "01JK8AOSV3ROLE0000000001"
     name: ORCHESTRATOR
     display_name: Orchestrator
-    description: "Domain gateway team: team_10 (tiktrack) or team_11 (agents_os). Coordinates spec writing, routes to implementation teams per process variant (TRACK_FULL/TRACK_FOCUSED), and submits QA packages. Does not implement directly."
+    description: "Domain gateway team: team_10 (tiktrack) or team_11 (agents_os). Coordinates spec writing, routes to implementation teams per process variant (TRACK_FULL/TRACK_FOCUSED), and submits QA packages. Does not implement directly. Active from GATE_1 onward."
+    can_block_gate: 0
+    is_seeded: 1
+  - id: "01JK8AOSV3ROLE0000000002"
+    name: CONSTITUTIONAL_VALIDATOR
+    display_name: Constitutional Validator (GATE_0)
+    description: "Team 190 — entry quality gate. Validates spec completeness and constitutional compliance before a WP enters the pipeline. Domain-agnostic (same team for tiktrack and agents_os). Binary gate: PASS advances to GATE_1, FAIL rejects entry (run=FAILED, WP reset to PLANNED)."
+    can_block_gate: 1
+    is_seeded: 1
+  - id: "01JK8AOSV3ROLE0000000003"
+    name: SPEC_AUTHOR
+    display_name: Spec Author (GATE_1 phase 1.1)
+    description: "Team 170 — produces LOD200/LOD400 specifications at GATE_1/1.1. Domain-agnostic. Delivers structured spec with ACs, constraints, and team assignments to _COMMUNICATION/team_170/ with [GATE_1-SPEC] header."
+    can_block_gate: 0
+    is_seeded: 1
+  - id: "01JK8AOSV3ROLE0000000004"
+    name: ARCH_APPROVER
+    display_name: Architecture Approver (GATE_2)
+    description: "Architecture approval authority at GATE_2. The approver is the architect who authored the LOD200/LOD400 spec. Naming rule — suffix-0 = TikTrack, suffix-1 = AOS: TikTrack domain: team_110 (TikTrack Domain Architect). AOS domain: team_111 (AOS Domain Architect). System fallback (when domain architect inactive): team_100. team_00 acts ONLY when Nimrod explicitly overrides — never a system default. Determines 'האם אנחנו מאשרים לבנות את זה?'"
     can_block_gate: 0
     is_seeded: 1
   - id: IDEA_STATUS_AUTHORITY
@@ -659,6 +677,27 @@ pipeline_roles:
     description: Delegated idea pipeline status transitions (Authority Model v1.0.0)
     can_block_gate: 0
     is_seeded: 1
+
+# gate_role_authorities — per-gate blocking authority registry.
+# Both conditions must be true for fail_run() to produce GATE_FAILED_BLOCKING:
+#   1. pipeline_roles.can_block_gate = 1
+#   2. gate_role_authorities row exists with may_block_verdict = 1
+# This table was never seeded → all fail_run() calls were producing GATE_FAILED_ADVISORY.
+gate_role_authorities:
+  # GATE_0 — CONSTITUTIONAL_VALIDATOR has global blocking authority (entry gate, binary PASS/FAIL)
+  - id: "01JK8AOSV3GRA00000000001"
+    gate_id: GATE_0
+    phase_id: null
+    domain_id: null                          # global — both domains
+    role_id: "01JK8AOSV3ROLE0000000002"     # CONSTITUTIONAL_VALIDATOR → team_190
+    may_block_verdict: 1
+  # GATE_1/1.2 — CONSTITUTIONAL_VALIDATOR has blocking authority (spec constitutional review)
+  - id: "01JK8AOSV3GRA00000000002"
+    gate_id: GATE_1
+    phase_id: "1.2"
+    domain_id: null                          # global — both domains
+    role_id: "01JK8AOSV3ROLE0000000002"     # CONSTITUTIONAL_VALIDATOR → team_190
+    may_block_verdict: 1
 
 policies:
   - id: "01JK8AOSV3POL00000000001"
@@ -695,46 +734,50 @@ policies:
     priority: 100
 
 # GATE_0 routing — required for UC-01 InitiateRun (routing_rules → role_id → assignment team)
+# GATE_0 actor: team_190 (Constitutional Validator) — domain-agnostic, both domains
 routing_rules:
   - id: "01JK8AOSV3RR0000000001"
     gate_id: GATE_0
     phase_id: null
-    domain_id: "01JK8AOSV3DOMAIN00000001"
+    domain_id: "01JK8AOSV3DOMAIN00000001"   # agents_os
     variant: null
-    role_id: "01JK8AOSV3ROLE0000000001"
+    role_id: "01JK8AOSV3ROLE0000000002"     # CONSTITUTIONAL_VALIDATOR → team_190
     priority: 10
     resolve_from_state_key: null
   - id: "01JK8AOSV3RR0000000002"
     gate_id: GATE_0
     phase_id: null
-    domain_id: "01JK8AOSV3DOMAIN00000002"
+    domain_id: "01JK8AOSV3DOMAIN00000002"   # tiktrack
     variant: null
-    role_id: "01JK8AOSV3ROLE0000000001"
+    role_id: "01JK8AOSV3ROLE0000000002"     # CONSTITUTIONAL_VALIDATOR → team_190
     priority: 10
     resolve_from_state_key: null
   - id: "01JK8AOSV3RR0000000003"
     gate_id: GATE_0
     phase_id: null
-    domain_id: null
+    domain_id: null                          # global fallback
     variant: null
-    role_id: "01JK8AOSV3ROLE0000000001"
+    role_id: "01JK8AOSV3ROLE0000000002"     # CONSTITUTIONAL_VALIDATOR → team_190
     priority: 100
     resolve_from_state_key: null
-  # GATE_1-5 tiktrack domain (ORCHESTRATOR → team_10 for all gates)
+  # GATE_1-5 tiktrack domain
+  # GATE_1/1.1: SPEC_AUTHOR → team_170 (writes LOD200/LOD400 spec)
   - id: "01JK8AOSV3RR0000000010"
     gate_id: GATE_1
     phase_id: "1.1"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     variant: null
-    role_id: "01JK8AOSV3ROLE0000000001"
+    role_id: "01JK8AOSV3ROLE0000000003"    # SPEC_AUTHOR → team_170
     priority: 10
     resolve_from_state_key: null
+  # GATE_1/1.2 for tiktrack: covered by global fallback 01JK8AOSV3RR0000000025 → CONSTITUTIONAL_VALIDATOR
+  # GATE_2/2.1: ARCH_APPROVER → team_00 (Principal approval for tiktrack)
   - id: "01JK8AOSV3RR0000000011"
     gate_id: GATE_2
     phase_id: "2.1"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     variant: null
-    role_id: "01JK8AOSV3ROLE0000000001"
+    role_id: "01JK8AOSV3ROLE0000000004"    # ARCH_APPROVER → team_00 for tiktrack
     priority: 10
     resolve_from_state_key: null
   - id: "01JK8AOSV3RR0000000012"
@@ -742,7 +785,7 @@ routing_rules:
     phase_id: "3.1"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     variant: null
-    role_id: "01JK8AOSV3ROLE0000000001"
+    role_id: "01JK8AOSV3ROLE0000000001"    # ORCHESTRATOR → team_10
     priority: 10
     resolve_from_state_key: null
   - id: "01JK8AOSV3RR0000000013"
@@ -750,7 +793,7 @@ routing_rules:
     phase_id: "4.1"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     variant: null
-    role_id: "01JK8AOSV3ROLE0000000001"
+    role_id: "01JK8AOSV3ROLE0000000001"    # ORCHESTRATOR → team_10
     priority: 10
     resolve_from_state_key: null
   - id: "01JK8AOSV3RR0000000014"
@@ -758,24 +801,27 @@ routing_rules:
     phase_id: "5.1"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     variant: null
-    role_id: "01JK8AOSV3ROLE0000000001"
+    role_id: "01JK8AOSV3ROLE0000000001"    # ORCHESTRATOR → team_10
     priority: 10
     resolve_from_state_key: null
-  # GATE_1-5 agents_os domain (ORCHESTRATOR → team_11 AOS Gateway)
+  # GATE_1-5 agents_os domain
+  # GATE_1/1.1: SPEC_AUTHOR → team_170
   - id: "01JK8AOSV3RR0000000015"
     gate_id: GATE_1
     phase_id: "1.1"
     domain_id: "01JK8AOSV3DOMAIN00000001"   # agents_os
     variant: null
-    role_id: "01JK8AOSV3ROLE0000000001"
+    role_id: "01JK8AOSV3ROLE0000000003"    # SPEC_AUTHOR → team_170
     priority: 10
     resolve_from_state_key: null
+  # GATE_1/1.2 for agents_os: covered by global fallback 01JK8AOSV3RR0000000025 → CONSTITUTIONAL_VALIDATOR
+  # GATE_2/2.1: ARCH_APPROVER → team_100 (delegated for agents_os)
   - id: "01JK8AOSV3RR0000000016"
     gate_id: GATE_2
     phase_id: "2.1"
     domain_id: "01JK8AOSV3DOMAIN00000001"
     variant: null
-    role_id: "01JK8AOSV3ROLE0000000001"
+    role_id: "01JK8AOSV3ROLE0000000004"    # ARCH_APPROVER → team_100 for agents_os
     priority: 10
     resolve_from_state_key: null
   - id: "01JK8AOSV3RR0000000017"
@@ -783,7 +829,7 @@ routing_rules:
     phase_id: "3.1"
     domain_id: "01JK8AOSV3DOMAIN00000001"
     variant: null
-    role_id: "01JK8AOSV3ROLE0000000001"
+    role_id: "01JK8AOSV3ROLE0000000001"    # ORCHESTRATOR → team_11
     priority: 10
     resolve_from_state_key: null
   - id: "01JK8AOSV3RR0000000018"
@@ -791,7 +837,7 @@ routing_rules:
     phase_id: "4.1"
     domain_id: "01JK8AOSV3DOMAIN00000001"
     variant: null
-    role_id: "01JK8AOSV3ROLE0000000001"
+    role_id: "01JK8AOSV3ROLE0000000001"    # ORCHESTRATOR → team_11
     priority: 10
     resolve_from_state_key: null
   - id: "01JK8AOSV3RR0000000019"
@@ -799,16 +845,25 @@ routing_rules:
     phase_id: "5.1"
     domain_id: "01JK8AOSV3DOMAIN00000001"
     variant: null
-    role_id: "01JK8AOSV3ROLE0000000001"
+    role_id: "01JK8AOSV3ROLE0000000001"    # ORCHESTRATOR → team_11
     priority: 10
     resolve_from_state_key: null
-  # GATE_1-5 global fallbacks (domain=null, priority=100 — catches any unlisted domain)
+  # GATE_1-5 global fallbacks (domain=null, priority=100 — catches any unlisted domain / test domains)
   - id: "01JK8AOSV3RR0000000020"
     gate_id: GATE_1
     phase_id: null
     domain_id: null
     variant: null
-    role_id: "01JK8AOSV3ROLE0000000001"
+    role_id: "01JK8AOSV3ROLE0000000003"    # SPEC_AUTHOR → team_170 (global fallback for 1.1)
+    priority: 100
+    resolve_from_state_key: null
+  # GATE_1/1.2 global fallback
+  - id: "01JK8AOSV3RR0000000025"
+    gate_id: GATE_1
+    phase_id: "1.2"
+    domain_id: null
+    variant: null
+    role_id: "01JK8AOSV3ROLE0000000002"    # CONSTITUTIONAL_VALIDATOR → team_190
     priority: 100
     resolve_from_state_key: null
   - id: "01JK8AOSV3RR0000000021"
@@ -816,7 +871,7 @@ routing_rules:
     phase_id: null
     domain_id: null
     variant: null
-    role_id: "01JK8AOSV3ROLE0000000001"
+    role_id: "01JK8AOSV3ROLE0000000004"    # ARCH_APPROVER → team_00 for tiktrack, team_100 for AOS
     priority: 100
     resolve_from_state_key: null
   - id: "01JK8AOSV3RR0000000022"
@@ -850,65 +905,178 @@ templates:
     gate_id: GATE_0
     phase_id: null
     domain_id: null
-    name: Gate 0 — Bootstrap & Assignment
+    name: Gate 0 — Entry Quality Gate (Constitutional Validation)
     body_markdown: |
-      # L1 — Task: Work Package Bootstrap (GATE_0)
-      You are the **ORCHESTRATOR** for the work package identified in L4.
+      # Entry Quality Gate — GATE_0
+      You are **Team 190 — Constitutional Validator**.
 
-      **Phase 0.1 — Initialize:**
-      - Confirm WP scope alignment with the LOD200 brief in L4
-      - Detect domain (tiktrack / agents_os) and select process variant:
-        - tiktrack → TRACK_FULL (Teams 10, 20/30/40/60, 50)
-        - agents_os → TRACK_FOCUSED (Teams 11, 61, 51)
-      - Route constitutional validation request to Team 190
+      **Your role:** Binary entry gate. You do NOT coordinate work — you VALIDATE the incoming spec.
+      This is an ADVERSARIAL review. Assume the spec is incomplete until proven otherwise.
 
-      **Phase 0.2 — Assign:**
-      - Confirm Team 190 constitutional validation passed
-      - Register team assignments for this WP in pipeline state
-      - Advance when: domain confirmed, variant selected, team assignments registered
-    version: 2
+      **Validation criteria (all must pass):**
+      1. WP spec exists and is at LOD200 minimum: clear domain, scope, deliverables stated
+      2. All acceptance criteria are measurable and unambiguous (no "should", "may", "as needed")
+      3. No Iron Rule violations (financial precision NUMERIC(20,8), single human, cross-engine validation)
+      4. Domain and process variant are correctly identified in the WP
+      5. Spec is sufficient for an implementation team to begin GATE_1 without requesting clarification
+
+      **If PASS** — submit via `POST /api/runs/{run_id}/advance` with verdict=pass.
+      The WP enters GATE_1; the ORCHESTRATOR takes over.
+
+      **If FAIL** — submit via `POST /api/runs/{run_id}/reject-entry` with a precise reason.
+      The run is terminated immediately (status=FAILED). The WP returns to PLANNED.
+      The authoring architect must produce a revised spec and resubmit the WP.
+
+      Iron Rule: **GATE_0 BLOCK stops all downstream work. No correction cycles. No second chances.**
+
+      ## TRIGGER PROTOCOL
+
+      PASS: `POST /api/runs/{run_id}/advance` with `{"verdict": "pass", "summary": "Entry validated — all 5 criteria PASS"}`
+      FAIL (terminal): `POST /api/runs/{run_id}/reject-entry` with `{"reason": "<precise actionable reason>"}`
+
+      Identity header format: `# GATE_0 — team_190 | Run {run_id} | WP: {work_package_id}`
+    version: 4
     is_active: 1
   - id: "01JK8AOSV3TPL0000000002"
     gate_id: GATE_1
     phase_id: "1.1"
     domain_id: null
-    name: Gate 1 — Specification Routing
+    name: Gate 1 Phase 1.1 — Spec Production (Team 170)
     body_markdown: |
-      # L1 — Task: Specification Routing (GATE_1)
-      You are the **ORCHESTRATOR** for the work package in L4.
+      # L1 — Task: Specification Production (GATE_1 / Phase 1.1)
+      You are **Team 170 — Spec & Governance**.
 
-      **Your role:** Coordinate and route the specification process. You do NOT write the spec.
+      **Your role:** Produce the LOD200/LOD400 specification for this work package.
+      You write the spec. You do NOT route or coordinate other teams.
 
-      **Actions:**
-      1. Route LOD200/LOD400 spec request to Team 170 (Spec & Governance)
-      2. Receive spec draft from Team 170; verify it covers: scope, ACs, architecture
-         constraints, and team assignments for GATE_3 implementation
-      3. Route to Team 190 for constitutional validation
-      4. Confirm spec is delivered to `_COMMUNICATION/team_00/` with header `[GATE_1-SPEC]`
-      5. Advance when: spec is complete, all ACs are measurable, Team 190 confirms compliance
+      **Deliverables (ALL required before advancing):**
+      1. Spec document stored in `_COMMUNICATION/team_170/` with identity header `[GATE_1-SPEC]`
+      2. **Scope:** domain (tiktrack / agents_os), feature boundaries, what is explicitly excluded
+      3. **Acceptance criteria:** measurable and unambiguous — no "should", "may", "as needed"
+      4. **Architecture constraints:** Iron Rules applicable to this WP (NUMERIC(20,8), status model, etc.)
+      5. **Team assignments for GATE_3:** domain-aware
+         - TikTrack domain (TRACK_FULL): Team 20 (backend), Team 30 (frontend), Team 40 (assets), Team 50 (QA)
+         - Agents OS domain (TRACK_FOCUSED): Team 61 (full-stack), Team 51 (QA)
+      6. **Open questions:** any CLARIFICATION_REQUIRED items flagged for Team 00 before advancing
+
+      **If CLARIFICATION_REQUIRED items exist:** do NOT advance — flag and await Team 00 response.
+
+      **Advance when:** spec is complete, all items above present, no open clarifications.
+      Submit: `POST /api/runs/{run_id}/advance` with `{"verdict": "pass", "summary": "Spec complete"}`
+
+      The spec advances to Phase 1.2 (Team 190 validation).
+
+      ## TRIGGER PROTOCOL
+
+      Preferred (CANONICAL_AUTO / Mode A):
+      ```
+      POST /api/runs/{run_id}/feedback
+      X-Actor-Team-Id: team_170
+      {"detection_mode": "CANONICAL_AUTO", "structured_json": {"schema_version": "1", "verdict": "PASS", "confidence": "HIGH", "summary": "Spec complete", "blocking_findings": [], "route_recommendation": null}}
+      ```
+      Legacy: `POST /api/runs/{run_id}/advance` with `{"verdict": "pass", "summary": "Spec complete"}`
+      FAIL: `POST /api/runs/{run_id}/fail` with findings. `route_recommendation`: `"doc"` | `"impl"` | `"arch"`.
+    version: 4
+    is_active: 1
+  - id: "01JK8AOSV3TPL0000000007"
+    gate_id: GATE_1
+    phase_id: "1.2"
+    domain_id: null
+    name: Gate 1 Phase 1.2 — Spec Validation (Team 190)
+    body_markdown: |
+      # L1 — Task: Spec Validation (GATE_1 / Phase 1.2)
+      You are **Team 190 — Constitutional Validator**.
+
+      **Your role:** ADVERSARIAL review of the spec produced at Phase 1.1 by Team 170.
+      Independence is MANDATORY — do not review other architects' conclusions before your own validation.
+
+      **Validation criteria (ALL must pass):**
+      1. Spec exists at LOD200 minimum: scope, domain, deliverables clearly stated
+      2. All ACs are measurable and unambiguous (no "should", "may", "as needed")
+      3. No Iron Rule violations (NUMERIC(20,8), single human principal, cross-engine validation)
+      4. Implementation team assignments are correct (TRACK_FULL / TRACK_FOCUSED per domain)
+      5. Spec is self-sufficient — GATE_3 implementation teams can begin without requesting clarification
+
+      **If PASS:**
+      Submit: `POST /api/runs/{run_id}/advance` with `{"verdict": "pass", "summary": "Spec validated"}`
+      Run advances to GATE_2 for architecture approval.
+
+      **If FAIL (blocking findings):**
+      Submit: `POST /api/runs/{run_id}/fail` with blocking findings listed precisely.
+      The run enters CORRECTION mode — spec returns to Team 170 for revision.
+      Iron Rule: every FAIL report MUST include a `route_recommendation` field.
+
+      ## TRIGGER PROTOCOL
+
+      Preferred (CANONICAL_AUTO / Mode A):
+      ```
+      POST /api/runs/{run_id}/feedback
+      X-Actor-Team-Id: team_190
+      {"detection_mode": "CANONICAL_AUTO", "structured_json": {"schema_version": "1", "verdict": "PASS", "confidence": "HIGH", "summary": "Spec validated — all 5 criteria PASS", "blocking_findings": [], "route_recommendation": null}}
+      ```
+      Legacy PASS: `POST /api/runs/{run_id}/advance` with `{"verdict": "pass", "summary": "Spec validated"}`
+      FAIL: `POST /api/runs/{run_id}/fail`. `route_recommendation`: `"doc"` | `"impl"` | `"arch"` (NOT "full").
     version: 2
     is_active: 1
   - id: "01JK8AOSV3TPL0000000003"
     gate_id: GATE_2
     phase_id: "2.1"
     domain_id: null
-    name: Gate 2 — Architecture Approval Coordination
+    name: Gate 2 — Architecture Approval
     body_markdown: |
-      # L1 — Task: Architecture Approval Coordination (GATE_2)
-      You are the **ORCHESTRATOR** for the work package in L4.
+      # L1 — Task: Architecture Approval (GATE_2 / Phase 2.1)
 
-      **Your role:** Route the spec to the appropriate architectural reviewer. You do NOT approve.
+      **The approver is the architect who authored the LOD200/LOD400 spec (see L4 current_actor).**
 
-      **Domain-aware reviewer routing (see L4 for domain):**
-      - tiktrack domain → Team 00 (Nimrod) is the approving authority
-      - agents_os domain → Team 100 (Chief System Architect) is the approving authority
+      Actor resolution (domain-aware, naming rule: suffix-0 = TikTrack, suffix-1 = AOS):
+      - **TikTrack domain → team_110** (TikTrack Domain Architect, suffix-0); system fallback: team_100
+      - **Agents OS domain → team_111** (AOS Domain Architect, suffix-1); system fallback: team_100
+      - team_00 acts ONLY when Nimrod explicitly overrides — never a system default
+      - `is_human_gate = 0` — ADVANCE button (not APPROVE). Human approval is NOT required.
 
-      **Actions:**
-      1. Deliver spec package from GATE_1 to the domain reviewer
-      2. If PASS: record approval decision, advance to GATE_3
-      3. If FAIL: classify finding type (doc / code / architectural), route back to Team 170
-         for revision, then re-submit for review
-    version: 2
+      ---
+
+      ## Validation checklist (ALL must pass before advancing)
+
+      ### Layer 1 — Strategic alignment
+      1. Spec aligns with the active Stage and approved roadmap program
+      2. All ACs are achievable within the current Stage constraints (no out-of-scope scope creep)
+
+      ### Layer 2 — Architectural integrity
+      3. No Iron Rule violations (NUMERIC(20,8), single human principal, 4-state status model, cross-engine validation)
+      4. No architectural anti-patterns (no per-entity customization, no bundler, no direct DB write outside ORM)
+
+      ### Layer 3 — Execution readiness
+      5. Implementation team assignments are correct for the domain and process variant:
+         - TRACK_FULL (TikTrack): Team 20 (backend) + Team 30 (frontend) + Team 40 (assets) + Team 50 (QA)
+         - TRACK_FOCUSED (AOS): Team 61 (full-stack) + Team 51 (QA)
+      6. LOD200/LOD400 sufficiency — GATE_3 implementation team can begin without requesting clarification
+
+      ### Layer 4 — AOS-specific (agents_os domain only)
+      7. Gate model compliance — spec correctly describes gate interactions, phase structure, and actor assignments
+      8. TRACK_FOCUSED adherence — only Team 61 + Team 51 assigned (no TRACK_FULL teams)
+
+      ---
+
+      **If PASS (all 8 checks GREEN):**
+      Use the **ADVANCE** button in the pipeline UI, or:
+      `POST /api/runs/{run_id}/advance` with `{"verdict": "pass", "summary": "Architecture approved — [brief reason]"}`
+
+      **If FAIL (any blocking finding):**
+      `POST /api/runs/{run_id}/fail` with `{"verdict": "fail", "summary": "...", "route_recommendation": "team_170"}`
+      Spec returns to Team 170 for revision (Correction Cycle). `route_recommendation` is MANDATORY on every FAIL.
+
+      ## TRIGGER PROTOCOL
+
+      Preferred (CANONICAL_AUTO / Mode A):
+      ```
+      POST /api/runs/{run_id}/feedback
+      X-Actor-Team-Id: {actor_team_id}
+      {"detection_mode": "CANONICAL_AUTO", "structured_json": {"schema_version": "1", "verdict": "PASS", "confidence": "HIGH", "summary": "Architecture approved — [brief reason]", "blocking_findings": [], "route_recommendation": null}}
+      ```
+      Legacy PASS: `POST /api/runs/{run_id}/advance` with `{"verdict": "pass", "summary": "Architecture approved — [brief reason]"}`
+      FAIL: `POST /api/runs/{run_id}/fail`. `route_recommendation`: `"doc"` | `"impl"` | `"arch"` (NOT "full").
+    version: 5
     is_active: 1
   - id: "01JK8AOSV3TPL0000000004"
     gate_id: GATE_3
@@ -986,7 +1154,9 @@ templates:
 # ---------------------------------------------------------------------------
 # Bootstrap: AOS smoke-test placeholder (keep for run smoke-tests)
 # TikTrack roadmap: all 21 programs from PHOENIX_PROGRAM_REGISTRY, seeded 2026-03-29
-#   id = program_id (readable, matches run.work_package_id when WP enters pipeline)
+#   id = work_package_id in canonical 3-level format: S{NNN}-P{NNN}-WP{NNN}
+#   Even single-WP programs must use WP001 suffix — never use program-level IDs as WP IDs.
+#   Directive: ARCHITECT_DIRECTIVE_WP_ID_NAMING_CONVENTION_v1.0.0.md
 #   stage_id = Milestone (S001-S006 per PHOENIX_PORTFOLIO_ROADMAP)
 #   status: COMPLETE | ACTIVE | PLANNED
 # ---------------------------------------------------------------------------
@@ -1000,7 +1170,7 @@ work_packages:
     program_id: null
 
   # ── S001 — Foundations Sealed ─────────────────────────────────────────────
-  - id: "S001-P002"
+  - id: "S001-P002-WP001"
     label: "Alerts POC (D34 widget)"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     status: ACTIVE
@@ -1009,7 +1179,7 @@ work_packages:
     program_id: "S001-P002"
 
   # ── S002 — Core Pipeline (TikTrack lane) ──────────────────────────────────
-  - id: "S002-P002"
+  - id: "S002-P002-WP001"
     label: "MCP-QA Transition (Full Pipeline Orchestrator)"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     status: COMPLETE
@@ -1017,7 +1187,7 @@ work_packages:
     stage_id: "S002"
     program_id: "S002-P002"
 
-  - id: "S002-P003"
+  - id: "S002-P003-WP001"
     label: "TikTrack Alignment (D22 + D33 + D34 + D35)"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     status: COMPLETE
@@ -1025,7 +1195,7 @@ work_packages:
     stage_id: "S002"
     program_id: "S002-P003"
 
-  - id: "S002-P004"
+  - id: "S002-P004-WP001"
     label: "Admin Review S002"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     status: PLANNED
@@ -1034,7 +1204,7 @@ work_packages:
     program_id: "S002-P004"
 
   # ── S003 — Essential Data ─────────────────────────────────────────────────
-  - id: "S003-P003"
+  - id: "S003-P003-WP001"
     label: "System Settings (D39 Preferences + D40 System Mgmt + D41 User Mgmt)"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     status: COMPLETE
@@ -1042,7 +1212,7 @@ work_packages:
     stage_id: "S003"
     program_id: "S003-P003"
 
-  - id: "S003-P004"
+  - id: "S003-P004-WP001"
     label: "User Tickers (D33) — live price display, display_name Iron Rule"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     status: ACTIVE
@@ -1050,7 +1220,7 @@ work_packages:
     stage_id: "S003"
     program_id: "S003-P004"
 
-  - id: "S003-P005"
+  - id: "S003-P005-WP001"
     label: "Watch Lists (D26) — CRUD watchlists + live prices"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     status: PLANNED
@@ -1058,7 +1228,7 @@ work_packages:
     stage_id: "S003"
     program_id: "S003-P005"
 
-  - id: "S003-P006"
+  - id: "S003-P006-WP001"
     label: "Admin Review S003"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     status: PLANNED
@@ -1067,7 +1237,7 @@ work_packages:
     program_id: "S003-P006"
 
   # ── S004 — Financial Execution ────────────────────────────────────────────
-  - id: "S004-P004"
+  - id: "S004-P004-WP001"
     label: "Executions (D36)"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     status: PLANNED
@@ -1075,7 +1245,7 @@ work_packages:
     stage_id: "S004"
     program_id: "S004-P004"
 
-  - id: "S004-P005"
+  - id: "S004-P005-WP001"
     label: "Data Import (D37) — Delta-Reset policy (Option B)"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     status: PLANNED
@@ -1083,7 +1253,7 @@ work_packages:
     stage_id: "S004"
     program_id: "S004-P005"
 
-  - id: "S004-P006"
+  - id: "S004-P006-WP001"
     label: "Admin Review S004"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     status: PLANNED
@@ -1091,7 +1261,7 @@ work_packages:
     stage_id: "S004"
     program_id: "S004-P006"
 
-  - id: "S004-P007"
+  - id: "S004-P007-WP001"
     label: "Indicators Infrastructure (ATR/MA/CCI, ticker_indicators table)"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     status: PLANNED
@@ -1100,7 +1270,7 @@ work_packages:
     program_id: "S004-P007"
 
   # ── S005 — Complex Entities (requires AOS Completion Gate) ────────────────
-  - id: "S005-P002"
+  - id: "S005-P002-WP001"
     label: "Trade Entities (D29 Trades + D24 Trade Plans)"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     status: PLANNED
@@ -1108,7 +1278,7 @@ work_packages:
     stage_id: "S005"
     program_id: "S005-P002"
 
-  - id: "S005-P003"
+  - id: "S005-P003-WP001"
     label: "Market Intelligence (D27 Ticker Dashboard + D25 AI Analysis)"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     status: PLANNED
@@ -1116,7 +1286,7 @@ work_packages:
     stage_id: "S005"
     program_id: "S005-P003"
 
-  - id: "S005-P004"
+  - id: "S005-P004-WP001"
     label: "Journal & History (D28 Trading Journal + D31 Trade History)"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     status: PLANNED
@@ -1124,7 +1294,7 @@ work_packages:
     stage_id: "S005"
     program_id: "S005-P004"
 
-  - id: "S005-P005"
+  - id: "S005-P005-WP001"
     label: "Admin Review S005"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     status: PLANNED
@@ -1133,7 +1303,7 @@ work_packages:
     program_id: "S005-P005"
 
   # ── S006 — Advanced Analytics ─────────────────────────────────────────────
-  - id: "S006-P001"
+  - id: "S006-P001-WP001"
     label: "Portfolio State (D32)"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     status: PLANNED
@@ -1141,7 +1311,7 @@ work_packages:
     stage_id: "S006"
     program_id: "S006-P001"
 
-  - id: "S006-P002"
+  - id: "S006-P002-WP001"
     label: "Analysis & Closure (D30)"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     status: PLANNED
@@ -1149,7 +1319,7 @@ work_packages:
     stage_id: "S006"
     program_id: "S006-P002"
 
-  - id: "S006-P003"
+  - id: "S006-P003-WP001"
     label: "Level-1 Dashboards"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     status: PLANNED
@@ -1157,7 +1327,7 @@ work_packages:
     stage_id: "S006"
     program_id: "S006-P003"
 
-  - id: "S006-P004"
+  - id: "S006-P004-WP001"
     label: "Admin Review S006 FINAL"
     domain_id: "01JK8AOSV3DOMAIN00000002"
     status: PLANNED

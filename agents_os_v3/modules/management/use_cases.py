@@ -309,6 +309,17 @@ def uc_01_initiate_run(
     return summary
 
 
+def uc_gate0_reject(
+    conn: Any,
+    *,
+    actor_team_id: str,
+    run_id: str,
+    reason: str,
+) -> dict[str, Any]:
+    """GATE_0 terminal rejection. WP resets to PLANNED. No correction cycle."""
+    return M.reject_entry_run(conn, run_id=run_id, actor_team_id=actor_team_id, reason=reason)
+
+
 def uc_02_advance_run(
     conn: Any,
     *,
@@ -607,6 +618,7 @@ def uc_15_ingest_feedback(
     detection_mode: str,
     file_path: str | None,
     raw_text: str | None,
+    structured_json: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """POST /api/runs/{run_id}/feedback — UI §10.1."""
     ing = FeedbackIngestor()
@@ -649,6 +661,7 @@ def uc_15_ingest_feedback(
                 detection_mode=detection_mode,
                 file_path=file_path,
                 raw_text=raw_text,
+                structured_json=structured_json,
             )
             try:
                 rec = ing.ingest(src, run_started_at=run.get("started_at"))
@@ -721,6 +734,32 @@ def uc_15_ingest_feedback(
         str(row["confidence"]),
         str(row["proposed_action"]),
     )
+
+    # §E — Auto-advance for eligible gates (CANONICAL_AUTO only + proposed_action=ADVANCE + auto_advance gate)
+    # CANONICAL_AUTO = structured machine-readable verdict → safe to auto-advance.
+    # RAW_PASTE / NATIVE_FILE / OPERATOR_NOTIFY = human-submitted → requires manual advance.
+    _AUTO_ADVANCE_GATES: frozenset[str] = frozenset({"GATE_0", "GATE_1", "GATE_1.1"})
+    if detection_mode == "CANONICAL_AUTO" and str(row["proposed_action"]) == "ADVANCE":
+        with conn.cursor() as _cur:
+            _run_check = R.fetch_run(_cur, run_id)
+        if _run_check and str(_run_check.get("current_gate_id", "")) in _AUTO_ADVANCE_GATES:
+            actual_actor = None
+            with conn.cursor() as _cur2:
+                actual_actor = resolve_actor_team_id(_cur2, _run_check)
+            if actual_actor:
+                try:
+                    advance_out = uc_02_advance_run(
+                        conn,
+                        actor_team_id=actual_actor,
+                        run_id=run_id,
+                        verdict="pass",
+                        summary=str(row.get("summary") or "Auto-advance: feedback PASS"),
+                    )
+                    out = {**out, "auto_advanced": True, "advance_result": advance_out}
+                except StateMachineError:
+                    # fail-safe — user sees proposed_action=ADVANCE, manual action required
+                    pass
+
     return out
 
 

@@ -33,9 +33,17 @@
 
 **Pre-commit:** `phoenix-aos-v3-file-index-v2-freeze` · **BUILD check:** `bash scripts/check_aos_v3_build_governance.sh`
 
+**Work Package ID format (Iron Rule):** Always `S{NNN}-P{NNN}-WP{NNN}` — three levels, always. Stage (`S003`), Program (`S003-P005`), Work Package (`S003-P005-WP001`). Even if a program has only one WP it must be `WP001`. **Never** use a program-level ID (`S003-P005`) as a `work_package_id`. Enforced in `initiate_run()` (HTTP 400 `INVALID_WP_ID_FORMAT`) and by a DB `CHECK` constraint. Directive: `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_WP_ID_NAMING_CONVENTION_v1.0.0.md`
+
 **Local AOS v3 DB (GATE_0):** Configure **`agents_os_v3/.env`** with **`AOS_V3_DATABASE_URL`** only (isolated from TikTrack `api/.env` / `DATABASE_URL`). Optional: `AOS_V3_DOCKER_PG_CONTAINER` when multiple Postgres containers exist. Then `bash scripts/init_aos_v3_database.sh` — applies `001`, runs `seed.py`.
 
-**AOS v3 API (local):** `bash scripts/start-aos-v3-server.sh` (default **8090**; PID file `/tmp/aos_v3_server.pid`). Health: `curl -s http://127.0.0.1:8090/api/health`. Stop: `bash scripts/stop-aos-v3-server.sh`. Restart: `bash scripts/restart-aos-v3-server.sh`. DB + API in one go: `bash scripts/bootstrap_aos_v3_local.sh` (skip DB with `AOS_V3_SKIP_DATABASE_INIT=1`). **8090 conflict:** `agents_os/scripts/start_ui_server.sh` (agents_os_v2) also uses 8090 — stop one before starting the other, or set `AOS_V3_SERVER_PORT` for dev.
+**AOS v3 API (local) — agent startup protocol:**
+1. **Always run `bash scripts/start-aos-v3-server.sh` as the first step** before any API call. The script is idempotent: if AOS v3 is already healthy on port 8090 it prints "already running" and exits 0; if the port is free it starts the server; if the port is occupied by a non-AOS process it exits 2 with diagnostics.
+2. A single failed `curl /api/health` is **not** sufficient to conclude the server is down — a brief reload window (~2–4 s) can cause a transient 7/connection-refused. Always run the start script, not a raw curl, to determine server state.
+3. **Do not start uvicorn with `--reload`** in agent/operational sessions. `--reload` causes brief downtime on every file change and will produce false-negative health checks for other agents running concurrently.
+4. `GET /api/state` **requires** the `X-Actor-Team-Id` header (e.g. `-H 'X-Actor-Team-Id: team_190'`).
+
+Commands: Start: `bash scripts/start-aos-v3-server.sh` · Stop: `bash scripts/stop-aos-v3-server.sh` · Restart: `bash scripts/restart-aos-v3-server.sh` · DB+API bootstrap: `bash scripts/bootstrap_aos_v3_local.sh`. **Port:** 8090 (canonical). `agents_os/scripts/start_ui_server.sh` (agents_os_v2, frozen) also defaults to 8090 — it must not be running during AOS v3 agent sessions.
 
 **Dual-domain DB health (TikTrack + AOS, isolated URLs):** `python3 scripts/verify_dual_domain_database_connectivity.py` (needs `psycopg2`; uses `api/.env` + `agents_os_v3/.env`).
 

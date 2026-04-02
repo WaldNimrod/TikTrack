@@ -7,6 +7,7 @@ from: Team 100 (Chief System Architect / Chief R&D) — סעיף משוב איכ
 to: Team 100 (בעלי התכנית), Team 11 (Gateway), Team 190 (Constitutional Validator)
 cc: Team 00 (Principal), Team 21, Team 31, Team 51, Team 61, Team 170
 date: 2026-04-01
+historical_record: true
 type: FEEDBACK_REPORT — איכות פרומפטים, קונטקסט לצוותים, ועומק תכנית Pipeline Quality
 domain: agents_os
 branch: aos-v3

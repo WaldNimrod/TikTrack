@@ -51,6 +51,7 @@ status: ACTIVE
       <button type="button" class="aosv3-tab active" data-tab="routing" role="tab" aria-selected="true" title="Routing rules — who handles each gate">Routing rules</button>
       <button type="button" class="aosv3-tab" data-tab="templates" role="tab" aria-selected="false" title="Prompt templates — instructions sent to agents at each gate">Templates</button>
       <button type="button" class="aosv3-tab" data-tab="policies" role="tab" aria-selected="false" title="Governance policies — runtime constraints and defaults">Policies</button>
+      <button type="button" class="aosv3-tab" data-tab="governance" role="tab" aria-selected="false" title="Governance matrix — teams and their governance files">Governance</button>
     </div>
 
     <div id="aosv3-panel-routing" class="aosv3-tab-panel active" role="tabpanel">
@@ -80,6 +81,22 @@ status: ACTIVE
 
     <div id=”aosv3-panel-policies” class=”aosv3-tab-panel” role=”tabpanel”>
       <p class=”aosv3-sidebar-hint”><strong>Policies</strong> — הגדרות שמשפיעות על התנהגות ה-pipeline בזמן ריצה: מספר מחזורי correction מקסימלי, ה-variant הברירת מחדל לפי domain, סוג gate (human/auto). מוחלות לפי scope: GLOBAL &gt; DOMAIN &gt; GATE. Read-only.</p>
+      <!-- P2-F05: Layer 2 polling interval control -->
+      <div class="section-card" style="margin-bottom:12px;padding:12px 16px">
+        <div class="section-title" style="margin-bottom:8px;font-size:13px">Layer 2 Polling Interval</div>
+        <label class="aosv3-form-label" style="display:flex;align-items:center;gap:10px">
+          Scan interval:
+          <select id="aosv3-layer2-interval-select" class="aosv3-input" style="width:auto">
+            <option value="30">30 seconds</option>
+            <option value="60" selected>60 seconds (default)</option>
+            <option value="120">120 seconds</option>
+            <option value="300">5 minutes</option>
+          </select>
+          <button type="button" id="aosv3-layer2-interval-save" class="btn btn-primary" style="padding:4px 10px;font-size:12px">Save</button>
+          <span id="aosv3-layer2-interval-status" class="aosv3-sidebar-hint" style="margin:0"></span>
+        </label>
+        <p class="aosv3-sidebar-hint" style="margin-top:6px">Requires server restart to take effect. Writes to <code>layer2_polling_interval_seconds</code> policy.</p>
+      </div>
       <div class="aosv3-table-wrap">
         <table class="aosv3-table aosv3-table--sortable" id="aosv3-config-table-policies" aria-label="Policies">
           <thead>
@@ -93,6 +110,26 @@ status: ACTIVE
             </tr>
           </thead>
           <tbody id="aosv3-policies-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- P2-F06: Governance matrix tab -->
+    <div id="aosv3-panel-governance" class="aosv3-tab-panel" role="tabpanel">
+      <p class="aosv3-sidebar-hint"><strong>Governance matrix</strong> — teams registered in the system vs. governance file presence in <code>agents_os_v3/governance/</code>. <code>routed_without_governance = 0</code> is required before every gate.</p>
+      <div id="aosv3-governance-summary" class="section-card" style="padding:10px 14px;margin-bottom:10px;font-size:13px"></div>
+      <div class="aosv3-table-wrap">
+        <table class="aosv3-table" id="aosv3-governance-table" aria-label="Governance matrix">
+          <thead>
+            <tr>
+              <th>team_id</th>
+              <th>engine</th>
+              <th>routing rules</th>
+              <th>governance file</th>
+              <th>file size</th>
+            </tr>
+          </thead>
+          <tbody id="aosv3-governance-tbody"></tbody>
         </table>
       </div>
     </div>

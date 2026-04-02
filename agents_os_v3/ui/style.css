@@ -302,6 +302,12 @@ status: ACTIVE
   border: 1px solid var(--danger);
 }
 
+.aosv3-status--gate0_rejected {
+  background: rgba(210, 153, 34, 0.14);
+  color: #e3a21a;
+  border: 1px solid #b87a0d;
+}
+
 .aosv3-toast {
   position: fixed;
   bottom: 24px;
@@ -1251,6 +1257,45 @@ status: ACTIVE
   background: var(--success);
   box-shadow: 0 0 6px rgba(63, 185, 80, 0.7);
 }
+
+/* P2-F04 — Feedback Ingested Banner */
+.aosv3-feedback-banner {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--success, #3fb950);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+
+.aosv3-feedback-banner[hidden] { display: none !important; }
+
+.aosv3-feedback-banner.aosv3-feedback-banner--fail {
+  background: var(--danger, #f85149);
+}
+
+.aosv3-feedback-banner-msg {
+  flex: 1;
+}
+
+.aosv3-feedback-banner-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 4px;
+  opacity: 0.8;
+  line-height: 1;
+}
+.aosv3-feedback-banner-close:hover { opacity: 1; }
 
 .aosv3-correction-blocking {
   background: rgba(210, 153, 34, 0.1);

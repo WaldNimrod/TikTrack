@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-03-26T09:40:13Z",
+  "domain": "agents_os",
+  "work_package_id": "S003-P011-WP099",
+  "stage_id": "S003",
+  "program_id": "S003-P011",
+  "current_gate": "GATE_2",
+  "gate_display_name": "Phase 2.2 work plan, 2.2v review, 2.3 architect sign-off",
+  "gate_owner": "team_100",
+  "gates_completed": [],
+  "gates_failed": [],
+  "remediation_cycle_count": 0,
+  "last_blocking_gate": null,
+  "pipeline_health": "GREEN",
+  "current_phase": "2.2",
+  "total_phases": 0,
+  "next_action": {
+    "description": "Phase 2.2 work plan, 2.2v review, 2.3 architect sign-off",
+    "owner": "team_100",
+    "engine": "cursor"
+  },
+  "flags": {
+    "manual_routing_required": false,
+    "remediation_active": false,
+    "waiting_human_approval": false
+  }
+}

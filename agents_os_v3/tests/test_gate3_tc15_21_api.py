@@ -173,7 +173,10 @@ def test_tc18_get_state_next_action_confirm_advance(api_client: TestClient, aos_
 
 @requires_aos_db
 def test_tc19_advance_prefills_summary_from_pending_feedback(api_client: TestClient, aos_db_conn: Any) -> None:
-    """TC-19 — advance without summary; event payload carries pending feedback summary."""
+    """TC-19 — advance without summary; event payload carries pending feedback summary.
+
+    GATE_0 is now owned by team_190 (Constitutional Validator). Use team_190 as actor.
+    """
     wp, rid = _new_run(aos_db_conn)
     try:
         paste = """```json
@@ -182,13 +185,13 @@ def test_tc19_advance_prefills_summary_from_pending_feedback(api_client: TestCli
 """
         r0 = api_client.post(
             f"/api/runs/{rid}/feedback",
-            headers=_hdr(),
+            headers=_hdr("team_190"),
             json={"detection_mode": "RAW_PASTE", "raw_text": paste},
         )
         assert r0.status_code == 200, r0.text
         r1 = api_client.post(
             f"/api/runs/{rid}/advance",
-            headers=_hdr(),
+            headers=_hdr("team_190"),
             json={"verdict": "pass"},
         )
         assert r1.status_code == 200, r1.text
@@ -280,7 +283,7 @@ def test_tc21_sse_receives_event_after_advance(aos_db_conn: Any) -> None:
             time.sleep(0.25)
             pr = httpx.post(
                 f"{base}/api/runs/{rid}/advance",
-                headers=_hdr(),
+                headers=_hdr("team_190"),  # GATE_0 actor is team_190
                 json={"verdict": "pass"},
                 timeout=30.0,
             )
@@ -295,7 +298,7 @@ def test_tc21_sse_receives_event_after_advance(aos_db_conn: Any) -> None:
 """
         fb = httpx.post(
             f"{base}/api/runs/{rid}/feedback",
-            headers=_hdr(),
+            headers=_hdr("team_190"),  # GATE_0 actor is team_190
             json={"detection_mode": "RAW_PASTE", "raw_text": paste},
             timeout=30.0,
         )

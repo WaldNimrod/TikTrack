@@ -111,7 +111,7 @@ def test_phase2_override_force_pass_in_progress_advances_phase(api_client: TestC
         assert ro.status_code == 200, ro.text
         assert ro.json()["to_status"] == "IN_PROGRESS"
         rg = api_client.get(f"/api/runs/{rid}").json()
-        assert rg["current_phase_id"] == "0.2"
+        assert rg["current_phase_id"] == "1.1"  # GATE_0 is single-phase; FORCE_PASS at 0.1 → GATE_1/1.1
         rh = api_client.get(f"/api/history?run_id={rid}&limit=3&order=desc")
         ev = next(e for e in rh.json()["events"] if e["event_type"] == "PRINCIPAL_OVERRIDE")
         pj = ev.get("payload_json") or {}

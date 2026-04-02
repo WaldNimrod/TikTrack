@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Literal, Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 # Default domain for ideas when omitted (Agents OS seed domain)
 DEFAULT_IDEAS_DOMAIN_ID = "01JK8AOSV3DOMAIN00000001"
@@ -16,6 +16,12 @@ class CreateRunBody(BaseModel):
     process_variant: Optional[str] = None
 
 
+class RejectEntryBody(BaseModel):
+    """POST /runs/{run_id}/reject-entry — GATE_0 terminal rejection by team_190 or team_00."""
+
+    reason: str
+
+
 class AdvanceRunBody(BaseModel):
     """UC-02 / T11; summary + optional Mode A feedback_json (UI §10.6)."""
 
@@ -24,10 +30,31 @@ class AdvanceRunBody(BaseModel):
     feedback_json: Optional[dict[str, Any]] = None
 
 
-class FeedbackIngestBody(BaseModel):
-    """POST /runs/{run_id}/feedback — operator modes B/C/D only (UI §10.1)."""
+class BlockingFindingV1(BaseModel):
+    """Single blocking finding inside a StructuredVerdictV1 payload."""
 
-    detection_mode: Literal["OPERATOR_NOTIFY", "NATIVE_FILE", "RAW_PASTE"]
+    id: str = Field(..., description="e.g. F-01")
+    severity: Literal["BLOCKER", "MAJOR", "MINOR"]
+    description: str = Field(..., min_length=1)
+    evidence: Optional[str] = None
+
+
+class StructuredVerdictV1(BaseModel):
+    """Mode A (CANONICAL_AUTO) structured verdict body — schema_version 1."""
+
+    schema_version: Literal["1"] = "1"
+    verdict: Literal["PASS", "FAIL"]
+    confidence: Literal["HIGH", "MEDIUM", "LOW"] = "HIGH"
+    summary: str = Field(..., min_length=1)
+    blocking_findings: list[BlockingFindingV1] = Field(default_factory=list)
+    route_recommendation: Optional[Literal["doc", "impl", "arch"]] = None
+
+
+class FeedbackIngestBody(BaseModel):
+    """POST /runs/{run_id}/feedback — all modes A/B/C/D (UI §10.1)."""
+
+    detection_mode: Literal["CANONICAL_AUTO", "OPERATOR_NOTIFY", "NATIVE_FILE", "RAW_PASTE"]
+    structured_json: Optional[StructuredVerdictV1] = None
     file_path: Optional[str] = None
     raw_text: Optional[str] = None
 
@@ -37,6 +64,16 @@ class FeedbackIngestBody(BaseModel):
         if isinstance(v, str) and not v.strip():
             return None
         return v
+
+    @model_validator(mode="after")
+    def _check_by_mode(self) -> "FeedbackIngestBody":
+        if self.detection_mode == "CANONICAL_AUTO" and not self.structured_json:
+            raise ValueError("structured_json required for CANONICAL_AUTO")
+        if self.detection_mode == "NATIVE_FILE" and not self.file_path:
+            raise ValueError("file_path required for NATIVE_FILE")
+        if self.detection_mode == "RAW_PASTE" and not self.raw_text:
+            raise ValueError("raw_text required for RAW_PASTE")
+        return self
 
 
 class FailRunBody(BaseModel):

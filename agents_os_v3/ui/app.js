@@ -931,14 +931,14 @@ status: ACTIVE
     "GATE_5",
   ];
 
-  /** Mock sub-phases per gate — UI only */
-  var MOCK_GATE_PHASES = {
-    GATE_0: ["phase_0_1"],
-    GATE_1: ["phase_1_1", "phase_1_2"],
-    GATE_2: ["phase_2_1", "phase_2_2", "phase_2_3"],
-    GATE_3: ["phase_3_1", "phase_3_2"],
-    GATE_4: ["phase_4_1"],
-    GATE_5: ["phase_5_1"],
+  /** Canonical phases per gate — SSOT: DB schema */
+  var GATE_PHASES_SCHEMA = {
+    GATE_0: ["0.1"],
+    GATE_1: ["1.1", "1.2"],   // 1.1: Team 170 spec production; 1.2: Team 190 spec validation
+    GATE_2: ["2.1"],
+    GATE_3: ["3.1"],
+    GATE_4: ["4.1"],
+    GATE_5: ["5.1"],
   };
 
   var MOCK_ACTIVATABLE_TARGETS = [
@@ -1221,6 +1221,8 @@ status: ACTIVE
     if (st === "PLANNED")     return "aosv3-status--not_started";
     if (st === "COMPLETE")    return "aosv3-status--complete";
     if (st === "CANCELLED")   return "aosv3-status--cancelled";
+    if (st === "FAILED")         return "aosv3-status--cancelled";  // GATE_0 rejection
+    if (st === "GATE0_REJECTED") return "aosv3-status--gate0_rejected";
     return "aosv3-status--idle";
   }
 
@@ -1231,6 +1233,7 @@ status: ACTIVE
   }
 
   var pipelineLastState = null;
+  var pipelineRawPromptText = null; // raw prompt from API (no blends); source of truth for pre display
   var pipelineLiveHistoryCache = null;
   var pipelineLivePollTimer = null;
   var pipelineLiveEs = null;
@@ -1304,7 +1307,7 @@ status: ACTIVE
       currentGateId &&
       runStatus !== "IDLE" &&
       runStatus !== "COMPLETE" &&
-      MOCK_GATE_PHASES[currentGateId];
+      GATE_PHASES_SCHEMA[currentGateId];
     if (showPhases) {
       var prow = document.createElement("div");
       prow.className = "aosv3-phase-map-row";
@@ -1314,7 +1317,7 @@ status: ACTIVE
       prow.appendChild(lab);
       var chips = document.createElement("div");
       chips.className = "aosv3-phase-chips";
-      MOCK_GATE_PHASES[currentGateId].forEach(function (ph) {
+      GATE_PHASES_SCHEMA[currentGateId].forEach(function (ph) {
         var sp = document.createElement("span");
         sp.className = "aosv3-phase-chip";
         sp.textContent = ph;
@@ -1681,9 +1684,11 @@ status: ACTIVE
         '" /></label>' +
         '<label class="aosv3-form-label">Route <select id="aosv3-handoff-fail-route" class="aosv3-input"><option value="doc"' +
         (route === "doc" ? " selected" : "") +
-        '>doc</option><option value="full"' +
-        (route === "full" ? " selected" : "") +
-        '>full</option></select></label>' +
+        '>doc</option><option value="impl"' +
+        (route === "impl" || route === "full" ? " selected" : "") +
+        '>impl</option><option value="arch"' +
+        (route === "arch" ? " selected" : "") +
+        '>arch</option></select></label>' +
         '<div class="aosv3-handoff-btn-row">' +
         '<button type="button" class="btn" data-mock-toast="' +
         esc(handoffActionToast("Cancel fail — mock", "Close")) +
@@ -1723,26 +1728,53 @@ status: ACTIVE
       fileHidden +
       ">" +
       '<label class="aosv3-form-label">File path <input type="text" id="aosv3-ingest-file-path" class="aosv3-input" placeholder="/path/to/verdict.md" /> ' +
-      '<button type="button" class="btn" data-mock-toast="' +
-      esc(
-        handoffActionToast(
-          "POST /feedback NATIVE_FILE — mock",
-          "Parse feedback from file path"
-        )
-      ) +
-      '">Parse</button></label></div>' +
+      '<button type="button" id="aosv3-ingest-file-btn" class="btn">Parse</button></label></div>' +
       '<div id="aosv3-ingest-paste-row" class="aosv3-ingest-row"' +
       pasteHidden +
       ">" +
       '<label class="aosv3-form-label">Paste feedback<textarea id="aosv3-ingest-paste" class="aosv3-textarea" rows="4" maxlength="10000"></textarea></label> ' +
-      '<button type="button" class="btn" data-mock-toast="' +
-      esc(
-        handoffActionToast(
-          "POST /feedback RAW_PASTE — mock",
-          "Parse pasted feedback"
-        )
-      ) +
-      '">Parse Feedback</button></div>';
+      '<button type="button" id="aosv3-ingest-paste-btn" class="btn">Parse Feedback</button></div>';
+
+    // Wire live API calls for ingestion buttons
+    var runId = state.run_id;
+    var fileBtn = document.getElementById("aosv3-ingest-file-btn");
+    if (fileBtn && runId) {
+      fileBtn.onclick = function () {
+        var fp = (document.getElementById("aosv3-ingest-file-path") || {}).value || "";
+        if (!fp.trim()) { showAosv3Toast("יש להזין נתיב קובץ.", { level: "error" }); return; }
+        fileBtn.disabled = true;
+        AOSV3_apiJson("/api/runs/" + encodeURIComponent(runId) + "/feedback", {
+          method: "POST",
+          body: JSON.stringify({ detection_mode: "NATIVE_FILE", file_path: fp.trim() }),
+        }).then(function () {
+          showAosv3Toast("Feedback ingested ✓");
+          return loadPipelineStateFromApi(true);
+        }).catch(function (e) {
+          fileBtn.disabled = false;
+          var code = e.body && e.body.detail && e.body.detail.code;
+          showAosv3Toast(_friendlyErr(code, e.body && e.body.detail && e.body.detail.details, e.message), { level: "error", duration: 6000 });
+        });
+      };
+    }
+    var pasteBtn = document.getElementById("aosv3-ingest-paste-btn");
+    if (pasteBtn && runId) {
+      pasteBtn.onclick = function () {
+        var rt = (document.getElementById("aosv3-ingest-paste") || {}).value || "";
+        if (!rt.trim()) { showAosv3Toast("יש להדביק טקסט.", { level: "error" }); return; }
+        pasteBtn.disabled = true;
+        AOSV3_apiJson("/api/runs/" + encodeURIComponent(runId) + "/feedback", {
+          method: "POST",
+          body: JSON.stringify({ detection_mode: "RAW_PASTE", raw_text: rt }),
+        }).then(function () {
+          showAosv3Toast("Feedback ingested ✓");
+          return loadPipelineStateFromApi(true);
+        }).catch(function (e) {
+          pasteBtn.disabled = false;
+          var code = e.body && e.body.detail && e.body.detail.code;
+          showAosv3Toast(_friendlyErr(code, e.body && e.body.detail && e.body.detail.details, e.message), { level: "error", duration: 6000 });
+        });
+      };
+    }
   }
 
   function wireHandoffIngestionToggles() {
@@ -2053,7 +2085,7 @@ status: ACTIVE
       case "DOMAIN_INACTIVE":
         return "הדומיין אינו פעיל — פנו למנהל.";
       case "ROUTING_UNRESOLVED":
-        return "אין כלל ניתוב עבור GATE_0. בדקו את הגדרות ה-pipeline.";
+        return "לא נמצא actor פעיל לשלב הנוכחי — חסר routing rule או assignment. בדקו את הגדרות ה-pipeline.";
       case "WRONG_ACTOR":
         return "צוות שגוי — ה-X-Actor-Team-Id אינו מורשה לפעולה זו.";
       case "INSUFFICIENT_AUTHORITY":
@@ -2062,6 +2094,12 @@ status: ACTIVE
         return "שגיאת רצף שלב פנימית — פנו לאדריכל (PHASE_SEQUENCE_ERROR).";
       case "D03_VIOLATION":
         return "team_00 חסר מה-DB — הריצו seed מחדש.";
+      case "GOVERNANCE_NOT_FOUND":
+        return "קובץ governance חסר לצוות " + (d.team_id || "?") + " — נדרשת יצירת governance/{team_id}.md";
+      case "TEMPLATE_NOT_FOUND":
+        return "תבנית prompt לא נמצאה ל-" + (d.gate_id || "?") + "/" + (d.phase_id || "?") + " — בדקו את ה-seeder.";
+      case "INVALID_STATE":
+        return "מצב ריצה שגוי: " + (d.status || "?") + ". " + (d.hint || "");
       default:
         return fallback || (code ? code + ": שגיאה לא צפויה." : "שגיאה לא צפויה.");
     }
@@ -2084,6 +2122,22 @@ status: ACTIVE
     );
   }
 
+  function _blendedPromptText(rawBase) {
+    var blendAct = document.getElementById("aosv3-prompt-blend-activation");
+    var blendTeam = document.getElementById("aosv3-prompt-blend-team");
+    var blendPol = document.getElementById("aosv3-prompt-blend-policies");
+    var anyChecked = (blendAct && blendAct.checked) ||
+                     (blendTeam && blendTeam.checked) ||
+                     (blendPol && blendPol.checked);
+    if (!anyChecked) return rawBase;
+    // Temporarily set pipelineRawPromptText so buildPromptCopyPayload uses the right base
+    var prev = pipelineRawPromptText;
+    pipelineRawPromptText = rawBase;
+    var result = buildPromptCopyPayload();
+    pipelineRawPromptText = prev;
+    return result;
+  }
+
   function renderPromptSection(state, bustCache) {
     var sec = document.getElementById("aosv3-prompt-section");
     if (!sec) return;
@@ -2095,7 +2149,7 @@ status: ACTIVE
     sec.hidden = !show;
     if (!show) return;
 
-    // Actor banner — show who the prompt is for
+    // Actor banner — show who the prompt is for (SSOT: routing API → actor field)
     var actorBanner = document.getElementById("aosv3-prompt-actor-banner");
     if (actorBanner) {
       actorBanner.hidden = !show;
@@ -2107,6 +2161,10 @@ status: ACTIVE
         if (actPill) actPill.textContent = actorState.team_id;
         if (actName) actName.textContent = actorState.label || actorState.team_id;
         if (actEng) actEng.textContent = "· " + (actorState.engine || "—");
+      } else if (state.status === "PAUSED") {
+        if (actPill) actPill.textContent = "PAUSED";
+        if (actName) actName.textContent = "Run paused — resume to assign actor";
+        if (actEng) actEng.textContent = "";
       } else {
         if (actPill) actPill.textContent = "—";
         if (actName) actName.textContent = "";
@@ -2124,26 +2182,65 @@ status: ACTIVE
         var cch = document.getElementById("aosv3-prompt-cache");
         var layers = data.layers || {};
         var meta = data.meta || {};
+        // Success — hide error banner (may have been shown from a previous failed load)
+        var errBannerOk = document.getElementById("aosv3-prompt-error-banner");
+        if (errBannerOk) { errBannerOk.hidden = true; errBannerOk.textContent = ""; }
+
         var parts = [];
         if (layers.L1_template) parts.push(layers.L1_template);
         if (layers.L2_governance) parts.push(layers.L2_governance);
         if (layers.L3_policies_json) parts.push("### Policies\n" + layers.L3_policies_json);
         if (layers.L4_run_json) parts.push("### Run\n" + layers.L4_run_json);
-        if (pre) pre.textContent = parts.join("\n\n---\n\n");
+        var rawText = parts.join("\n\n---\n\n");
+        pipelineRawPromptText = rawText;
+        // Store prompt-resolved actor (SSOT: routing rule → prompt API, not DB assignment)
+        if (pipelineLastState && meta.actor_team_id) {
+          pipelineLastState.promptActorTeamId = meta.actor_team_id;
+          var actPillP = document.getElementById("aosv3-prompt-actor-pill");
+          var actNameP = document.getElementById("aosv3-prompt-actor-name");
+          if (actPillP) actPillP.textContent = meta.actor_team_id;
+          if (actNameP) actNameP.textContent = meta.actor_team_id;
+        }
+        if (pre) pre.textContent = _blendedPromptText(rawText);
         if (tok) tok.textContent = "token count: " + (meta.token_count || "\u2014") + " tokens";
         if (ass) ass.textContent = "assembled_at: " + (meta.assembled_at || new Date().toISOString());
         if (cch) cch.textContent = "cache_hit: " + String(meta.cache_hit || false);
       })
-      .catch(function () {
-        var p = MOCK_ASSEMBLED_PROMPT;
+      .catch(function (e) {
         var pre = document.getElementById("aosv3-prompt-pre");
         var tok = document.getElementById("aosv3-prompt-token-badge");
         var ass = document.getElementById("aosv3-prompt-assembled");
         var cch = document.getElementById("aosv3-prompt-cache");
-        if (pre) pre.textContent = assembledPromptBodyForState(state);
-        if (tok) tok.textContent = "token count: " + String(p.token_count) + " tokens";
-        if (ass) ass.textContent = "assembled_at: " + p.assembled_at + " (fallback/mock)";
-        if (cch) cch.textContent = "cache_hit: " + String(p.cache_hit);
+        var errBanner = document.getElementById("aosv3-prompt-error-banner");
+
+        // Always clear the pre — never show stale or mock content on error
+        if (pre) pre.textContent = "";
+        if (tok) tok.textContent = "token count: —";
+        if (ass) ass.textContent = "assembled_at: —";
+        if (cch) cch.textContent = "cache_hit: —";
+
+        if (state.status === "PAUSED") {
+          // Expected: prompt API returns 409 for PAUSED runs
+          if (errBanner) errBanner.hidden = true;
+          if (pre) pre.textContent = "[Run paused at " + (state.current_gate_id || "—") +
+            "/" + (state.current_phase_id || "—") + " — resume to load prompt]";
+        } else {
+          // Genuine error — show prominent banner, leave pre empty
+          var code = e && e.body && e.body.detail && e.body.detail.code;
+          var msg = e && e.message;
+          var det = e && e.body && e.body.detail && e.body.detail.details;
+          var friendly = _friendlyErr(code, det, msg);
+          var bannerText = "⚠ שגיאה בטעינת ה-prompt" +
+            (code ? " [" + code + "]" : "") +
+            " — " + friendly +
+            " | Gate: " + (state.current_gate_id || "?") + "/" + (state.current_phase_id || "?");
+          if (errBanner) {
+            errBanner.textContent = bannerText;
+            errBanner.hidden = false;
+          }
+          // Also surface as toast so it can't be missed
+          showAosv3Toast(friendly, { level: "error", duration: 10000 });
+        }
       });
   }
 
@@ -2337,22 +2434,26 @@ status: ACTIVE
   }
 
   function buildPromptCopyPayload() {
-    var base = assembledPromptBodyForState(
-      pipelineLastState || { run_id: null }
-    );
+    var base = pipelineRawPromptText ||
+      assembledPromptBodyForState(pipelineLastState || { run_id: null });
     var parts = [base];
     var inclTeam = document.getElementById("aosv3-prompt-blend-team");
     var inclPol = document.getElementById("aosv3-prompt-blend-policies");
     var inclActivation = document.getElementById("aosv3-prompt-blend-activation");
+    // SSOT for actor: prompt API meta.actor_team_id > state actor (state may be stale)
     var actorId =
-      pipelineLastState &&
-      pipelineLastState.actor &&
-      pipelineLastState.actor.team_id;
+      (pipelineLastState && pipelineLastState.promptActorTeamId) ||
+      (pipelineLastState && pipelineLastState.actor && pipelineLastState.actor.team_id);
     var team = findTeamById(actorId || "team_61");
     // Activation context — prepend, not append
     if (inclActivation && inclActivation.checked && pipelineLastState && pipelineLastState.run_id) {
       var st = pipelineLastState;
+      // Use prompt-resolved actor (not state actor which may be stale)
+      var promptActorId = st.promptActorTeamId || null;
       var actInfo = st.actor || {};
+      if (promptActorId && actInfo.team_id !== promptActorId) {
+        actInfo = { team_id: promptActorId, label: promptActorId, engine: actInfo.engine || "—" };
+      }
       var activationHeader =
         "# Agent Activation — " + (actInfo.team_id || "—") + " | " + (actInfo.label || actInfo.team_id || "—") + "\n" +
         "**Date:** " + new Date().toISOString().slice(0, 10) + "\n" +
@@ -2508,6 +2609,25 @@ status: ACTIVE
       }
     }
 
+    function showFeedbackBanner(data) {
+      var banner = document.getElementById("aosv3-feedback-banner");
+      var msg = document.getElementById("aosv3-feedback-banner-msg");
+      if (!banner || !msg) return;
+      var verdict = (data && data.verdict) || "";
+      var confidence = (data && data.confidence) || "";
+      var action = (data && data.proposed_action) || "";
+      var isFail = verdict.toUpperCase() === "FAIL";
+      banner.classList.toggle("aosv3-feedback-banner--fail", isFail);
+      msg.textContent = "Feedback ingested — verdict: " + (verdict || "?") +
+        (confidence ? " | confidence: " + confidence : "") +
+        (action ? " | action: " + action : "");
+      banner.hidden = false;
+      // Auto-dismiss after 8s for PASS; stays until dismissed for FAIL
+      if (!isFail) {
+        setTimeout(function () { banner.hidden = true; }, 8000);
+      }
+    }
+
     function attachSseListeners(es) {
       var refresh = function () {
         loadPipelineStateFromApi(false);
@@ -2515,7 +2635,15 @@ status: ACTIVE
       es.addEventListener("heartbeat", refresh);
       es.addEventListener("pipeline_event", refresh);
       es.addEventListener("run_state_changed", refresh);
-      es.addEventListener("feedback_ingested", refresh);
+      es.addEventListener("feedback_ingested", function (ev) {
+        try {
+          var data = ev.data ? JSON.parse(ev.data) : {};
+          showFeedbackBanner(data);
+        } catch (e) {
+          showFeedbackBanner({});
+        }
+        refresh();
+      });
     }
 
     function maybeStartSse(st) {
@@ -2747,8 +2875,11 @@ status: ACTIVE
       if (!r) return;
       var pr = window.prompt("Pause reason", "operator pause");
       if (pr == null || !pr.trim()) return;
-      postJson("/api/runs/" + encodeURIComponent(r) + "/pause", {
-        pause_reason: pr.trim(),
+      AOSV3_apiJson("/api/runs/" + encodeURIComponent(r) + "/pause", {
+        method: "POST",
+        body: JSON.stringify({ pause_reason: pr.trim() }),
+        headers: { "Content-Type": "application/json", "X-Actor-Team-Id": "team_00" },
+        skipActorHeader: true,
       })
         .then(function () {
           showAosv3Toast("ריצה הושהתה.");
@@ -2757,22 +2888,36 @@ status: ACTIVE
         .catch(function (e) {
           var code = e.body && e.body.detail && e.body.detail.code;
           showAosv3Toast(_friendlyErr(code, e.body && e.body.detail && e.body.detail.details, e.message), { level: "error", duration: 6000 });
+          loadPipelineStateFromApi(false); // sync UI even on failure
         });
     });
 
     wireLiveAction(document.getElementById("aosv3-btn-resume"), function () {
       var r = rid();
-      if (!r) return;
-      postJson("/api/runs/" + encodeURIComponent(r) + "/resume", {
-        resume_notes: "",
+      if (!r) {
+        showAosv3Toast("לא נמצאה ריצה פעילה — רעננו את הדף.", { level: "error", duration: 5000 });
+        return;
+      }
+      AOSV3_apiJson("/api/runs/" + encodeURIComponent(r) + "/resume", {
+        method: "POST",
+        body: JSON.stringify({ resume_notes: "" }),
+        headers: { "Content-Type": "application/json", "X-Actor-Team-Id": "team_00" },
+        skipActorHeader: true,
       })
         .then(function () {
-          showAosv3Toast("ריצה חודשה ✓");
+          showAosv3Toast("ריצה חודשה בהצלחה ✓", { duration: 4000 });
           return loadPipelineStateFromApi(true);
         })
         .catch(function (e) {
           var code = e.body && e.body.detail && e.body.detail.code;
-          showAosv3Toast(_friendlyErr(code, e.body && e.body.detail && e.body.detail.details, e.message), { level: "error", duration: 6000 });
+          var det = e.body && e.body.detail && e.body.detail.details;
+          // If INVALID_STATE the run may already be IN_PROGRESS (changed elsewhere) — reload to sync UI
+          var msg = code === "INVALID_STATE"
+            ? "הריצה כבר פעילה (שונתה ממקור אחר) — מסנכרן סטטוס..."
+            : _friendlyErr(code, det, e.message);
+          showAosv3Toast(msg, { level: "error", duration: 6000 });
+          // Always reload state so UI reflects reality, even on failure
+          loadPipelineStateFromApi(false);
         });
     });
 
@@ -2890,6 +3035,21 @@ status: ACTIVE
         });
       });
     }
+
+    // ── Blend checkbox live preview ───────────────────────────────────────
+    ["aosv3-prompt-blend-activation", "aosv3-prompt-blend-team", "aosv3-prompt-blend-policies"]
+      .forEach(function(id) {
+        var cb = document.getElementById(id);
+        if (cb && !cb._blendWired) {
+          cb._blendWired = true;
+          cb.addEventListener("change", function() {
+            var pre = document.getElementById("aosv3-prompt-pre");
+            if (pre && pipelineRawPromptText) {
+              pre.textContent = _blendedPromptText(pipelineRawPromptText);
+            }
+          });
+        }
+      });
 
     // ── CLI copy (live mode) ───────────────────────────────────────────────
     var cliCopyLive = document.getElementById("aosv3-handoff-cli-copy");
@@ -3552,11 +3712,82 @@ status: ACTIVE
       AOSV3_apiJson("/api/routing-rules"),
       AOSV3_apiJson("/api/policies"),
       AOSV3_apiJson("/api/templates"),
+      AOSV3_apiJson("/api/governance/status").catch(function () { return null; }),
     ])
       .then(function (pack) {
         var rr = pack[0].routing_rules || [];
         var policies = pack[1].policies || [];
         var templates = pack[2].templates || [];
+        var govData = pack[3];
+
+        // P2-F06: Render governance matrix
+        if (govData && govData.matrix) {
+          var sumEl = document.getElementById("aosv3-governance-summary");
+          var govTbody = document.getElementById("aosv3-governance-tbody");
+          var s = govData.summary || {};
+          if (sumEl) {
+            var warn = s.routed_without_governance > 0
+              ? ' <strong style="color:var(--danger)">⚠️ ' + s.routed_without_governance + ' routed without governance file</strong>'
+              : ' <span style="color:var(--success)">✓ All routed teams have governance files</span>';
+            sumEl.innerHTML = 'Teams: ' + s.total_teams +
+              ' | With governance: ' + s.teams_with_governance +
+              ' | Missing: ' + s.teams_without_governance + ' |' + warn;
+          }
+          if (govTbody) {
+            govTbody.innerHTML = (govData.matrix || []).map(function (m) {
+              var hasFile = m.has_governance_file;
+              var badge = hasFile
+                ? '<span style="color:var(--success)">✓</span>'
+                : (m.routing_rule_count > 0
+                  ? '<span style="color:var(--danger)">✗ missing</span>'
+                  : '<span style="color:var(--text-muted)">—</span>');
+              return '<tr>' +
+                '<td><code>' + esc(m.team_id) + '</code></td>' +
+                '<td>' + esc(m.engine || '—') + '</td>' +
+                '<td>' + m.routing_rule_count + '</td>' +
+                '<td>' + badge + '</td>' +
+                '<td>' + (m.file_size_bytes != null ? m.file_size_bytes + ' B' : '—') + '</td>' +
+                '</tr>';
+            }).join('');
+          }
+        }
+
+        // P2-F05: Wire layer2 polling interval save
+        var intervalSel = document.getElementById("aosv3-layer2-interval-select");
+        var intervalSave = document.getElementById("aosv3-layer2-interval-save");
+        var intervalStatus = document.getElementById("aosv3-layer2-interval-status");
+        // Pre-select current value from policies
+        var l2Policy = (policies || []).find(function (p) {
+          return p.policy_key === "layer2_polling_interval_seconds";
+        });
+        if (l2Policy && intervalSel) {
+          var curVal = String(l2Policy.id); // we'll match by value
+          // Just try to match the numeric value
+          var numVal = String(typeof l2Policy.policy_value_json === "number"
+            ? l2Policy.policy_value_json
+            : parseInt(l2Policy.policy_value_json, 10) || 60);
+          Array.from(intervalSel.options).forEach(function (opt) {
+            if (opt.value === numVal) opt.selected = true;
+          });
+        }
+        if (intervalSave && intervalSel) {
+          intervalSave.onclick = function () {
+            var seconds = parseInt(intervalSel.value, 10);
+            var policyId = l2Policy && l2Policy.id;
+            if (!policyId) {
+              if (intervalStatus) intervalStatus.textContent = "Policy not found — add layer2_polling_interval_seconds to definition.yaml";
+              return;
+            }
+            AOSV3_apiJson("/api/policies/" + encodeURIComponent(policyId), {
+              method: "PUT",
+              body: JSON.stringify({ policy_value_json: seconds }),
+            }).then(function () {
+              if (intervalStatus) intervalStatus.textContent = "Saved ✓ (restart required)";
+            }).catch(function (e) {
+              if (intervalStatus) intervalStatus.textContent = "Error: " + (e.message || String(e));
+            });
+          };
+        }
         MOCK_ROUTING.routing_rules = rr.map(function (r) {
           return {
             id: r.id,
@@ -3862,21 +4093,22 @@ status: ACTIVE
   }
 
   function buildTeamL3(team) {
+    var st = pipelineLastState || MOCK_STATE_ACTIVE;
     var lines = [];
     lines.push(
       "Active Run: " +
-        MOCK_STATE_ACTIVE.work_package_id +
+        (st.work_package_id || "—") +
         " (" +
-        MOCK_STATE_ACTIVE.domain_id +
+        (st.domain_slug || st.domain_id || "—") +
         ")"
     );
     lines.push(
       "Gate: " +
-        MOCK_STATE_ACTIVE.current_gate_id +
+        (st.current_gate_id || "—") +
         " / " +
-        MOCK_STATE_ACTIVE.current_phase_id
+        (st.current_phase_id || "—")
     );
-    lines.push("Status: " + MOCK_STATE_ACTIVE.status);
+    lines.push("Status: " + (st.status || "—"));
     lines.push(
       team.has_active_assignment
         ? "Assignment: Active"
@@ -4228,7 +4460,9 @@ status: ACTIVE
         '</pre><button type="button" class="btn" id="aosv3-copy-l4">Copy L4</button></div>' +
         '<div class="aosv3-context-actions">' +
         '<button type="button" class="btn btn-primary" id="aosv3-copy-full">Copy Full Context</button> ' +
-        '<button type="button" class="btn" id="aosv3-team-refresh">Refresh</button></div>';
+        (aosv3UseMock() ? '' : '<button type="button" class="btn btn-primary" id="aosv3-generate-context-prompt">Generate Context Prompt</button> ') +
+        '<button type="button" class="btn" id="aosv3-team-refresh">Refresh</button></div>' +
+        '<div id="aosv3-team-context-prompt-result" style="display:none;margin-top:8px"></div>';
 
       function wireCopy(id, text) {
         var b = document.getElementById(id);
@@ -4275,6 +4509,40 @@ status: ACTIVE
             renderContext(tm);
           }
         });
+
+      // P3-A4: Generate Context Prompt button — fetches live governance via /api/teams/{id}/context
+      var genCtxBtn = document.getElementById("aosv3-generate-context-prompt");
+      var ctxResultEl = document.getElementById("aosv3-team-context-prompt-result");
+      if (genCtxBtn && ctxResultEl && typeof AOSV3_apiJson === "function") {
+        genCtxBtn.onclick = function () {
+          genCtxBtn.disabled = true;
+          genCtxBtn.textContent = "Loading…";
+          AOSV3_apiJson("/api/teams/" + encodeURIComponent(team.team_id) + "/context")
+            .then(function (ctx) {
+              var md = ctx.governance_md || "(no governance file)";
+              ctxResultEl.style.display = "block";
+              ctxResultEl.innerHTML =
+                '<div class="section-card">' +
+                '<div class="section-title" style="font-size:12px">Generated Governance Context — ' + esc(team.team_id) + '</div>' +
+                '<div class="aosv3-sidebar-hint" style="margin:4px 0">' +
+                'Governance file: ' + (ctx.has_governance_file ? '✓ present (' + ctx.routing_rules.length + ' routing rules)' : '✗ missing') +
+                '</div>' +
+                '<pre class="aosv3-context-pre" style="max-height:300px;overflow:auto">' + esc(md) + '</pre>' +
+                '<button type="button" class="btn" id="aosv3-copy-gov-ctx">Copy</button>' +
+                '</div>';
+              var copyGov = document.getElementById("aosv3-copy-gov-ctx");
+              if (copyGov) copyGov.onclick = function () { copyToClipboard(md); };
+            })
+            .catch(function (e) {
+              ctxResultEl.style.display = "block";
+              ctxResultEl.innerHTML = '<p class="aosv3-sidebar-hint" style="color:var(--danger)">Error: ' + esc(e.message || String(e)) + '</p>';
+            })
+            .finally(function () {
+              genCtxBtn.disabled = false;
+              genCtxBtn.textContent = "Generate Context Prompt";
+            });
+        };
+      }
     }
 
     function renderRoster() {
@@ -4813,7 +5081,7 @@ status: ACTIVE
         });
         stageMap[stageKey].forEach(function (w) {
           var effStatus = wpEffectiveStatus(w);
-          var canStart = effStatus === "PLANNED" && !activeDom[w.domain_id];
+          var canStart = (effStatus === "PLANNED" || effStatus === "GATE0_REJECTED") && !activeDom[w.domain_id];
           var isActiveRun = (effStatus === "IN_PROGRESS" || effStatus === "CORRECTION" || effStatus === "PAUSED") && w.linked_run_id;
           var tr = document.createElement("tr");
           tr.className = "aosv3-wp-row aosv3-wp-row--clickable";
@@ -4849,6 +5117,13 @@ status: ACTIVE
               ' data-wp-id="' + esc(w.wp_id) + '" data-run-id="' + esc(w.linked_run_id || "") + '" data-domain-slug="' + esc(w.domain_slug || w.domain_id) + '"' +
               ' title="Switch to Pipeline view for this run">View Run</button>'
             );
+            if (effStatus === "PAUSED") {
+              btns.push(
+                '<button type="button" class="btn btn-primary aosv3-wp-stopprop aosv3-wp-btn-resume"' +
+                ' data-wp-id="' + esc(w.wp_id) + '" data-run-id="' + esc(w.linked_run_id || "") + '"' +
+                ' title="Resume paused run">▶ Resume</button>'
+              );
+            }
             btns.push(
               '<button type="button" class="btn btn-warning aosv3-wp-stopprop aosv3-wp-btn-stop"' +
               ' data-wp-id="' + esc(w.wp_id) + '" data-run-id="' + esc(w.linked_run_id || "") + '"' +
@@ -4858,6 +5133,21 @@ status: ACTIVE
             btns.push(
               '<span class="aosv3-status-badge aosv3-status--complete" style="font-size:11px">✓ Done</span>'
             );
+          } else if (effStatus === "GATE0_REJECTED") {
+            btns.push(
+              '<button type="button" class="btn btn-warning aosv3-wp-stopprop aosv3-wp-btn-start"' +
+              (canStart ? "" : " disabled") +
+              ' data-wp-id="' + esc(w.wp_id) + '" data-domain="' + esc(w.domain_id) + '" data-domain-slug="' + esc(w.domain_slug || w.domain_id) + '"' +
+              ' title="' + esc(canStart ? "הגש מחדש — צור ריצה חדשה לאחר תיקון החבילה" : "ריצה פעילה אחרת קיימת לדומיין זה") + '">' +
+              '↺ Re-Submit</button>'
+            );
+            if (w.linked_run_id) {
+              btns.push(
+                '<button type="button" class="btn aosv3-wp-stopprop aosv3-wp-btn-viewrun"' +
+                ' data-wp-id="' + esc(w.wp_id) + '" data-run-id="' + esc(w.linked_run_id) + '" data-domain-slug="' + esc(w.domain_slug || w.domain_id) + '"' +
+                ' title="צפה בריצה שנדחתה">View Rejected</button>'
+              );
+            }
           } else if (effStatus === "CANCELLED") {
             btns.push(
               '<span class="aosv3-status-badge aosv3-status--cancelled" style="font-size:11px">Cancelled</span>'
@@ -4879,8 +5169,8 @@ status: ACTIVE
             programTableCell(w.wp_id, w.program_id) +
             '</td><td class="aosv3-mono" title="' +
             esc(w.wp_id) +
-            '">' +
-            esc(runUlidSuffix(w.wp_id)) +
+            '" style="font-size:11px">' +
+            esc(w.wp_id) +
             "</td><td>" +
             domainPillHtml(w.domain_id) +
             '</td><td>' + statusCell +
@@ -4945,6 +5235,28 @@ status: ACTIVE
               var domainSlug = this.getAttribute("data-domain-slug") || "";
               try { if (domainSlug) localStorage.setItem("pipeline_domain", domainSlug); } catch (ex) {}
               window.location.href = "index.html";
+            });
+          }
+
+          // Resume button → POST /api/runs/{id}/resume (PAUSED → IN_PROGRESS)
+          var resumeWpBtn = tr.querySelector(".aosv3-wp-btn-resume");
+          if (resumeWpBtn) {
+            resumeWpBtn.addEventListener("click", function () {
+              var runId = this.getAttribute("data-run-id");
+              var wpId = this.getAttribute("data-wp-id");
+              if (!runId) { showAosv3Toast("Run ID לא נמצא.", { level: "error" }); return; }
+              AOSV3_apiFetch("/api/runs/" + encodeURIComponent(runId) + "/resume", {
+                method: "POST",
+                body: JSON.stringify({ resume_notes: "" }),
+                headers: { "Content-Type": "application/json", "X-Actor-Team-Id": "team_00" },
+                skipActorHeader: true,
+              }).then(function (r) { return r.json(); })
+              .then(function () {
+                showAosv3Toast("ריצה הופעלה מחדש ✓");
+                initPortfolioPageLive();
+              }).catch(function (e) {
+                showAosv3Toast("שגיאה בהפעלה מחדש: " + (e.message || String(e)), { level: "error", duration: 6000 });
+              });
             });
           }
 

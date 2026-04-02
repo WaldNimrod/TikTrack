@@ -19,8 +19,10 @@ from agents_os_v3.modules.state.errors import StateMachineError
 ORCH_ROLE_ID = "01JK8AOSV3ROLE0000000001"
 
 # Gates/phases after GATE_0 on the linear TRACK_FULL seed path (definition.yaml).
+# GATE_1 has two phases: 1.1 (Spec Production) and 1.2 (Spec Validation).
 LINEAR_TRACK_GATES_PHASES: list[tuple[str, str]] = [
     ("GATE_1", "1.1"),
+    ("GATE_1", "1.2"),   # Spec Validation phase (Team 190)
     ("GATE_2", "2.1"),
     ("GATE_3", "3.1"),
     ("GATE_4", "4.1"),
@@ -29,7 +31,10 @@ LINEAR_TRACK_GATES_PHASES: list[tuple[str, str]] = [
 
 
 def insert_linear_track_routing_rules(conn: Any, domain_id: str) -> list[str]:
-    """Seed routing_rules for GATE_1..GATE_5 so advances past GATE_0 resolve (returns new rule ids)."""
+    """Seed routing_rules for GATE_1..GATE_5 so advances past GATE_0 resolve (returns new rule ids).
+
+    Includes GATE_1/1.2 (Spec Validation) using ORCHESTRATOR role for test isolation.
+    """
     ids: list[str] = []
     with conn.cursor() as cur:
         for gate_id, phase_id in LINEAR_TRACK_GATES_PHASES:
@@ -39,7 +44,7 @@ def insert_linear_track_routing_rules(conn: Any, domain_id: str) -> list[str]:
                 """
                 INSERT INTO routing_rules (
                   id, gate_id, phase_id, domain_id, variant, role_id, priority, resolve_from_state_key, created_at
-                ) VALUES (%s, %s, %s, %s, NULL, %s, 10, NULL, NOW())
+                ) VALUES (%s, %s, %s, %s, NULL, %s, 50, NULL, NOW())
                 """,
                 (rid, gate_id, phase_id, domain_id, ORCH_ROLE_ID),
             )
@@ -96,8 +101,20 @@ def http_clear_pending_feedback(
 
 
 def drive_from_0_1_to_4_1(client: TestClient, run_id: str) -> None:
-    """Five pass cycles: 0.1→0.2→1.1→2.1→3.1→4.1 (human gate)."""
-    for _ in range(5):
+    """Five pass cycles: 0.1→1.1→1.2→2.1→3.1→4.1 (human gate).
+
+    GATE_0 (0.1 only) is owned by team_190 (Constitutional Validator).
+    GATE_1 has two phases: 1.1 (SPEC_AUTHOR) and 1.2 (CONSTITUTIONAL_VALIDATOR).
+    GATE_2+ (2.1, 3.1) use ORCHESTRATOR (team_11 for AOS, injected by test routing rules).
+    Tests using this helper inject their own routing rules via insert_linear_track_routing_rules
+    which assigns ORCHESTRATOR for all phases — actor team_11 works for all phases.
+    """
+    # GATE_0 phase 0.1: team_190 as actor (single phase — no 0.2)
+    http_feedback_pass(client, run_id, actor=C.CONSTITUTIONAL_VALIDATOR_TEAM_ID)
+    http_advance_pass(client, run_id, actor=C.CONSTITUTIONAL_VALIDATOR_TEAM_ID)
+    http_clear_pending_feedback(client, run_id, actor=C.CONSTITUTIONAL_VALIDATOR_TEAM_ID)
+    # GATE_1/1.1, GATE_1/1.2, GATE_2/2.1, GATE_3/3.1: team_11 as actor (injected ORCH rules)
+    for _ in range(4):
         http_feedback_pass(client, run_id)
         http_advance_pass(client, run_id)
         http_clear_pending_feedback(client, run_id)
@@ -127,7 +144,7 @@ def assert_ad_s7_01_atomic_rollback(conn: Any, domain_id: str) -> None:
                 M.advance_run(
                     conn,
                     run_id=rid,
-                    actor_team_id="team_10",
+                    actor_team_id=C.CONSTITUTIONAL_VALIDATOR_TEAM_ID,  # team_190 owns GATE_0
                     verdict="pass",
                     summary=None,
                 )
@@ -168,8 +185,26 @@ def assert_tc07_sentinel_bypass_resolver() -> None:
     m_asg.assert_not_called()
 
 
+def drive_through_gate0(client: TestClient, run_id: str) -> None:
+    """Advance through GATE_0 (single phase 0.1) using team_190 as actor.
+
+    GATE_0 is owned by team_190 (Constitutional Validator). One advance cycle required.
+    After this helper, the run is at GATE_1/1.1 with SPEC_AUTHOR (team_170) as active
+    assignment for canonical domains, or ORCHESTRATOR for test-injected routing.
+    """
+    http_feedback_pass(client, run_id, actor=C.CONSTITUTIONAL_VALIDATOR_TEAM_ID)
+    http_advance_pass(client, run_id, actor=C.CONSTITUTIONAL_VALIDATOR_TEAM_ID)
+    http_clear_pending_feedback(client, run_id, actor=C.CONSTITUTIONAL_VALIDATOR_TEAM_ID)
+
+
 def insert_blocking_authority_for_gate0(conn: Any, *, domain_id: str, gra_id: str) -> int:
-    """Enable blocking fail for orchestrator at GATE_0/0.1; returns previous can_block_gate."""
+    """Enable blocking fail for orchestrator at GATE_0/0.1; returns previous can_block_gate.
+
+    NOTE: GATE_0 is now owned by team_190 (CONSTITUTIONAL_VALIDATOR), not ORCHESTRATOR.
+    This helper still exists for legacy test infrastructure but blocking at GATE_0 by
+    ORCHESTRATOR is no longer the intended flow. Use insert_blocking_authority_for_gate1
+    for tests that verify ORCHESTRATOR blocking behaviour.
+    """
     with conn.cursor() as cur:
         cur.execute(
             "SELECT can_block_gate FROM pipeline_roles WHERE id = %s",
@@ -188,6 +223,34 @@ def insert_blocking_authority_for_gate0(conn: Any, *, domain_id: str, gra_id: st
             INSERT INTO gate_role_authorities (
               id, gate_id, phase_id, domain_id, role_id, may_block_verdict, created_at
             ) VALUES (%s, 'GATE_0', '0.1', %s, %s, 1, NOW())
+            """,
+            (gra_id, domain_id, ORCH_ROLE_ID),
+        )
+    conn.commit()
+    return prev_block
+
+
+def insert_blocking_authority_for_gate1(conn: Any, *, domain_id: str, gra_id: str) -> int:
+    """Enable blocking fail for ORCHESTRATOR at GATE_1/1.1; returns previous can_block_gate.
+
+    Used by tests that verify blocking-fail + correction-cycle behaviour after GATE_0 handoff.
+    """
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT can_block_gate FROM pipeline_roles WHERE id = %s",
+            (ORCH_ROLE_ID,),
+        )
+        row = cur.fetchone()
+        prev_block = int(row["can_block_gate"]) if row else 0
+        cur.execute(
+            "UPDATE pipeline_roles SET can_block_gate = 1 WHERE id = %s",
+            (ORCH_ROLE_ID,),
+        )
+        cur.execute(
+            """
+            INSERT INTO gate_role_authorities (
+              id, gate_id, phase_id, domain_id, role_id, may_block_verdict, created_at
+            ) VALUES (%s, 'GATE_1', '1.1', %s, %s, 1, NOW())
             """,
             (gra_id, domain_id, ORCH_ROLE_ID),
         )

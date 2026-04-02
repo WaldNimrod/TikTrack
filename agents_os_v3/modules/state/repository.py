@@ -281,6 +281,22 @@ def update_work_package_linked_run(cur: Any, wp_id: str, run_id: str) -> None:
     )
 
 
+def unlink_work_package_run(cur: Any, wp_id: str) -> None:
+    """Clear linked_run_id on WP after GATE_0 rejection (run=FAILED, WP back to PLANNED)."""
+    cur.execute(
+        "UPDATE work_packages SET linked_run_id = NULL, updated_at = NOW() WHERE id = %s",
+        (wp_id,),
+    )
+
+
+def deactivate_all_assignments_for_wp(cur: Any, work_package_id: str) -> None:
+    """Mark all active assignments for a WP as SUPERSEDED (gate boundary handoff)."""
+    cur.execute(
+        "UPDATE assignments SET status = 'SUPERSEDED' WHERE work_package_id = %s AND status = 'ACTIVE'",
+        (work_package_id,),
+    )
+
+
 def update_work_package_status(cur: Any, wp_id: str, status: str) -> None:
     """Sync work_package.status to match the terminal/active state of its linked run.
 

@@ -42,11 +42,13 @@ from .tc_module_map_helpers import (
     assert_tc07_sentinel_bypass_resolver,
     delete_routing_rules_by_ids,
     drive_from_0_1_to_4_1,
+    drive_through_gate0,
     hdr,
     http_advance_pass,
     http_clear_pending_feedback,
     http_feedback_pass,
     insert_blocking_authority_for_gate0,
+    insert_blocking_authority_for_gate1,
     insert_linear_track_routing_rules,
     restore_pipeline_role_block_and_delete_gra,
     seed_extra_phase_passed_events,
@@ -121,7 +123,8 @@ def test_tc02_blocking_fail_correction_resubmit_advance(api_client: TestClient, 
     wp = insert_temp_wp(aos_db_conn, dom)
     prev_block = 0
     try:
-        prev_block = insert_blocking_authority_for_gate0(aos_db_conn, domain_id=dom, gra_id=gra_id)
+        # Blocking authority at GATE_1 (GATE_0 is now owned by team_190, not ORCHESTRATOR)
+        prev_block = insert_blocking_authority_for_gate1(aos_db_conn, domain_id=dom, gra_id=gra_id)
         r0 = api_client.post(
             "/api/runs",
             headers=hdr("team_10"),
@@ -129,6 +132,9 @@ def test_tc02_blocking_fail_correction_resubmit_advance(api_client: TestClient, 
         )
         assert r0.status_code == 201, r0.text
         rid = r0.json()["run_id"]
+        # Advance through GATE_0 (team_190 owns both phases 0.1 and 0.2)
+        drive_through_gate0(api_client, rid)
+        # Now at GATE_1/1.1 — ORCHESTRATOR (team_11) is the active actor
         rf = api_client.post(
             f"/api/runs/{rid}/fail",
             headers=hdr("team_11"),
@@ -145,9 +151,13 @@ def test_tc02_blocking_fail_correction_resubmit_advance(api_client: TestClient, 
         assert rr.status_code == 200, rr.text
         assert rr.json()["status"] == "IN_PROGRESS"
         http_feedback_pass(api_client, rid)
-        ra = http_advance_pass(api_client, rid)
-        assert ra["current_gate_id"] == "GATE_0"
-        assert ra["current_phase_id"] == "0.2"
+        http_advance_pass(api_client, rid)   # 1.1 → 1.2 (Spec Validation phase)
+        http_clear_pending_feedback(api_client, rid)
+        http_feedback_pass(api_client, rid)
+        ra = http_advance_pass(api_client, rid)  # 1.2 → GATE_2/2.1
+        # After completing both GATE_1 phases → advances to GATE_2/2.1
+        assert ra["current_gate_id"] == "GATE_2"
+        assert ra["current_phase_id"] == "2.1"
     finally:
         restore_pipeline_role_block_and_delete_gra(aos_db_conn, gra_id=gra_id, prev_can_block=prev_block)
         purge_work_package(aos_db_conn, wp)
@@ -167,6 +177,9 @@ def test_tc03_advisory_fail_stays_in_progress(api_client: TestClient, aos_db_con
             json={"work_package_id": wp, "domain_id": dom},
         )
         rid = r0.json()["run_id"]
+        # Advance through GATE_0 first (team_190 owns GATE_0)
+        drive_through_gate0(api_client, rid)
+        # Now at GATE_1/1.1 — advisory fail by ORCHESTRATOR (team_11, can_block_gate=0)
         rf = api_client.post(
             f"/api/runs/{rid}/fail",
             headers=hdr("team_11"),
@@ -225,9 +238,8 @@ def test_tc05_pause_resume_gate_unchanged(api_client: TestClient, aos_db_conn: A
             json={"work_package_id": wp, "domain_id": dom},
         )
         rid = r0.json()["run_id"]
-        http_feedback_pass(api_client, rid)
-        http_advance_pass(api_client, rid)
-        http_clear_pending_feedback(api_client, rid)
+        # Advance through GATE_0 (both phases, team_190) to reach GATE_1
+        drive_through_gate0(api_client, rid)
         g1 = api_client.get(f"/api/runs/{rid}").json()
         rp = api_client.post(
             f"/api/runs/{rid}/pause",
@@ -329,9 +341,9 @@ def test_tc08_routing_unresolved_on_initiate(api_client: TestClient, aos_db_conn
                 INSERT INTO routing_rules (
                   id, gate_id, phase_id, domain_id, variant, role_id, priority, resolve_from_state_key, created_at
                 ) VALUES (%s, 'GATE_0', NULL, NULL, NULL, %s, 100, NULL, NOW())
-                ON CONFLICT (id) DO NOTHING
+                ON CONFLICT (id) DO UPDATE SET role_id = EXCLUDED.role_id
                 """,
-                (GLOBAL_GATE0_FALLBACK_RR_ID, ORCH_ROLE_ID),
+                (GLOBAL_GATE0_FALLBACK_RR_ID, "01JK8AOSV3ROLE0000000002"),  # CONSTITUTIONAL_VALIDATOR
             )
             cur.execute("DELETE FROM work_packages WHERE id = %s", (wp,))
             cur.execute("DELETE FROM domains WHERE id = %s", (did,))
@@ -352,13 +364,17 @@ def test_tc10_principal_override_force_pass_from_correction(api_client: TestClie
     wp = insert_temp_wp(aos_db_conn, dom)
     prev_block = 0
     try:
-        prev_block = insert_blocking_authority_for_gate0(aos_db_conn, domain_id=dom, gra_id=gra_id)
+        # Blocking authority at GATE_1 (GATE_0 now owned by team_190, not ORCHESTRATOR)
+        prev_block = insert_blocking_authority_for_gate1(aos_db_conn, domain_id=dom, gra_id=gra_id)
         r0 = api_client.post(
             "/api/runs",
             headers=hdr("team_10"),
             json={"work_package_id": wp, "domain_id": dom},
         )
         rid = r0.json()["run_id"]
+        # Advance through GATE_0 first (team_190 owns both phases)
+        drive_through_gate0(api_client, rid)
+        # Now at GATE_1 — blocking fail by ORCHESTRATOR (team_11)
         api_client.post(
             f"/api/runs/{rid}/fail",
             headers=hdr("team_11"),
@@ -445,18 +461,23 @@ def test_tc12_max_correction_cycles_escalation_on_resubmit(api_client: TestClien
                 (json.dumps({"max": 1}), pol_id),
             )
         aos_db_conn.commit()
-        prev_block = insert_blocking_authority_for_gate0(aos_db_conn, domain_id=dom, gra_id=gra_id)
+        # Blocking authority at GATE_1 (GATE_0 now owned by team_190)
+        prev_block = insert_blocking_authority_for_gate1(aos_db_conn, domain_id=dom, gra_id=gra_id)
         r0 = api_client.post(
             "/api/runs",
             headers=hdr("team_10"),
             json={"work_package_id": wp, "domain_id": dom},
         )
         rid = r0.json()["run_id"]
+        # Advance through GATE_0 first (team_190 owns both phases)
+        drive_through_gate0(api_client, rid)
+        # Now at GATE_1 — blocking fail #1 → CORRECTION
         api_client.post(
             f"/api/runs/{rid}/fail",
             headers=hdr("team_11"),
             json={"reason": "TC-12", "findings": []},
         )
+        # Resubmit → hits max correction cycles (max=1) → CORRECTION_ESCALATED
         rs = api_client.post(
             f"/api/runs/{rid}/advance",
             headers=hdr("team_11"),

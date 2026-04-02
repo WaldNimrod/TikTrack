@@ -6,6 +6,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["--yes", "serve", "agents_os/ui", "-l", "8090", "--no-clipboard"],
       "port": 8090
+    },
+    {
+      "name": "agents_os_v3",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "set -a && source agents_os_v3/.env && set +a && python3 -m uvicorn agents_os_v3.modules.management.api:app --host 0.0.0.0 --port 8090 --reload"],
+      "port": 8090
     }
   ]
 }

@@ -1,0 +1,163 @@
+{
+  "generated": "2026-03-27T19:48:31.511Z",
+  "base": "http://127.0.0.1:8766/agents_os_v3/ui/index.html",
+  "reference": "_COMMUNICATION/team_00/TEAM_00_TO_TEAM_51_GATE3_MATRIX_CLARIFICATION_RESPONSE_v1.1.0.md",
+  "cells": [
+    {
+      "file": "gate3_active_phase_3_1.png",
+      "preset": "active",
+      "phase": "phase_3_1",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=active&aosv3_phase=phase_3_1"
+    },
+    {
+      "file": "gate3_active_phase_3_2.png",
+      "preset": "active",
+      "phase": "phase_3_2",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=active&aosv3_phase=phase_3_2"
+    },
+    {
+      "file": "gate3_await_feedback_phase_3_1.png",
+      "preset": "await_feedback",
+      "phase": "phase_3_1",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=await_feedback&aosv3_phase=phase_3_1"
+    },
+    {
+      "file": "gate3_await_feedback_phase_3_2.png",
+      "preset": "await_feedback",
+      "phase": "phase_3_2",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=await_feedback&aosv3_phase=phase_3_2"
+    },
+    {
+      "file": "gate3_feedback_fallback_phase_3_1.png",
+      "preset": "feedback_fallback",
+      "phase": "phase_3_1",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=feedback_fallback&aosv3_phase=phase_3_1"
+    },
+    {
+      "file": "gate3_feedback_fallback_phase_3_2.png",
+      "preset": "feedback_fallback",
+      "phase": "phase_3_2",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=feedback_fallback&aosv3_phase=phase_3_2"
+    },
+    {
+      "file": "gate3_feedback_pass_phase_3_1.png",
+      "preset": "feedback_pass",
+      "phase": "phase_3_1",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=feedback_pass&aosv3_phase=phase_3_1"
+    },
+    {
+      "file": "gate3_feedback_pass_phase_3_2.png",
+      "preset": "feedback_pass",
+      "phase": "phase_3_2",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=feedback_pass&aosv3_phase=phase_3_2"
+    },
+    {
+      "file": "gate3_feedback_fail_phase_3_1.png",
+      "preset": "feedback_fail",
+      "phase": "phase_3_1",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=feedback_fail&aosv3_phase=phase_3_1"
+    },
+    {
+      "file": "gate3_feedback_fail_phase_3_2.png",
+      "preset": "feedback_fail",
+      "phase": "phase_3_2",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=feedback_fail&aosv3_phase=phase_3_2"
+    },
+    {
+      "file": "gate3_feedback_low_phase_3_1.png",
+      "preset": "feedback_low",
+      "phase": "phase_3_1",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=feedback_low&aosv3_phase=phase_3_1"
+    },
+    {
+      "file": "gate3_feedback_low_phase_3_2.png",
+      "preset": "feedback_low",
+      "phase": "phase_3_2",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=feedback_low&aosv3_phase=phase_3_2"
+    },
+    {
+      "file": "gate3_correction_blocking_phase_3_1.png",
+      "preset": "correction_blocking",
+      "phase": "phase_3_1",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=correction_blocking&aosv3_phase=phase_3_1"
+    },
+    {
+      "file": "gate3_correction_blocking_phase_3_2.png",
+      "preset": "correction_blocking",
+      "phase": "phase_3_2",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=correction_blocking&aosv3_phase=phase_3_2"
+    },
+    {
+      "file": "gate3_paused_phase_3_1.png",
+      "preset": "paused",
+      "phase": "phase_3_1",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=paused&aosv3_phase=phase_3_1"
+    },
+    {
+      "file": "gate3_paused_phase_3_2.png",
+      "preset": "paused",
+      "phase": "phase_3_2",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=paused&aosv3_phase=phase_3_2"
+    },
+    {
+      "file": "gate3_escalated_phase_3_1.png",
+      "preset": "escalated",
+      "phase": "phase_3_1",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=escalated&aosv3_phase=phase_3_1"
+    },
+    {
+      "file": "gate3_escalated_phase_3_2.png",
+      "preset": "escalated",
+      "phase": "phase_3_2",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=escalated&aosv3_phase=phase_3_2"
+    },
+    {
+      "file": "gate3_human_gate_phase_3_1.png",
+      "preset": "human_gate",
+      "phase": "phase_3_1",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=human_gate&aosv3_phase=phase_3_1"
+    },
+    {
+      "file": "gate3_human_gate_phase_3_2.png",
+      "preset": "human_gate",
+      "phase": "phase_3_2",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=human_gate&aosv3_phase=phase_3_2"
+    },
+    {
+      "file": "gate3_sentinel_phase_3_1.png",
+      "preset": "sentinel",
+      "phase": "phase_3_1",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=sentinel&aosv3_phase=phase_3_1"
+    },
+    {
+      "file": "gate3_sentinel_phase_3_2.png",
+      "preset": "sentinel",
+      "phase": "phase_3_2",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=sentinel&aosv3_phase=phase_3_2"
+    },
+    {
+      "file": "gate3_sse_connected_phase_3_1.png",
+      "preset": "sse_connected",
+      "phase": "phase_3_1",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=sse_connected&aosv3_phase=phase_3_1"
+    },
+    {
+      "file": "gate3_sse_connected_phase_3_2.png",
+      "preset": "sse_connected",
+      "phase": "phase_3_2",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=sse_connected&aosv3_phase=phase_3_2"
+    },
+    {
+      "file": "gate3_idle.png",
+      "preset": "idle",
+      "phase": "—",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=idle"
+    },
+    {
+      "file": "gate3_complete.png",
+      "preset": "complete",
+      "phase": "—",
+      "url": "http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=complete"
+    }
+  ]
+}

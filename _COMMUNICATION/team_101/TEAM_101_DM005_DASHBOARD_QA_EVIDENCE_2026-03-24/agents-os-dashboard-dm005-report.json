@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "domain": "agents_os",
+  "wp": "S003-P015-WP001",
+  "gate": "✅ WP CLOSED",
+  "owner": "—",
+  "expectedTeam": "—",
+  "bannerPrefix": "WORK PACKAGE CLOSED\n✅ S003-P015-WP001\nTRACK_FOCUSED\nCLOSED\n6 gates completed\n1\nThis work package is fully closed. All gates passed and docs archived.\n2\nTo start a new WP, update pipeline_state_agents_",
+  "severe": [],
+  "suspicious404ish": [],
+  "network404Hints": []
+}

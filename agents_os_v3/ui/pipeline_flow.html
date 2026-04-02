@@ -201,21 +201,21 @@
   <div class="mermaid-wrap">
     <div class="mermaid">
 flowchart LR
-    G0(["GATE_0\nInfrastructure\n✅ PASS"])
-    G1(["GATE_1\nCore API\n✅ PASS"])
-    G2(["GATE_2\nArch Review\n✅ PASS\nConditional HITL"])
-    G3(["GATE_3\nFIP + SSE\n⏳ Next"])
+    G0(["GATE_0\nInfrastructure"])
+    G1(["GATE_1\nCore API"])
+    G2(["GATE_2\nArch Review\nConditional HITL"])
+    G3(["GATE_3\nFIP + SSE"])
     G4(["GATE_4\nUX Sign-off\n🔒 Permanent HITL"])
     G5(["GATE_5\nCleanup + Closure"])
 
     G0 --> G1 --> G2 --> G3 --> G4 --> G5
 
-    T0["Implement: team_61\nDB migrations + env + dual-domain isolation\nApprove: team_11 Gateway\nCheck: team_191 branch + hooks"]
-    T1["Implement: team_21\nstate machine + basic UCs + routing\nQA: team_51 pytest\nReview: team_100 arch + seed"]
-    T2["Implement: team_21\nfull use cases + authority model\nQA: team_51 — 43 tests PASS\nApprove: team_100 architectural verdict\nHITL: team_00 only if PENDING_REVIEW"]
-    T3["Implement: team_21\nFIP + SSE stream + advanced routing\nQA: team_51 TC-15 to TC-18\nValidate: team_190 constitutional"]
-    T4["Implement: team_31\nUI mockups + interactions + Pipeline Flow page\nQA: team_51 E2E TC-19 to TC-26\nApprove: team_00 UX — ALWAYS"]
-    T5["QA: team_51 all TCs 01 to 26\nCleanup: team_61 report\nGateway: team_11 BUILD COMPLETE\nApprove: team_00 final sign-off"]
+    T0["team_61: DB migrations, env, dual-domain\nteam_11: Gateway approval\nteam_191: branch + hooks"]
+    T1["team_21: state machine + routing\nteam_51: pytest QA\nteam_100: arch review"]
+    T2["team_21: full UCs + authority model\nteam_51: QA\nteam_100: verdict\nteam_00: HITL if PENDING_REVIEW"]
+    T3["team_21: FIP + SSE + routing\nteam_51: TC-15 to TC-18\nteam_190: constitutional"]
+    T4["team_31: UI + System Map\nteam_51: E2E TC-19 to TC-26\nteam_00: UX — ALWAYS"]
+    T5["team_51: full TC-01 to TC-26\nteam_61: cleanup\nteam_11: BUILD COMPLETE\nteam_00: final sign-off"]
 
     G0 -.- T0
     G1 -.- T1
@@ -226,10 +226,9 @@ flowchart LR
     </div>
   </div>
   <div class="legend">
-    <strong>Current status (2026-03-28):</strong>
-    GATE_0 ✅ PASS | GATE_1 ✅ PASS | GATE_2 ✅ PASS |
-    GATE_3 ⏳ Pending GATE_3 activation (team_21, after team_190 PASS + team_100 mandate approval) |
-    GATE_4 🔒 awaiting GATE_3 completion
+    <strong>BUILD COMPLETE (2026-03-28) — GATE_0→GATE_5 all PASS.</strong>
+    GATE_2 = Conditional HITL (team_00 only when verdict=PENDING_REVIEW).
+    GATE_4 🔒 = Permanent HITL (team_00 always approves UX).
   </div>
 </div>
 
@@ -302,8 +301,8 @@ flowchart LR
     subgraph CORRECTION["CORRECTION"]
         direction TB
         CO["status = CORRECTION\ngatePhase preserved\ncycle_count tracked"]
-        CO_LOOP["T10: resubmit() cycle >= max\nG08: BLOCKED — await Principal\nA09: ESCALATED event"]
-        CO --> CO_LOOP --> CO
+        CO_ESC["BLOCKED\ncycle ≥ max → T10 ESCALATED\nawait team_00 only"]
+        CO --> CO_ESC --> CO
     end
 
     PA["PAUSED\nrouting snapshot saved\npaused_at recorded"]
@@ -358,14 +357,14 @@ flowchart TD
     subgraph ROUTING["Routing Resolution — 2 Stages (domain-scoped)"]
         direction TB
         NOTE["Every rule match filters by domain_id\nRuns in different domains use different rule sets"]
-        SA["Stage A — Sentinel DEPRECATED\nresolve_from_state_key IS NOT NULL\nmatch gate+phase+domain+variant\nL1 cutover: all NULL before PROD"]
+        SA["⚠ Stage A — Sentinel [INACTIVE IN PROD]\nresolve_from_state_key: all NULL before PROD\nLegacy path — not used in current deployment"]
         SB1["Stage B.1 — Rule Resolution\nrouting_rules WHERE gate+phase+domain+variant\nreturns role_id\norder: exact > domain+phase > domain > variant > default"]
         SB2["Stage B.2 — Team Resolution\nassignments WHERE work_package_id + role_id + ACTIVE\nreturns team_id for this specific WP+domain"]
         EROU["ROUTING_UNRESOLVED 500\nescalate to team_00"]
 
         NOTE --> SA
-        SA -->|"sentinel found — bypass B"| SB2
-        SA -->|"no sentinel"| SB1
+        SA -.->|"legacy: sentinel found"| SB2
+        SA -.->|"legacy: no sentinel"| SB1
         SB1 -->|"no rule match at any level"| EROU
         SB1 -->|"role_id found"| SB2
         SB2 -->|"no active assignment"| EROU
@@ -635,10 +634,10 @@ flowchart TD
     ACT{"action"}
 
     A_FP["FORCE_PASS\nA10A\nnon-final: advance gate/phase\nfinal: status=COMPLETE"]
-    A_FF["FORCE_FAIL\nA10B\nstatus=CORRECTION\ncycle_count++ — counted as fail"]
+    A_FF["⚠ FORCE_FAIL\nA10B: status=CORRECTION\ncycle_count++ ← counts as team failure"]
     A_FPZ["FORCE_PAUSE\nA10C\nATOMIC: status=PAUSED + snapshot\nidentical to UC-07 mechanism"]
     A_FR["FORCE_RESUME\nA10D\nstatus=IN_PROGRESS\nrouting from snapshot or re-resolve"]
-    A_FC["FORCE_CORRECTION\nA10E\nstatus=CORRECTION\ncycle_count NOT incremented\n(no fail event — manual intervention)"]
+    A_FC["FORCE_CORRECTION\nA10E: status=CORRECTION\ncycle_count unchanged ← operator action\nno fail event logged"]
 
     EV(["EVENT: PRINCIPAL_OVERRIDE\nactor_type=human\npayload: action, from_status\nto_status, reason, timestamp"])
 

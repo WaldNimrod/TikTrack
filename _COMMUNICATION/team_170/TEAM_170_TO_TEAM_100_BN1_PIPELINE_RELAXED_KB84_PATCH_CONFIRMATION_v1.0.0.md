@@ -1,0 +1,11 @@
+---
+id: TEAM_170_TO_TEAM_100_BN1_PIPELINE_RELAXED_KB84_PATCH_CONFIRMATION_v1.0.0
+historical_record: true
+from: Team 170
+to: Team 100
+date: 2026-03-23
+authority: TEAM_100_AOS_PIPELINE_DOCS_MANDATE_FINAL_APPROVAL_v1.0.0.md (BN-1)---
+
+**BN-1 CONFIRMED:** `PIPELINE_RELAXED_KB84` Iron Rule added to `documentation/docs-system/02-PIPELINE/AOS_PIPELINE_ARCHITECTURE_REFERENCE_v1.0.0.md` §4 (doc v1.0.2).
+
+**log_entry | TEAM_170 | BN1_RELAXED_KB84 | TEAM_100_NOTIFY | 2026-03-23**

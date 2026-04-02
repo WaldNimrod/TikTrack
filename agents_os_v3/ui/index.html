@@ -30,6 +30,12 @@ status: ACTIVE
   </div>
 </header>
 
+<!-- P2-F04: Feedback Ingested Banner — shown on SSE feedback_ingested events -->
+<div id="aosv3-feedback-banner" class="aosv3-feedback-banner" role="alert" aria-live="assertive" hidden>
+  <span id="aosv3-feedback-banner-msg" class="aosv3-feedback-banner-msg"></span>
+  <button type="button" class="aosv3-feedback-banner-close" onclick="document.getElementById('aosv3-feedback-banner').hidden=true" aria-label="Dismiss">✕</button>
+</div>
+
 <nav class="pipeline-nav">
   <a class="nav-link active" href="index.html">Pipeline</a>
   <span class="nav-sep"></span>
@@ -190,6 +196,7 @@ status: ACTIVE
           <span id="aosv3-prompt-assembled" class="agents-refresh-label"></span>
           <span id="aosv3-prompt-cache" class="agents-refresh-label"></span>
         </div>
+        <div id="aosv3-prompt-error-banner" class="aosv3-escalation-banner" hidden role="alert" aria-live="assertive"></div>
         <pre id="aosv3-prompt-pre" class="aosv3-prompt-pre"></pre>
         <div class="aosv3-prompt-blend">
           <div class="sidebar-label">Copy — optional additions</div>

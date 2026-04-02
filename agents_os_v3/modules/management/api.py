@@ -61,6 +61,7 @@ from agents_os_v3.modules.definitions.models import (
     PauseRunBody,
     PolicyUpdateBody,
     PrincipalOverrideBody,
+    RejectEntryBody,
     ResumeRunBody,
     RoutingRuleCreateBody,
     RoutingRuleUpdateBody,
@@ -154,6 +155,27 @@ def post_advance(
         raise _sm_http(e) from e
 
 
+@business_router.post("/runs/{run_id}/reject-entry", status_code=200)
+def post_reject_entry(
+    run_id: str,
+    body: RejectEntryBody,
+    actor_team_id: str = Depends(get_actor_team_id),
+    conn: Any = Depends(_db_conn),
+) -> dict[str, Any]:
+    """GATE_0 terminal rejection (Entry Quality Gate).
+    Only team_190 or team_00. Terminates run (status=FAILED) and resets WP to PLANNED.
+    """
+    try:
+        return UC.uc_gate0_reject(
+            conn,
+            actor_team_id=actor_team_id,
+            run_id=run_id,
+            reason=body.reason.strip(),
+        )
+    except StateMachineError as e:
+        raise _sm_http(e) from e
+
+
 @business_router.post("/runs/{run_id}/fail")
 def post_fail(
     run_id: str,
@@ -216,24 +238,6 @@ def post_run_feedback(
     actor_team_id: str = Depends(get_actor_team_id),
     conn: Any = Depends(_db_conn),
 ) -> dict[str, Any]:
-    if body.detection_mode == "NATIVE_FILE" and not body.file_path:
-        raise HTTPException(
-            status_code=400,
-            detail={
-                "code": "INVALID_ACTION",
-                "message": "file_path required for NATIVE_FILE",
-                "details": {},
-            },
-        )
-    if body.detection_mode == "RAW_PASTE" and not body.raw_text:
-        raise HTTPException(
-            status_code=400,
-            detail={
-                "code": "INVALID_ACTION",
-                "message": "raw_text required for RAW_PASTE",
-                "details": {},
-            },
-        )
     try:
         return UC.uc_15_ingest_feedback(
             conn,
@@ -242,6 +246,7 @@ def post_run_feedback(
             detection_mode=body.detection_mode,
             file_path=body.file_path,
             raw_text=body.raw_text,
+            structured_json=body.structured_json.model_dump() if body.structured_json else None,
         )
     except StateMachineError as e:
         raise _sm_http(e) from e
@@ -365,8 +370,9 @@ def get_run_prompt(
         raise HTTPException(
             status_code=404,
             detail={
-                "code": "GovernanceNotFound",
-                "message": f"Governance markdown missing for team {e.team_id}",
+                "code": "GOVERNANCE_NOT_FOUND",
+                "message": f"Governance markdown missing for actor team '{e.team_id}'. "
+                           f"Create agents_os_v3/governance/{e.team_id}.md to resolve.",
                 "details": {"team_id": e.team_id},
             },
         ) from e
@@ -710,6 +716,159 @@ def get_policies(conn: Any = Depends(_db_conn)) -> dict[str, Any]:
     return {"policies": rows}
 
 
+@business_router.get("/runs/{run_id}/context")
+def get_run_context(
+    run_id: str,
+    conn: Any = Depends(_db_conn),
+    actor_team_id: str = Depends(get_actor_team_id),
+) -> dict[str, Any]:
+    """P3-A1 — Run context bundle: run state + governance + token budget meta."""
+    try:
+        prompt_out = assemble_prompt_for_run(conn, run_id=run_id, bust_cache=True)
+    except StateMachineError as e:
+        raise _sm_http(e) from e
+    except GovernanceNotFoundError as e:
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "code": "GOVERNANCE_NOT_FOUND",
+                "message": f"Governance markdown missing for actor team '{e.team_id}'.",
+                "details": {"team_id": e.team_id},
+            },
+        ) from e
+    return {
+        "run_id": run_id,
+        "meta": prompt_out.get("meta"),
+        "token_budget_warning": prompt_out.get("meta", {}).get("token_budget_warning"),
+        "approx_tokens": prompt_out.get("meta", {}).get("approx_tokens"),
+    }
+
+
+@business_router.get("/teams/{team_id}/context")
+def get_team_context(
+    team_id: str,
+    conn: Any = Depends(_db_conn),
+) -> dict[str, Any]:
+    """P3-A3 — Team context: governance file contents + routing rules for team."""
+    from agents_os_v3.modules.prompting.builder import GOVERNANCE_DIR
+    gov_path = GOVERNANCE_DIR / f"{team_id}.md"
+    has_file = gov_path.is_file()
+    governance_md: Optional[str] = None
+    if has_file:
+        governance_md = gov_path.read_text(encoding="utf-8")
+
+    with conn.cursor() as cur:
+        cur.execute("SELECT id, engine FROM teams WHERE id = %s", (team_id,))
+        team_row = cur.fetchone()
+        if not team_row:
+            raise HTTPException(
+                status_code=404,
+                detail={"code": "NOT_FOUND", "message": f"Team '{team_id}' not found.", "details": {}},
+            )
+        cur.execute(
+            "SELECT gate_id, phase_id, domain_id, variant, priority FROM routing_rules WHERE role_id = %s ORDER BY priority",
+            (team_id,),
+        )
+        rules = [dict(r) for r in (cur.fetchall() or [])]
+
+    return {
+        "team_id": team_id,
+        "engine": team_row["engine"],
+        "has_governance_file": has_file,
+        "governance_md": governance_md,
+        "routing_rules": rules,
+    }
+
+
+@business_router.get("/feedback/stats")
+def get_feedback_stats(
+    actor_team_id: str = Depends(get_actor_team_id),
+    run_id: Optional[str] = Query(default=None),
+    conn: Any = Depends(_db_conn),
+) -> dict[str, Any]:
+    """§I-0 — KPI aggregation from pending_feedbacks.
+    Auth: X-Actor-Team-Id required. Phase 0: global aggregate (no PII).
+    """
+    with conn.cursor() as cur:
+        if run_id:
+            cur.execute(
+                """
+                SELECT detection_mode, ingestion_layer, COUNT(*) AS cnt
+                FROM pending_feedbacks
+                WHERE run_id = %s
+                GROUP BY detection_mode, ingestion_layer
+                ORDER BY cnt DESC
+                """,
+                (run_id,),
+            )
+        else:
+            cur.execute(
+                """
+                SELECT detection_mode, ingestion_layer, COUNT(*) AS cnt
+                FROM pending_feedbacks
+                GROUP BY detection_mode, ingestion_layer
+                ORDER BY cnt DESC
+                """
+            )
+        rows = [dict(r) for r in (cur.fetchall() or [])]
+        cur.execute("SELECT COUNT(*) AS total FROM pending_feedbacks" + (" WHERE run_id = %s" if run_id else ""),
+                    (run_id,) if run_id else ())
+        total_row = cur.fetchone()
+        total = int(total_row["total"]) if total_row else 0
+
+    return {
+        "total_feedbacks": total,
+        "run_id_filter": run_id,
+        "breakdown": [
+            {"detection_mode": r["detection_mode"], "ingestion_layer": r["ingestion_layer"], "count": int(r["cnt"])}
+            for r in rows
+        ],
+        "phase": "0 — collection only (N<20 threshold not yet reached)",
+    }
+
+
+@business_router.get("/governance/status")
+def get_governance_status(conn: Any = Depends(_db_conn)) -> dict[str, Any]:
+    """P2-F06 — Governance matrix: all teams vs. governance file presence.
+    Returns teams with engine, role_count, has_governance_file, file_size_bytes.
+    """
+    governance_dir = Path(__file__).resolve().parents[2] / "governance"
+    with conn.cursor() as cur:
+        cur.execute("SELECT id, engine FROM teams ORDER BY id")
+        teams = [dict(r) for r in (cur.fetchall() or [])]
+        cur.execute("SELECT role_id, COUNT(*) AS rule_count FROM routing_rules GROUP BY role_id")
+        rule_counts = {str(r["role_id"]): int(r["rule_count"]) for r in (cur.fetchall() or [])}
+
+    matrix = []
+    total_teams = len(teams)
+    teams_with_gov = 0
+    for t in teams:
+        tid = str(t["id"])
+        gov_path = governance_dir / f"{tid}.md"
+        has_file = gov_path.is_file()
+        if has_file:
+            teams_with_gov += 1
+        matrix.append({
+            "team_id": tid,
+            "engine": t.get("engine"),
+            "routing_rule_count": rule_counts.get(tid, 0),
+            "has_governance_file": has_file,
+            "file_size_bytes": gov_path.stat().st_size if has_file else None,
+        })
+
+    return {
+        "summary": {
+            "total_teams": total_teams,
+            "teams_with_governance": teams_with_gov,
+            "teams_without_governance": total_teams - teams_with_gov,
+            "routed_without_governance": sum(
+                1 for m in matrix if m["routing_rule_count"] > 0 and not m["has_governance_file"]
+            ),
+        },
+        "matrix": matrix,
+    }
+
+
 @business_router.put("/policies/{policy_id}")
 def put_policy(
     policy_id: str,
@@ -766,14 +925,98 @@ async def events_stream(
     return StreamingResponse(_gen(), media_type="text/event-stream")
 
 
+_LAYER2_POLL_INTERVAL_DEFAULT = 60  # seconds
+
+
+def _get_layer2_poll_interval() -> int:
+    """Read layer2_polling_interval_seconds policy from DB; fall back to default."""
+    try:
+        conn = connection()
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT policy_value_json FROM policies WHERE policy_key = %s LIMIT 1",
+                    ("layer2_polling_interval_seconds",),
+                )
+                row = cur.fetchone()
+                if row:
+                    val = row[0]
+                    if isinstance(val, (int, float)) and val > 0:
+                        return int(val)
+                    try:
+                        import json as _json
+                        parsed = _json.loads(str(val))
+                        if isinstance(parsed, (int, float)) and parsed > 0:
+                            return int(parsed)
+                    except Exception:
+                        pass
+        conn.close()
+    except Exception:
+        pass
+    return _LAYER2_POLL_INTERVAL_DEFAULT
+
+
+async def _scan_layer2_feedback() -> None:
+    """§F — Layer 2 APScheduler scan: auto-ingest OPERATOR_NOTIFY feedback files."""
+    import asyncio as _asyncio
+    try:
+        conn = connection()
+        with conn:
+            with conn.cursor() as cur:
+                # Fetch all IN_PROGRESS runs without pending feedback
+                cur.execute(
+                    """
+                    SELECT r.id AS run_id, r.current_gate_id, r.work_package_id, r.started_at
+                    FROM runs r
+                    WHERE r.status IN ('IN_PROGRESS', 'CORRECTION')
+                      AND NOT EXISTS (
+                        SELECT 1 FROM pending_feedbacks pf
+                        WHERE pf.run_id = r.id AND pf.cleared_at IS NULL
+                      )
+                    LIMIT 50
+                    """
+                )
+                active_runs = [dict(row) for row in (cur.fetchall() or [])]
+        conn.close()
+
+        for run_info in active_runs:
+            rid = str(run_info["run_id"])
+            try:
+                conn2 = connection()
+                UC.uc_15_ingest_feedback(
+                    conn2,
+                    actor_team_id="team_system",
+                    run_id=rid,
+                    detection_mode="OPERATOR_NOTIFY",
+                    file_path=None,
+                    raw_text=None,
+                )
+                conn2.close()
+            except Exception as scan_exc:
+                # FEEDBACK_ALREADY_INGESTED, ROUTING_UNRESOLVED, etc. — skip silently
+                logger.debug("layer2_scan skip run %s: %s", rid, scan_exc)
+    except Exception as exc:
+        logger.warning("layer2_scan error: %s", exc)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     loop = asyncio.get_running_loop()
     init_sse(loop)
     app.state.sse_broadcaster = get_broadcaster()
     scheduler = AsyncIOScheduler()
+    interval_s = _get_layer2_poll_interval()
+    scheduler.add_job(
+        _scan_layer2_feedback,
+        "interval",
+        seconds=interval_s,
+        id="layer2_scan",
+        coalesce=True,
+        max_instances=1,
+        replace_existing=True,
+    )
     scheduler.start()
-    logger.info("APScheduler started (GATE_0 — no jobs registered)")
+    logger.info("APScheduler started — layer2_scan every %ds", interval_s)
     yield
     scheduler.shutdown(wait=False)
     shutdown_sse()

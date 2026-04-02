@@ -3,8 +3,48 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any
+
+
+# ---------------------------------------------------------------------------
+# §H — Token Budget helpers
+# ---------------------------------------------------------------------------
+
+_OPTIONAL_SECTIONS_RE = re.compile(
+    r"^(## OPTIONAL_.*|## APPENDIX.*|## BACKGROUND.*)",
+    re.MULTILINE,
+)
+
+# Soft budget thresholds (in approx tokens)
+_L1_L2_MAX_TOKENS = 6000
+_L3_MAX_TOKENS = 2000
+_L4_MAX_TOKENS = 1000
+_TOTAL_WARN_TOKENS = 8000
+_TOTAL_NEAR_TOKENS = 6000
+
+
+def _approx_tokens(text: str) -> int:
+    """Lower-bound heuristic: len//4.
+    English ≈ accurate. Hebrew/emoji = underestimate (actual higher).
+    Suitable for soft budget warnings only — not for billing.
+    """
+    return len(text) // 4
+
+
+def _trim_optional_sections(text: str, max_chars: int) -> tuple[str, bool]:
+    """Remove optional sections from bottom up until under max_chars.
+    Never removes SECTION 1 (MISSION), SECTION 2 (CONSTRAINTS), SECTION 3 (TRIGGER).
+
+    ⚠️ R-03 — IMPLEMENTATION MANDATE (Team 21): unit tests REQUIRED before merge.
+    """
+    if len(text) <= max_chars:
+        return text, False
+    parts = _OPTIONAL_SECTIONS_RE.split(text)
+    while len("".join(parts)) > max_chars and len(parts) > 1:
+        parts.pop()
+    return "".join(parts), len("".join(parts)) < len(text)
 
 from agents_os_v3.modules.policy.settings import list_policies
 from agents_os_v3.modules.prompting import cache as prompt_cache
@@ -93,13 +133,59 @@ def assemble_prompt_for_run(
         l2 = _load_layer2(actor_team)
 
         policies = list_policies(cur)
-        l3 = json.dumps(
+        l3_raw = json.dumps(
             [{"policy_key": p["policy_key"], "policy_value_json": p["policy_value_json"]} for p in policies],
             default=str,
         )
 
         run_public = {k: str(v) if not hasattr(v, "isoformat") else v.isoformat() for k, v in dict(run).items()}
-        l4 = json.dumps(run_public, default=str)
+        l4_raw = json.dumps(run_public, default=str)
+
+        # §H — section-based trim for L1/L2; meta-only truncation for L3/L4
+        truncation_applied = False
+        truncated_layers: list[str] = []
+        max_l1_l2_chars = _L1_L2_MAX_TOKENS * 4
+
+        l1_trimmed, l1_cut = _trim_optional_sections(l1, max_l1_l2_chars)
+        if l1_cut:
+            truncated_layers.append("L1")
+            truncation_applied = True
+            l1 = l1_trimmed
+
+        l2_trimmed, l2_cut = _trim_optional_sections(l2, max_l1_l2_chars)
+        if l2_cut:
+            truncated_layers.append("L2")
+            truncation_applied = True
+            l2 = l2_trimmed
+
+        l3 = l3_raw
+        if _approx_tokens(l3_raw) > _L3_MAX_TOKENS:
+            l3 = json.dumps({
+                "_truncated": True,
+                "count": len(policies),
+                "note": "fetch /api/policies for full list",
+            })
+            truncated_layers.append("L3")
+            truncation_applied = True
+
+        l4 = l4_raw
+        if _approx_tokens(l4_raw) > _L4_MAX_TOKENS:
+            l4 = json.dumps({
+                "_truncated": True,
+                "note": "fetch /api/runs/" + run_id + " for full run state",
+            })
+            truncated_layers.append("L4")
+            truncation_applied = True
+
+        total_tokens = (
+            _approx_tokens(l1) + _approx_tokens(l2) + _approx_tokens(l3) + _approx_tokens(l4)
+        )
+        if total_tokens > _TOTAL_WARN_TOKENS:
+            token_budget_warning = f"OVER_BUDGET: ~{total_tokens} tokens (limit {_TOTAL_WARN_TOKENS})"
+        elif total_tokens > _TOTAL_NEAR_TOKENS:
+            token_budget_warning = f"NEAR_BUDGET: ~{total_tokens} tokens"
+        else:
+            token_budget_warning = None
 
         out = {
             "run_id": run_id,
@@ -113,7 +199,11 @@ def assemble_prompt_for_run(
                 "template_id": str(tpl["id"]),
                 "template_version": ver,
                 "actor_team_id": actor_team,
-                "token_budget_warning": None,
+                "token_budget_warning": token_budget_warning,
+                "approx_tokens": total_tokens,
+                "approx_tokens_note": "lower-bound heuristic (len//4); Hebrew underestimated",
+                "truncation_applied": truncation_applied,
+                "truncated_layers": truncated_layers,
             },
         }
         prompt_cache.cache_set(cache_key, out)

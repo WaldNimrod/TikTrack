@@ -1,0 +1,75 @@
+# AOS v3 — pytest + PostgreSQL (Remediation Phase 4–5, Team 61)
+# Does NOT replace or modify canary-simulation-tests.yml (agents_os_v2).
+name: AOS v3 Tests
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "agents_os_v3/**"
+      - ".github/workflows/aos-v3-tests.yml"
+  push:
+    branches: [main, aos-v3, develop]
+    paths:
+      - "agents_os_v3/**"
+      - ".github/workflows/aos-v3-tests.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aos-v3-tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  aos-v3-pytest-postgres:
+    name: pytest agents_os_v3/tests + Postgres 15
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: aosv3_ci
+          POSTGRES_PASSWORD: aosv3_ci_pass
+          POSTGRES_DB: aos_v3_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U aosv3_ci -d aos_v3_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+      # Isolated AOS v3 DB only (same pattern as agents_os_v3/.env.example — not TikTrack DATABASE_URL)
+      AOS_V3_DATABASE_URL: postgresql://aosv3_ci:aosv3_ci_pass@localhost:5432/aos_v3_ci
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: agents_os_v3/requirements.txt
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r agents_os_v3/requirements.txt
+
+      - name: Apply migration 001 + seed
+        run: |
+          python3 agents_os_v3/db/run_migration.py --fresh
+          python3 agents_os_v3/seed.py
+
+      - name: Run pytest (exclude Phase 5 canary folder)
+        run: |
+          python3 -m pytest agents_os_v3/tests/ \
+            --ignore=agents_os_v3/tests/canary_simulation/ \
+            -v --tb=short
+
+      - name: Phase 5 — pipeline canary simulation (F-05)
+        run: |
+          bash scripts/run_aos_v3_canary_simulation.sh

@@ -12,8 +12,14 @@ Environment:
 from __future__ import annotations
 
 import os
+import re
 import sys
 from pathlib import Path
+
+# Work Package ID format validation (matches machine.py rules)
+_WP_ID_CANONICAL_RE = re.compile(r"^S\d{3}-P\d{3}-WP\d{3}$")
+# Accepts real ULIDs (26 chars) AND bootstrap seeded IDs (e.g. 01JK8AOSV3WP0000000001, 22 chars)
+_WP_ID_ULID_RE = re.compile(r"^[0-9A-Z]{20,26}$")
 
 import psycopg2
 import yaml
@@ -189,12 +195,39 @@ def main() -> None:
                       %(id)s, %(gate_id)s, %(phase_id)s, %(domain_id)s, %(variant)s, %(role_id)s,
                       %(priority)s, %(resolve_from_state_key)s, NOW()
                     )
-                    ON CONFLICT (id) DO NOTHING
+                    ON CONFLICT (id) DO UPDATE SET
+                      role_id               = EXCLUDED.role_id,
+                      priority              = EXCLUDED.priority,
+                      resolve_from_state_key = EXCLUDED.resolve_from_state_key
                     """,
                     rr,
                 )
 
+            for gra in data.get("gate_role_authorities", []):
+                cur.execute(
+                    """
+                    INSERT INTO gate_role_authorities (
+                      id, gate_id, phase_id, domain_id, role_id, may_block_verdict, created_at
+                    ) VALUES (
+                      %(id)s, %(gate_id)s, %(phase_id)s, %(domain_id)s, %(role_id)s,
+                      %(may_block_verdict)s, NOW()
+                    )
+                    ON CONFLICT (id) DO UPDATE SET
+                      may_block_verdict = EXCLUDED.may_block_verdict
+                    """,
+                    gra,
+                )
+
             for wp in data.get("work_packages", []):
+                wp_id = wp.get("id", "")
+                if (wp_id
+                        and not _WP_ID_CANONICAL_RE.match(wp_id)
+                        and not _WP_ID_ULID_RE.match(wp_id)):
+                    raise ValueError(
+                        f"Invalid work_package_id format in definition.yaml: '{wp_id}'. "
+                        f"Expected S{{NNN}}-P{{NNN}}-WP{{NNN}} (e.g. S003-P005-WP001) or ULID. "
+                        f"Directive: ARCHITECT_DIRECTIVE_WP_ID_NAMING_CONVENTION_v1.0.0.md"
+                    )
                 cur.execute(
                     """
                     INSERT INTO work_packages (

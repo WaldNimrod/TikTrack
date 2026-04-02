@@ -1,0 +1,31 @@
+{
+  "generated": "2026-03-29T09:56:12.817Z",
+  "base": "http://127.0.0.1:8899",
+  "mock": true,
+  "outputs": [
+    {
+      "file": "01_pipeline.png",
+      "url": "http://127.0.0.1:8899/agents_os_v3/ui/index.html?mock=1"
+    },
+    {
+      "file": "02_history.png",
+      "url": "http://127.0.0.1:8899/agents_os_v3/ui/history.html?mock=1"
+    },
+    {
+      "file": "03_config.png",
+      "url": "http://127.0.0.1:8899/agents_os_v3/ui/config.html?mock=1"
+    },
+    {
+      "file": "04_teams.png",
+      "url": "http://127.0.0.1:8899/agents_os_v3/ui/teams.html?mock=1"
+    },
+    {
+      "file": "05_portfolio.png",
+      "url": "http://127.0.0.1:8899/agents_os_v3/ui/portfolio.html?mock=1"
+    },
+    {
+      "file": "06_flow.png",
+      "url": "http://127.0.0.1:8899/agents_os_v3/ui/flow.html?mock=1"
+    }
+  ]
+}

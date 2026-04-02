@@ -1,0 +1,4 @@
+interface:
+  display_name: "Constitutional Package Linter"
+  short_description: "Lint canonical package contracts"
+  default_prompt: "Use $constitutional-package-linter to preflight a canonical governance or validation package before review."

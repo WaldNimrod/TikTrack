@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מטריצת GATE_3 — גלריית צילומי מסך (AOS v3 mock)</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --card: #1a2332;
+      --text: #e8eef5;
+      --muted: #8b9cb3;
+      --accent: #3d8bfd;
+      --border: #2a3548;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, "Segoe UI", "Noto Sans Hebrew", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    h1 { font-size: 1.5rem; margin: 0 0 0.5rem; }
+    .lead { color: var(--muted); margin: 0; font-size: 0.95rem; }
+    .lead code { background: var(--card); padding: 0.1em 0.35em; border-radius: 4px; font-size: 0.85em; }
+    .grid {
+      display: grid;
+      gap: 2rem;
+    }
+    figure {
+      margin: 0;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    figcaption {
+      padding: 1rem 1.1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    figcaption .num { color: var(--muted); font-size: 0.8rem; }
+    figcaption h2 { margin: 0.25rem 0 0.35rem; font-size: 1.05rem; }
+    .meta {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin: 0 0 0.5rem;
+    }
+    .meta strong { color: #b8c9dc; }
+    figure a.mock {
+      display: inline-block;
+      font-size: 0.82rem;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    figure a.mock:hover { text-decoration: underline; }
+    figure img {
+      width: 100%;
+      height: auto;
+      vertical-align: middle;
+      display: block;
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>מטריצת GATE_3 — גלריית צילומי מסך</h1>
+      <p class="lead">
+        מוקאפ <code>agents_os_v3/ui</code> · 26 תאים לפי
+        <code>TEAM_00_TO_TEAM_51_GATE3_MATRIX_CLARIFICATION_RESPONSE_v1.1.0.md</code>
+        · תמונות בתיקייה זו (נתיבים יחסיים).
+      </p>
+    </header>
+
+    <div class="grid">
+
+      <figure id="cell-1">
+        <figcaption>
+          <div class="num">#1</div>
+          <h2>ריצה פעילה — המתנה לסיום סוכן</h2>
+          <p class="meta"><strong>preset:</strong> active · <strong>phase:</strong> phase_3_1 · <strong>next_action:</strong> AWAIT_FEEDBACK</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=active&amp;aosv3_phase=phase_3_1" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_active_phase_3_1.png" width="1440" height="900" alt="active phase_3_1" loading="lazy">
+      </figure>
+
+      <figure id="cell-2">
+        <figcaption>
+          <div class="num">#2</div>
+          <h2>ריצה פעילה — אותו תרחיש, פאזה שנייה בשער 3</h2>
+          <p class="meta"><strong>preset:</strong> active · <strong>phase:</strong> phase_3_2 · <strong>next_action:</strong> AWAIT_FEEDBACK</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=active&amp;aosv3_phase=phase_3_2" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_active_phase_3_2.png" width="1440" height="900" alt="active phase_3_2" loading="lazy">
+      </figure>
+
+      <figure id="cell-3">
+        <figcaption>
+          <div class="num">#3</div>
+          <h2>שלב 8B — כפתורי זיהוי משוב (Agent / File / Paste)</h2>
+          <p class="meta"><strong>preset:</strong> await_feedback · <strong>phase:</strong> phase_3_1 · <strong>next_action:</strong> AWAIT_FEEDBACK</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=await_feedback&amp;aosv3_phase=phase_3_1" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_await_feedback_phase_3_1.png" width="1440" height="900" alt="await_feedback phase_3_1" loading="lazy">
+      </figure>
+
+      <figure id="cell-4">
+        <figcaption>
+          <div class="num">#4</div>
+          <h2>שלב 8B — המתנה למשוב, פאזה 3.2</h2>
+          <p class="meta"><strong>preset:</strong> await_feedback · <strong>phase:</strong> phase_3_2 · <strong>next_action:</strong> AWAIT_FEEDBACK</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=await_feedback&amp;aosv3_phase=phase_3_2" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_await_feedback_phase_3_2.png" width="1440" height="900" alt="await_feedback phase_3_2" loading="lazy">
+      </figure>
+
+      <figure id="cell-5">
+        <figcaption>
+          <div class="num">#5</div>
+          <h2>כשלון Mode B — fallback (שדות נתיב + הדבקה גלויים)</h2>
+          <p class="meta"><strong>preset:</strong> feedback_fallback · <strong>phase:</strong> phase_3_1 · <strong>next_action:</strong> AWAIT_FEEDBACK · TC-16</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=feedback_fallback&amp;aosv3_phase=phase_3_1" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_feedback_fallback_phase_3_1.png" width="1440" height="900" alt="feedback_fallback phase_3_1" loading="lazy">
+      </figure>
+
+      <figure id="cell-6">
+        <figcaption>
+          <div class="num">#6</div>
+          <h2>Fallback C+D — פאזה 3.2</h2>
+          <p class="meta"><strong>preset:</strong> feedback_fallback · <strong>phase:</strong> phase_3_2 · <strong>next_action:</strong> AWAIT_FEEDBACK</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=feedback_fallback&amp;aosv3_phase=phase_3_2" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_feedback_fallback_phase_3_2.png" width="1440" height="900" alt="feedback_fallback phase_3_2" loading="lazy">
+      </figure>
+
+      <figure id="cell-7">
+        <figcaption>
+          <div class="num">#7</div>
+          <h2>PASS מועבר — אישור התקדמות ל־GATE_4</h2>
+          <p class="meta"><strong>preset:</strong> feedback_pass · <strong>phase:</strong> phase_3_1 · <strong>next_action:</strong> CONFIRM_ADVANCE</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=feedback_pass&amp;aosv3_phase=phase_3_1" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_feedback_pass_phase_3_1.png" width="1440" height="900" alt="feedback_pass phase_3_1" loading="lazy">
+      </figure>
+
+      <figure id="cell-8">
+        <figcaption>
+          <div class="num">#8</div>
+          <h2>PASS — אישור התקדמות, פאזה 3.2</h2>
+          <p class="meta"><strong>preset:</strong> feedback_pass · <strong>phase:</strong> phase_3_2 · <strong>next_action:</strong> CONFIRM_ADVANCE</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=feedback_pass&amp;aosv3_phase=phase_3_2" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_feedback_pass_phase_3_2.png" width="1440" height="900" alt="feedback_pass phase_3_2" loading="lazy">
+      </figure>
+
+      <figure id="cell-9">
+        <figcaption>
+          <div class="num">#9</div>
+          <h2>FAIL — ממצאים חוסמים ואישור כישלון</h2>
+          <p class="meta"><strong>preset:</strong> feedback_fail · <strong>phase:</strong> phase_3_1 · <strong>next_action:</strong> CONFIRM_FAIL</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=feedback_fail&amp;aosv3_phase=phase_3_1" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_feedback_fail_phase_3_1.png" width="1440" height="900" alt="feedback_fail phase_3_1" loading="lazy">
+      </figure>
+
+      <figure id="cell-10">
+        <figcaption>
+          <div class="num">#10</div>
+          <h2>FAIL — אישור כישלון, פאזה 3.2</h2>
+          <p class="meta"><strong>preset:</strong> feedback_fail · <strong>phase:</strong> phase_3_2 · <strong>next_action:</strong> CONFIRM_FAIL</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=feedback_fail&amp;aosv3_phase=phase_3_2" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_feedback_fail_phase_3_2.png" width="1440" height="900" alt="feedback_fail phase_3_2" loading="lazy">
+      </figure>
+
+      <figure id="cell-11">
+        <figcaption>
+          <div class="num">#11</div>
+          <h2>IL-3 — ביטחון נמוך, סקירה ידנית (PASS/FAIL)</h2>
+          <p class="meta"><strong>preset:</strong> feedback_low · <strong>phase:</strong> phase_3_1 · <strong>next_action:</strong> MANUAL_REVIEW</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=feedback_low&amp;aosv3_phase=phase_3_1" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_feedback_low_phase_3_1.png" width="1440" height="900" alt="feedback_low phase_3_1" loading="lazy">
+      </figure>
+
+      <figure id="cell-12">
+        <figcaption>
+          <div class="num">#12</div>
+          <h2>IL-3 — סקירה ידנית, פאזה 3.2</h2>
+          <p class="meta"><strong>preset:</strong> feedback_low · <strong>phase:</strong> phase_3_2 · <strong>next_action:</strong> MANUAL_REVIEW</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=feedback_low&amp;aosv3_phase=phase_3_2" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_feedback_low_phase_3_2.png" width="1440" height="900" alt="feedback_low phase_3_2" loading="lazy">
+      </figure>
+
+      <figure id="cell-13">
+        <figcaption>
+          <div class="num">#13</div>
+          <h2>CORRECTION — ממצאים חוסמים + המתנה למשוב (מוקאפ: AWAIT_FEEDBACK)</h2>
+          <p class="meta"><strong>preset:</strong> correction_blocking · <strong>phase:</strong> phase_3_1</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=correction_blocking&amp;aosv3_phase=phase_3_1" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_correction_blocking_phase_3_1.png" width="1440" height="900" alt="correction_blocking phase_3_1" loading="lazy">
+      </figure>
+
+      <figure id="cell-14">
+        <figcaption>
+          <div class="num">#14</div>
+          <h2>CORRECTION + BF — פאזה 3.2</h2>
+          <p class="meta"><strong>preset:</strong> correction_blocking · <strong>phase:</strong> phase_3_2</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=correction_blocking&amp;aosv3_phase=phase_3_2" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_correction_blocking_phase_3_2.png" width="1440" height="900" alt="correction_blocking phase_3_2" loading="lazy">
+      </figure>
+
+      <figure id="cell-15">
+        <figcaption>
+          <div class="num">#15</div>
+          <h2>ריצה מושהית — Resume</h2>
+          <p class="meta"><strong>preset:</strong> paused · <strong>phase:</strong> phase_3_1 · <strong>next_action:</strong> RESUME</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=paused&amp;aosv3_phase=phase_3_1" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_paused_phase_3_1.png" width="1440" height="900" alt="paused phase_3_1" loading="lazy">
+      </figure>
+
+      <figure id="cell-16">
+        <figcaption>
+          <div class="num">#16</div>
+          <h2>מושהית — פאזה 3.2</h2>
+          <p class="meta"><strong>preset:</strong> paused · <strong>phase:</strong> phase_3_2 · <strong>next_action:</strong> RESUME</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=paused&amp;aosv3_phase=phase_3_2" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_paused_phase_3_2.png" width="1440" height="900" alt="paused phase_3_2" loading="lazy">
+      </figure>
+
+      <figure id="cell-17">
+        <figcaption>
+          <div class="num">#17</div>
+          <h2>CORRECTION + באנר הסלמה (מוקאפ: AWAIT_FEEDBACK)</h2>
+          <p class="meta"><strong>preset:</strong> escalated · <strong>phase:</strong> phase_3_1</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=escalated&amp;aosv3_phase=phase_3_1" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_escalated_phase_3_1.png" width="1440" height="900" alt="escalated phase_3_1" loading="lazy">
+      </figure>
+
+      <figure id="cell-18">
+        <figcaption>
+          <div class="num">#18</div>
+          <h2>הסלמה — פאזה 3.2</h2>
+          <p class="meta"><strong>preset:</strong> escalated · <strong>phase:</strong> phase_3_2</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=escalated&amp;aosv3_phase=phase_3_2" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_escalated_phase_3_2.png" width="1440" height="900" alt="escalated phase_3_2" loading="lazy">
+      </figure>
+
+      <figure id="cell-19">
+        <figcaption>
+          <div class="num">#19</div>
+          <h2>שער אנושי — אישור Principal (HUMAN_APPROVE)</h2>
+          <p class="meta"><strong>preset:</strong> human_gate · <strong>phase:</strong> phase_3_1 · <strong>next_action:</strong> HUMAN_APPROVE</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=human_gate&amp;aosv3_phase=phase_3_1" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_human_gate_phase_3_1.png" width="1440" height="900" alt="human_gate phase_3_1" loading="lazy">
+      </figure>
+
+      <figure id="cell-20">
+        <figcaption>
+          <div class="num">#20</div>
+          <h2>שער אנושי — פאזה 3.2</h2>
+          <p class="meta"><strong>preset:</strong> human_gate · <strong>phase:</strong> phase_3_2 · <strong>next_action:</strong> HUMAN_APPROVE</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=human_gate&amp;aosv3_phase=phase_3_2" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_human_gate_phase_3_2.png" width="1440" height="900" alt="human_gate phase_3_2" loading="lazy">
+      </figure>
+
+      <figure id="cell-21">
+        <figcaption>
+          <div class="num">#21</div>
+          <h2>Sentinel פעיל + המתנה למשוב</h2>
+          <p class="meta"><strong>preset:</strong> sentinel · <strong>phase:</strong> phase_3_1 · <strong>next_action:</strong> AWAIT_FEEDBACK</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=sentinel&amp;aosv3_phase=phase_3_1" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_sentinel_phase_3_1.png" width="1440" height="900" alt="sentinel phase_3_1" loading="lazy">
+      </figure>
+
+      <figure id="cell-22">
+        <figcaption>
+          <div class="num">#22</div>
+          <h2>Sentinel — פאזה 3.2</h2>
+          <p class="meta"><strong>preset:</strong> sentinel · <strong>phase:</strong> phase_3_2 · <strong>next_action:</strong> AWAIT_FEEDBACK</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=sentinel&amp;aosv3_phase=phase_3_2" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_sentinel_phase_3_2.png" width="1440" height="900" alt="sentinel phase_3_2" loading="lazy">
+      </figure>
+
+      <figure id="cell-23">
+        <figcaption>
+          <div class="num">#23</div>
+          <h2>SSE מחובר בכותרת + המתנה למשוב</h2>
+          <p class="meta"><strong>preset:</strong> sse_connected · <strong>phase:</strong> phase_3_1 · <strong>next_action:</strong> AWAIT_FEEDBACK</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=sse_connected&amp;aosv3_phase=phase_3_1" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_sse_connected_phase_3_1.png" width="1440" height="900" alt="sse_connected phase_3_1" loading="lazy">
+      </figure>
+
+      <figure id="cell-24">
+        <figcaption>
+          <div class="num">#24</div>
+          <h2>SSE מחובר — פאזה 3.2</h2>
+          <p class="meta"><strong>preset:</strong> sse_connected · <strong>phase:</strong> phase_3_2 · <strong>next_action:</strong> AWAIT_FEEDBACK</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=sse_connected&amp;aosv3_phase=phase_3_2" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_sse_connected_phase_3_2.png" width="1440" height="900" alt="sse_connected phase_3_2" loading="lazy">
+      </figure>
+
+      <figure id="cell-25">
+        <figcaption>
+          <div class="num">#25</div>
+          <h2>IDLE — אין ריצה פעילה (טופס Activate)</h2>
+          <p class="meta"><strong>preset:</strong> idle · ללא פאזה · אין handoff</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=idle" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_idle.png" width="1440" height="900" alt="idle" loading="lazy">
+      </figure>
+
+      <figure id="cell-26">
+        <figcaption>
+          <div class="num">#26</div>
+          <h2>COMPLETE — ריצה הסתיימה</h2>
+          <p class="meta"><strong>preset:</strong> complete · ללא פאזה · אין handoff</p>
+          <a class="mock" href="http://127.0.0.1:8766/agents_os_v3/ui/index.html?aosv3_preset=complete" target="_blank" rel="noopener">פתח במוקאפ →</a>
+        </figcaption>
+        <img src="gate3_complete.png" width="1440" height="900" alt="complete" loading="lazy">
+      </figure>
+
+    </div>
+  </div>
+</body>
+</html>

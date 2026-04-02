@@ -126,6 +126,7 @@ Once declared, the track is immutable for the work package lifetime.
 - Desired outcome
 - Business or product rationale
 - What is explicitly out of scope
+- Open questions or blocking assumptions (even if unresolved — must be surfaced, not omitted)
 
 **Must not contain:**
 - Solution design of any kind
@@ -143,12 +144,16 @@ Once declared, the track is immutable for the work package lifetime.
 **Question answered:** What kind of solution are we building?
 
 **Must include:**
+- LOD100 content confirmed or refined (problem statement still accurate)
+- Proposed solution concept (what kind of system or approach are we building?)
 - Major components and their purpose
 - Primary flow (happy path, brief)
 - Actors / users / systems involved
 - Open decisions (explicitly listed — not left implicit)
-- Risk classification (Low / Medium / High / Critical)
-- Track declaration (A or B)
+- Dependencies and constraints
+- Initial success criteria
+- Risk classification (Low / Medium / High / Critical) *(added in v0.3)*
+- Track declaration (A or B) *(added in v0.3)*
 
 **Must not contain:**
 - Full field-level specification
@@ -527,6 +532,9 @@ The following are explicitly prohibited:
 | Anti-pattern | Description |
 |-------------|-------------|
 | **Fake LOD400** | Long and detailed but still contains open product questions ("TBD", "we'll decide later") |
+| **Inflated LOD** | Writing LOD400-level detail in a LOD200 document — bypasses the gate where concept approval happens; creates false confidence before the spec is authorized |
+| **Mixed-state document** | A single document containing content at multiple LOD levels (e.g., LOD200 concept mixed with LOD400 field specs); makes gate evaluation impossible |
+| **Hidden ambiguity** | Deliberately or accidentally omitting known open questions from LOD documents; the gate cannot evaluate what it cannot see |
 | **Spec-less build** | Builder starts before LOD400 is approved at GATE_2 / L-GATE_S |
 | **Orphan LOD500** | Written from memory after the fact, without actual verification run |
 | **Self-certified LOD500** | Implementing team approves its own as-built record |

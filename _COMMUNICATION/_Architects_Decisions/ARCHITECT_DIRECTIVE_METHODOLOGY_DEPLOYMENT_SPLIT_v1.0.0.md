@@ -26,7 +26,7 @@ the project's governance framework is replicated to new projects.
 ```
 METHODOLOGY LAYER (portable, universal)
 ├── LOD Standard (specification levels 100–500)
-├── Gate model (GATE_0–GATE_5 concepts)
+├── Gate model (5 canonical gates GATE_1–GATE_5; GATE_0 = operational intake, predates the canon)
 ├── Team role type definitions
 ├── Iron Rules (including cross-engine validation)
 ├── Process tracks (FULL / FOCUSED / FAST)

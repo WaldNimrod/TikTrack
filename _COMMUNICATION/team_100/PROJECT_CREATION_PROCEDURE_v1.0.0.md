@@ -236,10 +236,24 @@ uvicorn agents_os_v3.api.main:app --port 8082 --reload
 ### Step 6 — Verify pipeline state
 
 ```bash
-curl http://localhost:8082/api/v1/governance/status
+curl http://localhost:8082/api/governance/status
 ```
 
-Expected: `{"status": "healthy", "domain": "my-domain", "active_run": null}`
+Expected response shape:
+```json
+{
+  "summary": {
+    "total_teams": <N>,
+    "teams_with_governance": <N>,
+    ...
+  },
+  "matrix": [
+    {"team_id": "...", "engine": "...", "routing_rule_count": <N>, "has_governance_file": true, "file_size_bytes": <N>},
+    ...
+  ]
+}
+```
+*(Endpoint is mounted on the `business_router` at prefix `/api` — not `/api/v1/`)*
 
 ### Step 7 — Begin first WP
 
@@ -259,7 +273,7 @@ Option B — CLI:
 ### Step 8 — Verify first run
 
 ```
-✓ GET /api/v1/governance/status: active_run exists
+✓ GET /api/governance/status: returns summary + matrix (200 OK)
 ✓ Dashboard shows WP as IN_PROGRESS
 ✓ GATE_0 prompt generated successfully
 ✓ DB work_packages table: WP record with status IN_PROGRESS

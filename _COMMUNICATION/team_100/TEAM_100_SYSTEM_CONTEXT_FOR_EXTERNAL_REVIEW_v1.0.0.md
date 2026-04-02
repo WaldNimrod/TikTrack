@@ -79,11 +79,13 @@ A gate is a formal checkpoint in the lifecycle of a work package. It defines:
 
 Gates do not exist for bureaucratic reasons. They exist because in a multi-agent system, each transition between roles is a failure point. A gate makes that transition explicit, auditable, and reversible.
 
-### The active gate sequence: GATE_0 through GATE_5
+### The active gate sequence
+
+The canonical gate sequence (per `ARCHITECT_DIRECTIVE_GATE_SEQUENCE_CANON_v1.0.0.md`) defines **5 top-level gates: GATE_1 through GATE_5**. Operationally, AOS v3 also uses **GATE_0** as a pre-pipeline intake gate (eligibility check before a WP enters the formal sequence). GATE_0 predates the locked canon document; both definitions are consistent in practice.
 
 | Gate | Name | Question answered |
 |------|------|-------------------|
-| GATE_0 | Intake & Eligibility | Is this work package ready to enter the pipeline? |
+| GATE_0 | Intake & Eligibility *(operational pre-gate)* | Is this work package ready to enter the pipeline? |
 | GATE_1 | Specification Approval | Is the concept well-enough defined to invest in a full spec? |
 | GATE_2 | Execution Authorization | Is the LOD400 spec complete enough to authorize a build? |
 | GATE_3 | Build Execution | Is the implementation being executed against the spec? |
@@ -293,7 +295,7 @@ The gate model gates decisions to specific spec versions. "What did GATE_2 appro
 
 ---
 
-*Document prepared for external review of LOD Standard v0.2.*
-*Reference document: `_COMMUNICATION/team_100/TEAM_100_LOD_STANDARD_v0.2.md`*
+*Document prepared for external review of LOD Standard v0.3 (RELEASE_CANDIDATE).*
+*Reference document: `_COMMUNICATION/team_100/TEAM_100_LOD_STANDARD_v0.3.md`*
 
 **log_entry | TEAM_100 | SYSTEM_CONTEXT_FOR_EXTERNAL_REVIEW | 2026-04-02**

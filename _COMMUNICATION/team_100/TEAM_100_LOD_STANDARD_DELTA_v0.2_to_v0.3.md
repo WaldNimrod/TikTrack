@@ -10,7 +10,7 @@
 
 ## Overview
 
-v0.3 makes 7 categories of changes. The core LOD100–500 definitions and authority matrix from v0.2 are unchanged. All changes are additive and architectural — they extend the standard to cover deployment profiles and the Lean operating mode, neither of which existed in v0.2. The single most significant change is the introduction of the **Methodology/Deployment Split**, which is the foundational principle enabling everything else.
+v0.3 makes 9 categories of changes. The most significant change is the introduction of the **Methodology/Deployment Split**, which is the foundational principle enabling everything else. In addition to architectural extensions (deployment profiles, Lean Gate Model, Lean Kit, team structure, overlays), v0.3 also makes targeted corrections to LOD100 and LOD200 required-content lists (restoring items that were inadvertently absent from v0.2) and revises the anti-patterns list (expanding from 8 to 15, restoring dropped items, adding deployment-profile-aware patterns). Authority matrix is unchanged. Versioning policy and gate mapping are unchanged.
 
 v0.3 is released as RELEASE_CANDIDATE. It becomes v1.0.0 upon Team 00 formal approval and relocation to `documentation/docs-governance/`.
 
@@ -225,23 +225,76 @@ Making the modes explicit prevents confusion when an agent receives instructions
 | Team structure expanded | Guidance | No | No | Expands §9 | MEDIUM |
 | §Lean overlay | L0 process | No | No | New §14 | HIGH |
 | §AOS v3 overlay updated | L2 labeling | No | No | Updates §15 | LOW |
+| LOD100/LOD200 required-content corrections | Core definitions | **YES** | No | Updates §5 | MEDIUM |
+| Anti-patterns list revised | Quality rules | **YES** | No | Updates §13 | MEDIUM |
 
-**Core LOD100–500 definitions: unchanged from v0.2.**
 **Authority matrix: unchanged from v0.2.**
 **Cross-engine validation Iron Rule: unchanged but now explicitly applies to ALL profiles.**
+**Versioning policy: unchanged from v0.2.**
+**Gate mapping (LOD200→GATE_1, LOD400→GATE_2, LOD500→GATE_5): unchanged.**
+
+---
+
+## Change 8 — LOD100 and LOD200 required-content corrections (§5)
+
+### What changed
+
+**LOD100:** Added a sixth required item that was absent from v0.2:
+- *Open questions or blocking assumptions* — must be surfaced even if unresolved; cannot be omitted
+
+**LOD200:** Restored four required items from v0.2 that were missing from early v0.3 drafts, and retained two new items introduced by the Methodology/Deployment Split work:
+
+Items restored from v0.2:
+- *LOD100 content confirmed or refined* — problem statement still accurate before proceeding
+- *Proposed solution concept* — what kind of system or approach are we building?
+- *Dependencies and constraints*
+- *Initial success criteria*
+
+Items added in v0.3 (new, not in v0.2):
+- *Risk classification* (Low / Medium / High / Critical) — required to determine gate sequence
+- *Track declaration* (A or B) — required for Lean Gate Model routing
+
+### Previous state (v0.2)
+LOD200 in v0.2 required: LOD100 confirmation, proposed solution, major components, primary flows, major components, dependencies/constraints, key unresolved decisions, initial success criteria (8 items total). LOD100 required 5 items. Both were correct but underdocumented in early v0.3 drafts.
+
+### Logic
+The LOD200 additions (risk classification, track declaration) were introduced as part of the Lean Gate Model — without a declared track and risk level, the gate routing system cannot determine which gate sequence to apply. These are structural requirements, not optional metadata.
+
+---
+
+## Change 9 — Anti-patterns list revised (§13)
+
+### What changed
+
+Anti-patterns list expanded from 8 (v0.2) to 15 (v0.3).
+
+**Three anti-patterns from v0.2 were inadvertently dropped in early v0.3 drafts — restored:**
+- *Inflated LOD* — writing LOD400 detail in a LOD200 document; bypasses concept gate
+- *Mixed-state document* — single document with content at multiple LOD levels
+- *Hidden ambiguity* — deliberately or accidentally omitting known open questions
+
+**Seven new anti-patterns added in v0.3:**
+- *Spec-less build* — builder starts before LOD400 approved
+- *Profile-based spec reduction* — arguing Lean mode requires less rigorous specs
+- *Same-engine validation* — same LLM provider for build and final validation
+- *Undeclared track* — starting build without explicitly declaring Track A or B
+- *LOD500 without spec_ref* — as-built record with no traceable link to LOD400
+- *Cross-gate confusion* — merging GATE_5/L-GATE_V with any other gate
+- *Version drift* — LOD500 references superseded LOD400 version without documenting delta
+
+These additions are directly driven by the Lean Gate Model introduction (new failure modes) and deployment profile addition (new incorrect arguments teams may use).
 
 ---
 
 ## What v0.3 does NOT change
 
 The following remain exactly as defined in v0.2:
-- LOD100–500 definitions and required contents
 - Declaration authority matrix (who produces, who approves each level)
 - Versioning policy
 - Machine-readable YAML frontmatter spec
-- Anti-patterns list (12 anti-patterns)
 - Gate mapping (LOD200 → GATE_1, LOD400 → GATE_2, LOD500 → GATE_5)
 - Cross-engine validation rule (unchanged; scope expanded to explicitly cover L0)
+- LOD300, LOD400, LOD500 definitions and required contents (unchanged from v0.2)
 
 ---
 

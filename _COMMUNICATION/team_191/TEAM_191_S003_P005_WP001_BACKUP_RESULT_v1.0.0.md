@@ -18,8 +18,9 @@ status: COMPLETE
 |-----|-----|
 | **guards (שלב 1)** | **PASS** — `lint_governance_dates.sh`, `sync_registry_mirrors_from_wsm.py --check`, `build_portfolio_snapshot.py --check`, `lint_process_functional_separation.sh` (לאחר סנכרון/רענון ראשוני לפני קומיט) |
 | **pre-commit / pre-push** | **PASS** (כולל DATE-LINT staged, FREEZE ל־`agents_os_v2/`, unit tests, Bandit, frontend build, portfolio pre-push guard) |
-| **commit_sha** | `bbb380884` |
-| **files_committed** | 996 קבצים (`142215` insertions, `304` deletions) |
+| **commit_sha (גוף הגיבוי)** | `bbb380884` |
+| **commit_sha (דוח תוצאה זה)** | `752a904f1` — `docs(team_191): S003-P005-WP001 backup completion RESULT v1.0.0` |
+| **files_committed** | 996 קבצים בגיבוי הראשי (`142215` insertions, `304` deletions) + קובץ דוח זה בקומיט נפרד |
 | **push** | **SUCCESS** |
 | **remote** | `origin/aos-v3` |
 | **log** | `bbb380884 feat(aos-v3): S003-P005-WP001 Pipeline Quality Plan v3.5.0 — full implementation` |

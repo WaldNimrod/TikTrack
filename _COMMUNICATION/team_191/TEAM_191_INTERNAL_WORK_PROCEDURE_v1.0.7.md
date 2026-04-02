@@ -1,13 +1,11 @@
-# TEAM 191 INTERNAL WORK PROCEDURE v1.0.6
-
-> **SUPERSEDED** by `TEAM_191_INTERNAL_WORK_PROCEDURE_v1.0.7.md` (2026-04-02). Use v1.0.7 for active operations (GitLens §16 + v2 LEGACY row in §15.1).
+# TEAM 191 INTERNAL WORK PROCEDURE v1.0.7
 
 **project_domain:** SHARED (TIKTRACK + AGENTS_OS)
-**id:** TEAM_191_INTERNAL_WORK_PROCEDURE_v1.0.6
+**id:** TEAM_191_INTERNAL_WORK_PROCEDURE_v1.0.7
 **owner:** Team 191 (child team of Team 190)
-**date:** 2026-03-30
+**date:** 2026-04-02
 **status:** ACTIVE
-**supersedes:** `TEAM_191_INTERNAL_WORK_PROCEDURE_v1.0.5.md`
+**supersedes:** `TEAM_191_INTERNAL_WORK_PROCEDURE_v1.0.6.md`
 **authority_source:** `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md`
 
 ---
@@ -400,7 +398,7 @@ Subject lines and process-ID rules: see **§11) Process-ID Title Lock**.
 | ענף עבודה | `aos-v3` |
 | upstream | `origin/aos-v3` (ישיר; ללא `codex/team191-integration` במסלול זה) |
 | פיפליין | לא בשימוש לפרויקט v3 בתקופה זו |
-| `agents_os_v2/` | **FREEZE** — אין שינויים; אכיפה: `scripts/lint_aos_v3_file_index_and_v2_freeze.sh` (pre-commit) + `scripts/check_aos_v3_build_governance.sh` (BUILD) |
+| `agents_os_v2/` | **LEGACY** — מערכת v2 הוחלפה ב־`agents_os_v3/`; קיים `agents_os_v2/LEGACY_NOTICE.md`. אין פיתוח נוסף. הוספות ב־v2 מותרות **רק** במסלול LEGACY_CLOSURE (ADD בלבד, עם NOTICE) לפי `ARCHITECT_DIRECTIVE_AOS_V3_FILE_INDEX_AND_V2_FREEZE_v2.0.0.md`. אכיפה: `scripts/lint_aos_v3_file_index_and_v2_freeze.sh` + BUILD check |
 | `agents_os_v3/` | כל קובץ חייב רישום ב־`agents_os_v3/FILE_INDEX.json` לפני commit — אכיפה כנ"ל |
 | סיום | איחוד ל־`main` לפי `TEAM_00_TO_TEAM_191_AOS_V3_GIT_GOVERNANCE_CANONICAL_v1.1.0` §4 (כולל CLEANUP_REPORT) |
 
@@ -474,6 +472,30 @@ AOS_V3_E2E_RUN=1 AOS_V3_E2E_HEADLESS=1 PYTHONPATH=. python3 -m pytest agents_os_
 
 ---
 
+## 16) GitLens — שכבת IDE לזרימת Team 191 (binding)
+
+**מטרה:** הרחבת **GitLens** (VS Code / Cursor) משפרת נראות Git ומקצרת זמן אבחון; היא **אינה** מחליפה hooks, סקריפטי portfolio, או פקודות CLI קנוניות ב־§10 / §14.
+
+### 16.1 שימושים חובה (מפעילי Team 191)
+
+1. **Line Blame / File Blame** — לפני תיקון DATE-LINT או FILE_INDEX drift, לפתוח Blame על הנתיב ולזהות קומיט אחרון (סוכן/אדם) ולהימנע מכפילות תיקון.
+2. **File History** — עבור `_COMMUNICATION/team_*/` ו־`documentation/docs-governance/`, לוודא מתי הנתיב נכנס (חלון `aos-v3` מול promotion ל־`main`).
+3. **Compare References** — להשוות `aos-v3` ↔ `main` (או `origin/main` ↔ `HEAD`) לפני הצהרת "מיזוג נקי"; ליישר עם `git merge-base` ובדיקות §3.
+4. **Repositories / Graph** — לאמת ancestry לפני push כאשר **מגנני GitHub** דורשים PR (למשל `main` מוגן); לוודא שענף promotion מכסה את אותו טווח קומיטים כמו `main` מקומי.
+5. **Search commits** — לשייך כשלי `lint_governance_dates.sh` (טווח `BASE..HEAD`) לקומיטים ספציפיים.
+
+### 16.2 הגדרות מומלצות
+
+- להפעיל **Current Line Blame** לקבצי `*.md`, `*.py`, `*.yaml`, `*.json` בריפו.
+- לקבע **שורש repository** לשורש workspace (מניעת blame יחסי לתיקיית משנה שגויה).
+
+### 16.3 איסורים מפורשים
+
+- **אסור** לדלג על `bash scripts/lint_governance_dates.sh`, `sync_registry_mirrors_from_wsm.py`, `build_portfolio_snapshot.py`, או `lint_aos_v3_file_index_and_v2_freeze.sh` רק בגלל GitLens.
+- **אסור** לבצע merge/push מממשק GitLens בניגוד ל־§14 (פקודות קנוניות קצרות / סקריפטים מאושרים בלבד לפעולות חוזרות).
+
+---
+
 **log_entry | TEAM_190 | TEAM_191_INTERNAL_WORK_PROCEDURE | CREATED_AND_ACTIVATED | 2026-03-11**
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | DATE_LINT_RECURRING_PATTERN_POLICY_LOCKED | 2026-03-11**
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | HEBREW_LANGUAGE_LOCK_AND_191_HELP_PROMPT_LOCKED | 2026-03-11**
@@ -486,5 +508,4 @@ AOS_V3_E2E_RUN=1 AOS_V3_E2E_HEADLESS=1 PYTHONPATH=. python3 -m pytest agents_os_
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | AOS_V3_OVERLAY_SECTION_15_v1_0_4 | 2026-03-27**
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | FILE_INDEX_AUTO_UPDATE_AND_RUN_SUFFIX_CONVENTION_v1_0_5 | 2026-03-29**
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | v1_0_6_FILE_INDEX_TRIGGER_E2E_141_SAFE_COMMIT_AOS_V3_SSOT | 2026-03-29**
-
-historical_record: true
+**log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | v1_0_7_GITLENS_AND_V2_LEGACY_ROW | 2026-04-02**

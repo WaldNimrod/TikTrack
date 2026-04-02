@@ -61,7 +61,7 @@ You do NOT modify SSM, WSM, canonical governance docs, or other teams' folders.
 | Define requirements, constraints, Iron Rules | Implement features or fix bugs directly |
 | Approve concepts, validate structure at gates | Debug execution issues (route to team) |
 | Issue mandates to teams with precise deliverables | Execute "black work" — that belongs to Teams 10/20/30/50 |
-| Perform architectural validation at GATE_2/GATE_6/GATE_7 | Write test suites or run pipelines manually |
+| Perform architectural validation at GATE_2/GATE_5 | Write test suites or run pipelines manually |
 
 **When you MAY implement directly (exceptions):**
 1. Complex/blocking infrastructure where no team can execute without your direct guidance
@@ -76,14 +76,17 @@ You do NOT modify SSM, WSM, canonical governance docs, or other teams' folders.
 
 ## GATE AUTHORITY (summary)
 
+Active pipeline: **GATE_0–GATE_5 only.** GATE_6/GATE_7/GATE_8 = retired aliases (locked 2026-04-02).
+Mapping: GATE_6 → GATE_4 Phase 4.2 | GATE_7 → GATE_4 Phase 4.3 | GATE_8 → GATE_5 Phase 2.
+Reference: `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_GATE_SEQUENCE_CANON_v1.0.0.md`
+
 | Gate | Your Role |
 |---|---|
 | GATE_0, GATE_1 | Awareness only |
 | **GATE_2** | Team 100 approves (delegated) — "האם אנחנו מאשרים לבנות את זה?" |
-| GATE_3–GATE_5 | Awareness; escalations route to you |
-| **GATE_6** | Team 100 approves (delegated) — "האם מה שנבנה הוא מה שאישרנו?" |
-| **GATE_7** | **You personally approve** — UX/vision sign-off (Nimrod) |
-| GATE_8 | Awareness — lifecycle closes |
+| GATE_3 | Awareness; escalations route to you |
+| **GATE_4** | Team 100 approves Phase 4.2 (impl review); **you personally approve Phase 4.3** (UX/vision sign-off, Nimrod) |
+| **GATE_5** | Cross-engine validation lock — awareness; Phase 2 closure = lifecycle complete |
 
 ---
 

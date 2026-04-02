@@ -49,6 +49,40 @@ Commands: Start: `bash scripts/start-aos-v3-server.sh` · Stop: `bash scripts/st
 
 ---
 
+## Document Correction Protocol (Iron Rule — 2026-04-03)
+
+**Root cause:** Validation loops extended to 4 rounds because corrections fixed the specific location named in a finding but missed duplicate occurrences of the same claim elsewhere in the same document. The "Authority matrix: unchanged" line survived 2 full correction rounds this way.
+
+**Mandatory steps when addressing any validation finding that involves correcting a claim in a document:**
+
+### Step 1 — Identify the key phrase
+Extract the specific claim being corrected. Example: `Authority matrix: unchanged from v0.2`
+
+### Step 2 — Search exhaustively before editing
+```bash
+grep -in "authority matrix.*unchanged" _COMMUNICATION/team_100/RELEVANT_DOC.md
+# Run for EVERY document that is being corrected, not just the one line referenced
+```
+
+### Step 3 — Fix ALL occurrences in a single commit
+Every instance found in Step 2 must be fixed in the same commit. No partial fixes.
+
+### Step 4 — Verify zero remaining occurrences after editing
+```bash
+grep -in "authority matrix.*unchanged" _COMMUNICATION/team_100/RELEVANT_DOC.md
+# Expected: no output. If any output remains → do not commit.
+```
+
+### Step 5 — Cross-check related documents
+For any claim that appears in document A, check whether the same claim was also copied into companion documents (delta docs, context docs, summaries). Run the same grep against the full `_COMMUNICATION/` tree:
+```bash
+grep -rn "key phrase" _COMMUNICATION/
+```
+
+**This protocol is BLOCKING.** A correction that misses a duplicate is a failed correction — it will be found in the next validation round and extend the loop unnecessarily.
+
+---
+
 ## Organizational Structure (LOCKED — 2026-03-26)
 
 **Every agent MUST learn the organizational structure and fully adopt its assigned role at onboarding.** This is non-negotiable. Drift from role boundaries is a governance violation.

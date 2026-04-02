@@ -3,7 +3,7 @@
 **id:** `D15_MASTER_INDEX`  
 **owner:** Team 10 (The Gateway)  
 **status:** Entry point — canonical structure post Phoenix Cutover  
-**last_updated:** 2026-03-28
+**last_updated:** 2026-04-02
 **deprecated_alias_notice:** Legacy prefix `documentation/docs-governance/PHOENIX_CANONICAL/` is deprecated for active authority routing; use `documentation/docs-governance/01-FOUNDATIONS/` canonical paths.
 
 ### חזון ועיקרון הפעלה: 3 מצבי העבודה (3 Modes of Operation)
@@ -25,6 +25,7 @@
 | Team taxonomy (x0/x1, professions) | `documentation/docs-governance/01-FOUNDATIONS/TEAM_TAXONOMY_v1.0.1.md` |
 | **Active workflow & orchestration** | `documentation/docs-governance/04-PROCEDURES/AGENTS_OS_V2_OPERATING_PROCEDURES_v1.0.0.md` |
 | WSM + Gate Model | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md`, `04_GATE_MODEL_PROTOCOL_v2.3.0.md` |
+| **LOD Standard v1.0.0** | `documentation/docs-governance/01-FOUNDATIONS/LOD_STANDARD_v1.0.0.md` — תקן LOD100–500 נורמטיבי (כולל Lean Gate Model ו־deployment overlays) \| **ACTIVE** |
 
 **לא פעיל (הועבר לארכיון):** `documentation/docs-governance/09-GOVERNANCE/standards/` (כולל PHOENIX_MASTER_BIBLE, CURSOR_INTERNAL_PLAYBOOK) — לא קיים בנתיב פעיל; הוחלף במסמכים למעלה וב־V2 Operating Procedures.
 

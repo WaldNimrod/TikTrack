@@ -176,6 +176,7 @@ D38 (tag registry management) ב-S005 הוא ממשק ניהול רישום הת
 | ID | Stage | Name | Type | Priority | Scope | Status |
 |---|---|---|---|---|---|---|
 | S008-NOTIFICATION-TOAST-SYSTEM | S008 (post-S006) | General Notification & Toast System | Cross-cutting infrastructure | NON-URGENT | Replace all browser alert/confirm with unified in-app NotificationService; add toast levels SUCCESS/WARNING/ERROR/INFO; add in-app alert notification panel; complete universal modal/toast migration using legacy notification system as reference. | DEFERRED |
+| S003-P017-LEAN-KIT | S003 | Lean Kit + methodology portability | Methodology (Agents_OS) | PLANNED | **Program `S003-P017`:** `S003-P017-WP001` (Team 191, repo init), `S003-P017-WP002` (Team 170, lean-kit content); concept WPs `LEAN-KIT-WP002`–`WP004` scheduled **S004+**. Authority: `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_METHODOLOGY_DEPLOYMENT_SPLIT_v1.0.0.md` §3. Registry: `PHOENIX_PROGRAM_REGISTRY_v1.0.0.md`. | PLANNED |
 
 **דשבורדים רמה 1** (בית, תכנון, מעקב, מחקר, נתונים, ניהול): מימוש תוכן — **שלב 6 ומאוחר יותר**.
 
@@ -189,3 +190,4 @@ D38 (tag registry management) ב-S005 הוא ממשק ניהול רישום הת
 **log_entry | TEAM_170 | ROADMAP_ID_UPDATE | INDICATORS_PROGRAM_ID_CANONICALIZED_TO_S004-P007 | per_TEAM_00_RATIFICATION | 2026-03-03**
 **log_entry | TEAM_190 | PHOENIX_PORTFOLIO_ROADMAP | S002_SCOPE_NOTE_UPDATED_FOR_MCP_QA_TRANSITION_PACKAGING | 2026-03-06**
 **log_entry | TEAM_170 | PHOENIX_PORTFOLIO_ROADMAP | ADR031_S002_P005_ANNOTATION_WP001_WP002_PER_TEAM_100_MANDATE | 2026-03-15**
+**log_entry | TEAM_170 | PHOENIX_PORTFOLIO_ROADMAP | S003_P017_LEAN_KIT_FUTURE_ROW | 2026-04-02**

@@ -1339,34 +1339,57 @@ work_packages:
     program_id: "S006-P004"
 
   # ---------------------------------------------------------------------------
-  # Lean Kit + Methodology Portability WPs (registered 2026-04-02)
+  # Lean Kit + Methodology Portability WPs
   # Ref: ARCHITECT_DIRECTIVE_METHODOLOGY_DEPLOYMENT_SPLIT_v1.0.0.md
-  # Stage: TBD (to be assigned when Lean Kit stage is planned)
+  # Stage assignment (2026-04-02): WP001 → S003-P017; WP002-WP004 → S004+ (future)
+  # Program S003-P017: agents-os repo initialization + Lean Kit content build
   # ---------------------------------------------------------------------------
-  - id: "LEAN-KIT-WP001"
-    label: "BUILD_LEAN_KIT_REPO — Create standalone lean-kit repository with all templates, role definitions, gate model, and project creation procedure"
+
+  # S003-P017-WP001: agents-os repo initialization (Team 191)
+  - id: "S003-P017-WP001"
+    label: "INIT_AGENTS_OS_REPO — Initialize agents-os repository at github.com/WaldNimrod/agents-os with correct directory structure, core/ from agents_os_v3, governance files, and CLAUDE.md"
     domain_id: "01JK8AOSV3DOMAIN00000001"
     status: PLANNED
     linked_run_id: null
-    stage_id: null  # TBD — assign to appropriate future stage
-    program_id: null
-    notes: "Ref: ARCHITECT_DIRECTIVE_METHODOLOGY_DEPLOYMENT_SPLIT_v1.0.0.md §3; LOD_STANDARD_v0.3.md §10"
+    stage_id: "S003"
+    program_id: "S003-P017"
+    notes: "Executor: Team 191. Mandate: TEAM_100_TO_TEAM_191_S003_P017_WP001_AGENTS_OS_REPO_INIT_MANDATE_v1.0.0.md. GitHub repo created 2026-04-02 by Nimrod."
+
+  # S003-P017-WP002: Lean Kit content (Team 170)
+  - id: "S003-P017-WP002"
+    label: "BUILD_LEAN_KIT_CONTENT — Create lean-kit/ folder content: LOD templates (5 levels), role definitions (5 types), L-GATE checklists (4+1), roadmap.yaml + team_assignments.yaml templates, example project"
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S003"
+    program_id: "S003-P017"
+    notes: "Executor: Team 170. Mandate: TEAM_100_TO_TEAM_170_S003_P017_WP002_LEAN_KIT_CONTENT_MANDATE_v1.0.0.md. Depends on S003-P017-WP001 (repo must exist first)."
+
+  # Conceptual WP IDs (kept for roadmap tracking; canonical S003 IDs above)
+  - id: "LEAN-KIT-WP001"
+    label: "BUILD_LEAN_KIT_REPO — canonical concept ID; executed as S003-P017-WP001+WP002"
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: "S003"
+    program_id: "S003-P017"
+    notes: "Concept WP for tracking. Execution split: WP001=Team191(repo init), WP002=Team170(content). Ref: ARCHITECT_DIRECTIVE_METHODOLOGY_DEPLOYMENT_SPLIT_v1.0.0.md §3"
 
   - id: "LEAN-KIT-WP002"
     label: "BUILD_LEAN_KIT_GENERATOR — Python script that auto-generates lean-kit snapshot from AOS SSoT (definition.yaml + LOD Standard)"
     domain_id: "01JK8AOSV3DOMAIN00000001"
     status: PLANNED
     linked_run_id: null
-    stage_id: null
+    stage_id: null  # S004+ — depends on S003-P017 completion
     program_id: null
-    notes: "Depends on LEAN-KIT-WP001. SSoT principle: no manual copy maintenance."
+    notes: "Depends on S003-P017 (LEAN-KIT-WP001 complete). SSoT principle: no manual copy maintenance."
 
   - id: "LEAN-KIT-WP003"
     label: "BUILD_LEAN_TO_AOS_UPGRADE — Migration tool: roadmap.yaml → AOS DB (enables L0→L2 upgrade path)"
     domain_id: "01JK8AOSV3DOMAIN00000001"
     status: PLANNED
     linked_run_id: null
-    stage_id: null
+    stage_id: null  # S004+ — depends on S003-P017 completion
     program_id: null
     notes: "roadmap.yaml schema mirrors AOS DB; import script populates work_packages table."
 
@@ -1375,9 +1398,9 @@ work_packages:
     domain_id: "01JK8AOSV3DOMAIN00000001"
     status: PLANNED
     linked_run_id: null
-    stage_id: null
+    stage_id: null  # S004+ — depends on LEAN-KIT-WP001+WP002
     program_id: null
-    notes: "Depends on LEAN-KIT-WP001 + LEAN-KIT-WP002. Makes new project creation ~5 minutes for both profiles."
+    notes: "Depends on S003-P017 (LEAN-KIT-WP001+WP002). Makes new project creation ~5 minutes for both profiles."
 
 # ---------------------------------------------------------------------------
 # V2 → V3 Migration: Ideas

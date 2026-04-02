@@ -45,7 +45,9 @@ while IFS= read -r file; do
 done < <(
   git diff --name-only "$BASE_REF" "$HEAD_REF" \
     | grep -E '^(_COMMUNICATION/|documentation/docs-governance/).+\.md$' \
+    | grep -v '^_COMMUNICATION/99-ARCHIVE/' \
     || true
+  # _COMMUNICATION/99-ARCHIVE/ is excluded: archive files have historical dates by definition
 )
 
 if [[ ${#changed_docs[@]} -eq 0 ]]; then

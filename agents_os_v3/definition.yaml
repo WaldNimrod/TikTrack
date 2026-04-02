@@ -1338,6 +1338,47 @@ work_packages:
     stage_id: "S006"
     program_id: "S006-P004"
 
+  # ---------------------------------------------------------------------------
+  # Lean Kit + Methodology Portability WPs (registered 2026-04-02)
+  # Ref: ARCHITECT_DIRECTIVE_METHODOLOGY_DEPLOYMENT_SPLIT_v1.0.0.md
+  # Stage: TBD (to be assigned when Lean Kit stage is planned)
+  # ---------------------------------------------------------------------------
+  - id: "LEAN-KIT-WP001"
+    label: "BUILD_LEAN_KIT_REPO — Create standalone lean-kit repository with all templates, role definitions, gate model, and project creation procedure"
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: null  # TBD — assign to appropriate future stage
+    program_id: null
+    notes: "Ref: ARCHITECT_DIRECTIVE_METHODOLOGY_DEPLOYMENT_SPLIT_v1.0.0.md §3; LOD_STANDARD_v0.3.md §10"
+
+  - id: "LEAN-KIT-WP002"
+    label: "BUILD_LEAN_KIT_GENERATOR — Python script that auto-generates lean-kit snapshot from AOS SSoT (definition.yaml + LOD Standard)"
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: null
+    program_id: null
+    notes: "Depends on LEAN-KIT-WP001. SSoT principle: no manual copy maintenance."
+
+  - id: "LEAN-KIT-WP003"
+    label: "BUILD_LEAN_TO_AOS_UPGRADE — Migration tool: roadmap.yaml → AOS DB (enables L0→L2 upgrade path)"
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: null
+    program_id: null
+    notes: "roadmap.yaml schema mirrors AOS DB; import script populates work_packages table."
+
+  - id: "LEAN-KIT-WP004"
+    label: "BUILD_PROJECT_SCAFFOLDING_CLI — New project creation CLI for both L0 (Lean) and L2 (AOS v3); automates PROJECT_CREATION_PROCEDURE_v1.0.0.md"
+    domain_id: "01JK8AOSV3DOMAIN00000001"
+    status: PLANNED
+    linked_run_id: null
+    stage_id: null
+    program_id: null
+    notes: "Depends on LEAN-KIT-WP001 + LEAN-KIT-WP002. Makes new project creation ~5 minutes for both profiles."
+
 # ---------------------------------------------------------------------------
 # V2 → V3 Migration: Ideas
 # Seeded 2026-03-29 by Team 00 (Nimrod).

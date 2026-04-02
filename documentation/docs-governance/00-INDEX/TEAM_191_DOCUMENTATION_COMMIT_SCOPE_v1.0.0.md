@@ -21,3 +21,5 @@ status: ACTIVE
 - סמכות קנונית לתוכן ב־`documentation/docs-governance/` נשארת לפי חלוקת Team 170 / Team 70; Team 191 מבצע **פעולת קבצים** בלבד.
 
 **log_entry | TEAM_191 | DOCUMENTATION_COMMIT_SCOPE | PUBLISHED | 2026-03-29**
+
+historical_record: true

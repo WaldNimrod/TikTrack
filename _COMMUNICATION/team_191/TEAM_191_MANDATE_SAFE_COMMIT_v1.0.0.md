@@ -253,3 +253,5 @@ unknown reasons), do NOT bypass — report to Team 00 with the exact output.
 ---
 
 **log_entry | TEAM_00 | TEAM_191_MANDATE_SAFE_COMMIT | ISSUED | 2026-03-24**
+
+historical_record: true

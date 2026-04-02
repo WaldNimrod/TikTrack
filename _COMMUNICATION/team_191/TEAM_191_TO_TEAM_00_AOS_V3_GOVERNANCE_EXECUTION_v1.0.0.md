@@ -36,3 +36,5 @@ authority: TEAM_00_TO_TEAM_191_AOS_V3_GIT_GOVERNANCE_CANONICAL_v1.1.0
 ---
 
 **log_entry | TEAM_191 | TO_TEAM_00 | AOS_V3_GOVERNANCE_EXECUTION | COMPLETE | 2026-03-27**
+
+historical_record: true

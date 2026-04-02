@@ -114,3 +114,5 @@ work_package_ref: S003-P016 (Pipeline Git Isolation / COS extraction — related
 ---
 
 **log_entry | TEAM_191 | TO_TEAM_00_TEAM_100 | S003_P016_PORTFOLIO_CODE_ALIGNMENT | REPORT | 2026-03-24**
+
+historical_record: true

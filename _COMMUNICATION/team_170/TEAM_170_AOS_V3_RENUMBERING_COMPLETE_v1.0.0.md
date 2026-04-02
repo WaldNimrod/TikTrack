@@ -54,3 +54,5 @@ Roster semantics **team_101 → team_110**, **team_102 → team_111** in listed 
 
 **log_entry | TEAM_170 | AOS_V3_RENUMBERING | COMPLETE_INDEX | 2026-03-26**  
 **log_entry | TEAM_170 | AOS_V3_RENUMBERING | T100_FINAL_REPORT_ISSUED | 2026-03-26**
+
+historical_record: true

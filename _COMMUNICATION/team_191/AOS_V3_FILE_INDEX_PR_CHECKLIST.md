@@ -19,3 +19,5 @@ authority: TEAM_00_TO_TEAM_191_AOS_V3_GIT_GOVERNANCE_CANONICAL_v1.1.0 §3 אפש
 **Iron Rule:** אי-עמידה = **FAIL** ב-review.
 
 **log_entry | TEAM_191 | AOS_V3_FILE_INDEX_PR_CHECKLIST | PUBLISHED | 2026-03-27**
+
+historical_record: true

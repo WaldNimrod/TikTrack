@@ -79,3 +79,5 @@ supersedes: TEAM_191_AOS_V3_PROJECT_BRANCH_WORK_MODE_v1.0.0
 ---
 
 **log_entry | TEAM_191 | AOS_V3_BRANCH_WORK_MODE | APPROVED_v1.1.0 | 2026-03-27**
+
+historical_record: true

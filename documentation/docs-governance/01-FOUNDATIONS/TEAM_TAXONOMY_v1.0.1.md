@@ -149,3 +149,5 @@ PFS = כלי/חבילת בדיקות לזרימת pipeline + dashboard **בלי*
 ---
 
 **log_entry | TEAM_TAXONOMY | v1.0.1 | CANONICAL | 2026-03-26**
+
+historical_record: true

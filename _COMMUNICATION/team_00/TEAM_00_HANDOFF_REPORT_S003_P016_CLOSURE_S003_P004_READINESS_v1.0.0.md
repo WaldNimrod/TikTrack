@@ -180,3 +180,5 @@ After COMPLETE: Nimrod performs manual UX review (organizational action, not a p
 ---
 
 **log_entry | TEAM_00 | HANDOFF_REPORT | S003_P016_CLOSURE | S003_P004_READY | 2026-03-24**
+
+historical_record: true

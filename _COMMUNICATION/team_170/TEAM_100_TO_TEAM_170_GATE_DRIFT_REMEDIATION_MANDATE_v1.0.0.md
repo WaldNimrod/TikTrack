@@ -122,3 +122,5 @@ Report:
 ---
 
 **log_entry | TEAM_100 | GATE_DRIFT_REMEDIATION_MANDATE_ISSUED | TO_TEAM_170 | 2026-04-02**
+
+historical_record: true

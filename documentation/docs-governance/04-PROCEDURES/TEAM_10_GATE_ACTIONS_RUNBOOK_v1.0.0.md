@@ -144,3 +144,5 @@ Normative fast-track protocol:
 **log_entry | TEAM_170 | TEAM_10_GATE_ACTIONS_RUNBOOK | v1.0.0_LOCKED | 2026-02-23**
 **log_entry | TEAM_190 | TEAM_10_GATE_ACTIONS_RUNBOOK | FAST_TRACK_REFERENCE_ADDED | 2026-02-26**
 **log_entry | TEAM_170 | TEAM_10_GATE_ACTIONS_RUNBOOK | WSM_PIPELINE_SYSTEM_ONLY | 2026-03-17**
+
+historical_record: true

@@ -166,3 +166,5 @@ One channel (10↔90), two distinct lifecycle phases; no contradiction. **Canoni
 
 **log_entry | TEAM_100 | GATE_PROTOCOL_v2.2.0 | LOCKED | 2026-02-20**  
 **log_entry | TEAM_100 | GATE_PROTOCOL_v2.2.0 | SUPERSEDED_BY_v2.3.0 | 2026-02-22**
+
+historical_record: true

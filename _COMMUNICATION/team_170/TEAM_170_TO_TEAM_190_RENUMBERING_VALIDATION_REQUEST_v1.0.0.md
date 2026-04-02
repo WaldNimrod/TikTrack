@@ -42,3 +42,5 @@ correction_cycle: 0
 ---
 
 **log_entry | TEAM_170 | TO_TEAM_190 | RENUMBERING_VALIDATION_REQUEST | 2026-03-26**
+
+historical_record: true

@@ -75,3 +75,5 @@ relevant to S003-P004 or later work.
 ---
 
 **log_entry | TEAM_00 | TEAM_100_FOLDER_INDEX | CREATED | 2026-03-24**
+
+historical_record: true

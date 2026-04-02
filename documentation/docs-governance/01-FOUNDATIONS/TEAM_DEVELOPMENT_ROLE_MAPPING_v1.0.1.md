@@ -183,3 +183,5 @@ This document must be updated whenever a new squad is added. Missing squad defin
 **log_entry | TEAM_170 | TEAM_DEVELOPMENT_ROLE_MAPPING | v1.0.1_LOCKED | 2026-03-26**  
 **log_entry | TEAM_170 | TEAM_DEVELOPMENT_ROLE_MAPPING | CANON_PRINCIPLES_TEAM_101_MANDATE | 2026-03-26**  
 **log_entry | TEAM_170 | TEAM_DEVELOPMENT_ROLE_MAPPING | AOS_V3_RENUMBERING_REPORTING_LINE | 2026-03-26**
+
+historical_record: true

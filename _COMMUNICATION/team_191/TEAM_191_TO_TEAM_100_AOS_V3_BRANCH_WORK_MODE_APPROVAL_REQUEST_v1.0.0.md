@@ -41,3 +41,5 @@ re: AOS v3 — מצב ענף Git ופרסום ישיר
 ---
 
 **log_entry | TEAM_191 | TO_TEAM_100 | AOS_V3_BRANCH_MODE_APPROVAL_REQUEST | OPEN | 2026-03-27**
+
+historical_record: true

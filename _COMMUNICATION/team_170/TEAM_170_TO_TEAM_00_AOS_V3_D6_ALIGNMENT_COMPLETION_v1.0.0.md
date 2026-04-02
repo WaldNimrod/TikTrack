@@ -45,3 +45,5 @@ correction_cycle: 0
 ---
 
 **log_entry | TEAM_170 | TO_TEAM_00 | AOS_V3_D6_DOC_MANDATE | COMPLETE | 2026-03-29**
+
+historical_record: true

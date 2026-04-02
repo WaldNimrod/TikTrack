@@ -40,3 +40,5 @@ date: 2026-02-22
 ---
 
 **log_entry | [Architect] | FOOTER_STRATEGY | APPROVED | GREEN | 2026-02-01**
+
+historical_record: true

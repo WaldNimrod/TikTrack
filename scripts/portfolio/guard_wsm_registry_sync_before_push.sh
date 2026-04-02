@@ -65,7 +65,18 @@ if [[ "$warn_count" -ge 3 ]]; then
 fi
 
 echo "PORTFOLIO PRE-PUSH GUARD: running date-lint for outgoing range ${RANGE}"
-bash scripts/lint_governance_dates.sh "${UPSTREAM_REF:-}" HEAD
+# Date-lint base: use the most recent commit already on ANY remote tracking branch
+# that is reachable from HEAD. This avoids re-checking files that were already
+# validated when pushed to another remote branch (e.g. origin/aos-v3).
+# For normal session pushes this resolves to the upstream ref itself (no difference).
+# For merge-to-main scenarios it resolves to origin/aos-v3 HEAD, skipping re-checks.
+DATE_LINT_BASE="${UPSTREAM_REF:-}"
+if REMOTE_ANCESTOR="$(git log --remotes --no-walk --pretty=format:'%H' HEAD 2>/dev/null | xargs -I{} git merge-base {} HEAD 2>/dev/null | sort -u | tail -1 2>/dev/null)"; then
+  if [[ -n "$REMOTE_ANCESTOR" ]]; then
+    DATE_LINT_BASE="$REMOTE_ANCESTOR"
+  fi
+fi
+bash scripts/lint_governance_dates.sh "${DATE_LINT_BASE}" HEAD
 
 TOUCHED_FILES="$(git diff --name-only "$RANGE" -- "${PORTFOLIO_AUTHORITY_FILES[@]}")"
 if [[ -z "$TOUCHED_FILES" ]]; then

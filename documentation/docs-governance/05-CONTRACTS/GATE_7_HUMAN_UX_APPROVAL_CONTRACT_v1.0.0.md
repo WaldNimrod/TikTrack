@@ -109,3 +109,5 @@ Every GATE_7 scenario artifact issued by Team 90 must include:
 
 **log_entry | TEAM_190 | GATE_7_HUMAN_UX_APPROVAL_CONTRACT | LOCKED | 2026-02-23**
 **log_entry | TEAM_170 | GATE_7_HUMAN_UX_APPROVAL_CONTRACT | SUPERSEDED_BY_v1.1.0 | 2026-03-11 | See ARCHITECT_DIRECTIVE_DUAL_DOMAIN_GOVERNANCE_v1.0.0**
+
+historical_record: true

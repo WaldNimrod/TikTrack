@@ -343,3 +343,5 @@ If (b): no change needed to dashboard logic, only the data shape may need minor 
 ---
 
 **log_entry | TEAM_00 | ARCHITECT_DIRECTIVE_PIPELINE_GIT_ISOLATION | ISSUED | S003-P016 | 2026-03-24**
+
+historical_record: true

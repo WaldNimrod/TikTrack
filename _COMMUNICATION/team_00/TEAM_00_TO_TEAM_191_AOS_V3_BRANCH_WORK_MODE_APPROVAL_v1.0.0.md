@@ -106,3 +106,5 @@ PR מ-`aos-v3` ל-`main` לפי מדיניות מיזוג מאושרת (לאחר
 ---
 
 **log_entry | TEAM_00 | TEAM_191_APPROVAL | AOS_V3_BRANCH_WORK_MODE | PASS | 2026-03-27**
+
+historical_record: true

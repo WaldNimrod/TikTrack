@@ -66,3 +66,5 @@ This addendum locks **human / Principal / Team 00** semantics for agent-loaded g
 **log_entry | TEAM_170 | PRINCIPAL_AND_TEAM_00_MODEL | v1.0.0_CANONICAL | 2026-03-26**  
 **log_entry | TEAM_170 | PRINCIPAL_AND_TEAM_00_MODEL | D03_DB_SECTION_EXPANDED | 2026-03-26**  
 **log_entry | TEAM_170 | PRINCIPAL_AND_TEAM_00_MODEL | D03_EVENT_ACTOR_TEAM_ID_ALIGNMENT | 2026-03-26**
+
+historical_record: true

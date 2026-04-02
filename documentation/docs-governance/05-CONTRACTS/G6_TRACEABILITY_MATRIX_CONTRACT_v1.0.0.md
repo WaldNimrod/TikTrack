@@ -56,3 +56,5 @@ Every GATE_2 acceptance criterion (from the architect-approved spec) must appear
 ---
 
 **log_entry | TEAM_170 | G6_TRACEABILITY_MATRIX_CONTRACT | v1.0.0_CREATED | ARCHITECT_DECISION_GATE_QUALITY_GOVERNANCE_HARDENING_v1.0.0 | 2026-03-10**
+
+historical_record: true

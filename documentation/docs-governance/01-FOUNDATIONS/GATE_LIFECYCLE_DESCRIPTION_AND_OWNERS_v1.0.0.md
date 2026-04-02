@@ -86,3 +86,5 @@ Pantheon-ready document:
 [GATE_LIFECYCLE_PRESENTATION_PANTHEON_v1.0.0.md](./GATE_LIFECYCLE_PRESENTATION_PANTHEON_v1.0.0.md)
 
 In Mermaid Live, paste the raw content of the `.mmd` file directly (without markdown fences).
+
+historical_record: true

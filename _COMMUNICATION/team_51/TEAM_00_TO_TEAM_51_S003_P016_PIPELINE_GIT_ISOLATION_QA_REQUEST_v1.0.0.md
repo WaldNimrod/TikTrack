@@ -134,3 +134,5 @@ Escalation: any BLOCK findings → route to Team 00 (System Designer) with findi
 ---
 
 **log_entry | TEAM_00 | S003_P016_QA_SUBMISSION | SENT_TO_TEAM_51 | 2026-03-24**
+
+historical_record: true

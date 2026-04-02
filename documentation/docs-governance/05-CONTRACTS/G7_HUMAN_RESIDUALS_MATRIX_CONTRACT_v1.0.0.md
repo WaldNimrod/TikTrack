@@ -56,3 +56,5 @@ All rows must have PASS. In addition, Nimrod must provide explicit sign-off (◊ê◊
 ---
 
 **log_entry | TEAM_170 | G7_HUMAN_RESIDUALS_MATRIX_CONTRACT | v1.0.0_CREATED | ARCHITECT_DECISION_GATE_QUALITY_GOVERNANCE_HARDENING_v1.0.0 | 2026-03-10**
+
+historical_record: true

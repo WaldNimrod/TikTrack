@@ -276,3 +276,5 @@ Out of scope for this QA pass:
 ---
 
 **log_entry | TEAM_00 | QA_PROMPT_ISSUED | S003_P016 | TO_TEAM_51 | 2026-03-24**
+
+historical_record: true

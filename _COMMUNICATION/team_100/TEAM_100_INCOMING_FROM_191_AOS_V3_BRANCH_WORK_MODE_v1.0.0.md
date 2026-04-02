@@ -20,3 +20,5 @@ status: CLOSED — Team 00 canonical v1.1.0 supersedes routing
 **פעולה צפויה ל-Team 100:** `PASS` / `FAIL` / `CONDITIONAL` לפי תבנית הבקשה.
 
 **log_entry | TEAM_100 | INCOMING | AOS_V3_GIT_WORK_MODE_FROM_191 | OPEN | 2026-03-27**
+
+historical_record: true

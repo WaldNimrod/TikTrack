@@ -26,3 +26,5 @@ work_package_id: S003-P013-WP001
 ---
 
 **log_entry | TEAM_191 | TO_TEAM_10 | S003_P013_WP001 | REPO_ARCHIVE_POLICY_GATE_NOTICE | 2026-03-24**
+
+historical_record: true

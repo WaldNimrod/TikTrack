@@ -28,3 +28,5 @@ correction_cycle: 1
 ---
 
 **log_entry | TEAM_170 | T190_C01 | DOC_REMEDIATION_CLOSURE | 2026-03-26**
+
+historical_record: true

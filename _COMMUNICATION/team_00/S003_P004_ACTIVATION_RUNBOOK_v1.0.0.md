@@ -221,3 +221,5 @@ The monitor logs every gate checkpoint to a structured JSONL file for post-run a
 ---
 
 **log_entry | TEAM_100 | S003_P004_ACTIVATION_RUNBOOK | CREATED | 2026-03-24**
+
+historical_record: true

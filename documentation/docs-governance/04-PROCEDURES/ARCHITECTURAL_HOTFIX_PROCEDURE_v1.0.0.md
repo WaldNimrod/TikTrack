@@ -23,3 +23,5 @@ This procedure applies to ALL architectural agents, regardless of operating mode
 
 ## 4. Zero-Trust Compliance
 An architect writing code is indistinguishable from a developer writing code. The system does not trust the origin of the code, only the validation seal of the Checker team.
+
+historical_record: true

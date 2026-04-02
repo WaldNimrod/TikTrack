@@ -10,7 +10,7 @@
 
 ## Overview
 
-v0.3 makes 9 categories of changes. The most significant change is the introduction of the **Methodology/Deployment Split**, which is the foundational principle enabling everything else. In addition to architectural extensions (deployment profiles, Lean Gate Model, Lean Kit, team structure, overlays), v0.3 also makes targeted corrections to LOD100 and LOD200 required-content lists (restoring items that were inadvertently absent from v0.2) and revises the anti-patterns list (expanding from 8 to 15, restoring dropped items, adding deployment-profile-aware patterns). Authority matrix is unchanged. Versioning policy and gate mapping are unchanged.
+v0.3 makes 10 categories of changes. The most significant change is the introduction of the **Methodology/Deployment Split**, which is the foundational principle enabling everything else. In addition to architectural extensions (deployment profiles, Lean Gate Model, Lean Kit, team structure, overlays), v0.3 also makes targeted corrections to LOD100 and LOD200 required-content lists (restoring items inadvertently dropped from v0.2), revises the anti-patterns list (expanding from 8 to 15), and restructures the authority matrix (tightening producer definitions and adding an explicit cross-engine required flag). Versioning policy and gate mapping are unchanged.
 
 v0.3 is released as RELEASE_CANDIDATE. It becomes v1.0.0 upon Team 00 formal approval and relocation to `documentation/docs-governance/`.
 
@@ -227,6 +227,7 @@ Making the modes explicit prevents confusion when an agent receives instructions
 | §AOS v3 overlay updated | L2 labeling | No | No | Updates §15 | LOW |
 | LOD100/LOD200 required-content corrections | Core definitions | **YES** | No | Updates §5 | MEDIUM |
 | Anti-patterns list revised | Quality rules | **YES** | No | Updates §13 | MEDIUM |
+| Authority matrix revised | Authority rules | **YES** | No | Updates §11 | MEDIUM |
 
 **Authority matrix: unchanged from v0.2.**
 **Cross-engine validation Iron Rule: unchanged but now explicitly applies to ALL profiles.**
@@ -239,7 +240,7 @@ Making the modes explicit prevents confusion when an agent receives instructions
 
 ### What changed
 
-**LOD100:** Added a sixth required item that was absent from v0.2:
+**LOD100:** The sixth required item — *Open questions or blocking assumptions* — existed in v0.2 (item 6, line 101) but was inadvertently dropped in early v0.3 drafts. It has been restored:
 - *Open questions or blocking assumptions* — must be surfaced even if unresolved; cannot be omitted
 
 **LOD200:** Restored four required items from v0.2 that were missing from early v0.3 drafts, and retained two new items introduced by the Methodology/Deployment Split work:
@@ -286,10 +287,26 @@ These additions are directly driven by the Lean Gate Model introduction (new fai
 
 ---
 
+## Change 10 — Authority matrix revised (§11)
+
+### What changed
+
+The declaration authority matrix was restructured and its content updated in v0.3:
+
+- **Column structure:** v0.2 had 4 columns (LOD, May be produced by, Approved by, Notes); v0.3 has 4 columns (LOD Level, Who produces, Who approves, Cross-engine required) — "Notes" replaced by explicit cross-engine flag
+- **LOD100:** Producer changed from "Any team" → "Principal or Architect"; approver changed from "Optional" → "Principal"
+- **LOD200:** Approver changed from "Planning authority (human or designated arch agent)" → "Architecture team"
+- **LOD300:** Approver changed from "Consuming team (builder) acknowledgment" → "Architecture team + consuming team"
+- **LOD500:** Producer changed from "QA / validation team" → "Tech writer / Architect post-build"
+
+### Logic
+The v0.3 matrix tightens producer definitions to align with the explicit role types introduced in §9, and adds the cross-engine required flag to make the Iron Rule visible at a glance. The v0.2 "Notes" column contained important constraints (e.g., "Self-certification invalid") that are now enforced structurally via the cross-engine flag rather than as free text.
+
+---
+
 ## What v0.3 does NOT change
 
 The following remain exactly as defined in v0.2:
-- Declaration authority matrix (who produces, who approves each level)
 - Versioning policy
 - Machine-readable YAML frontmatter spec
 - Gate mapping (LOD200 → GATE_1, LOD400 → GATE_2, LOD500 → GATE_5)

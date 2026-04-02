@@ -230,7 +230,7 @@ Confirm:
 ### Step 5 — Start AOS server
 
 ```bash
-uvicorn agents_os_v3.api.main:app --port 8082 --reload
+uvicorn agents_os_v3.modules.management.api:app --port 8082 --reload
 ```
 
 ### Step 6 — Verify pipeline state

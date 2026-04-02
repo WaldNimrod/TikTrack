@@ -28,8 +28,8 @@ mandate_ref: TEAM_100_TO_TEAM_191_AGENTS_OS_V2_LEGACY_AND_MAIN_MERGE_MANDATE_v1.
 |-----|-----|
 | **החלטת Team 00 (Principal)** | **APPROVED** — אושר מיזוג `aos-v3` → `main` והגדרת הגרסה הנוכחית כקו הפצה רשמי |
 | **merge_commit_sha (מקומי על `main`)** | `567328520` — `merge(main): promote aos-v3 to main — AOS v3 + S003 milestone release` |
-| **קומיטי המשך (אותו מסלול promotion)** | `c2da2a430` — `fix(date-lint): exclude _COMMUNICATION/99-ARCHIVE/ from date-lint guard` · `eb8046461` — `fix(pre-push): date-lint base uses most-recent remote ancestor to avoid re-checking` |
-| **HEAD promotion branch (טיפ)** | `eb8046461` |
+| **קומיטי המשך (מסלול promotion / `aos-v3`)** | `fb3d5ebbb` — `fix(date-lint): exclude _COMMUNICATION/99-ARCHIVE/...` · `d8d543af9` — `fix(pre-push): date-lint base uses most-recent remote ancestor...` · `f83f866b4` — `docs(team_191): LEGACY+main merge RESULT, procedure v1.0.7 (GitLens)...` |
+| **HEAD `origin/aos-v3` וענף promotion (מסונכרנים)** | `f83f866b4` — עודכן `team191/promote-aos-v3-to-main-20260402` ב־`--force-with-lease` כדי לכלול את דוח התוצאה ונוהל v1.0.7 |
 | **push ישיר ל־`origin/main`** | **DECLINED** — כללי GitHub (`GH013`): שינויים דרך **Pull Request** בלבד + בדיקות סטטוס נדרשות |
 | **ענף promotion ב־remote** | `team191/promote-aos-v3-to-main-20260402` (תוכן מזהה ל־`main` מקומי עד קומיט `eb8046461`) |
 | **PR (לפתיחה ידנית)** | https://github.com/WaldNimrod/TikTrack/pull/new/team191/promote-aos-v3-to-main-20260402 |

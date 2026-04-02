@@ -80,7 +80,7 @@ Add source map entries for D1 (Iron Rules category) and D5 (Project Operations c
 **Pre-condition: Team 100 approval confirmed before this activation was sent.**
 
 4a. Copy `_COMMUNICATION/team_100/TEAM_100_LOD_STANDARD_v0.3.md` to:
-`documentation/docs-governance/LOD_STANDARD_v1.0.0.md`
+`documentation/docs-governance/01-FOUNDATIONS/LOD_STANDARD_v1.0.0.md`
 
 4b. In the copied document, update frontmatter:
 - `version: v0.3 (RELEASE_CANDIDATE)` → `version: v1.0.0`
@@ -91,9 +91,10 @@ Add source map entries for D1 (Iron Rules category) and D5 (Project Operations c
 4c. Update GOVERNANCE_PROCEDURES_INDEX entry for D3 to show canonical path.
 
 4d. Add to `00_MASTER_INDEX.md` governance section:
-`| LOD Standard v1.0.0 | documentation/docs-governance/LOD_STANDARD_v1.0.0.md | Normative LOD100-500 standard | ACTIVE |`
+`| LOD Standard v1.0.0 | documentation/docs-governance/01-FOUNDATIONS/LOD_STANDARD_v1.0.0.md | Normative LOD100-500 standard | ACTIVE |`
 
 ### Task 5 — Register LEAN-KIT program in program registry
+
 **File:** `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md`
 
 Add LEAN-KIT as a future program with 4 WPs:
@@ -109,6 +110,15 @@ Work Packages:
   - LEAN-KIT-WP004: BUILD_PROJECT_SCAFFOLDING_CLI (S004+, PLANNED)
 Reference: ARCHITECT_DIRECTIVE_METHODOLOGY_DEPLOYMENT_SPLIT_v1.0.0.md §3
 ```
+
+### Task 6 — Complete Part 6 index links in Project Creation Procedure
+**File:** `_COMMUNICATION/team_100/PROJECT_CREATION_PROCEDURE_v1.0.0.md`
+
+Part 6 of the document contains unchecked index link TODOs (lines ~350–355). Complete them:
+- Fill in the correct canonical paths for all cross-referenced documents listed
+- Use the same paths that appear in `00_MASTER_INDEX.md` after Task 1 is complete
+- Format: `[Document Name](relative/path/to/document.md)` — consistent with existing links in the file
+- Do not change any other content in the procedure
 
 ---
 
@@ -126,13 +136,13 @@ Reference: ARCHITECT_DIRECTIVE_METHODOLOGY_DEPLOYMENT_SPLIT_v1.0.0.md §3
 
 Produce all outputs as file modifications in-repo (Cursor can write directly).
 
-After completing all 5 tasks, submit a completion report to:
+After completing all 6 tasks, submit a completion report to:
 ```
 _COMMUNICATION/_ARCHITECT_INBOX/TEAM_170_TO_TEAM_100_SESSION_20260402_INDEXING_COMPLETION_v1.0.0.md
 ```
 
 Report must include:
-- Task completion status (each of 5 tasks: COMPLETE / BLOCKED / PARTIAL)
+- Task completion status (each of 6 tasks: COMPLETE / BLOCKED / PARTIAL)
 - Files modified (exact paths)
 - LOD Standard canonical location: confirmed
 - Any flags or unresolved items

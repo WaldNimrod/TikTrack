@@ -204,7 +204,7 @@ LOD documents are **immutable after approval**. A correction cycle produces a ne
 - **LOD400** can only be declared approved by the consuming team (the team that will build it) — they are the ones who can confirm it is actually executable as written
 - **LOD500** requires sign-off by a team that did NOT build the implementation — cross-engine validation is mandatory
 
-### Anti-patterns the standard explicitly prohibits
+### Anti-patterns the standard explicitly prohibits *(selected examples; full list of 15 in LOD Standard §13)*
 - **Fake LOD400** — long and detailed but still leaves product decisions open
 - **Orphan LOD500** — written from memory after the fact, without run evidence
 - **Self-certified LOD500** — the implementing team approving their own fidelity record
@@ -223,7 +223,7 @@ Agents do not freely report "PASS" or "FAIL" in natural language. The system use
 - `findings`: numbered list with severity, category, description
 - `confidence_score`, `tested_at`, `runner_id`
 
-Non-conforming payloads (e.g., `route_recommendation: "full"`) are rejected with HTTP 422 — the pipeline never accepts ambiguous routing decisions.
+Non-conforming payloads (e.g., `route_recommendation: "full"`) are rejected with HTTP 422 — the pipeline never accepts ambiguous routing decisions. CANONICAL_AUTO is the strictest of several feedback modes; other modes accept less structured input but provide weaker guarantees.
 
 **Auto-advance:** When a CANONICAL_AUTO feedback payload proposes ADVANCE at eligible gates (GATE_0, GATE_1) with no blocking findings, the pipeline advances automatically. GATE_2 and above always require human-in-the-loop approval.
 
@@ -279,7 +279,7 @@ These are locked by the Principal and cannot be modified without constitutional 
 
 ## 12. Why This Context Matters for the LOD Standard
 
-The LOD standard (v0.2) was designed in and for this environment. Reviewers should evaluate it against these questions:
+The LOD standard (currently at v0.3, RELEASE_CANDIDATE) was designed in and for this environment. Reviewers should evaluate it against these questions:
 
 **Does the two-track model (Track A/B) make sense given the environment?**
 Most AOS and TikTrack work packages are single-component feature additions — they follow established patterns and don't require LOD300. A small number involve multi-system coordination (new APIs, new state machines) and do require a system behavior specification layer. The track model reflects this reality.

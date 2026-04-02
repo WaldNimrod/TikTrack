@@ -32,6 +32,7 @@ Answer these questions to determine which profile to use:
 | Do you need a persistent audit trail (DB-backed)? | L2 |
 | Will the project run for 6+ months with multiple stages? | L2 |
 | Is there a team of 4+ active agents simultaneously? | L2 |
+| Does the project span multiple operational domains? | Strongly suggests L2 |
 | Is this a short, bounded project (1–3 WPs)? | L0 |
 | Is setup speed the priority? | L0 |
 | Is this a proof-of-concept or experimental build? | L0 |

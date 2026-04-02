@@ -120,11 +120,12 @@ When methodology changes:
 2. Regenerate affected Lean Kit sections (manual until generator tool is built)
 3. Release new lean-kit version if change is significant
 
-**Future WPs registered in AOS roadmap:**
-- `BUILD_LEAN_KIT_REPO` — create standalone lean-kit repository
-- `BUILD_LEAN_KIT_GENERATOR` — script that auto-generates lean-kit from SSoT
-- `BUILD_LEAN_TO_AOS_UPGRADE` — roadmap.yaml → AOS DB migration tool
-- `BUILD_PROJECT_SCAFFOLDING_CLI` — new project creation CLI (both L0 + L2)
+**Future WPs registered in AOS roadmap (concept IDs LEAN-KIT-WP001–WP004;**
+**canonical S-P-WP execution IDs are assigned at program registration per stage):**
+- `LEAN-KIT-WP001` / `BUILD_LEAN_KIT_REPO` — create standalone lean-kit repository *(S003-P017)*
+- `LEAN-KIT-WP002` / `BUILD_LEAN_KIT_GENERATOR` — script that auto-generates lean-kit from SSoT *(S004+)*
+- `LEAN-KIT-WP003` / `BUILD_LEAN_TO_AOS_UPGRADE` — roadmap.yaml → AOS DB migration tool *(S004+)*
+- `LEAN-KIT-WP004` / `BUILD_PROJECT_SCAFFOLDING_CLI` — new project creation CLI (both L0 + L2) *(S004+)*
 
 ---
 
@@ -146,6 +147,9 @@ In L0 (Lean):
 In L0, work package state lives in `roadmap.yaml` — a YAML file that mirrors
 the AOS DB schema subset. When upgrading to L2 (AOS v3), this file is the
 source for DB population (future migration script).
+
+For the full `roadmap.yaml` schema and required fields per work package, see
+`TEAM_100_LOD_STANDARD_v0.3.md §10.2` (or `LOD_STANDARD_v1.0.0.md §10.2` after promotion).
 
 ---
 

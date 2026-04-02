@@ -328,7 +328,7 @@ work_package_id: S001-P001-WP001   # canonical 3-level ID
 ```yaml
 spec_ref: "LOD400_spec_v2.0.0.md"          # mandatory
 execution_fidelity: FULL_MATCH              # FULL_MATCH | DEVIATIONS_DOCUMENTED | PARTIAL
-verifying_team: openai-codex                # role or engine — must differ from builder
+verifying_team: team_190                    # team ID — must differ from builder team
 verifying_engine: openai                    # must differ from builder_engine
 builder_engine: cursor-composer
 validated_at: 2026-04-02T14:00:00Z
@@ -384,6 +384,8 @@ validator  (engine C — must ≠ engine B)
 Minimum 2 different engines. 3 roles can be collapsed to 2 humans/agents
 (architect + builder as one, validator as another) **as long as engine
 constraint is preserved.**
+
+In a minimum L0 setup: `architect` + `builder` may share an engine (collapsed to one agent); `validator_external` is always a separate engine. Remaining role types (`qa_internal`, `tech_writer`, `git_backup`, `domain_architect`) are optional in L0 and may be omitted for simple bounded projects.
 
 ### 9.3 Team creation (L0 — Lean)
 
@@ -495,10 +497,12 @@ Critical methodology updates trigger a propagation procedure
 
 | WP ID (future) | Label |
 |----------------|-------|
-| TBD-WP001 | BUILD_LEAN_KIT_REPO — create standalone lean-kit repository |
-| TBD-WP002 | BUILD_LEAN_KIT_GENERATOR — SSoT auto-generation script |
-| TBD-WP003 | BUILD_LEAN_TO_AOS_UPGRADE — roadmap.yaml → AOS DB migration |
-| TBD-WP004 | BUILD_PROJECT_SCAFFOLDING_CLI — new project CLI (L0 + L2) |
+| LEAN-KIT-WP001 | BUILD_LEAN_KIT_REPO — create standalone lean-kit repository *(S003-P017)* |
+| LEAN-KIT-WP002 | BUILD_LEAN_KIT_GENERATOR — SSoT auto-generation script *(S004+)* |
+| LEAN-KIT-WP003 | BUILD_LEAN_TO_AOS_UPGRADE — roadmap.yaml → AOS DB migration *(S004+)* |
+| LEAN-KIT-WP004 | BUILD_PROJECT_SCAFFOLDING_CLI — new project CLI (L0 + L2) *(S004+)* |
+
+> Concept IDs (LEAN-KIT-WP001–WP004). Canonical S-P-WP execution IDs are assigned at program registration each stage.
 
 ---
 
@@ -656,6 +660,6 @@ eligible gates. Architecture and gate model are identical to L2. Changes:
 
 *This document is the authoritative LOD Standard v0.3 RELEASE_CANDIDATE.*
 *Upon Team 00 approval → promoted to v1.0.0 and moved to*
-*`documentation/docs-governance/LOD_STANDARD_v1.0.0.md`*
+*`documentation/docs-governance/01-FOUNDATIONS/LOD_STANDARD_v1.0.0.md`*
 
 **log_entry | TEAM_100 | LOD_STANDARD_v0.3_RELEASE_CANDIDATE | 2026-04-02**

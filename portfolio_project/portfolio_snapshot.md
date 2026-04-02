@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-04-02T09:25:42.568433+00:00`
+- Generated (UTC): `2026-04-02T22:57:55.653290+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -16,7 +16,7 @@
 ## Portfolio Counts
 
 - stages: `6`
-- programs: `40`
+- programs: `41`
 - work_packages: `23`
 
 ## Roadmap (hierarchical)
@@ -99,7 +99,9 @@
     ├── **Program** `S003-P015` — AOS DM-005 SC Verification Run | ACTIVE | domain: **AGENTS_OS**
         └── **WP** `S003-P015-WP001` | IN_PROGRESS | gate: COMPLETE | domain: **AGENTS_OS** (active)
 
-    └── **Program** `S003-P016` — Pipeline Git Isolation — Branch-per-WP + State Consolidation | PLANNED | domain: **SHARED**
+    ├── **Program** `S003-P016` — Pipeline Git Isolation — Branch-per-WP + State Consolidation | PLANNED | domain: **SHARED**
+
+    └── **Program** `S003-P017` — Lean Kit — agents-os repository + methodology portability (LEAN-KIT) | PLANNED | domain: **AGENTS_OS**
 
 
 ### S004 — שלב 4 — Financial Execution | PLANNED [SHARED]

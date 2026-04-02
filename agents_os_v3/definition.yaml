@@ -27,9 +27,10 @@ team_00:
     GATE_0: awareness_only
     GATE_1: awareness_only
     GATE_2: delegated_to_team_100_for_aos__team_00_approval_for_tiktrack
-    GATE_6: delegated_to_team_100_for_aos__team_00_approval_for_tiktrack
-    GATE_7: personal_approval_required__nimrod_browser_signoff__cannot_delegate
-    GATE_8: awareness_only
+    # LEGACY — GATE_6/7/8 not active in 5-gate model (superseded 2026-03-24)
+    GATE_6: delegated_to_team_100_for_aos__team_00_approval_for_tiktrack  # LEGACY
+    GATE_7: personal_approval_required__nimrod_browser_signoff__cannot_delegate  # LEGACY
+    GATE_8: awareness_only  # LEGACY
     ALL: can_override
   writes_to:
     - "_COMMUNICATION/team_00/"
@@ -37,7 +38,7 @@ team_00:
   iron_rules:
     - "No guessing — read the file first"
     - "You are an Architect, not a Development Team"
-    - "GATE_7 requires personal Nimrod approval — never delegate"
+    - "GATE_5 Phase 5.1 human sign-off requires personal Nimrod approval — never delegate (GATE_7 = LEGACY name)"
     - "All Iron Rules are set by Team 00 — no other team can modify them"
     - "Writing authority: team_00/ and _Architects_Decisions/ ONLY"
   mandatory_reads:
@@ -297,7 +298,7 @@ team_60:
     - "_COMMUNICATION/team_60/"
   iron_rules:
     - "Infrastructure changes require Team 00 approval"
-    - "No production deployments without GATE_7 pass"
+    - "No production deployments without GATE_5 pass (GATE_7 = LEGACY name for same checkpoint)"
   mandatory_reads: []
 
 team_61:
@@ -345,7 +346,7 @@ team_70:
     - "documentation/docs-system/"
   iron_rules:
     - "All docs require identity header"
-    - "AS_MADE_REPORT mandatory at GATE_8"
+    - "AS_MADE_REPORT mandatory at GATE_5 Phase 5.1 (GATE_8 = LEGACY name for same checkpoint)"
     - "Do NOT modify SSM/WSM without Team 00 instruction"
     - "TikTrack domain only — AOS documentation routes to team_71"
   mandatory_reads: []
@@ -389,12 +390,14 @@ team_90:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: team_00
-  role_description: "GATE_5–GATE_8 validation, blocking reports, route_recommendation. Validates both TikTrack and AOS domains. Fresh validation every run — never repeat prior findings without full re-execution."
+  role_description: "GATE_5 validation, blocking reports, route_recommendation. Validates both TikTrack and AOS domains. Fresh validation every run — never repeat prior findings without full re-execution. (GATE_6/7/8 = LEGACY aliases, not active pipeline gates.)"
   gate_authority:
     GATE_5: owner
-    GATE_6: validator
-    GATE_7: orchestrator
-    GATE_8: owner
+    # LEGACY — GATE_6/7/8 are not active pipeline gates (superseded 2026-03-24, ARCHITECT_DIRECTIVE_GATE_SEQUENCE_CANON_v1.0.0.md)
+    # Active model: GATE_0–GATE_5 only. GATE_6≈GATE_4 alias, GATE_7/8≈GATE_5 alias.
+    GATE_6: validator  # LEGACY
+    GATE_7: orchestrator  # LEGACY
+    GATE_8: owner  # LEGACY
   writes_to:
     - "_COMMUNICATION/team_90/"
   iron_rules:
@@ -417,14 +420,14 @@ team_100:
   roster_version: "1.6.0"
   created_at: "2026-03-26T00:00:00Z"
   parent_team_id: team_00
-  role_description: "Program-level architecture and synthesis under Principal (Team 00). GATE_2 + GATE_6 owner for AOS domain. Coordinates domain IDE architects team_110 (TikTrack) and team_111 (AOS) and execution teams (team_61, team_51). Covers both TikTrack and AOS domains."
+  role_description: "Program-level architecture and synthesis under Principal (Team 00). GATE_2 owner for AOS domain (GATE_6 = LEGACY alias). Coordinates domain IDE architects team_110 (TikTrack) and team_111 (AOS) and execution teams (team_61, team_51). Covers both TikTrack and AOS domains."
   gate_authority:
     GATE_2: owner_for_aos_domain
-    GATE_6: owner_for_aos_domain
+    GATE_6: owner_for_aos_domain  # LEGACY — not an active gate (superseded 2026-03-24)
   writes_to:
     - "_COMMUNICATION/team_100/"
   iron_rules:
-    - "GATE_6 approval requires explicit evidence review — no rubber-stamping"
+    - "GATE_2 (and post-build review) approval requires explicit evidence review — no rubber-stamping (rule previously referenced GATE_6 = LEGACY)"
     - "route_recommendation mandatory if REJECTED"
     - "LOD400 must be fully specified before issuing to execution teams"
     - "Never issue mandates without Nimrod context or Team 00 strategic alignment"

@@ -1,0 +1,6 @@
+id: scenario_03_gate0_alias
+description: Canonical GATE_0 identity in GATE_ALIASES (no alias to GATE_1)
+expect:
+  alias_check:
+    legacy: GATE_0
+    canonical: GATE_0

@@ -634,9 +634,11 @@ AOS v3 supports two interaction modes (both use the same pipeline, same DB):
 | Interaction mode | Description |
 |-----------------|-------------|
 | **Dashboard** | Human uses web UI to monitor runs, read gate prompts, trigger actions |
-| **CLI** | Human uses `pipeline_run.sh` commands to operate the same pipeline |
+| **Script** | Human uses `pipeline_run.sh` commands to operate the same pipeline |
 
 The distinction is UI only — pipeline logic and enforcement are identical.
+
+> **Naming note:** The "Script" mode uses the `pipeline_run.sh` shell script. The name "CLI" is reserved for the L3 profile ("AOS v4 / CLI") which introduces full CANONICAL_AUTO automation — a distinct concept.
 
 ---
 

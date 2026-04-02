@@ -229,7 +229,6 @@ Making the modes explicit prevents confusion when an agent receives instructions
 | Anti-patterns list revised | Quality rules | **YES** | No | Updates §13 | MEDIUM |
 | Authority matrix revised | Authority rules | **YES** | No | Updates §11 | MEDIUM |
 
-**Authority matrix: unchanged from v0.2.**
 **Cross-engine validation Iron Rule: unchanged but now explicitly applies to ALL profiles.**
 **Versioning policy: unchanged from v0.2.**
 **Gate mapping (LOD200→GATE_1, LOD400→GATE_2, LOD500→GATE_5): unchanged.**

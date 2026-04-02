@@ -230,13 +230,21 @@ Confirm:
 ### Step 5 — Start AOS server
 
 ```bash
-uvicorn agents_os_v3.modules.management.api:app --port 8082 --reload
+bash scripts/start-aos-v3-server.sh
 ```
+
+*(Canonical port: **8090**. `--reload` is prohibited in agent sessions. The script handles venv activation, port conflict detection, and background PID tracking. For foreground mode: `bash scripts/start-aos-v3-server.sh --foreground`.)*
+
+Verify health:
+```bash
+curl -s http://localhost:8090/api/health
+```
+Expected: `{"status":"ok"}`
 
 ### Step 6 — Verify pipeline state
 
 ```bash
-curl http://localhost:8082/api/governance/status
+curl http://localhost:8090/api/governance/status
 ```
 
 Expected response shape:

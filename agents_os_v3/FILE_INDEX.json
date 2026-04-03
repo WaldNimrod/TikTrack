@@ -1,0 +1,1062 @@
+{
+  "version": "1.1.29",
+  "last_updated": "2026-03-27",
+  "entries": [
+    {
+      "path": "agents_os_v3/CLEANUP_REPORT.md",
+      "status": "NEW",
+      "spec_ref": "ARCHITECT_DIRECTIVE_AOS_V3_FILE_INDEX §3.1 + TEAM_11 GATE_5_COORDINATION",
+      "owner_team": "team_61",
+      "added_in_gate": "GATE_5",
+      "notes": "FILE_INDEX-derived queues + infra hygiene snapshot; v2 deletion awaits Team 00"
+    },
+    {
+      "path": "agents_os_v3/.env.example",
+      "status": "NEW",
+      "spec_ref": "WP D.3 Team 61 — DB URL template",
+      "owner_team": "team_61",
+      "added_in_gate": "GATE_0",
+      "notes": "AOS_V3_DATABASE_URL only; isolated from TikTrack api/.env; no secrets committed."
+    },
+    {
+      "path": "agents_os_v3/README.md",
+      "status": "NEW",
+      "spec_ref": "GATE_DOC Phase B — Team 11 mandate; Directive 3B",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_DOC_B",
+      "notes": "Local runbook; aligned with AGENTS.md; no agents_os_v3/docs/"
+    },
+    {
+      "path": "agents_os_v3/requirements-e2e.txt",
+      "status": "NEW",
+      "spec_ref": "TEAM_11 Remediation Phase 3a — browser E2E deps (Selenium)",
+      "owner_team": "team_61",
+      "added_in_gate": "REMEDIATION_P3A",
+      "notes": "pip install -r when running agents_os_v3/tests/e2e/"
+    },
+    {
+      "path": "agents_os_v3/tests/e2e/README.md",
+      "status": "MODIFIED",
+      "spec_ref": "TEAM_11 Remediation Phase 3a — E2E run instructions",
+      "owner_team": "team_61",
+      "added_in_gate": "REMEDIATION_P3A",
+      "notes": "Stack script + pytest env vars; AOS_V3_E2E_UI_MOCK; documents test_e2e_full_ui_survey.py full page/tab checklist (2026-03-28)"
+    },
+    {
+      "path": "agents_os_v3/tests/e2e/conftest.py",
+      "status": "MODIFIED",
+      "spec_ref": "TEAM_11 Remediation Phase 3a/3b — Selenium fixtures",
+      "owner_team": "team_61",
+      "added_in_gate": "REMEDIATION_P3A",
+      "notes": "browser_driver; default base 8090/v3/index.html; _e2e_ui_dir_from_base_page(); legacy 8778 via AOS_V3_E2E_BASE_URL (Team 51 Phase 3b; aligned tasks/scripts 2026-03-28)"
+    },
+    {
+      "path": "agents_os_v3/tests/e2e/test_phase3b_browser_scenarios.py",
+      "status": "NEW",
+      "spec_ref": "TEAM_11 → Team 51 REMEDIATION_PHASE3_BROWSER_E2E_MANDATE v1.0.0 §7.3",
+      "owner_team": "team_51",
+      "added_in_gate": "REMEDIATION_P3B",
+      "notes": "Selenium 3.1–3.6; 3_6 System Map asserts hash #gates after subnav (headless-safe; 2026-03-28)"
+    },
+    {
+      "path": "agents_os_v3/tests/e2e/test_e2e_full_ui_survey.py",
+      "status": "MODIFIED",
+      "spec_ref": "AOS v3 UI — full page/tab survey + Type A/B domain controls",
+      "owner_team": "team_51",
+      "added_in_gate": "REMEDIATION_P3B",
+      "notes": "Type B excludes config.html; test_e2e_config_page_solo_main_no_domain_scope (2026-03-28)"
+    },
+    {
+      "path": "agents_os_v3/tests/e2e/test_smoke_index.py",
+      "status": "NEW",
+      "spec_ref": "TEAM_11 Remediation Phase 3a — smoke load index.html",
+      "owner_team": "team_61",
+      "added_in_gate": "REMEDIATION_P3A",
+      "notes": "Requires AOS_V3_E2E_RUN=1; Team 51 extends scenarios"
+    },
+    {
+      "path": "agents_os_v3/tests/canary_simulation/README.md",
+      "status": "NEW",
+      "spec_ref": "TEAM_11 Remediation Phase 5 — F-05 canary contract",
+      "owner_team": "team_61",
+      "added_in_gate": "REMEDIATION_P5",
+      "notes": "M1/M2/M3 pointer; paired with Team 51 completion"
+    },
+    {
+      "path": "agents_os_v3/tests/canary_simulation/conftest.py",
+      "status": "NEW",
+      "spec_ref": "TEAM_11 Remediation Phase 5 — canary fixtures + marker",
+      "owner_team": "team_61",
+      "added_in_gate": "REMEDIATION_P5",
+      "notes": "api_client; aos_v3_canary_sim marker"
+    },
+    {
+      "path": "agents_os_v3/tests/canary_simulation/test_phase5_canary_pipeline.py",
+      "status": "NEW",
+      "spec_ref": "TEAM_11 Remediation Phase 5 — happy-path canary (C-03)",
+      "owner_team": "team_61",
+      "added_in_gate": "REMEDIATION_P5",
+      "notes": "DB pipeline E2E via TestClient; Team 51 may add scenarios"
+    },
+    {
+      "path": "agents_os_v3/cli/__init__.py",
+      "status": "NEW",
+      "spec_ref": "WP D.1 — cli/",
+      "owner_team": "team_61",
+      "added_in_gate": "GATE_0",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/cli/pipeline_run.py",
+      "status": "NEW",
+      "spec_ref": "WP D.3 item 7 — v3 CLI",
+      "owner_team": "team_61",
+      "added_in_gate": "GATE_0",
+      "notes": "GATE_0 stub; expanded GATE_4."
+    },
+    {
+      "path": "agents_os_v3/cli/pipeline_run.sh",
+      "status": "NEW",
+      "spec_ref": "IR-1 — agents_os_v3/cli/pipeline_run.sh",
+      "owner_team": "team_61",
+      "added_in_gate": "GATE_0",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/db/migrations/001_aos_v3_fresh_schema_v1.0.2.sql",
+      "status": "NEW",
+      "spec_ref": "TEAM_111_AOS_V3_DDL_SPEC_v1.0.1 + WP D.5 v1.0.3",
+      "owner_team": "team_111",
+      "added_in_gate": "GATE_0",
+      "notes": "Complete schema: empty → v1.0.2. Apply first on fresh DB. Team 61 applies."
+    },
+    {
+      "path": "agents_os_v3/db/migrations/002_aos_v3_delta_v1.0.1_to_v1.0.2.sql",
+      "status": "NEW",
+      "spec_ref": "TEAM_111_AOS_V3_DDL_SPEC_v1.0.1 + WP D.5 v1.0.3",
+      "owner_team": "team_111",
+      "added_in_gate": "GATE_0",
+      "notes": "Delta migration: v1.0.1 → v1.0.2. Pre-flight data checks required before FK backfill. Team 61 applies."
+    },
+    {
+      "path": "agents_os_v3/db/migrations/002_add_stage_program_to_work_packages.sql",
+      "status": "NEW",
+      "spec_ref": "WP work_packages stage/program columns",
+      "owner_team": "team_61",
+      "added_in_gate": "GATE_0",
+      "notes": "Additive migration for stage_id / program_id on work_packages when applied out-of-band from numbered delta."
+    },
+    {
+      "path": "agents_os_v3/db/run_migration.py",
+      "status": "NEW",
+      "spec_ref": "Team 61 — migration apply helper (psycopg2)",
+      "owner_team": "team_61",
+      "added_in_gate": "GATE_0",
+      "notes": "--fresh | --delta; optional --create-db"
+    },
+    {
+      "path": "agents_os_v3/db/ensure_local_postgres_for_aos.py",
+      "status": "NEW",
+      "spec_ref": "Team 61 — Docker localhost auto-provision role+DB",
+      "owner_team": "team_61",
+      "added_in_gate": "GATE_0",
+      "notes": "Called by scripts/init_aos_v3_database.sh; AOS_V3_DATABASE_URL + optional AOS_V3_DOCKER_PG_CONTAINER"
+    },
+    {
+      "path": "agents_os_v3/definition.yaml",
+      "status": "MODIFIED",
+      "spec_ref": "DDL Spec §3 + Entity Dictionary v2.0.2 + UC-01 routing seed",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_0",
+      "notes": "Full team_* roster seed (21 teams); parent_team_id per TEAMS_ROSTER; API derives children; routing/WP/ideas unchanged (2026-03-28)"
+    },
+    {
+      "path": "agents_os_v3/pipeline_state.json",
+      "status": "MODIFIED",
+      "spec_ref": "Team 191 backup mandate S003-P005-WP001 — pipeline snapshot on aos-v3",
+      "owner_team": "team_11",
+      "added_in_gate": "GATE_0",
+      "notes": "Runtime state JSON; mandated for backup commit; excluded from some hygiene scripts elsewhere"
+    },
+    {
+      "path": "agents_os_v3/modules/__init__.py",
+      "status": "NEW",
+      "spec_ref": "WP D.1 — modules/",
+      "owner_team": "team_61",
+      "added_in_gate": "GATE_0",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/modules/definitions/__init__.py",
+      "status": "NEW",
+      "spec_ref": "Process Map §10 Layer 0",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_1",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/modules/definitions/constants.py",
+      "status": "MODIFIED",
+      "spec_ref": "State Machine v1.0.2 + UC-08 snapshot schema",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_1",
+      "notes": "GATE_2: TRANS_* + IDEA_STATUS_AUTHORITY_ROLE_ID"
+    },
+    {
+      "path": "agents_os_v3/modules/definitions/models.py",
+      "status": "MODIFIED",
+      "spec_ref": "WP D.6 GATE_1 bodies; advance uses summary",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_1",
+      "notes": "GATE_2: no actor in bodies; ideas + admin models; GATE_3: AdvanceRunBody.feedback_json, FeedbackIngestBody GATE_4: IdeaCreateBody.idea_type + ALLOWED_IDEA_TYPES. Remediation P1: PrincipalOverrideBody, PolicyUpdateBody."
+    },
+    {
+      "path": "agents_os_v3/modules/definitions/queries.py",
+      "status": "NEW",
+      "spec_ref": "Layer 0 placeholder",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_1",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/modules/governance/__init__.py",
+      "status": "NEW",
+      "spec_ref": "Team 100 Note 3 — Process Map §10",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_1",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/modules/governance/archive.py",
+      "status": "NEW",
+      "spec_ref": "wp_artifact_index archive transitions; GATE_5",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_1",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/modules/governance/artifact_index.py",
+      "status": "NEW",
+      "spec_ref": "wp_artifact_index CRUD",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_1",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/modules/management/__init__.py",
+      "status": "NEW",
+      "spec_ref": "WP D.1 — modules/management/",
+      "owner_team": "team_61",
+      "added_in_gate": "GATE_0",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/modules/management/api.py",
+      "status": "MODIFIED",
+      "spec_ref": "WP D.6 — GATE_1 run lifecycle on business_router",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_0",
+      "notes": "GATE_2: X-Actor-Team-Id, portfolio 8A, admin, GET prompt; GATE_3: SSE stream, GET /state /history, POST feedback + clear, lifespan SSE init; GATE_4: PUT /teams/{id}/engine, CORS UI ports, GET /templates list GATE_4: GET /runs current_gate_id query; POST /ideas idea_type. Remediation P1: POST /runs/{id}/override, GET /teams/{id}, DELETE /routing-rules/{id}, PUT /policies/{id}. 2026-03-28: GET / serves index.html (address bar /); `<base href=/v3/>` in v3 HTML; StaticFiles /v3 + /agents_os/ui; CORS +8092; port policy SSOT AGENTS_OS_V3_NETWORK_PORTS_AND_UI_ENTRY_v1.0.0.md."
+    },
+    {
+      "path": "agents_os_v3/modules/management/db.py",
+      "status": "NEW",
+      "spec_ref": "AOS_V3_DATABASE_URL connection helper",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_1",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/requirements.txt",
+      "status": "MODIFIED",
+      "spec_ref": "WP D.3 — API + seed dependencies",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_0",
+      "notes": "GATE_1: python-ulid, jsonschema; GATE_1 QA: pytest"
+    },
+    {
+      "path": "agents_os_v3/seed.py",
+      "status": "MODIFIED",
+      "spec_ref": "WP D.3 + GATE_1 routing_rules + work_packages",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_0",
+      "notes": "Upserts all definition.yaml team_* keys (sorted); idempotent (2026-03-28)"
+    },
+    {
+      "path": "agents_os_v3/tests/__init__.py",
+      "status": "NEW",
+      "spec_ref": "Process Map §5 §11 — pytest package",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_1",
+      "notes": "TEAM_11_TO_TEAM_21_AOS_V3_GATE_1_QA_BLOCK_REMEDIATION_MANDATE_v1.0.0"
+    },
+    {
+      "path": "agents_os_v3/tests/test_layer0_definitions.py",
+      "status": "NEW",
+      "spec_ref": "Layer 0 unit tests",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_1",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/tests/test_layer1_governance.py",
+      "status": "NEW",
+      "spec_ref": "Layer 1 governance.artifact_index (mocked)",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_1",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/tests/test_layer1_repository.py",
+      "status": "MODIFIED",
+      "spec_ref": "Layer 1 audit.compute_event_hash",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_1",
+      "notes": "GATE_2: Event Obs §3.1 canonical hash tests"
+    },
+    {
+      "path": "agents_os_v3/tests/test_layer1_state_errors.py",
+      "status": "NEW",
+      "spec_ref": "Layer 1 StateMachineError",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_1",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/tests/conftest.py",
+      "status": "MODIFIED",
+      "spec_ref": "Process Map §6 — Team 51 GATE_2 pytest fixtures",
+      "owner_team": "team_51",
+      "added_in_gate": "GATE_2",
+      "notes": "AOS_V3_DATABASE_URL from agents_os_v3/.env; aos_db_conn; pytest marker aos_v3_phase5_canary (Remediation P5)"
+    },
+    {
+      "path": "agents_os_v3/tests/gate2_db_helpers.py",
+      "status": "NEW",
+      "spec_ref": "Process Map §6 — DB helpers for integration/HTTP tests",
+      "owner_team": "team_51",
+      "added_in_gate": "GATE_2",
+      "notes": "Temp work_packages + purge for isolated machine tests"
+    },
+    {
+      "path": "agents_os_v3/tests/test_api_gate2_http.py",
+      "status": "MODIFIED",
+      "spec_ref": "Team 11 GATE_2 QA handoff — HTTP / portfolio / admin / ideas / prompt",
+      "owner_team": "team_51",
+      "added_in_gate": "GATE_2",
+      "notes": "Root index: accept base href ./ or /v3/ (Team 11 UI alignment 2026-03-29)"
+    },
+    {
+      "path": "agents_os_v3/tests/test_integration_gate2.py",
+      "status": "NEW",
+      "spec_ref": "Process Map §6 — four cross-module checks",
+      "owner_team": "team_51",
+      "added_in_gate": "GATE_2",
+      "notes": "routing→builder, machine+ledger rollback, authority, sentinel"
+    },
+    {
+      "path": "agents_os_v3/tests/test_layer2_prompting_builder.py",
+      "status": "NEW",
+      "spec_ref": "Process Map §6 — Layer 2B builder",
+      "owner_team": "team_51",
+      "added_in_gate": "GATE_2",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/tests/test_layer2_prompting_cache.py",
+      "status": "NEW",
+      "spec_ref": "Process Map §6 — Layer 2A cache (AD-S6-01)",
+      "owner_team": "team_51",
+      "added_in_gate": "GATE_2",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/tests/test_layer2_prompting_templates.py",
+      "status": "NEW",
+      "spec_ref": "Process Map §6 — Layer 2A templates",
+      "owner_team": "team_51",
+      "added_in_gate": "GATE_2",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/tests/test_layer2_routing_resolver.py",
+      "status": "NEW",
+      "spec_ref": "Process Map §6 — Layer 2A routing/resolver",
+      "owner_team": "team_51",
+      "added_in_gate": "GATE_2",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/tests/test_layer2_state_machine.py",
+      "status": "NEW",
+      "spec_ref": "Process Map §6 — Layer 2B machine surfaces",
+      "owner_team": "team_51",
+      "added_in_gate": "GATE_2",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/tests/test_gate3_fip.py",
+      "status": "NEW",
+      "spec_ref": "UI §12.1 FIP IL-1/2/3 + Event registry + AdvanceRunBody.feedback_json",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_3",
+      "notes": "Unit tests; TC-15–TC-18 with DB → Team 51"
+    },
+    {
+      "path": "agents_os_v3/tests/test_gate3_tc15_21_api.py",
+      "status": "NEW",
+      "spec_ref": "UI Spec Amendment v1.1.1 §17 TC-15–TC-21 + Team 11 GATE_3 QA handoff",
+      "owner_team": "team_51",
+      "added_in_gate": "GATE_3",
+      "notes": "HTTP+Postgres integration; per-request DB via TestClient; TC-21 Uvicorn loopback + curl -N for SSE (httpx stream unreliable)"
+    },
+    {
+      "path": "agents_os_v3/tests/test_remediation_phase1_api.py",
+      "status": "NEW",
+      "spec_ref": "Team 11 → Team 21 AOS_V3_REMEDIATION_PHASE1_API_GAPS_MANDATE v1.0.1",
+      "owner_team": "team_21",
+      "added_in_gate": "REMEDIATION_P1",
+      "notes": "Smoke: GET /teams/{id}, override ACTOR_MISMATCH/INSUFFICIENT_AUTHORITY, DELETE routing-rules + PUT policies 403 for non–team_00"
+    },
+    {
+      "path": "agents_os_v3/tests/tc_module_map_helpers.py",
+      "status": "NEW",
+      "spec_ref": "Team 11 → Team 51 REMEDIATION_PHASE2_TC_TRACEABILITY_MANDATE v1.0.0",
+      "owner_team": "team_51",
+      "added_in_gate": "REMEDIATION_P2",
+      "notes": "Shared pytest helpers: linear routing seed, feedback/advance/clear loop, AD-S7-01 + sentinel assertions, synthetic history rows"
+    },
+    {
+      "path": "agents_os_v3/tests/test_tc01_14_module_map_integration.py",
+      "status": "NEW",
+      "spec_ref": "Module Map Integration Spec v1.0.1 §7 TC-01..TC-14 + Process Map D.3",
+      "owner_team": "team_51",
+      "added_in_gate": "REMEDIATION_P2",
+      "notes": "Explicit test_tc01_*..test_tc14_* HTTP+DB traceability (F-04 closure)"
+    },
+    {
+      "path": "agents_os_v3/tests/test_remediation_phase2_api_contracts.py",
+      "status": "NEW",
+      "spec_ref": "Team 11 → Team 51 REMEDIATION_PHASE2_QA_HANDOFF v1.0.0 (2.2)",
+      "owner_team": "team_51",
+      "added_in_gate": "REMEDIATION_P2",
+      "notes": "Contract matrix: override (FORCE_PASS/PAUSE/RESUME/FAIL/terminal), GET /teams/{id} fields, DELETE routing-rules, PUT /policies — Option B paths"
+    },
+    {
+      "path": "agents_os_v3/tests/test_remediation_phase5_canary_simulation.py",
+      "status": "NEW",
+      "spec_ref": "TEAM_11_TO_TEAM_51_AOS_V3_REMEDIATION_PHASE5_CANARY_SIM_MANDATE v1.0.0 (M2/M3)",
+      "owner_team": "team_51",
+      "added_in_gate": "REMEDIATION_P5",
+      "notes": "Five pipeline steps on one run: initiate → advance (GATE_0 0.1→0.2) → pause → resume → advance to GATE_1; isolated domain+wp (ULID); complements canary_simulation/ happy path"
+    },
+    {
+      "path": "agents_os_v3/modules/state/__init__.py",
+      "status": "NEW",
+      "spec_ref": "Process Map §10 — state package",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_1",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/modules/state/errors.py",
+      "status": "NEW",
+      "spec_ref": "UC catalog HTTP error mapping",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_1",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/modules/state/machine.py",
+      "status": "MODIFIED",
+      "spec_ref": "State Machine v1.0.2 T01–T12 + IR-8 transactions",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_1",
+      "notes": "GATE_2: audit.append_event; execute_transition; GATE_3: feedback_json pre-ingest on advance; notify_after_run_mutation (SSE post-commit). Remediation P1: principal_override_run (UC-12 PRINCIPAL_OVERRIDE only)."
+    },
+    {
+      "path": "agents_os_v3/modules/state/repository.py",
+      "status": "MODIFIED",
+      "spec_ref": "DDL v1.0.2 persistence",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_1",
+      "notes": "GATE_2: fetch_latest_event; has_active_assignment_for_role; GATE_3: pending_feedbacks CRUD helpers; count_events_filtered. REMEDIATION_P2: update_run_position allows explicit NULL for paused_at / paused_routing_snapshot_json (resume clears pause fields; chk_runs_paused_consistency)."
+    },
+    {
+      "path": "agents_os_v3/governance/team_00.md",
+      "status": "NEW",
+      "spec_ref": "Team 00 Q2 — L2 governance files",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_2",
+      "notes": "Prompt builder L2"
+    },
+    {
+      "path": "agents_os_v3/governance/team_10.md",
+      "status": "NEW",
+      "spec_ref": "Team 00 Q2 — L2 governance files",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_2",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/governance/team_11.md",
+      "status": "NEW",
+      "spec_ref": "Team 00 Q2 — L2 governance files",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_2",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/modules/audit/__init__.py",
+      "status": "NEW",
+      "spec_ref": "Event Obs §3.1 + AD-S7-01",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_2",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/modules/audit/ledger.py",
+      "status": "NEW",
+      "spec_ref": "Event Obs §3.1 append_event + canonical event_hash",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_2",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/modules/audit/ingestion.py",
+      "status": "NEW",
+      "spec_ref": "UI Spec Amendment v1.1.1 §2 / §12.1 FIP (IL-1/2/3, four detection modes)",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_3",
+      "notes": "FeedbackIngestor, IngestSource, Mode B path glob"
+    },
+    {
+      "path": "agents_os_v3/modules/audit/sse.py",
+      "status": "NEW",
+      "spec_ref": "UI Spec Amendment v1.1.1 §10.4 SSE + AD-S8B-10 post-commit hooks",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_3",
+      "notes": "SSEBroadcaster, heartbeat task, notify_* from sync via run_coroutine_threadsafe"
+    },
+    {
+      "path": "agents_os_v3/modules/definitions/event_registry.py",
+      "status": "NEW",
+      "spec_ref": "Event Observability Spec v1.0.3 §1 VALID_EVENT_TYPES",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_3",
+      "notes": "History INVALID_EVENT_TYPE validation"
+    },
+    {
+      "path": "agents_os_v3/modules/policy/__init__.py",
+      "status": "NEW",
+      "spec_ref": "WP D.4 policy module",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_2",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/modules/policy/settings.py",
+      "status": "MODIFIED",
+      "spec_ref": "policies table read",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_2",
+      "notes": "Remediation P1: update_policy_by_id (PUT /policies/{id})."
+    },
+    {
+      "path": "agents_os_v3/modules/routing/__init__.py",
+      "status": "NEW",
+      "spec_ref": "ROUTING_SPEC v1.0.1",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_2",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/modules/routing/resolver.py",
+      "status": "NEW",
+      "spec_ref": "ROUTING_SPEC v1.0.1 resolve_actor slice",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_2",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/modules/prompting/__init__.py",
+      "status": "NEW",
+      "spec_ref": "Prompt Arch Spec",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_2",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/modules/prompting/templates.py",
+      "status": "NEW",
+      "spec_ref": "templates table active slot",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_2",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/modules/prompting/cache.py",
+      "status": "NEW",
+      "spec_ref": "AD-S6-01 L2/L4 cache",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_2",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/modules/prompting/builder.py",
+      "status": "NEW",
+      "spec_ref": "GET /api/runs/{id}/prompt assembly",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_2",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/modules/management/authority.py",
+      "status": "NEW",
+      "spec_ref": "Team 00 Q3 X-Actor-Team-Id BUILD stub",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_2",
+      "notes": "TODO AUTH_STUB"
+    },
+    {
+      "path": "agents_os_v3/modules/management/use_cases.py",
+      "status": "NEW",
+      "spec_ref": "UC Catalog v1.0.4 + execute_transition only",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_2",
+      "notes": "GATE_3: UC-13 state+handoff, UC-14 history wrapper, UC-15/16 FIP, uc_02 feedback_json. Remediation P1: uc_12_principal_override."
+    },
+    {
+      "path": "agents_os_v3/modules/management/portfolio.py",
+      "status": "MODIFIED",
+      "spec_ref": "UI Spec Amendment v1.0.3 Stage 8A",
+      "owner_team": "team_21",
+      "added_in_gate": "GATE_2",
+      "notes": "_def_team_meta: all team_* YAML, children from parent_team_id; runs/WP/ideas list joins domains slug + run WP label/program; list_ideas i. alias WHERE fix (2026-03-28)"
+    },
+    {
+      "path": "agents_os_v3/ui/api-client.js",
+      "status": "NEW",
+      "spec_ref": "GATE_4 live UI — IR-3",
+      "owner_team": "team_31",
+      "added_in_gate": "GATE_4",
+      "notes": "API base URL + X-Actor-Team-Id + apiJson / EventSource URL builder; loaded before app.js on all six pages."
+    },
+    {
+      "path": "agents_os_v3/ui/app.js",
+      "status": "MODIFIED",
+      "spec_ref": "§6",
+      "owner_team": "team_31",
+      "added_in_gate": "pre-BUILD",
+      "notes": "Portfolio domain_slug scope + WP/program columns + thead sort; history/config sortable tables; matchesUiDataScope(slug); ULID domain labels; live run WP hints from SQL join (2026-03-28)"
+    },
+    {
+      "path": "agents_os_v3/ui/config.html",
+      "status": "MODIFIED",
+      "spec_ref": "§6.3",
+      "owner_team": "team_31",
+      "added_in_gate": "pre-BUILD",
+      "notes": "Solo main aosv3-config-main--solo; sortable routing/policies tables; no sidebar scope (2026-03-28)"
+    },
+    {
+      "path": "agents_os_v3/ui/flow.html",
+      "status": "MODIFIED",
+      "spec_ref": "TEAM_111_AOS_V3_DDL_SPEC_v1.0.2 + pipeline_flow.html (verbatim diagrams)",
+      "owner_team": "team_31",
+      "added_in_gate": "GATE_4",
+      "notes": "System Map: api-client + SSE status chip (live); Mermaid SSOT unchanged; domain switch reload preserved. base href ./ (2026-03-27)."
+    },
+    {
+      "path": "agents_os_v3/ui/history.html",
+      "status": "MODIFIED",
+      "spec_ref": "§6.2",
+      "owner_team": "team_31",
+      "added_in_gate": "pre-BUILD",
+      "notes": "Run overview in sidebar; sortable event table aosv3-history-table (2026-03-28)"
+    },
+    {
+      "path": "agents_os_v3/ui/index.html",
+      "status": "MODIFIED",
+      "spec_ref": "§6.1",
+      "owner_team": "team_31",
+      "added_in_gate": "pre-BUILD",
+      "notes": "base href ./ (2026-03-27)"
+    },
+    {
+      "path": "agents_os_v3/ui/portfolio.html",
+      "status": "MODIFIED",
+      "spec_ref": "§6.5",
+      "owner_team": "team_31",
+      "added_in_gate": "pre-BUILD",
+      "notes": "Gate filter in sidebar; sortable portfolio tables; WP/program/domain columns; base href ./ (2026-03-28)"
+    },
+    {
+      "path": "agents_os_v3/ui/pipeline_flow.html",
+      "status": "MODIFIED",
+      "spec_ref": "GATE_3 pipeline / FIP diagram (reference UI)",
+      "owner_team": "team_31",
+      "added_in_gate": "GATE_3",
+      "notes": "Mermaid flow; governance index registration. base href ./ (2026-03-27)."
+    },
+    {
+      "path": "agents_os_v3/ui/run_preflight.sh",
+      "status": "MODIFIED",
+      "spec_ref": "AOS v3 UI tooling",
+      "owner_team": "team_61",
+      "added_in_gate": "PRE_BUILD",
+      "notes": "GATE_4: optional AOS_V3_API_BASE → curl /api/health"
+    },
+    {
+      "path": "agents_os_v3/ui/scripts/README_GATE3_MATRIX.md",
+      "status": "NEW",
+      "spec_ref": "AOS v3 UI tooling",
+      "owner_team": "team_61",
+      "added_in_gate": "PRE_BUILD",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/ui/scripts/capture_gate3_matrix.mjs",
+      "status": "NEW",
+      "spec_ref": "AOS v3 UI tooling",
+      "owner_team": "team_61",
+      "added_in_gate": "PRE_BUILD",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/ui/scripts/capture_ui_review_screenshots.mjs",
+      "status": "NEW",
+      "spec_ref": "Team 31 — UI review screenshots (Playwright)",
+      "owner_team": "team_31",
+      "added_in_gate": "POST_BUILD",
+      "notes": "Six pages ?mock=1 fullPage PNG → _COMMUNICATION/team_31/evidence/ui_review_screenshots/; optional AOSV3_SCREENSHOT_BASE; temp python http.server from repo root (2026-03-27)"
+    },
+    {
+      "path": "agents_os_v3/ui/scripts/verify_table_header_contract.mjs",
+      "status": "NEW",
+      "spec_ref": "Team 31 — table thead vs render contract (static)",
+      "owner_team": "team_31",
+      "added_in_gate": "POST_BUILD",
+      "notes": "Node: portfolio <th> counts + app.js markers; npm run verify:table-contracts from ui/scripts"
+    },
+    {
+      "path": "agents_os_v3/ui/scripts/package-lock.json",
+      "status": "NEW",
+      "spec_ref": "AOS v3 UI tooling",
+      "owner_team": "team_61",
+      "added_in_gate": "PRE_BUILD",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/ui/scripts/package.json",
+      "status": "MODIFIED",
+      "spec_ref": "AOS v3 UI tooling",
+      "owner_team": "team_61",
+      "added_in_gate": "PRE_BUILD",
+      "notes": "script verify:table-contracts → verify_table_header_contract.mjs"
+    },
+    {
+      "path": "agents_os_v3/ui/style.css",
+      "status": "MODIFIED",
+      "spec_ref": "§6",
+      "owner_team": "team_31",
+      "added_in_gate": "pre-BUILD",
+      "notes": "aosv3-table: sticky th, min-width wrap, border-separate; aosv3-table-actions-inner flex (2026-03-27)"
+    },
+    {
+      "path": "agents_os_v3/ui/teams.html",
+      "status": "MODIFIED",
+      "spec_ref": "§6.4",
+      "owner_team": "team_31",
+      "added_in_gate": "pre-BUILD",
+      "notes": "base href ./ (2026-03-27)"
+    },
+    {
+      "path": "agents_os_v3/ui/theme-init.js",
+      "status": "NEW",
+      "spec_ref": "AOS v3 UI",
+      "owner_team": "team_61",
+      "added_in_gate": "PRE_BUILD",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/__init__.py",
+      "status": "NEW",
+      "spec_ref": "WP D.1 — package root",
+      "owner_team": "team_61",
+      "added_in_gate": "GATE_0",
+      "notes": ""
+    },
+    {
+      "path": "agents_os_v3/tests/test_gate4_tc19_26_api.py",
+      "status": "NEW",
+      "spec_ref": "UI §17 TC-19..TC-26 + Team 11 GATE_4 QA handoff",
+      "owner_team": "team_51",
+      "added_in_gate": "GATE_4",
+      "notes": "HTTP+DB TC-22..TC-26; TC-19..TC-21 remain in test_gate3_tc15_21_api.py"
+    },
+    {
+      "path": "agents_os_v3/tests/test_gate4_ui_mock_regression.py",
+      "status": "NEW",
+      "spec_ref": "GATE_4 handoff — mock query/meta regression",
+      "owner_team": "team_51",
+      "added_in_gate": "GATE_4",
+      "notes": "Static asserts on app.js mock toggles"
+    },
+    {
+      "path": "agents_os_v3/tests/canary_gate4.sh",
+      "status": "NEW",
+      "spec_ref": "GATE_4 canary — shell driver",
+      "owner_team": "team_51",
+      "added_in_gate": "GATE_4",
+      "notes": "Team 191 FILE_INDEX sync — governance check"
+    },
+    {
+      "path": "agents_os_v3/tests/test_gate4_canary_smoke.py",
+      "status": "NEW",
+      "spec_ref": "GATE_4 canary smoke tests",
+      "owner_team": "team_51",
+      "added_in_gate": "GATE_4",
+      "notes": "Team 191 FILE_INDEX sync — governance check"
+    },
+    {
+      "path": "agents_os_v3/tests/test_update_aos_v3_file_index.py",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/db/migrations/003_add_team_context_columns.sql",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/tests/e2e/test_canary_full_pipeline.py",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/tests/e2e/test_canary_full_pipeline.py",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/db/migrations/002_add_failed_run_status.sql",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/tests/test_gate0_entry_quality_gate.py",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/governance/team_190.md",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/db/migrations/002_wp_id_format_migration_v1.0.0.sql",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/governance/team_100.md",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/governance/team_110.md",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/governance/team_111.md",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/governance/team_170.md",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/governance/team_20.md",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/governance/team_30.md",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/governance/team_40.md",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/governance/team_50.md",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/governance/team_51.md",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/governance/team_61.md",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/governance/team_70.md",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/governance/team_71.md",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/governance/team_90.md",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/governance/team_20.md",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/governance/team_30.md",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/governance/team_40.md",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/governance/team_50.md",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/governance/team_51.md",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/governance/team_61.md",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/governance/team_70.md",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/governance/team_71.md",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    },
+    {
+      "path": "agents_os_v3/governance/team_90.md",
+      "status": "NEW",
+      "spec_ref": "AUTO — update manually with spec_ref and owner_team",
+      "owner_team": "team_61",
+      "added_in_gate": "PENDING",
+      "notes": "Auto-added by scripts/update_aos_v3_file_index.py"
+    }
+  ]
+}

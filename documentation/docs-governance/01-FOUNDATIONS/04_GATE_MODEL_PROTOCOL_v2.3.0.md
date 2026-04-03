@@ -58,7 +58,7 @@ Every artifact in the gate flow MUST include the following block (or equivalent 
 | program_id | YES | L2 identifier. |
 | work_package_id | YES | L3 identifier; gate binding. |
 | task_id | When applicable | L4 identifier; else N/A. |
-| gate_id | YES | GATE_0 … GATE_8 only. (Work-plan validation before implementation is inside GATE_3 as sub-stage G3.5; see §6.1.) |
+| gate_id | YES | GATE_0 … GATE_8 only *(**LEGACY span** in historical enum text; **active runtime / validation:** GATE_0–GATE_5 — Team 00, 2026-03-24)*. (Work-plan validation before implementation is inside GATE_3 as sub-stage G3.5; see §6.1.) |
 | track_mode | Conditional | `NORMAL` or `FAST` in runtime contexts where fast-track is used. `gate_id` remains canonical and is not replaced by FAST enums. |
 | phase_owner | YES | Team 10 or as assigned. |
 | required_ssm_version | YES | e.g. 1.0.0. |
@@ -112,9 +112,11 @@ Example: `S001-P001-WP002-T003` = Stage 1, Program 1, Work Package 2, Task 3.
 | GATE_7 | HUMAN_UX_APPROVAL | Team 90 |
 | GATE_8 | DOCUMENTATION_CLOSURE (AS_MADE_LOCK) | Team 90 |
 
-**WSM ownership (deterministic):** Gates 0–2: Team 190 updates WSM. Gates 3–4: Team 10 updates WSM. Gates 5–8: Team 90 updates WSM. Reference: _COMMUNICATION/team_170/WSM_OWNER_MATRIX_GATES_0_8_v1.0.0.md.
+> **LEGACY (2026-03-24):** Rows **GATE_6, GATE_7, GATE_8** above describe **non-pipeline** / historical constructs. **Active runtime pipeline:** GATE_0–GATE_5 only. *(GATE_6 = organizational admin; GATE_7/GATE_8 = historical labels.)*
 
-**Approval authority (Team 100):** At **GATE_2** and **GATE_6**, **Team 100** (Development Architecture Authority) holds architectural approval authority; execution and WSM update remain with Team 190 (GATE_2) and Team 90 (GATE_6) per table above.
+**WSM ownership (deterministic):** Gates 0–2: Team 190 updates WSM. Gates 3–4: Team 10 updates WSM. Gates 5–8: Team 90 updates WSM *(**LEGACY:** “Gates 5–8” includes historical labels; **active** pipeline closure authority ends at **GATE_5**)*. Reference: _COMMUNICATION/team_170/WSM_OWNER_MATRIX_GATES_0_8_v1.0.0.md.
+
+**Approval authority (Team 100):** At **GATE_2** and **GATE_6** *(GATE_6: **LEGACY** reference — not an active pipeline gate)*, **Team 100** (Development Architecture Authority) holds architectural approval authority; execution and WSM update remain with Team 190 (GATE_2) and Team 90 (GATE_6) per table above.
 
 ---
 
@@ -133,6 +135,8 @@ Trigger, Purpose, PASS/FAIL, and constraints per runbook and WSM ownership matri
 **GATE_2:** "האם אנחנו מאשרים לבנות את זה?"
 
 ### 4.3 GATE_6 — Reality gate (locked semantics)
+
+> **LEGACY SECTION —** **GATE_6** is **not** an active pipeline gate (organizational / historical construct; Team 00, 2026-03-24).
 
 **GATE_6** = בדיקה אדריכלית של **מה שנבנה בפועל**. לאחר ביצוע, חבילת Execution חוזרת ל-Team 100 לאישור. **שער מציאות** — האדריכל מאמת ש**מה שנבנה תואם את הכוונה שאושרה ב-GATE_2**.
 
@@ -160,6 +164,8 @@ Trigger, Purpose, PASS/FAIL, and constraints per runbook and WSM ownership matri
 
 ## 5. GATE_8 — DOCUMENTATION_CLOSURE (AS_MADE_LOCK)
 
+> **LEGACY SECTION —** **GATE_8** is **not** an active pipeline gate (historical documentation-closure label; active closure: **GATE_5**).
+
 | Field | Value |
 |-------|--------|
 | Owner | Team 90 |
@@ -183,7 +189,7 @@ Trigger, Purpose, PASS/FAIL, and constraints per runbook and WSM ownership matri
 
 ### 6.1 GATE_3 internal sub-stages and Team 90 validation (deterministic)
 
-GATE_3 has a canonical internal sub-stage sequence **G3.1..G3.9**. Work-plan validation with Team 90 is **G3.5 (WORK_PACKAGE_VALIDATION_WITH_TEAM_90)**. Only after G3.5 PASS may Team 10 proceed to G3.6 (TEAM_ACTIVATION_MANDATES). Full sequence: _COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION_v1.0.0.md. **GATE_6 rejection routing:** DOC_ONLY_LOOP / CODE_CHANGE_REQUIRED / escalation to Team 00 per _COMMUNICATION/team_170/GATE_6_REJECTION_ROUTE_PROTOCOL_v1.0.0.md.
+GATE_3 has a canonical internal sub-stage sequence **G3.1..G3.9**. Work-plan validation with Team 90 is **G3.5 (WORK_PACKAGE_VALIDATION_WITH_TEAM_90)**. Only after G3.5 PASS may Team 10 proceed to G3.6 (TEAM_ACTIVATION_MANDATES). Full sequence: _COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION_v1.0.0.md. **LEGACY — GATE_6 rejection routing** *(historical; GATE_6 not an active pipeline gate):* DOC_ONLY_LOOP / CODE_CHANGE_REQUIRED / escalation to Team 00 per _COMMUNICATION/team_170/GATE_6_REJECTION_ROUTE_PROTOCOL_v1.0.0.md.
 
 ### 6.2 Context Boundary Rule (Drift Prevention)
 
@@ -195,7 +201,7 @@ Any architectural discussion involving one of the following events **MUST** incl
 - Domain change (TikTrack ↔ Agents_OS)
 - SSM version change
 - WSM structural change
-- Post-GATE_8 stage closure
+- Post-GATE_8 stage closure *(**LEGACY** label; active model: post-**GATE_5** / stage closure)*
 - Any new architectural decision outside an existing active Work Package
 
 **Mandatory injection artifacts:**
@@ -215,7 +221,7 @@ If missing, Team 100 MUST halt discussion and request completion.
 
 Fast-track is a runtime execution overlay; it does not redefine the gate enum.
 
-1. `gate_id` stays canonical (`GATE_0..GATE_8`).
+1. `gate_id` stays canonical (`GATE_0..GATE_8`) *(**LEGACY enum span** in historical text; **active** overlay references `GATE_0..GATE_5`)*.
 2. Fast-track status is represented by `track_mode` (`NORMAL` / `FAST`) in WSM/runtime context.
 3. Domain application:
   - `TIKTRACK`: optional activation path.
@@ -234,10 +240,10 @@ Fast-track is a runtime execution overlay; it does not redefine the gate enum.
 
 Operational detail and artifact contracts are referenced canonically:
 
-- **Execution runbook (GATE_3..GATE_8 operations from Team 10 gateway perspective):** `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md`
+- **Execution runbook (GATE_3..GATE_8 operations from Team 10 gateway perspective)** *(**LEGACY** gate span; **active:** GATE_3..GATE_5 in runtime):** `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md`
 - **Fast-track overlay (domain-aware; AGENTS_OS default):** `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.2.0.md`
 - **Spec lifecycle contract (GATE_0..GATE_2):** `documentation/docs-governance/05-CONTRACTS/GATE_0_1_2_SPEC_LIFECYCLE_CONTRACT_v1.1.0.md`
-- **Human UX approval contract (GATE_7):** `documentation/docs-governance/05-CONTRACTS/GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.1.0.md`
+- **Human UX approval contract (GATE_7)** *(**LEGACY** — GATE_7 not an active pipeline gate):** `documentation/docs-governance/05-CONTRACTS/GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.1.0.md`
 
 All teams must use these references for deterministic gate execution and artifact naming. No duplicate gate-action tables in other governance docs.
 
@@ -250,3 +256,5 @@ All teams must use these references for deterministic gate execution and artifac
 **log_entry | TEAM_190 | GATE_PROTOCOL_v2.3.0 | FAST_TRACK_OVERLAY_RULE_AND_REFERENCE_ADDED | 2026-02-26**
 **log_entry | TEAM_170 | GATE_MODEL_PROTOCOL_v2.3.0 | DOMAIN_MATCH_ENFORCEMENT_ADDED_TO_SEC_2_3 | ARCHITECT_DIRECTIVE_DUAL_DOMAIN_GOVERNANCE_v1.0.0 | 2026-03-10**
 **log_entry | TEAM_190 | GATE_PROTOCOL_v2.3.0 | FAST_TRACK_DOMAIN_AWARE_AND_V1_1_REFERENCE_LOCKED | 2026-03-11**
+
+historical_record: true

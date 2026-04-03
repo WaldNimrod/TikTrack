@@ -9,6 +9,13 @@ authority: ARCHITECT_DECISION_GATE_QUALITY_GOVERNANCE_HARDENING_v1.0.0
 
 ---
 
+> ⚠️ **LEGACY DOCUMENT — DO NOT USE IN NEW WORK**
+> This document references GATE_6, GATE_7, or GATE_8, which are NOT active pipeline gates.
+> Active pipeline: GATE_0 through GATE_5 only (2026-03-24).
+> Preserved for historical reference only.
+
+---
+
 ## 1) Purpose
 
 Define the canonical template and verdict rules for `G6_TRACEABILITY_MATRIX.md`. This artifact is the mandatory evidence for GATE_6 (Traceability Verdict / Reality Gate). Every GATE_2 acceptance criterion must appear as a row. MATCH_ALL or DEVIATION_FOUND verdict.
@@ -49,3 +56,5 @@ Every GATE_2 acceptance criterion (from the architect-approved spec) must appear
 ---
 
 **log_entry | TEAM_170 | G6_TRACEABILITY_MATRIX_CONTRACT | v1.0.0_CREATED | ARCHITECT_DECISION_GATE_QUALITY_GOVERNANCE_HARDENING_v1.0.0 | 2026-03-10**
+
+historical_record: true

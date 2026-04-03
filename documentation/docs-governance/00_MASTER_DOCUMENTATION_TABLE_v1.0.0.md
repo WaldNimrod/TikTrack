@@ -60,7 +60,9 @@
 | TEAM_10_GATE_ACTIONS_RUNBOOK | פעולות Team 10 לכל שער (GATE_3..GATE_8; G3.5 ולידציית תוכנית בתוך GATE_3) — מקור יחיד לפרט תפעולי | `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md` | v1.0.0 |
 | **AGENTS_OS_V2_OPERATING_PROCEDURES** | **נוהל פעיל יחיד** לתזרימת V2 — Pipeline CLI, הוראות לכל צוות, Context injection, MCP; כל האיגנטים משתמשים בזה | `documentation/docs-governance/04-PROCEDURES/AGENTS_OS_V2_OPERATING_PROCEDURES_v1.0.0.md` | v1.0.0 |
 | FAST_TRACK_EXECUTION_PROTOCOL | מסלול מקוצר (AGENTS_OS ברירת מחדל; TIKTRACK אופציונלי): FAST_0..FAST_4, בלעדיות מסלול, track_mode, SLA 48h, ורפרנס מחייב ל־GATE_3; §11 handoff, §12–13 domain precision | `documentation/docs-governance/04-PROCEDURES/FAST_TRACK_EXECUTION_PROTOCOL_v1.2.0.md` | v1.2.0 (active); v1.0.0 superseded historical |
-| TEAM_DEVELOPMENT_ROLE_MAPPING | מיפוי קנוני 20/30/40/50/51/60/61/70/90/100/170/190/191 + אורקסטרציה Team 10; Team 191 = Git Governance Operations child of Team 190 | `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md` | v1.0.0 |
+| TEAM_DEVELOPMENT_ROLE_MAPPING | מיפוי קנוני + Team 110/111 (IDE architects) + Principal/pipeline §3; v1.0.0 superseded | `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.1.md` | v1.0.1 (active); v1.0.0 superseded |
+| PRINCIPAL_AND_TEAM_00_MODEL | D-01…D-14 + Pipeline Fidelity Suite (PFS) — תוספת קנונית | `documentation/docs-governance/01-FOUNDATIONS/PRINCIPAL_AND_TEAM_00_MODEL_v1.0.0.md` | v1.0.0 |
+| TEAM_TAXONOMY | טקסונומיית צוותים (x0/x1, professions); v1.0.0 superseded | `documentation/docs-governance/01-FOUNDATIONS/TEAM_TAXONOMY_v1.0.1.md` | v1.0.1 (active) |
 | TEAM_190_CANONICAL_MESSAGE_FORMAT_LOCK | נעילת פורמט הודעות קנוני — from/to/cc, identity header, log_entry (מסמכים כקבצים) | `_COMMUNICATION/team_190/TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK_v1.0.0.md` | v1.0.0 |
 | PHOENIX_CANONICAL_TEAM_MESSAGE_GUIDE | **פרונט יחיד** — מתי מסמך (קובץ) ומתי פרומט להעתקה (בלוק); מפנה ל־190 lock ול־G36 prompts | `_COMMUNICATION/PHOENIX_CANONICAL_TEAM_MESSAGE_GUIDE_v1.0.0.md` | v1.0.0 |
 
@@ -111,7 +113,7 @@
 
 ## 9. נהלים לפי צוות / תהליך (פעיל + ארכיון)
 
-**הנחיה פעילה לשערים ותפקידי צוות:** `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md`, `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md`.
+**הנחיה פעילה לשערים ותפקידי צוות:** `documentation/docs-governance/04-PROCEDURES/TEAM_10_GATE_ACTIONS_RUNBOOK_v1.0.0.md`, `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.1.md`.
 
 | שם קובץ | מה מגדיר | נתיב מדויק | גרסה |
 |---------|----------|-------------|------|
@@ -148,9 +150,28 @@
 
 ---
 
+## 12. Session 2026-04-02 — Methodology / LOD / Lean Kit (indexed)
+
+| שם קובץ | מה מגדיר | נתיב מדויק | גרסה |
+|---------|----------|-------------|------|
+| ARCHITECT_DIRECTIVE_METHODOLOGY_DEPLOYMENT_SPLIT_v1.0.0 | Iron Rule: הפרדת שכבת מתודולוגיה מפריסה (L0/L2/L3); מודל snapshot ל־Lean Kit | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_METHODOLOGY_DEPLOYMENT_SPLIT_v1.0.0.md` | ACTIVE \| 2026-04-02 |
+| ARCHITECT_DIRECTIVE_AOS_V3_FILE_INDEX_AND_V2_FREEZE_v2.0.0 | אינדקס קבצי AOS v3 והקפאת v2 — גרסה נוכחית | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_AOS_V3_FILE_INDEX_AND_V2_FREEZE_v2.0.0.md` | ACTIVE \| 2026-04-02 |
+| ARCHITECT_DIRECTIVE_AOS_V3_FILE_INDEX_AND_V2_FREEZE_v1.0.0 | גרסה קודמת של אותו directive — **SUPERSEDED** ע״י v2.0.0 | `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_AOS_V3_FILE_INDEX_AND_V2_FREEZE_v1.0.0.md` | SUPERSEDED \| 2026-04-02 |
+| LOD_STANDARD_v1.0.0 | תקן LOD100–500 קנוני (Lean Gate Model, deployment overlays); קידום מ־TEAM_100_LOD_STANDARD_v0.3 | `documentation/docs-governance/01-FOUNDATIONS/LOD_STANDARD_v1.0.0.md` | ACTIVE \| 2026-04-02 |
+| TEAM_100_LOD_STANDARD_v0.3 | מקור עבודה לפני קידום — ראו קנון `LOD_STANDARD_v1.0.0.md` | `_COMMUNICATION/team_100/TEAM_100_LOD_STANDARD_v0.3.md` | RELEASE_CANDIDATE (מקור) \| 2026-04-02 |
+| TEAM_100_LOD_STANDARD_DELTA_v0.2_to_v0.3 | דלתא בין תקן LOD v0.2 ל־v0.3 | `_COMMUNICATION/team_100/TEAM_100_LOD_STANDARD_DELTA_v0.2_to_v0.3.md` | Delta \| 2026-04-02 |
+| PROJECT_CREATION_PROCEDURE_v1.0.0 | נהל יצירת פרויקט — פרופילי L0 (Lean) ו־L2 (AOS v3) | `_COMMUNICATION/team_100/PROJECT_CREATION_PROCEDURE_v1.0.0.md` | ACTIVE \| 2026-04-02 |
+| TEAM_100_SYSTEM_CONTEXT_FOR_EXTERNAL_REVIEW_v1.0.0 | הקשר מערכת לביקורת חיצונית | `_COMMUNICATION/team_100/TEAM_100_SYSTEM_CONTEXT_FOR_EXTERNAL_REVIEW_v1.0.0.md` | Reference \| 2026-04-02 |
+| TEAM_100_TO_TEAM_191_AGENTS_OS_V2_LEGACY_AND_MAIN_MERGE_MANDATE_v1.0.0 | מנדט תפעולי: מיזוג legacy Agents_OS v2 ו־main | `_COMMUNICATION/team_191/TEAM_100_TO_TEAM_191_AGENTS_OS_V2_LEGACY_AND_MAIN_MERGE_MANDATE_v1.0.0.md` | Mandate \| 2026-04-02 |
+
+---
+
 **הערה:** מסמכי 07-DIRECTIVES_AND_DECISIONS (כל ה־ARCHITECT_* mandates) מפורטים ב־GOVERNANCE_PROCEDURES_INDEX; כאן הובאו נציגים. למיפוי מלא — GOVERNANCE_PROCEDURES_SOURCE_MAP.
 
 **log_entry | TEAM_170 | 00_MASTER_DOCUMENTATION_TABLE | DELIVERED | 2026-02-22**
 **log_entry | TEAM_190 | 00_MASTER_DOCUMENTATION_TABLE | FAST_TRACK_PROTOCOL_REFERENCE_ADDED | 2026-02-26**
 **log_entry | TEAM_170 | 00_MASTER_DOCUMENTATION_TABLE | KNOWN_BUGS_PROCEDURE_AND_REGISTER_LINKED | 2026-03-03**
 **log_entry | TEAM_190 | 00_MASTER_DOCUMENTATION_TABLE | POL_015_CANONICAL_POLICY_ENTRY_ADDED | 2026-03-06**
+**log_entry | TEAM_170 | 00_MASTER_DOCUMENTATION_TABLE | SESSION_20260402_INDEXING_D1_D7_AND_LOD_PROMOTION | 2026-04-02**
+
+historical_record: true

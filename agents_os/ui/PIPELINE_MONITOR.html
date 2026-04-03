@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+  (function(){var d=localStorage.getItem("pipeline_domain")||"tiktrack";
+  document.documentElement.classList.toggle("theme-tiktrack",d==="tiktrack");})();
+  </script>
+  <title>Agents OS — Pipeline Live Monitor</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="css/pipeline-shared.css?v=7" />
+  <link rel="stylesheet" href="css/pipeline-monitor.css?v=6" />
+</head>
+<body data-monitor-mode="live">
+
+<header class="agents-header">
+  <div class="agents-header-left">
+    <h1 class="agents-header-title">📡 Agents OS — <span>Pipeline Live Monitor</span></h1>
+    <span data-testid="monitor-provenance-badge" id="monitor-provenance-badge" class="provenance-badge" title="Data source">[live files]</span>
+  </div>
+  <div class="agents-header-right">
+    <span class="agents-refresh-label" id="monitor-last-refresh">Loading…</span>
+  </div>
+</header>
+
+<nav class="pipeline-nav">
+  <a class="nav-link" href="PIPELINE_DASHBOARD.html">📊 Dashboard</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link active" href="PIPELINE_MONITOR.html">📡 Live Monitor</a>
+  <span class="nav-sep nav-sep-group" title="Active Process Management | System Management"></span>
+  <a class="nav-link" href="PIPELINE_ROADMAP.html">🗺️ Roadmap</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="PIPELINE_TEAMS.html">👥 Teams</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="PIPELINE_CONSTITUTION.html">🏛️ Constitution</a>
+</nav>
+
+<div class="agents-page-layout monitor-layout">
+  <aside class="agents-page-sidebar monitor-sidebar">
+    <div class="agents-domain-bar agents-domain-bar--sidebar agents-domain-bar--no-domain">
+      <button class="btn btn-primary" id="monitor-refresh-btn" onclick="loadMonitor()">↺ Refresh</button>
+      <label class="refresh-label">
+        <input type="checkbox" id="monitor-auto-refresh" checked>
+        <span class="agents-refresh-label">Auto</span>
+      </label>
+      <input type="number" id="monitor-interval-input" value="10" min="3" max="300" class="monitor-interval-input" title="Refresh interval in seconds">
+      <span class="agents-refresh-label">s</span>
+      <div class="monitor-readonly-note">👁 Read-only. No state mutations, no pipeline commands.</div>
+    </div>
+
+    <div class="sidebar-section-card">
+      <div class="sidebar-section-title">Data Sources <span class="badge" id="monitor-sources-badge">—</span></div>
+      <div id="monitor-sources-content"><span class="loading">Loading…</span></div>
+    </div>
+
+    <div class="sidebar-section-card">
+      <div class="sidebar-section-title">System Alerts <span class="badge" id="monitor-alerts-badge">—</span></div>
+      <div id="monitor-alerts-content"><span class="loading">Loading…</span></div>
+    </div>
+
+    <div class="sidebar-section-card">
+      <div class="sidebar-section-title">Scope Guardrails</div>
+      <ul class="monitor-guardrails">
+        <li>No writes to <code>pipeline_state_*.json</code></li>
+        <li>No <code>pass</code> / <code>fail</code> / <code>approve</code> actions</li>
+        <li>Only reads canonical domain files</li>
+        <li>Shows raw errors instead of fallback</li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="agents-page-main monitor-main">
+    <div class="monitor-accordion open" id="monitor-acc-live-programs">
+      <div class="monitor-accordion-header monitor-accordion-header-current" onclick="toggleMonitorAccordion('monitor-acc-live-programs')">
+        <span>📋</span>
+        <span class="monitor-accordion-title">Active Programs + Track</span>
+        <span class="badge" id="monitor-runtime-badge">—</span>
+        <span class="monitor-accordion-chevron">▶</span>
+      </div>
+      <div class="monitor-accordion-body">
+        <div id="monitor-active-programs"><span class="loading">Loading active programs…</span></div>
+      </div>
+    </div>
+
+    <div class="monitor-accordion open" id="monitor-acc-live-state">
+      <div class="monitor-accordion-header monitor-accordion-header-current" onclick="toggleMonitorAccordion('monitor-acc-live-state')">
+        <span>🧪</span>
+        <span class="monitor-accordion-title">Live Runtime State (Dual Domain)</span>
+        <span class="badge">Current Gate/Phase</span>
+        <span class="monitor-accordion-chevron">▶</span>
+      </div>
+      <div class="monitor-accordion-body">
+        <div class="monitor-domains-grid">
+          <div class="monitor-domain-card tiktrack" id="monitor-domain-tiktrack"><span class="loading">Loading TikTrack…</span></div>
+          <div class="monitor-domain-card agentsos" id="monitor-domain-agents_os"><span class="loading">Loading Agents_OS…</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="monitor-accordion open" id="monitor-acc-live-matrix">
+      <div class="monitor-accordion-header monitor-accordion-header-current" onclick="toggleMonitorAccordion('monitor-acc-live-matrix')">
+        <span>🧮</span>
+        <span class="monitor-accordion-title">Cross-Domain Gate Matrix</span>
+        <span class="badge" id="monitor-matrix-badge">—</span>
+        <span class="monitor-accordion-chevron">▶</span>
+      </div>
+      <div class="monitor-accordion-body">
+        <div id="monitor-gate-matrix"><span class="loading">Loading gate matrix…</span></div>
+      </div>
+    </div>
+
+    <div class="monitor-accordion open" id="monitor-acc-live-events">
+      <div class="monitor-accordion-header monitor-accordion-header-current" onclick="toggleMonitorAccordion('monitor-acc-live-events')">
+        <span>🛰️</span>
+        <span class="monitor-accordion-title">Recent Event Stream</span>
+        <span class="badge" id="monitor-events-badge">—</span>
+        <span class="monitor-accordion-chevron">▶</span>
+      </div>
+      <div class="monitor-accordion-body">
+        <div class="monitor-events-grid">
+          <div class="monitor-events-col">
+            <div class="monitor-events-title">TikTrack + Global</div>
+            <div class="monitor-events-list" id="monitor-events-tiktrack"><span class="loading">Loading…</span></div>
+          </div>
+          <div class="monitor-events-col">
+            <div class="monitor-events-title">Agents_OS + Global</div>
+            <div class="monitor-events-list" id="monitor-events-agents_os"><span class="loading">Loading…</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="monitor-accordion open" id="monitor-acc-phase-detail">
+      <div class="monitor-accordion-header monitor-accordion-header-current" onclick="toggleMonitorAccordion('monitor-acc-phase-detail')">
+        <span>🔍</span>
+        <span class="monitor-accordion-title">Active Phase Drill-Down</span>
+        <span class="badge" id="monitor-phase-detail-badge">—</span>
+        <span class="monitor-accordion-chevron">▶</span>
+      </div>
+      <div class="monitor-accordion-body">
+        <div id="monitor-phase-detail"><span class="loading">Loading active phase detail…</span></div>
+      </div>
+    </div>
+
+    <div class="monitor-accordion open" id="monitor-acc-state-raw">
+      <div class="monitor-accordion-header monitor-accordion-header-current" onclick="toggleMonitorAccordion('monitor-acc-state-raw')">
+        <span>📄</span>
+        <span class="monitor-accordion-title">Full Domain State (All Fields)</span>
+        <span class="badge">Raw JSON fields</span>
+        <span class="monitor-accordion-chevron">▶</span>
+      </div>
+      <div class="monitor-accordion-body">
+        <div id="monitor-state-raw"><span class="loading">Loading full state…</span></div>
+      </div>
+    </div>
+
+    <div class="monitor-accordion" id="monitor-acc-chains">
+      <div class="monitor-accordion-header monitor-accordion-header-current" onclick="toggleMonitorAccordion('monitor-acc-chains')">
+        <span>🔗</span>
+        <span class="monitor-accordion-title">Program Execution Chains</span>
+        <span class="badge" id="monitor-chains-badge">—</span>
+        <span class="monitor-accordion-chevron">▶</span>
+      </div>
+      <div class="monitor-accordion-body">
+        <div id="monitor-program-chains"><span class="loading">Loading program chains…</span></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="js/pipeline-gate-map.generated.js?v=2"></script>
+<script src="js/pipeline-config.js?v=18"></script>
+<script src="js/pipeline-state.js?v=4"></script>
+<script src="js/pipeline-dom.js?v=5"></script>
+<script src="js/pipeline-monitor-core.js?v=4"></script>
+<script src="js/pipeline-monitor-live.js?v=1"></script>
+</body>
+</html>

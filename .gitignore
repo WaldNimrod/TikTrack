@@ -20,12 +20,29 @@ _Cursor_full_design_*/
 storage/uploads/users/
 
 # Archive (Phoenix 99-ARCHIVE + root archive)
+# Team 170 / Team 191 (S003-P013-WP001): shards under _COMMUNICATION/99-ARCHIVE/ are local-only;
+# legacy blobs may remain in git history until optional history rewrite.
 **/99-ARCHIVE/
 **/99-archive/
 archive/
+
+# Program / lifecycle archives under _COMMUNICATION (local-only; pipeline may still write here)
+_COMMUNICATION/_ARCHIVE/
 
 # OS specific
 .DS_Store
 *.tmp
 .tmp.driveupload/
 .claude/worktrees/
+
+# Canary simulation — generated mock mirror (regenerate: scripts/canary_simulation/generate_mocks.py)
+_COMMUNICATION/team_101/simulation_mocks/*/mirror/
+
+# Pipeline runtime artifacts — volatile, never source-of-truth (S003-P016)
+_COMMUNICATION/agents_os/STATE_SNAPSHOT.json
+_COMMUNICATION/agents_os/logs/pipeline_events.jsonl
+
+# Google Workspace local stub files — not source, never commit
+*.gdoc
+*.gsheet
+*.gslides

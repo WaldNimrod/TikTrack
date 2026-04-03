@@ -176,6 +176,9 @@ D38 (tag registry management) ב-S005 הוא ממשק ניהול רישום הת
 | ID | Stage | Name | Type | Priority | Scope | Status |
 |---|---|---|---|---|---|---|
 | S008-NOTIFICATION-TOAST-SYSTEM | S008 (post-S006) | General Notification & Toast System | Cross-cutting infrastructure | NON-URGENT | Replace all browser alert/confirm with unified in-app NotificationService; add toast levels SUCCESS/WARNING/ERROR/INFO; add in-app alert notification panel; complete universal modal/toast migration using legacy notification system as reference. | DEFERRED |
+| S003-P017-LEAN-KIT | S003 | Lean Kit + methodology portability | Methodology (Agents_OS) | — | **Program `S003-P017` COMPLETE 2026-04-03:** WP001 GATE_5 (Team 191, `agents-os` init); WP002 GATE_5 (Team 170, lean-kit content). Repo: `github.com/WaldNimrod/agents-os`. Follow-on programs registered in `PHOENIX_PROGRAM_REGISTRY_v1.0.0.md` (`S003-P018`/`S003-P019`, `S004-P009`–`S004-P011` Lean Kit track — slots `S004-P009`+ chosen to preserve existing TikTrack `S004-P005`–`P007` rows). Authority: `ARCHITECT_DIRECTIVE_METHODOLOGY_DEPLOYMENT_SPLIT_v1.0.0.md` §3; `ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md`. | COMPLETE |
+| S003-P018-P019-S004-P009-P011 | S003 / S004 | Bridge sync + multi-project adoption + generator + upgrade + CLI | Methodology (Agents_OS) | PLANNED | Five follow-on programs registered from S003-P017 completion. Registry detail: `PHOENIX_PROGRAM_REGISTRY_v1.0.0.md`. Authority: `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md`. | PLANNED |
+| S005-P006 | S005 | Domain Clean Separation — TikTrack Consumes AOS as Installed Tool (Phase E) | Methodology (Agents_OS) | PLANNED | Removes `agents_os_v3/` from TikTrack; AOS as installable L3 CLI. Pre-conditions: ALL of S003-P018/P019 + S004-P009/P010/P011 GATE_5 PASS. Locked: `ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md` Phase E. LOD100: `TEAM_00_LOD100_S005_P006_DOMAIN_CLEAN_SEPARATION_v1.0.0.md`. | PLANNED |
 
 **דשבורדים רמה 1** (בית, תכנון, מעקב, מחקר, נתונים, ניהול): מימוש תוכן — **שלב 6 ומאוחר יותר**.
 
@@ -189,3 +192,6 @@ D38 (tag registry management) ב-S005 הוא ממשק ניהול רישום הת
 **log_entry | TEAM_170 | ROADMAP_ID_UPDATE | INDICATORS_PROGRAM_ID_CANONICALIZED_TO_S004-P007 | per_TEAM_00_RATIFICATION | 2026-03-03**
 **log_entry | TEAM_190 | PHOENIX_PORTFOLIO_ROADMAP | S002_SCOPE_NOTE_UPDATED_FOR_MCP_QA_TRANSITION_PACKAGING | 2026-03-06**
 **log_entry | TEAM_170 | PHOENIX_PORTFOLIO_ROADMAP | ADR031_S002_P005_ANNOTATION_WP001_WP002_PER_TEAM_100_MANDATE | 2026-03-15**
+**log_entry | TEAM_170 | PHOENIX_PORTFOLIO_ROADMAP | S003_P017_LEAN_KIT_FUTURE_ROW | 2026-04-02**
+**log_entry | TEAM_170 | PHOENIX_PORTFOLIO_ROADMAP | S003_P017_COMPLETE_AND_FOLLOWON_PROGRAMS_ROW | TEAM_100_MANDATE_REGISTRY_ROADMAP_UPDATE | 2026-04-03**
+**log_entry | TEAM_00 | PHOENIX_PORTFOLIO_ROADMAP | S005_P006_DOMAIN_CLEAN_SEPARATION_ROW_ADDED | PHASE_E_LOCKED | 2026-04-03**

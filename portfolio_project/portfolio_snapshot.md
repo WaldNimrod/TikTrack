@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-03-23T17:40:47.439893+00:00`
+- Generated (UTC): `2026-04-03T14:27:03.150692+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -8,16 +8,16 @@
 ## Runtime (from WSM)
 
 - active_stage_id: `S003`
-- active_program_id: `S003-P013`
-- active_work_package_id: `N/A`
+- active_program_id: `S003-P015`
+- active_work_package_id: `S003-P015-WP001`
 - current_gate: `COMPLETE`
-- next_required_action: `Lifecycle complete — await next WP activation (Team 100 / Team 00).`
+- next_required_action: ``
 
 ## Portfolio Counts
 
 - stages: `6`
-- programs: `37`
-- work_packages: `19`
+- programs: `47`
+- work_packages: `23`
 
 ## Roadmap (hierarchical)
 
@@ -64,9 +64,10 @@
     ├── **Program** `S003-P003` — System Settings (D39+D40+D41) | COMPLETE | domain: **TIKTRACK**
         └── **WP** `S003-P003-WP001` | CLOSED | gate: GATE_8 (PASS) | domain: **TIKTRACK**
 
-    ├── **Program** `S003-P004` — User Tickers (D33) | PLANNED | domain: **TIKTRACK**
+    ├── **Program** `S003-P004` — User Tickers (D33) | ACTIVE | domain: **TIKTRACK**
 
-    ├── **Program** `S003-P005` — Watch Lists (D26) | PLANNED | domain: **TIKTRACK**
+    ├── **Program** `S003-P005` — Watch Lists (D26) | ACTIVE | domain: **TIKTRACK**
+        └── **WP** `S003-P005-WP001` | IN_PROGRESS | gate: GATE_0 | domain: **TIKTRACK**
 
     ├── **Program** `S003-P006` — Admin Review S003 | PLANNED | domain: **TIKTRACK**
 
@@ -88,8 +89,23 @@
     ├── **Program** `S003-P012` — AOS Pipeline Operator Reliability | COMPLETE | domain: **AGENTS_OS**
         └── **WP** `S003-P012-WP001` | IN_PROGRESS | gate: GATE_8 (WP001 governance closure in progress) | domain: **AGENTS_OS**
 
-    └── **Program** `S003-P013` — TikTrack Pipeline Canary Run (D33 display_name) | COMPLETE | domain: **TIKTRACK**
-        └── **WP** `S003-P013-WP001` | CLOSED | gate: GATE_5 | domain: **TIKTRACK**
+    ├── **Program** `S003-P013` — TikTrack Pipeline Canary Run (D33 display_name) | COMPLETE | domain: **TIKTRACK**
+        ├── **WP** `S003-P013-WP001` | CLOSED | gate: GATE_5 | domain: **TIKTRACK**
+        └── **WP** `S003-P013-WP002` | HOLD | gate: GATE_0 | domain: **TIKTRACK**
+
+    ├── **Program** `S003-P014` — TikTrack Pipeline Operator E2E Simulation | COMPLETE | domain: **TIKTRACK**
+        └── **WP** `S003-P014-WP001` | CLOSED | gate: GATE_5 (PASS) | domain: **TIKTRACK**
+
+    ├── **Program** `S003-P015` — AOS DM-005 SC Verification Run | ACTIVE | domain: **AGENTS_OS**
+        └── **WP** `S003-P015-WP001` | IN_PROGRESS | gate: COMPLETE | domain: **AGENTS_OS** (active)
+
+    ├── **Program** `S003-P016` — Pipeline Git Isolation — Branch-per-WP + State Consolidation | PLANNED | domain: **SHARED**
+
+    ├── **Program** `S003-P017` — Lean Kit — agents-os repository + methodology portability (LEAN-KIT) | COMPLETE | domain: **AGENTS_OS**
+
+    ├── **Program** `S003-P018` — AOS Snapshot Version Management | PLANNED | domain: **AGENTS_OS**
+
+    └── **Program** `S003-P019` — Multi-Project Lean Kit Adoption — SmallFarmsAgents + EyalAmit | PLANNED | domain: **AGENTS_OS**
 
 
 ### S004 — שלב 4 — Financial Execution | PLANNED [SHARED]
@@ -108,7 +124,13 @@
 
     ├── **Program** `S004-P007` — Indicators Infrastructure | PLANNED | domain: **TIKTRACK**
 
-    └── **Program** `S004-P008` — Agents_OS Mediated Reconciliation Engine (ADR-031 Stage C) | PLANNED | domain: **AGENTS_OS**
+    ├── **Program** `S004-P008` — Agents_OS Mediated Reconciliation Engine (ADR-031 Stage C) | PLANNED | domain: **AGENTS_OS**
+
+    ├── **Program** `S004-P009` — Lean Kit Generator | PLANNED | domain: **AGENTS_OS**
+
+    ├── **Program** `S004-P010` — L0→L2 Upgrade Path | PLANNED | domain: **AGENTS_OS**
+
+    └── **Program** `S004-P011` — Project Scaffolding CLI | PLANNED | domain: **AGENTS_OS**
 
 
 ### S005 — שלב 5 — Trades/Plans | PLANNED [SHARED]
@@ -121,7 +143,9 @@
 
     ├── **Program** `S005-P004` — Journal & History (D28+D31) | PLANNED | domain: **TIKTRACK**
 
-    └── **Program** `S005-P005` — Admin Review S005 | PLANNED | domain: **TIKTRACK**
+    ├── **Program** `S005-P005` — Admin Review S005 | PLANNED | domain: **TIKTRACK**
+
+    └── **Program** `S005-P006` — Domain Clean Separation — TikTrack Consumes AOS as Installed Tool | PLANNED | domain: **AGENTS_OS**
 
 
 ### S006 — שלב 6 — Advanced Analytics | PLANNED [SHARED]

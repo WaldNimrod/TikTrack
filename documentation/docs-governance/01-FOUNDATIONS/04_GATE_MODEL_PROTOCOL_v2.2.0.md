@@ -10,6 +10,11 @@
 
 > **[ARCHIVED — superseded by ARCHITECT_DIRECTIVE_GATE_SEQUENCE_CANON_v1.0.0.md — 5-gate canonical model]**
 
+> ⚠️ **LEGACY DOCUMENT — DO NOT USE IN NEW WORK**
+> This document references GATE_6, GATE_7, or GATE_8, which are NOT active pipeline gates.
+> Active pipeline: GATE_0 through GATE_5 only (2026-03-24).
+> Preserved for historical reference only.
+
 # 7 GATE MODEL PROTOCOL v2.2.0
 **project_domain:** TIKTRACK
 
@@ -161,3 +166,5 @@ One channel (10↔90), two distinct lifecycle phases; no contradiction. **Canoni
 
 **log_entry | TEAM_100 | GATE_PROTOCOL_v2.2.0 | LOCKED | 2026-02-20**  
 **log_entry | TEAM_100 | GATE_PROTOCOL_v2.2.0 | SUPERSEDED_BY_v2.3.0 | 2026-02-22**
+
+historical_record: true

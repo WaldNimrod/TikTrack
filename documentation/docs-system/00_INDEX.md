@@ -4,7 +4,7 @@
 **project_domain:** TIKTRACK  
 **id:** DOCS_SYSTEM_00_INDEX  
 **owner:** Team 10 (Gateway); Team 70 (Librarian)  
-**date:** 2026-02-19  
+**date:** 2026-03-26  
 **status:** Active — תוכנית אופציה C
 
 ---
@@ -28,4 +28,16 @@
 
 ---
 
-**log_entry | TEAM_170 | DOCS_SYSTEM_00_INDEX | DELIVERED | 2026-02-19**
+## 3. S003-P004-WP001 — D33 User Tickers (canonical)
+
+| מסמך | נתיב |
+|------|------|
+| **סיכום יישום (as-built)** | [08-PRODUCT/D33_USER_TICKERS_IMPLEMENTATION_SUMMARY_v1.0.0.md](08-PRODUCT/D33_USER_TICKERS_IMPLEMENTATION_SUMMARY_v1.0.0.md) |
+| **ספר פעולות G3 (גוף תוכנית העבודה)** | [08-PRODUCT/S003_P004_WP001_D33_OPERATIONS_HANDBOOK_G3_PLAN_v1.0.0.md](08-PRODUCT/S003_P004_WP001_D33_OPERATIONS_HANDBOOK_G3_PLAN_v1.0.0.md) |
+
+**הערה:** LOD200 / LLD400 נשארים תחת `_COMMUNICATION/team_100` ו־`_COMMUNICATION/team_170` עד קידום נפרד לפי נוהל ידע.
+
+---
+
+**log_entry | TEAM_170 | DOCS_SYSTEM_00_INDEX | DELIVERED | 2026-02-19**  
+**log_entry | TEAM_70 | DOCS_SYSTEM_00_INDEX | S003-P004-WP001_D33_LINKS | 2026-03-26**

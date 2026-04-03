@@ -1,7 +1,8 @@
 """
-GATE_6 — ARCHITECTURAL_DEV_VALIDATION (Reality Gate)
-Owner: Team 90 (execution), Team 100 (approval)
-Question: "Does what was built match what we approved?"
+⚠️ LEGACY — DO NOT USE IN NEW WORK
+GATE_6 is not an active pipeline gate. The pipeline has GATE_0 through GATE_5 only.
+This file is preserved for historical reference only (2026-03-24).
+Post-execution organizational review, when required, is triggered manually by Team 00.
 """
 
 from ..engines.base import BaseEngine

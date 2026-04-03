@@ -1,0 +1,5 @@
+Google Chrome 146.0.7680.165 
+Python 3.9.6
+selenium 4.15.2
+2eb45765d0f7293e76b2c7fd6428c28936e2d1a3
+AOS_V3_E2E_RUN=1

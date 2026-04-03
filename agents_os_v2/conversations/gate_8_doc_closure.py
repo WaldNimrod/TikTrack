@@ -1,4 +1,9 @@
 """
+⚠️ LEGACY — DO NOT USE IN NEW WORK
+GATE_8 is not an active pipeline gate. The pipeline has GATE_0 through GATE_5 only.
+Preserved for historical reference only (2026-03-24).
+
+[ORIGINAL HEADER BELOW — LEGACY]
 GATE_8 — DOCUMENTATION_CLOSURE
 Owner: Team 90 (execution), Team 70 (documentation)
 Action: AS_MADE_REPORT, clean folders, validate closure.

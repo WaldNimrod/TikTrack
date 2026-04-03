@@ -9,6 +9,13 @@ scope: GATE_7
 
 ---
 
+> ⚠️ **LEGACY DOCUMENT — DO NOT USE IN NEW WORK**
+> This document references GATE_6, GATE_7, or GATE_8, which are NOT active pipeline gates.
+> Active pipeline: GATE_0 through GATE_5 only (2026-03-24).
+> Preserved for historical reference only.
+
+---
+
 ## 1) Purpose
 
 Define deterministic artifacts and routing for GATE_7 (HUMAN_UX_APPROVAL), including reject routing and transition readiness to GATE_8.
@@ -149,3 +156,5 @@ Every GATE_7 scenario artifact issued by Team 90 must include:
 **log_entry | TEAM_00 | GATE_7_CONTRACT_V1_1_0 | INFRASTRUCTURE_WP_PROVISION_AND_GATE6_OVERRIDE_PROHIBITION_ADDED | ARCHITECT_DIRECTIVE_DUAL_DOMAIN_GOVERNANCE_v1.0.0 | 2026-03-10**
 **log_entry | TEAM_170 | GATE_7_CONTRACT_V1_1_0 | CREATED_UNDER_MANDATE | TEAM_00_TO_TEAM_170_GOVERNANCE_IMMEDIATE_ACTIVATION_v1.0.0 | 2026-03-10**
 **log_entry | TEAM_00 | GATE_7_CONTRACT_V1_1_0 | RESIDUALS_ONLY_PRINCIPLE_ADDED_SEC_2_7 | ARCHITECT_DECISION_GATE_QUALITY_GOVERNANCE_HARDENING_v1.0.0 | 2026-03-10**
+
+historical_record: true

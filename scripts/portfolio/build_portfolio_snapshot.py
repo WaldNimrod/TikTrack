@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Build and validate canonical portfolio snapshot from markdown SSOT files.
 
-SSOT rules:
-- Runtime current state is read only from WSM CURRENT_OPERATIONAL_STATE.
+SSOT rules (S003-P016 update):
+- Runtime current state is read from pipeline_state_*.json (WSM COS removed per S003-P016).
+  Falls back to WSM CURRENT_OPERATIONAL_STATE if present (legacy/pre-P016 environments).
 - Portfolio pipeline is read from roadmap/program/wp registries.
 """
 
@@ -22,6 +23,9 @@ WSM_PATH = ROOT / "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_W
 ROADMAP_PATH = ROOT / "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md"
 PROGRAM_PATH = ROOT / "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md"
 WP_PATH = ROOT / "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_WORK_PACKAGE_REGISTRY_v1.0.0.md"
+
+PIPELINE_STATE_AGENTS_OS = ROOT / "_COMMUNICATION/agents_os/pipeline_state_agentsos.json"
+PIPELINE_STATE_TIKTRACK = ROOT / "_COMMUNICATION/agents_os/pipeline_state_tiktrack.json"
 
 STAGE_ID_RE = re.compile(r"^S\d{3}$")
 PROGRAM_ID_RE = re.compile(r"^S\d{3}-P\d{3}$")
@@ -98,18 +102,65 @@ def _table_after_heading(text: str, heading: str) -> List[Dict[str, str]]:
     return rows
 
 
+def _wsm_proxy_from_pipeline_json() -> Dict[str, str]:
+    """Same contract as sync_registry_mirrors_from_wsm (S003-P016 COS removed from WSM)."""
+    candidates: List[dict] = []
+    for path in (PIPELINE_STATE_AGENTS_OS, PIPELINE_STATE_TIKTRACK):
+        if not path.exists():
+            continue
+        try:
+            candidates.append(json.loads(path.read_text(encoding="utf-8")))
+        except (json.JSONDecodeError, OSError):
+            continue
+    if not candidates:
+        raise PortfolioError(
+            "No readable pipeline_state_*.json; cannot build portfolio snapshot (S003-P016)"
+        )
+
+    def _pick(rows: List[dict]) -> dict:
+        for d in rows:
+            cg = str(d.get("current_gate") or "").strip().upper()
+            if cg and cg != "COMPLETE":
+                return d
+        return rows[0]
+
+    d = _pick(candidates)
+    wp = str(d.get("work_package_id") or "").strip()
+    st = str(d.get("stage_id") or "").strip()
+    prog = wp.rsplit("-WP", 1)[0] if "-WP" in wp else ""
+    spec = str(d.get("spec_brief") or "").replace("\n", " ").strip()
+    if len(spec) > 240:
+        spec = spec[:237] + "..."
+    return {
+        "active_stage_id": st,
+        "active_program_id": prog,
+        "active_work_package_id": wp,
+        "current_gate": str(d.get("current_gate") or "").strip(),
+        "active_project_domain": str(d.get("project_domain") or "").strip(),
+        "active_flow": spec,
+        "last_gate_event": "",
+        "last_closed_work_package_id": "",
+    }
+
+
 def _extract_wsm_current_state(text: str) -> Dict[str, str]:
-    block = _find_heading_block(text, "CURRENT_OPERATIONAL_STATE (single canonical block — TEAM_100_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0)")
-    _, rows = _parse_markdown_table(block)
-    out: Dict[str, str] = {}
-    for row in rows:
-        key = row.get("Field", "").strip()
-        val = row.get("Value", "").strip()
-        if key:
-            out[key] = val
-    if not out:
-        raise PortfolioError("WSM CURRENT_OPERATIONAL_STATE table is empty")
-    return out
+    try:
+        block = _find_heading_block(
+            text,
+            "CURRENT_OPERATIONAL_STATE (single canonical block — TEAM_100_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0)",
+        )
+        _, rows = _parse_markdown_table(block)
+        out: Dict[str, str] = {}
+        for row in rows:
+            key = row.get("Field", "").strip()
+            val = row.get("Value", "").strip()
+            if key:
+                out[key] = val
+        if not out:
+            raise PortfolioError("WSM CURRENT_OPERATIONAL_STATE table is empty")
+        return out
+    except PortfolioError:
+        return _wsm_proxy_from_pipeline_json()
 
 
 def _parse_bool(val: str) -> bool:
@@ -318,8 +369,11 @@ def validate_snapshot(snapshot: Dict[str, object]) -> ValidationResult:
             errors.append(f"Program parent mismatch: program_id='{pid}' does not belong to stage_id='{sid}'")
         if status and status not in PROGRAM_ALLOWED_STATUSES:
             errors.append(f"Program {pid} has invalid status '{status}'")
-        if domain and domain not in {"AGENTS_OS", "TIKTRACK"}:
-            errors.append(f"Program {pid} has invalid domain '{domain}' (must be single-domain: AGENTS_OS or TIKTRACK)")
+        if domain and domain not in {"AGENTS_OS", "TIKTRACK", "SHARED"}:
+            errors.append(
+                f"Program {pid} has invalid domain '{domain}' "
+                "(expected AGENTS_OS, TIKTRACK, or SHARED per program registry)"
+            )
 
     for w in work_packages:
         wid = (w.get("work_package_id") or "").strip()

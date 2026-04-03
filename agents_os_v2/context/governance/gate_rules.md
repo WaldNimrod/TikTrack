@@ -43,5 +43,17 @@ Per TEAM_190_TO_ALL_TEAMS_CANONICAL_MESSAGE_FORMAT_LOCK_v1.0.0:
   - Team 60 => cross-domain platform lane
   - Teams 90/190 => cross-domain validation lanes
 
-## GATE_4/5/6/7 and Gate Quality (canonical source)
-GATE_4/5/6/7 definitions and GATE_7 semantics are superseded by: `documentation/docs-governance/04-PROCEDURES/GATES_4_5_6_7_GOVERNANCE_POLICY_v1.0.0.md` and `documentation/docs-governance/05-CONTRACTS/GATE_7_HUMAN_UX_APPROVAL_CONTRACT_v1.1.0.md` per ARCHITECT_DECISION_GATE_QUALITY_GOVERNANCE_HARDENING_v1.0.0. Gate Model Protocol reference: 04_GATE_MODEL_PROTOCOL_v2.3.0 (canonical).
+## Active Gate Model (canonical — 2026-03-24)
+
+**Pipeline gates: GATE_0 through GATE_5 only.**
+
+| Gate | Name |
+|------|------|
+| GATE_0 | Scope validation |
+| GATE_1 | LLD400 lock |
+| GATE_2 | Architectural sign-off (5 phases) |
+| GATE_3 | Implementation |
+| GATE_4 | QA |
+| GATE_5 | Dev validation → COMPLETE |
+
+> ⚠️ **LEGACY — DO NOT USE:** GATE_6, GATE_7, GATE_8 are historical drift from a previous process model. Documents referencing `GATES_4_5_6_7_GOVERNANCE_POLICY`, `GATE_7_HUMAN_UX_APPROVAL_CONTRACT`, `GATE_8_DOCS_CLOSURE` are superseded and legacy. Gate Model Protocol reference: 04_GATE_MODEL_PROTOCOL_v2.3.0 (contains legacy entries — treat GATE_6/7/8 sections as historical only).

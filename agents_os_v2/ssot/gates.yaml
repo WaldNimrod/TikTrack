@@ -1,0 +1,25 @@
+# WP004 — Single SSOT for legacy gate id → canonical 5-gate model (KB-66 / R2).
+# Python (GATE_ALIASES) and UI (LEGACY_GATE_TO_CANONICAL) MUST match this file.
+# Generate: python agents_os_v2/tools/generate_gate_map_assets.py
+#
+# NOTE (Team 170 FINDING-001): This file is for **progress / UI / alias resolution** only.
+# `pipeline.py` → `_canonical_fail_routing_key()` uses a **separate** legacy map for **FAIL
+# command routing** (which FAIL_ROUTING row to consult). G3_PLAN / G3_5 map to GATE_2 there
+# because work-plan failures are handled under the GATE_2 fail-routing bucket — not a drift
+# from this SSOT; see comment on `_canonical_fail_routing_key` in pipeline.py.
+
+legacy_to_canonical:
+  G3_PLAN: GATE_3
+  G3_5: GATE_3
+  G3_6_MANDATES: GATE_3
+  G3_REMEDIATION: GATE_3
+  CURSOR_IMPLEMENTATION: GATE_3
+  # GATE_0 is canonical (GATE_SEQUENCE[0]) — do NOT map to GATE_1; see TEAM_61_SSOT_GATE0_ALIAS_DECISION_v1.0.0.md
+  WAITING_GATE2_APPROVAL: GATE_2
+  # ⚠️ LEGACY — GATE_6/7/8 are NOT active pipeline gates (2026-03-24).
+  # Active pipeline: GATE_0 through GATE_5 only. Aliases retained for old-state compat only.
+  # GATE_6 = organizational admin action (not a pipeline gate). GATE_7/8 = historical drift.
+  GATE_6: GATE_4
+  WAITING_GATE6_APPROVAL: GATE_4
+  GATE_7: GATE_4
+  GATE_8: GATE_5

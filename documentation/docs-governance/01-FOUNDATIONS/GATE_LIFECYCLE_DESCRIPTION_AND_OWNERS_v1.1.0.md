@@ -11,7 +11,7 @@ source_of_truth: 04_GATE_MODEL_PROTOCOL_v2.3.0.md
 
 ## Purpose
 
-Canonical readable description of lifecycle GATE_0..GATE_8, owners, WSM ownership, GATE_3 sub-stages, and completeness audit of entry/exit/deliverables/handoffs.
+Canonical readable description of lifecycle GATE_0..GATE_8, owners, WSM ownership, GATE_3 sub-stages, and completeness audit of entry/exit/deliverables/handoffs. *(**Legacy span:** GATE_6–GATE_8 in this document are **not** active pipeline gates; **active model:** GATE_0–GATE_5 — Team 00, 2026-03-24.)*
 
 ## Linked flowcharts
 
@@ -22,6 +22,8 @@ Canonical readable description of lifecycle GATE_0..GATE_8, owners, WSM ownershi
 ---
 
 ## Gate table (approved model)
+
+> **LEGACY (2026-03-24):** Rows **GATE_6, GATE_7, GATE_8** in the table below are **not** active pipeline gates. **Active pipeline:** GATE_0–GATE_5 only. *(GATE_6 = organizational admin, not a pipeline gate; GATE_7/GATE_8 = historical process labels.)*
 
 | Gate ID | Gate Name | Gate Owner (execution) | Approval authority | WSM Owner |
 |---------|-----------|------------------------|--------------------|-----------|
@@ -63,6 +65,8 @@ Reference: `_COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION_v1.0.0.md`.
 
 ## Completeness audit by gate (entry/exit/deliverables/next)
 
+> **LEGACY:** Rows **GATE_6–GATE_8** in the audit table below are historical; active pipeline closure is **GATE_5** (canonical model).
+
 | Gate | Entry defined | Process + involved teams | Required deliverables defined | Exit criteria defined | Next-step owner defined | Audit status |
 |---|---|---|---|---|---|---|
 | GATE_0 | YES (idea intake + alignment) | YES (Architects + Team 190) | YES (contracted by GATE_0_1_2 spec lifecycle contract) | YES (PASS/REJECT) | YES (to GATE_1 Team 190) | COMPLETE |
@@ -78,6 +82,8 @@ Reference: `_COMMUNICATION/team_170/GATE_3_SUBSTAGES_DEFINITION_v1.0.0.md`.
 ---
 
 ## Core transition rules
+
+> **LEGACY:** Rules 2 and 4 below reference superseded gate IDs; in the **active** model, lifecycle completes at **GATE_5 PASS**.
 
 1. `PRE_GATE_3` is removed from active model; work-plan validation is G3.5 under GATE_3.
 2. GATE_6 rejection routing is deterministic: `DOC_ONLY_LOOP` / `CODE_CHANGE_REQUIRED` / `ESCALATE_TO_TEAM_00`.
@@ -97,3 +103,5 @@ No open findings. Gate ownership, transitions, and artifact contracts are aligne
 
 **log_entry | TEAM_190 | GATE_LIFECYCLE_DESCRIPTION_AND_OWNERS | v1.1.0_CREATED | 2026-02-23**
 **log_entry | TEAM_190 | GATE_LIFECYCLE_DESCRIPTION_AND_OWNERS | v1.1.0_GAPS_CLOSED_PASS_CLEAN | 2026-02-23**
+
+historical_record: true

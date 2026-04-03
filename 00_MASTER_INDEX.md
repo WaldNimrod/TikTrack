@@ -3,7 +3,7 @@
 **id:** `D15_MASTER_INDEX`  
 **owner:** Team 10 (The Gateway)  
 **status:** Entry point — canonical structure post Phoenix Cutover  
-**last_updated:** 2026-03-14
+**last_updated:** 2026-04-02
 **deprecated_alias_notice:** Legacy prefix `documentation/docs-governance/PHOENIX_CANONICAL/` is deprecated for active authority routing; use `documentation/docs-governance/01-FOUNDATIONS/` canonical paths.
 
 ### חזון ועיקרון הפעלה: 3 מצבי העבודה (3 Modes of Operation)
@@ -20,9 +20,12 @@
 | Purpose | Path |
 |--------|------|
 | Squad ID + mandatory files | `.cursorrules` (repo root) |
-| Role mapping (20/30/40/50/51/60/61/70/90/100/101/170/190/191) | `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md` |
+| Role mapping (20/30/40/50/51/60/61/70/90/100/110/111/170/190/191) | `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.1.md` |
+| Principal / Team 00 + PFS | `documentation/docs-governance/01-FOUNDATIONS/PRINCIPAL_AND_TEAM_00_MODEL_v1.0.0.md` |
+| Team taxonomy (x0/x1, professions) | `documentation/docs-governance/01-FOUNDATIONS/TEAM_TAXONOMY_v1.0.1.md` |
 | **Active workflow & orchestration** | `documentation/docs-governance/04-PROCEDURES/AGENTS_OS_V2_OPERATING_PROCEDURES_v1.0.0.md` |
 | WSM + Gate Model | `documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md`, `04_GATE_MODEL_PROTOCOL_v2.3.0.md` |
+| **LOD Standard v1.0.0** | `documentation/docs-governance/01-FOUNDATIONS/LOD_STANDARD_v1.0.0.md` — תקן LOD100–500 נורמטיבי (כולל Lean Gate Model ו־deployment overlays) \| **ACTIVE** |
 
 **לא פעיל (הועבר לארכיון):** `documentation/docs-governance/09-GOVERNANCE/standards/` (כולל PHOENIX_MASTER_BIBLE, CURSOR_INTERNAL_PLAYBOOK) — לא קיים בנתיב פעיל; הוחלף במסמכים למעלה וב־V2 Operating Procedures.
 
@@ -32,8 +35,9 @@
 
 | דומיין | נקודת כניסה | תוכן |
 |--------|-------------|------|
-| **TIKTRACK** | [documentation/docs-system/](documentation/docs-system/) | ארכיטקטורה, שרת, עיצוב, מוצר — ראה [00_INDEX (docs-system)](documentation/docs-system/00_INDEX.md). |
-| **AGENTS_OS** | [agents_os/documentation/00_INDEX.md](agents_os/documentation/00_INDEX.md) | ספריית תיעוד Agents_OS: 01-FOUNDATIONS, 02-SPECS, 03-TEMPLATES (קישור ל־06-TEMPLATES). |
+| **TIKTRACK** | [documentation/docs-system/](documentation/docs-system/) | ארכיטקטורה, שרת, עיצוב, מוצר — ראה [00_INDEX (docs-system)](documentation/docs-system/00_INDEX.md) (כולל §3: D33 / S003-P004-WP001). |
+| **AGENTS_OS** | [agents_os/documentation/00_INDEX.md](agents_os/documentation/00_INDEX.md) | ספריית תיעוד Agents_OS (מסלול v2 / UI): 01-FOUNDATIONS, 02-SPECS, 03-TEMPLATES (קישור ל־06-TEMPLATES). |
+| **AGENTS_OS — v3 (BUILD)** | [documentation/docs-agents-os/00_AGENTS_OS_MASTER_INDEX.md](documentation/docs-agents-os/00_AGENTS_OS_MASTER_INDEX.md) | תיעוד קנוני **v3** (Directive 3B): קבצי `AGENTS_OS_V3_*` תחת `documentation/docs-agents-os/` (Overview, Architecture, API, Runbook, Checklist); ענף פיתוח `aos-v3`. |
 | **משותף (משילות)** | [documentation/docs-governance/00-INDEX/](documentation/docs-governance/00-INDEX/) | WSM, SSM, נהלים, חוזים, תבניות (כולל LLD400, LOD200 ב־06-TEMPLATES). |
 
 **דוחות וארטיפקטים (נתיב קנוני יחיד):** `documentation/reports/05-REPORTS`, `documentation/reports/08-REPORTS` בלבד. אסור ליצור או להשתמש ב־`documentation/05-REPORTS` או `05-REPORTS` בשורש ה־repo.
@@ -47,6 +51,7 @@
 | Location | Contents |
 |----------|----------|
 | `documentation/docs-system/` | 01-ARCHITECTURE, 02-SERVER, 07-DESIGN, 08-PRODUCT |
+| `documentation/docs-agents-os/` | תיעוד טכני **Agents_OS** (v2 + **v3**): אינדקס `00_AGENTS_OS_MASTER_INDEX.md`; קבצי **v3** עם קידומת `AGENTS_OS_V3_` (01-OVERVIEW … 05-TEMPLATES). |
 | `documentation/docs-governance/` | 00-INDEX, 01-FOUNDATIONS (SSM/WSM/Gate Model), 02-POLICIES, 04-PROCEDURES, 05-CONTRACTS, 06-TEMPLATES, 07-DIRECTIVES_AND_DECISIONS, 08-WORKING_VALIDATION_RECORDS, AGENTS_OS_GOVERNANCE, 99-archive. **מבנה תיקיות מחייב:** `documentation/docs-governance/00_DOCUMENTATION_FOLDER_STRUCTURE_CANONICAL_v1.0.0.md` |
 | `documentation/reports/` | 05-REPORTS, 08-REPORTS *(נתיב קבוע לארטיפקטים ודוחות)* |
 | `archive/` | documentation, code |

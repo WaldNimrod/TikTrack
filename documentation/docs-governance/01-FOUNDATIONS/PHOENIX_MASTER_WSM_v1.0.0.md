@@ -39,7 +39,7 @@ ssm_dependency: 1.0.0
 | L4 | Task | משימה | Atomic task within a work package. |
 
 **Rule:** Gate binding **only to Work Package** (L3).  
-**Portfolio boundary (per PORTFOLIO_CANONICALIZATION):** Runtime state (active stage, current gate, last_gate_event, active_work_package_id) is **stored only in this document** (block CURRENT_OPERATIONAL_STATE). The canonical Portfolio layer (Roadmap/Program/Work Package registries) holds a **mirror** for structural catalog only; they are not a second source of runtime truth. See `documentation/docs-governance/00-INDEX/PORTFOLIO_INDEX.md` and `PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.  
+**Portfolio boundary (per PORTFOLIO_CANONICALIZATION, updated S003-P016):** Runtime state (active stage, current gate, last_gate_event, active_work_package_id) is **stored exclusively in `pipeline_state_tiktrack.json` and `pipeline_state_agentsos.json`** — not in this document (COS section removed per S003-P016 architectural directive). The canonical Portfolio layer (Roadmap/Program/Work Package registries) holds a **mirror** for structural catalog only; they are not a second source of runtime truth. See `documentation/docs-governance/00-INDEX/PORTFOLIO_INDEX.md` and `PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.  
 **Numbering:** S{NNN}-P{NNN}-WP{NNN}-T{NNN}; prefix inheritance; no implicit numbering; no duplicate identifiers. Validation rules: 04_GATE_MODEL_PROTOCOL_v2.3.0 §2.3.  
 **Uniqueness (mandatory):** Within a Stage, each Program number is unique; within a Program, each Work Package number is unique. **One domain per Program:** each Program is assigned to exactly one domain (per SSM §0 and 04_GATE_MODEL §2.2).  
 **Identity header:** roadmap_id, stage_id, program_id, work_package_id, task_id, gate_id, phase_owner, required_ssm_version, required_active_stage.  
@@ -78,46 +78,10 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 ## 5. EXECUTION ORDER LOCK (structural rule only — no operational state here)
 
-**Structural lock (per SSM §5.1):** S001-P002 may not be activated until S001-P001-WP001 completes GATE_8. **Current operational state** (active stage, current gate, last_gate_event, etc.) is **solely** in the **CURRENT_OPERATIONAL_STATE** block below. No duplication of operational truth elsewhere in this document.
+**Structural lock (per SSM §5.1):** S001-P002 may not be activated until S001-P001-WP001 completes GATE_8. **Current operational state** (active stage, current gate, last_gate_event, etc.) is stored exclusively in `pipeline_state_tiktrack.json` and `pipeline_state_agentsos.json` (S003-P016 architectural directive — COS extracted from WSM).
 
----
-
-## CURRENT_OPERATIONAL_STATE (single canonical block — TEAM_100_WSM_OPERATIONAL_STATE_PROTOCOL_v1.0.0)
-
-**Mandate:** Every gate closure (SPEC or EXECUTION) must update this block. No gate progression without WSM update. The Gate Owner must update this block immediately upon gate closure.
-**Track exclusivity:** only one runtime track can be active at a time. If `track_mode=FAST`, normal flow must be on HOLD with explicit `hold_reason`.
-
-**Gate-owner update evidence:** **2026-03-21** by **Team 100** (S003-P012 PROGRAM COMPLETE — all 5 WPs GATE_5 FULL PASS): AOS Pipeline Operator Reliability fully closed. Pipeline readiness certificate: 205 tests. **Team 170** governance closure + registry sync per `TEAM_170_S003_P012_GOVERNANCE_CLOSURE_AND_ARCHIVE_MANDATE_v1.0.0.md`.
-
-> ⚠️ **AUTO-GENERATED BLOCK — Do NOT edit manually.**
-> This block is written exclusively by `pipeline_run.sh` (pass / fail / approve).
-> Manual edits will be overwritten on next pipeline advance.
-> To check SSOT consistency: `python -m agents_os_v2.tools.ssot_check`
-> To see drift: `python -m agents_os_v2.tools.ssot_check --domain tiktrack`
-
-| Field | Value |
-|-------|-------|
-| active_stage_id | S003|
-| active_stage_label | שלב 2 — Stage 2|
-| active_flow | S003-P013-WP001 — gate COMPLETE (last event: GATE_5 PASS)|
-| active_project_domain | TIKTRACK|
-| active_work_package_id | N/A|
-| in_progress_work_package_id | N/A|
-| last_closed_work_package_id | S003-P013-WP001|
-| last_closed_program_id | S003-P003 (System Settings D39+D40+D41 — GATE_8 PASS 2026-03-21; DOCUMENTATION_CLOSED). Prior: S003-P011-WP002 (DOCUMENTATION_CLOSED 2026-03-21). |
-| last_s002_p003_milestone | GATE_8 PASS \| 2026-03-07 \| Team 90 validated Team 70 closure package; lifecycle DOCUMENTATION_CLOSED |
-| allowed_gate_range | GATE_0_TO_GATE_8 (normal execution lifecycle) |
-| current_gate | COMPLETE|
-| track_mode | NORMAL|
-| suspended_track_state | N/A |
-| hold_reason | N/A |
-| agents_os_parallel_track | **S003-P012 PROGRAM COMPLETE 2026-03-21 — all 5 WPs GATE_5 FULL PASS.** Next AOS: **S003-P011-WP003 (RBAC)** — awaiting activation (Team 00 signal). |
-| active_program_id | S003-P013|
-| active_plan_id | S003|
-| phase_owner_team | Team 10|
-| last_gate_event | **GATE_5 PASS** — S003-P013-WP001 \| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-23| 2026-03-22| 2026-03-22| 2026-03-22. Parallel: S003-P012 program complete 2026-03-21; runtime row synced until next `pipeline_run.sh` advance. |
-| next_required_action | Lifecycle complete — await next WP activation (Team 100 / Team 00).|
-| next_responsible_team | Team 100|
+> **Runtime state:** see `_COMMUNICATION/agents_os/pipeline_state_tiktrack.json` and `_COMMUNICATION/agents_os/pipeline_state_agentsos.json`
+> To check state consistency: `python -m agents_os_v2.tools.ssot_check`
 
 ---
 
@@ -128,14 +92,14 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 | domain | active_program_id | active_work_package_id | phase_status | current_gate | gate_owner_team |
 |--------|-------------------|------------------------|--------------|--------------|-----------------|
-| AGENTS_OS | S003-P011 | PENDING (S003-P011-WP003 awaiting GATE_1) | **S003-P012 PROGRAM COMPLETE 2026-03-21.** Next: **S003-P011-WP003** (Role-Based Team Management) — activation pending Team 00 signal. | PENDING | Team 00 (activation decision) |
-| TIKTRACK | S003-P013 | S003-P013-WP001 | **COMPLETE 2026-03-23** — Canary monitored pipeline run (D33 display_name field). ALL GATES PASS: GATE_0–GATE_5 complete. No blocking findings. Monitor: Team 100. Pipeline state: COMPLETE. Prior closed: S003-P003-WP001 DOCUMENTATION_CLOSED 2026-03-21. | COMPLETE | Team 10 |
+| AGENTS_OS | S003-P011 | S003-P011-WP099 | **2026-03-26** pipeline sync — gate=GATE_3 — phase=3.2 — wp=S003-P011-WP099 | GATE_3 | Team 61 |
+| TIKTRACK | S003-P013 | S003-P013-WP001 | **2026-03-24** pipeline sync — gate=COMPLETE — wp=S003-P013-WP001 | COMPLETE | Team 10 |
 
 ---
 
 ## 🗺️ LEVEL 1: ROADMAP MODULES (אסטרטגי — structural catalog only; no operational status)
 
-**Live status of modules/roadmap is solely in CURRENT_OPERATIONAL_STATE.** This list is a structural catalog; it does not store operational state.
+**Live status of modules/roadmap is in `pipeline_state_tiktrack.json` / `pipeline_state_agentsos.json` (S003-P016: COS removed from WSM).** This list is a structural catalog; it does not store operational state.
 
 - M1: Identity & Security (v1.0.0)
 - M2: Financial Core (שלב 2.5)
@@ -145,7 +109,7 @@ Role contract in workflow (Gate Governance Realignment v1.1.0):
 
 ## 📋 LEVEL 2: Task list reference (מבצעי — structural catalog only; no operational status)
 
-**Canonical Master Task List (רשימת משימות מרכזית):** `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md` — this is the source for Task status (OPEN/CLOSED) and closure dates. **Live task/execution status is solely in CURRENT_OPERATIONAL_STATE** (block above). The table below is a structural/other catalog — not the central list.
+**Canonical Master Task List (רשימת משימות מרכזית):** `_COMMUNICATION/team_10/TEAM_10_MASTER_TASK_LIST.md` — this is the source for Task status (OPEN/CLOSED) and closure dates. **Live task/execution status is in `pipeline_state_*.json`** (S003-P016: COS section removed from WSM — see Section 5). The table below is a structural/other catalog — not the central list.
 
 | Task ID | Description | Owner | Evidence Link |
 | :--- | :--- | :--- | :--- |
@@ -388,3 +352,11 @@ GOVERNANCE_ALIGNMENT_S003_PREP_COMPLETE:
 **log_entry | TEAM_61 | SSOT_WSM_SYNC | GATE_4 PASS | S003-P013-WP001 | 2026-03-23**
 **log_entry | TEAM_70 | STAGE_PARALLEL_TRACKS_SYNC | S003-P013-WP001 | TIKTRACK_row_current_gate_GATE_3_to_GATE_5 | BF-G5-DOC-001_REMEDIATED | aligns_WITH_CURRENT_OPERATIONAL_STATE | 2026-03-23**
 **log_entry | TEAM_61 | SSOT_WSM_SYNC | GATE_5 PASS | S003-P013-WP001 | 2026-03-23**
+**log_entry | PIPELINE_RUNNER | WSM_IDLE_RESET | COMPLETE | TT=S003-P013-WP001 AOS=S003-P015-WP001 | 2026-03-24**
+**log_entry | PIPELINE_RUNNER | STAGE_PARALLEL_TRACKS_SYNC | TIKTRACK | COMPLETE | S003-P013-WP001 | 2026-03-24**
+**log_entry | PIPELINE_RUNNER | STAGE_PARALLEL_TRACKS_SYNC | AGENTS_OS | COMPLETE | S003-P015-WP001 | 2026-03-24**
+**log_entry | TEAM_61 | SSOT_WSM_SYNC | GATE_3 FAIL | S003-P011-WP099 | 2026-03-24**
+**log_entry | PIPELINE_RUNNER | STAGE_PARALLEL_TRACKS_SYNC | AGENTS_OS | GATE_3 | S003-P011-WP099 | 2026-03-24**
+**log_entry | PIPELINE_RUNNER | STAGE_PARALLEL_TRACKS_SYNC | AGENTS_OS | GATE_3 | S003-P011-WP099 | 2026-03-26**
+
+historical_record: true

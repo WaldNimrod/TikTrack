@@ -1,0 +1,183 @@
+{
+  "meta": {
+    "wp": "S003-P013-WP001",
+    "domain": "tiktrack",
+    "page": "D33",
+    "feature": "display_name column (שם תצוגה)",
+    "source_lld400": "_COMMUNICATION/team_170/TEAM_170_S003_P013_WP001_LLD400_v1.0.0.md",
+    "generated_by": "team_00",
+    "generated_date": "2026-03-23",
+    "gate": "GATE_4",
+    "phase": "4.3",
+    "reviewer": "Nimrod (Team 00)"
+  },
+  "environment": {
+    "frontend_url": "http://localhost:8080",
+    "backend_url": "http://localhost:8082",
+    "d33_url": "http://localhost:8080/user_tickers",
+    "login_url": "http://localhost:8080",
+    "api_tickers": "http://localhost:8082/api/v1/me/tickers",
+    "credentials": "TikTrackAdmin / 4181"
+  },
+  "items": [
+    {
+      "id": "HRC-01",
+      "scenario": "D33 — דף נטען ללא שגיאות",
+      "category": "sanity",
+      "lld_ref": "§4 general",
+      "environment_label": "🌐 Browser",
+      "url": "http://localhost:8080/user_tickers",
+      "precondition": "מחובר כמשתמש עם לפחות ticker אחד פעיל",
+      "steps": [
+        "נווט אל http://localhost:8080/user_tickers",
+        "פתח DevTools → Console",
+        "המתן לטעינת הטבלה המלאה"
+      ],
+      "success_criteria": "הדף נטען, הטבלה מוצגת, 0 שגיאות JS ב-Console, קריאות API מחזירות 200",
+      "failure_indicators": "שגיאות JS, טבלה ריקה, 404/500 ב-Network tab"
+    },
+    {
+      "id": "HRC-02",
+      "scenario": "API — display_name מוחזר כמחרוזת",
+      "category": "api",
+      "lld_ref": "Scenario A + AC-1",
+      "environment_label": "🔧 API / DevTools Network",
+      "url": "http://localhost:8082/api/v1/me/tickers",
+      "precondition": "קיים ticker עם display_name מוגדר (לא NULL)",
+      "steps": [
+        "ב-DevTools → Network → בצע רענון הדף",
+        "מצא קריאת GET /api/v1/me/tickers",
+        "בדוק את ה-Response — שדה data[]"
+      ],
+      "success_criteria": "כל אובייקט ב-data[] מכיל מפתח display_name עם ערך מחרוזת (לא null). מפתח חייב להיות נוכח.",
+      "failure_indicators": "מפתח display_name חסר, שגיאת 500, ערך שגוי"
+    },
+    {
+      "id": "HRC-03",
+      "scenario": "API — display_name מוחזר כ-null",
+      "category": "api",
+      "lld_ref": "Scenario B + AC-1",
+      "environment_label": "🔧 API / DevTools Network",
+      "url": "http://localhost:8082/api/v1/me/tickers",
+      "precondition": "קיים ticker עם display_name = NULL ב-DB",
+      "steps": [
+        "ב-DevTools → Network → בצע רענון הדף",
+        "מצא קריאת GET /api/v1/me/tickers",
+        "בדוק אובייקט עם ticker שאין לו שם תצוגה"
+      ],
+      "success_criteria": "המפתח display_name קיים באובייקט עם הערך null (לא נעדר, לא מחרוזת ריקה)",
+      "failure_indicators": "מפתח חסר לחלוטין, ערך שגוי כגון undefined או מחרוזת ריקה"
+    },
+    {
+      "id": "HRC-04",
+      "scenario": "D33 — עמודת שם תצוגה מציגה ערך מותאם",
+      "category": "ui",
+      "lld_ref": "Scenario C + AC-3,5",
+      "environment_label": "🌐 Browser",
+      "url": "http://localhost:8080/user_tickers",
+      "precondition": "ticker עם display_name = 'My Label' קיים ב-DB",
+      "steps": [
+        "נווט לדף D33",
+        "אתר שורה של ticker עם שם תצוגה מוגדר",
+        "בדוק את תא עמודת 'שם תצוגה'"
+      ],
+      "success_criteria": "התא מציג את הערך המותאם (למשל 'My Label') בצבע טקסט רגיל (לא מעומעם). data-testid=d33-cell-display-name נוכח.",
+      "failure_indicators": "הערך לא מוצג, מוצג עם עיצוב מעומעם, data-testid חסר"
+    },
+    {
+      "id": "HRC-05",
+      "scenario": "D33 — Fallback: NULL מציג סמל ticker מעומעם",
+      "category": "ui",
+      "lld_ref": "Scenario D + AC-4",
+      "environment_label": "🌐 Browser",
+      "url": "http://localhost:8080/user_tickers",
+      "precondition": "ticker עם display_name = NULL קיים ב-DB",
+      "steps": [
+        "נווט לדף D33",
+        "אתר שורה של ticker ללא שם תצוגה",
+        "בדוק את תא עמודת 'שם תצוגה' ואת הסגנון שלו"
+      ],
+      "success_criteria": "תא שם תצוגה מציג את הסמל (symbol) עם צבע מעומעם/אפור (var(--color-text-muted)). ויזואלית שונה מהתא הראשי.",
+      "failure_indicators": "הסמל מוצג בצבע רגיל (לא מעומעם), תא ריק לחלוטין, CSS מעומעם לא חל"
+    },
+    {
+      "id": "HRC-06",
+      "scenario": "D33 — אין נתיב עריכה לשם תצוגה",
+      "category": "ui-negative",
+      "lld_ref": "Scenario E + AC-6",
+      "environment_label": "🌐 Browser",
+      "url": "http://localhost:8080/user_tickers",
+      "precondition": "מחובר כמשתמש רגיל",
+      "steps": [
+        "נווט לדף D33",
+        "לחץ על תפריט פעולות (⋮) בשורה כלשהי",
+        "עיין בכל האפשרויות הזמינות"
+      ],
+      "success_criteria": "אין אפשרות 'שנה שם תצוגה' בתפריט. אין modal עריכה לשם תצוגה. אין PATCH לdisplay_name מ-D33.",
+      "failure_indicators": "קיים פקד עריכת שם תצוגה, modal נפתח עם שדה display_name, PATCH נשלח"
+    },
+    {
+      "id": "HRC-07",
+      "scenario": "D33 — data-testid attributes נוכחים",
+      "category": "structural",
+      "lld_ref": "Scenario F + AC-7",
+      "environment_label": "🔧 DevTools Elements",
+      "url": "http://localhost:8080/user_tickers",
+      "precondition": "הדף נטען",
+      "steps": [
+        "פתח DevTools → Elements",
+        "חפש data-testid=d33-user-tickers-table",
+        "בדוק שורה ראשונה — חפש d33-cell-display-name ו-d33-cell-symbol"
+      ],
+      "success_criteria": "data-testid=d33-user-tickers-table קיים על הטבלה. כל שורה מכילה d33-cell-display-name ו-d33-cell-symbol.",
+      "failure_indicators": "אחד מה-testid חסר, שגוי, או לא על האלמנט הנכון"
+    },
+    {
+      "id": "HRC-08",
+      "scenario": "מיון — עמודת שם תצוגה פועלת",
+      "category": "ui",
+      "lld_ref": "AC-9",
+      "environment_label": "🌐 Browser",
+      "url": "http://localhost:8080/user_tickers",
+      "precondition": "מספר tickers עם ערכי display_name שונים (כולל NULL)",
+      "steps": [
+        "לחץ על כותרת עמודת 'שם תצוגה'",
+        "בדוק שהסדר השתנה",
+        "לחץ שוב לסדר הפוך"
+      ],
+      "success_criteria": "המיון עובד. NULL/ריק מוצגים בעדיפות נמוכה (עפ''י הגדרה: sort by display_name ?? symbol). מיון הפוך עובד.",
+      "failure_indicators": "לחיצה על הכותרת לא ממיינת, שגיאה, סדר אקראי"
+    },
+    {
+      "id": "HRC-09",
+      "scenario": "Empty state — colspan תקין",
+      "category": "structural",
+      "lld_ref": "AC-8",
+      "environment_label": "🌐 Browser / DevTools",
+      "url": "http://localhost:8080/user_tickers",
+      "precondition": "משתמש ללא tickers (או מצב filter שמסנן הכל)",
+      "steps": [
+        "גרום למצב empty state (למחוק tickers או להשתמש במשתמש נקי)",
+        "בדוק שורת ה-empty state ב-Elements"
+      ],
+      "success_criteria": "שורת empty state מופיעה עם colspan שמתאים למספר העמודות הנוכחי (כולל העמודה החדשה). פריסה תקינה.",
+      "failure_indicators": "empty state לא מופיע, colspan שגוי, שבירת פריסה"
+    },
+    {
+      "id": "HRC-10",
+      "scenario": "אין migration חדש — DB לא שונה",
+      "category": "non-regression",
+      "lld_ref": "AC-10",
+      "environment_label": "🔧 Terminal",
+      "url": null,
+      "precondition": "גישה לטרמינל",
+      "steps": [
+        "cd <repo_root>",
+        "git log --oneline -5 -- migrations/",
+        "וודא שאין migration חדש שנוצר ע''י WP זה"
+      ],
+      "success_criteria": "אין קובץ migration חדש מ-WP זה. העמודה display_name קיימת כבר ב-DB (ממיגרציה קודמת).",
+      "failure_indicators": "קיים migration חדש שנוצר ב-WP זה, DDL שנוסף"
+    }
+  ]
+}

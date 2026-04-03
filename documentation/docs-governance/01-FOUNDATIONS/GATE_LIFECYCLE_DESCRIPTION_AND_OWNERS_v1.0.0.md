@@ -1,11 +1,18 @@
 # GATE_LIFECYCLE_DESCRIPTION_AND_OWNERS_v1.0.0
 
+**date:** 2026-03-10
+
 project_domain: SHARED
 status: ACTIVE
 version: 1.0.0
 source_of_truth: 04_GATE_MODEL_PROTOCOL_v2.3.0.md
 
 ---
+
+> ⚠️ **LEGACY DOCUMENT — DO NOT USE IN NEW WORK**
+> This document references GATE_6, GATE_7, or GATE_8, which are NOT active pipeline gates.
+> Active pipeline: GATE_0 through GATE_5 only (2026-03-24).
+> Preserved for historical reference only.
 
 ## Purpose
 
@@ -79,3 +86,5 @@ Pantheon-ready document:
 [GATE_LIFECYCLE_PRESENTATION_PANTHEON_v1.0.0.md](./GATE_LIFECYCLE_PRESENTATION_PANTHEON_v1.0.0.md)
 
 In Mermaid Live, paste the raw content of the `.mmd` file directly (without markdown fences).
+
+historical_record: true

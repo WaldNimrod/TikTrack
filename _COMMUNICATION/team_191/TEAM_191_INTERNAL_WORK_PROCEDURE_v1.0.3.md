@@ -1,9 +1,11 @@
 # TEAM 191 INTERNAL WORK PROCEDURE v1.0.3
 
+> **SUPERSEDED** by `TEAM_191_INTERNAL_WORK_PROCEDURE_v1.0.4.md` (2026-03-27). Keep file for history only.
+
 **project_domain:** SHARED (TIKTRACK + AGENTS_OS)  
 **id:** TEAM_191_INTERNAL_WORK_PROCEDURE_v1.0.3  
 **owner:** Team 191 (child team of Team 190)  
-**date:** 2026-03-15  
+**date:** 2026-03-24  
 **status:** ACTIVE  
 **authority_source:** `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md`
 
@@ -227,6 +229,56 @@ Every Team 191 closure note must include:
 
 ---
 
+## §הגנה לפני קומיט (חובה) / §PRE-COMMIT GUARD (MANDATORY)
+
+**Must run before every `191 קומיט` and `191 פוש` invocation.**
+A failed guard BLOCKS the commit. Team 191 reports the failure to Nimrod and
+waits for instruction — never bypasses.
+
+```bash
+# Step 1 — SSOT consistency check (both domains)
+python3 -m agents_os_v2.tools.ssot_check --domain tiktrack
+python3 -m agents_os_v2.tools.ssot_check --domain agents_os
+# Required: ✓ CONSISTENT on both
+# If drift: run ./pipeline_run.sh wsm-reset FIRST, then re-check
+
+# Step 2 — WP099 contamination check
+grep -c "WP099" documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md
+# Required: output = 0
+# If output > 0: git checkout HEAD -- documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md
+#                then re-run Step 1
+
+# Step 3 — Show pending changes for review
+git status
+# Required: review output — no unexpected files
+# NEVER commit: *.env, credentials, *.key, pipeline_state_*.json (unless explicitly instructed)
+```
+
+**Iron Rule — git add scope:**
+- NEVER use `git add -A` or `git add .`
+- ALWAYS use targeted `git add <specific-paths>` based on the changes being committed
+- When unsure which paths to add: show `git status` output to Nimrod and wait
+
+**Iron Rule — git merge:**
+- NEVER execute `git merge` unless Nimrod provides the exact branch name and confirms
+- Merging without context is strictly prohibited
+
+**Iron Rule — git push --force:**
+- NEVER. Under any circumstances.
+
+**Operational wrapper (mandatory default for guarded commits):** `bash scripts/safe_commit.sh "<message>" <path1> [path2] ...`  
+Dry-run (guards + `git status` only): `bash scripts/safe_commit.sh`
+
+---
+
+## §COMMIT
+
+> **⚠️ Pre-commit guard must pass before this step. See §PRE-COMMIT GUARD.**
+
+Subject lines and process-ID rules: see **§11) Process-ID Title Lock**.
+
+---
+
 ## 11) Process-ID Title Lock (Binding)
 
 1. Every `191 commit` and `191 push` output must use a canonical process identifier as the main title prefix.
@@ -334,3 +386,6 @@ Every Team 191 closure note must include:
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | CONTINUOUS_FLOW_DEFAULT_LOCK_ADDED | 2026-03-15**
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | PERMISSION_AND_TOKEN_EFFICIENCY_LOCK_ADDED_v1_0_2 | 2026-03-15**
 **log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | PROCESS_FUNCTIONAL_SEPARATION_LANE_ADDED_v1_0_3 | 2026-03-15**
+**log_entry | TEAM_191 | TEAM_191_INTERNAL_WORK_PROCEDURE | PRE_COMMIT_GUARD_SAFE_COMMIT_MANDATE_TEAM100 | 2026-03-24**
+
+historical_record: true

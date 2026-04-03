@@ -1,0 +1,7 @@
+# WP004 harness — legacy GATE_8 → GATE_5
+id: scenario_01_gate8_alias
+description: Canonical 8→5 mapping for legacy GATE_8 label
+expect:
+  alias_check:
+    legacy: GATE_8
+    canonical: GATE_5

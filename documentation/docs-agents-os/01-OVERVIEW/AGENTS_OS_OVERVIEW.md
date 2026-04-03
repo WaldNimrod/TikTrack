@@ -64,7 +64,7 @@ Agents_OS is the automation and governance layer that drives TikTrack developmen
 
 | Team | Role |
 |------|------|
-| Team 10 | Implements changes, advances gates via CLI |
+| Team 10 | Work Plan Generator; advances gates via CLI |
 | Team 170 | Maintains documentation (this folder) |
 | Team 00 | Architectural decisions and spec documents |
 

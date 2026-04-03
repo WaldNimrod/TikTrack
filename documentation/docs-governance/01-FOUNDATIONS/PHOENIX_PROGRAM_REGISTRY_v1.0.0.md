@@ -1,3 +1,6 @@
+date: 2026-03-10
+historical_record: true
+
 
 # PHOENIX_PROGRAM_REGISTRY_v1.0.0
 
@@ -47,15 +50,21 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | S003 | S003-P001 | Data Model Validator | AGENTS_OS | COMPLETE | FAST_4 CLOSED (WP001) 2026-03-11 — Data Model Validator deployed; FAST_0..FAST_3 completed; Team 170 closure per TEAM_61_TO_TEAM_170_S003_P001_WP001_FAST4_HANDOFF_PROMPT_v1.0.0 |
 | S003 | S003-P002 | Test Template Generator | AGENTS_OS | COMPLETE | FAST_4 CLOSED (WP001) 2026-03-12 — Test Template Generator deployed; G3.7 added; agents_os_v2/requirements.txt canonical |
 | S003 | S003-P003 | System Settings (D39+D40+D41) | TIKTRACK | COMPLETE | GATE_8; active_flow=S003-P003-WP001 — DOCUMENTATION_CLOSED (GATE_8 PASS + lock closed 2026-03-21). Lifecycle complete.; active_work_package_id=N/A |
-| S003 | S003-P004 | User Tickers (D33) | TIKTRACK | PLANNED | — (registered from integrated roadmap v1.1.0) |
-| S003 | S003-P005 | Watch Lists (D26) | TIKTRACK | PLANNED | — (D38 tag_management relocated to S005 per ARCHITECT_DIRECTIVE_ROADMAP_AMENDMENT_v1.0.0 §A1; registered from integrated roadmap v1.1.0) |
+| S003 | S003-P004 | User Tickers (D33) | TIKTRACK | ACTIVE | GATE_0 pending — Team 100 authorization 2026-03-25 |
+| S003 | S003-P005 | Watch Lists (D26) | TIKTRACK | ACTIVE | GATE_0 — activated per Principal mandate 2026-03-31; first flight through AOS v3; active_work_package_id=S003-P005-WP001 |
 | S003 | S003-P006 | Admin Review S003 | TIKTRACK | PLANNED | — (Stage Governance Package; planning marker per integrated roadmap v1.1.0) |
 | S003 | S003-P007 | Agents_OS Command Bridge Lite (ADR-031 Stage B) | AGENTS_OS | MERGED | **MERGED_INTO_S003-P011-WP001** (2026-03-19). ADR-031 Stage B scope (approve-path desync, command bridge copy flow, model-B realignment) fully delivered through S003-P011-WP001. Authority: ARCHITECT_DIRECTIVE_AOS_ROADMAP_RESET_v1.0.0. |
 | S003 | S003-P008 | Agents_OS Pipeline Governance Hardening | AGENTS_OS | SUPERSEDED | **SUPERSEDED_BY_S003-P010** (2026-03-19). LOD200 acknowledged as historical reference. Scope absorbed: STATE_VIEW.json + date governance → P010-WP003; JSON verdict protocol → P010-WP002. Authority: ARCHITECT_DIRECTIVE_AOS_ROADMAP_RESET_v1.0.0. |
 | S003 | S003-P010 | Agents_OS Pipeline Core Reliability | AGENTS_OS | COMPLETE | **DOCUMENTATION_CLOSED 2026-03-19.** SUPERVISED_SPRINT completed: 4 phases; Team 51 QA 108/108 PASS; Team 00 architectural review PASS. Deliverables: PipelineState remediation fields, _generate_remediation_mandate, json_enforcer.py, FAIL_ROUTING G3_PLAN, _write_state_view, _preflight_date_correction. active_work_package_id=N/A. |
 | S003 | S003-P011 | Agents_OS — Process Model v2.0 + Pipeline Stabilization | AGENTS_OS | COMPLETE | GATE_3; active_flow=S003-P011-WP099 — gate GATE_3 (last event: GATE_3 FAIL); active_work_package_id=S003-P011-WP099; DB_DEPENDENCY_REF: IDEA-052 |
 | S003 | S003-P012 | AOS Pipeline Operator Reliability | AGENTS_OS | COMPLETE | **DOCUMENTATION_CLOSED 2026-03-21 — Team 100.** WP001–WP005 **GATE_5 FULL PASS**; pipeline readiness **205 tests**. Program-level closure + comms archive: `TEAM_170_S003_P012_GOVERNANCE_CLOSURE_AND_ARCHIVE_MANDATE_v1.0.0.md`; DB_DEPENDENCY_REF: IDEA-052 |
-| S003 | S003-P013 | TikTrack Pipeline Canary Run (D33 display_name) | TIKTRACK | COMPLETE | COMPLETE; active_flow=S003-P013-WP001 — gate COMPLETE (last event: GATE_5 PASS); active_work_package_id=N/A |
+| S003 | S003-P013 | TikTrack Pipeline Canary Run (D33 display_name) | TIKTRACK | COMPLETE | COMPLETE; active_flow=S003-P013-WP001 — gate COMPLETE (last event: GATE_5 PASS); active_work_package_id=N/A. **SIMULATION slot:** `S003-P013-WP002` registered as HOLD in Work Package Registry for future Team 100 Canary mocks (does not change ACTIVE program rows). |
+| S003 | S003-P014 | TikTrack Pipeline Operator E2E Simulation | TIKTRACK | COMPLETE | **SIMULATION CLOSED 2026-03-23** — operator dry-run completed (GATE_0–GATE_5); registry row retained as evidence. |
+| S003 | S003-P015 | AOS DM-005 SC Verification Run | AGENTS_OS | ACTIVE | COMPLETE; active_flow=S003-P015-WP001 — AOS DM-005 SC Verification Run. Documentation-only pipeline run (GATE_0→GATE_5, TRACK_FOCUSED) to verify AOS pipeline engine readiness for DM-005 closure. No code changes. Authority: DM-005 v1.2.0.; active_work_package_id=S003-P015-WP001 |
+| S003 | S003-P016 | Pipeline Git Isolation — Branch-per-WP + State Consolidation | SHARED | PLANNED | **PREREQUISITE to S003-P004.** Architectural refactor: (1) WSM COS block extracted → pipeline_state_*.json; (2) volatile state files gitignored; (3) branch-per-WP: pipeline creates isolated git branch at GATE_0, merges to main at COMPLETE; (4) SSOT check rewritten (single source); (5) dashboard updated; (6) full regression suite + stability validation. Authority: Team 00 architectural directive TEAM_00_ARCHITECT_DIRECTIVE_PIPELINE_GIT_ISOLATION_v1.0.0.md. **S003-P004 cannot start until S003-P016 reaches GATE_5 PASS.** |
+| S003 | S003-P017 | Lean Kit — agents-os repository + methodology portability (LEAN-KIT) | AGENTS_OS | COMPLETE | WP001 GATE_5 PASS 2026-04-03 (Team 191 — repo init); WP002 GATE_5 PASS 2026-04-03 (Team 170 — lean-kit content, 24 files). `agents-os` repo: `github.com/WaldNimrod/agents-os`. Lean Kit v0.1.0-scaffold. Follow-on programs: `S003-P018`, `S003-P019`, `S004-P009`, `S004-P010`, `S004-P011` (Lean Kit generator / L0→L2 / CLI — registry slots chosen to avoid collision with existing TikTrack `S004-P005`–`P007`). |
+| S003 | S003-P018 | AOS Snapshot Version Management | AGENTS_OS | PLANNED | LOD100 authored 2026-04-03. Scope: version numbering + automated sync script for `agents_os_v3/` snapshot in client repos. Pre-condition for S003-P019. Ref: `ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md` §2 Decision 1; LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S003_P018_AOS_SNAPSHOT_VERSION_MANAGEMENT_v1.0.0.md`. |
+| S003 | S003-P019 | Multi-Project Lean Kit Adoption — SmallFarmsAgents + EyalAmit | AGENTS_OS | PLANNED | LOD100 authored 2026-04-03. Scope: onboard 2 active projects onto L0 Lean profile; register in `agents-os/projects/`; validate Lean Kit in real-world conditions. Requires S003-P018 GATE_5 PASS. Ref: `ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md` §2 Decision 2; LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S003_P019_MULTI_PROJECT_LEAN_KIT_ADOPTION_v1.0.0.md`. |
 | S003 | S003-P009 | Agents_OS Pipeline Resilience Package | AGENTS_OS | COMPLETE | S003-P009-WP001 GATE_8 PASS 2026-03-18; DOCUMENTATION_CLOSED. Scope: 3-tier resolution (AC-10/AC-11), wsm_writer.py, targeted git (pre-GATE_4 + GATE_8); Items 4a/4b verification only. LOD400: TEAM_100_PIPELINE_RESILIENCE_LOD400_DRAFT; authority: Team 00 PRE-CONDITION 2026-03-17; DB_DEPENDENCY_REF: IDEA-052 |
 | S004 | S004-P001 | Financial Precision Validator | AGENTS_OS | PLANNED | — (placeholder; program number assigned at activation; LOD200 authoring begins when S003 Agents_OS programs complete; scope: float prohibition E-18..E-19, NUMERIC(20,8) enforcement E-20..E-22; DB_DEPENDENCY_REF: IDEA-052) |
 | S004 | S004-P002 | Business Logic Validator | AGENTS_OS | PLANNED | — (placeholder; ⚡ ACCELERATED from S005; scope: multi-entity consistency, state machine completeness, business rule coverage; MUST complete before S005 TikTrack begins; DB_DEPENDENCY_REF: IDEA-052) |
@@ -65,11 +74,15 @@ Programs are **single-domain only**. **current_gate_mirror** is derived from WSM
 | S004 | S004-P006 | Admin Review S004 | TIKTRACK | PLANNED | — (Stage Governance Package; planning marker per integrated roadmap v1.1.0) |
 | S004 | S004-P007 | Indicators Infrastructure | TIKTRACK | PLANNED | — (canonical slot assigned for registry consistency; architectural alias in directives: S004-PXXX. Deliverables: ticker_indicators table NUMERIC(20,8), indicator_computation_service ATR/MA/CCI, nightly_indicators_calculation APScheduler job, GET /api/v1/tickers/{id}/indicators endpoint) |
 | S004 | S004-P008 | Agents_OS Mediated Reconciliation Engine (ADR-031 Stage C) | AGENTS_OS | PLANNED | — (independent stage-4 package after existing AGENTS_OS stage-4 programs; scope lock: proposed_updates mediator, SSM legality gate, visual evidence diff/capture flow; authority source: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`; lock package: `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`; DB_DEPENDENCY_REF: IDEA-052) |
+| S004 | S004-P009 | Lean Kit Generator | AGENTS_OS | PLANNED | LOD100 authored 2026-04-03. Concept: LEAN-KIT-WP002. Scope: code generator producing project scaffold from minimal inputs. Requires S003-P019 GATE_5 PASS. LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S004_P005_LEAN_KIT_GENERATOR_v1.0.0.md`. |
+| S004 | S004-P010 | L0→L2 Upgrade Path | AGENTS_OS | PLANNED | LOD100 authored 2026-04-03. Concept: LEAN-KIT-WP003. Scope: migration runbook + tooling for projects moving from Lean (L0) to AOS v3 (L2). Requires S003-P019 GATE_5 PASS + AOS L2 stability bar. LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S004_P006_L0_TO_L2_UPGRADE_PATH_v1.0.0.md`. |
+| S004 | S004-P011 | Project Scaffolding CLI | AGENTS_OS | PLANNED | LOD100 authored 2026-04-03. Concept: LEAN-KIT-WP004. Scope: unified `aos` CLI (new, gate, snapshot, status). L3 profile entry point. Requires S004-P009 + S003-P018 GATE_5 PASS. LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S004_P007_PROJECT_SCAFFOLDING_CLI_v1.0.0.md`. |
 | S005 | S005-P001 | Analytics Quality Validator | AGENTS_OS | PLANNED | — (placeholder; moved from S006; scope: analytics calculation declaration, output format compliance; built during S005 era to serve S006 TikTrack analytics work; DB_DEPENDENCY_REF: IDEA-052) |
 | S005 | S005-P002 | Trade Entities (D29+D24) | TIKTRACK | PLANNED | — (registered from integrated roadmap v1.1.0) |
 | S005 | S005-P003 | Market Intelligence (D27+D25) | TIKTRACK | PLANNED | — (registered from integrated roadmap v1.1.0) |
 | S005 | S005-P004 | Journal & History (D28+D31) | TIKTRACK | PLANNED | — (registered from integrated roadmap v1.1.0) |
 | S005 | S005-P005 | Admin Review S005 | TIKTRACK | PLANNED | — (Stage Governance Package; planning marker per integrated roadmap v1.1.0) |
+| S005 | S005-P006 | Domain Clean Separation — TikTrack Consumes AOS as Installed Tool | AGENTS_OS | PLANNED | LOD100 authored 2026-04-03. Phase E of `ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md`. Scope: remove `agents_os_v3/` from TikTrack; AOS delivered as installable L3 CLI. All of S003-P018/P019 + S004-P009/P010/P011 must be GATE_5 PASS first. LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S005_P006_DOMAIN_CLEAN_SEPARATION_v1.0.0.md`. |
 | S006 | S006-P001 | Portfolio State (D32) | TIKTRACK | PLANNED | — (registered from integrated roadmap v1.1.0) |
 | S006 | S006-P002 | Analysis & Closure (D30) | TIKTRACK | PLANNED | — (registered from integrated roadmap v1.1.0) |
 | S006 | S006-P003 | Level-1 Dashboards | TIKTRACK | PLANNED | — (registered from integrated roadmap v1.1.0) |
@@ -94,14 +107,14 @@ Status: Team 11 producing Work Plan; next: Team 90 review (2.2v) → Team 100 si
 |---|---|---|---|
 | Role-Based Team Management | C1 | T190 Monitor Report v1.1 | `role_catalog.json` + `domain_role_defaults.json` + `wp_role_assignments/{wp}.json`; role→team resolution replacing `_DOMAIN_PHASE_ROUTING` nested dict |
 | Teams UI roster-driven | C2 | T190 GAP-A1 | Remove hardcoded `TEAMS` array from `pipeline-teams.js`; drive from `TEAMS_ROSTER_v1.0.0.json` at runtime |
-| TEAMS_ROSTER entries | C3 | T190 GAP-A2 | Add missing roster entries: `team_11`, `team_101`, `team_102` (team_191 is utility — assess at WP003 spec) |
+| TEAMS_ROSTER entries | C3 | T190 GAP-A2 | Roster: `team_11`, **`team_110`**, **`team_111`** (canonical; legacy aliases `team_101`/`team_102` for backward-compat reads where applicable). `team_191` utility — assess at WP003 spec. |
 | .cursorrules coverage | C4 | T190 GAP-A5 | `.cursorrules` team list is subset-only; expand to full active roster |
 | Engine editor role extension | C5 | T190 RBTM-F06 | Extend engine editor from team→engine to role→preferred_engine |
 | WP-level role override policy | C6 | T190 §5 | Define approval model for per-WP role overrides (after role catalog established) |
 | Multi-channel context parity | C7 | T190 GAP-A6 | CI checks for context construction parity across LLM channels |
 | TRACK_FAST variant | C8 | LLD400 §2 | `_DOMAIN_PHASE_ROUTING` spec drafted but TRACK_FAST implementation deferred; full routing chain for single-team execution |
 
-**LOD200 authoring:** requires Team 101; begins at WP002 GATE_8 PASS.
+**LOD200 authoring:** requires **Team 110** (AOS Domain Architect IDE; artifact path may remain `_COMMUNICATION/team_101/`); begins at WP002 GATE_8 PASS.
 **WP03 Directive source:** `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_DECISIONS_WP2_02_03_04_v1.0.0.md §DECISION-WP2-02`
 
 ---
@@ -155,9 +168,9 @@ Source directives:
 
 ---
 
-**current_gate_mirror source:** WSM CURRENT_OPERATIONAL_STATE (last update 2026-03-23). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
+**current_gate_mirror source:** pipeline_state_*.json via wsm_sync (S003-P016 — COS removed from WSM; last update 2026-04-03). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
 
-**WSM mirror (2026-03-23):** active_stage_id=S003; active_program_id=S003-P013; current_gate=COMPLETE; active_work_package_id=N/A; active_flow=S003-P013-WP001 — gate COMPLETE (last event: GATE_5 PASS).
+**WSM mirror (2026-04-03):** active_stage_id=S003; active_program_id=S003-P015; current_gate=COMPLETE; active_work_package_id=S003-P015-WP001; active_flow=S003-P015-WP001 — AOS DM-005 SC Verification Run. Documentation-only pipeline run (GATE_0→GATE_5, TRACK_FOCUSED) to verify AOS pipeline engine readiness for DM-005 closure. No code changes. Authority: DM-005 v1.2.0..
 
 ---
 
@@ -203,3 +216,8 @@ Source directives:
 **log_entry | TEAM_90 | PHOENIX_PROGRAM_REGISTRY | S003_P003_WP001_GATE8_PASS_DOCUMENTATION_CLOSED | TEAM_90_REVALIDATION_LOCK_CLOSED | LIFECYCLE_COMPLETE | 2026-03-21**
 **log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S003_P011_WP003_BACKLOG_REGISTERED | C1_C8_DEFERRED_ITEMS_CAPTURED | AUTHORITY_DECISIONS_WP2_02_03_04 | 2026-03-20**
 **log_entry | TEAM_00 | PHOENIX_PROGRAM_REGISTRY | S003_P012_REGISTERED_ACTIVE | AOS_PIPELINE_OPERATOR_RELIABILITY | 5_WPs | SSOT+PROMPT+DASHBOARD+CI+TESTKIT | PRE_CONDITION_ALL_SUBSEQUENT | 2026-03-21**
+**log_entry | TEAM_110 | PHOENIX_PROGRAM_REGISTRY | S003_P005_PLANNED_TO_ACTIVE | D26_WATCH_LISTS_FIRST_FLIGHT | PRINCIPAL_MANDATE | WP001_GATE_0_ENTRY | 2026-03-31**
+**log_entry | TEAM_170 | PHOENIX_PROGRAM_REGISTRY | S003_P017_LEAN_KIT_PROGRAM_ROW_REGISTERED | SESSION_20260402_INDEXING | 2026-04-02**
+**log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S003_P017_CLOSED_COMPLETE | WP001_WP002_GATE5_PASS | 2026-04-03**
+**log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S003_P018_P019_REGISTERED | S004_P009_P010_P011_REGISTERED | DOMAIN_SEPARATION_BRIDGE_MODEL_DIRECTIVE | 2026-04-03**
+**log_entry | TEAM_00 | PHOENIX_PROGRAM_REGISTRY | S005_P006_DOMAIN_CLEAN_SEPARATION_REGISTERED | PHASE_E_LOCKED | LOD100_AUTHORED | 2026-04-03**

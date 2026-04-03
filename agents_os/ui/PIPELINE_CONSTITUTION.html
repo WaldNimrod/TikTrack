@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+  (function(){var d=localStorage.getItem("pipeline_domain")||"tiktrack";
+  document.documentElement.classList.toggle("theme-tiktrack",d==="tiktrack");})();
+  </script>
+  <title>Agents OS — Pipeline Constitution Map</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="css/pipeline-shared.css?v=7" />
+  <link rel="stylesheet" href="css/pipeline-monitor.css?v=5" />
+</head>
+<body data-monitor-mode="constitution">
+
+<header class="agents-header">
+  <div class="agents-header-left">
+    <h1 class="agents-header-title">🏛️ Agents OS — <span>Pipeline Constitution Map</span></h1>
+    <span data-testid="monitor-provenance-badge" id="monitor-provenance-badge" class="provenance-badge" title="Data source">[canonical + resolved live context]</span>
+  </div>
+  <div class="agents-header-right">
+    <span class="agents-refresh-label" id="monitor-last-refresh">Loading…</span>
+  </div>
+</header>
+
+<nav class="pipeline-nav">
+  <a class="nav-link" href="PIPELINE_DASHBOARD.html">📊 Dashboard</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="PIPELINE_MONITOR.html">📡 Live Monitor</a>
+  <span class="nav-sep nav-sep-group" title="Active Process Management | System Management"></span>
+  <a class="nav-link" href="PIPELINE_ROADMAP.html">🗺️ Roadmap</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link" href="PIPELINE_TEAMS.html">👥 Teams</a>
+  <span class="nav-sep"></span>
+  <a class="nav-link active" href="PIPELINE_CONSTITUTION.html">🏛️ Constitution</a>
+</nav>
+
+<div class="agents-page-layout monitor-layout">
+  <aside class="agents-page-sidebar monitor-sidebar">
+    <div class="agents-domain-bar agents-domain-bar--sidebar agents-domain-bar--no-domain">
+      <button class="btn btn-primary" id="monitor-refresh-btn" onclick="loadMonitor()">↺ Refresh</button>
+      <label class="refresh-label">
+        <input type="checkbox" id="monitor-auto-refresh" checked>
+        <span class="agents-refresh-label">Auto (5s)</span>
+      </label>
+      <div class="monitor-readonly-note">Canonical process map. Read-only, no state mutation.</div>
+    </div>
+
+    <div class="sidebar-section-card">
+      <div class="sidebar-section-title">Data Sources <span class="badge" id="monitor-sources-badge">—</span></div>
+      <div id="monitor-sources-content"><span class="loading">Loading…</span></div>
+    </div>
+
+    <div class="sidebar-section-card">
+      <div class="sidebar-section-title">System Alerts <span class="badge" id="monitor-alerts-badge">—</span></div>
+      <div id="monitor-alerts-content"><span class="loading">Loading…</span></div>
+    </div>
+
+    <div class="sidebar-section-card">
+      <div class="sidebar-section-title">Scope Guardrails</div>
+      <ul class="monitor-guardrails">
+        <li>No writes to <code>pipeline_state_*.json</code></li>
+        <li>No operational commands from this page</li>
+        <li>Canonical flow + ownership by track/domain</li>
+        <li>Expected outputs follow naming canon</li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="agents-page-main monitor-main">
+    <div class="monitor-accordion open" id="constitution-acc-flow">
+      <div class="monitor-accordion-header monitor-accordion-header-structure" onclick="toggleMonitorAccordion('constitution-acc-flow')">
+        <span>🗺️</span>
+        <span class="monitor-accordion-title">Canonical Flow Map + Gate/Phase Ownership</span>
+        <span class="badge">Structure</span>
+        <span class="monitor-accordion-chevron">▶</span>
+      </div>
+      <div class="monitor-accordion-body">
+        <div class="track-view-toolbar" id="track-view-toolbar">
+          <span class="track-view-label">Track View:</span>
+          <button class="btn track-view-btn active" data-track-view="AUTO" onclick="setMonitorTrackView('AUTO')">AUTO</button>
+          <button class="btn track-view-btn" data-track-view="TRACK_FULL" onclick="setMonitorTrackView('TRACK_FULL')">TRACK_FULL</button>
+          <button class="btn track-view-btn" data-track-view="TRACK_FOCUSED" onclick="setMonitorTrackView('TRACK_FOCUSED')">TRACK_FOCUSED</button>
+          <span class="badge" id="track-view-badge">AUTO</span>
+        </div>
+
+        <div class="flow-track">
+          <div class="flow-node">Idea Intake</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node gate">GATE_0<br><span>Scope validation (Team 190)</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node gate">GATE_1<br><span>Spec + Validation</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node gate">GATE_2<br><span>Plan + Review + Sign-off</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node gate">GATE_3<br><span>Mandates + Implementation + QA</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node gate">GATE_4<br><span>Dev Validation + Arch + Human</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node gate">GATE_5<br><span>AS_MADE + Lock</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">Complete</div>
+        </div>
+
+        <div class="monitor-subtitle">All Gate Phases (Canonical)</div>
+        <div id="monitor-phase-map"><span class="loading">Loading phase map…</span></div>
+      </div>
+    </div>
+
+    <div class="monitor-accordion open" id="constitution-acc-responsibility">
+      <div class="monitor-accordion-header monitor-accordion-header-structure" onclick="toggleMonitorAccordion('constitution-acc-responsibility')">
+        <span>🧩</span>
+        <span class="monitor-accordion-title">Responsibility Model + Program Accountability Chain</span>
+        <span class="badge">Governance</span>
+        <span class="monitor-accordion-chevron">▶</span>
+      </div>
+      <div class="monitor-accordion-body">
+        <div class="monitor-subtitle">Principled ownership rules first, then drill-down for active program chains.</div>
+        <div id="monitor-responsibility-summary"><span class="loading">Loading responsibility summary…</span></div>
+        <details class="monitor-drilldown" id="monitor-chain-drilldown">
+          <summary>Active Program Accountability Chain</summary>
+          <div id="monitor-program-chains"><span class="loading">Loading active chains…</span></div>
+        </details>
+      </div>
+    </div>
+
+    <div class="monitor-accordion open" id="constitution-acc-outputs">
+      <div class="monitor-accordion-header monitor-accordion-header-structure" onclick="toggleMonitorAccordion('constitution-acc-outputs')">
+        <span>📦</span>
+        <span class="monitor-accordion-title">Canonical Expected Outputs (Phase / Team / Process)</span>
+        <span class="badge" id="monitor-outputs-badge">—</span>
+        <span class="monitor-accordion-chevron">▶</span>
+      </div>
+      <div class="monitor-accordion-body">
+        <div class="monitor-subtitle">Naming Rule: <code>TEAM_{sender}[_TO_TEAM_{recipient}]_SXXX_PXXX_WPXXX_GATE_N[_PHASE_X.Y]_{TYPE}_v1.0.0.md</code></div>
+        <div id="monitor-expected-outputs"><span class="loading">Loading expected outputs…</span></div>
+        <div class="monitor-overall-output" id="monitor-overall-output"><span class="loading">Loading overall package outputs…</span></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="js/pipeline-gate-map.generated.js?v=2"></script>
+<script src="js/pipeline-config.js?v=18"></script>
+<script src="js/pipeline-state.js?v=4"></script>
+<script src="js/pipeline-dom.js?v=5"></script>
+<script src="js/pipeline-monitor-core.js?v=2"></script>
+<script src="js/pipeline-monitor-constitution.js?v=2"></script>
+</body>
+</html>

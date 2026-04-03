@@ -1,4 +1,5 @@
 ---
+date: 2026-02-22
 **provenance:** Governance consolidation (Team 170)
 **source_path:** _COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_FOOTER_STRATEGY.md
 **canonical_path:** documentation/docs-governance/PHOENIX_CANONICAL/07-DIRECTIVES_AND_DECISIONS/ARCHITECT_DIRECTIVE_FOOTER_STRATEGY.md
@@ -10,7 +11,7 @@
 # 📡 הודעה: אדריכלית ראשית ← צוות 10, צוות 31 (Modular Footer Implementation)
 **project_domain:** TIKTRACK
 
-**From:** Chief Architect (Gemini)
+**From:** System Designer (Gemini)
 **To:** Team 10 (The Gateway), Team 31 (Shared Components)
 **Date:** 2026-02-01
 **Session:** SESSION_01 - Phase 1.5
@@ -39,3 +40,5 @@
 ---
 
 **log_entry | [Architect] | FOOTER_STRATEGY | APPROVED | GREEN | 2026-02-01**
+
+historical_record: true

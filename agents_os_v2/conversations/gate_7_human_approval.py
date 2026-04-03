@@ -1,4 +1,10 @@
 """
+⚠️ LEGACY — DO NOT USE IN NEW WORK
+GATE_7 is not an active pipeline gate. The pipeline has GATE_0 through GATE_5 only.
+Preserved for historical reference only (2026-03-24).
+Human UX review by Nimrod is an organizational action outside the pipeline.
+
+[ORIGINAL HEADER BELOW — LEGACY]
 GATE_7 — HUMAN_UX_APPROVAL
 Owner: Team 90 (execution), Team 00/Nimrod (decision)
 This is the ONLY human checkpoint. Pipeline pauses here.

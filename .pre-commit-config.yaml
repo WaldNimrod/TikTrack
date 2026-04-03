@@ -21,6 +21,22 @@ repos:
         files: '^(_COMMUNICATION/|documentation/docs-governance/).+\.md$'
         stages: [pre-commit]
 
+      - id: phoenix-aos-v3-file-index-auto-update
+        name: "AOS v3 FILE_INDEX — auto-stub new files [NON-BLOCKING]"
+        entry: python3 scripts/update_aos_v3_file_index.py
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+        always_run: false
+        files: '^agents_os_v3/'
+
+      - id: phoenix-aos-v3-file-index-v2-freeze
+        name: "AOS v3 — FILE_INDEX + agents_os_v2 FREEZE [BLOCKING when staged]"
+        entry: bash scripts/lint_aos_v3_file_index_and_v2_freeze.sh
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
       - id: phoenix-process-functional-separation
         name: "Phoenix — Process-Functional Separation Guard"
         language: system

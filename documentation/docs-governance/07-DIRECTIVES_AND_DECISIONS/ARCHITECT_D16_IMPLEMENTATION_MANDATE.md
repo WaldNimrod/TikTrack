@@ -1,4 +1,5 @@
 ---
+date: 2026-02-22
 **provenance:** Governance consolidation (Team 170)
 **source_path:** _COMMUNICATION/_Architects_Decisions/ARCHITECT_D16_IMPLEMENTATION_MANDATE.md
 **canonical_path:** documentation/docs-governance/PHOENIX_CANONICAL/07-DIRECTIVES_AND_DECISIONS/ARCHITECT_D16_IMPLEMENTATION_MANDATE.md
@@ -10,7 +11,7 @@
 # 📡 הודעה: אדריכלית ראשית ← כל הצוותים (D16 Implementation Plan)
 **project_domain:** TIKTRACK
 
-**From:** Chief Architect (Gemini)
+**From:** System Designer (Gemini)
 **To:** Team 10 (Gateway), Team 20 (Backend), Team 30 (Frontend), Team 40 (UI/Design)
 **Date:** 2026-02-03
 **Session:** SESSION_01 - Phase 2.0 (Kickoff)
@@ -32,3 +33,5 @@
 
 ---
 **log_entry | [Architect] | D16_KICKOFF | BATCH_2_ACTIVE | GREEN | 2026-02-03**
+
+historical_record: true

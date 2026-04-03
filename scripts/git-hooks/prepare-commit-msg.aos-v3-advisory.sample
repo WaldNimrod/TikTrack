@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Advisory prepare-commit-msg — AOS v3 [run: …] hint (opt-in; copy to .git/hooks/prepare-commit-msg)
+# Never blocks; exit 0 always. See scripts/git-hooks/README.md
+
+set -euo pipefail
+COMMIT_MSG_FILE="${1:-}"
+[[ -n "$COMMIT_MSG_FILE" && -f "$COMMIT_MSG_FILE" ]] || exit 0
+
+REPO="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
+cd "$REPO" || exit 0
+
+if ! git diff --cached --name-only 2>/dev/null | grep -q '^agents_os_v3/'; then
+  exit 0
+fi
+
+SUF="$(
+  AOS_V3_PIPELINE_STATE_TIKTRACK="$REPO/_COMMUNICATION/agents_os/pipeline_state_tiktrack.json" \
+    bash "$REPO/scripts/suggest_run_suffix.sh" 2>/dev/null || true
+)"
+[[ -n "$SUF" ]] || exit 0
+
+TMP="${COMMIT_MSG_FILE}.aos_v3_advisory.$$"
+{
+  printf '%s\n' "# AOS v3 advisory (remove this line): consider appending to subject: ${SUF}"
+  cat "$COMMIT_MSG_FILE"
+} >"$TMP"
+mv "$TMP" "$COMMIT_MSG_FILE"
+exit 0

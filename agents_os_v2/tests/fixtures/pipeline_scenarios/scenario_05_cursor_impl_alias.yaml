@@ -1,0 +1,6 @@
+id: scenario_05_cursor_impl_alias
+description: CURSOR_IMPLEMENTATION → GATE_3
+expect:
+  alias_check:
+    legacy: CURSOR_IMPLEMENTATION
+    canonical: GATE_3

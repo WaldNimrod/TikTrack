@@ -1,0 +1,6 @@
+id: scenario_02_g3_plan_alias
+description: G3_PLAN sub-id maps to GATE_3
+expect:
+  alias_check:
+    legacy: G3_PLAN
+    canonical: GATE_3

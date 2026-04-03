@@ -161,6 +161,55 @@
 
 ---
 
+### pass_with_actions
+
+| Field | Content |
+|-------|---------|
+| **Usage** | `./pipeline_run.sh pass_with_actions "a1\|a2\|a3"` |
+| **When to use** | S002-P005-WP002: Gate passes but with pending actions — record and hold |
+| **What it does** | Records PASS_WITH_ACTION with pipe-separated action IDs; holds gate until `actions_clear` |
+| **Output** | Confirmation + action list displayed |
+| **Example** | `./pipeline_run.sh pass_with_actions "a1|a2"` |
+| **Next step** | Resolve actions → `./pipeline_run.sh actions_clear` |
+
+---
+
+### actions_clear
+
+| Field | Content |
+|-------|---------|
+| **Usage** | `./pipeline_run.sh actions_clear` |
+| **When to use** | After all PASS_WITH_ACTION items are resolved |
+| **What it does** | Clears action list; advances to next gate |
+| **Output** | Next gate prompt |
+| **Example** | `./pipeline_run.sh actions_clear` |
+
+---
+
+### override
+
+| Field | Content |
+|-------|---------|
+| **Usage** | `./pipeline_run.sh override "reason text"` |
+| **When to use** | Human decision to override gate and advance (e.g. verdict unavailable) |
+| **What it does** | Records override reason; advances to next gate |
+| **Output** | Confirmation + next gate prompt |
+| **Example** | `./pipeline_run.sh override "Verdict file delayed — Nimrod approval"` |
+
+---
+
+### insist
+
+| Field | Content |
+|-------|---------|
+| **Usage** | `./pipeline_run.sh insist` |
+| **When to use** | Stay at current gate — regenerate correction prompt (no advance) |
+| **What it does** | Calls `--insist`; displays same-gate prompt for re-work |
+| **Output** | Correction prompt block |
+| **Example** | `./pipeline_run.sh insist` |
+
+---
+
 ## Domain Flag
 
 | Flag | Effect |

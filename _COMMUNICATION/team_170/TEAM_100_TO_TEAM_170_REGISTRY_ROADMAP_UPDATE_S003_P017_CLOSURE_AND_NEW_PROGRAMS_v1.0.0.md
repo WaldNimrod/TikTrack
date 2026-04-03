@@ -68,9 +68,9 @@ Add in the S004 section (after S004-P008, before S005 rows):
 
 ### Task D2 — Add S005-P006 row
 
-> **Canonical ID:** S005-P001..P005 are taken. Use S005-P006.
+> **Canonical ID:** S005-P006. (Slots P001–P005 are already assigned — do not use.)
 
-Add after all S005 existing rows (S005-P001..P005), before S006:
+Add after all existing S005 rows, before S006:
 
 ```
 | S005 | S005-P006 | Domain Clean Separation — TikTrack Consumes AOS as Installed Tool | AGENTS_OS | PLANNED | LOD100 authored 2026-04-03. Phase E of ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md. Scope: remove `agents_os_v3/` from TikTrack; AOS delivered as installable CLI (L3). ALL of S003-P018/P019 + S004-P009/P010/P011 must be GATE_5 PASS first. LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S005_P006_DOMAIN_CLEAN_SEPARATION_v1.0.0.md`. |
@@ -110,7 +110,7 @@ add the new programs as follow-on rows:
 - [ ] S003-P018 row present with correct note
 - [ ] S003-P019 row present with correct note
 - [ ] S004-P009, P010, P011 rows present in S004 section (slot hygiene: S004-P005/P006/P007 = TikTrack — do not use for Lean Kit)
-- [ ] S005-P006 row present in S005 section (Phase E clean separation only — slot hygiene: S005-P001..P005 already assigned elsewhere)
+- [ ] S005-P006 row present in S005 section (Phase E clean separation only — slot hygiene: slots P001–P005 already assigned elsewhere)
 - [ ] Log entries appended
 - [ ] Roadmap S003-P017-LEAN-KIT row = COMPLETE
 - [ ] Follow-on rows added: S003-P018/P019+S004-P009..P011 block + S005-P006 row

@@ -11,7 +11,7 @@ oi_02_makefile_defaults: "No defaults for SOURCE or VERS — both are required o
 git_commits:
   - "agents-os: ecf247c — docs(core): S003-P018 — add SYNC_PROCEDURE.md operator runbook"
   - "TikTrack: 647239387ef554ba3e051666302761993df827a7 — sync(aos): v0.1.0+ecf247c — S003-P018 snapshot tooling + core alignment"
-  - "TikTrack: b3446902a — docs(191): S003-P018 completion report + Team 190 GATE_5 validation request"
+  - "TikTrack: follow-up commit on same branch — docs(191): S003-P018 completion report + Team 190 GATE_5 validation request (see git log)"
 overall_verdict: PASS_WITH_FINDINGS
 ---
 

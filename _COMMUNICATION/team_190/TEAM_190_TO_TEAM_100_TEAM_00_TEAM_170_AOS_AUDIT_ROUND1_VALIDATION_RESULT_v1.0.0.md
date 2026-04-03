@@ -43,11 +43,6 @@ scope: Audit Round 1 validation for Process-Functional Separation (2A)
 
 1. `DRIFT-03` (Team 51 routing/handoff text still embedded in identity output contract)
 
-## owner_next_action
-
-1. Team 170: issue targeted remediation patch for `agents_os_v2/context/identity/team_51.md` and add missing round-1 report artifact file.
-2. Team 190: run strict revalidation immediately after remediation package submission.
-
 ## evidence-by-path
 
 1. `documentation/docs-governance/01-FOUNDATIONS/TEAM_DEVELOPMENT_ROLE_MAPPING_v1.0.0.md`

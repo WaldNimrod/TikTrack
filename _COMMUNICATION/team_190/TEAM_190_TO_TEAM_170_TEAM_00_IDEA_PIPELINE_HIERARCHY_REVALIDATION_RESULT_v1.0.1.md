@@ -38,11 +38,6 @@ scope: Revalidation result for IDEA-019 Option C hierarchy remediation (pointwis
 
 **NONE**
 
-## owner_next_action
-
-1. Team 00: may accept IDEA-019 Option C package as constitutionally validated.
-2. Team 170 + Team 10: optionally apply `IHC-RV-NB-01` hardening in a maintenance sweep.
-
 ## evidence-by-path
 
 1. `_COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_IDEA_PIPELINE_HIERARCHY_REVALIDATION_REQUEST_v1.0.0.md`

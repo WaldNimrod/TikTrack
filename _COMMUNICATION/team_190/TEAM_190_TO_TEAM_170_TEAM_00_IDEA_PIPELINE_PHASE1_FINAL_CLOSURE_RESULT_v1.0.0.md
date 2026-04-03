@@ -34,12 +34,6 @@ scope: Final closure confirmation for Idea Pipeline Phase 1 after PASS_WITH_ACTI
 
 **NONE**
 
-## owner_next_action
-
-1. Team 00: approve package closure as architect authority.
-2. Team 170: archive this cycle as constitutionally closed.
-3. Team 190: no further actions on Idea Pipeline Phase 1 thread.
-
 ## evidence-by-path
 
 1. `_COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_IDEA_PIPELINE_PHASE1_RETURN_CONTRACT_v1.0.0.md`

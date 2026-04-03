@@ -1341,16 +1341,8 @@ work_packages:
   # ---------------------------------------------------------------------------
   # Lean Kit + Methodology Portability WPs
   # Ref: ARCHITECT_DIRECTIVE_METHODOLOGY_DEPLOYMENT_SPLIT_v1.0.0.md
-  # Ref: ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md
-  # Registry SSOT (program rows): documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md
-  # S003-P017: repo init + lean-kit content — COMPLETE 2026-04-03. Follow-on concepts are registered (not “S004+” only):
-  # Concept WP → registry mapping (canonical IDs, locked 2026-04-03):
-  #   LEAN-KIT-WP001 → S003-P017 (COMPLETE)
-  #   LEAN-KIT-WP002 → S004-P009 (Lean Kit Generator)
-  #   LEAN-KIT-WP003 → S004-P010 (L0→L2 Upgrade Path)
-  #   LEAN-KIT-WP004 → S004-P011 (Project Scaffolding CLI)
-  #   Phase E        → S005-P006 (Domain Clean Separation)
-  # Note: S004-P005/006/007 are TikTrack-domain programs — DO NOT reassign.
+  # Stage assignment (2026-04-02): WP001 → S003-P017; WP002-WP004 → S004+ (future)
+  # Program S003-P017: agents-os repo initialization + Lean Kit content build
   # ---------------------------------------------------------------------------
 
   # S003-P017-WP001: agents-os repo initialization (Team 191)
@@ -1374,9 +1366,7 @@ work_packages:
     notes: "Executor: Team 170. Mandate: TEAM_100_TO_TEAM_170_S003_P017_WP002_LEAN_KIT_CONTENT_MANDATE_v1.0.0.md. Depends on S003-P017-WP001 (repo must exist first)."
 
   # Conceptual WP IDs (kept for roadmap tracking; canonical S003 IDs above)
-  # concept: true  →  seed.py skips these (non-standard ID format; no DB row needed)
   - id: "LEAN-KIT-WP001"
-    concept: true
     label: "BUILD_LEAN_KIT_REPO — canonical concept ID; executed as S003-P017-WP001+WP002"
     domain_id: "01JK8AOSV3DOMAIN00000001"
     status: PLANNED
@@ -1386,34 +1376,31 @@ work_packages:
     notes: "Concept WP for tracking. Execution split: WP001=Team191(repo init), WP002=Team170(content). Ref: ARCHITECT_DIRECTIVE_METHODOLOGY_DEPLOYMENT_SPLIT_v1.0.0.md §3"
 
   - id: "LEAN-KIT-WP002"
-    concept: true
     label: "BUILD_LEAN_KIT_GENERATOR — Python script that auto-generates lean-kit snapshot from AOS SSoT (definition.yaml + LOD Standard)"
     domain_id: "01JK8AOSV3DOMAIN00000001"
     status: PLANNED
     linked_run_id: null
-    stage_id: "S004"  # Canonical registry ID: S004-P009
-    program_id: "S004-P009"
-    notes: "Canonical program: S004-P009. Depends on S003-P019 GATE_5 PASS. SSoT principle: no manual copy maintenance. LOD100: TEAM_00_LOD100_S004_P005_LEAN_KIT_GENERATOR_v1.0.0.md."
+    stage_id: null  # S004+ — depends on S003-P017 completion
+    program_id: null
+    notes: "Depends on S003-P017 (LEAN-KIT-WP001 complete). SSoT principle: no manual copy maintenance."
 
   - id: "LEAN-KIT-WP003"
-    concept: true
     label: "BUILD_LEAN_TO_AOS_UPGRADE — Migration tool: roadmap.yaml → AOS DB (enables L0→L2 upgrade path)"
     domain_id: "01JK8AOSV3DOMAIN00000001"
     status: PLANNED
     linked_run_id: null
-    stage_id: "S004"  # Canonical registry ID: S004-P010
-    program_id: "S004-P010"
-    notes: "Canonical program: S004-P010. Depends on S003-P019 GATE_5 PASS + AOS L2 stability bar. roadmap.yaml schema mirrors AOS DB. LOD100: TEAM_00_LOD100_S004_P006_L0_TO_L2_UPGRADE_PATH_v1.0.0.md."
+    stage_id: null  # S004+ — depends on S003-P017 completion
+    program_id: null
+    notes: "roadmap.yaml schema mirrors AOS DB; import script populates work_packages table."
 
   - id: "LEAN-KIT-WP004"
-    concept: true
     label: "BUILD_PROJECT_SCAFFOLDING_CLI — New project creation CLI for both L0 (Lean) and L2 (AOS v3); automates PROJECT_CREATION_PROCEDURE_v1.0.0.md"
     domain_id: "01JK8AOSV3DOMAIN00000001"
     status: PLANNED
     linked_run_id: null
-    stage_id: "S004"  # Canonical registry ID: S004-P011
-    program_id: "S004-P011"
-    notes: "Canonical program: S004-P011. Depends on S004-P009 + S003-P018 GATE_5 PASS. Makes new project creation ~5 minutes for both profiles. LOD100: TEAM_00_LOD100_S004_P007_PROJECT_SCAFFOLDING_CLI_v1.0.0.md."
+    stage_id: null  # S004+ — depends on LEAN-KIT-WP001+WP002
+    program_id: null
+    notes: "Depends on S003-P017 (LEAN-KIT-WP001+WP002). Makes new project creation ~5 minutes for both profiles."
 
 # ---------------------------------------------------------------------------
 # V2 → V3 Migration: Ideas

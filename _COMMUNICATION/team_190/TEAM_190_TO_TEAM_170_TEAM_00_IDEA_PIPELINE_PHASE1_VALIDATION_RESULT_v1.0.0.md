@@ -39,12 +39,6 @@ scope: Constitutional validation for Idea Pipeline Phase 1 package (DOC-1..DOC-4
 1. `IPP1-01`
 2. `IPP1-02`
 
-## owner_next_action
-
-1. Team 170: submit corrected package versions (dates/log consistency across request, report, inbox package).
-2. Team 00: confirm corrected constitutional adoption/date metadata in `TEAM_00_CONSTITUTION`.
-3. Team 190: re-run validation immediately on corrected package.
-
 ## evidence-by-path
 
 1. `_COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_IDEA_PIPELINE_VALIDATION_REQUEST_v1.0.0.md`

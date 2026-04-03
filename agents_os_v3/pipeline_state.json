@@ -3,19 +3,19 @@
     "actor_team_id": "team_190",
     "current_gate_id": "GATE_0",
     "current_phase_id": "0.1",
-    "last_updated": "2026-04-03T00:25:26.680050Z",
-    "run_id": "01KN8BP0WKYCF598VQ1JN5RSEV",
+    "last_updated": "2026-04-01T22:21:00.718979Z",
+    "run_id": "01KN5J5EX9K66EA566FXP474YA",
     "status": "IN_PROGRESS",
-    "work_package_id": "01KN8BP0W804J93AT911839RH5"
+    "work_package_id": "01KN5J5EWXXJHKJED565B3NV1F"
   },
   "01JK8AOSV3DOMAIN00000002": {
     "actor_team_id": "team_190",
     "current_gate_id": "GATE_0",
     "current_phase_id": "0.1",
-    "last_updated": "2026-04-03T00:25:26.172414Z",
-    "run_id": "01KN8BP0CQ6T1RQKG09KXFW998",
+    "last_updated": "2026-04-01T22:21:00.204615Z",
+    "run_id": "01KN5J5ED8Z8MFFVDQ66AEFN7B",
     "status": "IN_PROGRESS",
-    "work_package_id": "01KN8BP0CKAPCG4T4NCRQDE4KQ"
+    "work_package_id": "01KN5J5ED315GX2AJA45NP05GN"
   },
   "01KMTX5NVW75GB5G4DPR7X7YBB": {
     "actor_team_id": "team_10",
@@ -979,14 +979,5 @@
     "run_id": "01KN5J5D0AXTGAFM4BTW9CHP1J",
     "status": "IN_PROGRESS",
     "work_package_id": "01KN5J5CZSQ8QD24GQVG2DZ7X4"
-  },
-  "01KN8BNZ2WPTZQXP834A6Q1QCA": {
-    "actor_team_id": "team_10",
-    "current_gate_id": "GATE_1",
-    "current_phase_id": "1.1",
-    "last_updated": "2026-04-03T00:25:24.944066Z",
-    "run_id": "01KN8BNZ3CKRRP0144Q3YC8HE0",
-    "status": "IN_PROGRESS",
-    "work_package_id": "01KN8BNZ2WPTZQXP834A6Q1QCB"
   }
 }

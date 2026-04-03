@@ -37,11 +37,6 @@ scope: Revalidation result for IDEA-019 Option C hierarchy remediation
 
 1. `IHC-RV-BF-01`
 
-## owner_next_action
-
-1. Team 170: patch revalidation request metadata date/log_entry for temporal consistency.
-2. Team 190: run immediate pointwise revalidation after metadata fix.
-
 ## evidence-by-path
 
 1. `_COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_IDEA_PIPELINE_HIERARCHY_REVALIDATION_REQUEST_v1.0.0.md`

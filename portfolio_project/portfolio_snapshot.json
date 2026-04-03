@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-04-03T14:27:03.150692+00:00",
+  "generated_at_utc": "2026-04-03T21:29:27.071300+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -262,8 +262,8 @@
       "program_name": "AOS Snapshot Version Management",
       "domain": "AGENTS_OS",
       "stage_id": "S003",
-      "status": "PLANNED",
-      "current_gate_mirror": "LOD100 authored 2026-04-03. Scope: version numbering + automated sync script for `agents_os_v3/` snapshot in client repos. Pre-condition for S003-P019. Ref: `ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md` §2 Decision 1; LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S003_P018_AOS_SNAPSHOT_VERSION_MANAGEMENT_v1.0.0.md`."
+      "status": "COMPLETE",
+      "current_gate_mirror": "GATE_5 PASS_WITH_FINDINGS 2026-04-03 (Team 191 build; Team 190 validated). Deliverables: `agents_os_v3/SNAPSHOT_VERSION` (v0.1.0+ecf247c), `scripts/sync_aos_snapshot.sh`, `agents_os_v3/SYNC_PROCEDURE.md`, `agents-os/core/SYNC_PROCEDURE.md`, Makefile `sync-snapshot` target. AC-01..AC-10 PASS. F-01 MINOR (pre-commit PFS on unrelated historical Team 190 docs — non-blocking). S003-P019 unblocked."
     },
     {
       "program_id": "S003-P019",
@@ -1114,8 +1114,8 @@
           "program_id": "S003-P018",
           "program_name": "AOS Snapshot Version Management",
           "domain": "AGENTS_OS",
-          "status": "PLANNED",
-          "current_gate_mirror": "LOD100 authored 2026-04-03. Scope: version numbering + automated sync script for `agents_os_v3/` snapshot in client repos. Pre-condition for S003-P019. Ref: `ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md` §2 Decision 1; LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S003_P018_AOS_SNAPSHOT_VERSION_MANAGEMENT_v1.0.0.md`.",
+          "status": "COMPLETE",
+          "current_gate_mirror": "GATE_5 PASS_WITH_FINDINGS 2026-04-03 (Team 191 build; Team 190 validated). Deliverables: `agents_os_v3/SNAPSHOT_VERSION` (v0.1.0+ecf247c), `scripts/sync_aos_snapshot.sh`, `agents_os_v3/SYNC_PROCEDURE.md`, `agents-os/core/SYNC_PROCEDURE.md`, Makefile `sync-snapshot` target. AC-01..AC-10 PASS. F-01 MINOR (pre-commit PFS on unrelated historical Team 190 docs — non-blocking). S003-P019 unblocked.",
           "work_packages": []
         },
         {

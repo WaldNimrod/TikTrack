@@ -134,3 +134,5 @@ For each row: **PASS** / **FAIL** + `evidence-by-path` + `route_recommendation` 
 *VALIDATION_REQUEST | TEAM_170 → TEAM_100 (in lieu of Team 190) | S003-P017-WP002 | 2026-04-02*
 
 **Consolidated deep review (same addressee):** `_COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_S003_P017_DEEP_DRIFT_AND_PORTFOLIO_VALIDATION_REQUEST_v1.0.0.md`
+
+historical_record: true

@@ -130,3 +130,5 @@ Execute **V-01 … V-08** from `_COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_S00
 ---
 
 *VALIDATION_REQUEST | TEAM_170 → TEAM_100 (in lieu of Team 190) | S003_P017_DEEP_DRIFT_AND_PORTFOLIO | 2026-03-31*
+
+historical_record: true

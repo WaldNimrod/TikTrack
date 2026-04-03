@@ -220,3 +220,5 @@ LOW proposals (nice-to-have, defer to future revision):
 ---
 
 **log_entry | TEAM_100 | SESSION_20260402_ARCHITECTURAL_REVIEW | CONDITIONAL_PASS | 2_BLOCKERS | 2026-04-02**
+
+historical_record: true

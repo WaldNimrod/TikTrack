@@ -70,3 +70,5 @@ Every staged `agents_os_v3/` file must be registered in `agents_os_v3/FILE_INDEX
 **log_entry | TEAM_00 | AOS_V3_V2_FREEZE_LIFTED_FOR_LEGACY_CLOSURE | 2026-04-02**
 
 *historical_record: true — this directive locks a permanent architectural decision and is retained indefinitely.*
+
+historical_record: true

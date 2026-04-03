@@ -69,6 +69,8 @@ lifecycle_note: "S003-P018 GATE_5 acknowledged — Team 190 PASS_WITH_FINDINGS; 
 
 **Team 191 acknowledgment:** S003-P018 GATE_5 received; **F-01** routed per Team 190 to a separate Team 190 governance hygiene cycle (not a P018 rework item).
 
+**SOP-013 Seal to Team 100:** `_COMMUNICATION/_ARCHITECT_INBOX/TEAM_191_TO_TEAM_100_S003_P018_SOP013_SEAL_v1.0.0.md`
+
 ---
 
 *log_entry | TEAM_191 | S003_P018 | GATE_5_ACK | TEAM_190_RESULT_INGESTED | 2026-04-03*

@@ -1,10 +1,11 @@
 ---
 id: TEAM_170_TO_TEAM_190_S003_P017_DEEP_DRIFT_AND_PORTFOLIO_VALIDATION_REQUEST_v1.0.0
 from: Team 170 (Spec & Governance)
-to: Team 190 (Constitutional Validator)
-cc: Team 00 (Principal), Team 100 (Architecture), Team 10 (Gateway), Team 191 (Git lane)
+to: Team 100 (Chief System Architecture — validation + architectural review in lieu of Team 190)
+cc: Team 00 (Principal), Team 190 (Constitutional Validator — unavailable; informational), Team 10 (Gateway), Team 191 (Git lane)
 date: 2026-03-31
 status: VALIDATION_REQUEST
+routing_note: Team 190 unavailable; Team 100 executes constitutional-style checklist, architectural coherence review, and PASS/FAIL verdict. Publish response under _COMMUNICATION/team_100/.
 in_response_to:
   - TEAM_100_TO_TEAM_170_REGISTRY_ROADMAP_UPDATE_S003_P017_CLOSURE_AND_NEW_PROGRAMS_v1.0.0.md
   - TEAM_100_TO_TEAM_170_S003_P017_WP002_LEAN_KIT_CONTENT_MANDATE_v1.0.0.md (parallel scope)
@@ -21,20 +22,20 @@ related_validation_request: _COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_S003_P0
 | roadmap_id | PHOENIX_ROADMAP |
 | package_id | S003_P017_PORTFOLIO_REGISTRY_AND_CROSS_SSOT_DRIFT |
 | mandate | TEAM_100_TO_TEAM_170_REGISTRY_ROADMAP_UPDATE_S003_P017_CLOSURE_AND_NEW_PROGRAMS_v1.0.0.md (+ Lean Kit WP002 mandate as linked package) |
-| validation_authority | Team 190 |
-| phase_owner | Team 100 (mandate issuer); Team 170 (executor) |
+| validation_authority | Team 100 (in lieu of Team 190 for this tranche) |
+| phase_owner | Team 100 (mandate issuer + validator); Team 170 (executor) |
 | date | 2026-03-31 |
 
 ---
 
-## 1. Scope — what Team 190 must validate
+## 1. Scope — what Team 100 must validate (architectural + validation)
 
 Unified constitutional / governance-integrity review across **three threads** that together define “S003-P017 closed” and Lean Kit follow-on truth:
 
 | # | Thread | Normative intent |
 |---|--------|------------------|
 | A | **Program Registry + Portfolio Roadmap** | S003-P017 = COMPLETE; S003-P018 / S003-P019 registered; three Lean Kit follow-on rows under S004; log entries; Future Stages roadmap rows coherent. |
-| B | **Lean Kit deliverable (agents-os)** | Templates, roles, gates, YAML, example project — per existing checklist in `TEAM_170_TO_TEAM_190_S003_P017_WP002_LEAN_KIT_VALIDATION_REQUEST_v1.0.0.md` (this request **incorporates** that checklist by reference; Team 190 may issue one verdict covering both or split findings by thread). |
+| B | **Lean Kit deliverable (agents-os)** | Templates, roles, gates, YAML, example project — per existing checklist in `TEAM_170_TO_TEAM_190_S003_P017_WP002_LEAN_KIT_VALIDATION_REQUEST_v1.0.0.md` (this request **incorporates** that checklist by reference; Team 100 may issue one verdict covering both or split findings by thread). |
 | C | **Deep drift (cross-SSOT)** | No silent contradiction between canonical registry/roadmap, authoring mandates, Bridge / Methodology directives, LOD Standard §10 narrative, YAML comments in `agents_os_v3/definition.yaml` (read-only for this review), and known secondary mirrors (e.g. portfolio snapshot). |
 
 **Note (terminology):** הבקשה כוללת **בדיקת דריפט מעמיקה** ו**בדיקת רישום (registry) מול מקורות משניים**. אם התכוונתם לניסוח אחר ("מרגל" וכו׳), הטווח המעשי כאן הוא: עקביות בין-מסמכית ומסלולי תיקון.
@@ -106,13 +107,13 @@ Execute **V-01 … V-08** from `_COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_S00
 
 ---
 
-## 6. Deliverable requested from Team 190
+## 6. Deliverable requested from Team 100
 
-1. **Verdict:** `PASS` | `FAIL` | `PASS_WITH_FINDINGS` (per Team 190 constitution).
-2. **Artifact:** Publish under `_COMMUNICATION/team_190/` with identity header and date **2026-03-31** or later (actual validation date).
-3. **If FAIL:** Findings table with `evidence-by-path` and `route_recommendation` for each finding (mandatory for constitutional packages).
+1. **Verdict:** `PASS` | `FAIL` | `PASS_WITH_FINDINGS` (Team 100 applies the same rigor as constitutional validation; escalate to Team 00 on ambiguity).
+2. **Artifact:** Publish under `_COMMUNICATION/team_100/` with identity header and date **2026-03-31** or later (actual review date). Suggested filename stem: `TEAM_100_VALIDATION_S003_P017_PORTFOLIO_AND_LEAN_KIT_v1.0.0.md`.
+3. **If FAIL:** Findings table with `evidence-by-path` and `route_recommendation` for each finding (same format as Team 190 packages).
 
-Team 100 shall treat **S003-P017 program closure**, **follow-on program registration**, and **S003-P017-WP002** closure as **approval-pending** until Team 190 record is on file **or** Team 00 waives per standing protocol.
+**S003-P017 program closure**, **follow-on program registration**, and **S003-P017-WP002** closure are **approval-pending** until Team 100 publishes the verdict artifact **or** Team 00 waives per standing protocol. When Team 190 returns, Team 100 may file a short reconciliation note if a second-pass constitutional review is required.
 
 ---
 
@@ -128,6 +129,4 @@ Team 100 shall treat **S003-P017 program closure**, **follow-on program registra
 
 ---
 
-*VALIDATION_REQUEST | TEAM_170 → TEAM_190 | S003_P017_DEEP_DRIFT_AND_PORTFOLIO | 2026-03-31*
-
-historical_record: true
+*VALIDATION_REQUEST | TEAM_170 → TEAM_100 (in lieu of Team 190) | S003_P017_DEEP_DRIFT_AND_PORTFOLIO | 2026-03-31*

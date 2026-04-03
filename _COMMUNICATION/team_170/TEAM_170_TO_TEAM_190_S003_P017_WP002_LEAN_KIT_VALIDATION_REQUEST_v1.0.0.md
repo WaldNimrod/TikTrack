@@ -1,10 +1,11 @@
 ---
 id: TEAM_170_TO_TEAM_190_S003_P017_WP002_LEAN_KIT_VALIDATION_REQUEST_v1.0.0
 from: Team 170 (Spec & Governance)
-to: Team 190 (Constitutional Validator)
-cc: Team 00 (Principal), Team 100 (Architecture), Team 10 (Gateway)
+to: Team 100 (Chief System Architecture — validation + architectural review in lieu of Team 190)
+cc: Team 00 (Principal), Team 190 (unavailable; informational), Team 10 (Gateway)
 date: 2026-04-02
 status: VALIDATION_REQUEST
+routing_note: Team 190 unavailable; Team 100 performs GATE_5-equivalent review. Response artifact under _COMMUNICATION/team_100/.
 in_response_to: TEAM_100_TO_TEAM_170_S003_P017_WP002_LEAN_KIT_CONTENT_MANDATE_v1.0.0.md
 activation: TEAM_170_ACTIVATION_PROMPT_S003_P017_WP002_LEAN_KIT_v1.0.0.md
 completion_report: _COMMUNICATION/_ARCHITECT_INBOX/TEAM_170_TO_TEAM_100_S003_P017_WP002_COMPLETION_v1.0.0.md
@@ -18,13 +19,13 @@ content_location: agents-os repository — path prefix `lean-kit/` (see evidence
 | roadmap_id | PHOENIX_ROADMAP |
 | package_id | S003_P017_WP002_LEAN_KIT_CONTENT |
 | mandate | TEAM_100_TO_TEAM_170_S003_P017_WP002_LEAN_KIT_CONTENT_MANDATE_v1.0.0 |
-| validation_authority | Team 190 |
-| phase_owner | Team 100 (mandate issuer); Team 170 (executor) |
+| validation_authority | Team 100 (in lieu of Team 190) |
+| phase_owner | Team 100 (mandate issuer + validator); Team 170 (executor) |
 | date | 2026-04-02 |
 
 ---
 
-## 1. Scope — what Team 190 must validate
+## 1. Scope — what Team 100 must validate
 
 Content and methodology integrity review of **S003-P017-WP002 Lean Kit** (L0 profile): templates, role definitions, L-GATE checklists, YAML config templates, and worked example — **before** Team 100 may treat the WP as fully closed per mandate (GATE_5).
 
@@ -93,7 +94,7 @@ Content and methodology integrity review of **S003-P017-WP002 Lean Kit** (L0 pro
 
 ---
 
-## 3. Validation checklist (Team 190 — explicit PASS/FAIL)
+## 3. Validation checklist (Team 100 — explicit PASS/FAIL)
 
 For each row: **PASS** / **FAIL** + `evidence-by-path` + `route_recommendation` if FAIL.
 
@@ -110,13 +111,13 @@ For each row: **PASS** / **FAIL** + `evidence-by-path` + `route_recommendation` 
 
 ---
 
-## 4. Deliverable requested from Team 190
+## 4. Deliverable requested from Team 100
 
-1. **Verdict:** `PASS` | `FAIL` | `PASS_WITH_FINDINGS` (if constitution allows).
-2. **Artifact:** Publish under `_COMMUNICATION/team_190/` with identity header and date **2026-04-02** or later (actual validation date).
-3. **If FAIL:** Findings table with `evidence-by-path` and `route_recommendation` per Team 190 canonical format.
+1. **Verdict:** `PASS` | `FAIL` | `PASS_WITH_FINDINGS`.
+2. **Artifact:** Publish under `_COMMUNICATION/team_100/` with identity header and date **2026-04-02** or later (actual review date).
+3. **If FAIL:** Findings table with `evidence-by-path` and `route_recommendation` (Team 190-style format).
 
-Team 100 shall **not** close S003-P017-WP002 as fully approved until Team 190 record is on file (or Team 00 waives per standing protocol).
+**S003-P017-WP002** remains **approval-pending** until Team 100 publishes the verdict **or** Team 00 waives. Prefer merging this checklist into the consolidated package: `TEAM_170_TO_TEAM_190_S003_P017_DEEP_DRIFT_AND_PORTFOLIO_VALIDATION_REQUEST_v1.0.0.md` (also routed to Team 100).
 
 ---
 
@@ -125,11 +126,11 @@ Team 100 shall **not** close S003-P017-WP002 as fully approved until Team 190 re
 | If | Then |
 |----|------|
 | FAIL on templates/gates wording only | Return to Team 170 for lean-kit text fix in agents-os |
-| FAIL on methodology / LOD misalignment | Escalate to Team 100 + Team 00 |
+| FAIL on methodology / LOD misalignment | Team 100 adjudicates + escalate to Team 00 if constitutional |
 | PASS | Team 100 may proceed to formal WP closure |
 
 ---
 
-*VALIDATION_REQUEST | TEAM_170 → TEAM_190 | S003-P017-WP002 | 2026-04-02*
+*VALIDATION_REQUEST | TEAM_170 → TEAM_100 (in lieu of Team 190) | S003-P017-WP002 | 2026-04-02*
 
-**Consolidated deep review:** For portfolio/registry closure + cross-SSOT drift in the same S003-P017 tranche, see `_COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_S003_P017_DEEP_DRIFT_AND_PORTFOLIO_VALIDATION_REQUEST_v1.0.0.md`.
+**Consolidated deep review (same addressee):** `_COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_S003_P017_DEEP_DRIFT_AND_PORTFOLIO_VALIDATION_REQUEST_v1.0.0.md`

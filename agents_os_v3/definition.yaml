@@ -1341,8 +1341,16 @@ work_packages:
   # ---------------------------------------------------------------------------
   # Lean Kit + Methodology Portability WPs
   # Ref: ARCHITECT_DIRECTIVE_METHODOLOGY_DEPLOYMENT_SPLIT_v1.0.0.md
+  # Ref: ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md
   # Stage assignment (2026-04-02): WP001 → S003-P017; WP002-WP004 → S004+ (future)
-  # Program S003-P017: agents-os repo initialization + Lean Kit content build
+  # Program S003-P017: agents-os repo initialization + Lean Kit content build — COMPLETE 2026-04-03
+  # Concept WP → registry mapping (canonical IDs, locked 2026-04-03):
+  #   LEAN-KIT-WP001 → S003-P017 (COMPLETE)
+  #   LEAN-KIT-WP002 → S004-P009 (Lean Kit Generator)
+  #   LEAN-KIT-WP003 → S004-P010 (L0→L2 Upgrade Path)
+  #   LEAN-KIT-WP004 → S004-P011 (Project Scaffolding CLI)
+  #   Phase E        → S005-P006 (Domain Clean Separation)
+  # Note: S004-P005/006/007 are TikTrack-domain programs — DO NOT reassign.
   # ---------------------------------------------------------------------------
 
   # S003-P017-WP001: agents-os repo initialization (Team 191)
@@ -1380,27 +1388,27 @@ work_packages:
     domain_id: "01JK8AOSV3DOMAIN00000001"
     status: PLANNED
     linked_run_id: null
-    stage_id: null  # S004+ — depends on S003-P017 completion
-    program_id: null
-    notes: "Depends on S003-P017 (LEAN-KIT-WP001 complete). SSoT principle: no manual copy maintenance."
+    stage_id: "S004"  # Canonical registry ID: S004-P009
+    program_id: "S004-P009"
+    notes: "Canonical program: S004-P009. Depends on S003-P019 GATE_5 PASS. SSoT principle: no manual copy maintenance. LOD100: TEAM_00_LOD100_S004_P005_LEAN_KIT_GENERATOR_v1.0.0.md."
 
   - id: "LEAN-KIT-WP003"
     label: "BUILD_LEAN_TO_AOS_UPGRADE — Migration tool: roadmap.yaml → AOS DB (enables L0→L2 upgrade path)"
     domain_id: "01JK8AOSV3DOMAIN00000001"
     status: PLANNED
     linked_run_id: null
-    stage_id: null  # S004+ — depends on S003-P017 completion
-    program_id: null
-    notes: "roadmap.yaml schema mirrors AOS DB; import script populates work_packages table."
+    stage_id: "S004"  # Canonical registry ID: S004-P010
+    program_id: "S004-P010"
+    notes: "Canonical program: S004-P010. Depends on S003-P019 GATE_5 PASS + AOS L2 stability bar. roadmap.yaml schema mirrors AOS DB. LOD100: TEAM_00_LOD100_S004_P006_L0_TO_L2_UPGRADE_PATH_v1.0.0.md."
 
   - id: "LEAN-KIT-WP004"
     label: "BUILD_PROJECT_SCAFFOLDING_CLI — New project creation CLI for both L0 (Lean) and L2 (AOS v3); automates PROJECT_CREATION_PROCEDURE_v1.0.0.md"
     domain_id: "01JK8AOSV3DOMAIN00000001"
     status: PLANNED
     linked_run_id: null
-    stage_id: null  # S004+ — depends on LEAN-KIT-WP001+WP002
-    program_id: null
-    notes: "Depends on S003-P017 (LEAN-KIT-WP001+WP002). Makes new project creation ~5 minutes for both profiles."
+    stage_id: "S004"  # Canonical registry ID: S004-P011
+    program_id: "S004-P011"
+    notes: "Canonical program: S004-P011. Depends on S004-P009 + S003-P018 GATE_5 PASS. Makes new project creation ~5 minutes for both profiles. LOD100: TEAM_00_LOD100_S004_P007_PROJECT_SCAFFOLDING_CLI_v1.0.0.md."
 
 # ---------------------------------------------------------------------------
 # V2 → V3 Migration: Ideas

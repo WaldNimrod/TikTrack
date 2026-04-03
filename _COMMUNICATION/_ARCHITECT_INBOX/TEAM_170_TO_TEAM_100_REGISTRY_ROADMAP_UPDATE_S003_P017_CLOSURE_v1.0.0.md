@@ -48,13 +48,15 @@ Mandate Task D specified new program IDs **`S004-P005`–`S004-P007`** for Lean 
 
 ---
 
-## Team 190 validation
+## Validation routing (Team 100 in lieu of Team 190)
 
-Per mandate **§4**, **no** Team 190 validation package was originally required (registry/roadmap update only). **Principal / Gateway** subsequently directed a full Team 190 pass including **deep cross-SSOT drift** review. Superseding / augmenting package:
+Per mandate **§4**, **no** Team 190 package was originally required. **Principal / Gateway** then requested a full validation pass including **deep cross-SSOT drift**. **Team 190 is currently unavailable**; **Team 100** shall perform **both architectural review and validation** (same checklists and PASS/FAIL rigor) and publish the verdict under `_COMMUNICATION/team_100/`.
+
+Request package (addressee updated in-file to Team 100):
 
 `_COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_S003_P017_DEEP_DRIFT_AND_PORTFOLIO_VALIDATION_REQUEST_v1.0.0.md`
 
-**Team 100** spot-check remains useful; formal approval path is **Team 190 verdict** unless Team 00 waives.
+When Team 190 returns, Team 100 may optionally file a reconciliation note if a second constitutional pass is required.
 
 ---
 

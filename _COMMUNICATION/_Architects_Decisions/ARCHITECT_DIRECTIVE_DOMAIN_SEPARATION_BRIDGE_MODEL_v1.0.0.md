@@ -89,12 +89,17 @@ Separation is a direction of travel, not an immediate mandate.
 |---------|-------|------|--------|
 | S003-P018 | S003 | AOS Snapshot Version Management | PLANNED |
 | S003-P019 | S003 | Multi-Project Lean Kit Adoption | PLANNED |
-| S004-P005 | S004 | Lean Kit Generator (LEAN-KIT-WP002) | PLANNED |
-| S004-P006 | S004 | L0→L2 Upgrade Path (LEAN-KIT-WP003) | PLANNED |
-| S004-P007 | S004 | Project Scaffolding CLI (LEAN-KIT-WP004) | PLANNED |
+| S004-P009 | S004 | Lean Kit Generator (LEAN-KIT-WP002) | PLANNED |
+| S004-P010 | S004 | L0→L2 Upgrade Path (LEAN-KIT-WP003) | PLANNED |
+| S004-P011 | S004 | Project Scaffolding CLI (LEAN-KIT-WP004) | PLANNED |
+| S005-P006 | S005 | Domain Clean Separation — Phase E (TikTrack consumes AOS as installed tool) | PLANNED |
 
-LOD100 documents: `_COMMUNICATION/team_00/TEAM_00_LOD100_S003_P018_*.md` through `S004_P007_*.md`
+> **Note (2026-04-03):** Registry IDs S004-P009/010/011 (not P005/006/007 — those slots are taken
+> by existing TikTrack programs). S005-P006 (not P001 — P001..P005 taken). Ratified by Team 00.
+
+LOD100 documents: `_COMMUNICATION/team_00/TEAM_00_LOD100_S003_P018_*.md` through `TEAM_00_LOD100_S005_P006_DOMAIN_CLEAN_SEPARATION_v1.0.0.md`
 
 ---
 
 **log_entry | TEAM_00 | DOMAIN_SEPARATION_BRIDGE_MODEL | LOCKED | 3_DECISIONS | 5_PROGRAMS | 2026-04-03**
+**log_entry | TEAM_00 | DOMAIN_SEPARATION_BRIDGE_MODEL | REGISTRY_IDS_CORRECTED | S004_P009_P010_P011_S005_P006 | F01_FIX | 2026-04-03**

@@ -76,8 +76,11 @@ def run_fresh(url: str, *, allow_nonempty: bool, create_db: str | None, maintena
         path = "/" + create_db
         url = urlunparse((p.scheme, p.netloc, path, "", "", ""))
 
-    sql_path = MIGRATIONS / "001_aos_v3_fresh_schema_v1.0.2.sql"
-    sql = sql_path.read_text(encoding="utf-8")
+    # Fresh install applies the base schema then all numbered delta migrations in order.
+    fresh_migrations = [
+        MIGRATIONS / "001_aos_v3_fresh_schema_v1.0.2.sql",
+        MIGRATIONS / "003_add_team_context_columns.sql",
+    ]
 
     conn = psycopg2.connect(url)
     conn.autocommit = False
@@ -88,10 +91,12 @@ def run_fresh(url: str, *, allow_nonempty: bool, create_db: str | None, maintena
                 file=sys.stderr,
             )
             sys.exit(1)
-        with conn.cursor() as cur:
-            cur.execute(sql)
-        conn.commit()
-        print(f"OK: applied {sql_path.name}")
+        for sql_path in fresh_migrations:
+            sql = sql_path.read_text(encoding="utf-8")
+            with conn.cursor() as cur:
+                cur.execute(sql)
+            conn.commit()
+            print(f"OK: applied {sql_path.name}")
     except Exception:
         conn.rollback()
         raise

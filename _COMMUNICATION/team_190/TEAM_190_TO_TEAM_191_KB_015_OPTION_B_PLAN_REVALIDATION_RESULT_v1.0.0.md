@@ -56,7 +56,7 @@ Execution under Option B is authorized immediately.
    - action_taken
    - checks_verified
    - remaining_blockers
-   - owner_next_action
+   - resolution_summary
    - evidence paths + command transcript
 
 ## 4) Non-Blocking Hardening Recommendation

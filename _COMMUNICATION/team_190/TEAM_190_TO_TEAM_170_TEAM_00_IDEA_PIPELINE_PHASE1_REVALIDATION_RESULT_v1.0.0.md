@@ -36,12 +36,6 @@ scope: Revalidation of Idea Pipeline Phase 1 remediation package (IPP1-01, IPP1-
 
 **NONE**
 
-## owner_next_action
-
-1. Team 170: close `IPP1-RV-ACT-01` with a one-line explicit rationale/update.
-2. Team 00: accept Phase 1 package for architectural closure after the above alignment.
-3. Team 190: no additional constitutional blockers for this package.
-
 ## evidence-by-path
 
 1. `_COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_IDEA_PIPELINE_PHASE1_REVALIDATION_REQUEST_v1.0.0.md`

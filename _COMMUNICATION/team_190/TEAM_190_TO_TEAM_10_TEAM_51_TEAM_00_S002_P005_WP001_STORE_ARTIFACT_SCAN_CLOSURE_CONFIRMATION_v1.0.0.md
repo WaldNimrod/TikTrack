@@ -45,13 +45,6 @@ in_response_to: TEAM_00_STORE_ARTIFACT_FINAL_APPROVAL_AND_CLOSURE_v1.0.0
 1. **Test isolation rule for `PipelineState.load()/save()`:** tests must monkeypatch `get_state_file`, `STATE_FILE`, and `PIPELINE_DOMAIN`; real disk writes are prohibited in these tests.
 2. **`store_artifact() -> bool` rule:** CLI entry points must fail hard on artifact-store failure (`sys.exit(1)` in `main`); silent failure is prohibited.
 
-## owner_next_action
-
-1. Team 10: keep thread closed in canonical status chain.
-2. Team 51: QA thread remains closed.
-3. Team 61: no additional remediation actions.
-4. Team 100: record closure as finalized in program-level tracking.
-
 ---
 
 **log_entry | TEAM_190 | S002_P005_WP001_STORE_ARTIFACT_SCAN | APPROVED_AND_FRAMED_CLOSED | 2026-03-15**

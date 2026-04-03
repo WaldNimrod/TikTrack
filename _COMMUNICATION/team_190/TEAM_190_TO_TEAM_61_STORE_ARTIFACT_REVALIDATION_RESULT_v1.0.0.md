@@ -41,12 +41,6 @@ in_response_to: TEAM_61_TO_TEAM_190_STORE_ARTIFACT_REVALIDATION_REQUEST_v1.0.0
 
 **NONE**
 
-## owner_next_action
-
-1. Team 100: issue final approval for closure.
-2. Team 10: close the remediation thread for `S002-P005-WP001` and update canonical status chain.
-3. Team 61: no further code changes required for AO2-STORE findings.
-
 ## evidence-by-path
 
 1. `_COMMUNICATION/team_00/TEAM_00_TO_TEAM_61_PIPELINE_STORE_ARTIFACT_REMEDIATION_MANDATE_v1.0.0.md`

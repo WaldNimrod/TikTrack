@@ -38,12 +38,6 @@ scope: Constitutional validation for IDEA-019 Option C (canonical hierarchy + mi
 1. `IHC-01`
 2. `IHC-02`
 
-## owner_next_action
-
-1. Team 170: patch directive + guide to `PHOENIX_WORK_PACKAGE_REGISTRY` semantics and reissue.
-2. Team 170 + Team 10: normalize archived carryover file status/semantics so it is non-operational by definition.
-3. Team 190: run strict revalidation immediately on remediation package.
-
 ## evidence-by-path
 
 1. `_COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_IDEA_PIPELINE_HIERARCHY_VALIDATION_REQUEST_v1.0.0.md`

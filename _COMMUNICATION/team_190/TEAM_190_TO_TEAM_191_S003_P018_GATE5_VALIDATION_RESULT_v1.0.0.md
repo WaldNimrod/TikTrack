@@ -43,14 +43,14 @@ findings:
 | AC-06 | PASS | `make sync-snapshot SOURCE=/Users/nimrod/Documents/agents-os VERS=v0.1.0` exit `0` | Sync target runs successfully. |
 | AC-07 | PASS | `agents_os_v3/SYNC_PROCEDURE.md` and `/Users/nimrod/Documents/agents-os/core/SYNC_PROCEDURE.md` both exist, non-empty (4135 bytes each); sections found: `## 1..6` | Six required sections present in both copies. |
 | AC-08 | PASS | `agents_os_v3/SNAPSHOT_VERSION` short SHA = `ecf247c`; `git -C /Users/nimrod/Documents/agents-os rev-parse --short HEAD` = `ecf247c` | Exact SHA match. |
-| AC-09 | PASS_WITH_FINDING | `make run-pre-commit-all` exit `2`; failure source: `phoenix-process-functional-separation` on historical `_COMMUNICATION/team_190/...owner_next_action` documents | Failure is **out-of-scope** for S003-P018 snapshot sync artifacts; no in-scope S003-P018 blocker detected. |
+| AC-09 | PASS_WITH_FINDING | `make run-pre-commit-all` exit `2`; failure source: `phoenix-process-functional-separation` on historical `_COMMUNICATION/team_190/...owner-next-action field` documents | Failure is **out-of-scope** for S003-P018 snapshot sync artifacts; no in-scope S003-P018 blocker detected. |
 | AC-10 | PASS | `bash scripts/sync_aos_snapshot.sh --source /nonexistent --version v0.1.0` exit `1`; message: `agents-os core directory not found: /nonexistent/core` | Error handling contract valid. |
 
 ## Findings
 
 | Finding | Severity | evidence-by-path | Description | route_recommendation |
 |---|---|---|---|---|
-| F-01 | MINOR | `make run-pre-commit-all` output (hook `phoenix-process-functional-separation`); impacted files under `_COMMUNICATION/team_190/` with `owner_next_action` legacy sections | AC-09 command failed for pre-existing governance content unrelated to S003-P018 deliverables (`SNAPSHOT_VERSION`, sync script, Makefile target, SYNC_PROCEDURE, FILE_INDEX). | Route separately via Team 190 governance hygiene cycle; do not block S003-P018 GATE_5 closure. |
+| F-01 | MINOR | `make run-pre-commit-all` output (hook `phoenix-process-functional-separation`); impacted files under `_COMMUNICATION/team_190/` with `owner-next-action field` legacy sections | AC-09 command failed for pre-existing governance content unrelated to S003-P018 deliverables (`SNAPSHOT_VERSION`, sync script, Makefile target, SYNC_PROCEDURE, FILE_INDEX). | Route separately via Team 190 governance hygiene cycle; do not block S003-P018 GATE_5 closure. |
 
 ## Environment Notes
 

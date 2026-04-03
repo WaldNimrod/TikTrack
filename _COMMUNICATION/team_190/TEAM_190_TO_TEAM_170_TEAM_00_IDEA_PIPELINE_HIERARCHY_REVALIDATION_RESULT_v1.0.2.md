@@ -38,11 +38,6 @@ scope: Revalidation result for IDEA-019 Option C hierarchy remediation following
 
 **NONE**
 
-## owner_next_action
-
-1. Team 00: may treat IDEA-019 Option C hierarchy package as fully constitutionally validated.
-2. Team 170: no further remediation required for this revalidation loop.
-
 ## evidence-by-path
 
 1. `_COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_IDEA_PIPELINE_HIERARCHY_REVALIDATION_REQUEST_v1.0.1.md`

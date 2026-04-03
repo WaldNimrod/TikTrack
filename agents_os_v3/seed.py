@@ -223,6 +223,10 @@ def main() -> None:
                 if (wp_id
                         and not _WP_ID_CANONICAL_RE.match(wp_id)
                         and not _WP_ID_ULID_RE.match(wp_id)):
+                    if wp.get("concept", False):
+                        # Concept/placeholder WPs (e.g. LEAN-KIT-WP002..004) are registry
+                        # tracking entries only — not DB rows. Skip silently.
+                        continue
                     raise ValueError(
                         f"Invalid work_package_id format in definition.yaml: '{wp_id}'. "
                         f"Expected S{{NNN}}-P{{NNN}}-WP{{NNN}} (e.g. S003-P005-WP001) or ULID. "

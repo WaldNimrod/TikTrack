@@ -576,8 +576,9 @@ INSERT INTO gates (id, sequence_order, name, is_human_gate, description) VALUES
 
 -- Phase stubs under GATE_0 (expand per spec)
 INSERT INTO phases (id, gate_id, sequence_order, name, allow_auto, display_in_ui) VALUES
-  ('0.1', 'GATE_0', 1, 'Initialize', 0, 1),
-  ('0.2', 'GATE_0', 2, 'Assign',     0, 1);
+  ('0.1', 'GATE_0', 1, 'Initialize', 0, 1);
+  -- Phase 0.2 (Assign) deprecated and removed — GATE_0 is single-phase (0.1 only).
+  -- Advancing from 0.1 crosses directly into GATE_1/1.1 (SPEC_AUTHOR).
 
 -- Pipeline role stub (replace with full catalog)
 INSERT INTO pipeline_roles (id, name, display_name, description, can_block_gate, is_seeded, created_at) VALUES

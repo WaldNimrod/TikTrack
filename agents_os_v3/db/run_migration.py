@@ -76,9 +76,13 @@ def run_fresh(url: str, *, allow_nonempty: bool, create_db: str | None, maintena
         path = "/" + create_db
         url = urlunparse((p.scheme, p.netloc, path, "", "", ""))
 
-    # Fresh install applies the base schema then all numbered delta migrations in order.
+    # Fresh install applies the base schema then all structural delta migrations in order.
+    # NOTE: data-only migrations (002_wp_id_format_migration, 002_aos_v3_delta) are
+    # for upgrading existing installs and are NOT applied in fresh mode.
     fresh_migrations = [
         MIGRATIONS / "001_aos_v3_fresh_schema_v1.0.2.sql",
+        MIGRATIONS / "002_add_stage_program_to_work_packages.sql",
+        MIGRATIONS / "002_add_failed_run_status.sql",
         MIGRATIONS / "003_add_team_context_columns.sql",
     ]
 

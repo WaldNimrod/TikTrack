@@ -48,15 +48,15 @@ Mandate Task D specified new program IDs **`S004-P005`–`S004-P007`** for Lean 
 
 ---
 
-## Validation routing (Team 100 in lieu of Team 190)
+## Validation routing (Team 190)
 
-Per mandate **§4**, **no** Team 190 package was originally required. **Principal / Gateway** then requested a full validation pass including **deep cross-SSOT drift**. **Team 190 is currently unavailable**; **Team 100** shall perform **both architectural review and validation** (same checklists and PASS/FAIL rigor) and publish the verdict under `_COMMUNICATION/team_100/`.
+Per mandate **§4**, **no** Team 190 package was originally required for the registry edit alone. **Principal / Gateway** then requested a full validation pass including **deep cross-SSOT drift**. **Team 190 is available**; constitutional validation is the primary path.
 
-Request package (addressee updated in-file to Team 100):
+Request package (addressee: **Team 190**):
 
 `_COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_S003_P017_DEEP_DRIFT_AND_PORTFOLIO_VALIDATION_REQUEST_v1.0.0.md`
 
-When Team 190 returns, Team 100 may optionally file a reconciliation note if a second constitutional pass is required.
+Team 100 remains mandate issuer and closes the mandate after Team 190 **PASS** (or Team 00 waiver). **P-08** in that package: Team 100 ratifies registry ID deviation (S004-P009–P011 vs mandate literal P005–P007) as documented in this completion report.
 
 ---
 

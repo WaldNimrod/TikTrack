@@ -59,7 +59,7 @@
 | Topic | Resolution |
 |-------|------------|
 | LOD SSOT path inside agents-os clone | Gate docs reference `methodology/gate-model/LOD_STANDARD_v1.0.0.md` (file exists in agents-os). Alternate: `methodology/lod-standard/TEAM_100_LOD_STANDARD_v0.3.md`. Phoenix canonical LOD v1.0.0: `documentation/docs-governance/01-FOUNDATIONS/LOD_STANDARD_v1.0.0.md` (TikTrack repo). |
-| Activation §9 “only completion in TikTrack” vs validation request | Plan required a validation request under `_COMMUNICATION/team_170/`; **Team 100** performs review in lieu of unavailable Team 190 (see below). |
+| Activation §9 “only completion in TikTrack” vs validation request | Plan required a validation request under `_COMMUNICATION/team_170/`; addressee **Team 190** (see below). |
 
 ## Example project self-validation
 
@@ -72,16 +72,14 @@
 
 **PASS**
 
-## Ready for GATE_5 (validation — Team 100 in lieu of Team 190)
+## Ready for GATE_5 (Team 190 validation)
 
-**YES** — validation request published (addressee: **Team 100**; Team 190 unavailable):
+**YES** — validation request published (addressee: **Team 190**):
 
 `_COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_S003_P017_WP002_LEAN_KIT_VALIDATION_REQUEST_v1.0.0.md`
 
-Consolidated portfolio + drift package (same routing): `_COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_S003_P017_DEEP_DRIFT_AND_PORTFOLIO_VALIDATION_REQUEST_v1.0.0.md`
+Consolidated portfolio + drift package: `_COMMUNICATION/team_170/TEAM_170_TO_TEAM_190_S003_P017_DEEP_DRIFT_AND_PORTFOLIO_VALIDATION_REQUEST_v1.0.0.md`
 
 ---
 
 *TEAM_170 | S003-P017-WP002 | COMPLETION | 2026-04-02*
-
-historical_record: true

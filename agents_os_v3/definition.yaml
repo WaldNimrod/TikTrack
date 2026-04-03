@@ -1342,8 +1342,8 @@ work_packages:
   # Lean Kit + Methodology Portability WPs
   # Ref: ARCHITECT_DIRECTIVE_METHODOLOGY_DEPLOYMENT_SPLIT_v1.0.0.md
   # Ref: ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md
-  # Stage assignment (2026-04-02): WP001 → S003-P017; WP002-WP004 → S004+ (future)
-  # Program S003-P017: agents-os repo initialization + Lean Kit content build — COMPLETE 2026-04-03
+  # Registry SSOT (program rows): documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PROGRAM_REGISTRY_v1.0.0.md
+  # S003-P017: repo init + lean-kit content — COMPLETE 2026-04-03. Follow-on concepts are registered (not “S004+” only):
   # Concept WP → registry mapping (canonical IDs, locked 2026-04-03):
   #   LEAN-KIT-WP001 → S003-P017 (COMPLETE)
   #   LEAN-KIT-WP002 → S004-P009 (Lean Kit Generator)

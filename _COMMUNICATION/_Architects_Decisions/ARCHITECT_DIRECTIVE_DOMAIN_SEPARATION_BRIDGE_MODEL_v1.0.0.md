@@ -78,8 +78,8 @@ Separation is a direction of travel, not an immediate mandate.
 | **A — Bridge established** | S003 ✅ | agents-os repo exists; snapshot in TikTrack; methodology in agents-os |
 | **B — Sync formalized** | S003-P018 | Snapshot sync process automated; version declared |
 | **C — Lean expansion** | S003-P019 | SmallFarmsAgents + EyalAmit onboarded; Lean Kit proven on ≥3 projects |
-| **D — Tooling** | S004 | Generator (P005), L0→L2 upgrade (P006), CLI (P007) |
-| **E — Clean separation** | S005+ | TikTrack consumes AOS as installed tool; dashboard separation decision |
+| **D — Tooling** | S004 | Lean Kit follow-on programs **`S004-P009`** (generator), **`S004-P010`** (L0→L2), **`S004-P011`** (CLI) — canonical registry IDs (TikTrack programs remain **`S004-P005`–`S004-P007`**). See §5. |
+| **E — Clean separation** | S005 | Phase E program **`S005-P006`** — TikTrack consumes AOS as installed tool; dashboard separation decision. See §5. |
 
 ---
 

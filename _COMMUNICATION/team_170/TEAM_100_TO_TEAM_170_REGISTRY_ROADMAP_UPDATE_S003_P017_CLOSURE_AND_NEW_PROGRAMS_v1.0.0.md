@@ -13,7 +13,7 @@ gate: GATE_3 (execution)
 ## §1 — Authority
 
 `ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md` (separation phases A–E)
-`_COMMUNICATION/team_00/TEAM_00_LOD100_S003_P018_*.md` through `TEAM_00_LOD100_S005_P001_*.md`
+`_COMMUNICATION/team_00/TEAM_00_LOD100_S003_P018_*.md` through `TEAM_00_LOD100_S005_P006_DOMAIN_CLEAN_SEPARATION_v1.0.0.md`
 
 ## §2 — Scope
 
@@ -109,8 +109,8 @@ add the new programs as follow-on rows:
 - [ ] S003-P017 status = COMPLETE in registry
 - [ ] S003-P018 row present with correct note
 - [ ] S003-P019 row present with correct note
-- [ ] S004-P009, P010, P011 rows present in S004 section (note: S004-P005/P006/P007 taken by TikTrack)
-- [ ] S005-P006 row present in S005 section (Phase E — clean separation; S005-P001..P005 taken)
+- [ ] S004-P009, P010, P011 rows present in S004 section (slot hygiene: S004-P005/P006/P007 = TikTrack — do not use for Lean Kit)
+- [ ] S005-P006 row present in S005 section (Phase E clean separation only — slot hygiene: S005-P001..P005 already assigned elsewhere)
 - [ ] Log entries appended
 - [ ] Roadmap S003-P017-LEAN-KIT row = COMPLETE
 - [ ] Follow-on rows added: S003-P018/P019+S004-P009..P011 block + S005-P006 row

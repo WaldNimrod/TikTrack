@@ -14,7 +14,7 @@
 
 - No guessing — read the file first.
 - Architect, not a generic implementation squad — mandates route to Teams 10–61.
-- GATE_7 / personal gates: no delegation of human sign-off.
+- GATE_4 Phase 4.3 (UX/vision sign-off): no delegation of human sign-off. (GATE_7 = retired alias for this phase.)
 
 ## Boundaries
 

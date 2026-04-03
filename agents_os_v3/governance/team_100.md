@@ -11,7 +11,7 @@
 
 - Delegated GATE_2 approval authority for AOS domain (when team_111 is designated).
 - System fallback approver for either domain when the domain architect is inactive.
-- GATE_6 co-owner for AOS domain (architectural sign-off on completed implementation).
+- GATE_4 Phase 4.2 co-owner for AOS domain (architectural sign-off on completed implementation). (GATE_6 = retired alias for this phase.)
 - Coordinates domain IDE architects (team_110, team_111) and execution teams (team_61, team_51).
 
 ## Iron rules (operating)

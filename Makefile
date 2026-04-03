@@ -3,7 +3,7 @@
 # Team 60 (DevOps & Platform)
 # ============================================
 
-.PHONY: db-backup db-test-clean db-test-fill db-backup-then-fill db-test-report help portfolio-pre-push-guard install-pre-push-hook bootstrap-quality-tools verify-quality-tools install-pre-commit run-pre-commit-all
+.PHONY: db-backup db-test-clean db-test-fill db-backup-then-fill db-test-report help portfolio-pre-push-guard install-pre-push-hook bootstrap-quality-tools verify-quality-tools install-pre-commit run-pre-commit-all sync-snapshot
 
 # Database connection (from .env)
 DATABASE_URL ?= $(shell grep DATABASE_URL api/.env | cut -d '=' -f2 | tr -d '"' | tr -d "'")
@@ -42,6 +42,10 @@ install-pre-commit:
 ## Run pre-commit hooks across entire repository.
 run-pre-commit-all:
 	@bash -lc '. api/venv/bin/activate && pre-commit run --all-files'
+
+## Sync agents-os/core/ into agents_os_v3/ (S003-P018). Example: make sync-snapshot SOURCE=/path/to/agents-os VERS=v0.1.0
+sync-snapshot:
+	bash scripts/sync_aos_snapshot.sh --source $(SOURCE) --version $(VERS)
 
 ## Full DB backup + verify (run before seed). Exit 0 only if backup created and verified.
 db-backup:

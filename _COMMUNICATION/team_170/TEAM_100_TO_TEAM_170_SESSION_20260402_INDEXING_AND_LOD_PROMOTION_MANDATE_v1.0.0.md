@@ -216,3 +216,5 @@ Team 100 will review all outputs before any file is committed.
 ---
 
 *log_entry | TEAM_100 → TEAM_170 | MANDATE-T170-20260402-001 | 2026-04-02*
+
+historical_record: true

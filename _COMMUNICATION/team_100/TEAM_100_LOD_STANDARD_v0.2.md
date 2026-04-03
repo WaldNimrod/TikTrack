@@ -620,3 +620,5 @@ After approval: promote to `documentation/docs-governance/LOD_STANDARD.md` via T
 ---
 
 *log_entry | TEAM_100 | LOD_STANDARD_v0.2 | DRAFT | 2026-04-02*
+
+historical_record: true

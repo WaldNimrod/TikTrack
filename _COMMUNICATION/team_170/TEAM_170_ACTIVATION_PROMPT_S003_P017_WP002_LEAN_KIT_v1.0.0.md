@@ -208,3 +208,5 @@ Does the example project's LOD documents pass the gate checklists they claim to 
 ---
 
 *ACTIVATION | TEAM_170 | S003-P017-WP002 | GATE_3_EXECUTION | STEP_5_OF_5 | 2026-04-02*
+
+historical_record: true

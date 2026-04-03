@@ -67,3 +67,5 @@ Blocker count: 0
 Major finding count: 2
 Minor finding count: 1
 LOD Standard v0.3 promotion recommendation: HOLD — promotion should wait until the remaining delta-accuracy issue (authority matrix unchanged claim) and the Project Creation startup command path are corrected.
+
+historical_record: true

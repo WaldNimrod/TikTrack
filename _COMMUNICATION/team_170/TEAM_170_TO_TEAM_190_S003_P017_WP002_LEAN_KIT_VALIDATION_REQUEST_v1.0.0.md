@@ -131,3 +131,5 @@ Team 100 shall **not** close S003-P017-WP002 as fully approved until Team 190 re
 ---
 
 *VALIDATION_REQUEST | TEAM_170 → TEAM_190 | S003-P017-WP002 | 2026-04-02*
+
+historical_record: true

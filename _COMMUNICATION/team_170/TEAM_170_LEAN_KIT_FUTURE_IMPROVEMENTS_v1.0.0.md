@@ -83,3 +83,5 @@ At that time:
 ---
 
 *log_entry | TEAM_100 | LEAN_KIT_FUTURE_IMPROVEMENTS | BACKLOG_REGISTERED | SOURCE_TEAM190_SPY_NOTES | 2026-04-02*
+
+historical_record: true

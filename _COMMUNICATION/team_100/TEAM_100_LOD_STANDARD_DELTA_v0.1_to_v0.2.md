@@ -232,3 +232,5 @@ GATE_6/7/8 language persists in:
 ---
 
 *log_entry | TEAM_100 | LOD_STANDARD_DELTA_v0.1_to_v0.2 | 2026-04-02*
+
+historical_record: true

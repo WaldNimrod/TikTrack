@@ -299,3 +299,5 @@ The gate model gates decisions to specific spec versions. "What did GATE_2 appro
 *Reference document: `_COMMUNICATION/team_100/TEAM_100_LOD_STANDARD_v0.3.md`*
 
 **log_entry | TEAM_100 | SYSTEM_CONTEXT_FOR_EXTERNAL_REVIEW | 2026-04-02**
+
+historical_record: true

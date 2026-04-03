@@ -888,3 +888,5 @@ GATE_5: Team 190 cross-engine validation (content review against LOD Standard v0
 ---
 
 *log_entry | TEAM_100 → TEAM_170 | S003-P017-WP002 | GATE_2_MANDATE_ISSUED | 2026-04-02*
+
+historical_record: true

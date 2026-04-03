@@ -362,3 +362,5 @@ After GATE_5 PASS, S003-P017-WP002 (Team 170 Lean Kit content) is unblocked.
 ---
 
 *log_entry | TEAM_100 → TEAM_191 | S003-P017-WP001 | GATE_2_MANDATE_ISSUED | 2026-04-02*
+
+historical_record: true

@@ -55,3 +55,5 @@ findings:
 
 ---
 **log_entry | TEAM_190 | SESSION_20260402_INDEXING | VALIDATION_RESULT_FAIL | F-01_MAJOR | 2026-04-02**
+
+historical_record: true

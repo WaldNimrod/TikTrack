@@ -102,3 +102,5 @@ Team 100 shall **not** close the mandate as fully approved until Team 190 record
 ---
 
 **log_entry | TEAM_170 | SESSION_20260402_INDEXING | TEAM_190_VALIDATION_REQUEST | SUBMITTED | 2026-04-02**
+
+historical_record: true

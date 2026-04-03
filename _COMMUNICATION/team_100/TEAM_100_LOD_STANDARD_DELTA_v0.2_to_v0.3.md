@@ -324,3 +324,5 @@ No functional changes are expected between v0.3 and v1.0.0 — only status chang
 ---
 
 *log_entry | TEAM_100 | LOD_STANDARD_DELTA_v0.2_to_v0.3 | 2026-04-02*
+
+historical_record: true

@@ -50,3 +50,5 @@ Blocker count: 0
 Major finding count: 1
 Minor finding count: 0
 LOD Standard v0.3 promotion recommendation: HOLD — resolve remaining delta inconsistency in `_COMMUNICATION/team_100/TEAM_100_LOD_STANDARD_DELTA_v0.2_to_v0.3.md:232`.
+
+historical_record: true

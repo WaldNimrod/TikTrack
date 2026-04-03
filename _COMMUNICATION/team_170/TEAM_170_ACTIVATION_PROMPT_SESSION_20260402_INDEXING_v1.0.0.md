@@ -160,3 +160,5 @@ Report must include:
 ---
 
 *ACTIVATION | TEAM_170 | SESSION_20260402_INDEXING | STEP_3_OF_5 | 2026-04-02*
+
+historical_record: true

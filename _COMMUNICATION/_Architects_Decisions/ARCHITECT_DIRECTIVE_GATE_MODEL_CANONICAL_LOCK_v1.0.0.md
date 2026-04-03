@@ -100,3 +100,5 @@ Expected result: zero matches.
 ---
 
 **log_entry | TEAM_00 | GATE_MODEL_CANONICAL_LOCK | ACTIVE | ALL_DRIFT_CLOSED | 2026-04-02**
+
+historical_record: true

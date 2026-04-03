@@ -663,3 +663,5 @@ eligible gates. Architecture and gate model are identical to L2. Changes:
 *`documentation/docs-governance/01-FOUNDATIONS/LOD_STANDARD_v1.0.0.md`*
 
 **log_entry | TEAM_100 | LOD_STANDARD_v0.3_RELEASE_CANDIDATE | 2026-04-02**
+
+historical_record: true

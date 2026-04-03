@@ -155,3 +155,5 @@ For the full `roadmap.yaml` schema and required fields per work package, see
 
 **log_entry | TEAM_00 | METHODOLOGY_DEPLOYMENT_SPLIT_LOCKED | 2026-04-02**
 **log_entry | TEAM_100 | LEAN_KIT_ARCHITECTURE_DEFINED | SNAPSHOT_MODEL | 2026-04-02**
+
+historical_record: true

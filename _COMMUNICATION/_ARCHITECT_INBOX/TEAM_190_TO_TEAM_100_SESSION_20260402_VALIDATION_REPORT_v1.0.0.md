@@ -60,3 +60,5 @@ Blocker count: 1
 Major finding count: 7
 Minor finding count: 1
 LOD Standard v0.3 promotion recommendation: HOLD — blocker-level mismatch between "core unchanged" claim and actual v0.2→v0.3 changes, plus inaccurate delta metadata.
+
+historical_record: true

@@ -8,12 +8,12 @@ priority: HIGH
 gate: GATE_3 (execution)
 ---
 
-# Mandate: Registry + Roadmap Update — S003-P017 Closure + 5 New Programs
+# Mandate: Registry + Roadmap Update — S003-P017 Closure + 6 New Programs
 
 ## §1 — Authority
 
-`ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md` (5 new programs)
-`_COMMUNICATION/team_00/TEAM_00_LOD100_S003_P018_*.md` through `TEAM_00_LOD100_S004_P007_*.md`
+`ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md` (separation phases A–E)
+`_COMMUNICATION/team_00/TEAM_00_LOD100_S003_P018_*.md` through `TEAM_00_LOD100_S005_P001_*.md`
 
 ## §2 — Scope
 
@@ -64,13 +64,21 @@ Add in the S004 section (after S004-P004, before any later S004 rows or S005+):
 | S004 | S004-P007 | Project Scaffolding CLI | AGENTS_OS | PLANNED | LOD100 authored 2026-04-03. Concept: LEAN-KIT-WP004. Scope: unified `aos` CLI (new, gate, snapshot, status). L3 profile entry point. Requires S004-P005 + S003-P018 GATE_5 PASS. LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S004_P007_PROJECT_SCAFFOLDING_CLI_v1.0.0.md`. |
 ```
 
+### Task D2 — Add S005-P001 row
+
+Add in a new S005 section (after all S004 rows, before any later entries or the footer):
+
+```
+| S005 | S005-P001 | Domain Clean Separation — TikTrack Consumes AOS as Installed Tool | AGENTS_OS | PLANNED | LOD100 authored 2026-04-03. Phase E of ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md. Scope: remove `agents_os_v3/` from TikTrack; AOS delivered as installable CLI (L3). ALL of S003-P018/P019 + S004-P005/P006/P007 must be GATE_5 PASS first. LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S005_P001_DOMAIN_CLEAN_SEPARATION_v1.0.0.md`. |
+```
+
 ### Task E — Add log entries
 
 Append to the log section at the bottom of the registry:
 
 ```
 **log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S003_P017_CLOSED_COMPLETE | WP001_WP002_GATE5_PASS | 2026-04-03**
-**log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S003_P018_P019_REGISTERED | S004_P005_P006_P007_REGISTERED | DOMAIN_SEPARATION_BRIDGE_MODEL_DIRECTIVE | 2026-04-03**
+**log_entry | TEAM_100 | PHOENIX_PROGRAM_REGISTRY | S003_P018_P019_REGISTERED | S004_P005_P006_P007_REGISTERED | S005_P001_REGISTERED | DOMAIN_SEPARATION_BRIDGE_MODEL_DIRECTIVE | 2026-04-03**
 ```
 
 ---
@@ -80,13 +88,14 @@ Append to the log section at the bottom of the registry:
 ### Task F — Update Future Stages S003-P017 entry
 
 Find the S003-P017-LEAN-KIT row in the Future Stages section. Update status to COMPLETE and
-add the new programs as a follow-on note:
+add the new programs as follow-on rows:
 
 **Find the row containing `S003-P017-LEAN-KIT`** and update the Status cell from `PLANNED` to
-`COMPLETE`. Then add a new row immediately after:
+`COMPLETE`. Then add two new rows immediately after:
 
 ```
-| S003-P018/P019 + S004-P005/P006/P007 | S003 / S004 | Bridge sync + multi-project adoption + generator + upgrade + CLI | Methodology (Agents_OS) | PLANNED | 5 follow-on programs registered from S003-P017 completion. Authority: `ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md`. See PHOENIX_PROGRAM_REGISTRY for detail. | PLANNED |
+| S003-P018/P019 + S004-P005/P006/P007 | S003 / S004 | Bridge sync + multi-project adoption + generator + upgrade + CLI | Methodology (Agents_OS) | PLANNED | 5 follow-on programs registered from S003-P017 completion. Authority: `ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md`. See PHOENIX_PROGRAM_REGISTRY for detail. |
+| S005-P001 | S005 | Domain Clean Separation — TikTrack Consumes AOS as Installed Tool (Phase E) | Methodology (Agents_OS) | PLANNED | Removes `agents_os_v3/` from TikTrack; AOS as installable L3 CLI. Pre-conditions: ALL of S003-P018/P019 + S004-P005/P006/P007 GATE_5 PASS. Locked: `ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md` Phase E. LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S005_P001_DOMAIN_CLEAN_SEPARATION_v1.0.0.md`. |
 ```
 
 ---
@@ -96,10 +105,11 @@ add the new programs as a follow-on note:
 - [ ] S003-P017 status = COMPLETE in registry
 - [ ] S003-P018 row present with correct note
 - [ ] S003-P019 row present with correct note
-- [ ] S004-P005, P006, P007 rows present in S004 section
+- [ ] S004-P009, P010, P011 rows present in S004 section (note: S004-P005/P006/P007 taken by TikTrack)
+- [ ] S005-P006 row present in S005 section (Phase E — clean separation; S005-P001..P005 taken)
 - [ ] Log entries appended
 - [ ] Roadmap S003-P017-LEAN-KIT row = COMPLETE
-- [ ] New follow-on row added to roadmap Future Stages
+- [ ] Follow-on rows added: S003-P018/P019+S004 block + S005-P001 row
 
 ## §4 — Submission
 

@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-04-03T00:10:48.531451+00:00",
+  "generated_at_utc": "2026-04-03T00:32:36.848086+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -254,8 +254,24 @@
       "program_name": "Lean Kit — agents-os repository + methodology portability (LEAN-KIT)",
       "domain": "AGENTS_OS",
       "stage_id": "S003",
+      "status": "COMPLETE",
+      "current_gate_mirror": "WP001 GATE_5 PASS 2026-04-03 (Team 191 — repo init); WP002 GATE_5 PASS 2026-04-03 (Team 170 — lean-kit content, 24 files). `agents-os` repo: `github.com/WaldNimrod/agents-os`. Lean Kit v0.1.0-scaffold. Follow-on programs: `S003-P018`, `S003-P019`, `S004-P009`, `S004-P010`, `S004-P011` (Lean Kit generator / L0→L2 / CLI — registry slots chosen to avoid collision with existing TikTrack `S004-P005`–`P007`)."
+    },
+    {
+      "program_id": "S003-P018",
+      "program_name": "AOS Snapshot Version Management",
+      "domain": "AGENTS_OS",
+      "stage_id": "S003",
       "status": "PLANNED",
-      "current_gate_mirror": "— **WPs:** `S003-P017-WP001` INIT_AGENTS_OS_REPO (Team 191); `S003-P017-WP002` BUILD_LEAN_KIT_CONTENT (Team 170); concept `LEAN-KIT-WP002`–`WP004` (generator, L0→L2 upgrade, scaffolding CLI) → **S004+**. Ref: `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_METHODOLOGY_DEPLOYMENT_SPLIT_v1.0.0.md` §3; `documentation/docs-governance/01-FOUNDATIONS/LOD_STANDARD_v1.0.0.md` §10."
+      "current_gate_mirror": "LOD100 authored 2026-04-03. Scope: version numbering + automated sync script for `agents_os_v3/` snapshot in client repos. Pre-condition for S003-P019. Ref: `ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md` §2 Decision 1; LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S003_P018_AOS_SNAPSHOT_VERSION_MANAGEMENT_v1.0.0.md`."
+    },
+    {
+      "program_id": "S003-P019",
+      "program_name": "Multi-Project Lean Kit Adoption — SmallFarmsAgents + EyalAmit",
+      "domain": "AGENTS_OS",
+      "stage_id": "S003",
+      "status": "PLANNED",
+      "current_gate_mirror": "LOD100 authored 2026-04-03. Scope: onboard 2 active projects onto L0 Lean profile; register in `agents-os/projects/`; validate Lean Kit in real-world conditions. Requires S003-P018 GATE_5 PASS. Ref: `ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md` §2 Decision 2; LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S003_P019_MULTI_PROJECT_LEAN_KIT_ADOPTION_v1.0.0.md`."
     },
     {
       "program_id": "S003-P009",
@@ -330,6 +346,30 @@
       "current_gate_mirror": "— (independent stage-4 package after existing AGENTS_OS stage-4 programs; scope lock: proposed_updates mediator, SSM legality gate, visual evidence diff/capture flow; authority source: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`; lock package: `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`; DB_DEPENDENCY_REF: IDEA-052)"
     },
     {
+      "program_id": "S004-P009",
+      "program_name": "Lean Kit Generator",
+      "domain": "AGENTS_OS",
+      "stage_id": "S004",
+      "status": "PLANNED",
+      "current_gate_mirror": "LOD100 authored 2026-04-03. Concept: LEAN-KIT-WP002. Scope: code generator producing project scaffold from minimal inputs. Requires S003-P019 GATE_5 PASS. LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S004_P005_LEAN_KIT_GENERATOR_v1.0.0.md`."
+    },
+    {
+      "program_id": "S004-P010",
+      "program_name": "L0→L2 Upgrade Path",
+      "domain": "AGENTS_OS",
+      "stage_id": "S004",
+      "status": "PLANNED",
+      "current_gate_mirror": "LOD100 authored 2026-04-03. Concept: LEAN-KIT-WP003. Scope: migration runbook + tooling for projects moving from Lean (L0) to AOS v3 (L2). Requires S003-P019 GATE_5 PASS + AOS L2 stability bar. LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S004_P006_L0_TO_L2_UPGRADE_PATH_v1.0.0.md`."
+    },
+    {
+      "program_id": "S004-P011",
+      "program_name": "Project Scaffolding CLI",
+      "domain": "AGENTS_OS",
+      "stage_id": "S004",
+      "status": "PLANNED",
+      "current_gate_mirror": "LOD100 authored 2026-04-03. Concept: LEAN-KIT-WP004. Scope: unified `aos` CLI (new, gate, snapshot, status). L3 profile entry point. Requires S004-P009 + S003-P018 GATE_5 PASS. LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S004_P007_PROJECT_SCAFFOLDING_CLI_v1.0.0.md`."
+    },
+    {
       "program_id": "S005-P001",
       "program_name": "Analytics Quality Validator",
       "domain": "AGENTS_OS",
@@ -368,6 +408,14 @@
       "stage_id": "S005",
       "status": "PLANNED",
       "current_gate_mirror": "— (Stage Governance Package; planning marker per integrated roadmap v1.1.0)"
+    },
+    {
+      "program_id": "S005-P006",
+      "program_name": "Domain Clean Separation — TikTrack Consumes AOS as Installed Tool",
+      "domain": "AGENTS_OS",
+      "stage_id": "S005",
+      "status": "PLANNED",
+      "current_gate_mirror": "LOD100 authored 2026-04-03. Phase E of `ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md`. Scope: remove `agents_os_v3/` from TikTrack; AOS delivered as installable L3 CLI. All of S003-P018/P019 + S004-P009/P010/P011 must be GATE_5 PASS first. LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S005_P006_DOMAIN_CLEAN_SEPARATION_v1.0.0.md`."
     },
     {
       "program_id": "S006-P001",
@@ -1058,8 +1106,24 @@
           "program_id": "S003-P017",
           "program_name": "Lean Kit — agents-os repository + methodology portability (LEAN-KIT)",
           "domain": "AGENTS_OS",
+          "status": "COMPLETE",
+          "current_gate_mirror": "WP001 GATE_5 PASS 2026-04-03 (Team 191 — repo init); WP002 GATE_5 PASS 2026-04-03 (Team 170 — lean-kit content, 24 files). `agents-os` repo: `github.com/WaldNimrod/agents-os`. Lean Kit v0.1.0-scaffold. Follow-on programs: `S003-P018`, `S003-P019`, `S004-P009`, `S004-P010`, `S004-P011` (Lean Kit generator / L0→L2 / CLI — registry slots chosen to avoid collision with existing TikTrack `S004-P005`–`P007`).",
+          "work_packages": []
+        },
+        {
+          "program_id": "S003-P018",
+          "program_name": "AOS Snapshot Version Management",
+          "domain": "AGENTS_OS",
           "status": "PLANNED",
-          "current_gate_mirror": "— **WPs:** `S003-P017-WP001` INIT_AGENTS_OS_REPO (Team 191); `S003-P017-WP002` BUILD_LEAN_KIT_CONTENT (Team 170); concept `LEAN-KIT-WP002`–`WP004` (generator, L0→L2 upgrade, scaffolding CLI) → **S004+**. Ref: `_COMMUNICATION/_Architects_Decisions/ARCHITECT_DIRECTIVE_METHODOLOGY_DEPLOYMENT_SPLIT_v1.0.0.md` §3; `documentation/docs-governance/01-FOUNDATIONS/LOD_STANDARD_v1.0.0.md` §10.",
+          "current_gate_mirror": "LOD100 authored 2026-04-03. Scope: version numbering + automated sync script for `agents_os_v3/` snapshot in client repos. Pre-condition for S003-P019. Ref: `ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md` §2 Decision 1; LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S003_P018_AOS_SNAPSHOT_VERSION_MANAGEMENT_v1.0.0.md`.",
+          "work_packages": []
+        },
+        {
+          "program_id": "S003-P019",
+          "program_name": "Multi-Project Lean Kit Adoption — SmallFarmsAgents + EyalAmit",
+          "domain": "AGENTS_OS",
+          "status": "PLANNED",
+          "current_gate_mirror": "LOD100 authored 2026-04-03. Scope: onboard 2 active projects onto L0 Lean profile; register in `agents-os/projects/`; validate Lean Kit in real-world conditions. Requires S003-P018 GATE_5 PASS. Ref: `ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md` §2 Decision 2; LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S003_P019_MULTI_PROJECT_LEAN_KIT_ADOPTION_v1.0.0.md`.",
           "work_packages": []
         }
       ]
@@ -1137,6 +1201,30 @@
           "status": "PLANNED",
           "current_gate_mirror": "— (independent stage-4 package after existing AGENTS_OS stage-4 programs; scope lock: proposed_updates mediator, SSM legality gate, visual evidence diff/capture flow; authority source: `_COMMUNICATION/_Architects_Decisions/Gimini 00 cloud/פסיקה אדריכלית_ סמנטיקת כתיבה ותוכנית אבולוציה Agents_OS v2.md`; lock package: `_COMMUNICATION/team_190/TEAM_190_TO_TEAM_00_ADR031_DECISION_LOCK_AND_SIGNER_CHAIN_PROPOSAL_v1.0.0.md`; DB_DEPENDENCY_REF: IDEA-052)",
           "work_packages": []
+        },
+        {
+          "program_id": "S004-P009",
+          "program_name": "Lean Kit Generator",
+          "domain": "AGENTS_OS",
+          "status": "PLANNED",
+          "current_gate_mirror": "LOD100 authored 2026-04-03. Concept: LEAN-KIT-WP002. Scope: code generator producing project scaffold from minimal inputs. Requires S003-P019 GATE_5 PASS. LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S004_P005_LEAN_KIT_GENERATOR_v1.0.0.md`.",
+          "work_packages": []
+        },
+        {
+          "program_id": "S004-P010",
+          "program_name": "L0→L2 Upgrade Path",
+          "domain": "AGENTS_OS",
+          "status": "PLANNED",
+          "current_gate_mirror": "LOD100 authored 2026-04-03. Concept: LEAN-KIT-WP003. Scope: migration runbook + tooling for projects moving from Lean (L0) to AOS v3 (L2). Requires S003-P019 GATE_5 PASS + AOS L2 stability bar. LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S004_P006_L0_TO_L2_UPGRADE_PATH_v1.0.0.md`.",
+          "work_packages": []
+        },
+        {
+          "program_id": "S004-P011",
+          "program_name": "Project Scaffolding CLI",
+          "domain": "AGENTS_OS",
+          "status": "PLANNED",
+          "current_gate_mirror": "LOD100 authored 2026-04-03. Concept: LEAN-KIT-WP004. Scope: unified `aos` CLI (new, gate, snapshot, status). L3 profile entry point. Requires S004-P009 + S003-P018 GATE_5 PASS. LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S004_P007_PROJECT_SCAFFOLDING_CLI_v1.0.0.md`.",
+          "work_packages": []
         }
       ]
     },
@@ -1188,6 +1276,14 @@
           "domain": "TIKTRACK",
           "status": "PLANNED",
           "current_gate_mirror": "— (Stage Governance Package; planning marker per integrated roadmap v1.1.0)",
+          "work_packages": []
+        },
+        {
+          "program_id": "S005-P006",
+          "program_name": "Domain Clean Separation — TikTrack Consumes AOS as Installed Tool",
+          "domain": "AGENTS_OS",
+          "status": "PLANNED",
+          "current_gate_mirror": "LOD100 authored 2026-04-03. Phase E of `ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md`. Scope: remove `agents_os_v3/` from TikTrack; AOS delivered as installable L3 CLI. All of S003-P018/P019 + S004-P009/P010/P011 must be GATE_5 PASS first. LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S005_P006_DOMAIN_CLEAN_SEPARATION_v1.0.0.md`.",
           "work_packages": []
         }
       ]

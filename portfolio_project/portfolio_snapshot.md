@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-04-03T00:10:48.531451+00:00`
+- Generated (UTC): `2026-04-03T00:32:36.848086+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -16,7 +16,7 @@
 ## Portfolio Counts
 
 - stages: `6`
-- programs: `41`
+- programs: `47`
 - work_packages: `23`
 
 ## Roadmap (hierarchical)
@@ -101,7 +101,11 @@
 
     ├── **Program** `S003-P016` — Pipeline Git Isolation — Branch-per-WP + State Consolidation | PLANNED | domain: **SHARED**
 
-    └── **Program** `S003-P017` — Lean Kit — agents-os repository + methodology portability (LEAN-KIT) | PLANNED | domain: **AGENTS_OS**
+    ├── **Program** `S003-P017` — Lean Kit — agents-os repository + methodology portability (LEAN-KIT) | COMPLETE | domain: **AGENTS_OS**
+
+    ├── **Program** `S003-P018` — AOS Snapshot Version Management | PLANNED | domain: **AGENTS_OS**
+
+    └── **Program** `S003-P019` — Multi-Project Lean Kit Adoption — SmallFarmsAgents + EyalAmit | PLANNED | domain: **AGENTS_OS**
 
 
 ### S004 — שלב 4 — Financial Execution | PLANNED [SHARED]
@@ -120,7 +124,13 @@
 
     ├── **Program** `S004-P007` — Indicators Infrastructure | PLANNED | domain: **TIKTRACK**
 
-    └── **Program** `S004-P008` — Agents_OS Mediated Reconciliation Engine (ADR-031 Stage C) | PLANNED | domain: **AGENTS_OS**
+    ├── **Program** `S004-P008` — Agents_OS Mediated Reconciliation Engine (ADR-031 Stage C) | PLANNED | domain: **AGENTS_OS**
+
+    ├── **Program** `S004-P009` — Lean Kit Generator | PLANNED | domain: **AGENTS_OS**
+
+    ├── **Program** `S004-P010` — L0→L2 Upgrade Path | PLANNED | domain: **AGENTS_OS**
+
+    └── **Program** `S004-P011` — Project Scaffolding CLI | PLANNED | domain: **AGENTS_OS**
 
 
 ### S005 — שלב 5 — Trades/Plans | PLANNED [SHARED]
@@ -133,7 +143,9 @@
 
     ├── **Program** `S005-P004` — Journal & History (D28+D31) | PLANNED | domain: **TIKTRACK**
 
-    └── **Program** `S005-P005` — Admin Review S005 | PLANNED | domain: **TIKTRACK**
+    ├── **Program** `S005-P005` — Admin Review S005 | PLANNED | domain: **TIKTRACK**
+
+    └── **Program** `S005-P006` — Domain Clean Separation — TikTrack Consumes AOS as Installed Tool | PLANNED | domain: **AGENTS_OS**
 
 
 ### S006 — שלב 6 — Advanced Analytics | PLANNED [SHARED]

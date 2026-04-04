@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-04-04T13:32:41.073905+00:00",
+  "generated_at_utc": "2026-04-04T17:39:04.632147+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -270,8 +270,8 @@
       "program_name": "Lean Kit Adoption — SmallFarmsAgents (EyalAmit deferred)",
       "domain": "AGENTS_OS",
       "stage_id": "S003",
-      "status": "ACTIVE",
-      "current_gate_mirror": "LOD200 APPROVED 2026-04-04 (Team 00). Phase 1 L-GATE_V PASS 2026-04-04 (Team 170 build; Team 190 validated — AC-01..AC-10 PASS; commit `c116602` agents-os). Deliverables D1–D6 in `agents-os/projects/sfa/`. Phase 2 ACTIVE: Team 170 writing SFA onboarding docs (L-GATE_B); L-GATE_V validator = sfa_team_50 (OpenAI). EyalAmit deferred per LOD200 D-01 (re-eval trigger: EyalAmit M2 COMPLETE + Nimrod request). Mandate: `TEAM_100_TO_TEAM_170_S003_P019_PHASE2_SFA_ONBOARDING_v1.0.1.md`."
+      "status": "COMPLETE",
+      "current_gate_mirror": "Phase 1 L-GATE_V PASS 2026-04-04 (Team 190, AC-01..AC-10; agents-os commit `c116602`). Phase 2 L-GATE_V PASS 2026-04-04 (sfa_team_50 OpenAI, PAC-01..PAC-10; SFA commit `c3fc864`). ARCH_APPROVER ratified. SFA-P001-WP001 COMPLETE (agents-os `ccde088`). Deliverables: `agents-os/projects/sfa/` (D1–D6) + `SmallFarmsAgents/_COMMUNICATION/` (PD1–PD5). EyalAmit deferred per LOD200 D-01."
     },
     {
       "program_id": "S003-P009",
@@ -1122,8 +1122,8 @@
           "program_id": "S003-P019",
           "program_name": "Lean Kit Adoption — SmallFarmsAgents (EyalAmit deferred)",
           "domain": "AGENTS_OS",
-          "status": "ACTIVE",
-          "current_gate_mirror": "LOD200 APPROVED 2026-04-04 (Team 00). Phase 1 L-GATE_V PASS 2026-04-04 (Team 170 build; Team 190 validated — AC-01..AC-10 PASS; commit `c116602` agents-os). Deliverables D1–D6 in `agents-os/projects/sfa/`. Phase 2 ACTIVE: Team 170 writing SFA onboarding docs (L-GATE_B); L-GATE_V validator = sfa_team_50 (OpenAI). EyalAmit deferred per LOD200 D-01 (re-eval trigger: EyalAmit M2 COMPLETE + Nimrod request). Mandate: `TEAM_100_TO_TEAM_170_S003_P019_PHASE2_SFA_ONBOARDING_v1.0.1.md`.",
+          "status": "COMPLETE",
+          "current_gate_mirror": "Phase 1 L-GATE_V PASS 2026-04-04 (Team 190, AC-01..AC-10; agents-os commit `c116602`). Phase 2 L-GATE_V PASS 2026-04-04 (sfa_team_50 OpenAI, PAC-01..PAC-10; SFA commit `c3fc864`). ARCH_APPROVER ratified. SFA-P001-WP001 COMPLETE (agents-os `ccde088`). Deliverables: `agents-os/projects/sfa/` (D1–D6) + `SmallFarmsAgents/_COMMUNICATION/` (PD1–PD5). EyalAmit deferred per LOD200 D-01.",
           "work_packages": []
         }
       ]

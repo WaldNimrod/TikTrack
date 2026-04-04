@@ -1,6 +1,7 @@
 # Team 170 — Completion Report: Registry + Roadmap Update (S003-P017 closure)
 
-**date:** 2026-04-03  
+**date:** 2026-04-03
+**historical_record:** true  
 **executor:** Team 170  
 **mandate:** `_COMMUNICATION/team_170/TEAM_100_TO_TEAM_170_REGISTRY_ROADMAP_UPDATE_S003_P017_CLOSURE_AND_NEW_PROGRAMS_v1.0.0.md`  
 **gate:** GATE_3 execution complete (self-QA per mandate §3)

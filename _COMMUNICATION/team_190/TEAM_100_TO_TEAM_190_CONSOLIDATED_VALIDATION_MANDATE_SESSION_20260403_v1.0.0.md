@@ -7,6 +7,7 @@ date: 2026-04-03
 type: VALIDATION_MANDATE
 priority: HIGH
 status: ACTIVE
+historical_record: true
 ---
 
 # Consolidated Validation Mandate — Session 2026-04-03

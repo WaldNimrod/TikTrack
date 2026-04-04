@@ -1,4 +1,5 @@
 ---
+historical_record: true
 id: TEAM_100_TO_TEAM_170_REGISTRY_ROADMAP_UPDATE_S003_P017_CLOSURE_AND_NEW_PROGRAMS_v1.0.0.md
 from: Team 100 (Architecture)
 to: Team 170 (Documentation)

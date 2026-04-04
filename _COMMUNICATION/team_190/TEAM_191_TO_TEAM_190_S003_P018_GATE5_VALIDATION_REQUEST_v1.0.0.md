@@ -1,4 +1,5 @@
 ---
+historical_record: true
 id: TEAM_191_TO_TEAM_190_S003_P018_GATE5_VALIDATION_REQUEST_v1.0.0
 from: Team 191 (Git Governance — Cursor)
 to: Team 190 (Constitutional Validator)

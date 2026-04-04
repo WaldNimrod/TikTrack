@@ -1,4 +1,5 @@
 ---
+historical_record: true
 id: TEAM_190_CONSOLIDATED_VALIDATION_RESULT_SESSION_20260403_v1.0.0
 from: Team 190
 to: Team 100, Team 00, Team 170

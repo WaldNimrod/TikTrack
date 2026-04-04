@@ -1,4 +1,5 @@
 ---
+historical_record: true
 lod_target: LOD100
 lod_status: DRAFT
 track: A

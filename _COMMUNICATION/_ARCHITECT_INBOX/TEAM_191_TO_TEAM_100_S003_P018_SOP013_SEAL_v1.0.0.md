@@ -1,4 +1,5 @@
 ---
+historical_record: true
 from: Team 191 (Git Governance — Cursor)
 to: Team 100 (Chief System Architect)
 cc: Team 00 (Principal), Team 190 (Constitutional Validator), Team 10 (Gateway)

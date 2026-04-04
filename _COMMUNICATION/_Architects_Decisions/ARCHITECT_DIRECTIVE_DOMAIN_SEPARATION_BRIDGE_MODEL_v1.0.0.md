@@ -1,4 +1,5 @@
 ---
+historical_record: true
 id: ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0
 author: Team 00 (Nimrod — Chief Architect)
 date: 2026-04-03

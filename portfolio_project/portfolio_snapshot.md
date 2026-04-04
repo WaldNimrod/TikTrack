@@ -1,6 +1,6 @@
 # Portfolio Automation Snapshot
 
-- Generated (UTC): `2026-04-03T21:29:27.071300+00:00`
+- Generated (UTC): `2026-04-04T17:39:04.632147+00:00`
 - Validation: `PASS`
 - Errors: `0`
 - Warnings: `0`
@@ -105,7 +105,7 @@
 
     ├── **Program** `S003-P018` — AOS Snapshot Version Management | COMPLETE | domain: **AGENTS_OS**
 
-    └── **Program** `S003-P019` — Multi-Project Lean Kit Adoption — SmallFarmsAgents + EyalAmit | PLANNED | domain: **AGENTS_OS**
+    └── **Program** `S003-P019` — Lean Kit Adoption — SmallFarmsAgents (EyalAmit deferred) | COMPLETE | domain: **AGENTS_OS**
 
 
 ### S004 — שלב 4 — Financial Execution | PLANNED [SHARED]

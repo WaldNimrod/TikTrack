@@ -1,4 +1,5 @@
 ---
+historical_record: true
 id: TEAM_170_TO_TEAM_190_S003_P017_DEEP_DRIFT_REVALIDATION_REQUEST_v1.0.0
 from: Team 170 (Spec & Governance)
 to: Team 190 (Constitutional Validator)

@@ -10,6 +10,7 @@ supersedes: TEAM_00_LOD100_S003_P018_AOS_SNAPSHOT_VERSION_MANAGEMENT_v1.0.0.md
 program_id: S003-P018
 domain: AGENTS_OS
 approved_by: Team 00 (Nimrod)
+historical_record: true
 ---
 
 # LOD200 — AOS Snapshot Version Management

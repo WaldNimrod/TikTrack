@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-04-03T21:29:27.071300+00:00",
+  "generated_at_utc": "2026-04-04T17:39:04.632147+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -267,11 +267,11 @@
     },
     {
       "program_id": "S003-P019",
-      "program_name": "Multi-Project Lean Kit Adoption — SmallFarmsAgents + EyalAmit",
+      "program_name": "Lean Kit Adoption — SmallFarmsAgents (EyalAmit deferred)",
       "domain": "AGENTS_OS",
       "stage_id": "S003",
-      "status": "PLANNED",
-      "current_gate_mirror": "LOD100 authored 2026-04-03. Scope: onboard 2 active projects onto L0 Lean profile; register in `agents-os/projects/`; validate Lean Kit in real-world conditions. Requires S003-P018 GATE_5 PASS. Ref: `ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md` §2 Decision 2; LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S003_P019_MULTI_PROJECT_LEAN_KIT_ADOPTION_v1.0.0.md`."
+      "status": "COMPLETE",
+      "current_gate_mirror": "Phase 1 L-GATE_V PASS 2026-04-04 (Team 190, AC-01..AC-10; agents-os commit `c116602`). Phase 2 L-GATE_V PASS 2026-04-04 (sfa_team_50 OpenAI, PAC-01..PAC-10; SFA commit `c3fc864`). ARCH_APPROVER ratified. SFA-P001-WP001 COMPLETE (agents-os `ccde088`). Deliverables: `agents-os/projects/sfa/` (D1–D6) + `SmallFarmsAgents/_COMMUNICATION/` (PD1–PD5). EyalAmit deferred per LOD200 D-01."
     },
     {
       "program_id": "S003-P009",
@@ -1120,10 +1120,10 @@
         },
         {
           "program_id": "S003-P019",
-          "program_name": "Multi-Project Lean Kit Adoption — SmallFarmsAgents + EyalAmit",
+          "program_name": "Lean Kit Adoption — SmallFarmsAgents (EyalAmit deferred)",
           "domain": "AGENTS_OS",
-          "status": "PLANNED",
-          "current_gate_mirror": "LOD100 authored 2026-04-03. Scope: onboard 2 active projects onto L0 Lean profile; register in `agents-os/projects/`; validate Lean Kit in real-world conditions. Requires S003-P018 GATE_5 PASS. Ref: `ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md` §2 Decision 2; LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S003_P019_MULTI_PROJECT_LEAN_KIT_ADOPTION_v1.0.0.md`.",
+          "status": "COMPLETE",
+          "current_gate_mirror": "Phase 1 L-GATE_V PASS 2026-04-04 (Team 190, AC-01..AC-10; agents-os commit `c116602`). Phase 2 L-GATE_V PASS 2026-04-04 (sfa_team_50 OpenAI, PAC-01..PAC-10; SFA commit `c3fc864`). ARCH_APPROVER ratified. SFA-P001-WP001 COMPLETE (agents-os `ccde088`). Deliverables: `agents-os/projects/sfa/` (D1–D6) + `SmallFarmsAgents/_COMMUNICATION/` (PD1–PD5). EyalAmit deferred per LOD200 D-01.",
           "work_packages": []
         }
       ]

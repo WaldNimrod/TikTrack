@@ -9,6 +9,7 @@ priority: LOW
 status: ACTIVE
 blocking: NONE
 source_finding: S003-P018 GATE_5 F-01 (MINOR) — Team 190 GATE_5 validation result v1.0.0
+historical_record: true
 ---
 
 # Hygiene Mandate — PFS Hook Violations in Team 190 Historical Files

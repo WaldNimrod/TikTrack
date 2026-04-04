@@ -168,9 +168,9 @@ Source directives:
 
 ---
 
-**current_gate_mirror source:** pipeline_state_*.json via wsm_sync (S003-P016 — COS removed from WSM; last update 2026-04-03). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
+**current_gate_mirror source:** pipeline_state_*.json via wsm_sync (S003-P016 — COS removed from WSM; last update 2026-04-04). Sync contract: `documentation/docs-governance/01-FOUNDATIONS/PORTFOLIO_WSM_SYNC_RULES_v1.0.0.md`.
 
-**WSM mirror (2026-04-03):** active_stage_id=S003; active_program_id=S003-P015; current_gate=COMPLETE; active_work_package_id=S003-P015-WP001; active_flow=S003-P015-WP001 — AOS DM-005 SC Verification Run. Documentation-only pipeline run (GATE_0→GATE_5, TRACK_FOCUSED) to verify AOS pipeline engine readiness for DM-005 closure. No code changes. Authority: DM-005 v1.2.0..
+**WSM mirror (2026-04-04):** active_stage_id=S003; active_program_id=S003-P015; current_gate=COMPLETE; active_work_package_id=S003-P015-WP001; active_flow=S003-P015-WP001 — AOS DM-005 SC Verification Run. Documentation-only pipeline run (GATE_0→GATE_5, TRACK_FOCUSED) to verify AOS pipeline engine readiness for DM-005 closure. No code changes. Authority: DM-005 v1.2.0..
 
 ---
 

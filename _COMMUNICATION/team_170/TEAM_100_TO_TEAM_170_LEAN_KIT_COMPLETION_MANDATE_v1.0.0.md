@@ -1,4 +1,5 @@
 ---
+historical_record: true
 id: TEAM_100_TO_TEAM_170_LEAN_KIT_COMPLETION_MANDATE_v1.0.0
 from: Team 100 (Architecture)
 to: Team 170 (Documentation)

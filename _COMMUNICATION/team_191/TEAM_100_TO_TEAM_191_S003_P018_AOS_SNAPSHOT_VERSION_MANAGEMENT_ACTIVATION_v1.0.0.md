@@ -1,4 +1,5 @@
 ---
+historical_record: true
 id: TEAM_100_TO_TEAM_191_S003_P018_AOS_SNAPSHOT_VERSION_MANAGEMENT_ACTIVATION_v1.0.0
 from: Team 100 (Architecture — acting on Team 00 authority)
 to: Team 191 (GitHub & Git lane — Cursor Composer)

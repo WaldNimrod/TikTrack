@@ -1,4 +1,5 @@
 ---
+historical_record: true
 id: TEAM_170_TO_TEAM_190_LEAN_KIT_COMPLETION_VALIDATION_REQUEST_v1.0.0
 from: Team 170 (Spec & Governance)
 to: Team 190 (Constitutional Validator)

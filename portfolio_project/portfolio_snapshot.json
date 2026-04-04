@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-04-03T21:29:27.071300+00:00",
+  "generated_at_utc": "2026-04-04T13:32:41.073905+00:00",
   "sources": {
     "wsm": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_MASTER_WSM_v1.0.0.md",
     "roadmap": "documentation/docs-governance/01-FOUNDATIONS/PHOENIX_PORTFOLIO_ROADMAP_v1.0.0.md",
@@ -267,11 +267,11 @@
     },
     {
       "program_id": "S003-P019",
-      "program_name": "Multi-Project Lean Kit Adoption — SmallFarmsAgents + EyalAmit",
+      "program_name": "Lean Kit Adoption — SmallFarmsAgents (EyalAmit deferred)",
       "domain": "AGENTS_OS",
       "stage_id": "S003",
-      "status": "PLANNED",
-      "current_gate_mirror": "LOD100 authored 2026-04-03. Scope: onboard 2 active projects onto L0 Lean profile; register in `agents-os/projects/`; validate Lean Kit in real-world conditions. Requires S003-P018 GATE_5 PASS. Ref: `ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md` §2 Decision 2; LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S003_P019_MULTI_PROJECT_LEAN_KIT_ADOPTION_v1.0.0.md`."
+      "status": "ACTIVE",
+      "current_gate_mirror": "LOD200 APPROVED 2026-04-04 (Team 00). Phase 1 L-GATE_V PASS 2026-04-04 (Team 170 build; Team 190 validated — AC-01..AC-10 PASS; commit `c116602` agents-os). Deliverables D1–D6 in `agents-os/projects/sfa/`. Phase 2 ACTIVE: Team 170 writing SFA onboarding docs (L-GATE_B); L-GATE_V validator = sfa_team_50 (OpenAI). EyalAmit deferred per LOD200 D-01 (re-eval trigger: EyalAmit M2 COMPLETE + Nimrod request). Mandate: `TEAM_100_TO_TEAM_170_S003_P019_PHASE2_SFA_ONBOARDING_v1.0.1.md`."
     },
     {
       "program_id": "S003-P009",
@@ -1120,10 +1120,10 @@
         },
         {
           "program_id": "S003-P019",
-          "program_name": "Multi-Project Lean Kit Adoption — SmallFarmsAgents + EyalAmit",
+          "program_name": "Lean Kit Adoption — SmallFarmsAgents (EyalAmit deferred)",
           "domain": "AGENTS_OS",
-          "status": "PLANNED",
-          "current_gate_mirror": "LOD100 authored 2026-04-03. Scope: onboard 2 active projects onto L0 Lean profile; register in `agents-os/projects/`; validate Lean Kit in real-world conditions. Requires S003-P018 GATE_5 PASS. Ref: `ARCHITECT_DIRECTIVE_DOMAIN_SEPARATION_BRIDGE_MODEL_v1.0.0.md` §2 Decision 2; LOD100: `_COMMUNICATION/team_00/TEAM_00_LOD100_S003_P019_MULTI_PROJECT_LEAN_KIT_ADOPTION_v1.0.0.md`.",
+          "status": "ACTIVE",
+          "current_gate_mirror": "LOD200 APPROVED 2026-04-04 (Team 00). Phase 1 L-GATE_V PASS 2026-04-04 (Team 170 build; Team 190 validated — AC-01..AC-10 PASS; commit `c116602` agents-os). Deliverables D1–D6 in `agents-os/projects/sfa/`. Phase 2 ACTIVE: Team 170 writing SFA onboarding docs (L-GATE_B); L-GATE_V validator = sfa_team_50 (OpenAI). EyalAmit deferred per LOD200 D-01 (re-eval trigger: EyalAmit M2 COMPLETE + Nimrod request). Mandate: `TEAM_100_TO_TEAM_170_S003_P019_PHASE2_SFA_ONBOARDING_v1.0.1.md`.",
           "work_packages": []
         }
       ]

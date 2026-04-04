@@ -11,7 +11,13 @@ gate: L-GATE_V (SFA-P001-WP001)
 builder: Team 170 (Cursor)
 validator: Team 190 (OpenAI)
 pre_condition: Team 170 Phase 2 completion report filed in _ARCHITECT_INBOX
-status: PENDING — activate after Phase 2 completion report received
+status: RETIRED — superseded 2026-04-04
+retired_reason: >
+  Phase 1 artifacts locked sfa_team_50 (OpenAI) as the canonical L-GATE_V validator for
+  SFA-P001-WP001 (team_assignments.yaml cross_engine_validator field; LOD200 spec PAC-04;
+  roadmap.yaml validator field). Team 190 AOS-side validation of Phase 2 is not required.
+  Iron Rule is satisfied by: Team 170 (Cursor) builds → sfa_team_50 (OpenAI) validates.
+  Superseded by: TEAM_100_TO_TEAM_170_S003_P019_PHASE2_SFA_ONBOARDING_v1.0.1.md §11.
 ---
 
 # L-GATE_V Validation — S003-P019 Phase 2: SFA Team Onboarding Package

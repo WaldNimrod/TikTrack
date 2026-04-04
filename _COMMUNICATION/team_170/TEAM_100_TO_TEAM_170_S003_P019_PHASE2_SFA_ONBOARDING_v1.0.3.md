@@ -1,13 +1,10 @@
 ---
-deprecated: true
-superseded_by: TEAM_100_TO_TEAM_170_S003_P019_PHASE2_SFA_ONBOARDING_v1.0.3.md
-deprecation_note: "v1.0.2 fixes Phoenix QA roster drift — use Team 51 (AOS QA), not TikTrack Team 50, for handoffs."
-id: TEAM_100_TO_TEAM_170_S003_P019_PHASE2_SFA_ONBOARDING_v1.0.1
+id: TEAM_100_TO_TEAM_170_S003_P019_PHASE2_SFA_ONBOARDING_v1.0.3
 from: Team 100 (Architecture)
 to: Team 170 (Documentation)
-cc: Team 00 (Principal)
+cc: Team 00 (Principal), Team 51 (AOS QA — Phoenix routing), Team 190 (Constitutional closure — see §12)
 date: 2026-04-04
-supersedes: TEAM_100_TO_TEAM_170_S003_P019_PHASE2_SFA_ONBOARDING_v1.0.0.md
+supersedes: TEAM_100_TO_TEAM_170_S003_P019_PHASE2_SFA_ONBOARDING_v1.0.2.md
 type: BUILD_ACTIVATION
 program_id: S003-P019
 phase: Phase 2 — SFA Team Onboarding
@@ -16,8 +13,15 @@ pre_condition: S003-P019 Phase 1 L-GATE_V PASS ✓ (Team 190 revalidation — 20
 pilot_wp: SFA-P001-WP001
 pilot_wp_gate_entry: L-GATE_B (continuing from L-GATE_S — spec at projects/sfa/SFA_P001_WP001_LOD200_SPEC.md)
 lgate_v_validator: sfa_team_50 (OpenAI — canonical per team_assignments.yaml + LOD200 spec PAC-04)
+phoenix_aos_qa_roster: Team 51 (NOT TikTrack Team 50 — see §14)
 status: ACTIVE — Phase 1 closed; Phase 2 authorized
 change_log:
+  v1.0.3: "F-01 remediation (Team 190 Phase 2 PASS_WITH_FINDINGS) — §12 dual-track closure:
+          Track A = Lean L-GATE_V via sfa_team_50/OpenAI/PD5; Track B = Team 190 Phoenix
+          constitutional review when Principal requires. Retired mandate note clarified — not
+          a blanket retirement of Team 190."
+  v1.0.2: "ROUTING — §14: Phoenix/AOS QA handoffs use Team 51 (AOS QA). SFA in-repo TEAM_50/
+          and YAML id sfa_team_50 unchanged (SmallFarmsAgents namespace). Fixes roster drift."
   v1.0.1: "CORRECTION — §12/§1/cc: validator = sfa_team_50 (not Team 190). Team 190 Phase 2
            mandate retired. PAC alignment note added. Status updated from PENDING to ACTIVE."
 ---
@@ -40,13 +44,21 @@ Execute the pilot WP `SFA-P001-WP001` through L-GATE_B. This means writing `LEAN
 and all team activation prompts in the SmallFarmsAgents repository, so every SFA team has their
 Lean context and can begin executing immediately.
 
-**L-GATE_V validator for Phase 2:** `sfa_team_50` (OpenAI).
-SFA Team 50 is the canonical `CONSTITUTIONAL_VALIDATOR` declared in `team_assignments.yaml`
-and LOD200 spec PAC-04. The AOS-side Team 190 Phase 2 validation mandate is retired — it
-was based on a draft before the Phase 1 artifacts locked the canonical validator.
+**L-GATE_V validator for Phase 2 (Lean / engine):** `sfa_team_50` (OpenAI) — the canonical
+`CONSTITUTIONAL_VALIDATOR` **id** in `team_assignments.yaml` and LOD200 spec PAC-04. This is a
+**SmallFarmsAgents** roster id; it does **not** map to Phoenix **TikTrack Team 50**.
+
+**Phoenix / AOS QA routing:** For governance and QA handoffs **in this repository** on the **Agents OS**
+track, the correct QA squad is **Team 51** (AOS QA). Team 170 files handoff requests to **Team 51**, not
+to TikTrack Team 50. See **§14**.
+
+**Team 190 (Phoenix):** When Principal / Gateway directs, Team 190 performs **constitutional**
+review of the Phase 2 package (V-01..V-06) — see **§12 Track B**. This is **not** duplicate execution
+of Lean L-GATE_V (Track A).
 
 **Result of Phase 2:**
-`SFA-P001-WP001` advances to L-GATE_V. After sfa_team_50 PASS + Nimrod (ARCH_APPROVER) ratifies:
+`SFA-P001-WP001` advances to L-GATE_V. After **Track A** (Lean L-GATE_V) + **Track B** (Team 190
+constitutional verdict when directed) are acceptable and **Nimrod (ARCH_APPROVER)** ratifies:
 - SFA-P001-WP001 status = COMPLETE
 - S003-P019 fully complete (Phase 1 + Phase 2)
 - All SFA teams are Lean-ready
@@ -241,9 +253,11 @@ Self-QA before filing:
 
 ---
 
-## §11 — L-GATE_V: SFA Team 50 Activation (Nimrod's action after completion report)
+## §11 — L-GATE_V: Activation (Nimrod's action after completion report)
 
 After Team 170 files the completion report:
+
+0. **Team 51 (Phoenix AOS QA)** receives `_COMMUNICATION/team_170/TEAM_170_TO_TEAM_51_S003_P019_PHASE2_AOS_QA_HANDOFF_v1.0.0.md` and tracks PAC execution evidence (see §14).
 
 1. Nimrod opens a new **OpenAI** session
 2. Pastes content of `SmallFarmsAgents/_COMMUNICATION/TEAM_50/LEAN_KIT_ACTIVATION_TEAM50.md` as the activation prompt
@@ -257,12 +271,59 @@ After Team 170 files the completion report:
 
 ---
 
-## §12 — Note on Retired Mandate
+## §12 — Dual-track closure (Lean L-GATE_V + Phoenix constitutional)
 
-`TEAM_100_TO_TEAM_190_S003_P019_PHASE2_SFA_VALIDATION_v1.0.0.md` is **retired**.
-It was written before Phase 1 artifacts locked `sfa_team_50` as the canonical L-GATE_V validator.
-Team 190 AOS-side oversight of Phase 2 is NOT required. Iron Rule is satisfied by:
-Team 170 (Cursor) builds → sfa_team_50 (OpenAI) validates.
+**Normative rule (codifies Principal/Gateway + resolves Team 190 finding F-01):** S003-P019 Phase 2 is
+**not** fully closed in Phoenix until **both** tracks below have completed acceptably (unless Principal
+issues a written waiver for a specific track).
+
+### Track A — Lean L-GATE_V (SFA / Iron Rule / cross-engine)
+
+| Field | Value |
+|-------|--------|
+| **Role** | Lean **validate** gate execution for pilot WP `SFA-P001-WP001` |
+| **Validator id** | `sfa_team_50` (per `agents-os/projects/sfa/team_assignments.yaml`) |
+| **Engine** | **OpenAI** — session activated with PD5 (`LEAN_KIT_ACTIVATION_TEAM50.md`) |
+| **Output** | `SmallFarmsAgents/_COMMUNICATION/TEAM_50/reports/LGATE_V_SFA_P001_WP001_RESULT_v1.0.0.md` |
+| **Checks** | PAC-01..PAC-10 per mandate §8 / PD5 embedded table |
+
+Team 170 (Cursor) **builds**; **sfa_team_50** (OpenAI) **validates** at L-GATE_V — Iron Rule.
+
+### Track B — Phoenix constitutional review
+
+| Field | Value |
+|-------|--------|
+| **Role** | Governance / package-integrity review **in Phoenix** (not a second execution of Track A) |
+| **Owner** | **Team 190** (Constitutional Validator) |
+| **Trigger** | Principal / Gateway directive + Team 170 request: `TEAM_170_TO_TEAM_190_S003_P019_PHASE2_VALIDATION_REQUEST_v1.0.0.md` |
+| **Output** | e.g. `TEAM_190_TO_TEAM_170_S003_P019_PHASE2_VALIDATION_RESULT_v1.0.0.md` + canonical copy to `_ARCHITECT_INBOX/` |
+
+Track B **does not** replace Track A and **does not** re-assign the OpenAI L-GATE_V executor role.
+
+### Retired document (scope-limited)
+
+`TEAM_100_TO_TEAM_190_S003_P019_PHASE2_SFA_VALIDATION_v1.0.0.md` is **retired** only as an **obsolete
+duplicate charter** that implied Team 190 would **execute the same L-GATE_V validator hat** as
+`sfa_team_50`. Retirement **does not** remove optional or directed **Team 190 constitutional** review
+(Track B).
+
+### Team 51 (AOS QA — Phoenix)
+
+**Team 51** coordinates AOS-domain QA handoff and evidence in Phoenix (§14). It does **not** replace
+Track A or Track B.
+
+---
+
+## §14 — Phoenix roster correction: Team 51 vs Team 50
+
+| Namespace | Correct QA owner | Notes |
+|-----------|------------------|--------|
+| **Phoenix repo — AOS / Agents OS domain** | **Team 51** | QA & functional acceptance for `agents_os` / methodology overlays per `TEAM_DEVELOPMENT_ROLE_MAPPING` |
+| **Phoenix repo — TikTrack domain** | Team 50 | TikTrack QA — **do not** use for S003-P019 AOS handoffs |
+| **SmallFarmsAgents repo** | Folder `TEAM_50/`, YAML id `sfa_team_50` | SFA’s own QA team naming; unchanged |
+
+**Team 170 obligation:** File Phase 2 QA handoff to **`TEAM_170_TO_TEAM_51_...`** under `_COMMUNICATION/team_170/`.
+Deprecate any mis-addressed `TEAM_170_TO_TEAM_50_...` for **Phoenix** routing (TikTrack Team 50).
 
 ---
 
@@ -280,4 +341,4 @@ Team 170 (Cursor) builds → sfa_team_50 (OpenAI) validates.
 
 ---
 
-**log_entry | TEAM_100 | S003_P019_PHASE2_BUILD_ACTIVATION_v1.0.1 | TEAM_170 | PILOT_WP_LGATE_B | VALIDATOR_CORRECTED_SFA_TEAM_50 | 2026-04-04**
+**log_entry | TEAM_100 | S003_P019_PHASE2_BUILD_ACTIVATION_v1.0.3 | TEAM_170 | PILOT_WP_LGATE_B | F01_DUAL_TRACK_CLOSURE | 2026-04-04**

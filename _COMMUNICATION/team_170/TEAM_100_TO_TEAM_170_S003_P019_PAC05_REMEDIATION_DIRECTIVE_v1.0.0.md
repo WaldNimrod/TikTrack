@@ -7,7 +7,7 @@ date: 2026-04-04
 type: REMEDIATION_DIRECTIVE
 program_id: S003-P019
 phase: Phase 2 — L-GATE_V PAC-05 remediation
-trigger: sfa_team_50 L-GATE_V FAIL (PAC-05 blocking) — 2026-04-06
+trigger: sfa_team_50 L-GATE_V FAIL (PAC-05 blocking) — 2026-04-04
 severity: MINOR_FIX (single-line command correction)
 estimated_effort: < 10 minutes
 ---

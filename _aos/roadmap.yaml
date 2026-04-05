@@ -1,0 +1,92 @@
+# roadmap.yaml — TikTrack WP State Registry (Schema v1.1)
+# Active-state-forward: active programs from pipeline_state.json migrated.
+# Historical/COMPLETE WPs remain in agents_os_v3/pipeline_state.json (L2 SSoT).
+#
+# DUAL-PROFILE: L0 governance (_aos/) + L2 engine (agents_os_v2/ via pipeline_run.sh).
+# pipeline_run.sh is UNCHANGED — S004 scope. This _aos/ layer is ADDITIVE.
+
+project:
+  id: tiktrack
+  name: "TikTrack Phoenix"
+  profile: L2
+  lean_kit_version: "0.1.0+743dcb8"
+  created: "2026-04-05"
+  owner: tiktrack_sd
+  active_milestone: "S003"
+  notes: "Dual-profile: L0 governance (_aos/) + L2 engine (agents_os_v2/).
+          pipeline_run.sh unchanged (S004 scope).
+          109 historical pipeline runs in agents_os_v3/pipeline_state.json.
+          AOS engine snapshot: v0.1.0+ecf247c in agents_os_v3/."
+
+work_packages:
+  - id: "S003-P017-WP001"
+    label: "Lean Kit Foundation — agents-os repo init"
+    status: COMPLETE
+    track: A
+    current_lean_gate: L-GATE_V
+    lod_status: LOD500
+    assigned_builder: tiktrack_build
+    assigned_validator: tiktrack_val
+    created_at: "2026-04-02"
+    milestone_ref: "S003"
+    spec_ref: "_aos/work_packages/S003-P017-WP001/LOD200_spec.md"
+    gate_history:
+      - gate: L-GATE_V
+        result: PASS
+        date: "2026-04-04"
+        notes: "Migrated from pipeline_state. agents-os repo initialized."
+    notes: "Migrated from pipeline_state.json. Team 191 executed."
+
+  - id: "S003-P017-WP002"
+    label: "Lean Kit content — templates, gates, roles"
+    status: COMPLETE
+    track: A
+    current_lean_gate: L-GATE_V
+    lod_status: LOD500
+    assigned_builder: tiktrack_build
+    assigned_validator: tiktrack_val
+    created_at: "2026-04-02"
+    milestone_ref: "S003"
+    spec_ref: "_aos/work_packages/S003-P017-WP001/LOD200_spec.md"
+    gate_history:
+      - gate: L-GATE_V
+        result: PASS
+        date: "2026-04-04"
+        notes: "Migrated from pipeline_state. Team 170 populated lean-kit content."
+    notes: "Migrated from pipeline_state.json. Team 170 executed."
+
+  - id: "S003-P019-WP001"
+    label: "SFA Lean Kit onboarding — Phase 1 (overlay)"
+    status: COMPLETE
+    track: B
+    current_lean_gate: L-GATE_V
+    lod_status: LOD200
+    assigned_builder: tiktrack_build
+    assigned_validator: tiktrack_val
+    created_at: "2026-04-04"
+    milestone_ref: "S003"
+    spec_ref: "_aos/work_packages/S003-P017-WP001/LOD200_spec.md"
+    gate_history:
+      - gate: L-GATE_V
+        result: PASS
+        date: "2026-04-04"
+        notes: "Migrated. SFA overlay established in agents-os/projects/sfa/."
+    notes: "Migrated from pipeline_state.json."
+
+  - id: "AOS-V310-WP2"
+    label: "TikTrack _aos/ migration (this WP)"
+    status: IN_PROGRESS
+    track: A
+    current_lean_gate: L-GATE_B
+    lod_status: LOD400
+    assigned_builder: tiktrack_build
+    assigned_validator: tiktrack_val
+    created_at: "2026-04-05"
+    milestone_ref: "V310"
+    spec_ref: "_aos/work_packages/S003-P017-WP001/LOD200_spec.md"
+    gate_history:
+      - gate: L-GATE_E
+        result: PASS
+        date: "2026-04-05"
+        notes: "WP-1 complete. TikTrack migration eligible."
+    notes: "AOS v3.1.0 Phase 1. Creates _aos/ governance layer. Additive — does not change engine."

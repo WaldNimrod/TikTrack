@@ -1,0 +1,48 @@
+# team_assignments.yaml — TikTrack Team Registry (Schema v1.1)
+# L2 dual-profile: _aos/ governance + agents_os_v2 engine (until S004)
+# Slug regex: ^[a-z][a-z0-9]*_[a-z]+$
+
+project_id: tiktrack
+lean_kit_version: "0.1.0+743dcb8"
+
+teams:
+  - id: tiktrack_sd
+    role_type: system_designer
+    engine: human
+    name: "Nimrod"
+    skills:
+      - domain_knowledge
+      - decision_authority
+      - route_and_escalate
+    notes: "System Designer. Single human operator."
+
+  - id: tiktrack_arch
+    role_type: architecture_agent
+    engine: claude-code
+    name: "Team 100 — Chief System Architect"
+    skills:
+      - lod_spec_authoring
+      - iron_rule_knowledge
+      - mandate_issuance
+    notes: "Writes LOD200/LOD400. Global Team 100."
+
+  - id: tiktrack_build
+    role_type: builder_agent
+    engine: cursor-composer
+    name: "TikTrack Builder"
+    skills:
+      - lod400_execution
+      - lod500_authoring
+    notes: "Implements WPs. Engine MUST differ from validator."
+
+  - id: tiktrack_val
+    role_type: validator_agent
+    engine: openai
+    name: "Team 190 — Constitutional Validator"
+    skills:
+      - independent_review
+      - test_execution
+      - finding_classification
+    notes: "Cross-engine validator at L-GATE_V. IRON RULE: engine != builder."
+
+cross_engine_validator: tiktrack_val

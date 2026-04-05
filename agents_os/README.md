@@ -1,5 +1,7 @@
 # agents_os
 
+> **ARCHIVED** — v1 Foundation. Superseded by `agents_os_v3/` (engine) and `_aos/` (governance).
+
 ## Documentation
 
 → **Full documentation: [documentation/docs-agents-os/00_AGENTS_OS_MASTER_INDEX.md](../documentation/docs-agents-os/00_AGENTS_OS_MASTER_INDEX.md)**

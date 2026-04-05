@@ -13,5 +13,5 @@
 
 ## Iron Rules
 1. Your engine (cursor-composer) MUST differ from validator engine (openai)
-2. Run `bash _aos/lean-kit/scripts/validate_aos.sh .` before L-GATE_B
+2. Run `bash _aos/lean-kit/modules/validation-quality/scripts/validate_aos.sh .` before L-GATE_B
 3. DO NOT modify pipeline_run.sh, agents_os_v3/, or agents_os_v2/

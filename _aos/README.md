@@ -36,6 +36,6 @@ These layers are independent. `_aos/` does NOT change engine behavior.
 
 ## Quick Reference
 
-- **Validate:** `bash _aos/lean-kit/scripts/validate_aos.sh .`
+- **Validate:** `bash _aos/lean-kit/modules/validation-quality/scripts/validate_aos.sh .`
 - **Active WP:** Check `roadmap.yaml` → `status: IN_PROGRESS`
 - **Start session:** Read `context/ACTIVATION_[ROLE].md`

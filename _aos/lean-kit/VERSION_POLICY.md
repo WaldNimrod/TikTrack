@@ -56,3 +56,15 @@ aos_engine_version: "v0.1.0+ecf247c"   # engine snapshot version (from SNAPSHOT_
 ```
 
 **No standalone `AOS_ENGINE_VERSION` file.** All provenance is in metadata.yaml (RFI-005).
+
+## Rule 6 — Profile composition (v3.1.1)
+
+Profiles define MINIMUM required modules. See `lean-kit/profiles/` for canonical definitions.
+
+| Profile | CORE modules | Required additions | Optional |
+|---------|-------------|-------------------|----------|
+| **L0** | 01, 03, 04 | — | 02, 05-09, 11 |
+| **L2** | 01, 03, 04 | 02, 05, 06, 07, 08 | 09, 11 |
+| **L3** | 01, 03, 04 | 02, 05, 06, 07, 08, 09, 10 | 11 |
+
+Module 11 (Standards & Conventions) is always optional — activated per-standard per-project.

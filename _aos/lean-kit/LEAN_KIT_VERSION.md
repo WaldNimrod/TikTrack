@@ -1,8 +1,8 @@
 # Lean Kit Version
 
-**version:** 0.1.0
+**version:** 3.1.0
 **date:** 2026-04-05
-**status:** POPULATED — all core components present, pre-v3.1.0
+**status:** RELEASED — AOS v3.1.0 Hub-and-Spoke, In-Repo Governance
 
 ## Contents status
 
@@ -20,6 +20,7 @@
 |---------|------|--------|
 | 0.1.0-scaffold | 2026-04-02 | Initial repository scaffold (directories created) |
 | 0.1.0 | 2026-04-05 | All components populated (Team 170 WP002). Scaffold label removed. Status corrected from EMPTY. |
+| 3.1.0 | 2026-04-05 | AOS v3.1.0 RELEASED. Hub-and-Spoke governance deployed across 4 projects. Schema v1.1, validate_aos.sh (9 checks), 6 role types, VERSION_POLICY. |
 
 ## Snapshot model
 

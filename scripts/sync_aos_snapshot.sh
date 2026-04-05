@@ -99,7 +99,7 @@ if [[ "$DRY_RUN" -eq 1 ]]; then
   else
     echo "sync_aos_snapshot.sh: dry-run — (no --version; SNAPSHOT_VERSION would not be written in full sync)"
   fi
-  rsync -av --delete --dry-run --exclude='.git' "${CORE_SRC}/" "${DEST}/"
+  rsync -av --delete --dry-run --exclude='.git' --exclude='pipeline_state.json' "${CORE_SRC}/" "${DEST}/"
   exit 0
 fi
 
@@ -109,7 +109,7 @@ RSYNC_LOG="$(mktemp)"
 trap 'rm -f "$RSYNC_LOG"' EXIT
 
 set +e
-rsync -av --delete --stats --exclude='.git' "${CORE_SRC}/" "${DEST}/" >"$RSYNC_LOG" 2>&1
+rsync -av --delete --stats --exclude='.git' --exclude='pipeline_state.json' "${CORE_SRC}/" "${DEST}/" >"$RSYNC_LOG" 2>&1
 RSYNC_STATUS=$?
 set -e
 if [[ "$RSYNC_STATUS" -ne 0 ]]; then

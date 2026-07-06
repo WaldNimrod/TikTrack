@@ -178,22 +178,28 @@ TikTrack Phoenix is a full-stack stock/portfolio tracking web app:
 
 - **Backend**: Python FastAPI on port 8082 (`api/` directory, uses `api/venv` virtualenv)
 - **Frontend**: React 18 + Vite on port 8080 (`ui/` directory, npm)
-- **Database**: PostgreSQL 16 in Docker container `tiktrack-postgres-dev` on port 5432
+- **Database**: PostgreSQL 16 on port 5432. On the **Cursor Cloud VM** this is a local `apt` cluster (Docker is not installed here), not the `tiktrack-postgres-dev` Docker container the local dev scripts assume. DB `tiktrack`, credentials `postgres` / `postgres`.
 - **Tests**: Selenium/Mocha in `tests/` (npm), Python test suites via `make test-suite-*`
 
 ### Starting Services
 
-1. **Docker + PostgreSQL**: `sudo dockerd &` then `sudo docker start tiktrack-postgres-dev`
-2. **Backend**: From workspace root: `source api/venv/bin/activate && PYTHONPATH="/workspace/api:/workspace" uvicorn api.main:app --reload --host 0.0.0.0 --port 8082`
+1. **PostgreSQL (Cursor Cloud VM)**: The cluster is not auto-started on boot (no systemd). Start it with `sudo pg_ctlcluster 16 main start`. The `tiktrack` DB (schema + `TikTrackAdmin` QA user) is persisted in the VM snapshot; verify with `PGPASSWORD=postgres psql -h localhost -U postgres -d tiktrack -c "\dt user_data.*"`. Note: `scripts/init-full-env.sh` / `init-servers-for-qa.sh` reference the Docker container and will skip/fail here — start Postgres and the servers manually. To rebuild the DB from scratch, see **Database Setup Gotchas** below.
+2. **Backend**: From workspace root: `source api/venv/bin/activate && PYTHONPATH="/workspace/api:/workspace" uvicorn api.main:app --reload --host 0.0.0.0 --port 8082` (or `bash scripts/start-backend.sh`). `--reload` is fine for interactive dev.
 3. **Frontend**: From `ui/`: `npm run dev`
 4. **Health check**: `curl http://localhost:8082/health` should return `{"status":"ok"}`
 5. **AOS v3 (BUILD track):** From workspace root: `bash scripts/bootstrap_aos_v3_local.sh` or `bash scripts/start-aos-v3-server.sh` after DB init. Health: `curl -s http://127.0.0.1:8090/api/health` → `{"status":"ok"}`. VS Code / Cursor: **Tasks** include Init AOS v3 DB, Start/Stop/Restart AOS v3 API, Bootstrap.
 
 ### Database Setup Gotchas
 
-- The full DDL at `documentation/docs-system/02-SERVER/PHX_DB_SCHEMA_V2.5_FULL_DDL.sql` has ordering issues and partial unique constraint syntax errors. It cannot be applied cleanly in one pass. Several tables must be created manually after the initial DDL run (tickers, trading_accounts, trades, alerts, user_tickers, exchange_rates, ticker_prices, etc.).
-- Two extra tables not in the DDL are required by the ORM models: `user_data.user_refresh_tokens` and `user_data.revoked_tokens` (defined in `api/models/tokens.py`).
-- The `DATABASE_URL` in `api/.env` must use `postgresql://` (not `postgresql+asyncpg://`); the code adds the `+asyncpg` prefix automatically in `api/core/database.py`.
+- Neither `PHX_DB_SCHEMA_V2.5_FULL_DDL.sql` nor `V2.6_FULL_DDL.sql` applies cleanly (trailing commas before `)`, non-immutable generated columns, partitioned-table unique constraints). **Do not rely on the DDL.** The dev DB is instead built directly from the SQLAlchemy ORM models.
+- **Rebuild the DB from scratch** (only needed if the snapshot DB is wiped), from repo root with the backend venv active:
+  1. `sudo -u postgres psql -c "DROP DATABASE IF EXISTS tiktrack;" && sudo -u postgres createdb tiktrack`
+  2. `PGPASSWORD=postgres psql -h localhost -U postgres -d tiktrack -v ON_ERROR_STOP=1 -f scripts/dev_bootstrap_schema.sql` (extensions, `user_data`/`market_data`/`admin_data` schemas, ENUM types, and the model-less `market_data.external_data_providers` table)
+  3. `PYTHONPATH="$PWD/api:$PWD" python3 scripts/dev_build_schema_from_orm.py` (create_all for all 25 tables; skips broken partial indexes, keeps PK/UNIQUE)
+  4. `PGPASSWORD=postgres psql -h localhost -U postgres -d tiktrack -f scripts/migrations/g7_M005_job_run_log.sql -f scripts/migrations/g7_M005b_job_run_log_extended.sql` (creates `admin_data.job_run_log`, required by the APScheduler background jobs — without it the backend logs `UndefinedTableError` every 15 min)
+  5. `python3 scripts/seed_qa_test_user.py` (creates `TikTrackAdmin` / `4181`)
+- The ORM `__init__.py` only imports a subset of models; `scripts/dev_build_schema_from_orm.py` imports all `__tablename__` modules so notes/alerts/notifications/feature_flags tables are also created.
+- The `DATABASE_URL` in `api/.env` must use `postgresql://` (not `postgresql+asyncpg://`); the code adds the `+asyncpg` prefix automatically in `api/core/database.py`. `api/.env` is git-ignored and persisted in the VM snapshot.
 
 ### Auth & Admin
 

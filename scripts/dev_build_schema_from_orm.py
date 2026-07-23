@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
-"""dev_build_schema_from_orm.py — Cursor Cloud / local dev helper.
+"""dev_build_schema_from_orm.py — Cursor Cloud dev bootstrap helper (NOT canonical).
 
-Builds the TikTrack dev database schema directly from the SQLAlchemy ORM models
-via ``Base.metadata.create_all``. This is used instead of the canonical full DDL
-(``documentation/docs-system/02-SERVER/PHX_DB_SCHEMA_V2.6_FULL_DDL.sql``) because
-that DDL does not apply cleanly (trailing commas, non-immutable generated
-columns, partitioned-table unique constraints).
+Builds a *functional* TikTrack dev database schema directly from the SQLAlchemy
+ORM models via ``Base.metadata.create_all``.
+
+IMPORTANT — this is a pragmatic Cursor-Cloud-dev convenience, not the canonical
+provisioning path. In local/staging/production the schema is applied by an
+operator running ``scripts/migrations/*.sql`` with ``psql`` (see
+``scripts/migrations/README.md``). The app itself never calls ``create_all``,
+and the ORM ``server_default``/``postgresql_where`` values are inert metadata
+that only affect this ``create_all`` path (the hand-written migration SQL is
+correct). This script is used only because the Cloud VM needs a from-scratch DB
+and there is no single clean full DDL / migration runner in the repo.
 
 Prerequisites:
   1. PostgreSQL running and an empty ``tiktrack`` database created.

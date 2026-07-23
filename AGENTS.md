@@ -191,11 +191,12 @@ TikTrack Phoenix is a full-stack stock/portfolio tracking web app:
 
 ### Database Setup Gotchas
 
-- Neither `PHX_DB_SCHEMA_V2.5_FULL_DDL.sql` nor `V2.6_FULL_DDL.sql` applies cleanly (trailing commas before `)`, non-immutable generated columns, partitioned-table unique constraints). **Do not rely on the DDL.** The dev DB is instead built directly from the SQLAlchemy ORM models.
-- **Rebuild the DB from scratch** (only needed if the snapshot DB is wiped), from repo root with the backend venv active:
+- **Canonical provisioning (local / staging / production):** the schema is applied by an **operator** running the SQL files in `scripts/migrations/*.sql` with `psql` (see `scripts/migrations/README.md`). The app **never** builds the schema — `Base.metadata.create_all` is not called anywhere in `api/`, and CI runs `pytest` with a dummy `DATABASE_URL` (`.github/workflows/ci.yml`). So the ORM `server_default`/`postgresql_where` values are inert metadata that do **not** affect the running app, CI, or the operator path; the hand-written migration SQL (e.g. `DEFAULT '{}'::JSONB`, `WHERE deleted_at IS NULL`) is correct.
+- **Cloud-dev bootstrap (this VM only):** because there is no single clean from-scratch DDL and no migration runner, the Cloud dev DB is bootstrapped from the ORM as a **pragmatic convenience** via `scripts/dev_build_schema_from_orm.py` (which applies runtime-only shims for the inert `create_all` quirks above and skips standalone indexes). This is **not** the canonical path and is not representative of staging fidelity (e.g. it omits some partial indexes). Prefer applying the `scripts/migrations/*.sql` files when you need staging-accurate schema.
+- **Rebuild the Cloud-dev DB from scratch** (only needed if the snapshot DB is wiped), from repo root with the backend venv active:
   1. `sudo -u postgres psql -c "DROP DATABASE IF EXISTS tiktrack;" && sudo -u postgres createdb tiktrack`
   2. `PGPASSWORD=postgres psql -h localhost -U postgres -d tiktrack -v ON_ERROR_STOP=1 -f scripts/dev_bootstrap_schema.sql` (extensions, `user_data`/`market_data`/`admin_data` schemas, ENUM types, and the model-less `market_data.external_data_providers` table)
-  3. `PYTHONPATH="$PWD/api:$PWD" python3 scripts/dev_build_schema_from_orm.py` (create_all for all 25 tables; skips broken partial indexes, keeps PK/UNIQUE)
+  3. `PYTHONPATH="$PWD/api:$PWD" python3 scripts/dev_build_schema_from_orm.py` (create_all for all 25 tables; skips standalone indexes — a `create_all`-only rendering quirk, not a repo bug — keeps PK/UNIQUE)
   4. `PGPASSWORD=postgres psql -h localhost -U postgres -d tiktrack -f scripts/migrations/g7_M005_job_run_log.sql -f scripts/migrations/g7_M005b_job_run_log_extended.sql` (creates `admin_data.job_run_log`, required by the APScheduler background jobs — without it the backend logs `UndefinedTableError` every 15 min)
   5. `python3 scripts/seed_qa_test_user.py` (creates `TikTrackAdmin` / `4181`)
 - The ORM `__init__.py` only imports a subset of models; `scripts/dev_build_schema_from_orm.py` imports all `__tablename__` modules so notes/alerts/notifications/feature_flags tables are also created.

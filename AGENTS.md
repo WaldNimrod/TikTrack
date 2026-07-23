@@ -199,7 +199,8 @@ TikTrack Phoenix is a full-stack stock/portfolio tracking web app:
   4. `PGPASSWORD=postgres psql -h localhost -U postgres -d tiktrack -f scripts/migrations/g7_M005_job_run_log.sql -f scripts/migrations/g7_M005b_job_run_log_extended.sql` (creates `admin_data.job_run_log`, required by the APScheduler background jobs — without it the backend logs `UndefinedTableError` every 15 min)
   5. `python3 scripts/seed_qa_test_user.py` (creates `TikTrackAdmin` / `4181`)
 - The ORM `__init__.py` only imports a subset of models; `scripts/dev_build_schema_from_orm.py` imports all `__tablename__` modules so notes/alerts/notifications/feature_flags tables are also created.
-- The `DATABASE_URL` in `api/.env` must use `postgresql://` (not `postgresql+asyncpg://`); the code adds the `+asyncpg` prefix automatically in `api/core/database.py`. `api/.env` is git-ignored and persisted in the VM snapshot.
+- The `DATABASE_URL` in `api/.env` must use `postgresql://` (not `postgresql+asyncpg://`); the code adds the `+asyncpg` prefix automatically in `api/core/database.py`.
+- **Session-reset model (important):** on the Cursor Cloud VM, `/workspace` is reset to the git tree at the start of each session, so git-ignored/untracked files — `api/.env`, `api/venv`, `ui/node_modules` — do **not** survive between sessions. Only the PostgreSQL data dir (`/var/lib/postgresql`, a system path) persists via the snapshot, so the `tiktrack` DB schema + seeded user carry over. The startup update script recreates `api/venv` + `ui/node_modules` and runs `scripts/dev_ensure_env.sh`, which regenerates `api/.env` (local-dev defaults) only when missing. If you need a specific `JWT_SECRET_KEY`/`ENCRYPTION_KEY` (e.g. to decrypt data written in a prior session), set it explicitly rather than relying on the regenerated one.
 
 ### Auth & Admin
 
